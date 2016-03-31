@@ -20,21 +20,121 @@ Function LoadImage_Strict(file$)
 	Return tmp
 End Function
 
-Function LoadSound_Strict(file$)
+;Function LoadSound_Strict(file$)
+;	
+;	If FileType(file$)<>1 Then 
+;		CreateConsoleMsg("Sound " + file$ + " not found.")
+;		ConsoleInput = ""
+;		ConsoleOpen = True
+;		Return 0
+;	EndIf
+;   tmp = LoadSound(file$)
+;	If tmp = 0 Then 
+;		CreateConsoleMsg("Failed to load Sound:" + file$)
+;		ConsoleInput = ""
+;		ConsoleOpen = True
+;	EndIf
+;	Return tmp
+;End Function
+
+Type Sound
+	Field internalHandle%
+	Field name$
+	Field channels%[32]
+	Field releaseTime%
+End Type
+
+Function AutoReleaseSounds()
+	Local snd.Sound
+	For snd.Sound = Each Sound
+		Local tryRelease% = True
+		For i=0 To 31
+			If snd\channels[i]<>0 Then
+				If ChannelPlaying(snd\channels[i]) Then
+					tryRelease = False
+					snd\releaseTime = MilliSecs()+5000
+					Exit
+				EndIf
+			EndIf
+		Next
+		If tryRelease Then
+			If snd\releaseTime<MilliSecs() Then
+				If snd\internalHandle<>0 Then
+					FreeSound snd\internalHandle
+					snd\internalHandle = 0
+				EndIf
+			EndIf
+		EndIf
+	Next
+End Function
+
+Function PlaySound_Strict%(sndHandle%)
+	Local snd.Sound = Object.Sound(sndHandle)
+	If snd<>Null Then
+		Local shouldPlay% = True
+		For i=0 To 31
+			If snd\channels[i]<>0 Then
+				If Not ChannelPlaying(snd\channels[i]) Then
+					If snd\internalHandle=0 Then
+						If FileType(snd\name)<>1 Then
+							CreateConsoleMsg("Sound "+snd\name+" not found.")
+							;ConsoleOpen = True
+						Else
+							snd\internalHandle = LoadSound(snd\name)
+						EndIf
+						If snd\internalHandle = 0 Then
+							CreateConsoleMsg("Failed to load Sound: "+snd\name)
+							;ConsoleOpen = True
+						EndIf
+					EndIf
+					snd\channels[i]=PlaySound(snd\internalHandle)
+					;ChannelVolume snd\channels[i],SFXVolume#
+					snd\releaseTime = MilliSecs()+5000 ;release after 5 seconds
+					Return snd\channels[i]
+				EndIf
+			Else
+				If snd\internalHandle=0 Then
+					If FileType(snd\name)<>1 Then
+						CreateConsoleMsg("Sound "+snd\name+" not found.")
+						;ConsoleOpen = True
+					Else
+						snd\internalHandle = LoadSound(snd\name)
+					EndIf
+						
+					If snd\internalHandle = 0 Then
+						CreateConsoleMsg("Failed to load Sound: "+snd\name)
+						;ConsoleOpen = True
+					EndIf
+				EndIf
+				snd\channels[i]=PlaySound(snd\internalHandle)
+				;ChannelVolume snd\channels[i],SFXVolume#
+				snd\releaseTime = MilliSecs()+5000 ;release after 5 seconds
+				Return snd\channels[i]
+			EndIf
+		Next
+	EndIf
 	
-	If FileType(file$)<>1 Then 
-		CreateConsoleMsg("Sound " + file$ + " not found.")
-		ConsoleInput = ""
-		ConsoleOpen = True
-		Return 0
+	Return 0
+End Function
+
+Function LoadSound_Strict(file$)
+	Local snd.Sound = New Sound
+	snd\name = file
+	snd\internalHandle = 0
+	snd\releaseTime = 0
+	
+	Return Handle(snd)
+End Function
+
+Function FreeSound_Strict(sndHandle%)
+	Local snd.Sound = Object.Sound(sndHandle)
+	If snd<>Null Then
+		If snd\internalHandle<>0 Then
+			FreeSound snd\internalHandle
+			snd\internalHandle = 0
+		EndIf
+		Delete snd
 	EndIf
-    tmp = LoadSound(file$)
-	If tmp = 0 Then 
-		CreateConsoleMsg("Failed to load Sound:" + file$)
-		ConsoleInput = ""
-		ConsoleOpen = True
-	EndIf
-	Return tmp
 End Function
 
 Function LoadMesh_Strict(File$,parent=0)

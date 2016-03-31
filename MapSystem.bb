@@ -744,6 +744,8 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 	EntityType hiddenMesh,HIT_MAP
 	FreeTexture blankTexture
 	
+	;AddMesh hiddenMesh,BigRoomMesh
+	
 	obj=CreatePivot()
 	CreatePivot(obj) ;skip "meshes" object
 	EntityParent Opaque,obj
@@ -1514,6 +1516,8 @@ Global SecondaryLightOn# = True
 Global RemoteDoorOn = True
 Global Contained106 = False, Disabled173 = False
 
+Const MaxRoomLights% = 20
+
 Type Rooms
 	Field zone%
 	
@@ -1551,6 +1555,15 @@ Type Rooms
 	
 	Field NonFreeAble%[10]
 	Field Textures%[10]
+	
+	;New Room Variables in SCP:CB 1.3 - ENDSHN
+	Field MaxLights% = 0
+	Field LightSpriteHidden%[MaxRoomLights]
+	Field LightSpritesPivot%[MaxRoomLights]
+	Field LightSprites2%[MaxRoomLights]
+	Field LightHidden%[MaxRoomLights]
+	Field AlarmRotor%[1]
+	Field AlarmRotorLight%[1]
 End Type 
 
 Const gridsz%=20
@@ -2061,6 +2074,11 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("Radio Transceiver", "radio", r\x + 800.0 * RoomScale, r\y + 112.0 * RoomScale, r\z + 944.0 * RoomScale)
 			it\state = 80.0
 			EntityParent(it\obj, r\obj)
+			
+			r\Objects[3] = LoadMesh_Strict("GFX\map\372_hb.b3d",r\obj)
+			EntityPickMode r\Objects[3],2
+			EntityType r\Objects[3],HIT_MAP
+			EntityAlpha r\Objects[3],0.0
 			;[End Block]
 		Case "room079"
 			;[Block]
@@ -3283,6 +3301,25 @@ Function FillRoom(r.Rooms)
 			TurnEntity(sc\ScrObj, 0, 90, 0)
 			EntityParent(sc\ScrObj, r\obj)
 			
+			r\Objects[2] = CreatePivot()
+			PositionEntity (r\Objects[2], EntityX(r\obj) + 40.0 * RoomScale, 460.0 * RoomScale, EntityZ(r\obj) + 1072.0 * RoomScale)
+			r\Objects[3] = CreatePivot()
+			PositionEntity (r\Objects[3], EntityX(r\obj) - 80.0 * RoomScale, 100.0 * RoomScale, EntityZ(r\obj) + 526.0 * RoomScale)
+			r\Objects[4] = CreatePivot()
+			PositionEntity (r\Objects[4], EntityX(r\obj) - 128.0 * RoomScale, 100.0 * RoomScale, EntityZ(r\obj) + 320.0 * RoomScale)
+			
+			r\Objects[5] = CreatePivot()
+			PositionEntity (r\Objects[5], EntityX(r\obj) + 660.0 * RoomScale, 100.0 * RoomScale, EntityZ(r\obj) + 526.0 * RoomScale)
+			r\Objects[6] = CreatePivot()
+			PositionEntity (r\Objects[6], EntityX(r\obj) + 700 * RoomScale, 100.0 * RoomScale, EntityZ(r\obj) + 320.0 * RoomScale)
+			
+			r\Objects[7] = CreatePivot()
+			PositionEntity (r\Objects[7], EntityX(r\obj) + 1472.0 * RoomScale, 100.0 * RoomScale, EntityZ(r\obj) + 912.0 * RoomScale)
+			
+			For i = 2 To 7
+				EntityParent(r\Objects[i], r\obj)
+			Next
+			
 			;[End Block]
 		Case "room2scps"
 			;[Block]
@@ -3663,6 +3700,9 @@ Function FillRoom(r.Rooms)
 			PositionEntity(sc\ScrObj, r\x - 2256 * RoomScale, 224.0 * RoomScale, r\z - 928.0 * RoomScale)
 			TurnEntity(sc\ScrObj, 0, 90, 0)
 			EntityParent(sc\ScrObj, r\obj)
+			
+			r\Objects[9] = LoadMesh_Strict("GFX\map\173_2.b3d",r\obj)
+			EntityType r\Objects[9],HIT_MAP
 			;[End Block]
 		Case "room2ccont"
 			;[Block]
@@ -4001,7 +4041,10 @@ Function FillRoom(r.Rooms)
 			ScaleEntity r\Objects[13],46.0*RoomScale,45.0*RoomScale,46.0*RoomScale,True
 			EntityParent r\Objects[13],r\obj	
 			
-			
+			r\Objects[14] = LoadMesh_Strict("GFX\map\1123_hb.b3d",r\obj)
+			EntityPickMode r\Objects[14],2
+			EntityType r\Objects[14],HIT_MAP
+			EntityAlpha r\Objects[14],0.0
 			;[End Block]
 		Case "room178"
 			;[Block]
@@ -4165,6 +4208,104 @@ Function FillRoom(r.Rooms)
 			FreeTexture t
 			FreeEntity hallway
 			;[End Block]
+		;New rooms (in SCP:CB 1.3) - ENDSHN
+		Case "room1lifts"
+			;[Block]
+			r\Objects[0] = CreateButton(r\x + 96.0*RoomScale, r\y + 160.0 * RoomScale, r\z + 64.0 * RoomScale, 0,0,0)
+			EntityParent (r\Objects[0],r\obj)
+			r\Objects[1] = CreateButton(r\x - 96.0*RoomScale, r\y + 160.0 * RoomScale, r\z + 64.0 * RoomScale, 0,0,0)
+			EntityParent (r\Objects[1],r\obj)
+			;[End Block]
+		Case "room2servers2"
+			;[Block]
+			d.Doors = CreateDoor(r\zone, r\x + 264.0 * RoomScale, 0.0, r\z + 672.0 * RoomScale, 270, r, False, False, 3)
+			PositionEntity(d\buttons[0], r\x + 224.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 880.0 * RoomScale, True)
+			PositionEntity(d\buttons[1], r\x + 304.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 840.0 * RoomScale, True)	
+			TurnEntity d\buttons[1],0,0,0,True
+			d.Doors = CreateDoor(r\zone, r\x -512.0 * RoomScale, -768.0*RoomScale, r\z -336.0 * RoomScale, 0, r, False, False, 3)
+			d.Doors = CreateDoor(r\zone, r\x -509.0 * RoomScale, -768.0*RoomScale, r\z -1037.0 * RoomScale, 0, r, False, False, 3)
+			d.Doors\locked = True
+			d.Doors\DisableWaypoint = True
+			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x + 56.0154 * RoomScale, r\y - 648.0 * RoomScale, r\z + 749.638 * RoomScale)
+			it\state = 20
+			RotateEntity it\obj, 0, r\angle+Rand(245), 0
+			EntityParent(it\obj, r\obj)
+			;[End Block]
+		Case "room2gw"
+		    ;[Block]
+            r\Objects[2] = CreatePivot(r\obj)
+			PositionEntity (r\Objects[2], r\x - 156.825*RoomScale, -37.3458*RoomScale, r\z+121.364*RoomScale, True)
+			
+			de.Decals = CreateDecal(3,  r\x - 156.825*RoomScale, -37.3458*RoomScale, r\z+121.364*RoomScale,90,Rnd(360),0)
+			de\Size = 0.5
+			ScaleSprite(de\obj, de\Size,de\Size)
+			EntityParent de\obj, r\obj
+			;[End Block]
+		Case "room3gw"
+	        ;[Block]
+			d = CreateDoor(r\zone, r\x - 728.0 * RoomScale, 0.0, r\z - 458.0 * RoomScale, 0, r, False, False, 3)
+			d\AutoClose = False	: d\open = False  : d\locked = False
+			
+			d = CreateDoor(r\zone, r\x - 223.0 * RoomScale, 0.0, r\z - 736.0 * RoomScale, -90, r, False, False, 3)
+			d\AutoClose = False	: d\open = False  : d\locked = False
+			
+			d = CreateDoor(r\zone, r\x - 459.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale, 90, r, False, False)
+			PositionEntity(d\buttons[0], r\x + 580.822 * RoomScale, EntityY(d\buttons[0],True), r\z - 606.679 * RoomScale, True)	
+            PositionEntity(d\buttons[1], r\x + 580.822 * RoomScale, EntityY(d\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			d\dir = 1 : d\AutoClose = False	: d\open = True  : d\locked = True	
+			
+			d = CreateDoor(r\zone, r\x + 385.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale, 270, r, False, False)
+			PositionEntity(d\buttons[0], r\x + 580.822 * RoomScale, EntityY(d\buttons[0],True), r\z - 606.679 * RoomScale, True)	
+            PositionEntity(d\buttons[1], r\x + 580.822 * RoomScale, EntityY(d\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			
+			d\dir = 2 : d\AutoClose = False	: d\open = True  : d\locked = True
+	        
+	        ;[End Block]
+		Case "room1162"
+			;[Block]
+			d = CreateDoor(r\zone, r\x + 248.0*RoomScale, 0.0, r\z - 736.0*RoomScale, 90, r, False, False, 2)
+			r\Objects[0] = CreatePivot()
+			PositionEntity r\Objects[0],r\x+1012.0*RoomScale,r\y+128.0*RoomScale,r\z-640.0*RoomScale
+			EntityParent r\Objects[0],r\obj
+			EntityPickMode r\Objects[0],1
+			it = CreateItem("Document SCP-1162", "paper", r\x + 863.227 * RoomScale, r\y + 152.0 * RoomScale, r\z - 953.231 * RoomScale)
+			EntityParent(it\obj, r\obj)
+			;[End Block]
+		Case "room2scps2"
+			;[Block]
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 288.0*RoomScale, r\y, r\z + 576.0*RoomScale, 90, r, False, False, 3)
+			r\RoomDoors[0]\open = False : r\RoomDoors[0]\locked = True
+			d = CreateDoor(r\zone, r\x + 776.0*RoomScale, r\y, r\z + 736.0*RoomScale, 90, r, False, False)
+			d = CreateDoor(r\zone, r\x + 776.0*RoomScale, r\y, r\z + 288.0*RoomScale, 90, r, False, False)
+			d = CreateDoor(r\zone, r\x + 558.0*RoomScale, r\y, r\z + 8.0*RoomScale, 0, r, False, False)
+			r\Objects[0] = CreatePivot()
+			PositionEntity r\Objects[0],r\x + 576.0*RoomScale,r\y+160.0*RoomScale,r\z+632.0*RoomScale
+			EntityParent r\Objects[0],r\obj
+			it = CreateItem("SCP-198", "scp198", r\x + 1152.0 * RoomScale, r\y + 64.0 * RoomScale, r\z - 64.0 * RoomScale)
+			RotateEntity it\obj, 0, r\angle+Rand(180), 0
+			EntityParent(it\obj, r\obj)
+			it = CreateItem("SCP-1499", "scp1499", r\x + 600.0 * RoomScale, r\y + 192.0 * RoomScale, r\z - 512.0 * RoomScale)
+			RotateEntity it\obj, 0, r\angle, 0
+			EntityParent(it\obj, r\obj)
+			it = CreateItem("Document SCP-109", "paper", r\x + 864.0 * RoomScale, r\y + 192.0 * RoomScale, r\z + 584.0 * RoomScale)
+			EntityParent(it\obj, r\obj)
+			it = CreateItem("Level 2 Key Card", "key2", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
+			EntityParent(it\obj, r\obj)
+			;it = CreateItem("SCP-109","scp109", x, y, z)
+			;EntityParent(it\obj, r\obj)
+			;[End Block]
+		Case "room3offices"
+			;[Block]			
+			d.Doors = CreateDoor(r\zone, r\x + 736.0 * RoomScale, 0.0, r\z + 240.0 * RoomScale, 0, r, False, False, 3)
+			PositionEntity(d\buttons[0], r\x + 892.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 224.0 * RoomScale, True)
+			PositionEntity(d\buttons[1], r\x + 892.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 255.0 * RoomScale, True)
+			FreeEntity d\obj2 : d\obj2 = 0
+			;[End Block]
+		Case "room2offices4"
+			;[Block]
+			d.Doors = CreateDoor(0, r\x - 240.0 * RoomScale, 0.0, r\z, 90, r, False)
+			d\open = False : d\AutoClose = False 
+			;[End Block]
 	End Select
 	
 	For lt.lighttemplates = Each LightTemplates
@@ -4290,7 +4431,7 @@ Function UpdateRooms()
 					dist = EntityDistance(Collider,r\Lights[i])
 					If dist < HideDistance Then
 						TempLightVolume = TempLightVolume + r\LightIntensity[i]*r\LightIntensity[i]*((HideDistance-dist)/HideDistance)
-						ShowEntity(r\Lights[i]) 						
+						;ShowEntity(r\Lights[i]) 						
 					EndIf
 				Else
 					Exit
@@ -4341,8 +4482,10 @@ End Function
 
 Global LightVolume#, TempLightVolume#
 Function AddLight%(room.Rooms, x#, y#, z#, ltype%, range#, r%, g%, b%)
+	Local i
+	
 	If room<>Null Then
-		For i = 0 To 19
+		For i = 0 To MaxRoomLights-1
 			If room\Lights[i]=0 Then
 				room\Lights[i] = CreateLight(ltype)
 				;room\LightDist[i] = range
@@ -4360,6 +4503,29 @@ Function AddLight%(room.Rooms, x#, y#, z#, ltype%, range#, r%, g%, b%)
 				EntityBlend (room\LightSprites[i], 3)
 				
 				EntityParent(room\LightSprites[i], room\obj)
+				
+				room\LightSpritesPivot[i] = CreatePivot()
+				EntityRadius room\LightSpritesPivot[i],0.05
+				PositionEntity(room\LightSpritesPivot[i], x, y, z)
+				EntityParent(room\LightSpritesPivot[i], room\obj)
+				
+				room\LightSprites2[i] = CreateSprite()
+				PositionEntity(room\LightSprites2[i], x, y, z)
+				ScaleSprite(room\LightSprites2[i], 0.6, 0.6)
+				EntityTexture(room\LightSprites2[i], LightSpriteTex(2))
+				EntityBlend(room\LightSprites2[i], 3)
+				EntityOrder(room\LightSprites2[i], -1)
+				EntityColor(room\LightSprites2[i], r%, g%, b%)
+				EntityParent(room\LightSprites2[i], room\obj)
+				EntityFX(room\LightSprites2[i],1)
+				RotateEntity(room\LightSprites2[i],0,0,Rand(360))
+				SpriteViewMode(room\LightSprites2[i],1)
+				room\LightSpriteHidden%[i] = True
+				HideEntity room\LightSprites2[i]
+				
+				HideEntity room\Lights[i]
+				
+				room\MaxLights% = room\MaxLights% + 1
 				
 				Return room\Lights[i]
 			EndIf
@@ -4872,7 +5038,7 @@ Function UpdateScreens()
 						MaskImage s\img, 255,0,255
 						ResizeImage(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
 						
-						PlaySound ButtonSFX
+						PlaySound_Strict ButtonSFX
 						MouseUp1=False
 					EndIf
 				EndIf
@@ -5110,12 +5276,12 @@ Function UpdateSecurityCams()
 									If Rand(3) = 1 Then EntityTexture(sc\ScrOverlay, MonitorTexture)
 									If Rand(6) < 5 Then
 										EntityTexture(sc\ScrOverlay, GorePics(Rand(0, 5)))
-										If sc\PlayerState = 1 Then PlaySound(HorrorSFX(1))
+										If sc\PlayerState = 1 Then PlaySound_Strict(HorrorSFX(1))
 										sc\PlayerState = 2
 										If sc\soundCHN = 0 Then
-											sc\soundCHN = PlaySound(HorrorSFX(4))
+											sc\soundCHN = PlaySound_Strict(HorrorSFX(4))
 										Else
-											If Not ChannelPlaying(sc\soundCHN) Then sc\soundCHN = PlaySound(HorrorSFX(4))
+											If Not ChannelPlaying(sc\soundCHN) Then sc\soundCHN = PlaySound_Strict(HorrorSFX(4))
 										End If
 										If sc\CoffinEffect=3 And Rand(200)=1 Then sc\CoffinEffect=2 : sc\PlayerState = Rand(10000, 20000)
 									End If	
@@ -5124,7 +5290,7 @@ Function UpdateSecurityCams()
 									If Rand(7) = 1 Then EntityTexture(sc\ScrOverlay, MonitorTexture)
 									If Rand(50) = 1 Then
 										EntityTexture(sc\ScrOverlay, GorePics(Rand(0, 5)))
-										If sc\PlayerState = 0 Then PlaySound(HorrorSFX(0))
+										If sc\PlayerState = 0 Then PlaySound_Strict(HorrorSFX(0))
 										sc\PlayerState = Max(sc\PlayerState, 1)
 										If sc\CoffinEffect=3 And Rand(100)=1 Then sc\CoffinEffect=2 : sc\PlayerState = Rand(10000, 20000)
 									End If
@@ -5148,10 +5314,10 @@ Function UpdateSecurityCams()
 							EntityTexture(sc\ScrOverlay, MonitorTexture)
 						Else
 							If sc\soundCHN = 0 Then
-								sc\soundCHN = PlaySound(LoadTempSound("SFX\079_"+Rand(4,6)+".ogg"))
+								sc\soundCHN = PlaySound_Strict(LoadTempSound("SFX\079_"+Rand(4,6)+".ogg"))
 								If sc\CoffinEffect=2 Then sc\CoffinEffect=3 : sc\PlayerState = 0
 							ElseIf (Not ChannelPlaying(sc\soundCHN))
-								sc\soundCHN = PlaySound(LoadTempSound("SFX\079_"+Rand(4,6)+".ogg"))
+								sc\soundCHN = PlaySound_Strict(LoadTempSound("SFX\079_"+Rand(4,6)+".ogg"))
 								If sc\CoffinEffect=2 Then sc\CoffinEffect=3 : sc\PlayerState = 0
 							EndIf
 							EntityTexture(sc\ScrOverlay, OldAiPics(0))
@@ -5268,7 +5434,7 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 		If (ClosestButton = door1\buttons[0] Or ClosestButton = door1\buttons[1]) And MouseHit1 Then
 			UseDoor(door2,False)
 		EndIf
-	ElseIf Abs(door1\OpenState-door2\OpenState)<0.2 Then
+	ElseIf Abs(door1\openstate-door2\openstate)<0.2 Then
 		door1\IsElevatorDoor = 2
 		door2\IsElevatorDoor = 2
 	EndIf
@@ -5288,9 +5454,9 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 						inside = True
 						
 						If event\SoundCHN = 0 Then
-							event\SoundCHN = PlaySound(ElevatorMoveSFX)
+							event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
 						Else
-							If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound(ElevatorMoveSFX)
+							If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
 						EndIf
 						
 						CameraShake = Sin(Abs(State)/3.0)*0.3
@@ -5327,9 +5493,9 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 						inside = True
 						
 						If event\SoundCHN = 0 Then
-							event\SoundCHN = PlaySound(ElevatorMoveSFX)
+							event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
 						Else
-							If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound(ElevatorMoveSFX)
+							If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
 						EndIf
 						
 						CameraShake = Sin(Abs(State)/3.0)*0.3
@@ -5403,9 +5569,9 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 						inside = True
 						
 						If event\SoundCHN = 0 Then
-							event\SoundCHN = PlaySound(ElevatorMoveSFX)
+							event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
 						Else
-							If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound(ElevatorMoveSFX)
+							If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
 						EndIf
 						
 						CameraShake = Sin(Abs(State)/3.0)*0.3
@@ -5448,7 +5614,7 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 				EndIf
 				
 				PlaySound2(ElevatorBeepSFX, Camera, room1, 4.0)	
-				;PlaySound(ElevatorBeepSFX)	
+				;PlaySound_Strict(ElevatorBeepSFX)	
 			EndIf
 		Else ;alhaalta ylös
 			State = State + FPSfactor
@@ -5459,9 +5625,9 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 						inside = True
 						
 						If event\SoundCHN = 0 Then
-							event\SoundCHN = PlaySound(ElevatorMoveSFX)
+							event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
 						Else
-							If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound(ElevatorMoveSFX)
+							If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
 						EndIf
 						
 						CameraShake = Sin(Abs(State)/3.0)*0.3
@@ -5904,8 +6070,12 @@ Function CreateMap()
 	SetRoom("room1123",ROOM2,Floor(0.7*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2elevator",ROOM2,Floor(0.85*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2test1074",ROOM2,Floor(0.95*Float(Room2Amount[0])),min_pos,max_pos)
+	SetRoom("room2scps2",ROOM2,Floor(0.6*Float(Room2Amount[0])),min_pos,max_pos)
+	SetRoom("room2gw", ROOM2, Floor(0.4*Float(Room2Amount[0])),min_pos,max_pos)
 	
 	MapRoom(ROOM3, Floor(Rnd(0.2,0.8)*Float(Room3Amount[0]))) = "room3storage"
+	
+	MapRoom(ROOM2C, Floor(0.5*Float(Room2CAmount[0]))) = "room1162"
 	
 	;zone 2 --------------------------------------------------------------------------------------------------
 	
@@ -5934,7 +6104,8 @@ Function CreateMap()
 	;zone 3  --------------------------------------------------------------------------------------------------
 	
 	MapRoom(ROOM1, Room1Amount[0]+Room1Amount[1]+Room1Amount[2]-2) = "exit1"
-	MapRoom(ROOM1, Room1Amount[0]+Room1Amount[1]+Room1Amount[2]-1) = "gateaentrance"	
+	MapRoom(ROOM1, Room1Amount[0]+Room1Amount[1]+Room1Amount[2]-1) = "gateaentrance"
+	MapRoom(ROOM1, Room1Amount[0]+Room1Amount[1]) = "room1lifts"
 	
 	min_pos = Room2Amount[0]+Room2Amount[1]
 	max_pos = Room2Amount[0]+Room2Amount[1]+Room2Amount[2]-1		
@@ -5946,12 +6117,16 @@ Function CreateMap()
 	SetRoom("room860", ROOM2, min_pos+Floor(0.6*Room2Amount[2]),min_pos,max_pos)
 	SetRoom("room2poffices2", ROOM2, min_pos+Floor(0.8*Room2Amount[2]),min_pos,max_pos)
 	SetRoom("room2offices2", ROOM2, min_pos+Floor(0.9*Float(Room2Amount[2])),min_pos,max_pos)
+	SetRoom("room2servers2", ROOM2, min_pos+Floor(0.4*Room2Amount[2]),min_pos,max_pos)
+	SetRoom("room2offices4", ROOM2, min_pos+Floor(0.5*Room2Amount[2]),min_pos,max_pos)
 	
 	MapRoom(ROOM2C, Room2CAmount[0]+Room2CAmount[1]) = "room2ccont"	
 	MapRoom(ROOM2C, Room2CAmount[0]+Room2CAmount[1]+1) = "lockroom2"		
 	
 	MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]+Floor(0.3*Float(Room3Amount[2]))) = "room3servers"
 	MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]+Floor(0.7*Float(Room3Amount[2]))) = "room3servers2"
+	MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]) = "room3gw"
+	MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]+Floor(0.5*Float(Room3Amount[2]))) = "room3offices"
 	
 	;----------------------- luodaan kartta --------------------------------
 	
@@ -6386,11 +6561,85 @@ End Function
 Include "Skybox.bb"
 
 
+Function UpdateRoomLights()
+	
+	Local r.Rooms, i, random#
+	
+	For r.Rooms = Each Rooms
+		For i = 0 To r\MaxLights%
+			If r\Lights%[i]<>0
+				;If NTF_UseRoomLights
+					;If (Not UpdateAlarmLight%)
+						;If MainLightHidden%
+						;	ShowEntity MainLight
+						;	MainLightHidden% = False
+						;EndIf
+						If EntityDistance(Camera,r\Lights%[i])<8.5
+							If r\LightHidden[i]
+								ShowEntity r\Lights%[i]
+								r\LightHidden[i] = False
+							EndIf
+						Else
+							If (Not r\LightHidden[i])
+								HideEntity r\Lights%[i]
+								r\LightHidden[i] = True
+							EndIf
+						EndIf
+						
+						If EntityDistance(Camera,r\LightSpritesPivot%[i])<8.5
+							If EntityVisible(Camera,r\LightSpritesPivot%[i])
+								If r\LightSpriteHidden%[i]
+									ShowEntity r\LightSprites2%[i]
+									r\LightSpriteHidden%[i] = False
+								EndIf
+								random# = Rnd(0.35,0.45)
+								ScaleSprite r\LightSprites2[i],random#,random#
+								EntityAlpha r\LightSprites2[i],Max(3*(Brightness/255)*(r\LightIntensity[i]/2),1)
+							Else
+								If (Not r\LightSpriteHidden%[i])
+									HideEntity r\LightSprites2%[i]
+									r\LightSpriteHidden%[i] = True
+								EndIf
+							EndIf
+						Else
+							If (Not r\LightSpriteHidden%[i])
+								HideEntity r\LightSprites2%[i]
+								r\LightSpriteHidden%[i] = True
+							EndIf
+						EndIf
+					;Else
+						;If (Not MainLightHidden%)
+						;	HideEntity MainLight
+						;	MainLightHidden% = True
+						;EndIf
+					;	If (Not r\LightHidden[i])
+					;		HideEntity r\Lights%[i]
+					;		r\LightHidden[i] = True
+					;	EndIf
+					;	If (Not r\LightSpriteHidden%[i])
+					;		HideEntity r\LightSprites2%[i]
+					;		r\LightSpriteHidden%[i] = True
+					;	EndIf
+					;EndIf
+				;Else
+				;	If (Not MainLightHidden%)
+				;		HideEntity MainLight
+				;		MainLightHidden% = True
+				;	EndIf
+				;EndIf
+			EndIf
+		Next
+	Next
+	
+End Function
+
+
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FB#30C#31D#353#363#368#41A#524#543
-;~F#561#572#57D#5B6#5C4#614#61C#631#67E#6CF#711#733#78F#7A1#807#811#83B#84C#85D#87B
-;~F#8A2#8A9#8B7#8D3#8E8#905#922#92F#941#97A#9A4#9F0#A46#A59#A74#AC5#B1E#B2D#B69#B71
-;~F#B7F#B94#BD0#BEF#BFF#C17#C3F#C52#C74#C9C#CD7#D03#D2A#D31#D36#D6D#D94#DA9#E53#E6E
-;~F#EDB#F2D#F58#FA6#FAF#106D#10EA#10F6#111D#1128#1139#113E#114D#1164#12C2#12DF#12E6#12EC#12FA#131E
-;~F#133A#136D#1439#1472#1487#14F8#158D#1592#15A2#186A#1881#18A0#18A7
+;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
+;~F#526#545#563#574#57F#5B8#5C6#621#629#63E#68B#6DC#71E#740#79C#7AE#814#823#84D#85E
+;~F#86F#88D#8B4#8BB#8C9#8E5#8FA#917#934#941#953#98C#9B6#A02#A58#A6B#A86#AD7#B30#B3F
+;~F#B7B#B83#B91#BA6#BE2#C01#C11#C29#C51#C64#C86#CAE#CFC#D28#D4F#D56#D5B#D92#DB9#DCE
+;~F#DFE#E7B#E96#F03#F55#F80#FD1#FDA#1074#107B#108A#1094#10A8#10B2#10C9#10D0#1177#11C3#11CE#11DF
+;~F#11E4#11F3#120A#1280#1289#1368#1385#138C#1392#13A0#13C4#13E0#1413#14DF#1518#152D#159E#1633#1638#1919
+;~F#1930#194F#1956
 ;~C#Blitz3D

@@ -139,9 +139,9 @@ Function UpdateEmitters()
 		If KillTimer => 0 Then 
 			If Rand(150) = 1 Then
 				If CoughCHN = 0 Then
-					CoughCHN = PlaySound(CoughSFX(Rand(0, 2)))
+					CoughCHN = PlaySound_Strict(CoughSFX(Rand(0, 2)))
 				Else
-					If Not ChannelPlaying(CoughCHN) Then CoughCHN = PlaySound(CoughSFX(Rand(0, 2)))
+					If Not ChannelPlaying(CoughCHN) Then CoughCHN = PlaySound_Strict(CoughSFX(Rand(0, 2)))
 				End If
 			EndIf
 		EndIf
@@ -191,5 +191,5 @@ End Function
 	
 
 ;~IDEal Editor Parameters:
-;~F#4#2E#4A#53#65#99
+;~F#4#2E#4A#53#99
 ;~C#Blitz3D

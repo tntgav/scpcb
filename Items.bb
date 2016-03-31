@@ -287,6 +287,15 @@ Function InitItemTemplates()
 	
 	;.........
 	
+	;new Items in SCP:CB 1.3 - ENDSHN
+	it = CreateItemTemplate("SCP-1499","scp1499","GFX\items\SCP-1499.3ds","GFX\items\INVscp1499.jpg", "", 0.023,"GFX\items\SCP-1499.jpg")
+	it\sound = 2
+	CreateItemTemplate("SCP-198","scp198","GFX\items\scp198.b3d","GFX\items\INVscp198.jpg","",0.04)
+	CreateItemTemplate("SCP-109","scp109","GFX\items\scp109.b3d","GFX\items\INVscp109.jpg","",0.0009)
+	it = CreateItemTemplate("Document SCP-109", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc109.jpg", 0.003) : it\sound = 0
+	it = CreateItemTemplate("Document SCP-1162", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1162.jpg", 0.003) : it\sound = 0
+	CreateItemTemplate("Emily Ross's Badge", "badge", "GFX\items\badge.x", "GFX\items\INVpaper.jpg", "GFX\items\badge1.jpg", 0.0001, "GFX\items\badge1_tex.jpg")
+	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
 			If (it\texpath<>"") Then
@@ -498,7 +507,7 @@ Function PickItem(item.Items)
 									If e\eventstate = 0 Then
 										ShowEntity Light
 										LightFlash = 3
-										PlaySound(LoadTempSound("SFX\mindwipe.ogg"))											
+										PlaySound_Strict(LoadTempSound("SFX\mindwipe.ogg"))											
 									EndIf
 									e\eventstate = Max(1, e\eventstate)
 									Exit
@@ -510,7 +519,7 @@ Function PickItem(item.Items)
 					Case "killbat"
 						ShowEntity Light
 						LightFlash = 1.0
-						PlaySound(IntroSFX(11))
+						PlaySound_Strict(IntroSFX(11))
 						DeathMSG = "Subject D-9431 found dead inside SCP-914's output booth next to what appears to be an ordinary 9V battery. The subject is covered in severe "
 						DeathMSG = DeathMSG + "electrical burns, and assumed to be killed by an electrical shock caused by the battery. The battery has been stored for further study."
 						Kill()
@@ -532,7 +541,7 @@ Function PickItem(item.Items)
 						If item\itemtemplate\name = "S-NAV Navigator Ultimate" Then GiveAchievement(AchvSNAV)
 				End Select
 				
-				If item\itemtemplate\sound <> 66 Then PlaySound(PickSFX(item\itemtemplate\sound))
+				If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
 				item\Picked = True
 				item\Dropped = -1
 				
@@ -550,7 +559,7 @@ Function PickItem(item.Items)
 End Function
 
 Function DropItem(item.Items)
-	If item\itemtemplate\sound <> 66 Then PlaySound(PickSFX(item\itemtemplate\sound))
+	If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
 	
 	item\Dropped = 1
 	
@@ -601,5 +610,5 @@ Function DropItem(item.Items)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#1E#14C#18D
+;~F#B#1E#155#196
 ;~C#Blitz3D

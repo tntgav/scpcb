@@ -383,7 +383,7 @@ Function SaveGame(file$)
 	
 	CloseFile f
 	
-	PlaySound(LoadTempSound("SFX/save.ogg"))
+	PlaySound_Strict(LoadTempSound("SFX/save.ogg"))
 	
 	Msg = "Game saved"
 	MsgTimer = 70 * 4
@@ -1349,7 +1349,7 @@ Function LoadGameQuick(file$)
 	
 	Local e.Events
 	For e.Events = Each Events
-		If e\Sound <> 0 Then FreeSound e\Sound
+		If e\Sound <> 0 Then FreeSound_Strict e\Sound
 		Delete e
 	Next
 	

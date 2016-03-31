@@ -929,9 +929,9 @@ Function DrawLoading(percent%, shortloading=False)
 			If Not shortloading Then 
 				If firstloop Then 
 					If percent = 0 Then
-						PlaySound LoadTempSound("SFX\cwm1.cwm")
+						PlaySound_Strict LoadTempSound("SFX\cwm1.cwm")
 					ElseIf percent = 100
-						PlaySound LoadTempSound("SFX\cwm2.cwm")
+						PlaySound_Strict LoadTempSound("SFX\cwm2.cwm")
 					EndIf
 				EndIf
 			EndIf
@@ -998,7 +998,7 @@ Function DrawLoading(percent%, shortloading=False)
 		Text(GraphicWidth / 2, GraphicHeight / 2 - 100, "LOADING - " + percent + " %", True, True)
 		
 		If percent = 100 Then 
-			If firstloop And SelectedLoadingScreen\title <> "CWM" Then PlaySound HorrorSFX(8)
+			If firstloop And SelectedLoadingScreen\title <> "CWM" Then PlaySound_Strict HorrorSFX(8)
 			Text(GraphicWidth / 2, GraphicHeight - 50, "PRESS ANY KEY", True, True)
 		Else
 			FlushKeys()
@@ -1076,7 +1076,7 @@ Function DrawButton%(x%, y%, width%, height%, txt$, bigfont% = True)
 	DrawFrame (x, y, width, height)
 	If MouseOn(x, y, width, height) Then
 		Color(30, 30, 30)
-		If MouseHit1 Then clicked = True : PlaySound(ButtonSFX)
+		If MouseHit1 Then clicked = True : PlaySound_Strict(ButtonSFX)
 		Rect(x + 4, y + 4, width - 8, height - 8)	
 	Else
 		Color(0, 0, 0)
@@ -1100,7 +1100,7 @@ Function DrawTick%(x%, y%, selected%, locked% = False)
 	
 	If Highlight Then
 		Color(50, 50, 50)
-		If MouseHit1 Then selected = (Not selected) : PlaySound (ButtonSFX)
+		If MouseHit1 Then selected = (Not selected) : PlaySound_Strict (ButtonSFX)
 	Else
 		Color(0, 0, 0)		
 	End If
@@ -1179,5 +1179,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#30C#31E#328#3F9#40C#429#443#464#47C#483
+;~F#31#30C#31E#328#3F9#40C#429#464#47C#483
 ;~C#Blitz3D
