@@ -3563,9 +3563,8 @@ Function MeNPCSeesPlayer%(me.NPCs)
 	;spots the player if he's either in view or making a loud sound
 	If PlayerSoundVolume>1.0 Then Return True
 	If (Abs(DeltaYaw(me\Collider,Collider))>60.0) Then Return False
-	If (EntityVisible(me\Collider, Camera)) Then Return False
 	
-	Return True
+	Return EntityVisible(me\Collider, Camera)
 End Function
 
 Function UpdateMTFUnit(n.NPCs)
