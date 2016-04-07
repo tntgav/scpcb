@@ -3229,7 +3229,7 @@ Function DrawGUI()
 			If MouseHit2 Then
 				SelectedDoor = Null
 				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
-			endif
+			EndIf
 		Else
 			SelectedDoor = Null
 		EndIf
@@ -7588,9 +7588,23 @@ Function ManipulateNPCBones()
 	Next
 	
 End Function
+
+Function Inverse#(number#)
+	Local min_number#=0.0,max_number#=1.0,mid_number# = 0.5
+	Local new_number#
+	
+	If number# = mid_number#
+		new_number# = mid_number#
+	ElseIf number# > mid_number#
+		new_number# = max_number-number#
+	ElseIf number# < mid_number#
+		new_number# = max_number-number#
+	EndIf
+	
+	Return new_number#
+	
+End Function
 ;~IDEal Editor Parameters:
-;~F#20#70#F0#F4#34B#44E#46C#4E2#4EF#583#5FA#611#61E#650#6F7#7CB#130D#14B0#162D#164C
-;~F#166B#1689#168D#16AD#16B3#1A64#1A6A#1A74#1A80#1A8B#1A8F#1ACA#1AD2#1ADA#1AE1#1AE8#1AF7#1B06#1B52#1B59
-;~F#1B6C#1B85#1BB2#1BBD#1BC2#1BDC#1BE8#1C03#1C55#1C63#1C6B#1C77#1C80#1CA9#1CAE#1CB3#1CB8#1CC1#1CC9#1D47
-;~F#1D51#1D76#1D86
+;~F#20#70#F0#F4#FB#34B#44E#46C#4E2#4EF#583#5FA#611#61E#650#6F7#7CB#130D#14B0#162D
+;~F#164C#166B#1689#168D#16AD
 ;~C#Blitz3D

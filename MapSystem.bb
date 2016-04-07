@@ -1562,6 +1562,7 @@ Type Rooms
 	Field LightSpritesPivot%[MaxRoomLights]
 	Field LightSprites2%[MaxRoomLights]
 	Field LightHidden%[MaxRoomLights]
+	Field LightFlicker%[MaxRoomLights]
 	Field AlarmRotor%[1]
 	Field AlarmRotorLight%[1]
 End Type 
@@ -4523,6 +4524,7 @@ Function AddLight%(room.Rooms, x#, y#, z#, ltype%, range#, r%, g%, b%)
 				SpriteViewMode(room\LightSprites2[i],1)
 				room\LightSpriteHidden%[i] = True
 				HideEntity room\LightSprites2[i]
+				room\LightFlicker%[i] = Rand(1,10)
 				
 				HideEntity room\Lights[i]
 				
@@ -6564,7 +6566,7 @@ Include "Skybox.bb"
 
 Function UpdateRoomLights()
 	
-	Local r.Rooms, i, random#
+	Local r.Rooms, i, random#, alpha#, dist#
 	
 	For r.Rooms = Each Rooms
 		For i = 0 To r\MaxLights%
@@ -6593,9 +6595,28 @@ Function UpdateRoomLights()
 									ShowEntity r\LightSprites2%[i]
 									r\LightSpriteHidden%[i] = False
 								EndIf
-								random# = Rnd(0.35,0.45)
+								If PlayerRoom\RoomTemplate\Name$ = "173"
+									random# = Rnd(0.39,0.41)
+								Else
+									If r\LightFlicker%[i]<5
+										random# = Rnd(0.39,0.41)
+									ElseIf r\LightFlicker%[i]>4 And r\LightFlicker%[i]<10
+										random# = Rnd(0.35,0.45)
+									Else
+										random# = Rnd(0.3,0.5)
+									EndIf
+								EndIf
 								ScaleSprite r\LightSprites2[i],random#,random#
-								EntityAlpha r\LightSprites2[i],Max(3*(Brightness/255)*(r\LightIntensity[i]/2),1)
+								dist# = (EntityDistance(Camera,r\LightSpritesPivot[i])+1.0)/10.0
+								dist# = Max(Min(dist#,1.0),0.0)
+								alpha# = Float(Inverse(dist#))
+								
+								If alpha# > 0.0
+									EntityAlpha r\LightSprites2[i],Max(3*(Brightness/255)*(r\LightIntensity[i]/2),1)*alpha#
+								Else
+									;Instead of rendering the sprite invisible, just hiding it if the player is far away from it
+									HideEntity r\LightSprites2[i]
+								EndIf
 							Else
 								If (Not r\LightSpriteHidden%[i])
 									HideEntity r\LightSprites2%[i]
@@ -6637,10 +6658,10 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
-;~F#526#545#563#574#57F#5B8#5C6#5F0#621#629#63E#682#68B#6DC#71E#740#79C#7AE#814#823
-;~F#84D#85E#86F#88D#8B4#8BB#8C9#8E5#8FA#917#934#941#953#98C#9B6#A02#A58#A6B#A86#AD7
-;~F#B30#B3F#B7B#B83#B91#BA6#BE2#C01#C11#C29#C51#C64#C86#CAE#CFC#D28#D4F#D56#D5B#D92
-;~F#DB9#DCE#DFE#E7C#E97#F04#F56#F81#FD2#FDB#1075#107C#108B#1095#10A9#10B3#10CA#10D1#10FB#1178
-;~F#1184#11C4#11CF#11E0#11E5#11F4#120B#1281#128A#1369#1386#138D#1393#13A1#13C5#13E1#1414#14E0#1519#152E
-;~F#159F#1634#1639#1649#191A#1931#1950#1957
+;~F#526#545#563#574#57F#5B8#5C6#5F0#622#62A#63F#683#68C#6DD#71F#741#79D#7AF#815#824
+;~F#84E#85F#870#88E#8B5#8BC#8CA#8E6#8FB#918#935#942#954#98D#9B7#A03#A59#A6C#A87#AD8
+;~F#B31#B40#B7C#B84#B92#BA7#BE3#C02#C12#C2A#C52#C65#C87#CAF#CFD#D29#D50#D57#D5C#D93
+;~F#DBA#DCF#DFF#E7D#E98#F05#F57#F82#FD3#FDC#1076#107D#108C#1096#10AA#10B4#10CB#10D2#10FC#1179
+;~F#11C6#11D1#11E2#11E7#11F6#120D#1283#128C#136B#1388#138F#1395#13A3#13C7#13E3#1416#14E2#151B#1530#15A1
+;~F#1636#163B#164B#191C#1933#1952#1959
 ;~C#Blitz3D
