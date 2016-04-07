@@ -766,6 +766,12 @@ Function UpdateConsole()
 					Curr106\Idle = True
 					Curr106\State = 200000
 					Contained106 = True
+				Case "spawnnpcstate"
+					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					StrTemp$ = Piece$(args$,1," ")
+					StrTemp2$ = Piece$(args$,2," ")
+					
+					Console_SpawnNPC(StrTemp$,Int(StrTemp2$))
 				Default
 					CreateConsoleMsg("Command not found")
 			End Select
@@ -3220,7 +3226,10 @@ Function DrawGUI()
 			
 			If Fullscreen Then DrawImage CursorIMG, MouseX(),MouseY()
 			
-			If MouseHit2 Then SelectedDoor = Null
+			If MouseHit2 Then
+				SelectedDoor = Null
+				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+			endif
 		Else
 			SelectedDoor = Null
 		EndIf
@@ -4768,7 +4777,11 @@ Function DrawMenu()
 		If AchievementsMenu<=0 Then
 			If KillTimer >= 0 Then	
 				y = y+ 104*MenuScale
-				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Resume") Then MenuOpen = False
+				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Resume") Then
+					MenuOpen = False
+					ResumeSounds()
+					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+				EndIf
 				y = y + 80*MenuScale
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Achievements") Then AchievementsMenu = 1
 				y = y + 80*MenuScale
@@ -7566,16 +7579,18 @@ Function ManipulateNPCBones()
 			Select n\ManipulationType
 				Case 0 ;<--- looking at player
 					PointEntity bone%,Camera
-					yaw# = EntityYaw(n\obj)
 					RotateEntity bone%,EntityPitch(bone%),20,0
+				Case 1 ;<--- looking at player #2
+					PointEntity bone%,Collider
+					RotateEntity bone%,0,EntityYaw(bone%),0
 			End Select
 		EndIf
 	Next
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#20#70#F0#F4#FB#448#466#4DC#4E9#57D#5F4#60B#618#64A#6F1#7C5#1300#14A3#1620#163F
-;~F#165E#167C#1680#16A0#16A6#1A57#1A5D#1A67#1A73#1A7E#1A82#1ABD#1AC5#1ACD#1AD4#1ADB#1AEA#1AF9#1B45#1B4C
-;~F#1B5F#1B78#1BA5#1BB0#1BB5#1BCF#1BDB#1BF6#1C48#1C56#1C5E#1C6A#1C73#1C9C#1CA1#1CA6#1CAB#1CB4#1CBC#1D3A
-;~F#1D44#1D69#1D79
+;~F#20#70#F0#F4#34B#44E#46C#4E2#4EF#583#5FA#611#61E#650#6F7#7CB#130D#14B0#162D#164C
+;~F#166B#1689#168D#16AD#16B3#1A64#1A6A#1A74#1A80#1A8B#1A8F#1ACA#1AD2#1ADA#1AE1#1AE8#1AF7#1B06#1B52#1B59
+;~F#1B6C#1B85#1BB2#1BBD#1BC2#1BDC#1BE8#1C03#1C55#1C63#1C6B#1C77#1C80#1CA9#1CAE#1CB3#1CB8#1CC1#1CC9#1D47
+;~F#1D51#1D76#1D86
 ;~C#Blitz3D
