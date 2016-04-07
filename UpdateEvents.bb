@@ -226,9 +226,9 @@ Function UpdateEvents()
 								PlaySound_Strict(LoadTempSound("SFX\Intro\Commotion\Commotion"+i+".ogg"))
 							EndIf
 							
-							If i = 21 Then DebugLog "Commotion21"
+							;If i = 21 Then DebugLog "Commotion21"
 							
-							If (i>22) Then
+							If (i>23) Then
 								If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
 								If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
 								If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
@@ -517,6 +517,23 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 							
+							If e\room\NPC[8]<>Null Then ;the 2 guards and ClassD
+								If e\room\NPC[8]\State = 7 Then
+									;If e\room\RoomDoors[7]\open Then 
+									If Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\obj,True)-6688*RoomScale, EntityZ(e\room\obj,True)-1252*RoomScale)<2.5 Then
+										e\room\NPC[8]\State = 10
+										e\room\NPC[9]\State = 1
+										e\room\NPC[10]\State = 10
+									EndIf
+								Else
+									If EntityX(e\room\NPC[8]\Collider)<EntityX(e\room\obj,True)-7100.0*RoomScale Then
+										For i = 8 To 10
+											e\room\NPC[i]\State = 0
+										Next
+									EndIf
+								EndIf
+							EndIf
+							
 							If e\EventStr <> "" And e\EventStr <> "done" Then
 								If e\SoundCHN = 0 Then 
 									e\SoundCHN = PlaySound_Strict(LoadTempSound("SFX\intro\PA\on.ogg"))
@@ -609,7 +626,9 @@ Function UpdateEvents()
 										RotateEntity e\room\NPC[3]\Collider,0,CurveValue(EntityYaw(e\room\NPC[3]\obj),EntityYaw(e\room\NPC[3]\Collider),20.0),0,True
 										
 										If e\room\NPC[3]\PathStatus = 2 Then
-											e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],EntityX(e\room\obj,True)-1584*RoomScale, 0.3, EntityZ(e\room\obj,True)-1040*RoomScale)
+											;e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],EntityX(e\room\obj,True)-1584*RoomScale, 0.3, EntityZ(e\room\obj,True)-1040*RoomScale)
+											e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
+											e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
 											e\room\NPC[3]\State = 3
 										EndIf
 									Else
@@ -791,17 +810,30 @@ Function UpdateEvents()
 								EntityTexture e\room\NPC[7]\obj, tex
 								FreeTexture tex
 								
-								e\room\NPC[8] = CreateNPC(NPCtypeGuard, e\room\x-3800.0*RoomScale, 1.1, e\room\z-3900.0*RoomScale)
+								pvt = CreatePivot()
+								RotateEntity pvt,90,0,0
+								
+								e\room\NPC[8] = CreateNPC(NPCtypeGuard, e\room\x-3800.0*RoomScale, 1.0, e\room\z-3900.0*RoomScale)
 								e\room\NPC[8]\State = 7
-								RotateEntity e\room\NPC[8]\Collider,0,90,0
 								e\room\NPC[9] = CreateNPC(NPCtypeD, e\room\x-4000.0*RoomScale, 1.1, e\room\z-3900.0*RoomScale)
-								RotateEntity e\room\NPC[9]\Collider,0,90,0
+								e\room\NPC[9]\State2 = 1.0
 								tex = LoadTexture_Strict("GFX\npcs\classd3.jpg")
 								EntityTexture e\room\NPC[9]\obj, tex
 								FreeTexture tex
-								e\room\NPC[10] = CreateNPC(NPCtypeGuard, e\room\x-4200.0*RoomScale, 1.1, e\room\z-3900.0*RoomScale)
+								e\room\NPC[10] = CreateNPC(NPCtypeGuard, e\room\x-4200.0*RoomScale, 1.0, e\room\z-3900.0*RoomScale)
 								e\room\NPC[10]\State = 7
-								RotateEntity e\room\NPC[10]\Collider,0,90,0
+								
+								For i = 8 To 10
+									PositionEntity pvt,EntityX(e\room\NPC[i]\Collider),EntityY(e\room\NPC[i]\Collider),EntityZ(e\room\NPC[i]\Collider)
+									EntityPick pvt,20.0
+									If PickedEntity() <> 0
+										PositionEntity e\room\NPC[i]\Collider,PickedX(),PickedY(),PickedZ(),True
+										AlignToVector e\room\NPC[i]\Collider,-PickedNX(),-PickedNY(),-PickedNZ(),3
+										RotateEntity e\room\NPC[i]\Collider,0,90,0
+									EndIf
+								Next
+								
+								FreeEntity pvt
 								
 								PositionEntity(Curr173\Collider, EntityX(e\room\Objects[5], True), 0.5, EntityZ(e\room\Objects[5], True))
 								ResetEntity(Curr173\Collider)
@@ -1137,6 +1169,10 @@ Function UpdateEvents()
 												CameraFogMode(Camera, 1)
 												
 												e\EventState2 = 1
+												
+												;For i = 8 To 10
+												;	RemoveNPC(e\room\NPC[i])
+												;Next
 												
 												Exit
 											EndIf
@@ -7644,8 +7680,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#49F#4A9#4E2#517#576#6EB#8C5#8EC#8FA#904#911#AFA#B1B#B6A#BB8#BC5#BFF#C16#C36
-;~F#C3F#C49#C58#CEC#D0E#FBA#1000#1016#1022#1040#1091#10A8#1173#1274#1305#131E#133D#136E#137B#1394
-;~F#142C#15E2#168C#16E0#1791#1841#18F5#190D#19C6#19F3#1A10#1A37#1A67#1A84#1AA8#1B02#1B42#1B73#1B86#1C3E
-;~F#1C96#1CA9#1CB8#1CDE#1CFC
+;~F#F8#4C3#4CD#506#53B#59A#70F#8E9#910#91E#928#935#B1E#B3F#B8E#BDC#BE9#C23#C3A#C5A
+;~F#C63#C6D#C7C#D10#D32#FDE#1024#103A#1046#1064#10B5#10CC#1197#1298#1329#1342#1361#1392#139F#13B8
+;~F#1450#1606#16B0#1704#17B5#1865#1919#1931#19EA#1A17#1A34#1A5B#1A8B#1AA8#1ACC#1B26#1B66#1B97#1BAA#1C62
+;~F#1CBA#1CCD#1CDC#1D02#1D20
 ;~C#Blitz3D

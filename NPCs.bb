@@ -204,6 +204,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			temp# = 0.5 / MeshWidth(n\obj)
 			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
 		Case NPCtype372
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
@@ -1719,6 +1721,10 @@ Function UpdateNPCs()
 				;[Block]
 				prevFrame# = n\Frame
 				
+				n\BoneToManipulate = ""
+				n\ManipulateBone = False
+				n\ManipulationType = 0
+				
 				Select n\State
 					Case 1 ;aims and shoots at the player
 						AnimateNPC(n, 1539, 1553, 0.2, False)
@@ -1762,7 +1768,9 @@ Function UpdateNPCs()
 								
 								FreeEntity(pvt)									
 							EndIf
-							
+							n\BoneToManipulate = "spine"
+							n\ManipulateBone = True
+							n\ManipulationType = 1
 						Else
 							n\State = 0
 						EndIf
@@ -1851,6 +1859,12 @@ Function UpdateNPCs()
 						n\BoneToManipulate = "head"
 						n\ManipulateBone = True
 						n\ManipulationType = 0
+					Case 10
+						AnimateNPC(n, 1614, 1641, n\CurrSpeed*30)
+						
+						n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
+						
+						MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 					Default
 						If Rand(400) = 1 Then n\PrevState = Rnd(-30, 30)
 						n\PathStatus = 0
@@ -1873,7 +1887,8 @@ Function UpdateNPCs()
 				;RotateEntity(n\Collider, 0, EntityYaw(n\Collider), 0, True)
 				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.2, EntityZ(n\Collider))
 				
-				RotateEntity n\obj, EntityPitch(n\Collider)-90, EntityYaw(n\Collider), 0
+				;RotateEntity n\obj, EntityPitch(n\Collider)-90, EntityYaw(n\Collider), 0
+				RotateEntity n\obj, -90, EntityYaw(n\Collider), 0
 				;[End Block]
 			Case NPCtypeMTF ;------------------------------------------------------------------------------------------------------------------
 				;[Block]
@@ -1891,7 +1906,11 @@ Function UpdateNPCs()
 						n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
 						Animate2(n\obj, AnimTime(n\obj), 210, 235, 0.1)
 					Case 1 ;walking
-						n\CurrSpeed = CurveValue(0.015, n\CurrSpeed, 5.0)
+						If n\State2 = 1.0
+							n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
+						Else
+							n\CurrSpeed = CurveValue(0.015, n\CurrSpeed, 5.0)
+						EndIf
 						Animate2(n\obj, AnimTime(n\obj), 236, 260, n\CurrSpeed * 18)
 					Case 2 ;running
 						n\CurrSpeed = CurveValue(0.03, n\CurrSpeed, 5.0)
@@ -1901,19 +1920,19 @@ Function UpdateNPCs()
 				If n\State = 1
 					If n\CurrSpeed > 0.01 Then
 						If prevFrame < 244 And AnimTime(n\obj)=>244 Then
-							PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))						
+							PlaySound2(StepSFX(GetNPCStepSound(n),0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))						
 						ElseIf prevFrame < 256 And AnimTime(n\obj)=>256
-							PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+							PlaySound2(StepSFX(GetNPCStepSound(n),0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 						EndIf
 					EndIf
-				Else
+				ElseIf n\State = 2
 					If n\CurrSpeed > 0.01 Then
 						If prevFrame < 309 And AnimTime(n\obj)=>309
-							PlaySound2(StepSFX(0,1,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+							PlaySound2(StepSFX(GetNPCStepSound(n),1,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 						ElseIf prevFrame =< 319 And AnimTime(n\obj)=<301
-							PlaySound2(StepSFX(0,1,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+							PlaySound2(StepSFX(GetNPCStepSound(n),1,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 						EndIf
-					endif
+					EndIf
 				EndIf
 				
 				MoveEntity(n\Collider, 0, 0, n\CurrSpeed * FPSfactor)
@@ -3486,7 +3505,7 @@ Function UpdateNPCs()
 				;[End block]
 		End Select
 		
-		If Distance(EntityX(Collider),EntityZ(Collider),EntityX(n\Collider),EntityZ(n\Collider))<HideDistance*0.7 Then 
+		If Distance(EntityX(Collider),EntityZ(Collider),EntityX(n\Collider),EntityZ(n\Collider))<HideDistance*0.7 Then
 			TranslateEntity n\Collider, 0, n\DropSpeed, 0
 			
 			Local CollidedFloor% = False
@@ -4300,7 +4319,103 @@ Function Find860Angle(n.NPCs, fr.Forest)
 	EndIf		
 End Function
 
+Function Console_SpawnNPC(c_input$,state%=-9999)
+	Local n.NPCs
+	
+	Select c_input$ 
+		Case "mtf"
+			n.NPCs = CreateNPC(NPCtypeMTF, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "173","scp173","scp-173"
+			n.NPCs = CreateNPC(NPCtype173, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "106","scp106","scp-106","larry"
+			n.NPCs = CreateNPC(NPCtypeOldMan, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "guard"
+			n.NPCs = CreateNPC(NPCtypeGuard, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "096","scp096","scp-096"
+			n.NPCs = CreateNPC(NPCtype096, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "049","scp049","scp-049"
+			n.NPCs = CreateNPC(NPCtype049, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+			n\State = 2
+		Case "zombie","scp-049-2"
+			n.NPCs = CreateNPC(NPCtypeZombie, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+			n\State = 1
+		Case "966", "scp966", "scp-966"
+			n.NPCs = CreateNPC(NPCtype966, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "class-d","classd","d"
+			n.NPCs = CreateNPC(NPCtypeD, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "372","scp372","scp-372"
+			n.NPCs = CreateNPC(NPCtype372, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "apache"
+			n.NPCs = CreateNPC(NPCtypeApache, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "513-1","scp513-1","scp-513-1"
+			n.NPCs = CreateNPC(NPCtype5131, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "tentacle"
+			n.NPCs = CreateNPC(NPCtypeTentacle, EntityX(Collider),EntityY(Collider),EntityZ(Collider))
+		Case "860-2","scp860-2","scp-860-2"
+			n.NPCs = CreateNPC(NPCtype860, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "939","scp939","scp-939"
+			n.NPCs = CreateNPC(NPCtype939, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+			n\State = 1
+		Case "066","scp066","scp-066"
+			n.NPCs = CreateNPC(NPCtype066, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "npc178"
+			n.NPCs = CreateNPC(NPCtype178, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "pdplane"
+			n.NPCs = CreateNPC(NPCtypePdPlane, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "1048-a","scp1048-a","scp-1048-a","scp1048a","scp-1048a"
+			n.NPCs = CreateNPC(NPCtype1048a, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "mtf2"
+			n.NPCs = CreateNPC(NPCtypeMTF2, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "d2"
+			n.NPCs = CreateNPC(NPCtypeD2, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "scp-457","457","scp457"
+			n.NPCs = CreateNPC(NPCtype457, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "scp-008-1","008-1","scp008-1"
+			n.NPCs = CreateNPC(NPCtype008, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "d-9341","d9341","9341"
+			n.NPCs = CreateNPC(NPCtypeD9341, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "scp-1499-1","scp1499-1","1499-1"
+			n.NPCs = CreateNPC(NPCtype1499, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Default 
+			CreateConsoleMsg("NPC type not found")
+	End Select
+	
+	If n <> Null
+		If state%<>-9999
+			n\State = state%
+		EndIf
+	EndIf
+	
+End Function
+
+Function GetNPCStepSound(n.NPCs)
+	Local picker%,brush%,texture%,name$
+	Local mat.Materials
+	
+	picker = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-1,0)
+	If picker <> 0 Then
+		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
+		If brush<>0 Then
+			texture = GetBrushTexture(brush,1)
+			If texture <> 0 Then
+				name = StripPath(TextureName(texture))
+				FreeTexture(texture)
+				FreeBrush(brush)
+				For mat.Materials = Each Materials
+					If mat\name = name Then
+						If mat\StepSound>0 Then
+							Return mat\StepSound-1
+						EndIf
+						Exit
+					EndIf
+				Next				
+			EndIf
+		EndIf
+	EndIf
+	
+	Return 0
+End Function
 ;~IDEal Editor Parameters:
-;~F#0#38#210#234#31C#405#554#621#6B6#756#785#827#862#8EF#95B#A6E#B34#BE4#C97#D96
-;~F#DB5#DF0#10B0
+;~F#0#38#212#236#31E#407#556#623#6B8#765#798#83A#875#902#96E#A81#B47#BF7#CAA#DA9
+;~F#DC8#DEE#DF8#E02#E03#101F#1097#10A8#10C3#10E1#1126
 ;~C#Blitz3D
