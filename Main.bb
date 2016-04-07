@@ -5791,7 +5791,9 @@ Function AnimateNPC(n.NPCs, start#, quit#, speed#, loop=True)
 End Function
 
 Function SetNPCFrame(n.NPCs, frame#)
-	If (Floor(n\Frame)<>Floor(frame)) Then  SetAnimTime n\obj, frame
+	If (Abs(n\Frame-frame)<0.001) Then Return
+	
+	SetAnimTime n\obj, frame
 	
 	n\Frame = frame
 End Function
