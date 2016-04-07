@@ -7590,18 +7590,8 @@ Function ManipulateNPCBones()
 End Function
 
 Function Inverse#(number#)
-	Local min_number#=0.0,max_number#=1.0,mid_number# = 0.5
-	Local new_number#
 	
-	If number# = mid_number#
-		new_number# = mid_number#
-	ElseIf number# > mid_number#
-		new_number# = max_number-number#
-	ElseIf number# < mid_number#
-		new_number# = max_number-number#
-	EndIf
-	
-	Return new_number#
+	Return 1.0-number#
 	
 End Function
 ;~IDEal Editor Parameters:
