@@ -3566,6 +3566,7 @@ End Function
 
 Function OtherNPCSeesMeNPC%(me.NPCs,other.NPCs)
 	If other\BlinkTimer<=0.0 Then Return False
+	
 	If EntityDistance(other\Collider,me\Collider)<6.0 Then
 		If Abs(DeltaYaw(other\Collider,me\Collider))<60.0 Then
 			Return True
@@ -3576,16 +3577,18 @@ End Function
 
 Function MeNPCSeesPlayer%(me.NPCs)
 	If me\BlinkTimer<=0.0 Then Return False
-	If EntityDistance(Collider,me\Collider)<(8.0-CrouchState+PlayerSoundVolume) Then
-		;spots the player if he's either in view or making a loud sound
-		If PlayerSoundVolume>1.0 Then Return True
-		If (Abs(DeltaYaw(me\Collider,Collider))<60.0 And EntityVisible(me\Collider, Camera)) Then Return True
-	EndIf
-	Return False
+	
+	If EntityDistance(Collider,me\Collider)>(8.0-CrouchState+PlayerSoundVolume) Then Return False	
+	;spots the player if he's either in view or making a loud sound
+	If PlayerSoundVolume>1.0 Then Return True
+	If (Abs(DeltaYaw(me\Collider,Collider))>60.0) Then Return False
+	
+	Return EntityVisible(me\Collider, Camera)
 End Function
 
 Function UpdateMTFUnit(n.NPCs)
 	;[Block]
+	
 	If n\NPCtype<>NPCtypeMTF Then
 		Local realType$ = ""
 		Select n\NPCtype
@@ -3733,7 +3736,7 @@ Function UpdateMTFUnit(n.NPCs)
 							newDist# = EntityDistance(n\Collider,n\Path[n\PathLocation]\obj)
 							
 							If (newDist<1.0 And n\Path[n\PathLocation]\door<>Null) Then
-							;open the door and make it automatically close after 5 seconds
+								;open the door and make it automatically close after 5 seconds
 								n\Path[n\PathLocation]\door\open = True
 								n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
 							EndIf
@@ -3788,16 +3791,21 @@ Function UpdateMTFUnit(n.NPCs)
 					n\PathStatus=0
                 EndIf
                 
-                If EntityVisible(n\Collider,Curr173\Collider) And OtherNPCSeesMeNPC(Curr173,n) And (Curr173\Idle<2) Then
-					n\State = 2
-					n\EnemyX = EntityX(Curr173\Collider,True)
-					n\EnemyY = EntityY(Curr173\Collider,True)
-					n\EnemyZ = EntityZ(Curr173\Collider,True)
-					n\State2 = 70.0*15.0 ;give up after 15 seconds
-					n\State3 = 0.0
-					n\PathTimer=0.0
-					n\PathStatus=0
-                EndIf
+				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
+                If Curr173\Idle<2 Then
+					If OtherNPCSeesMeNPC(Curr173,n) Then
+						If EntityVisible(n\Collider,Curr173\Collider) Then							
+							n\State = 2
+							n\EnemyX = EntityX(Curr173\Collider,True)
+							n\EnemyY = EntityY(Curr173\Collider,True)
+							n\EnemyZ = EntityZ(Curr173\Collider,True)
+							n\State2 = 70.0*15.0 ;give up after 15 seconds
+							n\State3 = 0.0
+							n\PathTimer=0.0
+							n\PathStatus=0	
+						EndIf
+					EndIf
+				EndIf
                 ;[End Block]
 			Case 1 ;searching for player
                 ;[Block]
@@ -3965,22 +3973,26 @@ Function UpdateMTFUnit(n.NPCs)
 					n\State = 0
                 EndIf
                 
-                If EntityVisible(n\Collider,Curr173\Collider) And OtherNPCSeesMeNPC(Curr173,n) And (Curr173\Idle<2) Then
-					If n\LastSeen>10.0 Then ;if chasing the player, play the "stop chasing the d" -clip
-						PlayMTFSound(LoadTempSound("SFX\MTF\173spotted3.ogg"), n)
-					Else
-						PlayMTFSound(LoadTempSound("SFX\MTF\173spotted"+Rand(1,2)+".ogg"), n)	
+				If (Curr173\Idle<2) Then
+					If (OtherNPCSeesMeNPC(Curr173,n)) Then
+						If EntityVisible(n\Collider,Curr173\Collider) Then
+							If n\LastSeen>10.0 Then ;if chasing the player, play the "stop chasing the d" -clip
+								PlayMTFSound(LoadTempSound("SFX\MTF\173spotted3.ogg"), n)
+							Else
+								PlayMTFSound(LoadTempSound("SFX\MTF\173spotted"+Rand(1,2)+".ogg"), n)	
+							EndIf
+							
+							n\State = 2
+							n\EnemyX = EntityX(Curr173\Collider,True)
+							n\EnemyY = EntityY(Curr173\Collider,True)
+							n\EnemyZ = EntityZ(Curr173\Collider,True)
+							n\State2 = 70.0*15.0 ;give up after 15 seconds
+							n\State3 = 0.0
+							n\PathTimer=0.0
+							n\PathStatus=0
+						EndIf						
 					EndIf
-					
-					n\State = 2
-					n\EnemyX = EntityX(Curr173\Collider,True)
-					n\EnemyY = EntityY(Curr173\Collider,True)
-					n\EnemyZ = EntityZ(Curr173\Collider,True)
-					n\State2 = 70.0*15.0 ;give up after 15 seconds
-					n\State3 = 0.0
-					n\PathTimer=0.0
-					n\PathStatus=0
-                EndIf
+				EndIf
 				
                 ;DebugLog Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),n\EnemyX,n\EnemyZ)
                 
@@ -3997,12 +4009,15 @@ Function UpdateMTFUnit(n.NPCs)
 							EndIf
 						EndIf
 					Next
-					If EntityVisible(n\Collider,Curr173\Collider) Then
+					
+					Local curr173Dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(Curr173\Collider,True),EntityZ(Curr173\Collider,True))
+					
+					If curr173Dist<5.0 Then
 						n\State2 = 70.0*15.0
 						n\PathTimer = 0.0
 						Local tempDist# = 1.0
 						If n\MTFLeader<>Null Then tempDist = 2.0
-						If Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(Curr173\Collider,True),EntityZ(Curr173\Collider,True))<tempDist Then
+						If curr173Dist<tempDist Then
 							If n\MTFLeader = Null Then
 								n\State3=n\State3+FPSfactor
 								DebugLog "CONTAINING 173: "+n\State3
@@ -4064,6 +4079,12 @@ Function UpdateMTFUnit(n.NPCs)
 									
 									newDist# = EntityDistance(n\Collider,n\Path[n\PathLocation]\obj)
 									
+									If (newDist<1.0 And n\Path[n\PathLocation]\door<>Null) Then
+										;open the door and make it automatically close after 5 seconds
+										n\Path[n\PathLocation]\door\open = True
+										n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
+									EndIf
+									
 									If (newDist<0.2) Or ((prevDist<newDist) And (prevDist<1.0)) Then
 										n\PathLocation=n\PathLocation+1
 									EndIf
@@ -4082,6 +4103,7 @@ Function UpdateMTFUnit(n.NPCs)
 					EndIf
                 EndIf
                 ;[End Block]
+				
 		End Select
 		
 		If n\CurrSpeed > 0.01 Then
@@ -4102,9 +4124,9 @@ Function UpdateMTFUnit(n.NPCs)
 			EndIf
 		Else
 			For n2.NPCs = Each NPCs
-				If (n2<>n) Then
-					If (EntityDistance(n\Collider,n2\Collider)<0.7) Then
-						If ((Abs(DeltaYaw(n\Collider,n2\Collider))<80.0)) Then
+				If n2<>n Then
+					If Abs(DeltaYaw(n\Collider,n2\Collider))<80.0 Then
+						If EntityDistance(n\Collider,n2\Collider)<0.7 Then							
 							TranslateEntity n2\Collider, Cos(EntityYaw(n\Collider,True)+90)* 0.01 * FPSfactor, 0, Sin(EntityYaw(n\Collider,True)+90)* 0.01 * FPSfactor, True
 						EndIf
 					EndIf
@@ -4112,16 +4134,15 @@ Function UpdateMTFUnit(n.NPCs)
 			Next
 		EndIf
 		
-		
 		;teleport back to the facility if fell through the floor
 		If (EntityY(n\Collider) < -10.0) Then
 			TeleportCloser(n)
 		EndIf
 		
-		
 		RotateEntity n\obj,-90.0,n\Angle,0.0,True
 		
 		PositionEntity n\obj,EntityX(n\Collider,True),EntityY(n\Collider,True)-0.15,EntityZ(n\Collider,True),True
+		
 	EndIf
 End Function
 
