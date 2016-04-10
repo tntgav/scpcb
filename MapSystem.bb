@@ -4277,24 +4277,18 @@ Function FillRoom(r.Rooms)
 			;[Block]
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 288.0*RoomScale, r\y, r\z + 576.0*RoomScale, 90, r, False, False, 3)
 			r\RoomDoors[0]\open = False : r\RoomDoors[0]\locked = True
-			d = CreateDoor(r\zone, r\x + 776.0*RoomScale, r\y, r\z + 736.0*RoomScale, 90, r, False, False)
-			d = CreateDoor(r\zone, r\x + 776.0*RoomScale, r\y, r\z + 288.0*RoomScale, 90, r, False, False)
-			d = CreateDoor(r\zone, r\x + 558.0*RoomScale, r\y, r\z + 8.0*RoomScale, 0, r, False, False)
+			d = CreateDoor(r\zone, r\x + 777.0*RoomScale, r\y, r\z + 671.0*RoomScale, 90, r, False, False)
+			d = CreateDoor(r\zone, r\x + 556.0*RoomScale, r\y, r\z + 296.0*RoomScale, 0, r, False, False)
 			r\Objects[0] = CreatePivot()
 			PositionEntity r\Objects[0],r\x + 576.0*RoomScale,r\y+160.0*RoomScale,r\z+632.0*RoomScale
 			EntityParent r\Objects[0],r\obj
-			it = CreateItem("SCP-198", "scp198", r\x + 1152.0 * RoomScale, r\y + 64.0 * RoomScale, r\z - 64.0 * RoomScale)
-			RotateEntity it\obj, 0, r\angle+Rand(180), 0
-			EntityParent(it\obj, r\obj)
-			it = CreateItem("SCP-1499", "scp1499", r\x + 600.0 * RoomScale, r\y + 192.0 * RoomScale, r\z - 512.0 * RoomScale)
+			
+			it = CreateItem("SCP-1499", "scp1499", r\x + 600.0 * RoomScale, r\y + 176.0 * RoomScale, r\z - 228.0 * RoomScale)
 			RotateEntity it\obj, 0, r\angle, 0
 			EntityParent(it\obj, r\obj)
-			it = CreateItem("Document SCP-109", "paper", r\x + 864.0 * RoomScale, r\y + 192.0 * RoomScale, r\z + 584.0 * RoomScale)
+			
+			it = CreateItem("Emily Ross's Badge", "badge", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
 			EntityParent(it\obj, r\obj)
-			it = CreateItem("Level 2 Key Card", "key2", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
-			EntityParent(it\obj, r\obj)
-			;it = CreateItem("SCP-109","scp109", x, y, z)
-			;EntityParent(it\obj, r\obj)
 			;[End Block]
 		Case "room3offices"
 			;[Block]			
@@ -6658,10 +6652,10 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
-;~F#526#545#563#574#57F#5B8#5C6#5F0#622#62A#63F#683#68C#6DD#71F#741#79D#7AF#815#824
-;~F#84E#85F#870#88E#8B5#8BC#8CA#8E6#8FB#918#935#942#954#98D#9B7#A03#A59#A6C#A87#AD8
-;~F#B31#B40#B7C#B84#B92#BA7#BE3#C02#C12#C2A#C52#C65#C87#CAF#CFD#D29#D50#D57#D5C#D93
-;~F#DBA#DCF#DFF#E7D#E98#F05#F57#F82#FD3#FDC#1076#107D#108C#1096#10AA#10B4#10CB#10D2#10FC#1179
-;~F#11C6#11D1#11E2#11E7#11F6#120D#1283#128C#136B#1388#138F#1395#13A3#13C7#13E3#1416#14E2#151B#1530#15A1
-;~F#1636#163B#164B#191C#1933#1952#1959
+;~F#526#545#563#574#57F#5B8#5C6#5F0#622#62A#63F#68C#6DD#71F#741#79D#7AF#815#824#84E
+;~F#85F#870#88E#8B5#8BC#8CA#8E6#8FB#918#935#942#954#98D#9B7#A03#A59#A6C#A87#AD8#B31
+;~F#B40#B7C#B84#B92#BA7#BE3#C02#C12#C2A#C52#C65#C87#CAF#CFD#D29#D50#D57#D5C#D93#DBA
+;~F#DCF#DFF#E7D#E98#F05#F57#F82#FD3#FDC#1076#107D#108C#1096#10AA#10C5#10CC#10F6#1173#117F#11C0
+;~F#11CB#11DC#11E1#11F0#1207#127D#1286#1365#1382#1389#138F#139D#13C1#13DD#1410#14DC#1515#152A#159B#1630
+;~F#1635#1645#1916#192D#194C#1953#19A0
 ;~C#Blitz3D

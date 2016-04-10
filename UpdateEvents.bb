@@ -534,6 +534,8 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 							
+							e\room\NPC[5]\SoundChn = LoopSound2(e\room\NPC[5]\Sound,e\room\NPC[5]\SoundChn,Camera,e\room\NPC[5]\obj,2,0.5)
+							
 							If e\EventStr <> "" And e\EventStr <> "done" Then
 								If e\SoundCHN = 0 Then 
 									e\SoundCHN = PlaySound_Strict(LoadTempSound("SFX\intro\PA\on.ogg"))
@@ -796,7 +798,7 @@ Function UpdateEvents()
 								e\room\NPC[4] = CreateNPC(NPCtypeGuard, e\room\x-3840*RoomScale, 0.3, e\room\z+768*RoomScale)
 								SetNPCFrame(e\room\NPC[4], Rnd(1035, 1326))
 								e\room\NPC[5] = CreateNPC(NPCtypeGuard, e\room\x-8288*RoomScale, 0.3, e\room\z+1096*RoomScale)
-								;RotateEntity e\room\NPC[5]\Collider, 0, e\room\angle, 0, True
+								e\room\NPC[5]\Sound = LoadSound_Strict("SFX\Intro\guard_music.ogg")
 								RotateEntity e\room\NPC[5]\Collider, 0, e\room\angle+180, 0, True
 								e\room\NPC[5]\State = 7
 								e\room\NPC[6] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
@@ -7426,7 +7428,7 @@ Function UpdateEvents()
 			Case "room2scps2"
 				;[Block]
 				;If PlayerRoom = e\room
-				If e\room\dist < 15 And e\room\dist > 0 Then
+				If e\room\dist < 15
 					If Contained106 Then e\EventState = 2.0
 					If Curr106\State < 0 Then e\EventState = 2.0
 					
@@ -7445,6 +7447,7 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 					Else
+						DebugLog "Removed 'room2scps2' event"
 						e\room\RoomDoors[0]\locked = False
 						de.Decals = CreateDecal(0, EntityX(e\room\Objects[0],True), e\room\y+2.0*RoomScale, EntityZ(e\room\Objects[0],True), 90, Rand(360), 0)
 						de\Size = 0.5 : EntityAlpha(de\obj, 0.8)
@@ -7680,8 +7683,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#F8#4C3#4CD#506#53B#59A#70F#8E9#910#91E#928#935#B1E#B3F#B8E#BDC#BE9#C23#C3A#C5A
-;~F#C63#C6D#C7C#D10#D32#FDE#1024#103A#1046#1064#10B5#10CC#1197#1298#1329#1342#1361#1392#139F#13B8
-;~F#1450#1606#16B0#1704#17B5#1865#1919#1931#19EA#1A17#1A34#1A5B#1A8B#1AA8#1ACC#1B26#1B66#1B97#1BAA#1C62
-;~F#1CBA#1CCD#1CDC#1D02#1D20
+;~F#11#4C5#4CF#508#53D#59C#711#8EB#912#920#92A#937#B20#B41#B90#BDE#BEB#C25#C3C#C5C
+;~F#C65#C6F#C7E#D12#D34#FE0#1026#103C#1048#1066#10B7#10CE#1199#129A#132B#1344#1363#1394#13A1#13BA
+;~F#1452#1608#16B2#1706#17B7#1867#191B#1933#19EC#1A19#1A36#1A5D#1A8D#1AAA#1ACE#1B28#1B68#1B99#1BAC#1C64
+;~F#1CBC#1CCF#1CDE#1D04#1D23
 ;~C#Blitz3D
