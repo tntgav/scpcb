@@ -6596,10 +6596,10 @@ Function UpdateRoomLights()
 									r\LightSpriteHidden%[i] = False
 								EndIf
 								If PlayerRoom\RoomTemplate\Name$ = "173"
-									random# = Rnd(0.39,0.41)
+									random# = Rnd(0.38,0.42)
 								Else
 									If r\LightFlicker%[i]<5
-										random# = Rnd(0.39,0.41)
+										random# = Rnd(0.38,0.42)
 									ElseIf r\LightFlicker%[i]>4 And r\LightFlicker%[i]<10
 										random# = Rnd(0.35,0.45)
 									Else
@@ -6607,7 +6607,7 @@ Function UpdateRoomLights()
 									EndIf
 								EndIf
 								ScaleSprite r\LightSprites2[i],random#,random#
-								dist# = (EntityDistance(Camera,r\LightSpritesPivot[i])+1.0)/10.0
+								dist# = (EntityDistance(Camera,r\LightSpritesPivot[i])+0.5)/7.5
 								dist# = Max(Min(dist#,1.0),0.0)
 								alpha# = Float(Inverse(dist#))
 								
