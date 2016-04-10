@@ -13,6 +13,7 @@ EndIf
 Include "FastExt.bb"
 Include "FastText_Unicode.bb"
 Include "StrictLoads.bb"
+Include "fullscreen_window_fix.bb"
 
 CompatData%(12, 0) ;hopefully this fixes performance issues on Windows 8
 Global OptionFile$ = "options.ini"
@@ -52,14 +53,31 @@ Global ShowFPS = GetINIInt(OptionFile, "options", "show FPS"), WireframeState
 Global TotalGFXModes% = CountGfxModes3D(), GFXModes%
 Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
 
+Global FakeFullScreen% = GetINIInt(OptionFile, "options", "fakefullscreen")
+
 If LauncherEnabled Then 
 	UpdateLauncher()
 	
-	If Fullscreen Then
-		Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+	;New "fake fullscreen" - ENDSHN
+	If FakeFullScreen
+		DebugLog "Using Faked Fullscreen"
+		Graphics3DExt G_viewport_width, G_viewport_height, 0, 2
+		
+		; -- Change the window style to 'WS_POPUP' and then set the window position to force the style to update.
+		api_SetWindowLong( G_app_handle, C_GWL_STYLE, C_WS_POPUP )
+		api_SetWindowPos( G_app_handle, C_HWND_TOP, G_viewport_x, G_viewport_y, G_viewport_width, G_viewport_height, C_SWP_SHOWWINDOW )
+		
+		GraphicWidth = G_viewport_width
+		GraphicHeight = G_viewport_height
+		
+		Fullscreen = False
 	Else
-		Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
-	End If
+		If Fullscreen Then
+			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+		Else
+			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
+		End If
+	EndIf
 	
 Else
 	For i% = 1 To TotalGFXModes
@@ -78,11 +96,26 @@ Else
 	GraphicWidth = GfxModeWidths(SelectedGFXMode)
 	GraphicHeight = GfxModeHeights(SelectedGFXMode)
 	
-	If Fullscreen Then
-		Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+	;New "fake fullscreen" - ENDSHN
+	If FakeFullScreen
+		DebugLog "Using Faked Fullscreen"
+		Graphics3DExt G_viewport_width, G_viewport_height, 0, 2
+		
+		; -- Change the window style to 'WS_POPUP' and then set the window position to force the style to update.
+		api_SetWindowLong( G_app_handle, C_GWL_STYLE, C_WS_POPUP )
+		api_SetWindowPos( G_app_handle, C_HWND_TOP, G_viewport_x, G_viewport_y, G_viewport_width, G_viewport_height, C_SWP_SHOWWINDOW )
+		
+		GraphicWidth = G_viewport_width
+		GraphicHeight = G_viewport_height
+		
+		Fullscreen = False
 	Else
-		Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
-	End If
+		If Fullscreen Then
+			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+		Else
+			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
+		End If
+	EndIf
 	
 EndIf
 
@@ -7595,6 +7628,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#20#70#F0#F4#FB#34B#44E#46C#4E2#4EF#583#5FA#611#61E#650#6F7#7CB#130D#14B0#162D
-;~F#164C#166B#1689#168D#16AD
+;~F#91#111#115#11C#36C#46F#48D#503#510#5A4#61B#632#63F#671#718#7EC#132E#14D1#164E#166D
+;~F#168C#16AA#16AE#16CE
 ;~C#Blitz3D

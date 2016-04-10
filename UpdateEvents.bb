@@ -2233,11 +2233,22 @@ Function UpdateEvents()
 									Next
 								Else
 									
+									For i = 5 To 8
+										If e\room\NPC[i]\State = 5
+											e\room\NPC[i]\EnemyX = EntityX(Collider)
+											e\room\NPC[i]\EnemyY = EntityY(Collider)
+											e\room\NPC[i]\EnemyZ = EntityZ(Collider)
+										EndIf
+									Next
+									
 									If e\EventState2=<1 Then
 										For i = 5 To 8
-											If e\room\NPC[i]\State = 2 Then
+											If e\room\NPC[i]\State = 5 Then
 												For temp = 5 To 8
-													e\room\NPC[temp]\State = 2
+													e\room\NPC[temp]\State = 5
+													e\room\NPC[temp]\EnemyX = EntityX(Collider)
+													e\room\NPC[temp]\EnemyY = EntityY(Collider)
+													e\room\NPC[temp]\EnemyZ = EntityZ(Collider)
 													e\room\NPC[temp]\PathTimer = 70*Rand(7,10)
 													e\room\NPC[temp]\Reload = 2000
 												Next
@@ -2257,6 +2268,7 @@ Function UpdateEvents()
 										ShouldPlay = 0
 										CurrSpeed = 0
 										If ChannelPlaying(e\SoundCHN)=False Then
+											;PlaySound_Strict LoadTempSound("SFX\MTF\GateA_Gunshot.ogg")
 											PlaySound_Strict IntroSFX(9)
 											SelectedEnding = "A2"
 											GodMode = 0
@@ -7465,9 +7477,6 @@ Function UpdateEvents()
 				;- 1.0 = item "trade" will happen
 				;- 2.0 = the player doesn't has any items in the Inventory, giving him heavily Injuries and giving him a random item
 				If PlayerRoom = e\room
-					ShouldPlay=22
-					
-					If Music(22)=0 Then Music(22)=LoadSound_Strict("SFX\Music\GrowlingAmbiance.ogg")
 					
 					GrabbedEntity = 0
 					
@@ -7683,8 +7692,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#4C5#4CF#508#53D#59C#711#8EB#912#920#92A#937#B20#B41#B90#BDE#BEB#C25#C3C#C5C
-;~F#C65#C6F#C7E#D12#D34#FE0#1026#103C#1048#1066#10B7#10CE#1199#129A#132B#1344#1363#1394#13A1#13BA
-;~F#1452#1608#16B2#1706#17B7#1867#191B#1933#19EC#1A19#1A36#1A5D#1A8D#1AAA#1ACE#1B28#1B68#1B99#1BAC#1C64
-;~F#1CBC#1CCF#1CDE#1D04#1D23
+;~F#11#F8#4C5#4CF#508#53D#59C#711#8F7#91E#92C#936#943#B2C#B4D#B9C#BEA#BF7#C31#C48
+;~F#C68#C71#C7B#C8A#D1E#D40#FEC#1032#1048#1054#1072#10C3#10DA#11A5#12A6#1337#1350#136F#13A0#13AD
+;~F#13C6#145E#1614#16BE#1712#17C3#1873#1927#193F#19F8#1A25#1A42#1A69#1A99#1AB6#1ADA#1B34#1B74#1BA5#1BB8
+;~F#1C70#1CC8#1CDB#1CEA#1D10
 ;~C#Blitz3D

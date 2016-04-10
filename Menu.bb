@@ -743,12 +743,14 @@ Function UpdateLauncher()
 			y=y+20
 		Next
 		
-		Fullscreen = DrawTick(40 + 430, 262 - 55, Fullscreen)
-		LauncherEnabled = DrawTick(40 + 430, 260 - 55 + 40, LauncherEnabled)
+		Fullscreen = DrawTick(40 + 430 - 15, 260 - 55, Fullscreen)
+		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 40, LauncherEnabled)
+		FakeFullScreen = DrawTick(40 + 430 - 15, 260 - 55 + 80, FakeFullScreen)
 		
 		Color 255, 255, 255
-		Text(40 + 430 + 35, 262 - 55, "Fullscreen")
-		Text(40 + 430 + 35, 262 - 55 + 40, "Use launcher")
+		Text(40 + 430 + 15, 262 - 55, "Fullscreen")
+		Text(40 + 430 + 15, 262 - 55 + 40, "Use launcher")
+		Text(40 + 430 + 15, 262 - 55 + 80, "Fake Fullscreen")
 		
 		If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 55, 100, 30, "LAUNCH", False) Then
 			GraphicWidth = GfxModeWidths(SelectedGFXMode)
@@ -771,6 +773,11 @@ Function UpdateLauncher()
 		PutINIValue(OptionFile, "launcher", "launcher enabled", "true")
 	Else
 		PutINIValue(OptionFile, "launcher", "launcher enabled", "false")
+	EndIf
+	If FakeFullScreen Then
+		PutINIValue(OptionFile, "options", "fakefullscreen", "true")
+	Else
+		PutINIValue(OptionFile, "options", "fakefullscreen", "false")
 	EndIf
 	
 	PutINIValue(OptionFile, "options", "gfx driver", SelectedGFXDriver)
@@ -1179,5 +1186,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#30C#31E#328#3F9#40C#429#464#47C#483
+;~F#31#76#313#325#32F#400#413#430#46B#483#48A
 ;~C#Blitz3D
