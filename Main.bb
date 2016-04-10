@@ -1065,13 +1065,16 @@ Global MachineSFX% = LoadSound_Strict("SFX\Machine.ogg")
 Global ApacheSFX = LoadSound_Strict("SFX\apache.ogg")
 
 Global CurrStepSFX
-Dim StepSFX%(3, 2, 4) ;(normal/metal, walk/run, id)
+Dim StepSFX%(4, 2, 4) ;(normal/metal, walk/run, id)
 For i = 0 To 3
 	StepSFX(0, 0, i) = LoadSound_Strict("SFX\step" + (i + 1) + ".ogg")
 	StepSFX(1, 0, i) = LoadSound_Strict("SFX\stepmetal" + (i + 1) + ".ogg")
 	StepSFX(0, 1, i)= LoadSound_Strict("SFX\run" + (i + 1) + ".ogg")
 	StepSFX(1, 1, i) = LoadSound_Strict("SFX\runmetal" + (i + 1) + ".ogg")
-	If i < 3 Then StepSFX(2, 0, i) = LoadSound_Strict("SFX\MTF\StepMTF" + (i + 1) + ".ogg")	
+	If i < 3
+		StepSFX(2, 0, i) = LoadSound_Strict("SFX\MTF\StepMTF" + (i + 1) + ".ogg")
+		StepSFX(3, 0, i) = LoadSound_Strict("SFX\StepBoot"+ (i + 1) + ".ogg")
+	EndIf
 Next
 
 Dim Step2SFX(6)
@@ -2483,11 +2486,11 @@ Function MovePlayer()
 					
 					If Sprint = 1.0 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
-						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 3)))
+						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 3)))
 						ChannelVolume tempchn, 1.0-(Crouch*0.6)
 					Else
 						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
-						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 3)))
+						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 3)))
 						ChannelVolume tempchn, 1.0-(Crouch*0.6)
 					End If
 				ElseIf CurrStepSFX=1
@@ -7628,6 +7631,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#91#111#115#11C#36C#46F#48D#503#510#5A4#61B#632#63F#671#718#7EC#132E#14D1#164E#166D
-;~F#168C#16AA#16AE#16CE
+;~F#21#91#111#115#11C#472#490#506#513#5A7#61E#635#642#674#71B#7EF#1331#14D4#1651#1670
+;~F#168F#16AD#16B1#16D1
 ;~C#Blitz3D

@@ -1519,9 +1519,9 @@ Function UpdateNPCs()
 							
 							If n\CurrSpeed > 0.005 Then
 								If (prevFrame < 361 And n\Frame=>361) Or (prevFrame < 377 And n\Frame=>377) Then
-									PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.8,1.0))						
+									PlaySound2(StepSFX(3,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.8,1.0))						
 								ElseIf (prevFrame < 431 And n\Frame=>431) Or (prevFrame < 447 And n\Frame=>447)
-									PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.8,1.0))
+									PlaySound2(StepSFX(3,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.8,1.0))
 								EndIf
 							EndIf											
 						Else ;more than 3 rooms away from the player -> randomly teleport from waypoint to another
@@ -4582,5 +4582,5 @@ Function GetNPCStepSound(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#38#212#236#31E#407#556#623#6B8#765#76A#798#83A#875#902#96E#A81#B47#BF7#CAA
-;~F#DA9#DC8#DEE#E53#EE4#FA2#106C
+;~F#DA9#DC8#DEE#DF9#E04#E05#E53#EE4#FA2#100C#106C#10C4#113C#114D#1168#1186
 ;~C#Blitz3D
