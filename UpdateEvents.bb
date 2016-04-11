@@ -798,7 +798,7 @@ Function UpdateEvents()
 								e\room\NPC[4] = CreateNPC(NPCtypeGuard, e\room\x-3840*RoomScale, 0.3, e\room\z+768*RoomScale)
 								SetNPCFrame(e\room\NPC[4], Rnd(1035, 1326))
 								e\room\NPC[5] = CreateNPC(NPCtypeGuard, e\room\x-8288*RoomScale, 0.3, e\room\z+1096*RoomScale)
-								e\room\NPC[5]\Sound = LoadSound_Strict("SFX\Intro\guard_music.ogg")
+								e\room\NPC[5]\Sound = LoadSound_Strict("SFX\Intro\guard_music"+Rand(1,5)+".ogg")
 								RotateEntity e\room\NPC[5]\Collider, 0, e\room\angle+180, 0, True
 								e\room\NPC[5]\State = 7
 								e\room\NPC[6] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
@@ -7692,8 +7692,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4C5#4CF#508#53D#59C#711#8F7#91E#92C#936#943#B2C#B4D#B9C#BEA#BF7#C31#C48
-;~F#C68#C71#C7B#C8A#D1E#D40#FEC#1032#1048#1054#1072#10C3#10DA#11A5#12A6#1337#1350#136F#13A0#13AD
-;~F#13C6#145E#1614#16BE#1712#17C3#1873#1927#193F#19F8#1A25#1A42#1A69#1A99#1AB6#1ADA#1B34#1B74#1BA5#1BB8
-;~F#1C70#1CC8#1CDB#1CEA#1D10
+;~F#11#4C5#4CF#508#53D#59C#711#8F7#91E#92C#936#943#B2C#B4D#B9C#BEA#BF7#C31#C48#C68
+;~F#C71#C7B#C8A#D1E#D40#FEC#1032#1048#1054#1072#10C3#10DA#11A5#12A6#1337#1350#136F#13A0#13AD#13C6
+;~F#145E#1614#16BE#1712#17C3#1873#1927#193F#19F8#1A25#1A42#1A69#1A99#1AB6#1ADA#1B34#1B74#1BA5#1BB8#1C70
+;~F#1CC8#1CDB#1CEA#1D10
 ;~C#Blitz3D

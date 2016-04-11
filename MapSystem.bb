@@ -663,7 +663,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				
 				temp1i=0
 				
-				For j = 0 To 3
+				For j = 0 To MaxRoomEmitters-1
 					If rt\TempSoundEmitter[j]=0 Then
 						rt\TempSoundEmitterX[j]=ReadFloat(f)*RoomScale
 						rt\TempSoundEmitterY[j]=ReadFloat(f)*RoomScale
@@ -1373,6 +1373,9 @@ End Function
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+Const MaxRoomLights% = 20
+Const MaxRoomEmitters% = 8
+
 
 Const ROOM1% = 1, ROOM2% = 2, ROOM2C% = 3, ROOM3% = 4, ROOM4% = 5
 
@@ -1385,9 +1388,9 @@ Type RoomTemplates
 	
 	;Field ambience%
 	
-	Field TempSoundEmitter%[4]
-	Field TempSoundEmitterX#[4],TempSoundEmitterY#[4],TempSoundEmitterZ#[4]
-	Field TempSoundEmitterRange#[4]
+	Field TempSoundEmitter%[MaxRoomEmitters]
+	Field TempSoundEmitterX#[MaxRoomEmitters],TempSoundEmitterY#[MaxRoomEmitters],TempSoundEmitterZ#[MaxRoomEmitters]
+	Field TempSoundEmitterRange#[MaxRoomEmitters]
 	
 	Field Shape%, Name$
 	Field Commonness%, Large%
@@ -1515,9 +1518,6 @@ Global HideDistance# = 15.0
 Global SecondaryLightOn# = True
 Global RemoteDoorOn = True
 Global Contained106 = False, Disabled173 = False
-
-Const MaxRoomLights% = 20
-Const MaxRoomEmitters% = 8
 
 Type Rooms
 	Field zone%
@@ -4329,7 +4329,7 @@ Function FillRoom(r.Rooms)
 		EndIf
 	Next
 	
-	For i = 0 To 3
+	For i = 0 To MaxRoomEmitters-1
 		If r\RoomTemplate\TempSoundEmitter[i]<>0 Then
 			r\SoundEmitterObj[i]=CreatePivot(r\obj)
 			PositionEntity r\SoundEmitterObj[i], r\x+r\RoomTemplate\TempSoundEmitterX[i],r\y+r\RoomTemplate\TempSoundEmitterY[i],r\z+r\RoomTemplate\TempSoundEmitterZ[i],True
@@ -4388,7 +4388,7 @@ Function UpdateRooms()
 		
 		
 		If x<16 And z < 16 Then
-			For i = 0 To 3
+			For i = 0 To MaxRoomEmitters-1
 				If r\SoundEmitter[i]<>0 Then 
 					dist# = EntityDistance(r\SoundEmitterObj[i],Collider)
 					If dist < r\SoundEmitterRange[i] Then
@@ -4423,7 +4423,7 @@ Function UpdateRooms()
 			HideEntity r\obj
 		Else
 			ShowEntity r\obj
-			For i = 0 To 19
+			For i = 0 To MaxRoomLights-1
 				If r\Lights[i] <> 0 Then
 					dist = EntityDistance(Collider,r\Lights[i])
 					If dist < HideDistance Then
@@ -6652,11 +6652,11 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
-;~F#526#545#563#574#57F#5B8#5C6#623#62B#640#68D#6DE#720#742#79E#7B0#816#825#84F#860
-;~F#871#88F#8B6#8BD#8CB#8E7#8FC#919#936#943#955#98E#9B8#A04#A5A#A6D#A88#AD9#B32#B41
-;~F#B7D#B85#B93#BA8#BE4#C03#C13#C2B#C53#C66#C88#CB0#CFE#D2A#D51#D58#D5D#D94#DBB#DD0
-;~F#E00#E7E#E99#F06#F58#F83#FD4#FDD#1077#107E#108D#1097#10AB#10C6#10CD#10F7#1174#1180#11C1#11CC
-;~F#11DD#11E2#11F1#1208#127E#1287#1366#1383#138A#1390#139E#13C2#13DE#1411#14DD#1516#152B#159C#1631#1636
-;~F#1646#1917#192E#194D#1954#19A1
+;~F#2#A#2D#FA#109#110#117#11E#12F#137#2FD#30E#31F#347#355#365#36A#375#41C#526
+;~F#545#577#582#5BB#5C9#623#62B#640#68D#6DE#720#742#79E#7B0#816#825#84F#860#871#88F
+;~F#8B6#8BD#8CB#8E7#8FC#919#936#943#955#98E#9B8#A04#A5A#A6D#A88#AD9#B32#B41#B7D#B85
+;~F#B93#BA8#BE4#C03#C13#C2B#C53#C66#C88#CB0#CFE#D2A#D51#D58#D5D#D94#DBB#DD0#E00#E7E
+;~F#E99#F06#F58#F83#FD4#FDD#1077#107E#108D#1097#10AB#10C6#10CD#1174#1180#11C1#11CC#11DD#11E2#11F1
+;~F#1208#127E#1287#1366#1383#138A#1390#139E#13C2#13DE#1411#14DD#1516#152B#159C#1631#1636#1646#1917#192E
+;~F#194D#1954#19A1
 ;~C#Blitz3D
