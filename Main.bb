@@ -2446,7 +2446,7 @@ Function MovePlayer()
 			Shake# = (Shake + FPSfactor * Min(Sprint, 1.5) * 7) Mod 720
 			If temp < 180 And (Shake Mod 360) >= 180 Then
 				If CurrStepSFX=0 Then
-					temp = GetStepSound()
+					temp = GetStepSound(Collider)
 					
 					If Sprint = 1.0 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
@@ -2539,7 +2539,7 @@ Function MovePlayer()
 		If CollidedFloor = True Then
 			If DropSpeed# < - 0.07 Then 
 				If CurrStepSFX=0 Then
-					PlaySound_Strict(StepSFX(GetStepSound(), 0, Rand(0, 3)))					
+					PlaySound_Strict(StepSFX(GetStepSound(Collider), 0, Rand(0, 3)))					
 				ElseIf CurrStepSFX=1
 					PlaySound_Strict(Step2SFX(Rand(0, 2)))
 				ElseIf CurrStepSFX=2
@@ -5737,11 +5737,11 @@ Function ResumeSounds()
 	EndIf
 End Function
 
-Function GetStepSound()
+Function GetStepSound(entity%)
 	Local picker%,brush%,texture%,name$
 	Local mat.Materials
 	
-	picker = LinePick(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,-1,0)
+	picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
 	If picker <> 0 Then
 		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
 		If brush<>0 Then

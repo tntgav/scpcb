@@ -1920,17 +1920,17 @@ Function UpdateNPCs()
 				If n\State = 1
 					If n\CurrSpeed > 0.01 Then
 						If prevFrame < 244 And AnimTime(n\obj)=>244 Then
-							PlaySound2(StepSFX(GetNPCStepSound(n),0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))						
+							PlaySound2(StepSFX(GetStepSound(n\Collider),0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))						
 						ElseIf prevFrame < 256 And AnimTime(n\obj)=>256
-							PlaySound2(StepSFX(GetNPCStepSound(n),0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+							PlaySound2(StepSFX(GetStepSound(n\Collider),0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 						EndIf
 					EndIf
 				ElseIf n\State = 2
 					If n\CurrSpeed > 0.01 Then
 						If prevFrame < 309 And AnimTime(n\obj)=>309
-							PlaySound2(StepSFX(GetNPCStepSound(n),1,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+							PlaySound2(StepSFX(GetStepSound(n\Collider),1,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 						ElseIf prevFrame =< 319 And AnimTime(n\obj)=<301
-							PlaySound2(StepSFX(GetNPCStepSound(n),1,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+							PlaySound2(StepSFX(GetStepSound(n\Collider),1,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 						EndIf
 					EndIf
 				EndIf
@@ -4409,34 +4409,7 @@ Function Console_SpawnNPC(c_input$,state%=-9999)
 	
 End Function
 
-Function GetNPCStepSound(n.NPCs)
-	Local picker%,brush%,texture%,name$
-	Local mat.Materials
-	
-	picker = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-1,0)
-	If picker <> 0 Then
-		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
-		If brush<>0 Then
-			texture = GetBrushTexture(brush,1)
-			If texture <> 0 Then
-				name = StripPath(TextureName(texture))
-				FreeTexture(texture)
-				FreeBrush(brush)
-				For mat.Materials = Each Materials
-					If mat\name = name Then
-						If mat\StepSound>0 Then
-							Return mat\StepSound-1
-						EndIf
-						Exit
-					EndIf
-				Next				
-			EndIf
-		EndIf
-	EndIf
-	
-	Return 0
-End Function
 ;~IDEal Editor Parameters:
-;~F#0#38#212#236#31E#407#556#623#6B8#765#798#83A#875#902#96E#A81#B47#BF7#CAA#DA9
-;~F#DC8#DEE#DF8#E02#E03#101F#1097#10A8#10C3#10E1#1126
+;~F#0#A#38#212#236#31E#407#556#623#6B8#765#798#83A#875#902#96E#A81#B47#BF7#CAA
+;~F#DA9#DC8#DEE#DF9#E04#1034#10BD#10D8#10F6
 ;~C#Blitz3D
