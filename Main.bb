@@ -805,6 +805,13 @@ Function UpdateConsole()
 					StrTemp2$ = Piece$(args$,2," ")
 					
 					Console_SpawnNPC(StrTemp$,Int(StrTemp2$))
+				Case "toggle_warhead_lever"
+					For e.Events = Each Events
+						If e\EventName = "room2nuke" Then
+							e\EventState = (Not e\EventState)
+							Exit
+						EndIf
+					Next
 				Default
 					CreateConsoleMsg("Command not found")
 			End Select
@@ -7631,6 +7638,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#91#111#115#11C#36C#472#490#506#513#5A7#61E#635#642#674#71B#7EF#1331#14D4#1651
-;~F#1670#168F#16AD#16B1#16D1
+;~F#21#91#111#115#373#479#497#50D#51A#5AE#625#63C#649#67B#722#7F6#1338#14DB#1658#1677
+;~F#1696#16B4#16B8#16D8
 ;~C#Blitz3D

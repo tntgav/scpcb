@@ -1483,6 +1483,12 @@ Function UpdateEvents()
 							
 							e\EventState = 1.0
 							
+							For n.NPCs = Each NPCs
+								If n\NPCtype = NPCtypeMTF
+									RemoveNPC(n)
+								EndIf
+							Next
+							
 							DrawLoading(100,True)
 						Else
 							
@@ -1615,22 +1621,22 @@ Function UpdateEvents()
 												LoadEventSound(e,"SFX\nuke2.ogg")
 												e\SoundCHN = PlaySound_Strict(e\Sound)
 												
-												n.NPCs = CreateNPC(NPCtypeApache, EntityX(e\room\Objects[9],True),EntityY(e\room\Objects[9],True)+0.5,EntityZ(e\room\Objects[9],True))
-												n\State = 2
+												;n.NPCs = CreateNPC(NPCtypeApache, EntityX(e\room\Objects[9],True),EntityY(e\room\Objects[9],True)+0.5,EntityZ(e\room\Objects[9],True))
+												;n\State = 2
 												
-												e\room\NPC[2]\State = 2
+												;e\room\NPC[2]\State = 2
 												
-												For i = 14 To 17
-													em.Emitters = CreateEmitter(EntityX(e\room\Objects[i],True),EntityY(e\room\Objects[i],True), EntityZ(e\room\Objects[i],True),0)
-													TurnEntity(em\Obj, 90, 0, 0, True)
-													;EntityParent(em\Obj, e\room\obj)
-													em\Room = PlayerRoom
-													em\RandAngle = 15
-													em\Speed = 0.025
-													em\SizeChange = 0.005
-													em\Achange = -0.008
-													em\Gravity = -0.21
-												Next
+												;For i = 14 To 17
+												;	em.Emitters = CreateEmitter(EntityX(e\room\Objects[i],True),EntityY(e\room\Objects[i],True), EntityZ(e\room\Objects[i],True),0)
+												;	TurnEntity(em\Obj, 90, 0, 0, True)
+												;	;EntityParent(em\Obj, e\room\obj)
+												;	em\Room = PlayerRoom
+												;	em\RandAngle = 15
+												;	em\Speed = 0.025
+												;	em\SizeChange = 0.005
+												;	em\Achange = -0.008
+												;	em\Gravity = -0.21
+												;Next
 												
 												SelectedEnding = "B3"
 											EndIf
@@ -1642,13 +1648,15 @@ Function UpdateEvents()
 											e\room\NPC[0]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/85.0)+9.0
 											e\room\NPC[0]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/25.0)*3
 											
-											e\room\NPC[2]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs()/23.0)*3
-											e\room\NPC[2]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/83.0)+5.0
-											e\room\NPC[2]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/23.0)*3
+											;e\room\NPC[2]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs()/23.0)*3
+											;e\room\NPC[2]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/83.0)+5.0
+											;e\room\NPC[2]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/23.0)*3
+											
+											e\room\RoomDoors[5]\open = True
 											
 											If e\EventState-FPSfactor < 80.0*70 And e\EventState => 80.0*70 Then
 												For i = 0 To 1
-													n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[18],True)+(i*0.4),EntityY(e\room\Objects[18],True)+0.29*(i+1),EntityZ(e\room\Objects[18],True)+(i*0.4))
+													n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[18],True)+(i*0.4),EntityY(e\room\Objects[18],True)+0.29,EntityZ(e\room\Objects[18],True)+(i*0.4))
 												Next
 												
 												n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\RoomDoors[2]\obj,True),EntityY(e\room\RoomDoors[2]\obj,True)+0.29,(EntityZ(e\room\RoomDoors[2]\obj,True)+EntityZ(e\room\RoomDoors[3]\obj,True))/2)
@@ -1656,7 +1664,7 @@ Function UpdateEvents()
 												For n.NPCs = Each NPCs
 													If n\NPCtype = NPCtypeMTF Then
 														n\LastSeen = (70*Rnd(30,35))
-														n\State = 2
+														n\State = 3
 														n\State2 = 10
 														n\EnemyX = EntityX(Collider)
 														n\EnemyY = EntityY(Collider)
@@ -1664,7 +1672,78 @@ Function UpdateEvents()
 													EndIf
 												Next
 												
+												DebugLog "MTF Units spawned!"
+												
 												e\EventState = 85.0*70
+											EndIf
+											
+											;Update the MTF Units everytime they cannot detect the player
+											If e\EventState3 = 0.0
+												For n.NPCs = Each NPCs
+													If n\NPCtype = NPCtypeMTF
+														If n\State = 5
+															n\State = 3
+															n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider),EntityZ(Collider))
+															n\PathTimer = 70*Rand(15,20)
+															n\LastSeen = 70*300
+														EndIf
+														If EntityDistance(n\Collider,Collider)<3.0
+															n\State = 5
+															n\PathStatus = 0
+															n\PathTimer = 0
+															n\CurrSpeed = 0
+														EndIf
+													EndIf
+												Next
+											EndIf
+											
+											For n.NPCs = Each NPCs
+												If n\NPCtype = NPCtypeMTF
+													If n\State = 5 And EntityDistance(n\Collider,Collider)<3.0
+														If e\EventState3 = 0.0
+															PlaySound_Strict(LoadTempSound("SFX\MTF\ThereHeIs1.ogg"))
+															e\EventState3 = e\EventState3 + FPSfactor
+															For n2.NPCs = Each NPCs
+																If n2\NPCtype = n\NPCtype
+																	n2\State = 5
+																	n2\PathStatus = 0
+																	n2\PathTimer = 0
+																	n2\CurrSpeed = 0
+																EndIf
+															Next
+															Exit
+														EndIf
+													EndIf
+												EndIf
+											Next
+											
+											If e\EventState3 > 0.0 And e\EventState3 <= 500.0
+												e\EventState3 = e\EventState3 + FPSfactor
+												CurrSpeed = CurrSpeed - (CurrSpeed * 0.9 * FPSfactor)
+												For n.NPCs = Each NPCs
+													If n\NPCtype = NPCtypeMTF
+														n\EnemyX = EntityX(Collider)
+														n\EnemyY = EntityY(Collider)
+														n\EnemyZ = EntityZ(Collider)
+													EndIf
+												Next
+											ElseIf e\EventState3 > 500.0
+												For n.NPCs = Each NPCs
+													If n\NPCtype = NPCtypeMTF
+														RemoveNPC(n)
+													EndIf
+												Next
+												ShouldPlay = 0
+												CurrSpeed = 0
+												PlaySound_Strict LoadTempSound("SFX\MTF\GateB_Gunshot.ogg")
+												GodMode = 0
+												NoClip = 0
+												KillTimer = -0.1
+												DeathMSG = ""
+												Kill()
+												BlinkTimer = -10
+												RemoveEvent(e)
+												Exit
 											EndIf
 											
 										EndIf
@@ -1910,7 +1989,7 @@ Function UpdateEvents()
 						ResetEntity Collider
 						e\EventState = 1.0
 						
-						PlaySound_Strict LoadTempSound("SFX\106escape2.ogg") 
+						If (Not Contained106) Then PlaySound_Strict LoadTempSound("SFX\106escape2.ogg") 
 						
 						DrawLoading(100)
 					Else
@@ -7692,8 +7771,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#4C5#4CF#508#53D#59C#711#8F7#91E#92C#936#943#B2C#B4D#B9C#BEA#BF7#C31#C48#C68
-;~F#C71#C7B#C8A#D1E#D40#FEC#1032#1048#1054#1072#10C3#10DA#11A5#12A6#1337#1350#136F#13A0#13AD#13C6
-;~F#145E#1614#16BE#1712#17C3#1873#1927#193F#19F8#1A25#1A42#1A69#1A99#1AB6#1ADA#1B34#1B74#1BA5#1BB8#1C70
-;~F#1CC8#1CDB#1CEA#1D10
+;~F#11#F8#4C5#4CF#508#53D#760#946#96D#97B#985#992#B7B#B9C#BEB#C39#C46#C80#C97#CB7
+;~F#CC0#CCA#CD9#D6D#D8F#103B#1081#1097#10A3#10C1#1112#1129#11F4#12F5#1386#139F#13BE#13EF#13FC#1415
+;~F#14AD#1663#170D#1761#1812#18C2#1976#198E#1A47#1A74#1A91#1AB8#1AE8#1B05#1B29#1B83#1BC3#1BF4#1C07#1CBF
+;~F#1D17#1D2A#1D39#1D5F
 ;~C#Blitz3D

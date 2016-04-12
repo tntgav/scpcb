@@ -4213,7 +4213,7 @@ Function UpdateMTFUnit(n.NPCs)
 				If Abs(EntityX(target)-EntityX(n\Collider)) < 55.0 And Abs(EntityZ(target)-EntityZ(n\Collider)) < 55.0 And Abs(EntityY(target)-EntityY(n\Collider))< 20.0 Then
 					
 					PointEntity n\obj, target
-					RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),90.0), 0, True
+					RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),30.0), 0, True
 					
 					If n\PathTimer = 0 Then
 						n\PathStatus = EntityVisible(n\Collider,target)
@@ -4582,5 +4582,5 @@ Function GetNPCStepSound(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#38#212#236#31E#407#556#623#6B8#765#76A#798#83A#875#902#96E#A81#B47#BF7#CAA
-;~F#DA9#DC8#DEE#DF9#E04#E05#E53#EE4#FA2#100C#106C#10C4#113C#114D#1168#1186
+;~F#DA9#DC8#DEE#DF9#E05#E53#EE4#FA2#100C#10C4#113C#114D#1168#1186
 ;~C#Blitz3D
