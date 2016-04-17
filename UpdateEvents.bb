@@ -1648,9 +1648,9 @@ Function UpdateEvents()
 											e\room\NPC[0]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/85.0)+9.0
 											e\room\NPC[0]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/25.0)*3
 											
-											;e\room\NPC[2]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs()/23.0)*3
-											;e\room\NPC[2]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/83.0)+5.0
-											;e\room\NPC[2]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/23.0)*3
+											e\room\NPC[2]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs()/23.0)*3
+											e\room\NPC[2]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/83.0)+5.0
+											e\room\NPC[2]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/23.0)*3
 											
 											e\room\RoomDoors[5]\open = True
 											
@@ -1701,7 +1701,7 @@ Function UpdateEvents()
 												If n\NPCtype = NPCtypeMTF
 													If n\State = 5 And EntityDistance(n\Collider,Collider)<3.0
 														If e\EventState3 = 0.0
-															PlaySound_Strict(LoadTempSound("SFX\MTF\ThereHeIs1.ogg"))
+															PlaySound_Strict(LoadTempSound("SFX\MTF\GateB_Ending.ogg"))
 															e\EventState3 = e\EventState3 + FPSfactor
 															For n2.NPCs = Each NPCs
 																If n2\NPCtype = n\NPCtype

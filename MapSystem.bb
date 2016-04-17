@@ -4965,6 +4965,210 @@ Function FindPath(n.NPCs, x#, y#, z#)
 	EndIf
 	
 End Function
+Function FindPath049(n.NPCs, x#, y#, z#)
+	
+	DebugLog "findpath: "+n\NPCtype
+	
+	Local temp%, dist#, dist2#
+	Local xtemp#, ytemp#, ztemp#
+	
+	Local w.WayPoints, StartPoint.WayPoints, EndPoint.WayPoints	
+	
+	Local StartX% = Floor(EntityX(n\Collider) / 8.0 + 0.5), StartZ% = Floor(EntityZ(n\Collider) / 8.0 + 0.5)
+	;If StartX < 0 Or StartX > MapWidth Then Return 2
+	;If StartZ < 0 Or StartZ > MapWidth Then Return 2
+	
+	Local EndX% = Floor(x / 8.0 + 0.5), EndZ% = Floor(z / 8.0 + 0.5)
+	;If EndX < 0 Or EndX > MapWidth Then Return 2
+	;If EndZ < 0 Or EndZ > MapWidth Then Return 2
+	
+	Local CurrX, CurrZ
+	
+	;pathstatus = 0, ei ole etsitty reittiä
+	;pathstatus = 1, reitti löydetty
+	;pathstatus = 2, reittiä ei ole olemassa	
+	
+	For w.WayPoints = Each WayPoints 
+		w\state = 0
+		w\Fcost = 0
+		w\Gcost = 0
+		w\Hcost = 0
+	Next
+	
+	n\PathStatus = 0
+	n\PathLocation = 0
+	For i = 0 To 19
+		n\Path[i] = Null
+	Next
+	
+	Local pvt = CreatePivot()
+	PositionEntity(pvt, x,y,z, True)	
+	
+	temp = CreatePivot()
+	PositionEntity(temp, EntityX(n\Collider,True), EntityY(n\Collider,True)+0.15, EntityZ(n\Collider,True))
+	
+	;käytetään aloituspisteenä waypointia, joka on lähimpänä loppupistettä ja joka on näkyvissä
+	dist = 100.0
+	For w.WayPoints = Each WayPoints
+		xtemp = Abs(EntityX(w\obj,True)-EntityX(temp,True))
+		If xtemp < 8.0 Then
+			ztemp = Abs(EntityZ(w\obj,True)-EntityZ(temp,True))
+			If ztemp < 8.0 Then 
+				ytemp = Abs(EntityY(w\obj,True)-EntityY(temp,True))
+				If ytemp < 8.0 Then 
+					dist2# = xtemp+ztemp+ytemp
+					If dist2 < dist And EntityVisible(w\obj, temp) Then
+						dist = dist2
+						StartPoint = w
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	FreeEntity temp
+	
+	If StartPoint = Null Then Return 2
+	StartPoint\state = 1		
+	
+	If EndPoint = Null Then 
+		dist# = 20.0
+		For w.WayPoints = Each WayPoints
+			xtemp = Abs(EntityX(pvt,True)-EntityX(w\obj,True))
+			If xtemp =< 8.0 Then
+				ztemp = Abs(EntityZ(pvt,True)-EntityZ(w\obj,True))
+				If ztemp =< 8 Then
+					dist2# = xtemp+ztemp+Abs(EntityY(w\obj,True)-EntityY(pvt,True))
+					
+					If dist2 < dist Then	
+						dist = dist2
+						EndPoint = w
+					EndIf				
+				EndIf
+			EndIf
+		Next
+	EndIf
+	
+	FreeEntity pvt
+	
+	If EndPoint = StartPoint Then 
+		If dist < 0.4 Then
+			Return 0
+		Else
+			n\Path[0]=EndPoint
+			Return 1					
+		EndIf
+	EndIf
+	If EndPoint = Null Then Return 2
+	
+	;aloitus- ja lopetuspisteet löydetty, aletaan etsiä reittiä
+	
+	Repeat 
+		
+		temp% = False
+		smallest.WayPoints = Null
+		dist# = 10000.0
+		For w.WayPoints = Each WayPoints
+			If w\state = 1 Then
+				temp = True
+				If (w\Fcost) < dist Then 
+					dist = w\Fcost
+					smallest = w
+				EndIf
+			EndIf
+		Next
+		
+		If smallest <> Null Then
+			
+			w = smallest
+			w\state = 2
+			
+			For i = 0 To 4
+				If w\connected[i]<>Null Then 
+					If w\connected[i]\state < 2 Then 
+						
+						If w\connected[i]\state=1 Then ;open list
+							gtemp# = w\Gcost+w\dist[i]
+							If n\NPCtype = NPCtypeMTF Then 
+								If w\connected[i]\door = Null Then gtemp = gtemp + 0.5
+							EndIf
+							If gtemp < w\connected[i]\Gcost Then ;parempi reitti -> overwrite
+								w\connected[i]\Gcost = gtemp
+								w\connected[i]\Fcost = w\connected[i]\Gcost + w\connected[i]\Hcost
+								w\connected[i]\parent = w
+							EndIf
+						Else
+							w\connected[i]\Hcost# = Abs(EntityX(w\connected[i]\obj,True)-EntityX(EndPoint\obj,True))+Abs(EntityZ(w\connected[i]\obj,True)-EntityZ(EndPoint\obj,True))
+							gtemp# = w\Gcost+w\dist[i]
+							If n\NPCtype = NPCtypeMTF Then 
+								If w\connected[i]\door = Null Then gtemp = gtemp + 0.5
+							EndIf
+							w\connected[i]\Gcost = gtemp
+							w\connected[i]\Fcost = w\Gcost+w\Hcost 
+							w\connected[i]\parent = w
+							w\connected[i]\state=1
+						EndIf						
+					EndIf
+					
+				EndIf
+			Next
+		Else ;open listiltä ei löytynyt mitään
+			If EndPoint\state > 0 Then 
+				StartPoint\parent = Null
+				EndPoint\state = 2
+				Exit
+			EndIf
+		EndIf
+		
+		If EndPoint\state > 0 Then 
+			StartPoint\parent = Null
+			EndPoint\state = 2
+			Exit
+		EndIf
+		
+	Until temp = False
+	
+	If EndPoint\state > 0 Then
+		
+		currpoint.waypoints = EndPoint
+		
+		length = 0
+		Repeat
+			length = length +1
+			currpoint = currpoint\parent
+		Until currpoint = Null
+		
+		currpoint.waypoints = EndPoint
+		For i = 0 To (length-1)
+			temp =False
+			If length < 20 Then
+				n\Path[length-1-i] = currpoint.WayPoints
+			Else
+				If i < 20 Then
+					n\Path[20-1-i] = w.WayPoints
+				Else
+					;Return 1
+				EndIf
+			EndIf
+			
+			If currpoint = StartPoint Then Return 1
+			
+			If currpoint\parent <> Null Then
+				currpoint = currpoint\parent
+			Else
+				Exit
+			EndIf
+			
+		Next
+		
+	Else
+		
+		DebugLog "FUNCTION FindPath() - Pfad nicht gefunden"
+		Return 2
+		
+	EndIf
+	
+End Function
 Function CreateLine(x1#,y1#,z1#, x2#,y2#,z2#, mesh=0)
 	
 	If mesh = 0 Then 
@@ -6658,6 +6862,6 @@ End Function
 ;~F#872#890#8B7#8BE#8CC#8E8#8FD#91A#937#944#956#98F#9B9#A05#A5B#A6E#A89#ADA#B33#B42
 ;~F#B7E#B86#B94#BA9#BE5#C04#C14#C2C#C54#C67#C89#CB1#CFF#D2B#D52#D59#D5E#D95#DBC#DD1
 ;~F#E01#E7F#E9A#F07#F59#F84#FD5#FDE#1078#107F#108E#1098#10AC#10B6#10C7#10CE#1175#1181#11C2#11CD
-;~F#11DE#11E3#11F2#1209#127F#1288#1367#1384#138B#1391#139F#13C3#13DF#1412#14DE#1517#152C#159D#1632#1637
-;~F#1647#1918#192F#194E#1955#19A2
+;~F#11DE#11E3#11F2#1209#127F#1288#1367#1433#1450#1457#145D#146B#148F#14AB#14DE#15AA#15E3#15F8#1669#16FE
+;~F#1703#1713#19E4#19FB#1A1A#1A21#1A6E
 ;~C#Blitz3D

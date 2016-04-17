@@ -1511,7 +1511,7 @@ Function UpdateNPCs()
 									
 									n\PathTimer = n\PathTimer-FPSfactor
 									If n\PathTimer =< 0 Then
-										n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider)+0.1,EntityZ(Collider))
+										n\PathStatus = FindPath049(n, EntityX(Collider),EntityY(Collider)+0.1,EntityZ(Collider))
 										n\PathTimer = n\PathTimer+70*5
 									EndIf
 								EndIf
@@ -4581,6 +4581,6 @@ Function GetNPCStepSound(n.NPCs)
 	Return 0
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#38#212#236#31E#407#556#623#6B8#765#76A#798#83A#875#902#96E#A81#B47#BF7#CAA
-;~F#DA9#DC8#DEE#DF9#E05#E53#EE4#FA2#100C#10C4#113C#114D#1168#1186
+;~F#0#38#212#236#31E#407#623#6B8#765#76A#798#83A#875#902#96E#A81#B47#BF7#CAA#DA9
+;~F#DC8#DEE#DF9#E05#E53#EE4#FA2#100C#10C4#113C#114D#1168#1186
 ;~C#Blitz3D
