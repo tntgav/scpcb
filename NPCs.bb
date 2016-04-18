@@ -1461,8 +1461,13 @@ Function UpdateNPCs()
 								n\State2=n\State2-FPSfactor
 							Else
 								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 6.0, 0.6)
-								
-								If n\PathStatus = 1 Then ;path found
+								If n\Path[n\PathLocation]=Null Then
+									If n\PathLocation > 19 Then
+										n\PathLocation = 0 : n\PathStatus = 0
+									Else
+										n\PathLocation = n\PathLocation + 1
+									EndIf
+								Else If n\PathStatus = 1 Then ;path found
 									If n\Path[n\PathLocation]=Null Then 
 										If n\PathLocation > 19 Then 
 											n\PathLocation = 0 : n\PathStatus = 0
