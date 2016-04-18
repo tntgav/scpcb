@@ -1516,7 +1516,7 @@ Function UpdateNPCs()
 									
 									n\PathTimer = n\PathTimer-FPSfactor
 									If n\PathTimer =< 0 Then
-										n\PathStatus = FindPath049(n, EntityX(Collider),EntityY(Collider)+0.1,EntityZ(Collider))
+										n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider)+0.1,EntityZ(Collider))
 										n\PathTimer = n\PathTimer+70*5
 									EndIf
 								EndIf
@@ -4559,6 +4559,6 @@ Function Console_SpawnNPC(c_input$,state%=-9999)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#0#A#38#212#236#31E#407#556#623#6B8#765#798#83A#875#902#96E#A81#B47#BF7#CAA
-;~F#DA9#DC8#DEE#DF9#E04#1034#10BD#10D8#10F6
+;~F#0#A#38#212#236#31E#407#628#6BD#76A#76F#79D#83F#87A#907#973#A86#B4C#BFC#CAF
+;~F#DAE
 ;~C#Blitz3D
