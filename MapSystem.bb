@@ -663,7 +663,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				
 				temp1i=0
 				
-				For j = 0 To 3
+				For j = 0 To MaxRoomEmitters-1
 					If rt\TempSoundEmitter[j]=0 Then
 						rt\TempSoundEmitterX[j]=ReadFloat(f)*RoomScale
 						rt\TempSoundEmitterY[j]=ReadFloat(f)*RoomScale
@@ -1373,6 +1373,9 @@ End Function
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+Const MaxRoomLights% = 20
+Const MaxRoomEmitters% = 8
+
 
 Const ROOM1% = 1, ROOM2% = 2, ROOM2C% = 3, ROOM3% = 4, ROOM4% = 5
 
@@ -1385,9 +1388,9 @@ Type RoomTemplates
 	
 	;Field ambience%
 	
-	Field TempSoundEmitter%[4]
-	Field TempSoundEmitterX#[4],TempSoundEmitterY#[4],TempSoundEmitterZ#[4]
-	Field TempSoundEmitterRange#[4]
+	Field TempSoundEmitter%[MaxRoomEmitters]
+	Field TempSoundEmitterX#[MaxRoomEmitters],TempSoundEmitterY#[MaxRoomEmitters],TempSoundEmitterZ#[MaxRoomEmitters]
+	Field TempSoundEmitterRange#[MaxRoomEmitters]
 	
 	Field Shape%, Name$
 	Field Commonness%, Large%
@@ -1516,8 +1519,6 @@ Global SecondaryLightOn# = True
 Global RemoteDoorOn = True
 Global Contained106 = False, Disabled173 = False
 
-Const MaxRoomLights% = 20
-
 Type Rooms
 	Field zone%
 	
@@ -1534,10 +1535,10 @@ Type Rooms
 	
 	Field dp.DrawPortal, fr.Forest
 	
-	Field SoundEmitter%[4]
-	Field SoundEmitterObj%[4]
-	Field SoundEmitterRange#[4]
-	Field SoundEmitterCHN%[4]
+	Field SoundEmitter%[MaxRoomEmitters]
+	Field SoundEmitterObj%[MaxRoomEmitters]
+	Field SoundEmitterRange#[MaxRoomEmitters]
+	Field SoundEmitterCHN%[MaxRoomEmitters]
 	
 	Field Lights%[20]
 	Field LightIntensity#[20]
@@ -2057,7 +2058,8 @@ Function FillRoom(r.Rooms)
 			
 			;MTF:n spawnpoint
 			r\Objects[18] = CreatePivot()
-			PositionEntity(r\Objects[18], r\x+3727.0*RoomScale, 10066.0*RoomScale, r\z+6623.0*RoomScale, True)
+			;PositionEntity(r\Objects[18], r\x+3727.0*RoomScale, 10066.0*RoomScale, r\z+6623.0*RoomScale, True)
+			PositionEntity(r\Objects[18], r\x+3250.0*RoomScale, 9896.0*RoomScale, r\z+6623.0*RoomScale, True)
 			EntityParent r\Objects[18], r\obj
 			
 			;piste johon helikopterit pakenee nukea
@@ -3137,7 +3139,7 @@ Function FillRoom(r.Rooms)
 			EntityParent(it\obj, r\obj)
 			
 			it = CreateItem("Incident Report SCP-1048-A", "paper",r\x + 736.0 * RoomScale, r\y + 224.0 * RoomScale, r\z -480.0 * RoomScale)
-			clipboard\SecondInv[0] = it
+			;clipboard\SecondInv[0] = it
 			HideEntity(it\obj)
 			
 			r\Objects[0]=CreatePivot(r\obj)
@@ -4277,24 +4279,18 @@ Function FillRoom(r.Rooms)
 			;[Block]
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 288.0*RoomScale, r\y, r\z + 576.0*RoomScale, 90, r, False, False, 3)
 			r\RoomDoors[0]\open = False : r\RoomDoors[0]\locked = True
-			d = CreateDoor(r\zone, r\x + 776.0*RoomScale, r\y, r\z + 736.0*RoomScale, 90, r, False, False)
-			d = CreateDoor(r\zone, r\x + 776.0*RoomScale, r\y, r\z + 288.0*RoomScale, 90, r, False, False)
-			d = CreateDoor(r\zone, r\x + 558.0*RoomScale, r\y, r\z + 8.0*RoomScale, 0, r, False, False)
+			d = CreateDoor(r\zone, r\x + 777.0*RoomScale, r\y, r\z + 671.0*RoomScale, 90, r, False, False)
+			d = CreateDoor(r\zone, r\x + 556.0*RoomScale, r\y, r\z + 296.0*RoomScale, 0, r, False, False)
 			r\Objects[0] = CreatePivot()
 			PositionEntity r\Objects[0],r\x + 576.0*RoomScale,r\y+160.0*RoomScale,r\z+632.0*RoomScale
 			EntityParent r\Objects[0],r\obj
-			it = CreateItem("SCP-198", "scp198", r\x + 1152.0 * RoomScale, r\y + 64.0 * RoomScale, r\z - 64.0 * RoomScale)
-			RotateEntity it\obj, 0, r\angle+Rand(180), 0
-			EntityParent(it\obj, r\obj)
-			it = CreateItem("SCP-1499", "scp1499", r\x + 600.0 * RoomScale, r\y + 192.0 * RoomScale, r\z - 512.0 * RoomScale)
+			
+			it = CreateItem("SCP-1499", "scp1499", r\x + 600.0 * RoomScale, r\y + 176.0 * RoomScale, r\z - 228.0 * RoomScale)
 			RotateEntity it\obj, 0, r\angle, 0
 			EntityParent(it\obj, r\obj)
-			it = CreateItem("Document SCP-109", "paper", r\x + 864.0 * RoomScale, r\y + 192.0 * RoomScale, r\z + 584.0 * RoomScale)
+			
+			it = CreateItem("Emily Ross's Badge", "badge", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
 			EntityParent(it\obj, r\obj)
-			it = CreateItem("Level 2 Key Card", "key2", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
-			EntityParent(it\obj, r\obj)
-			;it = CreateItem("SCP-109","scp109", x, y, z)
-			;EntityParent(it\obj, r\obj)
 			;[End Block]
 		Case "room3offices"
 			;[Block]			
@@ -4334,7 +4330,7 @@ Function FillRoom(r.Rooms)
 		EndIf
 	Next
 	
-	For i = 0 To 3
+	For i = 0 To MaxRoomEmitters-1
 		If r\RoomTemplate\TempSoundEmitter[i]<>0 Then
 			r\SoundEmitterObj[i]=CreatePivot(r\obj)
 			PositionEntity r\SoundEmitterObj[i], r\x+r\RoomTemplate\TempSoundEmitterX[i],r\y+r\RoomTemplate\TempSoundEmitterY[i],r\z+r\RoomTemplate\TempSoundEmitterZ[i],True
@@ -4393,7 +4389,7 @@ Function UpdateRooms()
 		
 		
 		If x<16 And z < 16 Then
-			For i = 0 To 3
+			For i = 0 To MaxRoomEmitters-1
 				If r\SoundEmitter[i]<>0 Then 
 					dist# = EntityDistance(r\SoundEmitterObj[i],Collider)
 					If dist < r\SoundEmitterRange[i] Then
@@ -4428,7 +4424,7 @@ Function UpdateRooms()
 			HideEntity r\obj
 		Else
 			ShowEntity r\obj
-			For i = 0 To 19
+			For i = 0 To MaxRoomLights-1
 				If r\Lights[i] <> 0 Then
 					dist = EntityDistance(Collider,r\Lights[i])
 					If dist < HideDistance Then
@@ -4965,6 +4961,210 @@ Function FindPath(n.NPCs, x#, y#, z#)
 		
 		DebugLog "FUNCTION FindPath() - reittiä ei löytynyt"
 		Return 2 ;reittiä määränpäähän ei löytynyt
+		
+	EndIf
+	
+End Function
+Function FindPath049(n.NPCs, x#, y#, z#)
+	
+	DebugLog "findpath: "+n\NPCtype
+	
+	Local temp%, dist#, dist2#
+	Local xtemp#, ytemp#, ztemp#
+	
+	Local w.WayPoints, StartPoint.WayPoints, EndPoint.WayPoints	
+	
+	Local StartX% = Floor(EntityX(n\Collider) / 8.0 + 0.5), StartZ% = Floor(EntityZ(n\Collider) / 8.0 + 0.5)
+	;If StartX < 0 Or StartX > MapWidth Then Return 2
+	;If StartZ < 0 Or StartZ > MapWidth Then Return 2
+	
+	Local EndX% = Floor(x / 8.0 + 0.5), EndZ% = Floor(z / 8.0 + 0.5)
+	;If EndX < 0 Or EndX > MapWidth Then Return 2
+	;If EndZ < 0 Or EndZ > MapWidth Then Return 2
+	
+	Local CurrX, CurrZ
+	
+	;pathstatus = 0, ei ole etsitty reittiä
+	;pathstatus = 1, reitti löydetty
+	;pathstatus = 2, reittiä ei ole olemassa	
+	
+	For w.WayPoints = Each WayPoints 
+		w\state = 0
+		w\Fcost = 0
+		w\Gcost = 0
+		w\Hcost = 0
+	Next
+	
+	n\PathStatus = 0
+	n\PathLocation = 0
+	For i = 0 To 19
+		n\Path[i] = Null
+	Next
+	
+	Local pvt = CreatePivot()
+	PositionEntity(pvt, x,y,z, True)	
+	
+	temp = CreatePivot()
+	PositionEntity(temp, EntityX(n\Collider,True), EntityY(n\Collider,True)+0.15, EntityZ(n\Collider,True))
+	
+	;käytetään aloituspisteenä waypointia, joka on lähimpänä loppupistettä ja joka on näkyvissä
+	dist = 100.0
+	For w.WayPoints = Each WayPoints
+		xtemp = Abs(EntityX(w\obj,True)-EntityX(temp,True))
+		If xtemp < 8.0 Then
+			ztemp = Abs(EntityZ(w\obj,True)-EntityZ(temp,True))
+			If ztemp < 8.0 Then 
+				ytemp = Abs(EntityY(w\obj,True)-EntityY(temp,True))
+				If ytemp < 8.0 Then 
+					dist2# = xtemp+ztemp+ytemp
+					If dist2 < dist And EntityVisible(w\obj, temp) Then
+						dist = dist2
+						StartPoint = w
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	FreeEntity temp
+	
+	If StartPoint = Null Then Return 2
+	StartPoint\state = 1		
+	
+	If EndPoint = Null Then 
+		dist# = 20.0
+		For w.WayPoints = Each WayPoints
+			xtemp = Abs(EntityX(pvt,True)-EntityX(w\obj,True))
+			If xtemp =< 8.0 Then
+				ztemp = Abs(EntityZ(pvt,True)-EntityZ(w\obj,True))
+				If ztemp =< 8 Then
+					dist2# = xtemp+ztemp+Abs(EntityY(w\obj,True)-EntityY(pvt,True))
+					
+					If dist2 < dist Then	
+						dist = dist2
+						EndPoint = w
+					EndIf				
+				EndIf
+			EndIf
+		Next
+	EndIf
+	
+	FreeEntity pvt
+	
+	If EndPoint = StartPoint Then 
+		If dist < 0.4 Then
+			Return 0
+		Else
+			n\Path[0]=EndPoint
+			Return 1					
+		EndIf
+	EndIf
+	If EndPoint = Null Then Return 2
+	
+	;aloitus- ja lopetuspisteet löydetty, aletaan etsiä reittiä
+	
+	Repeat 
+		
+		temp% = False
+		smallest.WayPoints = Null
+		dist# = 10000.0
+		For w.WayPoints = Each WayPoints
+			If w\state = 1 Then
+				temp = True
+				If (w\Fcost) < dist Then 
+					dist = w\Fcost
+					smallest = w
+				EndIf
+			EndIf
+		Next
+		
+		If smallest <> Null Then
+			
+			w = smallest
+			w\state = 2
+			
+			For i = 0 To 4
+				If w\connected[i]<>Null Then 
+					If w\connected[i]\state < 2 Then 
+						
+						If w\connected[i]\state=1 Then ;open list
+							gtemp# = w\Gcost+w\dist[i]
+							If n\NPCtype = NPCtypeMTF Then 
+								If w\connected[i]\door = Null Then gtemp = gtemp + 0.5
+							EndIf
+							If gtemp < w\connected[i]\Gcost Then ;parempi reitti -> overwrite
+								w\connected[i]\Gcost = gtemp
+								w\connected[i]\Fcost = w\connected[i]\Gcost + w\connected[i]\Hcost
+								w\connected[i]\parent = w
+							EndIf
+						Else
+							w\connected[i]\Hcost# = Abs(EntityX(w\connected[i]\obj,True)-EntityX(EndPoint\obj,True))+Abs(EntityZ(w\connected[i]\obj,True)-EntityZ(EndPoint\obj,True))
+							gtemp# = w\Gcost+w\dist[i]
+							If n\NPCtype = NPCtypeMTF Then 
+								If w\connected[i]\door = Null Then gtemp = gtemp + 0.5
+							EndIf
+							w\connected[i]\Gcost = gtemp
+							w\connected[i]\Fcost = w\Gcost+w\Hcost 
+							w\connected[i]\parent = w
+							w\connected[i]\state=1
+						EndIf						
+					EndIf
+					
+				EndIf
+			Next
+		Else ;open listiltä ei löytynyt mitään
+			If EndPoint\state > 0 Then 
+				StartPoint\parent = Null
+				EndPoint\state = 2
+				Exit
+			EndIf
+		EndIf
+		
+		If EndPoint\state > 0 Then 
+			StartPoint\parent = Null
+			EndPoint\state = 2
+			Exit
+		EndIf
+		
+	Until temp = False
+	
+	If EndPoint\state > 0 Then
+		
+		currpoint.waypoints = EndPoint
+		
+		length = 0
+		Repeat
+			length = length +1
+			currpoint = currpoint\parent
+		Until currpoint = Null
+		
+		currpoint.waypoints = EndPoint
+		For i = 0 To (length-1)
+			temp =False
+			If length < 20 Then
+				n\Path[length-1-i] = currpoint.WayPoints
+			Else
+				If i < 20 Then
+					n\Path[20-1-i] = w.WayPoints
+				Else
+					;Return 1
+				EndIf
+			EndIf
+			
+			If currpoint = StartPoint Then Return 1
+			
+			If currpoint\parent <> Null Then
+				currpoint = currpoint\parent
+			Else
+				Exit
+			EndIf
+			
+		Next
+		
+	Else
+		
+		DebugLog "FUNCTION FindPath() - Pfad nicht gefunden"
+		Return 2
 		
 	EndIf
 	
@@ -6596,10 +6796,10 @@ Function UpdateRoomLights()
 									r\LightSpriteHidden%[i] = False
 								EndIf
 								If PlayerRoom\RoomTemplate\Name$ = "173"
-									random# = Rnd(0.39,0.41)
+									random# = Rnd(0.38,0.42)
 								Else
 									If r\LightFlicker%[i]<5
-										random# = Rnd(0.39,0.41)
+										random# = Rnd(0.38,0.42)
 									ElseIf r\LightFlicker%[i]>4 And r\LightFlicker%[i]<10
 										random# = Rnd(0.35,0.45)
 									Else
@@ -6607,7 +6807,7 @@ Function UpdateRoomLights()
 									EndIf
 								EndIf
 								ScaleSprite r\LightSprites2[i],random#,random#
-								dist# = (EntityDistance(Camera,r\LightSpritesPivot[i])+1.0)/10.0
+								dist# = (EntityDistance(Camera,r\LightSpritesPivot[i])+0.5)/7.5
 								dist# = Max(Min(dist#,1.0),0.0)
 								alpha# = Float(Inverse(dist#))
 								
@@ -6658,10 +6858,10 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
-;~F#526#545#563#574#57F#5B8#5C6#5F0#622#62A#63F#683#68C#6DD#71F#741#79D#7AF#815#824
-;~F#84E#85F#870#88E#8B5#8BC#8CA#8E6#8FB#918#935#942#954#98D#9B7#A03#A59#A6C#A87#AD8
-;~F#B31#B40#B7C#B84#B92#BA7#BE3#C02#C12#C2A#C52#C65#C87#CAF#CFD#D29#D50#D57#D5C#D93
-;~F#DBA#DCF#DFF#E7D#E98#F05#F57#F82#FD3#FDC#1076#107D#108C#1096#10AA#10B4#10CB#10D2#10FC#1179
-;~F#11C6#11D1#11E2#11E7#11F6#120D#1283#128C#136B#1388#138F#1395#13A3#13C7#13E3#1416#14E2#151B#1530#15A1
-;~F#1636#163B#164B#191C#1933#1952#1959
+;~F#526#545#566#577#582#5BB#5C9#5F1#623#62B#640#68D#6DE#720#742#79E#7B0#817#826#850
+;~F#861#872#890#8B7#8BE#8CC#8E8#8FD#91A#937#944#956#98F#9B9#A05#A5B#A6E#A89#ADA#B33
+;~F#B42#B7E#B86#B94#BA9#BE5#C04#C14#C54#C67#C89#CB1#CFF#D2B#D52#D59#D5E#D95#DBC#DD1
+;~F#E01#E7F#E9A#F07#F59#F84#FD5#FDE#1078#107F#108E#1098#10AC#10B6#10C7#10CE#1175#1181#11C2#11CD
+;~F#11DE#11E3#11F2#1209#127F#1288#1367#1433#1450#1457#145D#146B#148F#14AB#14DE#15AA#15E3#15F8#1669#16FE
+;~F#1703#1713#19E4#19FB#1A1A#1A21#1A6E
 ;~C#Blitz3D

@@ -13,6 +13,7 @@ EndIf
 Include "FastExt.bb"
 Include "FastText_Unicode.bb"
 Include "StrictLoads.bb"
+Include "fullscreen_window_fix.bb"
 
 CompatData%(12, 0) ;hopefully this fixes performance issues on Windows 8
 Global OptionFile$ = "options.ini"
@@ -52,14 +53,31 @@ Global ShowFPS = GetINIInt(OptionFile, "options", "show FPS"), WireframeState
 Global TotalGFXModes% = CountGfxModes3D(), GFXModes%
 Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
 
+Global FakeFullScreen% = GetINIInt(OptionFile, "options", "fakefullscreen")
+
 If LauncherEnabled Then 
 	UpdateLauncher()
 	
-	If Fullscreen Then
-		Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+	;New "fake fullscreen" - ENDSHN
+	If FakeFullScreen
+		DebugLog "Using Faked Fullscreen"
+		Graphics3DExt G_viewport_width, G_viewport_height, 0, 2
+		
+		; -- Change the window style to 'WS_POPUP' and then set the window position to force the style to update.
+		api_SetWindowLong( G_app_handle, C_GWL_STYLE, C_WS_POPUP )
+		api_SetWindowPos( G_app_handle, C_HWND_TOP, G_viewport_x, G_viewport_y, G_viewport_width, G_viewport_height, C_SWP_SHOWWINDOW )
+		
+		GraphicWidth = G_viewport_width
+		GraphicHeight = G_viewport_height
+		
+		Fullscreen = False
 	Else
-		Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
-	End If
+		If Fullscreen Then
+			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+		Else
+			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
+		End If
+	EndIf
 	
 Else
 	For i% = 1 To TotalGFXModes
@@ -78,11 +96,26 @@ Else
 	GraphicWidth = GfxModeWidths(SelectedGFXMode)
 	GraphicHeight = GfxModeHeights(SelectedGFXMode)
 	
-	If Fullscreen Then
-		Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+	;New "fake fullscreen" - ENDSHN
+	If FakeFullScreen
+		DebugLog "Using Faked Fullscreen"
+		Graphics3DExt G_viewport_width, G_viewport_height, 0, 2
+		
+		; -- Change the window style to 'WS_POPUP' and then set the window position to force the style to update.
+		api_SetWindowLong( G_app_handle, C_GWL_STYLE, C_WS_POPUP )
+		api_SetWindowPos( G_app_handle, C_HWND_TOP, G_viewport_x, G_viewport_y, G_viewport_width, G_viewport_height, C_SWP_SHOWWINDOW )
+		
+		GraphicWidth = G_viewport_width
+		GraphicHeight = G_viewport_height
+		
+		Fullscreen = False
 	Else
-		Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
-	End If
+		If Fullscreen Then
+			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+		Else
+			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
+		End If
+	EndIf
 	
 EndIf
 
@@ -772,6 +805,13 @@ Function UpdateConsole()
 					StrTemp2$ = Piece$(args$,2," ")
 					
 					Console_SpawnNPC(StrTemp$,Int(StrTemp2$))
+				Case "toggle_warhead_lever"
+					For e.Events = Each Events
+						If e\EventName = "room2nuke" Then
+							e\EventState = (Not e\EventState)
+							Exit
+						EndIf
+					Next
 				Default
 					CreateConsoleMsg("Command not found")
 			End Select
@@ -1032,13 +1072,16 @@ Global MachineSFX% = LoadSound_Strict("SFX\Machine.ogg")
 Global ApacheSFX = LoadSound_Strict("SFX\apache.ogg")
 
 Global CurrStepSFX
-Dim StepSFX%(3, 2, 4) ;(normal/metal, walk/run, id)
+Dim StepSFX%(4, 2, 4) ;(normal/metal, walk/run, id)
 For i = 0 To 3
 	StepSFX(0, 0, i) = LoadSound_Strict("SFX\step" + (i + 1) + ".ogg")
 	StepSFX(1, 0, i) = LoadSound_Strict("SFX\stepmetal" + (i + 1) + ".ogg")
 	StepSFX(0, 1, i)= LoadSound_Strict("SFX\run" + (i + 1) + ".ogg")
 	StepSFX(1, 1, i) = LoadSound_Strict("SFX\runmetal" + (i + 1) + ".ogg")
-	If i < 3 Then StepSFX(2, 0, i) = LoadSound_Strict("SFX\MTF\StepMTF" + (i + 1) + ".ogg")	
+	If i < 3
+		StepSFX(2, 0, i) = LoadSound_Strict("SFX\MTF\StepMTF" + (i + 1) + ".ogg")
+		StepSFX(3, 0, i) = LoadSound_Strict("SFX\StepBoot"+ (i + 1) + ".ogg")
+	EndIf
 Next
 
 Dim Step2SFX(6)
@@ -2450,11 +2493,11 @@ Function MovePlayer()
 					
 					If Sprint = 1.0 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
-						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 3)))
+						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 3)))
 						ChannelVolume tempchn, 1.0-(Crouch*0.6)
 					Else
 						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
-						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 3)))
+						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 3)))
 						ChannelVolume tempchn, 1.0-(Crouch*0.6)
 					End If
 				ElseIf CurrStepSFX=1
@@ -7590,21 +7633,11 @@ Function ManipulateNPCBones()
 End Function
 
 Function Inverse#(number#)
-	Local min_number#=0.0,max_number#=1.0,mid_number# = 0.5
-	Local new_number#
 	
-	If number# = mid_number#
-		new_number# = mid_number#
-	ElseIf number# > mid_number#
-		new_number# = max_number-number#
-	ElseIf number# < mid_number#
-		new_number# = max_number-number#
-	EndIf
-	
-	Return new_number#
+	Return 1.0-number#
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#20#70#F0#F4#FB#34B#44E#46C#4E2#4EF#583#5FA#611#61E#650#6F7#7CB#130D#14B0#162D
-;~F#164C#166B#1689#168D#16AD
+;~F#21#91#111#115#373#479#497#50D#51A#5AE#625#63C#649#67B#722#7F6#1338#14DB#1658#1677
+;~F#1696#16B4#16B8#16D8
 ;~C#Blitz3D
