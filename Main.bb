@@ -1872,6 +1872,8 @@ Global CamBaseOBJ%, CamOBJ%
 Global LiquidObj%,MTFObj%,GuardObj%,ClassDObj%
 Global ApacheObj%,ApacheRotorObj%
 
+Global UnableToMove% = False
+
 ;--------------------------------------- DL_Light (for Flashlight) ------------------------------------------------------------
 ;The Flashlight-Thingy is a new feature in version 1.3.0 - ENDSHN
 Include "DL_Lights.bb"
@@ -2486,7 +2488,7 @@ Function MovePlayer()
 			EndIf
 			
 			Local temp# = (Shake Mod 360), tempchn%
-			Shake# = (Shake + FPSfactor * Min(Sprint, 1.5) * 7) Mod 720
+			If (Not UnableToMove%) Then Shake# = (Shake + FPSfactor * Min(Sprint, 1.5) * 7) Mod 720
 			If temp < 180 And (Shake Mod 360) >= 180 Then
 				If CurrStepSFX=0 Then
 					temp = GetStepSound(Collider)
@@ -2572,7 +2574,7 @@ Function MovePlayer()
 			CurrSpeed = Max(CurveValue(0.0, CurrSpeed-0.1, 1.0),0.0)
 		EndIf
 		
-		TranslateEntity Collider, Cos(angle)*CurrSpeed * FPSfactor, 0, Sin(angle)*CurrSpeed * FPSfactor, True
+		If (Not UnableToMove%) Then TranslateEntity Collider, Cos(angle)*CurrSpeed * FPSfactor, 0, Sin(angle)*CurrSpeed * FPSfactor, True
 		
 		Local CollidedFloor% = False
 		For i = 1 To CountCollisions(Collider)
@@ -5393,6 +5395,8 @@ Function NullGame()
 	
 	ClearTextureCache
 	
+	UnableToMove% = False
+	
 	DeathMSG$=""
 	
 	SelectedMap = ""
@@ -7638,6 +7642,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#91#111#115#373#479#497#50D#51A#5AE#625#63C#649#67B#722#7F6#1338#14DB#1658#1677
-;~F#1696#16B4#16B8#16D8
+;~F#21#91#111#115#11C#373#449#479#497#50D#51A#5AE#625#63C#649#67B#722#7F8#133A#14DD
+;~F#165C#167B#169A#16B8#16BC#16DC
 ;~C#Blitz3D

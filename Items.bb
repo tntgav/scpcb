@@ -28,7 +28,7 @@ Type ItemTemplates
 	Field tex%, texpath$
 End Type 
 
-Function CreateItemTemplate.ItemTemplates(name$, tempname$, objpath$, invimgpath$, imgpath$, scale#, texturepath$ = "", Bump$="",invimgpath2$="",Anim%=0)
+Function CreateItemTemplate.ItemTemplates(name$, tempname$, objpath$, invimgpath$, imgpath$, scale#, texturepath$ = "", Bump$="",invimgpath2$="",Anim%=0, texflags%=9)
 	Local it.ItemTemplates = New ItemTemplates, n
 	
 	
@@ -58,7 +58,7 @@ Function CreateItemTemplate.ItemTemplates(name$, tempname$, objpath$, invimgpath
 				Exit
 			EndIf
 		Next
-		If texture=0 Then texture=LoadTexture_Strict(texturepath) : it\texpath = texturepath; : DebugLog texturepath
+		If texture=0 Then texture=LoadTexture_Strict(texturepath,texflags%) : it\texpath = texturepath; : DebugLog texturepath
 		EntityTexture it\obj, texture
 		it\tex = texture
 	EndIf  
@@ -293,6 +293,8 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Document SCP-109", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc109.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Document SCP-1162", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1162.jpg", 0.003) : it\sound = 0
 	CreateItemTemplate("Emily Ross's Badge", "badge", "GFX\items\badge.x", "GFX\items\INVpaper.jpg", "GFX\items\badge1.jpg", 0.0001, "GFX\items\badge1_tex.jpg")
+	it = CreateItemTemplate("Key", "key", "GFX\items\key.b3d", "GFX\items\INVkey.jpg", "", 0.001, "GFX\items\key2.png","","",0,1+2+8)
+	it\sound = 3
 	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -608,5 +610,5 @@ Function DropItem(item.Items)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#1E#153#194
+;~F#B#155#196
 ;~C#Blitz3D

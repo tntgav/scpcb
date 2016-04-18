@@ -1638,23 +1638,6 @@ Function UpdateEvents()
 												;	em\Gravity = -0.21
 												;Next
 												
-												SelectedEnding = "B3"
-											EndIf
-											
-										EndIf										
-									Else
-										If SelectedEnding = "B3" Then
-											e\room\NPC[0]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs()/25.0)*3
-											e\room\NPC[0]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/85.0)+9.0
-											e\room\NPC[0]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/25.0)*3
-											
-											e\room\NPC[2]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs()/23.0)*3
-											e\room\NPC[2]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/83.0)+5.0
-											e\room\NPC[2]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/23.0)*3
-											
-											e\room\RoomDoors[5]\open = True
-											
-											If e\EventState-FPSfactor < 80.0*70 And e\EventState => 80.0*70 Then
 												For i = 0 To 1
 													n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[18],True)+(i*0.4),EntityY(e\room\Objects[18],True)+0.29,EntityZ(e\room\Objects[18],True)+(i*0.4))
 												Next
@@ -1675,7 +1658,26 @@ Function UpdateEvents()
 												DebugLog "MTF Units spawned!"
 												
 												e\EventState = 85.0*70
+												
+												SelectedEnding = "B3"
 											EndIf
+											
+										EndIf										
+									Else
+										If SelectedEnding = "B3" Then
+											e\room\NPC[0]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs()/25.0)*3
+											e\room\NPC[0]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/85.0)+9.0
+											e\room\NPC[0]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/25.0)*3
+											
+											e\room\NPC[2]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs()/23.0)*3
+											e\room\NPC[2]\EnemyY = EntityY(e\room\Objects[11],True)+Cos(MilliSecs()/83.0)+5.0
+											e\room\NPC[2]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/23.0)*3
+											
+											e\room\RoomDoors[5]\open = True
+											
+											;If e\EventState-FPSfactor < 80.0*70 And e\EventState => 80.0*70 Then
+											;	
+											;EndIf
 											
 											;Update the MTF Units everytime they cannot detect the player
 											If e\EventState3 = 0.0
@@ -1719,7 +1721,7 @@ Function UpdateEvents()
 											
 											If e\EventState3 > 0.0 And e\EventState3 <= 500.0
 												e\EventState3 = e\EventState3 + FPSfactor
-												CurrSpeed = CurrSpeed - (CurrSpeed * 0.9 * FPSfactor)
+												UnableToMove% = True
 												For n.NPCs = Each NPCs
 													If n\NPCtype = NPCtypeMTF
 														n\EnemyX = EntityX(Collider)
@@ -2330,6 +2332,7 @@ Function UpdateEvents()
 													e\room\NPC[temp]\EnemyZ = EntityZ(Collider)
 													e\room\NPC[temp]\PathTimer = 70*Rand(7,10)
 													e\room\NPC[temp]\Reload = 2000
+													UnableToMove% = true
 												Next
 												
 												If e\EventState2=1 Then
@@ -7568,7 +7571,7 @@ Function UpdateEvents()
 					EndIf
 					
 					If GrabbedEntity <> 0
-						e\EventState2 = Rand(MaxItemAmount-1)
+						e\EventState2 = Rand(0,MaxItemAmount-1)
 						If Inventory(e\EventState2)<>Null
 							;randomly picked item slot has an item in it, using this slot
 							e\EventState3 = 1.0
@@ -7577,17 +7580,18 @@ Function UpdateEvents()
 							;randomly picked item slot is empty, getting the first available slot
 							For i = 0 To MaxItemAmount-1
 								If Inventory(i)<>Null
+									;sucessfull
 									e\EventState2 = i
 									e\EventState3 = 1.0
 									DebugLog "pick2"
 									Exit
 								Else
+									;not sucessful
 									e\EventState3 = 2.0
 									DebugLog "pick3"
 								EndIf
 							Next
 						EndIf
-						DebugLog "GrabbedEntity"
 					EndIf
 					
 					If e\EventState > 0.0
@@ -7667,26 +7671,6 @@ Function UpdateEvents()
 										Exit
 										DebugLog "vest"
 									EndIf
-								Case "scp198"
-									Injuries = Injuries + 5.0
-									pvt = CreatePivot()
-									PositionEntity pvt, EntityX(Collider),EntityY(Collider)-0.05,EntityZ(Collider)
-									TurnEntity pvt, 90, 0, 0
-									EntityPick(pvt,0.3)
-									de.decals = CreateDecal(3, PickedX(), PickedY()+0.005, PickedZ(), 90, Rand(360), 0)
-									de\size = 0.75 : ScaleSprite de\obj, de\size, de\size
-									FreeEntity pvt
-									RemoveItem(Inventory(e\EventState2))
-									e\EventState = e\EventState + 1.0
-									e\EventState3 = 0.0
-									PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
-									LightFlash = 5.0
-									Msg = "SCP-198 is now detached from your body, but you have high injuries"
-									MsgTimer = 70*5
-									DeathMSG = "MTF Unit [REDACTED] found dead with large amount of wounds and with some missing flesh and bone parts."
-									DeathMSG = DeathMSG + " It seems that he had put his hand in SCP-1162 without any items."
-									Exit
-									DebugLog "scp198"
 								Default
 									If itt\tempname = "misc" And Rand(6)=1
 										RemoveItem(Inventory(e\EventState2))
@@ -7720,12 +7704,11 @@ Function UpdateEvents()
 								Inventory(0)\Picked = True
 								e\EventState = e\EventState + 1.0
 								e\EventState3 = 0.0
-								;PlaySound_Strict LoadTempSound("NineTailedFoxMod\SFX\1162\use_injure.ogg")
 								PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
 								LightFlash = 5.0
 								Msg = "Something is now in your Inventory and you have high injuries"
 								MsgTimer = 70*5
-								DeathMSG = "MTF Unit [REDACTED] found dead with large amount of wounds and with some missing flesh and bone parts."
+								DeathMSG = "A Class-D was found dead with large amount of wounds and with some missing flesh and bone parts."
 								DeathMSG = DeathMSG + " It seems that he had put his hand in SCP-1162 without any items."
 								Exit
 							EndIf
@@ -7771,8 +7754,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4C5#4CF#508#53D#760#946#96D#97B#985#992#B7B#B9C#BEB#C39#C46#C80#C97#CB7
-;~F#CC0#CCA#CD9#D6D#D8F#103B#1081#1097#10A3#10C1#1112#1129#11F4#12F5#1386#139F#13BE#13EF#13FC#1415
-;~F#14AD#1663#170D#1761#1812#18C2#1976#198E#1A47#1A74#1A91#1AB8#1AE8#1B05#1B29#1B83#1BC3#1BF4#1C07#1CBF
-;~F#1D17#1D2A#1D39#1D5F
+;~F#11#F8#4C5#4CF#508#53D#59C#949#970#97E#988#995#B7E#B9F#BEE#C3C#C49#C83#C9A#CBA
+;~F#CC3#CCD#CDC#D70#D92#103E#1084#109A#10A6#10C4#1115#112C#11F7#12F8#1389#13A2#13C1#13F2#13FF#1418
+;~F#14B0#1666#1710#1764#1815#18C5#1979#1991#1A4A#1A77#1A94#1ABB#1AEB#1B08#1B2C#1B86#1BC6#1BF7#1C0A#1CC2
+;~F#1D1A#1D2D#1D3C#1D62#1D81
 ;~C#Blitz3D
