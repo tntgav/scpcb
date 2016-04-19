@@ -1735,6 +1735,7 @@ Function UpdateEvents()
 														RemoveNPC(n)
 													EndIf
 												Next
+												ent% = LoadSprite("GFX\blooddrop1.png",1+2)
 												ShouldPlay = 0
 												CurrSpeed = 0
 												PlaySound_Strict LoadTempSound("SFX\MTF\GateB_Gunshot.ogg")
@@ -2332,7 +2333,7 @@ Function UpdateEvents()
 													e\room\NPC[temp]\EnemyZ = EntityZ(Collider)
 													e\room\NPC[temp]\PathTimer = 70*Rand(7,10)
 													e\room\NPC[temp]\Reload = 2000
-													UnableToMove% = true
+													UnableToMove% = True
 												Next
 												
 												If e\EventState2=1 Then
@@ -7754,8 +7755,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4C5#4CF#508#53D#59C#949#970#97E#988#995#B7E#B9F#BEE#C3C#C49#C83#C9A#CBA
-;~F#CC3#CCD#CDC#D70#D92#103E#1084#109A#10A6#10C4#1115#112C#11F7#12F8#1389#13A2#13C1#13F2#13FF#1418
-;~F#14B0#1666#1710#1764#1815#18C5#1979#1991#1A4A#1A77#1A94#1ABB#1AEB#1B08#1B2C#1B86#1BC6#1BF7#1C0A#1CC2
-;~F#1D1A#1D2D#1D3C#1D62#1D81
+;~F#11#F8#4C5#4CF#508#53D#763#94A#971#97F#989#996#B7F#BA0#BEF#C3D#C4A#C84#C9B#CBB
+;~F#CC4#CCE#CDD#D71#D93#103F#1085#109B#10A7#10C5#1116#112D#11F8#12F9#138A#13A3#13C2#13F3#1400#1419
+;~F#14B1#1667#1711#1765#1816#18C6#197A#1992#1A4B#1A78#1A95#1ABC#1AEC#1B09#1B2D#1B87#1BC7#1BF8#1C0B#1CC3
+;~F#1D1B#1D2E#1D3D#1D63#1D82
 ;~C#Blitz3D

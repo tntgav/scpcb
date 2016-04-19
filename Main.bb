@@ -488,7 +488,7 @@ Function UpdateConsole()
 				Case "ending"
 					SelectedEnding = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					KillTimer = -0.1
-					EndingTimer = -0.1
+					;EndingTimer = -0.1
 				Case "noclipspeed"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
@@ -7642,6 +7642,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#91#111#115#11C#373#449#479#497#50D#51A#5AE#625#63C#649#67B#722#7F8#133A#14DD
-;~F#165C#167B#169A#16B8#16BC#16DC
+;~F#21#91#111#115#373#449#479#497#50D#51A#5AE#625#63C#649#67B#722#7F8#133A#14DD#165C
+;~F#167B#169A#16B8#16BC#16DC
 ;~C#Blitz3D
