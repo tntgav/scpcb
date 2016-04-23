@@ -52,6 +52,8 @@ Type NPCs
 	Field ManipulateBone%
 	Field BoneToManipulate$
 	Field ManipulationType%
+	Field BoneX#,BoneY#,BoneZ#
+	Field BonePitch#,BoneYaw#,BoneRoll#
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -4558,7 +4560,32 @@ Function Console_SpawnNPC(c_input$,state%=-9999)
 	
 End Function
 
+Function ManipulateNPCBones()
+	Local n.NPCs,bone%,pvt%,pitch#,yaw#,roll#
+	
+	For n = Each NPCs
+		If n\ManipulateBone
+			pvt% = CreatePivot()
+			bone% = FindChild(n\obj,n\BoneToManipulate$)
+			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate+Chr(34)+" is not existing!"
+			PositionEntity pvt%,EntityX(bone%,True),EntityY(bone%,True),EntityZ(bone%,True)
+			Select n\ManipulationType
+				Case 0 ;<--- looking at player
+					;PointEntity bone%,Camera
+					;RotateEntity bone%,EntityPitch(bone%),20,0
+					PointEntity pvt%,Camera
+					n\BonePitch# = CurveAngle(EntityYaw(pvt%)-180,n\BonePitch#,10.0)
+					n\BoneYaw# = CurveAngle(EntityPitch(pvt%)-20,n\BoneYaw#,10.0)
+					RotateEntity bone%,n\BonePitch#,-n\BoneYaw#,0
+				Case 1 ;<--- looking at player #2
+					PointEntity bone%,Collider
+					RotateEntity bone%,0,EntityYaw(bone%),0
+			End Select
+			FreeEntity pvt%
+		EndIf
+	Next
+	
+End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#38#212#236#31E#407#628#6BD#76A#76F#79D#83F#87A#907#973#A86#B4C#BFC#CAF
-;~F#DAE
+;~F#0#3A#214#238#320#409#62A#6BF#76C#771#79F#841#87C#909#975#A88#B4E#BFE#CB1#DB0
 ;~C#Blitz3D

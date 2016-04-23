@@ -293,7 +293,7 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Document SCP-109", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc109.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Document SCP-1162", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1162.jpg", 0.003) : it\sound = 0
 	CreateItemTemplate("Emily Ross's Badge", "badge", "GFX\items\badge.x", "GFX\items\INVpaper.jpg", "GFX\items\badge1.jpg", 0.0001, "GFX\items\badge1_tex.jpg")
-	it = CreateItemTemplate("Key", "key", "GFX\items\key.b3d", "GFX\items\INVkey.jpg", "", 0.001, "GFX\items\key2.png","","",0,1+2+8)
+	it = CreateItemTemplate("Forgotten Key", "key", "GFX\items\key.b3d", "GFX\items\INVkey.jpg", "", 0.001, "GFX\items\key2.png","","",0,1+2+8)
 	it\sound = 3
 	
 	For it = Each ItemTemplates

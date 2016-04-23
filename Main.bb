@@ -55,6 +55,8 @@ Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
 
 Global FakeFullScreen% = GetINIInt(OptionFile, "options", "fakefullscreen")
 
+Global EnableRoomLights% = GetINIInt(OptionFile, "options", "room lights enabled")
+
 If LauncherEnabled Then 
 	UpdateLauncher()
 	
@@ -126,8 +128,12 @@ SetBuffer BackBuffer()
 Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, FPSfactor2#
 Local CheckFPS%, ElapsedLoops%, FPS%, ElapsedTime#
 
-Local Framelimit% = GetINIInt(OptionFile, "options", "framelimit")
-Local Vsync% = GetINIInt(OptionFile, "options", "vsync")
+Global Framelimit% = GetINIInt(OptionFile, "options", "framelimit")
+Global Vsync% = GetINIInt(OptionFile, "options", "vsync")
+
+Global Opt_AntiAlias = GetINIInt(OptionFile, "options", "antialias")
+
+Global CurrFrameLimit# = Framelimit%
 
 Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
 If Fullscreen Then UpdateScreenGamma()
@@ -2156,7 +2162,12 @@ Repeat
 					Msg = "Find a lit up computer screen to save"
 					MsgTimer = 70 * 4						
 				Else
-					SaveGame(SavePath + CurrSave + "\")
+					If PlayerRoom\RoomTemplate\Name = "exit1" Or PlayerRoom\RoomTemplate\Name = "173" Or PlayerRoom\RoomTemplate\Name = "gatea" Then
+						Msg = "You can't save in this location"
+						MsgTimer = 70 * 4
+					Else
+						SaveGame(SavePath + CurrSave + "\")
+					EndIf
 				EndIf
 			Else
 				Msg = "Quicksaving is disabled"
@@ -7616,32 +7627,12 @@ Function UpdateScreenGamma()
 	UpdateGamma
 End Function
 
-Function ManipulateNPCBones()
-	Local n.NPCs,bone%,pvt%,pitch#,yaw#,roll#
-	
-	For n = Each NPCs
-		If n\ManipulateBone
-			bone% = FindChild(n\obj,n\BoneToManipulate$)
-			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate+Chr(34)+" is not existing!"
-			Select n\ManipulationType
-				Case 0 ;<--- looking at player
-					PointEntity bone%,Camera
-					RotateEntity bone%,EntityPitch(bone%),20,0
-				Case 1 ;<--- looking at player #2
-					PointEntity bone%,Collider
-					RotateEntity bone%,0,EntityYaw(bone%),0
-			End Select
-		EndIf
-	Next
-	
-End Function
-
 Function Inverse#(number#)
 	
 	Return 1.0-number#
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#91#111#115#373#449#479#497#50D#51A#5AE#625#63C#649#67B#722#7F8#133A#14DD#165C
-;~F#167B#169A#16B8#16BC#16DC
+;~F#21#97#117#11B#122#379#44F#47F#49D#513#520#5B4#62B#642#64F#681#728#7FE#1345#14E8
+;~F#1667#1686#16A5#16C3#16C7#16E7
 ;~C#Blitz3D

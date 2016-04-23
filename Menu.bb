@@ -27,7 +27,7 @@ Global MenuStr$, MenuStrX%, MenuStrY%
 Global MainMenuTab%
 
 
-Global IntroEnabled% = True
+Global IntroEnabled% = GetINIInt(OptionFile, "options", "intro enabled")
 
 Global SelectedInputBox%
 
@@ -278,6 +278,9 @@ Function UpdateMainMenu()
 		
 		If DrawButton(x + width + 20 * MenuScale, y, 580 * MenuScale - width - 20 * MenuScale, height, "BACK", False) Then 
 			Select MainMenuTab
+				Case 1
+					PutINIValue(OptionFile, "options", "intro enabled", IntroEnabled%)
+					MainMenuTab = 0
 				Case 3 ;save the options
 					PutINIValue(OptionFile, "options", "music volume", MusicVolume)
 					PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
@@ -285,6 +288,12 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "bump mapping enabled", BumpEnabled)			
 					PutINIValue(OptionFile, "options", "HUD enabled", HUDenabled)
 					PutINIValue(OptionFile, "options", "screengamma", ScreenGamma)
+					PutINIValue(OptionFile, "options", "antialias", Opt_AntiAlias)
+					PutINIValue(OptionFile, "options", "vsync", Vsync)
+					PutINIValue(OptionFile, "options", "show FPS", ShowFPS)
+					PutINIValue(OptionFile, "options", "framelimit", Framelimit%)
+					PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
+					PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
 					
 					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -411,6 +420,8 @@ Function UpdateMainMenu()
 						MainMenuOpen = False
 						FlushKeys()
 						FlushMouse()
+						
+						PutINIValue(OptionFile, "options", "intro enabled", IntroEnabled%)
 					Else
 						
 					End If
@@ -473,7 +484,7 @@ Function UpdateMainMenu()
 					Next
 				EndIf
 				
-			Case 3 ;options
+			Case 3,5,6,7 ;options
 				
 				x = 159 * MenuScale
 				y = 286 * MenuScale
@@ -488,111 +499,212 @@ Function UpdateMainMenu()
 				x = 160 * MenuScale
 				y = y + height + 20 * MenuScale
 				width = 580 * MenuScale
-				height = 130 * MenuScale
-				DrawFrame(x, y, width, height)
-				SetFont Font1
-				
-				;---------------------- graphics ------------------------------------------------
-				
-				y=y+20*MenuScale
-				
-				Local prevGamma# = ScreenGamma
-				ScreenGamma = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, ScreenGamma*50.0)/50.0)
-				Color 255,255,255
-				Text (x + 20 * MenuScale, y, "Screen gamma")
-				Text (x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
-				
-				If prevGamma<>ScreenGamma Then
-					UpdateScreenGamma()
-				EndIf
-				
-				y=y+40*MenuScale
-				
-				Color 255,255,255				
-				Text (x + 20 * MenuScale, y, "Enable HUD:")	
-				HUDenabled = DrawTick(x + 310 * MenuScale, y + MenuScale, HUDenabled)	
-				
-				y=y+30*MenuScale
-				
-				Color 255,255,255				
-				Text (x + 20 * MenuScale, y, "Enable bump mapping:")	
-				BumpEnabled = DrawTick(x + 310 * MenuScale, y + MenuScale, BumpEnabled)	
-				
-				;---------------------- sounds ------------------------------------------------
-				
-				y = y + 50 * MenuScale
 				height = 60 * MenuScale
-				DrawFrame(x, y, width, height)	
+				DrawFrame(x, y, width, height)
+				If DrawButton(x+20*MenuScale,y+15*MenuScale,width/5,height/2, "GRAPHICS", False) Then MainMenuTab = 3
+				If DrawButton(x+160*MenuScale,y+15*MenuScale,width/5,height/2, "AUDIO", False) Then MainMenuTab = 5
+				If DrawButton(x+300*MenuScale,y+15*MenuScale,width/5,height/2, "CONTROLS", False) Then MainMenuTab = 6
+				If DrawButton(x+440*MenuScale,y+15*MenuScale,width/5,height/2, "ADVANCED", False) Then MainMenuTab = 7
+				Color 0,255,0
+				If MainMenuTab = 3
+					Rect x+20*MenuScale,y+15*MenuScale,width/5,height/2,False
+					Text((x+20*MenuScale) + (width/5) / 2, (y+15*MenuScale) + (height/2) / 2, "GRAPHICS", True, True)
+				ElseIf MainMenuTab = 5
+					Rect x+160*MenuScale,y+15*MenuScale,width/5,height/2,False
+					Text((x+160*MenuScale) + (width/5) / 2, (y+15*MenuScale) + (height/2) / 2, "AUDIO", True, True)
+				ElseIf MainMenuTab = 6
+					Rect x+300*MenuScale,y+15*MenuScale,width/5,height/2,False
+					Text((x+300*MenuScale) + (width/5) / 2, (y+15*MenuScale) + (height/2) / 2, "CONTROLS", True, True)
+				ElseIf MainMenuTab = 7
+					Rect x+440*MenuScale,y+15*MenuScale,width/5,height/2,False
+					Text((x+440*MenuScale) + (width/5) / 2, (y+15*MenuScale) + (height/2) / 2, "ADVANCED", True, True)
+				EndIf
+				SetFont Font1
+				y = y + 70 * MenuScale
 				
-				y = y + 20*MenuScale
-				
-				MusicVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, MusicVolume*100.0)/100.0)
-				Color 255,255,255
-				Text (x + 20 * MenuScale, y, "Music volume:")	
-				
-				;---------------------- controls ------------------------------------------------
-				
-				y = y + 50 * MenuScale
-				height = 220 * MenuScale
-				DrawFrame(x, y, width, height)	
-				
-				y = y + 20*MenuScale
-				
-				MouseSens = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
-				Color(255, 255, 255)
-				Text (x + 20 * MenuScale, y, "Mouse sensitivity:")				
-				
-				y = y + 30*MenuScale
-				
-				Color(255, 255, 255)
-				Text (x + 20 * MenuScale, y, "Invert mouse Y-axis:")
-				InvertMouse = DrawTick(x + 310 * MenuScale, y + MenuScale, InvertMouse)
-				
-				y = y + 30*MenuScale
-				Text (x + 20 * MenuScale, y, "Control configuration:")	
-				y = y + 10*MenuScale
-				
-				Text (x + 20 * MenuScale, y + 20 * MenuScale, "Up")
-				InputBox(x + 170 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
-				Text (x + 20 * MenuScale, y + 40 * MenuScale, "Left")
-				InputBox(x + 170 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
-				Text (x + 20 * MenuScale, y + 60 * MenuScale, "Down")
-				InputBox(x + 170 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
-				Text (x + 20 * MenuScale, y + 80 * MenuScale, "Right")
-				InputBox(x + 170 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
-				
-				Text (x + 300 * MenuScale, y + 20 * MenuScale, "Blink")
-				InputBox(x + 450 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
-				Text (x + 300 * MenuScale, y + 40 * MenuScale, "Sprint")
-				InputBox(x + 450 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
-				Text (x + 300 * MenuScale, y + 60 * MenuScale, "Inventory")
-				InputBox(x + 450 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
-				Text (x + 300 * MenuScale, y + 80 * MenuScale, "Crouch")
-				InputBox(x + 450 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
-				
-				For i = 0 To 227
-					If KeyHit(i) Then key = i : Exit
-				Next
-				If key<>0 Then
-					Select SelectedInputBox
-						Case 3
-							KEY_LEFT = key
-						Case 4
-							KEY_RIGHT = key
-						Case 5
-							KEY_UP = key
-						Case 6
-							KEY_DOWN = key
-						Case 7
-							KEY_BLINK = key
-						Case 8
-							KEY_SPRINT = key
-						Case 9
-							KEY_INV = key
-						Case 10
-							KEY_CROUCH = key
-					End Select
-					SelectedInputBox = 0
+				If MainMenuTab = 3 ;Graphics
+					;[Block]
+					height = 400 * MenuScale
+					DrawFrame(x, y, width, height)
+					
+					y=y+20*MenuScale
+					
+					Color 255,255,255				
+					Text(x + 20 * MenuScale, y, "Show HUD:")	
+					HUDenabled = DrawTick(x + 310 * MenuScale, y + MenuScale, HUDenabled)	
+					
+					y=y+30*MenuScale
+					
+					Color 255,255,255				
+					Text(x + 20 * MenuScale, y, "Enable bump mapping:")	
+					BumpEnabled = DrawTick(x + 310 * MenuScale, y + MenuScale, BumpEnabled)	
+					
+					y=y+30*MenuScale
+					
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "VSync:")
+					Vsync% = DrawTick(x + 310 * MenuScale, y + MenuScale, Vsync%)
+					
+					y=y+30*MenuScale
+					
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Antialias:")
+					Opt_AntiAlias = DrawTick(x + 310 * MenuScale, y + MenuScale, Opt_AntiAlias%)
+					AntiAlias Opt_AntiAlias
+					Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					
+					y=y+40*MenuScale
+					
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Enable room lights:")
+					EnableRoomLights = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableRoomLights)
+					
+					y=y+30+MenuScale
+					
+					Local prevGamma# = ScreenGamma
+					ScreenGamma = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, ScreenGamma*50.0)/50.0)
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Screen gamma")
+					Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					
+					If prevGamma<>ScreenGamma Then
+						UpdateScreenGamma()
+					EndIf
+					;[End Block]
+				ElseIf MainMenuTab = 5 ;Audio
+					;[Block]
+					height = 160 * MenuScale
+					DrawFrame(x, y, width, height)	
+					
+					y = y + 20*MenuScale
+					
+					MusicVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, MusicVolume*100.0)/100.0)
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Music volume:")
+					
+					y = y + 30*MenuScale
+					
+					;SFXVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, SFXVolume*100.0)/100.0)
+					;Color 255,255,255
+					;Text2(x + 20 * MenuScale, y, Lang_Replace("Sound volume:"))
+					;If MouseDown1 Then
+					;	If MouseX() >= x And MouseX() <= x + width + 14 And MouseY() >= y And MouseY() <= y + 20 Then
+					;		PlayTestSound(True)
+					;	Else
+					;		PlayTestSound(False)
+					;	EndIf
+					;Else
+					;	PlayTestSound(False)
+					;EndIf
+					;[End Block]
+				ElseIf MainMenuTab = 6 ;Controls
+					;[Block]
+					height = 210 * MenuScale
+					DrawFrame(x, y, width, height)	
+					
+					y = y + 20*MenuScale
+					
+					MouseSens = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
+					Color(255, 255, 255)
+					Text(x + 20 * MenuScale, y, "Mouse sensitivity:")
+					
+					y = y + 30*MenuScale
+					
+					Color(255, 255, 255)
+					Text(x + 20 * MenuScale, y, "Invert mouse Y-axis:")
+					InvertMouse = DrawTick(x + 310 * MenuScale, y + MenuScale, InvertMouse)
+					
+					y = y + 30*MenuScale
+					Text(x + 20 * MenuScale, y, "Control configuration:")
+					y = y + 10*MenuScale
+					
+					Text(x + 20 * MenuScale, y + 20 * MenuScale, "Up")
+					InputBox(x + 170 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
+					Text(x + 20 * MenuScale, y + 40 * MenuScale, "Left")
+					InputBox(x + 170 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
+					Text(x + 20 * MenuScale, y + 60 * MenuScale, "Down")
+					InputBox(x + 170 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
+					Text(x + 20 * MenuScale, y + 80 * MenuScale, "Right")
+					InputBox(x + 170 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
+					
+					Text(x + 300 * MenuScale, y + 20 * MenuScale, "Blink")
+					InputBox(x + 450 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
+					Text(x + 300 * MenuScale, y + 40 * MenuScale, "Sprint")
+					InputBox(x + 450 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
+					Text(x + 300 * MenuScale, y + 60 * MenuScale, "Inventory")
+					InputBox(x + 450 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
+					Text(x + 300 * MenuScale, y + 80 * MenuScale, "Crouch")
+					InputBox(x + 450 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					
+					For i = 0 To 227
+						If KeyHit(i) Then key = i : Exit
+					Next
+					If key<>0 Then
+						Select SelectedInputBox
+							Case 3
+								KEY_LEFT = key
+							Case 4
+								KEY_RIGHT = key
+							Case 5
+								KEY_UP = key
+							Case 6
+								KEY_DOWN = key
+							Case 7
+								KEY_BLINK = key
+							Case 8
+								KEY_SPRINT = key
+							Case 9
+								KEY_INV = key
+							Case 10
+								KEY_CROUCH = key
+						End Select
+						SelectedInputBox = 0
+					EndIf
+					;[End Block]
+				ElseIf MainMenuTab = 7 ;Advanced
+					;[Block]
+					height = 180 * MenuScale
+					DrawFrame(x, y, width, height)	
+					
+					y = y + 20*MenuScale
+					
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Console auto-opening:")
+					NTF_DisableConsoleOpening = DrawTick(x + 310 * MenuScale, y + MenuScale, NTF_DisableConsoleOpening)
+					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Achievement popup:")
+					AchvMSGenabled% = DrawTick(x + 310 * MenuScale, y + MenuScale, AchvMSGenabled%)
+					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Show FPS:")
+					ShowFPS% = DrawTick(x + 310 * MenuScale, y + MenuScale, ShowFPS%)
+					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Framelimit:")
+					CurrFrameLimit# = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, CurrFrameLimit#*50.0)/50.0)
+					Framelimit% = CurrFrameLimit#*200.0
+					Color 255,255,0
+					If Framelimit% = 0
+						Text(x + 20 * MenuScale, y + 15 * MenuScale, "Disabled")
+					Else
+						Text(x + 20 * MenuScale, y + 15 * MenuScale, Framelimit%+" FPS")
+					EndIf
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y + 30 * MenuScale, "Disable:")
+					If DrawTick(x + 120 * MenuScale, y + 30 * MenuScale, 0) Then CurrFrameLimit# = 0.0
+					
+					y=y+60*MenuScale
+					
+					Color 255,255,255
+					
+					;[End Block]
 				EndIf
 			Case 4 ; load map
 				y = y + height + 20 * MenuScale
@@ -1186,5 +1298,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#76#313#325#32F#400#413#430#46B#483#48A
+;~F#31#301#383#395#39F#470#483#4A0#4DB#4F3#4FA
 ;~C#Blitz3D
