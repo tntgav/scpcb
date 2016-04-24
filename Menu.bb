@@ -512,16 +512,12 @@ Function UpdateMainMenu()
 				Color 0,255,0
 				If MainMenuTab = 3
 					Rect x+20*MenuScale,y+15*MenuScale,width/5,height/2,False
-					Text((x+20*MenuScale) + (width/5) / 2, (y+15*MenuScale) + (height/2) / 2, "GRAPHICS", True, True)
 				ElseIf MainMenuTab = 5
 					Rect x+160*MenuScale,y+15*MenuScale,width/5,height/2,False
-					Text((x+160*MenuScale) + (width/5) / 2, (y+15*MenuScale) + (height/2) / 2, "AUDIO", True, True)
 				ElseIf MainMenuTab = 6
 					Rect x+300*MenuScale,y+15*MenuScale,width/5,height/2,False
-					Text((x+300*MenuScale) + (width/5) / 2, (y+15*MenuScale) + (height/2) / 2, "CONTROLS", True, True)
 				ElseIf MainMenuTab = 7
 					Rect x+440*MenuScale,y+15*MenuScale,width/5,height/2,False
-					Text((x+440*MenuScale) + (width/5) / 2, (y+15*MenuScale) + (height/2) / 2, "ADVANCED", True, True)
 				EndIf
 				SetFont Font1
 				y = y + 70 * MenuScale
@@ -1332,5 +1328,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#323#3A5#3B7#3C1#492#4A5#4C2#4FD#515#51C
+;~F#31#31F#3A1#3B3#3BD#48E#4A1#4BE#4F9#511#518
 ;~C#Blitz3D

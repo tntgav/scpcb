@@ -4870,20 +4870,34 @@ Function DrawMenu()
 				AntiAlias Opt_AntiAlias
 				TextureLodBias TextureFloat#
 			EndIf
-			If OptionsMenu < 4 Then 
-				If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
-					OptionsMenu = OptionsMenu+1
-				EndIf
-			EndIf
-			If OptionsMenu > 1 Then
-				If DrawButton(x+41*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, "<") Then
-					OptionsMenu = OptionsMenu-1
-				EndIf
+			;If OptionsMenu < 4 Then 
+			;	If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
+			;		OptionsMenu = OptionsMenu+1
+			;	EndIf
+			;EndIf
+			;If OptionsMenu > 1 Then
+			;	If DrawButton(x+41*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, "<") Then
+			;		OptionsMenu = OptionsMenu-1
+			;	EndIf
+			;EndIf
+			If DrawButton(x-25*MenuScale,y,120*MenuScale,30*MenuScale,"GRAPHICS",False) Then OptionsMenu = 1
+			If DrawButton(x+95*MenuScale,y,120*MenuScale,30*MenuScale,"AUDIO",False) Then OptionsMenu = 2
+			If DrawButton(x+215*MenuScale,y,120*MenuScale,30*MenuScale,"CONTROLS",False) Then OptionsMenu = 3
+			If DrawButton(x+335*MenuScale,y,120*MenuScale,30*MenuScale,"ADVANCED",False) Then OptionsMenu = 4
+			Color 0,255,0
+			If OptionsMenu = 1
+				Rect(x-25*MenuScale,y,120*MenuScale,30*MenuScale,False)
+			ElseIf OptionsMenu = 2
+				Rect(x+95*MenuScale,y,120*MenuScale,30*MenuScale,False)
+			ElseIf OptionsMenu = 3
+				Rect(x+215*MenuScale,y,120*MenuScale,30*MenuScale,False)
+			ElseIf OptionsMenu = 4
+				Rect(x+335*MenuScale,y,120*MenuScale,30*MenuScale,False)
 			EndIf
 			Color 255,255,255
 			Select OptionsMenu
 				Case 1 ;Graphics
-					Text(x+210*MenuScale,y,"GRAPHICS",True,True)
+					;Text(x+210*MenuScale,y,"GRAPHICS",True,True)
 					SetFont Font1
 					;[Block]
 					y=y+40*MenuScale
@@ -4961,7 +4975,7 @@ Function DrawMenu()
 					End Select
 					;[End Block]
 				Case 2 ;Audio
-					Text(x+210*MenuScale,y,"AUDIO",True,True)
+					;Text(x+210*MenuScale,y,"AUDIO",True,True)
 					SetFont Font1
 					;[Block]
 					y = y + 40*MenuScale
@@ -4977,7 +4991,7 @@ Function DrawMenu()
 					Text(x - 20 * MenuScale, y, "Sound volume:")
 					;[End Block]
 				Case 3 ;Controls
-					Text(x+210*MenuScale,y,"CONTROLS",True,True)
+					;Text(x+210*MenuScale,y,"CONTROLS",True,True)
 					SetFont Font1
 					;[Block]
 					y = y + 40*MenuScale
@@ -5040,7 +5054,7 @@ Function DrawMenu()
 					EndIf
 					;[End Block]
 				Case 4 ;Advanced
-					Text(x+210*MenuScale,y,"ADVANCED",True,True)
+					;Text(x+210*MenuScale,y,"ADVANCED",True,True)
 					SetFont Font1
 					;[Block]
 					y = y + 40*MenuScale
@@ -7961,6 +7975,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#39E#4A9#4C7#53D#54A#5DE#655#66C#679#6AB#752#828#1481#1628#17AF
-;~F#17CE#17ED#180B#180F#182F
+;~F#21#A6#126#12A#131#39E#4A9#4C7#53D#54A#5DE#655#66C#679#6AB#752#828#148F#1636#17BD
+;~F#17DC#17FB#1819#181D#183D
 ;~C#Blitz3D
