@@ -6565,14 +6565,10 @@ Function UpdateRoomLights()
 	Local r.Rooms, i, random#, alpha#, dist#
 	
 	For r.Rooms = Each Rooms
-		For i = 0 To r\MaxLights%
-			If r\Lights%[i]<>0
-				;If NTF_UseRoomLights
-					;If (Not UpdateAlarmLight%)
-						;If MainLightHidden%
-						;	ShowEntity MainLight
-						;	MainLightHidden% = False
-						;EndIf
+		If r\dist < HideDistance*0.7 Or r = PlayerRoom
+			For i = 0 To r\MaxLights%
+				If r\Lights%[i]<>0
+					If EnableRoomLights%
 						If EntityDistance(Camera,r\Lights%[i])<8.5
 							If r\LightHidden[i]
 								ShowEntity r\Lights%[i]
@@ -6585,8 +6581,8 @@ Function UpdateRoomLights()
 							EndIf
 						EndIf
 						
-						If EntityDistance(Camera,r\LightSpritesPivot%[i])<8.5
-							If EntityVisible(Camera,r\LightSpritesPivot%[i])
+						If EntityDistance(Camera,r\LightSprites2[i])<8.5
+							If EntityVisible(Camera,r\LightSpritesPivot[i])
 								If r\LightSpriteHidden%[i]
 									ShowEntity r\LightSprites2%[i]
 									r\LightSpriteHidden%[i] = False
@@ -6611,7 +6607,10 @@ Function UpdateRoomLights()
 									EntityAlpha r\LightSprites2[i],Max(3*(Brightness/255)*(r\LightIntensity[i]/2),1)*alpha#
 								Else
 									;Instead of rendering the sprite invisible, just hiding it if the player is far away from it
-									HideEntity r\LightSprites2[i]
+									If (Not r\LightSpriteHidden%[i])
+										HideEntity r\LightSprites2[i]
+										r\LightSpriteHidden%[i]=True
+									EndIf
 								EndIf
 							Else
 								If (Not r\LightSpriteHidden%[i])
@@ -6625,28 +6624,19 @@ Function UpdateRoomLights()
 								r\LightSpriteHidden%[i] = True
 							EndIf
 						EndIf
-					;Else
-						;If (Not MainLightHidden%)
-						;	HideEntity MainLight
-						;	MainLightHidden% = True
-						;EndIf
-					;	If (Not r\LightHidden[i])
-					;		HideEntity r\Lights%[i]
-					;		r\LightHidden[i] = True
-					;	EndIf
-					;	If (Not r\LightSpriteHidden%[i])
-					;		HideEntity r\LightSprites2%[i]
-					;		r\LightSpriteHidden%[i] = True
-					;	EndIf
-					;EndIf
-				;Else
-				;	If (Not MainLightHidden%)
-				;		HideEntity MainLight
-				;		MainLightHidden% = True
-				;	EndIf
-				;EndIf
-			EndIf
-		Next
+					Else
+						If (Not r\LightHidden[i])
+							HideEntity r\Lights%[i]
+							r\LightHidden[i] = True
+						EndIf
+						If (Not r\LightSpriteHidden[i])
+							HideEntity r\LightSprites2[i]
+							r\LightSpriteHidden[i]=True
+						EndIf
+					EndIf
+				EndIf
+			Next
+		EndIf
 	Next
 	
 End Function
@@ -6657,7 +6647,7 @@ End Function
 ;~F#526#545#566#577#582#5BB#5C9#5F1#623#62B#640#68D#6DE#720#742#79E#817#826#850#861
 ;~F#872#890#8B7#8BE#8CC#8E8#8FD#91A#937#944#956#98F#9B9#A05#A5B#A6E#A89#ADA#B33#B42
 ;~F#B7E#B86#B94#BA9#BE5#C04#C14#C54#C67#C89#CB1#CFF#D2B#D52#D59#D5E#D95#DBC#DD1#E01
-;~F#E7F#E9A#F07#F59#F84#FD5#FDE#1078#107F#108E#1098#10AC#10B6#10C7#10CE#1175#1181#11C2#11CD#11DE
-;~F#11E3#11F2#1209#127F#1288#1367#1384#138B#1391#139F#13C3#13DF#1412#14DE#1517#152C#159D#1632#1637#1647
-;~F#1918#192F#194E#1955#19A2
+;~F#E7F#E9A#F07#F59#F84#FD5#FDE#1078#107F#108E#1098#10AC#10B6#10C7#10CE#1175#11C2#11CD#11DE#11E3
+;~F#11F2#1209#127F#1288#1367#1384#138B#1391#139F#13C3#13DF#1412#14DE#1517#152C#159D#1632#1637#1647#1918
+;~F#192F#194E#1955
 ;~C#Blitz3D
