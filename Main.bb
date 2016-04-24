@@ -57,6 +57,21 @@ Global FakeFullScreen% = GetINIInt(OptionFile, "options", "fakefullscreen")
 
 Global EnableRoomLights% = GetINIInt(OptionFile, "options", "room lights enabled")
 
+Global TextureDetails% = GetINIInt(OptionFile, "options", "texture details")
+Global TextureFloat#
+Select TextureDetails%
+	Case 0
+		TextureFloat# = 1.5
+	Case 1
+		TextureFloat# = 0.75
+	Case 2
+		TextureFloat# = 0.0
+	Case 3
+		TextureFloat# = -0.75
+End Select
+Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
+Global SFXVolume# = GetINIFloat(OptionFile, "options", "sound volume")
+
 If LauncherEnabled Then 
 	UpdateLauncher()
 	
@@ -818,6 +833,28 @@ Function UpdateConsole()
 							Exit
 						EndIf
 					Next
+				Case "kill","suicide"
+					KillTimer = -1
+				Case "playmusic"
+					If Instr(ConsoleInput, " ")<>0 Then
+						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					Else
+						StrTemp$ = ""
+					EndIf
+					
+					If StrTemp$ <> ""
+						PlayCustomMusic% = True
+						If CustomMusic <> 0 Then FreeSound_Strict CustomMusic : CustomMusic = 0
+						If MusicCHN <> 0 Then StopChannel MusicCHN
+						CustomMusic = LoadSound_Strict("SFX\Music\custom\"+StrTemp$)
+						If CustomMusic = 0
+							PlayCustomMusic% = False
+						EndIf
+					Else
+						PlayCustomMusic% = False
+						If CustomMusic <> 0 Then FreeSound_Strict CustomMusic : CustomMusic = 0
+						If MusicCHN <> 0 Then StopChannel MusicCHN
+					EndIf
 				Default
 					CreateConsoleMsg("Command not found")
 			End Select
@@ -1105,6 +1142,8 @@ DrawLoading(30, True)
 Global NTF_1499EnterSFX% = LoadSound_Strict("SFX\1499\1499_mfe_vhd_00.ogg")
 Global NTF_1499LeaveSFX% = LoadSound_Strict("SFX\1499\1499_mfe_lve_10.ogg")
 Global NTF_1499FuckedSFX% = LoadSound_Strict("SFX\1499\fuckedup.ogg")
+
+Global PlayCustomMusic% = False, CustomMusic% = 0
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1135,6 +1174,9 @@ Global NTF_1499X#
 Global NTF_1499Y#
 Global NTF_1499Z#
 Global NTF_PrevPlayerRoom$
+
+Global OptionsMenu% = 0
+Global QuitMSG% = 0
 
 ;----------------------------------------------  Items  -----------------------------------------------------
 
@@ -4766,6 +4808,14 @@ Function DrawMenu()
 			SetFont Font2
 			Text(x, y-(122-45)*MenuScale, "ACHIEVEMENTS",False,True)
 			SetFont Font1
+		ElseIf OptionsMenu Then
+			SetFont Font2
+			Text(x, y-(122-45)*MenuScale, "OPTIONS",False,True)
+			SetFont Font1
+		ElseIf QuitMSG Then
+			SetFont Font2
+			Text(x, y-(122-45)*MenuScale, "SAVE & QUIT?",False,True)
+			SetFont Font1
 		ElseIf KillTimer >= 0 Then
 			SetFont Font2
 			Text(x, y-(122-45)*MenuScale, "PAUSED",False,True)
@@ -4781,15 +4831,295 @@ Function DrawMenu()
 		Local SeparationConst% = 76*scale
 		Local imgsize% = 64
 		
-		If AchievementsMenu <= 0 Then
+		If AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG <= 0
 			SetFont Font1
 			Text x, y, "Designation: D-9341"
 			Text x, y+20*MenuScale, "Difficulty: "+SelectedDifficulty\name
 			Text x, y+40*MenuScale,	"Save: "+CurrSave
 			Text x, y+60*MenuScale, "Map seed: "+RandomSeed
+		ElseIf AchievementsMenu <= 0 And OptionsMenu > 0 And QuitMSG <= 0 And KillTimer >= 0
+			If DrawButton(x+101*MenuScale, y + 344*MenuScale, 230*MenuScale, 60*MenuScale, "Back") Then
+				AchievementsMenu = 0
+				OptionsMenu = 0
+				QuitMSG = 0
+				MouseHit1 = False
+				PutINIValue(OptionFile, "options", "music volume", MusicVolume)
+				PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
+				PutINIValue(OptionFile, "options", "invert mouse y", InvertMouse)
+				PutINIValue(OptionFile, "options", "bump mapping enabled", BumpEnabled)			
+				PutINIValue(OptionFile, "options", "HUD enabled", HUDenabled)
+				PutINIValue(OptionFile, "options", "screengamma", ScreenGamma)
+				PutINIValue(OptionFile, "options", "antialias", Opt_AntiAlias)
+				PutINIValue(OptionFile, "options", "vsync", Vsync)
+				PutINIValue(OptionFile, "options", "show FPS", ShowFPS)
+				PutINIValue(OptionFile, "options", "framelimit", Framelimit%)
+				PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
+				PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
+				PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
+				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
+				
+				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
+				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
+				PutINIValue(OptionFile, "options", "Up key", KEY_UP)
+				PutINIValue(OptionFile, "options", "Down key", KEY_DOWN)
+				PutINIValue(OptionFile, "options", "Blink key", KEY_BLINK)
+				PutINIValue(OptionFile, "options", "Sprint key", KEY_SPRINT)
+				PutINIValue(OptionFile, "options", "Inventory key", KEY_INV)
+				PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
+				
+				AntiAlias Opt_AntiAlias
+				TextureLodBias TextureFloat#
+			EndIf
+			If OptionsMenu < 4 Then 
+				If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
+					OptionsMenu = OptionsMenu+1
+				EndIf
+			EndIf
+			If OptionsMenu > 1 Then
+				If DrawButton(x+41*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, "<") Then
+					OptionsMenu = OptionsMenu-1
+				EndIf
+			EndIf
+			Color 255,255,255
+			Select OptionsMenu
+				Case 1 ;Graphics
+					Text(x+210*MenuScale,y,"GRAPHICS",True,True)
+					SetFont Font1
+					;[Block]
+					y=y+40*MenuScale
+					
+					Color 255,255,255				
+					Text(x-20*MenuScale, y, "Show HUD:")	
+					HUDenabled = DrawTick(x + 270 * MenuScale, y + MenuScale, HUDenabled)	
+					
+					y=y+30*MenuScale
+					
+					;Color 255,255,255				
+					;Text(x + 20 * MenuScale, y, "Enable bump mapping:")	
+					;BumpEnabled = DrawTick(x + 310 * MenuScale, y + MenuScale, BumpEnabled)	
+					;
+					;y=y+30*MenuScale
+					
+					Color 255,255,255
+					Text(x-20*MenuScale, y, "VSync:")
+					Vsync% = DrawTick(x + 270 * MenuScale, y + MenuScale, Vsync%)
+					
+					y=y+30*MenuScale
+					
+					Color 255,255,255
+					Text(x-20*MenuScale, y, "Antialias:")
+					Opt_AntiAlias = DrawTick(x + 270 * MenuScale, y + MenuScale, Opt_AntiAlias%)
+					Text(x-20*MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					
+					y=y+40*MenuScale
+					
+					Color 255,255,255
+					Text(x-20*MenuScale, y, "Enable room lights:")
+					EnableRoomLights = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableRoomLights)
+					
+					y=y+30+MenuScale
+					
+					Local prevGamma# = ScreenGamma
+					ScreenGamma = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, ScreenGamma*50.0)/50.0)
+					Color 255,255,255
+					Text(x-20*MenuScale, y, "Screen gamma")
+					Text(x-20+MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					
+					If prevGamma<>ScreenGamma Then
+						UpdateScreenGamma()
+					EndIf
+					
+					y=y+40*MenuScale
+					
+					Color 255,255,255
+					Text(x-20*MenuScale, y, "Texture details:")
+					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
+					If MouseHit1
+						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, MouseX(),MouseY(),0,0)
+							If TextureDetails% < 3
+								TextureDetails% = TextureDetails% + 1
+							Else
+								TextureDetails% = 0
+							EndIf
+							PlaySound_Strict(ButtonSFX)
+						EndIf
+					EndIf
+					Color 255,255,255
+					Select TextureDetails%
+						Case 0
+							Text(x + 300 * MenuScale, y + MenuScale, "LOW")
+							TextureFloat# = 1.5
+						Case 1
+							Text(x + 300 * MenuScale, y + MenuScale, "MEDIUM")
+							TextureFloat# = 0.75
+						Case 2
+							Text(x + 300 * MenuScale, y + MenuScale, "HIGH")
+							TextureFloat# = 0.0
+						Case 3
+							Text(x + 300 * MenuScale, y + MenuScale, "VERY HIGH")
+							TextureFloat# = -0.75
+					End Select
+					;[End Block]
+				Case 2 ;Audio
+					Text(x+210*MenuScale,y,"AUDIO",True,True)
+					SetFont Font1
+					;[Block]
+					y = y + 40*MenuScale
+					
+					MusicVolume = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, MusicVolume*100.0)/100.0)
+					Color 255,255,255
+					Text(x - 20 * MenuScale, y, "Music volume:")
+					
+					y = y + 30*MenuScale
+					
+					SFXVolume = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, SFXVolume*100.0)/100.0)
+					Color 255,255,255
+					Text(x - 20 * MenuScale, y, "Sound volume:")
+					;[End Block]
+				Case 3 ;Controls
+					Text(x+210*MenuScale,y,"CONTROLS",True,True)
+					SetFont Font1
+					;[Block]
+					y = y + 40*MenuScale
+					
+					MouseSens = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
+					Color(255, 255, 255)
+					Text(x - 20 * MenuScale, y, "Mouse sensitivity:")
+					
+					y = y + 30*MenuScale
+					
+					Color(255, 255, 255)
+					Text(x - 20 * MenuScale, y, "Invert mouse Y-axis:")
+					InvertMouse = DrawTick(x + 270 * MenuScale, y + MenuScale, InvertMouse)
+					
+					y = y + 30*MenuScale
+					Text(x - 20 * MenuScale, y, "Control configuration:")
+					y = y + 10*MenuScale
+					
+					Text(x - 20 * MenuScale, y + 20 * MenuScale, "Up")
+					InputBox(x + 50 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
+					Text(x - 20 * MenuScale, y + 40 * MenuScale, "Left")
+					InputBox(x + 50 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
+					Text(x - 20 * MenuScale, y + 60 * MenuScale, "Down")
+					InputBox(x + 50 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
+					Text(x - 20 * MenuScale, y + 80 * MenuScale, "Right")
+					InputBox(x + 50 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
+					
+					Text(x + 220 * MenuScale, y + 20 * MenuScale, "Blink")
+					InputBox(x + 320 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
+					Text(x + 220 * MenuScale, y + 40 * MenuScale, "Sprint")
+					InputBox(x + 320 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
+					Text(x + 220 * MenuScale, y + 60 * MenuScale, "Inventory")
+					InputBox(x + 320 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
+					Text(x + 220 * MenuScale, y + 80 * MenuScale, "Crouch")
+					InputBox(x + 320 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					
+					For i = 0 To 227
+						If KeyHit(i) Then key = i : Exit
+					Next
+					If key<>0 Then
+						Select SelectedInputBox
+							Case 3
+								KEY_LEFT = key
+							Case 4
+								KEY_RIGHT = key
+							Case 5
+								KEY_UP = key
+							Case 6
+								KEY_DOWN = key
+							Case 7
+								KEY_BLINK = key
+							Case 8
+								KEY_SPRINT = key
+							Case 9
+								KEY_INV = key
+							Case 10
+								KEY_CROUCH = key
+						End Select
+						SelectedInputBox = 0
+					EndIf
+					;[End Block]
+				Case 4 ;Advanced
+					Text(x+210*MenuScale,y,"ADVANCED",True,True)
+					SetFont Font1
+					;[Block]
+					y = y + 40*MenuScale
+					
+					Color 255,255,255
+					Text(x - 20 * MenuScale, y, "Console auto-opening:")
+					ConsoleOpening = DrawTick(x + 270 * MenuScale, y + MenuScale, ConsoleOpening)
+					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					Text(x - 20 * MenuScale, y, "Achievement popup:")
+					AchvMSGenabled% = DrawTick(x + 270 * MenuScale, y + MenuScale, AchvMSGenabled%)
+					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					Text(x - 20 * MenuScale, y, "Show FPS:")
+					ShowFPS% = DrawTick(x + 270 * MenuScale, y + MenuScale, ShowFPS%)
+					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					Text(x - 20 * MenuScale, y, "Framelimit:")
+					CurrFrameLimit# = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
+					Framelimit% = CurrFrameLimit#*200.0
+					Color 255,255,0
+					If Framelimit% = 0
+						Text(x - 20 * MenuScale, y + 15 * MenuScale, "Disabled")
+					Else
+						Text(x - 20 * MenuScale, y + 15 * MenuScale, Framelimit%+" FPS")
+					EndIf
+					Color 255,255,255
+					Text(x - 20 * MenuScale, y + 30 * MenuScale, "Disable:")
+					If DrawTick(x + 80 * MenuScale, y + 30 * MenuScale, 0) Then CurrFrameLimit# = 0.0
+					;[End Block]
+			End Select
+		ElseIf AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG > 0 And KillTimer >= 0
+			If SelectedDifficulty\saveType = SAVEONQUIT Or SelectedDifficulty\saveType = SAVEANYWHERE Then
+				If PlayerRoom\RoomTemplate\Name <> "173" And PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea" Then
+					If DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "Yes") Then
+						DropSpeed = 0
+						SaveGame(SavePath + CurrSave + "\")
+						NullGame()
+						MenuOpen = False
+						MainMenuOpen = True
+						MainMenuTab = 0
+						CurrSave = ""
+						FlushKeys()
+					EndIf
+				Else
+					DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "")
+					Color 50,50,50
+					Text(x+185*MenuScale, (y + 80*MenuScale)+30*MenuScale, "Yes", True, True)
+				EndIf
+			Else
+				DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "")
+				Color 50,50,50
+				Text(x+185*MenuScale, (y + 80*MenuScale)+30*MenuScale, "Yes", True, True)
+			EndIf
+			If DrawButton(x, y + 220*MenuScale, 390*MenuScale, 60*MenuScale, "No") Then
+				NullGame()
+				MenuOpen = False
+				MainMenuOpen = True
+				MainMenuTab = 0
+				CurrSave = ""
+				FlushKeys()
+			EndIf
+			If DrawButton(x+101*MenuScale, y + 344*MenuScale, 230*MenuScale, 60*MenuScale, "Back") Then
+				AchievementsMenu = 0
+				OptionsMenu = 0
+				QuitMSG = 0
+				MouseHit1 = False
+			EndIf
 		Else
 			If DrawButton(x+101*MenuScale, y + 344*MenuScale, 230*MenuScale, 60*MenuScale, "Back") Then
 				AchievementsMenu = 0
+				OptionsMenu = 0
+				QuitMSG = 0
 				MouseHit1 = False
 			EndIf
 			
@@ -4830,7 +5160,7 @@ Function DrawMenu()
 		
 		y = y+10
 		
-		If AchievementsMenu<=0 Then
+		If AchievementsMenu<=0 And OptionsMenu<=0 And QuitMSG<=0 Then
 			If KillTimer >= 0 Then	
 				y = y+ 104*MenuScale
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Resume") Then
@@ -4841,31 +5171,12 @@ Function DrawMenu()
 				y = y + 80*MenuScale
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Achievements") Then AchievementsMenu = 1
 				y = y + 80*MenuScale
-				
-				If SelectedDifficulty\saveType = SAVEONQUIT Or SelectedDifficulty\saveType = SAVEANYWHERE Then
-					If PlayerRoom\RoomTemplate\Name <> "173" And PlayerRoom\RoomTemplate\Name <> "exit1" Then
-						If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Save & quit") Then
-							DropSpeed = 0
-							SaveGame(SavePath + CurrSave + "\")
-							NullGame()
-							MenuOpen = False
-							MainMenuOpen = True
-							MainMenuTab = 0
-							CurrSave = ""
-							FlushKeys()	
-						EndIf
-					Else
-						DrawButton(x, y, 390*MenuScale, 60*MenuScale, "")
-						Color 50,50,50
-						Text(x + 185*MenuScale, y + 30*MenuScale, "Save & quit", True, True)
-					EndIf
-					y= y + 80*MenuScale
-				EndIf
+				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Options") Then OptionsMenu = 1
+				y = y + 80*MenuScale
 			Else
 				y = y+104*MenuScale
-				
 				If GameSaved Then
-					If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Load game") Then
+					If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Load Game") Then
 						DrawLoading(0)
 						
 						MenuOpen = False
@@ -4901,23 +5212,28 @@ Function DrawMenu()
 						UpdateWorld 0.0
 						
 						PrevTime = MilliSecs()
-						FPSfactor = 0	
+						FPSfactor = 0
 					EndIf
 				Else
 					DrawButton(x, y, 390*MenuScale, 60*MenuScale, "")
 					Color 50,50,50
-					Text(x + 185*MenuScale, y + 30*MenuScale, "Load game", True, True)
+					Text(x + 185*MenuScale, y + 30*MenuScale, "Load Game", True, True)
+				EndIf
+				If DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "Quit to Menu") Then
+					NullGame()
+					MenuOpen = False
+					MainMenuOpen = True
+					MainMenuTab = 0
+					CurrSave = ""
+					FlushKeys()
 				EndIf
 				y= y + 80*MenuScale
 			EndIf
 			
-			If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Quit") Then
-				NullGame()
-				MenuOpen = False
-				MainMenuOpen = True
-				MainMenuTab = 0
-				CurrSave = ""
-				FlushKeys()
+			If KillTimer >= 0 And (Not MainMenuOpen)
+				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Quit") Then
+					QuitMSG = 1
+				EndIf
 			EndIf
 			
 			SetFont Font1
@@ -4950,6 +5266,8 @@ Function LoadEntities()
 	For i=0 To 9
 		TempSounds[i]=0
 	Next
+	
+	TextureLodBias
 	
 	SoundEmitter = CreatePivot()
 	
@@ -5207,6 +5525,8 @@ Function LoadEntities()
 	ParticleTextures(6) = LoadTexture_Strict("GFX\smoke2.png", 1 + 2)
 	
 	LoadMaterials("DATA\materials.ini")
+	
+	TextureLodBias TextureFloat#
 	
 	DrawLoading(30)
 	
@@ -5648,7 +5968,7 @@ Function PlaySound2%(SoundHandle%, cam%, entity%, range# = 10, volume# = 1.0)
 			Local panvalue# = Sin(-DeltaYaw(cam,entity))
 			soundchn% = PlaySound_Strict (SoundHandle)
 			
-			ChannelVolume(soundchn, volume# * (1 - dist#))
+			ChannelVolume(soundchn, volume# * (1 - dist#)*SFXVolume#)
 			ChannelPan(soundchn, panvalue)			
 		EndIf
 	EndIf
@@ -5672,7 +5992,7 @@ Function LoopSound2%(SoundHandle%, Chn%, cam%, entity%, range# = 10, volume# = 1
 				If (Not ChannelPlaying(Chn)) Then Chn% = PlaySound_Strict (SoundHandle)
 			EndIf
 			
-			ChannelVolume(Chn, volume# * (1 - dist#))
+			ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
 			ChannelPan(Chn, panvalue)
 		EndIf
 	Else
@@ -5709,27 +6029,35 @@ End Function
 
 Function UpdateMusic()
 	
-	If FPSfactor > 0 Then 
-		If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
-			CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
-			If CurrMusicVolume = 0 Then
-				NowPlaying = ShouldPlay
-				If MusicCHN <> 0 Then StopChannel MusicCHN
+	If (Not PlayCustomMusic)
+		If FPSfactor > 0 Then 
+			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
+				CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
+				If CurrMusicVolume = 0 Then
+					NowPlaying = ShouldPlay
+					If MusicCHN <> 0 Then StopChannel MusicCHN
+				EndIf
+			Else ; playing the right clip
+				CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * 0.1
 			EndIf
-		Else ; playing the right clip
-			CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * 0.1
+		EndIf
+		
+		If NowPlaying < 66 Then
+			If MusicCHN = 0 Then
+				MusicCHN = PlaySound_Strict(Music(NowPlaying))
+			Else
+				If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
+			End If
+		EndIf
+		
+		ChannelVolume MusicCHN, CurrMusicVolume
+	Else
+		If FPSfactor > 0 Then
+			;CurrMusicVolume = 1.0
+			If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(CustomMusic)
+			ChannelVolume MusicCHN,1.0*MusicVolume
 		EndIf
 	EndIf
-	
-	If NowPlaying < 66 Then
-		If MusicCHN = 0 Then
-			MusicCHN = PlaySound_Strict(Music(NowPlaying))
-		Else
-			If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
-		End If
-	EndIf
-	
-	ChannelVolume MusicCHN, CurrMusicVolume
 	
 End Function 
 
@@ -7633,6 +7961,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#97#117#11B#122#379#44F#47F#49D#513#520#5B4#62B#642#64F#681#728#7FE#1345#14E8
-;~F#1667#1686#16A5#16C3#16C7#16E7
+;~F#21#A6#126#12A#39E#4A9#4C7#53D#54A#5DE#655#66C#679#6AB#752#828#1481#1628#17AF#17CE
+;~F#17ED#180B#180F#182F
 ;~C#Blitz3D

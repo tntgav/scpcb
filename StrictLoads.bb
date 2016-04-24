@@ -78,17 +78,21 @@ Function PlaySound_Strict%(sndHandle%)
 					If snd\internalHandle=0 Then
 						If FileType(snd\name)<>1 Then
 							CreateConsoleMsg("Sound "+snd\name+" not found.")
-							;ConsoleOpen = True
+							If ConsoleOpening
+								ConsoleOpen = True
+							EndIf
 						Else
 							snd\internalHandle = LoadSound(snd\name)
 						EndIf
 						If snd\internalHandle = 0 Then
 							CreateConsoleMsg("Failed to load Sound: "+snd\name)
-							;ConsoleOpen = True
+							If ConsoleOpening
+								ConsoleOpen = True
+							EndIf
 						EndIf
 					EndIf
 					snd\channels[i]=PlaySound(snd\internalHandle)
-					;ChannelVolume snd\channels[i],SFXVolume#
+					ChannelVolume snd\channels[i],SFXVolume#
 					snd\releaseTime = MilliSecs()+5000 ;release after 5 seconds
 					Return snd\channels[i]
 				EndIf
@@ -96,18 +100,22 @@ Function PlaySound_Strict%(sndHandle%)
 				If snd\internalHandle=0 Then
 					If FileType(snd\name)<>1 Then
 						CreateConsoleMsg("Sound "+snd\name+" not found.")
-						;ConsoleOpen = True
+						If ConsoleOpening
+							ConsoleOpen = True
+						EndIf
 					Else
 						snd\internalHandle = LoadSound(snd\name)
 					EndIf
 						
 					If snd\internalHandle = 0 Then
 						CreateConsoleMsg("Failed to load Sound: "+snd\name)
-						;ConsoleOpen = True
+						If ConsoleOpening
+							ConsoleOpen = True
+						EndIf
 					EndIf
 				EndIf
 				snd\channels[i]=PlaySound(snd\internalHandle)
-				;ChannelVolume snd\channels[i],SFXVolume#
+				ChannelVolume snd\channels[i],SFXVolume#
 				snd\releaseTime = MilliSecs()+5000 ;release after 5 seconds
 				Return snd\channels[i]
 			EndIf

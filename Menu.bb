@@ -294,6 +294,8 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "framelimit", Framelimit%)
 					PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 					PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
+					PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
+					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 					
 					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -303,6 +305,8 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "Sprint key", KEY_SPRINT)
 					PutINIValue(OptionFile, "options", "Inventory key", KEY_INV)
 					PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
+					
+					AntiAlias Opt_AntiAlias
 					MainMenuTab = 0
 				Case 4 ;move back to the "new game" tab
 					MainMenuTab = 1
@@ -524,7 +528,7 @@ Function UpdateMainMenu()
 				
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
-					height = 400 * MenuScale
+					height = 260 * MenuScale
 					DrawFrame(x, y, width, height)
 					
 					y=y+20*MenuScale
@@ -550,7 +554,6 @@ Function UpdateMainMenu()
 					Color 255,255,255
 					Text(x + 20 * MenuScale, y, "Antialias:")
 					Opt_AntiAlias = DrawTick(x + 310 * MenuScale, y + MenuScale, Opt_AntiAlias%)
-					AntiAlias Opt_AntiAlias
 					Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
 					
 					y=y+40*MenuScale
@@ -570,10 +573,41 @@ Function UpdateMainMenu()
 					If prevGamma<>ScreenGamma Then
 						UpdateScreenGamma()
 					EndIf
+					
+					y=y+40*MenuScale
+					
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Texture details:")
+					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
+					If MouseHit1
+						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, MouseX(),MouseY(),0,0)
+							If TextureDetails% < 3
+								TextureDetails% = TextureDetails% + 1
+							Else
+								TextureDetails% = 0
+							EndIf
+							PlaySound_Strict(ButtonSFX)
+						EndIf
+					EndIf
+					Color 255,255,255
+					Select TextureDetails%
+						Case 0
+							Text(x + 340 * MenuScale, y + MenuScale, "LOW")
+							TextureFloat# = 1.5
+						Case 1
+							Text(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
+							TextureFloat# = 0.75
+						Case 2
+							Text(x + 340 * MenuScale, y + MenuScale, "HIGH")
+							TextureFloat# = 0.0
+						Case 3
+							Text(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
+							TextureFloat# = -0.75
+					End Select
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
-					height = 160 * MenuScale
+					height = 90 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
@@ -584,9 +618,9 @@ Function UpdateMainMenu()
 					
 					y = y + 30*MenuScale
 					
-					;SFXVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, SFXVolume*100.0)/100.0)
-					;Color 255,255,255
-					;Text2(x + 20 * MenuScale, y, Lang_Replace("Sound volume:"))
+					SFXVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, SFXVolume*100.0)/100.0)
+					Color 255,255,255
+					Text(x + 20 * MenuScale, y, "Sound volume:")
 					;If MouseDown1 Then
 					;	If MouseX() >= x And MouseX() <= x + width + 14 And MouseY() >= y And MouseY() <= y + 20 Then
 					;		PlayTestSound(True)
@@ -670,7 +704,7 @@ Function UpdateMainMenu()
 					
 					Color 255,255,255
 					Text(x + 20 * MenuScale, y, "Console auto-opening:")
-					NTF_DisableConsoleOpening = DrawTick(x + 310 * MenuScale, y + MenuScale, NTF_DisableConsoleOpening)
+					ConsoleOpening = DrawTick(x + 310 * MenuScale, y + MenuScale, ConsoleOpening)
 					
 					y = y + 30*MenuScale
 					
@@ -700,9 +734,9 @@ Function UpdateMainMenu()
 					Text(x + 20 * MenuScale, y + 30 * MenuScale, "Disable:")
 					If DrawTick(x + 120 * MenuScale, y + 30 * MenuScale, 0) Then CurrFrameLimit# = 0.0
 					
-					y=y+60*MenuScale
-					
-					Color 255,255,255
+					;y=y+60*MenuScale
+					;
+					;Color 255,255,255
 					
 					;[End Block]
 				EndIf
@@ -1298,5 +1332,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#301#383#395#39F#470#483#4A0#4DB#4F3#4FA
+;~F#31#323#3A5#3B7#3C1#492#4A5#4C2#4FD#515#51C
 ;~C#Blitz3D
