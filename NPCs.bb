@@ -2544,6 +2544,7 @@ Function UpdateNPCs()
 							prevFrame = n\Frame
 							
 							If EntityY(n\Collider)<= -100 Then
+								DebugLog "Test234"
 								TFormPoint(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,PlayerRoom\obj)
 								x = Floor((TFormedX()*RoomScale+6.0)/12.0)
 								z = Floor((TFormedZ()*RoomScale+6.0)/12.0)
@@ -2554,7 +2555,9 @@ Function UpdateNPCs()
 											
 											TFormPoint((x2*12)/RoomScale,0,(z2*12)/RoomScale,PlayerRoom\obj,0)
 											
-											PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+0.5, TFormedZ()
+											;PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+0.5, TFormedZ()
+											PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+1.0, TFormedZ()
+											DebugLog EntityY(fr\Forest_Pivot,True)
 											
 											If EntityInView(n\Collider, Camera) Then
 												BlinkTimer=-10
@@ -3681,7 +3684,7 @@ Function UpdateMTFUnit(n.NPCs)
 						For r = Each Rooms
 							If ((Abs(r\x-EntityX(n\Collider,True))>12.0) Or (Abs(r\z-EntityZ(n\Collider,True))>12.0)) And (Rand(1,Max(4-Int(Abs(r\z-EntityZ(n\Collider,True)/8.0)),2))=1) Then
 								x = r\x
-								y = 0.5
+								y = 0.1
 								z = r\z
 								DebugLog r\RoomTemplate\Name
 								Exit
@@ -4587,5 +4590,6 @@ Function ManipulateNPCBones()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#3A#214#238#320#409#62A#6BF#76C#771#79F#841#87C#909#975#A88#B4E#BFE#CB1#DB0
+;~F#0#3A#214#238#320#409#558#62A#6BF#76C#771#79F#841#87C#909#975#A8B#B51#C01#CB4
+;~F#DB3
 ;~C#Blitz3D

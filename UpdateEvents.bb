@@ -6352,6 +6352,8 @@ Function UpdateEvents()
 						
 						CurrStepSFX = 2
 						
+						Curr106\Idle = True
+						
 						;ShowEntity fr\DetailEntities[0]
 						;ShowEntity fr\DetailEntities[1]
 						
@@ -6383,10 +6385,12 @@ Function UpdateEvents()
 						If e\room\NPC[0]\State = 0 Or EntityDistance(Collider, e\room\NPC[0]\Collider)>12.0 Then
 							e\EventState3 = e\EventState3 + (1+CurrSpeed)* FPSfactor
 							If (e\EventState3 Mod 500) < 10.0 And ((e\EventState3-FPSfactor) Mod 500) > 490.0 Then
-								If e\EventState3 > 3500 And Rnd(10000)<e\EventState3 Then
+								;If e\EventState3 > 3500 And Rnd(10000)<e\EventState3 Then
+								If e\EventState3 > 3000-(500*SelectedDifficulty\aggressiveNPCs) And Rnd(10000+(500*SelectedDifficulty\aggressiveNPCs)) < e\EventState3
 									e\room\NPC[0]\State=2
 									PositionEntity e\room\NPC[0]\Collider, 0,-110,0
-									e\EventState3=e\EventState3-Rnd(2000,3000)
+									;e\EventState3=e\EventState3-Rnd(2000,3000)
+									e\EventState3=e\EventState3-Rnd(1000,2000-(500*SelectedDifficulty\aggressiveNPCs))
 									DebugLog "attack"
 								Else
 									e\room\NPC[0]\State=1
@@ -6396,11 +6400,11 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 						
-						If KeyHit(25) Then
-							e\room\NPC[0]\State=2
-							PositionEntity e\room\NPC[0]\Collider, 0,-110,0
-							e\EventState3=e\EventState3-Rnd(2000,3000)
-						EndIf
+						;If KeyHit(25) Then
+						;	e\room\NPC[0]\State=2
+						;	PositionEntity e\room\NPC[0]\Collider, 0,-110,0
+						;	e\EventState3=e\EventState3-Rnd(2000,3000)
+						;EndIf
 						
 						For i = 0 To 1
 							If EntityDistance(fr\Door[i], Collider)<0.5 Then
@@ -6448,7 +6452,7 @@ Function UpdateEvents()
 						
 					Else
 						
-						
+						If (Not Contained106) Then Curr106\Idle = False
 						
 						;dp.DrawPortal=e\room\dp;Object.DrawPortal(e\room\Objects[0])
 						
@@ -7757,6 +7761,6 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#11#F8#4C5#4CF#508#53D#59C#763#94A#971#97F#989#996#B7F#BA0#BEF#C3D#C4A#C84#C9B
 ;~F#CBB#CC4#CCE#CDD#D71#D93#103F#1085#109B#10A7#10C5#1116#112D#11F8#12F9#138A#13A3#13C2#13F3#1400
-;~F#1419#14B1#1667#1711#1765#1816#18C6#197A#1992#1A4B#1A78#1A95#1ABC#1AEC#1B09#1B2D#1B87#1BC7#1BF8#1C0B
-;~F#1CC3#1D1B#1D2E#1D3D#1D63#1D82
+;~F#1419#14B1#1667#1711#1765#1816#197E#1996#1A4F#1A7C#1A99#1AC0#1AF0#1B0D#1B31#1B8B#1BCB#1BFC#1C0F#1CC7
+;~F#1D1F#1D32#1D41#1D67#1D86
 ;~C#Blitz3D
