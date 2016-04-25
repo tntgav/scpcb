@@ -524,7 +524,7 @@ Function UpdateMainMenu()
 				
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
-					height = 260 * MenuScale
+					height = 280 * MenuScale
 					DrawFrame(x, y, width, height)
 					
 					y=y+20*MenuScale
@@ -718,17 +718,16 @@ Function UpdateMainMenu()
 					
 					Color 255,255,255
 					Text(x + 20 * MenuScale, y, "Framelimit:")
-					CurrFrameLimit# = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, CurrFrameLimit#*50.0)/50.0)
-					Framelimit% = CurrFrameLimit#*200.0
-					Color 255,255,0
-					If Framelimit% = 0
-						Text(x + 20 * MenuScale, y + 15 * MenuScale, "Disabled")
-					Else
-						Text(x + 20 * MenuScale, y + 15 * MenuScale, Framelimit%+" FPS")
-					EndIf
 					Color 255,255,255
-					Text(x + 20 * MenuScale, y + 30 * MenuScale, "Disable:")
-					If DrawTick(x + 120 * MenuScale, y + 30 * MenuScale, 0) Then CurrFrameLimit# = 0.0
+					If DrawTick(x + 270 * MenuScale, y, CurrFrameLimit > 0.0) Then
+						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+23*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
+						CurrFrameLimit = Max(CurrFrameLimit, 0.1)
+						Framelimit% = CurrFrameLimit#*100.0
+						Color 255,255,0
+						Text(x + 25 * MenuScale, y + 25 * MenuScale, Framelimit%+" FPS")
+					Else
+						CurrFrameLimit# = 0.0
+					EndIf
 					
 					;y=y+60*MenuScale
 					;
@@ -886,13 +885,15 @@ Function UpdateLauncher()
 		Next
 		
 		Fullscreen = DrawTick(40 + 430 - 15, 260 - 55, Fullscreen)
-		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 40, LauncherEnabled)
-		FakeFullScreen = DrawTick(40 + 430 - 15, 260 - 55 + 80, FakeFullScreen)
+		FakeFullScreen = DrawTick(40 + 430 - 15, 260 - 55 + 30, FakeFullScreen)		
+		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 70, LauncherEnabled)
+		
 		
 		Color 255, 255, 255
 		Text(40 + 430 + 15, 262 - 55, "Fullscreen")
-		Text(40 + 430 + 15, 262 - 55 + 40, "Use launcher")
-		Text(40 + 430 + 15, 262 - 55 + 80, "Fake Fullscreen")
+		Text(40 + 430 + 15, 262 - 55 + 30, "Fake Fullscreen")		
+		Text(40 + 430 + 15, 262 - 55 + 70, "Use launcher")
+		
 		
 		If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 55, 100, 30, "LAUNCH", False) Then
 			GraphicWidth = GfxModeWidths(SelectedGFXMode)

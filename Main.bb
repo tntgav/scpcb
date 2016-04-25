@@ -4880,30 +4880,34 @@ Function DrawMenu()
 			;		OptionsMenu = OptionsMenu-1
 			;	EndIf
 			;EndIf
-			If DrawButton(x-25*MenuScale,y,120*MenuScale,30*MenuScale,"GRAPHICS",False) Then OptionsMenu = 1
-			If DrawButton(x+95*MenuScale,y,120*MenuScale,30*MenuScale,"AUDIO",False) Then OptionsMenu = 2
-			If DrawButton(x+215*MenuScale,y,120*MenuScale,30*MenuScale,"CONTROLS",False) Then OptionsMenu = 3
-			If DrawButton(x+335*MenuScale,y,120*MenuScale,30*MenuScale,"ADVANCED",False) Then OptionsMenu = 4
+			
 			Color 0,255,0
 			If OptionsMenu = 1
-				Rect(x-25*MenuScale,y,120*MenuScale,30*MenuScale,False)
+				Rect(x-10*MenuScale,y-5*MenuScale,110*MenuScale,40*MenuScale,True)
 			ElseIf OptionsMenu = 2
-				Rect(x+95*MenuScale,y,120*MenuScale,30*MenuScale,False)
+				Rect(x+100*MenuScale,y-5*MenuScale,110*MenuScale,40*MenuScale,True)
 			ElseIf OptionsMenu = 3
-				Rect(x+215*MenuScale,y,120*MenuScale,30*MenuScale,False)
+				Rect(x+210*MenuScale,y-5*MenuScale,110*MenuScale,40*MenuScale,True)
 			ElseIf OptionsMenu = 4
-				Rect(x+335*MenuScale,y,120*MenuScale,30*MenuScale,False)
+				Rect(x+320*MenuScale,y-5*MenuScale,110*MenuScale,40*MenuScale,True)
 			EndIf
+			
+			If DrawButton(x-5*MenuScale,y,100*MenuScale,30*MenuScale,"GRAPHICS",False) Then OptionsMenu = 1
+			If DrawButton(x+105*MenuScale,y,100*MenuScale,30*MenuScale,"AUDIO",False) Then OptionsMenu = 2
+			If DrawButton(x+215*MenuScale,y,100*MenuScale,30*MenuScale,"CONTROLS",False) Then OptionsMenu = 3
+			If DrawButton(x+325*MenuScale,y,100*MenuScale,30*MenuScale,"ADVANCED",False) Then OptionsMenu = 4
+			
+			
 			Color 255,255,255
 			Select OptionsMenu
 				Case 1 ;Graphics
 					;Text(x+210*MenuScale,y,"GRAPHICS",True,True)
 					SetFont Font1
 					;[Block]
-					y=y+40*MenuScale
+					y=y+50*MenuScale
 					
 					Color 255,255,255				
-					Text(x-20*MenuScale, y, "Show HUD:")	
+					Text(x, y, "Show HUD:")	
 					HUDenabled = DrawTick(x + 270 * MenuScale, y + MenuScale, HUDenabled)	
 					
 					y=y+30*MenuScale
@@ -4915,20 +4919,20 @@ Function DrawMenu()
 					;y=y+30*MenuScale
 					
 					Color 255,255,255
-					Text(x-20*MenuScale, y, "VSync:")
+					Text(x, y, "VSync:")
 					Vsync% = DrawTick(x + 270 * MenuScale, y + MenuScale, Vsync%)
 					
 					y=y+30*MenuScale
 					
 					Color 255,255,255
-					Text(x-20*MenuScale, y, "Antialias:")
+					Text(x, y, "Anti-aliasing:")
 					Opt_AntiAlias = DrawTick(x + 270 * MenuScale, y + MenuScale, Opt_AntiAlias%)
-					Text(x-20*MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					Text(x+5*MenuScale, y + 15 * MenuScale, "(fullscreen only)")
 					
 					y=y+40*MenuScale
 					
 					Color 255,255,255
-					Text(x-20*MenuScale, y, "Enable room lights:")
+					Text(x, y, "Enable room lights:")
 					EnableRoomLights = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableRoomLights)
 					
 					y=y+30+MenuScale
@@ -4936,25 +4940,21 @@ Function DrawMenu()
 					Local prevGamma# = ScreenGamma
 					ScreenGamma = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, ScreenGamma*50.0)/50.0)
 					Color 255,255,255
-					Text(x-20*MenuScale, y, "Screen gamma")
-					Text(x-20+MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					Text(x, y, "Screen gamma")
+					Text(x+5+MenuScale, y + 15 * MenuScale, "(fullscreen only)")
 					
 					If prevGamma<>ScreenGamma Then
 						UpdateScreenGamma()
 					EndIf
 					
-					y=y+40*MenuScale
+					y=y+45*MenuScale
 					
 					Color 255,255,255
-					Text(x-20*MenuScale, y, "Texture details:")
+					Text(x, y, "Texture details:")
 					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
 					If MouseHit1
 						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, MouseX(),MouseY(),0,0)
-							If TextureDetails% < 3
-								TextureDetails% = TextureDetails% + 1
-							Else
-								TextureDetails% = 0
-							EndIf
+							TextureDetails = (TextureDetails+1) Mod 4
 							PlaySound_Strict(ButtonSFX)
 						EndIf
 					EndIf
@@ -4978,46 +4978,46 @@ Function DrawMenu()
 					;Text(x+210*MenuScale,y,"AUDIO",True,True)
 					SetFont Font1
 					;[Block]
-					y = y + 40*MenuScale
+					y = y + 50*MenuScale
 					
-					MusicVolume = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, MusicVolume*100.0)/100.0)
+					MusicVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, MusicVolume*100.0)/100.0)
 					Color 255,255,255
-					Text(x - 20 * MenuScale, y, "Music volume:")
+					Text(x, y, "Music volume:")
 					
 					y = y + 30*MenuScale
 					
-					SFXVolume = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, SFXVolume*100.0)/100.0)
+					SFXVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, SFXVolume*100.0)/100.0)
 					Color 255,255,255
-					Text(x - 20 * MenuScale, y, "Sound volume:")
+					Text(x, y, "Sound volume:")
 					;[End Block]
 				Case 3 ;Controls
 					;Text(x+210*MenuScale,y,"CONTROLS",True,True)
 					SetFont Font1
 					;[Block]
-					y = y + 40*MenuScale
+					y = y + 50*MenuScale
 					
 					MouseSens = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
 					Color(255, 255, 255)
-					Text(x - 20 * MenuScale, y, "Mouse sensitivity:")
+					Text(x, y, "Mouse sensitivity:")
 					
 					y = y + 30*MenuScale
 					
 					Color(255, 255, 255)
-					Text(x - 20 * MenuScale, y, "Invert mouse Y-axis:")
+					Text(x, y, "Invert mouse Y-axis:")
 					InvertMouse = DrawTick(x + 270 * MenuScale, y + MenuScale, InvertMouse)
 					
 					y = y + 30*MenuScale
-					Text(x - 20 * MenuScale, y, "Control configuration:")
+					Text(x, y, "Control configuration:")
 					y = y + 10*MenuScale
 					
-					Text(x - 20 * MenuScale, y + 20 * MenuScale, "Up")
-					InputBox(x + 50 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
-					Text(x - 20 * MenuScale, y + 40 * MenuScale, "Left")
-					InputBox(x + 50 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
-					Text(x - 20 * MenuScale, y + 60 * MenuScale, "Down")
-					InputBox(x + 50 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
-					Text(x - 20 * MenuScale, y + 80 * MenuScale, "Right")
-					InputBox(x + 50 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
+					Text(x, y + 20 * MenuScale, "Up")
+					InputBox(x + 60 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
+					Text(x, y + 40 * MenuScale, "Left")
+					InputBox(x + 60 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
+					Text(x, y + 60 * MenuScale, "Down")
+					InputBox(x + 60 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
+					Text(x, y + 80 * MenuScale, "Right")
+					InputBox(x + 60 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
 					
 					Text(x + 220 * MenuScale, y + 20 * MenuScale, "Blink")
 					InputBox(x + 320 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
@@ -5057,39 +5057,39 @@ Function DrawMenu()
 					;Text(x+210*MenuScale,y,"ADVANCED",True,True)
 					SetFont Font1
 					;[Block]
-					y = y + 40*MenuScale
+					y = y + 50*MenuScale
 					
 					Color 255,255,255
-					Text(x - 20 * MenuScale, y, "Console auto-opening:")
-					ConsoleOpening = DrawTick(x + 270 * MenuScale, y + MenuScale, ConsoleOpening)
+					Text(x, y, "Console auto-opening:")
+					ConsoleOpening = DrawTick(x + 270 * MenuScale, y, ConsoleOpening)
 					
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
-					Text(x - 20 * MenuScale, y, "Achievement popup:")
-					AchvMSGenabled% = DrawTick(x + 270 * MenuScale, y + MenuScale, AchvMSGenabled%)
+					Text(x, y, "Achievement popup:")
+					AchvMSGenabled% = DrawTick(x + 270 * MenuScale, y, AchvMSGenabled%)
 					
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
-					Text(x - 20 * MenuScale, y, "Show FPS:")
-					ShowFPS% = DrawTick(x + 270 * MenuScale, y + MenuScale, ShowFPS%)
+					Text(x, y, "Show FPS:")
+					ShowFPS% = DrawTick(x + 270 * MenuScale, y, ShowFPS%)
 					
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
-					Text(x - 20 * MenuScale, y, "Framelimit:")
-					CurrFrameLimit# = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
-					Framelimit% = CurrFrameLimit#*200.0
-					Color 255,255,0
-					If Framelimit% = 0
-						Text(x - 20 * MenuScale, y + 15 * MenuScale, "Disabled")
+					Text(x, y, "Framelimit:")
+					
+					Color 255,255,255
+					If DrawTick(x + 270 * MenuScale, y, CurrFrameLimit > 0.0) Then
+						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+23*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
+						CurrFrameLimit = Max(CurrFrameLimit, 0.1)
+						Framelimit% = CurrFrameLimit#*100.0
+						Color 255,255,0
+						Text(x + 5 * MenuScale, y + 25 * MenuScale, Framelimit%+" FPS")
 					Else
-						Text(x - 20 * MenuScale, y + 15 * MenuScale, Framelimit%+" FPS")
+						CurrFrameLimit# = 0.0
 					EndIf
-					Color 255,255,255
-					Text(x - 20 * MenuScale, y + 30 * MenuScale, "Disable:")
-					If DrawTick(x + 80 * MenuScale, y + 30 * MenuScale, 0) Then CurrFrameLimit# = 0.0
 					;[End Block]
 			End Select
 		ElseIf AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG > 0 And KillTimer >= 0
