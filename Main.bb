@@ -5089,6 +5089,7 @@ Function DrawMenu()
 						Text(x + 5 * MenuScale, y + 25 * MenuScale, Framelimit%+" FPS")
 					Else
 						CurrFrameLimit# = 0.0
+						Framelimit = 0
 					EndIf
 					;[End Block]
 			End Select
@@ -7975,6 +7976,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#39E#4A9#4C7#53D#54A#5DE#655#66C#679#6AB#752#828#148F#1636#17BD
-;~F#17DC#17FB#1819#181D#183D
+;~F#21#A6#126#12A#131#39E#4A9#4C7#53D#54A#5DE#655#66C#679#6AB#752#828#1490#1637#17BE
+;~F#17DD#17FC#181A#181E#183E
 ;~C#Blitz3D

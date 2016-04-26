@@ -727,6 +727,7 @@ Function UpdateMainMenu()
 						Text(x + 25 * MenuScale, y + 25 * MenuScale, Framelimit%+" FPS")
 					Else
 						CurrFrameLimit# = 0.0
+						Framelimit = 0
 					EndIf
 					
 					;y=y+60*MenuScale
@@ -1329,5 +1330,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#31F#3A1#3B3#3BD#48E#4A1#4BE#4F9#511#518
+;~F#31
 ;~C#Blitz3D
