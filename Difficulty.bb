@@ -4,6 +4,7 @@ Type Difficulty
 	Field permaDeath%
 	Field aggressiveNPCs
 	Field saveType%
+	Field otherFactors%
 	
 	Field customizable%
 End Type
@@ -16,12 +17,15 @@ Const SAFE=0, EUCLID=1, KETER=2, CUSTOM=3
 
 Const SAVEANYWHERE = 0, SAVEONQUIT=1, SAVEONSCREENS=2
 
+Const EASY = 0, NORMAL = 1, HARD = 2
+
 difficulties(SAFE) = New Difficulty
 difficulties(SAFE)\name = "Safe"
 difficulties(SAFE)\description ="The game can be saved any time. However, as in the case of SCP Objects, a Safe classification does not mean that handling it does not pose a threat."
 difficulties(SAFE)\permaDeath = False
 difficulties(SAFE)\aggressiveNPCs = False
 difficulties(SAFE)\saveType = SAVEANYWHERE
+difficulties(SAFE)\otherFactors = EASY
 
 difficulties(EUCLID) = New Difficulty
 difficulties(EUCLID)\name = "Euclid"
@@ -31,6 +35,7 @@ difficulties(EUCLID)\description = difficulties(EUCLID)\description +"In Euclid 
 difficulties(EUCLID)\permaDeath = False
 difficulties(EUCLID)\aggressiveNPCs = False
 difficulties(EUCLID)\saveType = SAVEONSCREENS
+difficulties(SAFE)\otherFactors = NORMAL
 
 difficulties(KETER) = New Difficulty
 difficulties(KETER)\name = "Keter"
@@ -39,6 +44,7 @@ difficulties(KETER)\description = difficulties(KETER)\description +"The same can
 difficulties(KETER)\permaDeath = True
 difficulties(KETER)\aggressiveNPCs = True
 difficulties(KETER)\saveType = SAVEONQUIT
+difficulties(SAFE)\otherFactors = HARD
 
 difficulties(CUSTOM) = New Difficulty
 difficulties(CUSTOM)\name = "Custom"
@@ -46,6 +52,7 @@ difficulties(CUSTOM)\permaDeath = False
 difficulties(CUSTOM)\aggressiveNPCs = True
 difficulties(CUSTOM)\saveType = SAVEANYWHERE
 difficulties(CUSTOM)\customizable = True
+difficulties(SAFE)\otherFactors = EASY
 
 SelectedDifficulty = difficulties(SAFE)
 ;~IDEal Editor Parameters:

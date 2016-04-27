@@ -527,6 +527,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 	
 	n\ID = temp
 	
+	NPCSpeedChange(n)
+	
 	Return n
 End Function
 
@@ -4589,7 +4591,21 @@ Function ManipulateNPCBones()
 	Next
 	
 End Function
+
+Function NPCSpeedChange(n.NPCs)
+	
+	Select n\NPCtype
+		Case NPCtype173,NPCtypeOldMan,NPCtype096,NPCtype049
+			Select SelectedDifficulty\otherFactors
+				Case NORMAL
+					n\Speed = n\Speed * 1.1
+				Case HARD
+					n\Speed = n\Speed * 1.2
+			End Select
+	End Select
+	
+End Function
 ;~IDEal Editor Parameters:
-;~F#0#3A#214#238#320#409#558#62A#6BF#76C#771#79F#841#87C#909#975#A8B#B51#C01#CB4
-;~F#DB3
+;~F#0#216#231#23A#322#40B#55A#62C#6C1#76E#773#7A1#843#87E#90B#977#A8D#B53#C03#CB6
+;~F#DB5
 ;~C#Blitz3D

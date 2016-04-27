@@ -390,6 +390,27 @@ Function UpdateMainMenu()
 					SelectedDifficulty\aggressiveNPCs =  DrawTick(x + 160 * MenuScale, y + 225 * MenuScale, SelectedDifficulty\aggressiveNPCs)
 					Text(x + 200 * MenuScale, y + 225 * MenuScale, "Aggressive NPCs")
 					
+					;Other factor's difficulty					Color 255,255,255
+					DrawImage ArrowIMG(1),x + 155 * MenuScale, y+251*MenuScale
+					If MouseHit1
+						If ImageRectOverlap(ArrowIMG(1),x + 155 * MenuScale, y+251*MenuScale, MouseX(),MouseY(),0,0)
+							If SelectedDifficulty\otherFactors < HARD
+								SelectedDifficulty\otherFactors = SelectedDifficulty\otherFactors + 1
+							Else
+								SelectedDifficulty\otherFactors = EASY
+							EndIf
+							PlaySound_Strict(ButtonSFX)
+						EndIf
+					EndIf
+					Color 255,255,255
+					Select SelectedDifficulty\otherFactors
+						Case EASY
+							Text(x + 200 * MenuScale, y + 255 * MenuScale, "Other difficulty factors: Easy")
+						Case NORMAL
+							Text(x + 200 * MenuScale, y + 255 * MenuScale, "Other difficulty factors: Normal")
+						Case HARD
+							Text(x + 200 * MenuScale, y + 255 * MenuScale, "Other difficulty factors: Hard")
+					End Select
 				Else
 					RowText(SelectedDifficulty\description, x+160*MenuScale, y+160*MenuScale, (410-20)*MenuScale, 200)					
 				EndIf

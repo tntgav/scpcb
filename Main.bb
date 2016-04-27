@@ -6045,7 +6045,7 @@ End Function
 Function UpdateMusic()
 	
 	If (Not PlayCustomMusic)
-		If FPSfactor > 0 Then 
+		If FPSfactor > 0 Or OptionsMenu = 2 Then 
 			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
 				CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
 				If CurrMusicVolume = 0 Then
@@ -6067,7 +6067,7 @@ Function UpdateMusic()
 		
 		ChannelVolume MusicCHN, CurrMusicVolume
 	Else
-		If FPSfactor > 0 Then
+		If FPSfactor > 0 Or OptionsMenu = 2 Then
 			;CurrMusicVolume = 1.0
 			If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(CustomMusic)
 			ChannelVolume MusicCHN,1.0*MusicVolume
@@ -6441,11 +6441,31 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						End Select						
 					EndIf
 				Case "very fine"
-					If Rand(3)=1 Then
-						it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-					Else	
-						it2 = CreateItem("Mastercard", "misc", x, y, z)
-					EndIf
+					;If Rand(3)=1 Then
+					;	it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+					;Else	
+					;	it2 = CreateItem("Mastercard", "misc", x, y, z)
+					;EndIf
+					Select SelectedDifficulty\otherFactors
+						Case EASY
+							If Rand(5)=1 Then
+								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+						Case NORMAL
+							If Rand(7)=1 Then
+								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+						Case HARD
+							If Rand(10)=1 Then
+								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+					End Select
 			End Select			
 			
 			RemoveItem(item)
