@@ -1137,13 +1137,16 @@ DrawLoading(30, True)
 
 ;[End block]
 
-;New Sounds in SCP:CB 1.3 - ENDSHN
+;New Sounds and Meshes/Other things in SCP:CB 1.3 - ENDSHN
 ;[Block]
 Global NTF_1499EnterSFX% = LoadSound_Strict("SFX\1499\1499_mfe_vhd_00.ogg")
 Global NTF_1499LeaveSFX% = LoadSound_Strict("SFX\1499\1499_mfe_lve_10.ogg")
 Global NTF_1499FuckedSFX% = LoadSound_Strict("SFX\1499\fuckedup.ogg")
 
 Global PlayCustomMusic% = False, CustomMusic% = 0
+
+Global Monitor2, MonitorTexture2, MonitorTexture3
+Global MonitorTimer# = 0.0
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -5529,6 +5532,11 @@ Function LoadEntities()
 	CamOBJ = LoadMesh_Strict("GFX\map\CamHead.b3d")
 	HideEntity(CamOBJ)
 	
+	Monitor2 = LoadMesh_Strict("GFX\map\monitor.b3d")
+	HideEntity Monitor2
+	MonitorTexture2 = LoadTexture_Strict("GFX\map\MonitorTexture.jpg")
+	MonitorTexture3 = LoadTexture_Strict("GFX\map\MonitorTexture3.jpg")
+	
 	InitItemTemplates()
 	
 	ParticleTextures(0) = LoadTexture_Strict("GFX\smoke.png", 1 + 2)
@@ -7992,10 +8000,10 @@ End Function
 
 Function Inverse#(number#)
 	
-	Return 1.0-number#
+	Return Float(1.0-number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#39E#4A9#4C7#53D#54A#5DE#655#66C#679#6AB#752#828#1490#1637#17BE
-;~F#17DD#17FC#181A#181E#183E
+;~F#21#A6#126#12A#131#39E#4AC#4CA#540#54D#5E1#658#66F#67C#6AE#755#82B#1493#163F#17C6
+;~F#17E5#1804#1822#1826#1846
 ;~C#Blitz3D

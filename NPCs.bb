@@ -610,7 +610,7 @@ Function UpdateNPCs()
 								BlurVolume = Max(Max(Min((4.0 - dist) / 6.0, 0.9), 0.1), BlurVolume)
 								CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs())/20.0)+1.0)*15.0*Max((3.5-dist)/3.5,0.0))								
 								
-								If dist < 3.5 And MilliSecs() - n\LastSeen > 60000 And temp Then 
+								If dist < 3.5 And MilliSecs() - n\LastSeen > 60000 And temp Then
 									PlaySound_Strict(HorrorSFX(Rand(3,4)))
 									
 									n\LastSeen = MilliSecs()
@@ -618,7 +618,7 @@ Function UpdateNPCs()
 								
 								If dist < 1.5 And Rand(700) = 1 Then PlaySound2(Scp173SFX(Rand(0, 2)), Camera, n\obj)
 								
-								If dist < 1.5 And n\LastDist > 2.0 Then
+								If dist < 1.5 And n\LastDist > 2.0 And temp Then
 									CurrCameraZoom = 40.0
 									HeartBeatRate = Max(HeartBeatRate, 140)
 									HeartBeatVolume = 0.5
@@ -1868,6 +1868,7 @@ Function UpdateNPCs()
 						n\BoneToManipulate = "head"
 						n\ManipulateBone = True
 						n\ManipulationType = 0
+						n\Angle = EntityYaw(n\Collider)
 					Case 10
 						AnimateNPC(n, 1614, 1641, n\CurrSpeed*30)
 						
@@ -4541,16 +4542,8 @@ Function Console_SpawnNPC(c_input$,state%=-9999)
 			n.NPCs = CreateNPC(NPCtypePdPlane, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
 		Case "1048-a","scp1048-a","scp-1048-a","scp1048a","scp-1048a"
 			n.NPCs = CreateNPC(NPCtype1048a, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "mtf2"
-			n.NPCs = CreateNPC(NPCtypeMTF2, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "d2"
-			n.NPCs = CreateNPC(NPCtypeD2, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "scp-457","457","scp457"
-			n.NPCs = CreateNPC(NPCtype457, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
 		Case "scp-008-1","008-1","scp008-1"
 			n.NPCs = CreateNPC(NPCtype008, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "d-9341","d9341","9341"
-			n.NPCs = CreateNPC(NPCtypeD9341, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
 		Case "scp-1499-1","scp1499-1","1499-1"
 			n.NPCs = CreateNPC(NPCtype1499, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
 		Default 
@@ -4579,9 +4572,11 @@ Function ManipulateNPCBones()
 					;PointEntity bone%,Camera
 					;RotateEntity bone%,EntityPitch(bone%),20,0
 					PointEntity pvt%,Camera
-					n\BonePitch# = CurveAngle(EntityYaw(pvt%)-180,n\BonePitch#,10.0)
+					n\BonePitch# = CurveAngle(EntityYaw(pvt%),n\BonePitch#,10.0)
 					n\BoneYaw# = CurveAngle(EntityPitch(pvt%)-20,n\BoneYaw#,10.0)
-					RotateEntity bone%,n\BonePitch#,-n\BoneYaw#,0
+					n\BonePitch# = Max(Min(n\BonePitch#,WrapAngle(EntityYaw(n\obj)+90)),WrapAngle(EntityYaw(n\obj)-90))
+					RotateEntity bone%,WrapAngle(n\BonePitch#-n\Angle),-n\BoneYaw#,0
+					DebugLog n\ID
 				Case 1 ;<--- looking at player #2
 					PointEntity bone%,Collider
 					RotateEntity bone%,0,EntityYaw(bone%),0
@@ -4606,6 +4601,5 @@ Function NPCSpeedChange(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#216#231#23A#322#40B#55A#62C#6C1#76E#773#7A1#843#87E#90B#977#A8D#B53#C03#CB6
-;~F#DB5
+;~F#0#216#23A#322#40B#55A#62C#6C1#76F#774#7A2#844#87F#90C#978#A8E#B54#C04#CB7#DB6
 ;~C#Blitz3D
