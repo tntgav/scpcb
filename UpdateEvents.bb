@@ -1297,7 +1297,8 @@ Function UpdateEvents()
 						If e2\EventName = "008"
 							If e2\EventState = 2
 								If e\room\RoomDoors[0]\locked
-									EntityTexture e\room\Objects[2],MonitorTexture2
+									MonitorTimer# = 0.0
+									UpdateCheckpointMonitors(e\room\Objects[2])
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
@@ -6968,9 +6969,9 @@ Function UpdateEvents()
 					
 					e\EventState = 2	
 				Else
-					If e\Sound = 0 Then LoadEventSound(e,"SFX\SuicideGuard1.ogg");e\Sound = LoadSound_Strict("SFX\SuicideGuard1.ogg")
+					If e\Sound = 0 Then e\Sound = LoadSound_Strict("SFX\SuicideGuard1.ogg")
 					If e\room\dist < 15.0 Then 
-						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\Objects[1], 15.0)
+						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\NPC[0]\Collider, 15.0)
 						
 						If e\room\dist<4.0 And PlayerSoundVolume > 1.0 Then
 							de.Decals = CreateDecal(3,  EntityX(e\room\Objects[2],True), 0.01, EntityZ(e\room\Objects[2],True),90,Rnd(360),0)
@@ -6979,12 +6980,13 @@ Function UpdateEvents()
 							de.Decals = CreateDecal(17,  EntityX(e\room\Objects[2],True), 0.01, EntityZ(e\room\Objects[2],True),90,Rnd(360),0)
 							de\Size = 0.1 : de\maxsize = 0.45 : de\sizechange = 0.0002 : UpdateDecals()
 							
-							;e\Sound = LoadSound_Strict("SFX\SuicideGuard2.ogg")
-							StopChannel e\SoundCHN
-							LoadEventSound(e,"SFX\SuicideGuard2.ogg",1)
-							e\SoundCHN = PlaySound2(e\Sound2, Camera, e\room\Objects[1], 15.0)
-							
+							;FreeSound e\Sound
+							;StopChannel e\SoundCHN
+							;LoadEventSound(e,"SFX\SuicideGuard2.ogg",1)
+							e\room\NPC[0]\Sound = LoadSound_Strict("SFX\SuicideGuard2.ogg")
+							e\SoundCHN2 = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 15.0)
 							RemoveEvent(e)
+							
 						EndIf						
 					EndIf
 				EndIf
@@ -7793,8 +7795,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4CC#523#559#5B8#781#968#98F#99D#9A7#9B4#B9D#BBE#C0D#C5B#C68#CA2#CB9#CD9
-;~F#CE2#CEC#CFB#D8F#DB1#105D#10A3#10B9#10C5#10E3#1134#114B#1218#1319#13AA#13C3#13E2#1413#1420#1439
-;~F#14D1#1687#1731#1785#1836#18E6#199E#19B6#1A6F#1A9C#1AB9#1AE0#1B10#1B2D#1B51#1BAB#1BEB#1C1C#1C2F#1CE7
-;~F#1D3F#1D52#1D64#1D89#1DA8
+;~F#11#F8#4CC#524#55A#5B9#782#969#990#99E#9A8#9B5#B9E#BBF#C0E#C5C#C69#CA3#CBA#CDA
+;~F#CE3#CED#CFC#D90#DB2#105E#10A4#10BA#10C6#10E4#1135#114C#1219#131A#13AB#13C4#13E3#1414#1421#143A
+;~F#14D2#1688#1732#1786#1837#18E7#199F#19B7#1A70#1A9D#1ABA#1AE1#1B11#1B2E#1B53#1BAD#1BED#1C1E#1C31#1CE9
+;~F#1D41#1D54#1D66#1D8B#1DAA
 ;~C#Blitz3D

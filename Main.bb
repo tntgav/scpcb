@@ -5532,10 +5532,10 @@ Function LoadEntities()
 	CamOBJ = LoadMesh_Strict("GFX\map\CamHead.b3d")
 	HideEntity(CamOBJ)
 	
-	Monitor2 = LoadMesh_Strict("GFX\map\monitor.b3d")
+	Monitor2 = LoadMesh_Strict("GFX\map\monitor_checkpoint.b3d")
 	HideEntity Monitor2
-	MonitorTexture2 = LoadTexture_Strict("GFX\map\MonitorTexture.jpg")
-	MonitorTexture3 = LoadTexture_Strict("GFX\map\MonitorTexture3.jpg")
+	MonitorTexture2 = LoadTexture_Strict("GFX\map\LockdownScreen2.png")
+	MonitorTexture3 = LoadTexture_Strict("GFX\map\LockdownScreen.png")
 	
 	InitItemTemplates()
 	

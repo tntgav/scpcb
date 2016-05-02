@@ -6648,13 +6648,27 @@ Function UpdateRoomLights()
 End Function
 
 Function UpdateCheckpointMonitors(ent%)
+	Local i,sf,b,t1
 	
-	If MonitorTimer# < 50
-		EntityTexture ent%,MonitorTexture2
-	Else
-		EntityTexture ent%,MonitorTexture3
-	EndIf
-	
+	For i = 2 To CountSurfaces(Monitor2)
+		sf = GetSurface(Monitor2,i)
+		b = GetSurfaceBrush(sf)
+		If b<>0 Then
+			t1 = GetBrushTexture(b,0)
+			If t1<>0 Then
+				If Lower(StripPath(TextureName(t1))) <> "MonitorTexture.jpg"
+					If MonitorTimer# < 50
+						BrushTexture b, MonitorTexture2, 0, 0
+					Else
+						BrushTexture b, MonitorTexture3, 0, 0
+					EndIf
+					PaintSurface sf,b
+				EndIf
+				FreeTexture t1
+			EndIf
+			FreeBrush b
+		EndIf
+	Next
 	MonitorTimer# = (MonitorTimer# + FPSfactor) Mod 100
 	
 End Function
