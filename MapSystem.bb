@@ -2158,6 +2158,12 @@ Function FillRoom(r.Rooms)
 			r\Objects[0] = CreatePivot(r\obj)
 			PositionEntity (r\Objects[0], r\x - 720.0*RoomScale, 120.0*RoomScale, r\z+464.0*RoomScale, True)
 			
+			r\Objects[2] = CopyEntity(Monitor2,r\obj)
+			ScaleEntity(r\Objects[2], 2.0, 2.0, 2.0)
+			PositionEntity (r\Objects[2], r\x + 152.0*RoomScale, 384.0*RoomScale, r\z+380.0*RoomScale, True)
+			RotateEntity (r\Objects[2],0,180,0)
+			EntityFX r\Objects[2],1
+			
 			;[End Block]
 		Case "room2pit"
 			;[Block]
@@ -6641,13 +6647,23 @@ Function UpdateRoomLights()
 	
 End Function
 
-
+Function UpdateCheckpointMonitors(ent%)
+	
+	If MonitorTimer# < 50
+		EntityTexture ent%,MonitorTexture2
+	Else
+		EntityTexture ent%,MonitorTexture3
+	EndIf
+	
+	MonitorTimer# = (MonitorTimer# + FPSfactor) Mod 100
+	
+End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
-;~F#526#545#566#577#582#5BB#5C9#5F1#623#62B#640#68D#6DE#720#742#79E#817#826#850#861
-;~F#872#890#8B7#8BE#8CC#8E8#8FD#91A#937#944#956#98F#9B9#A05#A5B#A6E#A89#ADA#B33#B42
-;~F#B7E#B86#B94#BA9#BE5#C04#C14#C54#C67#C89#CB1#CFF#D2B#D52#D59#D5E#D95#DBC#DD1#E01
-;~F#E7F#E9A#F07#F59#F84#FD5#FDE#1078#107F#108E#1098#10AC#10B6#10C7#10CE#1175#11C2#11CD#11DE#11E3
-;~F#11F2#1209#127F#1288#1367#1384#138B#1391#139F#13C3#13DF#1412#14DE#1517#152C#159D#1632#1637#1647#1918
-;~F#192F#194E#1955
+;~F#526#545#566#577#582#5BB#5C9#5F1#623#62B#640#68D#6DE#720#742#79E#7B0#817#826#850
+;~F#878#896#8BD#8C4#8D2#8EE#903#920#93D#94A#95C#995#9BF#A0B#A61#A74#A8F#AE0#B39#B48
+;~F#B84#B8C#B9A#BAF#BEB#C0A#C1A#C32#C5A#C6D#C8F#CB7#D05#D31#D58#D5F#D64#D9B#DC2#DD7
+;~F#E07#E85#EA0#F0D#F5F#F8A#FDB#FE4#107E#1085#1094#109E#10B2#10BC#10CD#10D4#117B#11C8#11D3#11E4
+;~F#11E9#11F8#120F#1285#128E#136D#138A#1391#1397#13A5#13C9#13E5#1418#14E4#151D#1532#15A3#1638#163D#164D
+;~F#191E#1935#1954#195B#19A8
 ;~C#Blitz3D

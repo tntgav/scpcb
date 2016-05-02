@@ -356,15 +356,17 @@ Function UpdateEvents()
 							EndIf							
 							
 						ElseIf e\EventState3 => 150.0 And e\EventState3 < 700
-							If e\room\NPC[3]\State = 0 Then
+							If e\room\NPC[3]\State = 7 Then
 								;BlinkTimer = -10
 								
 								e\room\NPC[3]\Sound = LoadSound_Strict("SFX\intro\guard1.ogg")
 								e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
 								
-								e\room\NPC[3]\State = 7
-								e\room\NPC[4]\State = 7
+								;e\room\NPC[3]\State = 7
+								;e\room\NPC[4]\State = 7
 								;e\room\NPC[5]\State = 7
+								e\room\NPC[3]\State = 9
+								e\room\NPC[4]\State = 9
 								e\room\NPC[5]\State = 9
 								
 								e\room\RoomDoors[6]\locked = False		
@@ -372,11 +374,11 @@ Function UpdateEvents()
 								e\room\RoomDoors[6]\locked = True									
 							EndIf
 							
-							PointEntity e\room\NPC[3]\obj, Collider
-							RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\obj), 0
+							;PointEntity e\room\NPC[3]\obj, Collider
+							;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\obj), 0
 							
-							PointEntity e\room\NPC[4]\obj, Collider
-							RotateEntity e\room\NPC[4]\Collider, 0, EntityYaw(e\room\NPC[4]\obj), 0
+							;PointEntity e\room\NPC[4]\obj, Collider
+							;RotateEntity e\room\NPC[4]\Collider, 0, EntityYaw(e\room\NPC[4]\obj), 0
 							
 							e\EventState3 = Min(e\EventState3+FPSfactor/4,699)
 							
@@ -405,9 +407,9 @@ Function UpdateEvents()
 									e\EventState3 = 710
 								EndIf
 							Else ;inside the cell
-								e\room\NPC[3]\State = 7
-								PointEntity e\room\NPC[3]\Collider, Collider		
-								RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\Collider), 0
+								e\room\NPC[3]\State = 9
+								;PointEntity e\room\NPC[3]\Collider, Collider		
+								;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\Collider), 0
 								
 								If e\EventState3-(FPSfactor/4) < 350 And e\EventState3=>350 Then
 									;e\Sound = LoadSound_Strict("SFX\intro\guard2.ogg")
@@ -455,6 +457,7 @@ Function UpdateEvents()
 							;e\room\NPC[3]\EnemyY = EntityY(Collider)
 							;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
 						ElseIf e\EventState3 < 900
+							e\room\NPC[4]\Angle = 0
 							
 							If EntityX(Collider)<EntityX(e\room\obj,True)-5376*RoomScale And e\EventStr = "" Then
 								If Rand(3)=1 Then
@@ -795,8 +798,12 @@ Function UpdateEvents()
 								FreeTexture tex
 								
 								e\room\NPC[3] = CreateNPC(NPCtypeGuard, e\room\x-4096*RoomScale+Rnd(-0.3,0.3), 0.3, e\room\z+Rand(860,896)*RoomScale)
+								RotateEntity e\room\NPC[3]\Collider,0,e\room\angle+180,0
+								e\room\NPC[3]\State = 7
 								e\room\NPC[4] = CreateNPC(NPCtypeGuard, e\room\x-3840*RoomScale, 0.3, e\room\z+768*RoomScale)
-								SetNPCFrame(e\room\NPC[4], Rnd(1035, 1326))
+								RotateEntity e\room\NPC[4]\Collider,0,e\room\angle+135,0
+								e\room\NPC[4]\State = 7
+								;SetNPCFrame(e\room\NPC[4], Rnd(1035, 1326))
 								e\room\NPC[5] = CreateNPC(NPCtypeGuard, e\room\x-8288*RoomScale, 0.3, e\room\z+1096*RoomScale)
 								e\room\NPC[5]\Sound = LoadSound_Strict("SFX\Intro\guard_music"+Rand(1,5)+".ogg")
 								RotateEntity e\room\NPC[5]\Collider, 0, e\room\angle+180, 0, True
@@ -1284,6 +1291,26 @@ Function UpdateEvents()
 						EndIf
 					EndIf
 				EndIf
+				
+				If e\room\RoomTemplate\Name = "checkpoint2"
+					For e2.Events = Each Events
+						If e2\EventName = "008"
+							If e2\EventState = 2
+								If e\room\RoomDoors[0]\locked
+									EntityTexture e\room\Objects[2],MonitorTexture2
+									e\room\RoomDoors[0]\locked = False
+									e\room\RoomDoors[1]\locked = False
+								EndIf
+							Else
+								If e\room\dist < 12
+									UpdateCheckpointMonitors(e\room\Objects[2])
+									e\room\RoomDoors[0]\locked = True
+									e\room\RoomDoors[1]\locked = True
+								EndIf
+							EndIf
+						EndIf
+					Next
+				EndIf
 				;[End Block]
 			Case "coffin", "coffin106"
 				;[Block]
@@ -1737,6 +1764,8 @@ Function UpdateEvents()
 													EndIf
 												Next
 												ent% = LoadSprite("GFX\blooddrop1.png",1+2)
+												EntityFX ent%,1+2+8
+												ScaleSprite ent%,1.5,1.5
 												ShouldPlay = 0
 												CurrSpeed = 0
 												PlaySound_Strict LoadTempSound("SFX\MTF\GateB_Gunshot.ogg")
@@ -4420,6 +4449,8 @@ Function UpdateEvents()
 						e\SoundCHN = PlaySound_Strict (e\Sound)
 						
 						e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
+						
+						GiveAchievement(Achv096)
 						
 						e\EventState=1
 					EndIf
@@ -7475,17 +7506,20 @@ Function UpdateEvents()
 			Case "room2gw"
 				;[Block]
 				If PlayerRoom = e\room Then
+					
+                EndIf
+				
+				If e\room\dist < 8
 					If e\EventState = 0 Then
 						e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True)+0.5, EntityZ(e\room\Objects[2],True))
 						PointEntity e\room\NPC[0]\Collider, e\room\obj
 						RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider),0, True
-						;SetAnimTime e\room\NPC[0]\obj, 906
 						SetNPCFrame(e\room\NPC[0], 906)
 						e\room\NPC[0]\State = 8
 						
 						e\EventState = 1
 					EndIf
-                EndIf
+				EndIf
 				;[End Block]
 			Case "dimension1499"
 				;[Block]
@@ -7506,7 +7540,6 @@ Function UpdateEvents()
 					ShowEntity e\room\obj
 					;ShowEntity NTF_1499Sky
 					;Update1499Sky()
-					VolumeFogAmount# = 0.0
 					If e\EventState = 0.0
 						;For i = 0 To 99
 						;	n.NPCs = CreateNPC(NPCtype1499,EntityX(e\room\obj)+Rnd(-40.0,40.0),EntityY(e\room\obj)+0.2,EntityZ(e\room\obj)+Rnd(-40.0,40.0))
@@ -7760,8 +7793,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4C5#4CF#508#53E#59D#764#94B#972#980#98A#997#B80#BA1#BF0#C3E#C4B#C85#C9C
-;~F#CBC#CC5#CCF#CDE#D72#D94#1040#1086#109C#10A8#10C6#1117#112E#11F9#12FA#138B#13A4#13C3#13F4#1401
-;~F#141A#14B2#1668#1712#1766#1817#18C7#197F#1997#1A50#1A7D#1A9A#1AC1#1AF1#1B0E#1B32#1B8C#1BCC#1BFD#1C10
-;~F#1CC8#1D20#1D33#1D42#1D68#1D87
+;~F#11#F8#4CC#523#559#5B8#781#968#98F#99D#9A7#9B4#B9D#BBE#C0D#C5B#C68#CA2#CB9#CD9
+;~F#CE2#CEC#CFB#D8F#DB1#105D#10A3#10B9#10C5#10E3#1134#114B#1218#1319#13AA#13C3#13E2#1413#1420#1439
+;~F#14D1#1687#1731#1785#1836#18E6#199E#19B6#1A6F#1A9C#1AB9#1AE0#1B10#1B2D#1B51#1BAB#1BEB#1C1C#1C2F#1CE7
+;~F#1D3F#1D52#1D64#1D89#1DA8
 ;~C#Blitz3D

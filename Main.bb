@@ -1137,13 +1137,16 @@ DrawLoading(30, True)
 
 ;[End block]
 
-;New Sounds in SCP:CB 1.3 - ENDSHN
+;New Sounds and Meshes/Other things in SCP:CB 1.3 - ENDSHN
 ;[Block]
 Global NTF_1499EnterSFX% = LoadSound_Strict("SFX\1499\1499_mfe_vhd_00.ogg")
 Global NTF_1499LeaveSFX% = LoadSound_Strict("SFX\1499\1499_mfe_lve_10.ogg")
 Global NTF_1499FuckedSFX% = LoadSound_Strict("SFX\1499\fuckedup.ogg")
 
 Global PlayCustomMusic% = False, CustomMusic% = 0
+
+Global Monitor2, MonitorTexture2, MonitorTexture3
+Global MonitorTimer# = 0.0
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -5089,6 +5092,7 @@ Function DrawMenu()
 						Text(x + 5 * MenuScale, y + 25 * MenuScale, Framelimit%+" FPS")
 					Else
 						CurrFrameLimit# = 0.0
+						Framelimit = 0
 					EndIf
 					;[End Block]
 			End Select
@@ -5527,6 +5531,11 @@ Function LoadEntities()
 	HideEntity(CamBaseOBJ)
 	CamOBJ = LoadMesh_Strict("GFX\map\CamHead.b3d")
 	HideEntity(CamOBJ)
+	
+	Monitor2 = LoadMesh_Strict("GFX\map\monitor.b3d")
+	HideEntity Monitor2
+	MonitorTexture2 = LoadTexture_Strict("GFX\map\MonitorTexture.jpg")
+	MonitorTexture3 = LoadTexture_Strict("GFX\map\MonitorTexture3.jpg")
 	
 	InitItemTemplates()
 	
@@ -6044,7 +6053,7 @@ End Function
 Function UpdateMusic()
 	
 	If (Not PlayCustomMusic)
-		If FPSfactor > 0 Then 
+		If FPSfactor > 0 Or OptionsMenu = 2 Then 
 			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
 				CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
 				If CurrMusicVolume = 0 Then
@@ -6066,7 +6075,7 @@ Function UpdateMusic()
 		
 		ChannelVolume MusicCHN, CurrMusicVolume
 	Else
-		If FPSfactor > 0 Then
+		If FPSfactor > 0 Or OptionsMenu = 2 Then
 			;CurrMusicVolume = 1.0
 			If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(CustomMusic)
 			ChannelVolume MusicCHN,1.0*MusicVolume
@@ -6440,11 +6449,31 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						End Select						
 					EndIf
 				Case "very fine"
-					If Rand(3)=1 Then
-						it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-					Else	
-						it2 = CreateItem("Mastercard", "misc", x, y, z)
-					EndIf
+					;If Rand(3)=1 Then
+					;	it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+					;Else	
+					;	it2 = CreateItem("Mastercard", "misc", x, y, z)
+					;EndIf
+					Select SelectedDifficulty\otherFactors
+						Case EASY
+							If Rand(5)=1 Then
+								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+						Case NORMAL
+							If Rand(7)=1 Then
+								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+						Case HARD
+							If Rand(10)=1 Then
+								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+					End Select
 			End Select			
 			
 			RemoveItem(item)
@@ -7971,10 +8000,10 @@ End Function
 
 Function Inverse#(number#)
 	
-	Return 1.0-number#
+	Return Float(1.0-number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#39E#4A9#4C7#53D#54A#5DE#655#66C#679#6AB#752#828#148F#1636#17BD
-;~F#17DC#17FB#1819#181D#183D
+;~F#21#A6#126#12A#131#39E#4AC#4CA#540#54D#5E1#658#66F#67C#6AE#755#82B#1493#163F#17C6
+;~F#17E5#1804#1822#1826#1846
 ;~C#Blitz3D
