@@ -1229,11 +1229,17 @@ Function UpdateEvents()
 				;[Block]
 				If PlayerRoom = e\room Then
 					If EntityDistance(Collider, e\room\Objects[0]) < 1.8 Then
-						GiveAchievement(Achv789)
-						e\SoundCHN = PlaySound2(ButtGhostSFX, Camera,e\room\Objects[0])
-						RemoveEvent(e)
-					End If
-				End If
+						If e\EventState = 0
+							GiveAchievement(Achv789)
+							e\SoundCHN = PlaySound2(ButtGhostSFX, Camera,e\room\Objects[0])
+							e\EventState = 1
+						Else
+							If (Not ChannelPlaying(e\SoundCHN))
+								RemoveEvent(e)
+							EndIf
+						EndIf
+					EndIf
+				EndIf
 				;[End Block]
 			Case "checkpoint"
 				;[Block]
@@ -1298,13 +1304,14 @@ Function UpdateEvents()
 							If e2\EventState = 2
 								If e\room\RoomDoors[0]\locked
 									MonitorTimer# = 0.0
-									UpdateCheckpointMonitors(e\room\Objects[2])
+									;UpdateCheckpointMonitors()
+									TurnCheckPointMonitorsOff()
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
 							Else
 								If e\room\dist < 12
-									UpdateCheckpointMonitors(e\room\Objects[2])
+									UpdateCheckpointMonitors()
 									e\room\RoomDoors[0]\locked = True
 									e\room\RoomDoors[1]\locked = True
 								EndIf
@@ -7795,8 +7802,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4CC#524#55A#5B9#782#969#990#99E#9A8#9B5#B9E#BBF#C0E#C5C#C69#CA3#CBA#CDA
-;~F#CE3#CED#CFC#D90#DB2#105E#10A4#10BA#10C6#10E4#1135#114C#1219#131A#13AB#13C4#13E3#1414#1421#143A
-;~F#14D2#1688#1732#1786#1837#18E7#199F#19B7#1A70#1A9D#1ABA#1AE1#1B11#1B2E#1B53#1BAD#1BED#1C1E#1C31#1CE9
-;~F#1D41#1D54#1D66#1D8B#1DAA
+;~F#11#F8#4CC#52B#561#5C0#789#970#997#9A5#9AF#9BC#BA5#BC6#C15#C63#C70#CAA#CC1#CE1
+;~F#CEA#CF4#D03#D97#DB9#1065#10AB#10C1#10CD#10EB#113C#1153#1220#1321#13B2#13CB#13EA#141B#1428#1441
+;~F#14D9#168F#1739#178D#183E#18EE#19A6#19BE#1A77#1AA4#1AC1#1AE8#1B18#1B35#1B5A#1BB4#1BF4#1C25#1C38#1CF0
+;~F#1D48#1D5B#1D6D#1D92#1DB1
 ;~C#Blitz3D

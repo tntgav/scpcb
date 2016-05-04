@@ -5145,6 +5145,8 @@ End Function
 Function UpdateSecurityCams()
 	Local sc.SecurityCams
 	
+	PlayerDetected = False
+	
 	;coffineffect = 0, not affected by 895
 	;coffineffect = 1, constantly affected by 895
 	;coffineffect = 2, 079 can broadcast 895 feed on this screen
@@ -5163,6 +5165,11 @@ Function UpdateSecurityCams()
 			
 			If close Or sc=CoffinCam Then 
 				If sc\FollowPlayer Then
+					If sc<>CoffinCam
+						If EntityVisible(sc\obj,Camera)
+							PlayerDetected = True
+						EndIf
+					EndIf
 					PointEntity(sc\CameraObj, Camera)
 					Local temp# = EntityPitch(sc\CameraObj)
 					RotateEntity(sc\obj, 0, CurveAngle(EntityYaw(sc\CameraObj), EntityYaw(sc\obj), 75.0), 0)
@@ -5192,7 +5199,15 @@ Function UpdateSecurityCams()
 						PositionEntity(sc\Cam, EntityX(sc\CameraObj, True), EntityY(sc\CameraObj, True), EntityZ(sc\CameraObj, True))
 						RotateEntity(sc\Cam, EntityPitch(sc\CameraObj), EntityYaw(sc\CameraObj), 0)
 						MoveEntity(sc\Cam, 0, 0, 0.1)
-					EndIf 
+					EndIf
+					
+					If sc<>CoffinCam
+						If (Abs(DeltaYaw(sc\obj,Camera))<60.0)
+							If EntityVisible(sc\obj,Camera)
+								PlayerDetected = True
+							EndIf
+						EndIf
+					EndIf
 				EndIf
 			EndIf
 			
@@ -6647,7 +6662,7 @@ Function UpdateRoomLights()
 	
 End Function
 
-Function UpdateCheckpointMonitors(ent%)
+Function UpdateCheckpointMonitors()
 	Local i,sf,b,t1
 	
 	For i = 2 To CountSurfaces(Monitor2)
@@ -6672,12 +6687,34 @@ Function UpdateCheckpointMonitors(ent%)
 	MonitorTimer# = (MonitorTimer# + FPSfactor) Mod 100
 	
 End Function
+
+Function TurnCheckpointMonitorsOff()
+	Local i,sf,b,t1
+	
+	For i = 2 To CountSurfaces(Monitor2)
+		sf = GetSurface(Monitor2,i)
+		b = GetSurfaceBrush(sf)
+		If b<>0 Then
+			t1 = GetBrushTexture(b,0)
+			If t1<>0 Then
+				If Lower(StripPath(TextureName(t1))) <> "MonitorTexture.jpg"
+					BrushTexture b, MonitorTextureOff, 0, 0
+					PaintSurface sf,b
+				EndIf
+				FreeTexture t1
+			EndIf
+			FreeBrush b
+		EndIf
+	Next
+	MonitorTimer# = 0.0
+	
+End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
 ;~F#526#545#566#577#582#5BB#5C9#5F1#623#62B#640#68D#6DE#720#742#79E#7B0#817#826#850
 ;~F#878#896#8BD#8C4#8D2#8EE#903#920#93D#94A#95C#995#9BF#A0B#A61#A74#A8F#AE0#B39#B48
 ;~F#B84#B8C#B9A#BAF#BEB#C0A#C1A#C32#C5A#C6D#C8F#CB7#D05#D31#D58#D5F#D64#D9B#DC2#DD7
 ;~F#E07#E85#EA0#F0D#F5F#F8A#FDB#FE4#107E#1085#1094#109E#10B2#10BC#10CD#10D4#117B#11C8#11D3#11E4
-;~F#11E9#11F8#120F#1285#128E#136D#138A#1391#1397#13A5#13C9#13E5#1418#14E4#151D#1532#15A3#1638#163D#164D
-;~F#191E#1935#1954#195B#19A8
+;~F#11E9#11F8#120F#1285#128E#136D#138A#1391#1397#13A5#13C9#13E5#14F3#152C#1541#15B2#1647#164C#165C#192D
+;~F#1944#1963#196A#19B7
 ;~C#Blitz3D

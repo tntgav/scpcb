@@ -3575,6 +3575,7 @@ Function TeleportCloser(n.NPCs)
 		PositionEntity n\Collider, EntityX(closestWaypoint\obj,True), EntityY(closestWaypoint\obj,True)+0.15, EntityZ(closestWaypoint\obj,True), True
 		ResetEntity n\Collider
 	EndIf
+	
 End Function
 
 Function OtherNPCSeesMeNPC%(me.NPCs,other.NPCs)
@@ -3591,12 +3592,33 @@ End Function
 Function MeNPCSeesPlayer%(me.NPCs)
 	If me\BlinkTimer<=0.0 Then Return False
 	
+	If PlayerDetected Then Return True
+	
 	If EntityDistance(Collider,me\Collider)>(8.0-CrouchState+PlayerSoundVolume) Then Return False	
 	;spots the player if he's either in view or making a loud sound
 	If PlayerSoundVolume>1.0 Then Return True
 	If (Abs(DeltaYaw(me\Collider,Collider))>60.0) Then Return False
 	
 	Return EntityVisible(me\Collider, Camera)
+End Function
+
+Function TeleportMTFGroup(n.NPCs)
+	Local n2.NPCs
+	
+	If n\MTFLeader <> Null Then Return
+	
+	TeleportCloser(n)
+	
+	For n2 = Each NPCs
+		If n2\NPCtype = NPCtypeMTF
+			If n2\MTFLeader <> Null
+				PositionEntity n2\Collider,EntityX(n2\MTFLeader\Collider),EntityY(n2\MTFLeader\Collider)+0.1,EntityZ(n2\MTFLeader\Collider)
+			EndIf
+		EndIf
+	Next
+	
+	DebugLog "Teleported MTF Group (dist:"+EntityDistance(n\Collider,Collider)+")"
+	
 End Function
 
 Function UpdateMTFUnit(n.NPCs)
@@ -3804,6 +3826,10 @@ Function UpdateMTFUnit(n.NPCs)
 					DebugLog "player spotted :"+n\State2
 					n\PathTimer=0.0
 					n\PathStatus=0
+					
+					If EntityDistance(n\Collider,Collider)>HideDistance*0.7
+						TeleportMTFGroup(n)
+					EndIf
                 EndIf
                 
 				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
@@ -4602,4 +4628,5 @@ Function NPCSpeedChange(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#216#23A#322#40B#55A#62C#6C1#76F#774#7A2#844#87F#90C#978#A8E#B54#C04#CB7#DB6
+;~F#E28
 ;~C#Blitz3D

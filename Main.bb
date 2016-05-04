@@ -1145,8 +1145,13 @@ Global NTF_1499FuckedSFX% = LoadSound_Strict("SFX\1499\fuckedup.ogg")
 
 Global PlayCustomMusic% = False, CustomMusic% = 0
 
-Global Monitor2, MonitorTexture2, MonitorTexture3
+Global Monitor2, MonitorTexture2, MonitorTexture3, MonitorTextureOff
 Global MonitorTimer# = 0.0
+
+;This variable is for when a camera detected the player
+	;False: Player is not seen (will be set after every call of the Main Loop
+	;True: The Player got detected by a camera
+Global PlayerDetected%
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -5534,8 +5539,13 @@ Function LoadEntities()
 	
 	Monitor2 = LoadMesh_Strict("GFX\map\monitor_checkpoint.b3d")
 	HideEntity Monitor2
-	MonitorTexture2 = LoadTexture_Strict("GFX\map\LockdownScreen2.png")
-	MonitorTexture3 = LoadTexture_Strict("GFX\map\LockdownScreen.png")
+	MonitorTexture2 = LoadTexture_Strict("GFX\map\LockdownScreen2.jpg")
+	MonitorTexture3 = LoadTexture_Strict("GFX\map\LockdownScreen.jpg")
+	MonitorTextureOff = CreateTexture(1,1)
+	SetBuffer TextureBuffer(MonitorTextureOff)
+	ClsColor 0,0,0
+	Cls
+	SetBuffer BackBuffer()
 	
 	InitItemTemplates()
 	
@@ -8004,6 +8014,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#39E#4AC#4CA#540#54D#5E1#658#66F#67C#6AE#755#82B#1493#163F#17C6
-;~F#17E5#1804#1822#1826#1846
+;~F#21#A6#126#12A#131#39E#4B1#4CF#545#552#5E6#65D#674#681#6B3#75A#830#1498#1649#17D0
+;~F#17EF#180E#182C#1830#1850
 ;~C#Blitz3D
