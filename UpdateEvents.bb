@@ -6601,6 +6601,10 @@ Function UpdateEvents()
 						;	If Not ChannelPlaying(e\SoundCHN) Then e\SoundCHN = PlaySound_Strict(moddedambience)
 						;End If
 						
+						;Saving Injuries and Bloodloss, so that the player won't be healed automatically
+						PrevInjuries = Injuries
+						PrevBloodloss = Bloodloss
+						
 						e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[6],True),EntityY(e\room\Objects[6],True),EntityZ(e\room\Objects[6],True))
 						;e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
 						
@@ -6763,7 +6767,11 @@ Function UpdateEvents()
 						ShowEntity Light
 						LightFlash = 6
 						BlurTimer = 500	
-						Injuries = 0
+						Injuries = PrevInjuries
+						Bloodloss = PrevBloodloss
+						
+						PrevInjuries = 0
+						PrevBloodloss = 0
 						
 						RemoveNPC(e\room\NPC[0])
 						RemoveEvent(e)						
@@ -7802,8 +7810,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4CC#52B#561#5C0#789#970#997#9A5#9AF#9BC#BA5#BC6#C15#C63#C70#CAA#CC1#CE1
-;~F#CEA#CF4#D03#D97#DB9#1065#10AB#10C1#10CD#10EB#113C#1153#1220#1321#13B2#13CB#13EA#141B#1428#1441
-;~F#14D9#168F#1739#178D#183E#18EE#19A6#19BE#1A77#1AA4#1AC1#1AE8#1B18#1B35#1B5A#1BB4#1BF4#1C25#1C38#1CF0
-;~F#1D48#1D5B#1D6D#1D92#1DB1
+;~F#11#F8#4CC#4DC#52B#561#5C0#789#970#997#9A5#9AF#9BC#BA5#BC6#C15#C63#C70#CAA#CC1
+;~F#CE1#CEA#CF4#D03#D97#DB9#1065#10AB#10C1#10CD#10EB#113C#1153#1220#1321#13B2#13CB#13EA#141B#1428
+;~F#1441#14D9#168F#1739#178D#183E#18EE#19A6#1A7F#1AAC#1AC9#1AF0#1B20#1B3D#1B62#1BBC#1BFC#1C2D#1C40#1CF8
+;~F#1D50#1D63#1D75#1D9A#1DB9
 ;~C#Blitz3D

@@ -1152,6 +1152,7 @@ Global MonitorTimer# = 0.0
 	;False: Player is not seen (will be set after every call of the Main Loop
 	;True: The Player got detected by a camera
 Global PlayerDetected%
+Global PrevInjuries#,PrevBloodloss#
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -8014,6 +8015,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#39E#4B1#4CF#545#552#5E6#65D#674#681#6B3#75A#830#1498#1649#17D0
-;~F#17EF#180E#182C#1830#1850
+;~F#21#A6#126#12A#131#39E#4B2#4D0#546#553#5E7#65E#675#682#6B4#75B#831#1499#164A#17D1
+;~F#17F0#180F#182D#1831#1851
 ;~C#Blitz3D
