@@ -3260,16 +3260,19 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[1]\dir = 1 : r\RoomDoors[1]\open = True 
 			FreeEntity(r\RoomDoors[1]\buttons[0]) : r\RoomDoors[1]\buttons[0] = 0
 			FreeEntity(r\RoomDoors[1]\buttons[1]) : r\RoomDoors[1]\buttons[1] = 0
+			r\RoomDoors[1]\MTFClose = False
 			
 			r\RoomDoors[2] = CreateDoor(r\zone, r\x + 2704.0 * RoomScale, 384.0*RoomScale, r\z + 624.0 * RoomScale, 90, r, False)
 			r\RoomDoors[2]\AutoClose = False : r\RoomDoors[2]\open = False
 			FreeEntity(r\RoomDoors[2]\buttons[0]) : r\RoomDoors[2]\buttons[0] = 0
 			FreeEntity(r\RoomDoors[2]\buttons[1]) : r\RoomDoors[2]\buttons[1] = 0
+			r\RoomDoors[2]\MTFClose = False
 			
 			d.Doors = CreateDoor(r\zone, r\x + 1392.0 * RoomScale, 384.0*RoomScale, r\z + 64.0 * RoomScale, 90, r, True)
 			d\AutoClose = False
 			FreeEntity(d\buttons[0]) : d\buttons[0]=0
 			FreeEntity(d\buttons[1]) : d\buttons[1]=0
+			d\MTFClose = False
 			
 			d.Doors = CreateDoor(r\zone, r\x - 640.0 * RoomScale, 384.0*RoomScale, r\z + 64.0 * RoomScale, 90, r, False)
 			d\locked = True : d\AutoClose = False
@@ -3279,6 +3282,7 @@ Function FillRoom(r.Rooms)
 			PositionEntity(d\buttons[0], r\x + 1120.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 328.0 * RoomScale, True)
 			PositionEntity(d\buttons[1], r\x + 1120.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 296.0 * RoomScale, True)
 			FreeEntity(d\obj2) : d\obj2=0
+			d\MTFClose = False
 			
 			d.Doors = CreateDoor(r\zone, r\x, 0, r\z + 1184.0 * RoomScale, 0, r, False)
 			d\locked = True
@@ -4259,16 +4263,17 @@ Function FillRoom(r.Rooms)
 			d = CreateDoor(r\zone, r\x - 223.0 * RoomScale, 0.0, r\z - 736.0 * RoomScale, -90, r, False, False, 3)
 			d\AutoClose = False	: d\open = False  : d\locked = False
 			
-			d = CreateDoor(r\zone, r\x - 459.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale, 90, r, False, False)
-			PositionEntity(d\buttons[0], r\x + 580.822 * RoomScale, EntityY(d\buttons[0],True), r\z - 606.679 * RoomScale, True)	
-            PositionEntity(d\buttons[1], r\x + 580.822 * RoomScale, EntityY(d\buttons[1],True), r\z - 606.679 * RoomScale, True)
-			d\dir = 1 : d\AutoClose = False	: d\open = True  : d\locked = True	
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 459.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale, 90, r, False, False)
+			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
+            PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			r\RoomDoors[0]\dir = 1 : r\RoomDoors[0]\AutoClose = False	: r\RoomDoors[0]\open = True  : r\RoomDoors[0]\locked = True	
+			r\RoomDoors[0]\MTFClose = False
 			
-			d = CreateDoor(r\zone, r\x + 385.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale, 270, r, False, False)
-			PositionEntity(d\buttons[0], r\x + 580.822 * RoomScale, EntityY(d\buttons[0],True), r\z - 606.679 * RoomScale, True)	
-            PositionEntity(d\buttons[1], r\x + 580.822 * RoomScale, EntityY(d\buttons[1],True), r\z - 606.679 * RoomScale, True)
-			
-			d\dir = 2 : d\AutoClose = False	: d\open = True  : d\locked = True
+			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 385.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale, 270, r, False, False)
+			PositionEntity(r\RoomDoors[1]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
+            PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			r\RoomDoors[1]\dir = 2 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
+			r\RoomDoors[1]\MTFClose = False
 	        
 	        ;[End Block]
 		Case "room1162"
@@ -6712,9 +6717,9 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
 ;~F#526#545#566#577#582#5BB#5C9#5F1#623#62B#640#68D#6DE#720#742#79E#7B0#817#826#850
-;~F#878#896#8BD#8C4#8D2#8EE#903#920#93D#94A#95C#995#9BF#A0B#A61#A74#A8F#AE0#B39#B48
-;~F#B84#B8C#B9A#BAF#BEB#C0A#C1A#C32#C5A#C6D#C8F#CB7#D05#D31#D58#D5F#D64#D9B#DC2#DD7
-;~F#E07#E85#EA0#F0D#F5F#F8A#FDB#FE4#107E#1085#1094#109E#10B2#10BC#10CD#10D4#117B#11C8#11D3#11E4
-;~F#11E9#11F8#120F#1285#128E#136D#138A#1391#1397#13A5#13C9#13E5#14F3#152C#1541#15B2#1647#164C#165C#192D
-;~F#1944#1963#196A#19B7
+;~F#861#878#896#8BD#8C4#8D2#8EE#903#920#93D#94A#95C#995#9BF#A0B#A61#A74#A8F#AE0#B39
+;~F#B48#B84#B8C#B9A#BAF#BEB#C0A#C1A#C32#C5A#C6D#C8F#D09#D35#D5C#D63#D68#D9F#DC6#DDB
+;~F#E0B#E89#EA4#F11#F63#F8E#FDF#FE8#1082#1089#1098#10B7#10C1#10D2#10D9#1180#11CD#11D8#11E9#11EE
+;~F#11FD#1214#128A#1293#1372#138F#1396#139C#13AA#13CE#13EA#14F8#1531#1546#15B7#164C#1651#1661#1932#1949
+;~F#1968#196F#19BC
 ;~C#Blitz3D

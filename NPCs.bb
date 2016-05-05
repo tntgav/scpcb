@@ -605,6 +605,8 @@ Function UpdateNPCs()
 								EndIf
 							EndIf
 							
+							If NoTarget Then move = True
+							
 							;player is looking at it -> doesn't move
 							If move=False Then
 								BlurVolume = Max(Max(Min((4.0 - dist) / 6.0, 0.9), 0.1), BlurVolume)
@@ -694,6 +696,13 @@ Function UpdateNPCs()
 												Next
 											EndIf
 										Next
+									EndIf
+									
+									If NoTarget
+										temp = False
+										n\EnemyX = 0
+										n\EnemyY = 0
+										n\EnemyZ = 0
 									EndIf
 									
 									;player is not looking and is visible from 173's position -> attack
@@ -847,6 +856,8 @@ Function UpdateNPCs()
 									Visible% = EntityVisible(n\Collider, Collider)
 								EndIf
 								
+								If NoTarget Then Visible = False
+								
 								If Visible Then
 									If PlayerRoom\RoomTemplate\Name <> "gatea" Then n\PathTimer = 0
 									If EntityInView(n\Collider, Camera) Then
@@ -943,7 +954,7 @@ Function UpdateNPCs()
 										
 									EndIf
 									
-								ElseIf PlayerRoom\RoomTemplate\Name <> "gatea" ;dist < 0.8
+								ElseIf PlayerRoom\RoomTemplate\Name <> "gatea" And (Not NoTarget) ;dist < 0.8
 									
 									If dist > 0.5 Then 
 										n\CurrSpeed = CurveValue(n\Speed * 2.5,n\CurrSpeed,10.0)
@@ -958,7 +969,7 @@ Function UpdateNPCs()
 										PointEntity n\obj, Collider
 										RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 10.0), 0										
 										
-										If Ceil(n\Frame) = 110 Then
+										If Ceil(n\Frame) = 110 And (Not GodMode) Then
 											PlaySound_Strict(DamageSFX(1))
 											PlaySound_Strict(HorrorSFX(5))											
 											If PlayerRoom\RoomTemplate\Name = "pocketdimension" Then
@@ -3590,16 +3601,25 @@ Function OtherNPCSeesMeNPC%(me.NPCs,other.NPCs)
 End Function
 
 Function MeNPCSeesPlayer%(me.NPCs)
-	If me\BlinkTimer<=0.0 Then Return False
 	
-	If PlayerDetected Then Return True
+	If (Not PlayerDetected) Or me\NPCtype <> NPCtypeMTF
+		If me\BlinkTimer<=0.0 Then Return False
+		
+		If EntityDistance(Collider,me\Collider)>(8.0-CrouchState+PlayerSoundVolume) Then Return False
+		
+		If (Abs(DeltaYaw(me\Collider,Collider))>60.0) Then Return False
+		
+		;spots the player if he's either in view or making a loud sound
+		If PlayerSoundVolume>1.0 Then Return 2
+		
+		Return EntityVisible(me\Collider, Camera)
+	Else
+		If EntityDistance(Collider,me\Collider)>(8.0-CrouchState+PlayerSoundVolume) Then Return 2
+		
+		If EntityVisible(me\Collider, Camera) Then Return True
+		Return 2
+	EndIf
 	
-	If EntityDistance(Collider,me\Collider)>(8.0-CrouchState+PlayerSoundVolume) Then Return False	
-	;spots the player if he's either in view or making a loud sound
-	If PlayerSoundVolume>1.0 Then Return True
-	If (Abs(DeltaYaw(me\Collider,Collider))>60.0) Then Return False
-	
-	Return EntityVisible(me\Collider, Camera)
 End Function
 
 Function TeleportMTFGroup(n.NPCs)
@@ -3774,8 +3794,16 @@ Function UpdateMTFUnit(n.NPCs)
 							
 							If (newDist<1.0 And n\Path[n\PathLocation]\door<>Null) Then
 								;open the door and make it automatically close after 5 seconds
+								If (Not n\Path[n\PathLocation]\door\open)
+									Local sound = 0
+									If n\Path[n\PathLocation]\door\dir = 1 Then sound = 0 Else sound=Rand(0, 2)
+									PlaySound2(OpenDoorSFX(n\Path[n\PathLocation]\door\dir,sound),Camera,n\Path[n\PathLocation]\door\obj)
+									PlayMTFSound(MTFSFX(5),n)
+								EndIf
 								n\Path[n\PathLocation]\door\open = True
-								n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
+								If n\Path[n\PathLocation]\door\MTFClose
+									n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
+								EndIf
 							EndIf
                             
 							If (newDist<0.2) Or ((prevDist<newDist) And (prevDist<1.0)) Then
@@ -3808,11 +3836,25 @@ Function UpdateMTFUnit(n.NPCs)
 					EndIf
                 EndIf
                 
-                If MeNPCSeesPlayer(n) Then
+				Local temp = MeNPCSeesPlayer(n)
+				
+				If NoTarget Then temp = False
+				
+                If temp Then
 					If n\LastSeen > 0 And n\LastSeen < 70*15 Then
 						If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 						n\Sound = LoadSound_Strict("SFX\MTF\ThereHeIs"+Rand(1,6)+".ogg")
 						PlayMTFSound(n\Sound, n)
+					Else
+						If temp = True
+							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+							n\Sound = LoadSound_Strict("SFX\MTF\Stop"+Rand(1,6)+".ogg")
+							PlayMTFSound(n\Sound, n)
+						Else
+							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+							n\Sound = LoadSound_Strict("SFX\MTF\ClassD"+Rand(1,4)+".ogg")
+							PlayMTFSound(n\Sound, n)
+						EndIf
 					EndIf
 					
 					n\LastSeen = (70*Rnd(30,40))
@@ -3822,7 +3864,7 @@ Function UpdateMTFUnit(n.NPCs)
 					n\EnemyX = EntityX(Collider,True)
 					n\EnemyY = EntityY(Collider,True)
 					n\EnemyZ = EntityZ(Collider,True)
-					n\State2 = 70.0*15.0 ;give up after 15 seconds
+					n\State2 = 70.0*(15.0*temp) ;give up after 15 seconds (if detected through vision, overwise 30 seconds)
 					DebugLog "player spotted :"+n\State2
 					n\PathTimer=0.0
 					n\PathStatus=0
@@ -3852,7 +3894,7 @@ Function UpdateMTFUnit(n.NPCs)
                 ;[Block]
                 n\Speed = 0.015
                 n\State2=n\State2-FPSfactor
-                If MeNPCSeesPlayer(n) Then
+                If MeNPCSeesPlayer(n) = True Then
 					
 					;if close enough, start shooting at the player
 					If playerDist < 4.0 Then
@@ -3957,8 +3999,16 @@ Function UpdateMTFUnit(n.NPCs)
 								
 								If (newDist<1.0 And n\Path[n\PathLocation]\door<>Null) Then
 									;open the door and make it automatically close after 5 seconds
+									If (Not n\Path[n\PathLocation]\door\open)
+										sound = 0
+										If n\Path[n\PathLocation]\door\dir = 1 Then sound = 0 Else sound=Rand(0, 2)
+										PlaySound2(OpenDoorSFX(n\Path[n\PathLocation]\door\dir,sound),Camera,n\Path[n\PathLocation]\door\obj)
+										PlayMTFSound(MTFSFX(5),n)
+									EndIf
 									n\Path[n\PathLocation]\door\open = True
-									n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
+									If n\Path[n\PathLocation]\door\MTFClose
+										n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
+									EndIf
 								EndIf
 								
 								If (newDist<0.2) Or ((prevDist<newDist) And (prevDist<1.0)) Then
@@ -4004,6 +4054,10 @@ Function UpdateMTFUnit(n.NPCs)
 							PlayMTFSound(LoadTempSound("SFX\MTF\Searching"+Rand(1,6)+".ogg"),n)
 						EndIf
 					EndIf
+					
+					;If EntityDistance(n\Collider,Collider)>HideDistance*0.7
+					;	TeleportMTFGroup(n)
+					;EndIf
                 EndIf
                 
                 If n\State2<=0.0 And n\State2+FPSfactor >0.0 Then
@@ -4122,8 +4176,16 @@ Function UpdateMTFUnit(n.NPCs)
 									
 									If (newDist<1.0 And n\Path[n\PathLocation]\door<>Null) Then
 										;open the door and make it automatically close after 5 seconds
+										If (Not n\Path[n\PathLocation]\door\open)
+											sound = 0
+											If n\Path[n\PathLocation]\door\dir = 1 Then sound = 0 Else sound=Rand(0, 2)
+											PlaySound2(OpenDoorSFX(n\Path[n\PathLocation]\door\dir,sound),Camera,n\Path[n\PathLocation]\door\obj)
+											PlayMTFSound(MTFSFX(5),n)
+										EndIf
 										n\Path[n\PathLocation]\door\open = True
-										n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
+										If n\Path[n\PathLocation]\door\MTFClose
+											n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
+										EndIf
 									EndIf
 									
 									If (newDist<0.2) Or ((prevDist<newDist) And (prevDist<1.0)) Then
@@ -4295,7 +4357,9 @@ Function UpdateMTFUnit(n.NPCs)
 			EndIf
 		EndIf
 		
-		If n\State <> 3
+		If NoTarget And n\State = 1 Then n\State = 0
+		
+		If n\State <> 3 And n\State <> 5
 			If n\MTFLeader<>Null Then
 				If EntityDistance(n\Collider,n\MTFLeader\Collider)<0.7 Then
 					PointEntity n\Collider,n\MTFLeader\Collider
@@ -4627,6 +4691,6 @@ Function NPCSpeedChange(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#216#23A#322#40B#55A#62C#6C1#76F#774#7A2#844#87F#90C#978#A8E#B54#C04#CB7#DB6
-;~F#E28
+;~F#0#216#32B#416#565#637#6CC#77A#77F#7AD#84F#88A#917#983#A99#B5F#C0F#CC2#DC1#E3C
+;~F#F35#FFF#1071#10D1#112B#11A3#11B4#11CF#11ED#122A#1247
 ;~C#Blitz3D
