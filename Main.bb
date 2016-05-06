@@ -2079,6 +2079,20 @@ Repeat
 				PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 0.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
 				
 				If Rand(3)=1 Then PlayerZone = 3
+				
+				If PlayerRoom\RoomTemplate\Name = "173"
+					PlayerZone = 4
+				ElseIf PlayerRoom\RoomTemplate\Name = "room860"
+					For e.Events = Each Events
+						If e\EventName = "room860"
+							If e\EventState = 1.0
+								PlayerZone = 5
+								Exit
+							EndIf
+						EndIf
+					Next
+				EndIf
+				
 				CurrAmbientSFX = Rand(0,AmbientSFXAmount(PlayerZone)-1)
 				
 				Select PlayerZone
@@ -8065,6 +8079,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#3C5#572#616#68D#6A4#6B1#6E3#78A#860#14C8#1679#1803#1822#1841#185F#1863
-;~F#1883
+;~F#21#A6#126#12A#131#3C5#4DA#4FA#572#57F#616#68D#6A4#6B1#6E3#78A#86E#14D6#1687#1811
+;~F#1830#184F#186D#1871#1891
 ;~C#Blitz3D

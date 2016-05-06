@@ -66,6 +66,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 	n\MaxGravity = 0.2
 	Select NPCtype
 		Case NPCtype173
+			;[Block]
 			n\NVName = "SCP-173"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.32
@@ -101,7 +102,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj2, RoomScale, RoomScale, RoomScale
 			HideEntity n\obj2
 			
+			;[End Block]
 		Case NPCtypeOldMan
+			;[Block]
 			n\NVName = "SCP-106"
 			n\Collider = CreatePivot()
 			n\GravityMult = 0.0
@@ -137,7 +140,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			SpriteViewMode(n\obj2, 2)
 			
 			FreeTexture OldManEyes%
+			;[End Block]
 		Case NPCtypeGuard
+			;[Block]
 			n\NVName = "Human"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
@@ -149,7 +154,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			temp# = (GetINIFloat("DATA\NPCs.ini", "MTF", "scale") / 2.5)
 			
 			ScaleEntity n\obj, temp, temp, temp
+			;[End Block]
 		Case NPCtypeMTF
+			;[Block]
 			n\NVName = "Human"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
@@ -166,11 +173,11 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, temp, temp, temp
 			
 			If MTFSFX(0)=0 Then
-				;MTFSFX(0)=LoadSound_Strict("SFX\MTF\Stop0.ogg")
-				;MTFSFX(1)=LoadSound_Strict("SFX\MTF\Stop1.ogg")
-				;MTFSFX(2)=LoadSound_Strict("SFX\MTF\Stop2.ogg")			
-				;MTFSFX(3)=LoadSound_Strict("SFX\MTF\ClassD0.ogg")
-				;MTFSFX(4)=LoadSound_Strict("SFX\MTF\ClassD1.ogg")
+				MTFSFX(0)=LoadSound_Strict("SFX\MTF\ClassD1.ogg")
+				MTFSFX(1)=LoadSound_Strict("SFX\MTF\ClassD2.ogg")
+				MTFSFX(2)=LoadSound_Strict("SFX\MTF\ClassD3.ogg")			
+				MTFSFX(3)=LoadSound_Strict("SFX\MTF\ClassD4.ogg")
+				;MTFSFX(4)=LoadSound_Strict("SFX\MTF\Tesla0.ogg")
 				MTFSFX(5)=LoadSound_Strict("SFX\MTF\Beep.ogg")
 				MTFSFX(6)=LoadSound_Strict("SFX\MTF\Breath.ogg")
 			EndIf
@@ -194,7 +201,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 					End Select
 				Next			
 			EndIf
+			;[End Block]
 		Case NPCtypeD
+			;[Block]
 			n\NVName = "Human"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.32
@@ -208,14 +217,18 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, temp, temp, temp
 			
 			n\Speed = 2.0 / 100
+			;[End Block]
 		Case NPCtype372
+			;[Block]
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\372.b3d")
 			
 			temp# = 0.35 / MeshWidth(n\obj)
 			ScaleEntity n\obj, temp, temp, temp
+			;[End Block]
 		Case NPCtype5131
+			;[Block]
 			n\NVName = "SCP-513-1"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
@@ -227,7 +240,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			temp# = 1.8 / MeshWidth(n\obj)
 			ScaleEntity n\obj, temp, temp, temp
 			ScaleEntity n\obj2, temp, temp, temp
+			;[End Block]
 		Case NPCtype096
+			;[Block]
 			n\NVName = "SCP-096"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.3
@@ -240,7 +255,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-096", "scale") / 3.0)
 			ScaleEntity n\obj, temp, temp, temp	
+			;[End Block]
 		Case NPCtype049
+			;[Block]
 			n\NVName = "SCP-049"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
@@ -253,7 +270,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, temp, temp, temp	
 			
 			n\Sound = LoadSound_Strict("SFX\Horror12.ogg")
+			;[End Block]
 		Case NPCtypeZombie
+			;[Block]
 			n\NVName = "Human"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
@@ -280,7 +299,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			SetAnimTime(n\obj, 107)
 			
 			n\Sound = LoadSound_Strict("SFX\zombiebreath.ogg")
+			;[End Block]
 		Case NPCtypeApache
+			;[Block]
 			n\NVName = "Human"
 			n\GravityMult = 0.0
 			n\MaxGravity = 0.0
@@ -320,7 +341,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			temp# = 0.6
 			ScaleEntity n\obj, temp, temp, temp
+			;[End Block]
 		Case NPCtypeTentacle
+			;[Block]
 			n\NVName = "Unidentified"
 			
 			n\Collider = CreatePivot()
@@ -338,7 +361,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EndIf
 			
 			SetAnimTime n\obj, 283
+			;[End Block]
 		Case NPCtype860
+			;[Block]
 			n\NVName = "Unidentified"
 			
 			n\Collider = CreatePivot()
@@ -365,7 +390,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "forestmonster", "scale") / 20.0)
 			ScaleEntity n\obj, temp, temp, temp	
+			;[End Block]
 		Case NPCtype939
+			;[Block]
 			i = 53
 			For n2.NPCs = Each NPCs
 				If (n\NPCtype = n2\NPCtype) And (n<>n2) Then i=i+36
@@ -418,7 +445,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-939", "speed") / 100.0)
+			;[End Block]
 		Case NPCtype066
+			;[Block]
 			n\NVName = "SCP-066"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
@@ -440,7 +469,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-066", "speed") / 100.0)
+			;[End Block]
 		Case NPCtype178
+			;[Block]
 			n\NVName = "Unidentified"
 			
 			n\Collider = CreatePivot()
@@ -471,7 +502,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider,HIT_178
 			
 			n\Speed = 0.02
+			;[End Block]
 		Case NPCtype966
+			;[Block]
 			i = 1
 			For n2.NPCs = Each NPCs
 				If (n\NPCtype = n2\NPCtype) And (n<>n2) Then i=i+1
@@ -504,13 +537,16 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider,HIT_PLAYER
 			
 			n\Speed = 0.02
+			;[End Block]
 		Case NPCtype1048a
+			;[Block]
 			n\obj =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
 			ScaleEntity n\obj, 0.05,0.05,0.05
 			SetAnimTime(n\obj, 2)
 			
 			n\Sound = LoadSound_Strict("SFX\Shriek.ogg")
 			n\Sound2 = LoadSound_Strict("SFX\Squishy.ogg")
+			;[End Block]
 	End Select
 	
 	PositionEntity(n\Collider, x, y, z, True)
@@ -3601,6 +3637,11 @@ Function OtherNPCSeesMeNPC%(me.NPCs,other.NPCs)
 End Function
 
 Function MeNPCSeesPlayer%(me.NPCs)
+	;Return values:
+		;False (=0): Player is not detected anyhow
+		;True (=1): Player is detected by vision
+		;2: Player is detected by emitting a sound
+		;3: Player is detected by a camera (only for MTF Units!)
 	
 	If (Not PlayerDetected) Or me\NPCtype <> NPCtypeMTF
 		If me\BlinkTimer<=0.0 Then Return False
@@ -3614,10 +3655,13 @@ Function MeNPCSeesPlayer%(me.NPCs)
 		
 		Return EntityVisible(me\Collider, Camera)
 	Else
-		If EntityDistance(Collider,me\Collider)>(8.0-CrouchState+PlayerSoundVolume) Then Return 2
+		If EntityDistance(Collider,me\Collider)>(8.0-CrouchState+PlayerSoundVolume) Then Return 3
+		
+		;spots the player if he's either in view or making a loud sound
+		If PlayerSoundVolume>1.0 Then Return 2
 		
 		If EntityVisible(me\Collider, Camera) Then Return True
-		Return 2
+		Return 3
 	EndIf
 	
 End Function
@@ -3842,17 +3886,19 @@ Function UpdateMTFUnit(n.NPCs)
 				
                 If temp Then
 					If n\LastSeen > 0 And n\LastSeen < 70*15 Then
-						If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-						n\Sound = LoadSound_Strict("SFX\MTF\ThereHeIs"+Rand(1,6)+".ogg")
-						PlayMTFSound(n\Sound, n)
+						If temp < 2
+							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+							n\Sound = LoadSound_Strict("SFX\MTF\ThereHeIs"+Rand(1,6)+".ogg")
+							PlayMTFSound(n\Sound, n)
+						EndIf
 					Else
 						If temp = True
 							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 							n\Sound = LoadSound_Strict("SFX\MTF\Stop"+Rand(1,6)+".ogg")
 							PlayMTFSound(n\Sound, n)
-						Else
+						ElseIf temp = 2
 							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-							n\Sound = LoadSound_Strict("SFX\MTF\ClassD"+Rand(1,4)+".ogg")
+							n\Sound = MTFSFX(Rand(0,3))
 							PlayMTFSound(n\Sound, n)
 						EndIf
 					EndIf
@@ -3864,14 +3910,14 @@ Function UpdateMTFUnit(n.NPCs)
 					n\EnemyX = EntityX(Collider,True)
 					n\EnemyY = EntityY(Collider,True)
 					n\EnemyZ = EntityZ(Collider,True)
-					n\State2 = 70.0*(15.0*temp) ;give up after 15 seconds (if detected through vision, overwise 30 seconds)
+					n\State2 = 70.0*(15.0*temp) ;give up after 15 seconds (30 seconds if detected by footsteps, over camera 45)
 					DebugLog "player spotted :"+n\State2
 					n\PathTimer=0.0
 					n\PathStatus=0
 					
-					If EntityDistance(n\Collider,Collider)>HideDistance*0.7
-						TeleportMTFGroup(n)
-					EndIf
+					;If EntityDistance(n\Collider,Collider)>HideDistance*0.7
+					;	TeleportMTFGroup(n)
+					;EndIf
                 EndIf
                 
 				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
@@ -4302,6 +4348,10 @@ Function UpdateMTFUnit(n.NPCs)
 				
 				n\Angle = EntityYaw(n\Collider)
 				;[End Block]
+			Case 4 ;SCP-106 detected
+				;[Block]
+				n\Speed = 0.03
+				;[End Block]
 			Case 5 ;looking at some other target than the player
 				;[Block]
 				target=CreatePivot()
@@ -4691,6 +4741,7 @@ Function NPCSpeedChange(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#216#32B#416#565#637#6CC#77A#77F#7AD#84F#88A#917#983#A99#B5F#C0F#CC2#DC1#E3C
-;~F#F35#FFF#1071#10D1#112B#11A3#11B4#11CF#11ED#122A#1247
+;~F#0#44#6A#90#9E#CD#DD#E6#F4#103#112#12F#159#16D#18A#1C1#1D9#1FA#21D#23A
+;~F#34F#43A#589#65B#6F0#79E#7A3#7D1#873#8AE#93B#9A7#ABD#B83#C33#CE6#DE5#E68#F63#102D
+;~F#109F#10FF#1103#115D#11D5#11E6#1201#121F#125C#1279
 ;~C#Blitz3D
