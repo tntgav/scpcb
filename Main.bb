@@ -2720,7 +2720,7 @@ Function MovePlayer()
 			DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
 		EndIf	
 		
-		TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
+		If (Not UnableToMove%) Then TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
 	EndIf
 	
 	ForceMove = False
@@ -8079,6 +8079,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#3C5#4DA#4FA#572#57F#616#68D#6A4#6B1#6E3#78A#86E#14D6#1687#1811
-;~F#1830#184F#186D#1871#1891
+;~F#21#A6#126#12A#131#4DA#4FA#572#57F#616#68D#6A4#6B1#6E3#78A#86E#14D6#1687#1811#1830
+;~F#184F#186D#1871#1891
 ;~C#Blitz3D
