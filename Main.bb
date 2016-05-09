@@ -335,7 +335,7 @@ Function UpdateConsole()
 					
 					Select Lower(StrTemp)
 						Case "1",""
-							CreateConsoleMsg("LIST OF COMMANDS - PAGE 1/2")
+							CreateConsoleMsg("LIST OF COMMANDS - PAGE 1/3")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("- asd")
 							CreateConsoleMsg("- status")
@@ -354,11 +354,11 @@ Function UpdateConsole()
 							CreateConsoleMsg("- 173state")
 							CreateConsoleMsg("- 106state")
 							CreateConsoleMsg("******************************")
-							CreateConsoleMsg("Use "+Chr(34)+"help 2"+Chr(34)+" to find more commands.")
+							CreateConsoleMsg("Use "+Chr(34)+"help 2/3"+Chr(34)+" to find more commands.")
 							CreateConsoleMsg("Use "+Chr(34)+"help [command name]"+Chr(34)+" to get more information about a command.")
 							CreateConsoleMsg("******************************")
 						Case "2"
-							CreateConsoleMsg("LIST OF COMMANDS - PAGE 2/2")
+							CreateConsoleMsg("LIST OF COMMANDS - PAGE 2/3")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("- spawn513-1")
 							CreateConsoleMsg("- spawn106")
@@ -378,11 +378,15 @@ Function UpdateConsole()
 							CreateConsoleMsg("- debughud")
 							CreateConsoleMsg("- camerafog [near] [far]")
 							CreateConsoleMsg("- brightness [value]")
-							CreateConsoleMsg("- spawn [npc type]")
-							CreateConsoleMsg("- infinitestamina")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Use "+Chr(34)+"help [command name]"+Chr(34)+" to get more information about a command.")
 							CreateConsoleMsg("******************************")
+						Case "3"
+							CreateConsoleMsg("- spawn [npc type]")
+							CreateConsoleMsg("- infinitestamina")
+							CreateConsoleMsg("- playmusic [clip + .wav/.ogg]")
+							CreateConsoleMsg("- notarget")
+							CreateConsoleMsg("- spawnnpcstate [npc type] [state]")
 						Case "asd"
 							CreateConsoleMsg("HELP - asd")
 							CreateConsoleMsg("******************************")
@@ -855,6 +859,41 @@ Function UpdateConsole()
 						If CustomMusic <> 0 Then FreeSound_Strict CustomMusic : CustomMusic = 0
 						If MusicCHN <> 0 Then StopChannel MusicCHN
 					EndIf
+				Case "tp"
+					For n.NPCs = Each NPCs
+						If n\NPCtype = NPCtypeMTF
+							If n\MTFLeader = Null
+								PositionEntity Collider,EntityX(n\Collider),EntityY(n\Collider)+5,EntityZ(n\Collider)
+								ResetEntity Collider
+								Exit
+							EndIf
+						EndIf
+					Next
+				Case "tele"
+					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					StrTemp$ = Piece$(args$,1," ")
+					StrTemp2$ = Piece$(args$,2," ")
+					StrTemp3$ = Piece$(args$,3," ")
+					PositionEntity Collider,StrTemp$,StrTemp2$,StrTemp3$
+					CreateConsoleMsg("Teleported to coordinates (X|Y|Z): "+EntityX(Collider)+"|"+EntityY(Collider)+"|"+EntityZ(Collider))
+				Case "notarget"
+					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					
+					Select StrTemp
+						Case "on", "1", "true"
+							NoTarget% = True
+							CreateConsoleMsg("NOTARGET ON")							
+						Case "off", "0", "false"
+							NoTarget% = False
+							CreateConsoleMsg("NOTARGET OFF")	
+						Default
+							NoTarget% = Not NoTarget%
+							If NoTarget% = False Then
+								CreateConsoleMsg("NOTARGET OFF")
+							Else
+								CreateConsoleMsg("NOTARGET ON")	
+							EndIf
+					End Select
 				Default
 					CreateConsoleMsg("Command not found")
 			End Select
@@ -1145,8 +1184,15 @@ Global NTF_1499FuckedSFX% = LoadSound_Strict("SFX\1499\fuckedup.ogg")
 
 Global PlayCustomMusic% = False, CustomMusic% = 0
 
-Global Monitor2, MonitorTexture2, MonitorTexture3
+Global Monitor2, MonitorTexture2, MonitorTexture3, MonitorTextureOff
 Global MonitorTimer# = 0.0
+
+;This variable is for when a camera detected the player
+	;False: Player is not seen (will be set after every call of the Main Loop
+	;True: The Player got detected by a camera
+Global PlayerDetected%
+Global PrevInjuries#,PrevBloodloss#
+Global NoTarget% = False
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1220,6 +1266,8 @@ Type Doors
 	Field LinkedDoor.Doors
 	
 	Field IsElevatorDoor% = False
+	
+	Field MTFClose% = True
 End Type 
 
 Dim BigDoorOBJ(2), HeavyDoorObj(2)
@@ -1338,6 +1386,8 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	d\dir=big
 	d\room=room
 	
+	d\MTFClose = True
+	
 	Return d
 	
 End Function
@@ -1445,7 +1495,10 @@ Function UpdateDoors()
 					If d\timerstate > 0 Then
 						d\timerstate = Max(0, d\timerstate - FPSfactor)
 						If d\timerstate + FPSfactor > 110 And d\timerstate <= 110 Then PlaySound2(CautionSFX, Camera, d\obj)
-						If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(Min(d\dir,1),Rand(0, 2)), Camera, d\obj)
+						;If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(Min(d\dir,1),Rand(0, 2)), Camera, d\obj)
+						Local sound%
+						If d\dir = 1 Then sound% = 0 Else sound% = Rand(0, 2)
+						If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
 					EndIf
 					If d\AutoClose And RemoteDoorOn = True Then
 						If EntityDistance(Camera, d\obj) < 2.1 Then
@@ -2026,6 +2079,20 @@ Repeat
 				PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 0.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
 				
 				If Rand(3)=1 Then PlayerZone = 3
+				
+				If PlayerRoom\RoomTemplate\Name = "173"
+					PlayerZone = 4
+				ElseIf PlayerRoom\RoomTemplate\Name = "room860"
+					For e.Events = Each Events
+						If e\EventName = "room860"
+							If e\EventState = 1.0
+								PlayerZone = 5
+								Exit
+							EndIf
+						EndIf
+					Next
+				EndIf
+				
 				CurrAmbientSFX = Rand(0,AmbientSFXAmount(PlayerZone)-1)
 				
 				Select PlayerZone
@@ -2653,7 +2720,7 @@ Function MovePlayer()
 			DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
 		EndIf	
 		
-		TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
+		If (Not UnableToMove%) Then TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
 	EndIf
 	
 	ForceMove = False
@@ -5532,10 +5599,15 @@ Function LoadEntities()
 	CamOBJ = LoadMesh_Strict("GFX\map\CamHead.b3d")
 	HideEntity(CamOBJ)
 	
-	Monitor2 = LoadMesh_Strict("GFX\map\monitor.b3d")
+	Monitor2 = LoadMesh_Strict("GFX\map\monitor_checkpoint.b3d")
 	HideEntity Monitor2
-	MonitorTexture2 = LoadTexture_Strict("GFX\map\MonitorTexture.jpg")
-	MonitorTexture3 = LoadTexture_Strict("GFX\map\MonitorTexture3.jpg")
+	MonitorTexture2 = LoadTexture_Strict("GFX\map\LockdownScreen2.jpg")
+	MonitorTexture3 = LoadTexture_Strict("GFX\map\LockdownScreen.jpg")
+	MonitorTextureOff = CreateTexture(1,1)
+	SetBuffer TextureBuffer(MonitorTextureOff)
+	ClsColor 0,0,0
+	Cls
+	SetBuffer BackBuffer()
 	
 	InitItemTemplates()
 	
@@ -5964,6 +6036,9 @@ Function NullGame()
 	NTF_1499Y# = 0.0
 	NTF_1499Z# = 0.0
 	NTF_PrevPlayerRoom$ = ""
+	
+	NoTarget% = False
+	Brightness = 40
 	
 	DeInitExt
 	
@@ -8004,6 +8079,6 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#39E#4AC#4CA#540#54D#5E1#658#66F#67C#6AE#755#82B#1493#163F#17C6
-;~F#17E5#1804#1822#1826#1846
+;~F#21#A6#126#12A#131#4DA#4FA#572#57F#616#68D#6A4#6B1#6E3#78A#86E#14D6#1687#1811#1830
+;~F#184F#186D#1871#1891
 ;~C#Blitz3D

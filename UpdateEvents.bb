@@ -1229,11 +1229,17 @@ Function UpdateEvents()
 				;[Block]
 				If PlayerRoom = e\room Then
 					If EntityDistance(Collider, e\room\Objects[0]) < 1.8 Then
-						GiveAchievement(Achv789)
-						e\SoundCHN = PlaySound2(ButtGhostSFX, Camera,e\room\Objects[0])
-						RemoveEvent(e)
-					End If
-				End If
+						If e\EventState = 0
+							GiveAchievement(Achv789)
+							e\SoundCHN = PlaySound2(ButtGhostSFX, Camera,e\room\Objects[0])
+							e\EventState = 1
+						Else
+							If (Not ChannelPlaying(e\SoundCHN))
+								RemoveEvent(e)
+							EndIf
+						EndIf
+					EndIf
+				EndIf
 				;[End Block]
 			Case "checkpoint"
 				;[Block]
@@ -1297,13 +1303,15 @@ Function UpdateEvents()
 						If e2\EventName = "008"
 							If e2\EventState = 2
 								If e\room\RoomDoors[0]\locked
-									EntityTexture e\room\Objects[2],MonitorTexture2
+									MonitorTimer# = 0.0
+									;UpdateCheckpointMonitors()
+									TurnCheckPointMonitorsOff()
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
 							Else
 								If e\room\dist < 12
-									UpdateCheckpointMonitors(e\room\Objects[2])
+									UpdateCheckpointMonitors()
 									e\room\RoomDoors[0]\locked = True
 									e\room\RoomDoors[1]\locked = True
 								EndIf
@@ -1755,6 +1763,11 @@ Function UpdateEvents()
 														n\EnemyX = EntityX(Collider)
 														n\EnemyY = EntityY(Collider)
 														n\EnemyZ = EntityZ(Collider)
+														n\BoneToManipulate = "spine"
+														n\ManipulateBone = True
+														n\ManipulationType = 1
+														n\Gravity = 0
+														n\GravityMult = 0
 													EndIf
 												Next
 											ElseIf e\EventState3 > 500.0
@@ -6593,6 +6606,10 @@ Function UpdateEvents()
 						;	If Not ChannelPlaying(e\SoundCHN) Then e\SoundCHN = PlaySound_Strict(moddedambience)
 						;End If
 						
+						;Saving Injuries and Bloodloss, so that the player won't be healed automatically
+						PrevInjuries = Injuries
+						PrevBloodloss = Bloodloss
+						
 						e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[6],True),EntityY(e\room\Objects[6],True),EntityZ(e\room\Objects[6],True))
 						;e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
 						
@@ -6755,7 +6772,11 @@ Function UpdateEvents()
 						ShowEntity Light
 						LightFlash = 6
 						BlurTimer = 500	
-						Injuries = 0
+						Injuries = PrevInjuries
+						Bloodloss = PrevBloodloss
+						
+						PrevInjuries = 0
+						PrevBloodloss = 0
 						
 						RemoveNPC(e\room\NPC[0])
 						RemoveEvent(e)						
@@ -6968,9 +6989,9 @@ Function UpdateEvents()
 					
 					e\EventState = 2	
 				Else
-					If e\Sound = 0 Then LoadEventSound(e,"SFX\SuicideGuard1.ogg");e\Sound = LoadSound_Strict("SFX\SuicideGuard1.ogg")
+					If e\Sound = 0 Then e\Sound = LoadSound_Strict("SFX\SuicideGuard1.ogg")
 					If e\room\dist < 15.0 Then 
-						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\Objects[1], 15.0)
+						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\NPC[0]\Collider, 15.0)
 						
 						If e\room\dist<4.0 And PlayerSoundVolume > 1.0 Then
 							de.Decals = CreateDecal(3,  EntityX(e\room\Objects[2],True), 0.01, EntityZ(e\room\Objects[2],True),90,Rnd(360),0)
@@ -6979,12 +7000,13 @@ Function UpdateEvents()
 							de.Decals = CreateDecal(17,  EntityX(e\room\Objects[2],True), 0.01, EntityZ(e\room\Objects[2],True),90,Rnd(360),0)
 							de\Size = 0.1 : de\maxsize = 0.45 : de\sizechange = 0.0002 : UpdateDecals()
 							
-							;e\Sound = LoadSound_Strict("SFX\SuicideGuard2.ogg")
-							StopChannel e\SoundCHN
-							LoadEventSound(e,"SFX\SuicideGuard2.ogg",1)
-							e\SoundCHN = PlaySound2(e\Sound2, Camera, e\room\Objects[1], 15.0)
-							
+							;FreeSound e\Sound
+							;StopChannel e\SoundCHN
+							;LoadEventSound(e,"SFX\SuicideGuard2.ogg",1)
+							e\room\NPC[0]\Sound = LoadSound_Strict("SFX\SuicideGuard2.ogg")
+							e\SoundCHN2 = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 15.0)
 							RemoveEvent(e)
+							
 						EndIf						
 					EndIf
 				EndIf
@@ -7793,8 +7815,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4CC#523#559#5B8#781#968#98F#99D#9A7#9B4#B9D#BBE#C0D#C5B#C68#CA2#CB9#CD9
-;~F#CE2#CEC#CFB#D8F#DB1#105D#10A3#10B9#10C5#10E3#1134#114B#1218#1319#13AA#13C3#13E2#1413#1420#1439
-;~F#14D1#1687#1731#1785#1836#18E6#199E#19B6#1A6F#1A9C#1AB9#1AE0#1B10#1B2D#1B51#1BAB#1BEB#1C1C#1C2F#1CE7
-;~F#1D3F#1D52#1D64#1D89#1DA8
+;~F#11#F8#4CC#4DC#52B#561#5C0#78E#975#99C#9AA#9B4#9C1#BAA#BCB#C1A#C68#C75#CAF#CC6
+;~F#CE6#CEF#CF9#D08#D9C#DBE#106A#10B0#10C6#10D2#10F0#1141#1158#1225#1326#13B7#13D0#13EF#1420#142D
+;~F#1446#14DE#1694#173E#1792#1843#18F3#19AB#19C3#1A84#1AB1#1ACE#1AF5#1B25#1B42#1B67#1BC1#1C01#1C32#1C45
+;~F#1CFD#1D55#1D68#1D7A#1D9F#1DBE
 ;~C#Blitz3D

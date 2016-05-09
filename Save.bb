@@ -8,6 +8,7 @@ Function SaveGame(file$)
 	GameSaved = True
 	
 	Local x%, y%, i%, temp%
+	Local n.NPCs, r.Rooms, do.Doors
 	
 	CreateDir(file)
 	
@@ -50,6 +51,10 @@ Function SaveGame(file$)
 	
 	WriteFloat f, Injuries
 	WriteFloat f, Bloodloss
+	
+	WriteFloat f,PrevInjuries
+	WriteFloat f,PrevBloodloss
+	
 	WriteString f, DeathMSG
 	
 	For i = 0 To 5
@@ -65,10 +70,13 @@ Function SaveGame(file$)
 			If (i = CUSTOM) Then
 				WriteByte f,SelectedDifficulty\aggressiveNPCs
 				WriteByte f,SelectedDifficulty\permaDeath
-				WriteByte f,SelectedDifficulty\saveType				
+				WriteByte f,SelectedDifficulty\saveType
+				WriteByte f,SelectedDifficulty\otherFactors
 			EndIf
 		EndIf
 	Next
+	
+	WriteFloat f, MonitorTimer
 	
 	WriteFloat f, Sanity
 	
@@ -116,39 +124,39 @@ Function SaveGame(file$)
 	WriteInt f, temp
 	For n.NPCs = Each NPCs
 		WriteByte f, n\NPCtype
-		WriteFloat f, EntityX(n\collider,True)
-		WriteFloat f, EntityY(n\collider,True)
-		WriteFloat f, EntityZ(n\collider,True)
+		WriteFloat f, EntityX(n\Collider,True)
+		WriteFloat f, EntityY(n\Collider,True)
+		WriteFloat f, EntityZ(n\Collider,True)
 		
-		WriteFloat f, EntityPitch(n\collider)
-		WriteFloat f, EntityYaw(n\collider)
-		WriteFloat f, EntityRoll(n\collider)
+		WriteFloat f, EntityPitch(n\Collider)
+		WriteFloat f, EntityYaw(n\Collider)
+		WriteFloat f, EntityRoll(n\Collider)
 		
-		WriteFloat f, n\state
-		WriteFloat f, n\state2
-		WriteFloat f, n\state3
-		WriteInt f, n\prevstate
+		WriteFloat f, n\State
+		WriteFloat f, n\State2
+		WriteFloat f, n\State3
+		WriteInt f, n\PrevState
 		
-		WriteByte f, n\idle
-		WriteFloat f, n\lastDist
-		WriteInt f, n\lastSeen
+		WriteByte f, n\Idle
+		WriteFloat f, n\LastDist
+		WriteInt f, n\LastSeen
 		
-		WriteInt f, n\currspeed
+		WriteInt f, n\CurrSpeed
 		
-		WriteFloat f, n\angle
+		WriteFloat f, n\Angle
 		
-		WriteFloat f, n\reload
+		WriteFloat f, n\Reload
 		
 		WriteInt f, n\ID
-		If n\target <> Null Then
-			WriteInt f, n\target\id		
+		If n\Target <> Null Then
+			WriteInt f, n\Target\ID		
 		Else
 			WriteInt f, 0
 		EndIf
 		
-		WriteFloat f, n\enemyX
-		WriteFloat f, n\enemyY
-		WriteFloat f, n\enemyz
+		WriteFloat f, n\EnemyX
+		WriteFloat f, n\EnemyY
+		WriteFloat f, n\EnemyZ
 		
 		WriteString f, n\texture
 		
@@ -173,7 +181,7 @@ Function SaveGame(file$)
 	Next	
 	WriteInt f, temp	
 	For r.Rooms = Each Rooms
-		WriteInt f, r\roomtemplate\id
+		WriteInt f, r\RoomTemplate\id
 		WriteInt f, r\angle
 		WriteFloat f, r\x
 		WriteFloat f, r\y
@@ -190,10 +198,10 @@ Function SaveGame(file$)
 		EndIf
 		
 		For i = 0 To 11
-			If r\npc[i]=Null Then
+			If r\NPC[i]=Null Then
 				WriteInt f, 0
 			Else
-				WriteInt f, r\npc[i]\id
+				WriteInt f, r\NPC[i]\ID
 			EndIf
 		Next
 		
@@ -264,7 +272,10 @@ Function SaveGame(file$)
 		End If
 		
 		WriteFloat f, do\timer
-		WriteFloat f, do\timerstate	
+		WriteFloat f, do\timerstate
+		
+		WriteByte f, do\IsElevatorDoor
+		WriteByte f, do\MTFClose
 	Next
 	
 	WriteInt f, 1845
@@ -398,7 +409,7 @@ Function LoadGame(file$)
 	
 	GameSaved = True
 	
-	Local x#, y#, z#, i%, temp%, strtemp$, r.Rooms, id%
+	Local x#, y#, z#, i%, temp%, strtemp$, r.Rooms, id%, n.NPCs, do.Doors
 	Local f% = ReadFile(file + "save.txt")
 	
 	strtemp = ReadString(f)
@@ -445,6 +456,10 @@ Function LoadGame(file$)
 	
 	Injuries = ReadFloat(f)
 	Bloodloss = ReadFloat(f)
+	
+	PrevInjuries = ReadFloat(f)
+	PrevBloodloss = ReadFloat(f)
+	
 	DeathMSG = ReadString(f)
 	
 	For i = 0 To 5
@@ -458,8 +473,11 @@ Function LoadGame(file$)
 	If (difficultyIndex = CUSTOM) Then
 		SelectedDifficulty\aggressiveNPCs = ReadByte(f)
 		SelectedDifficulty\permaDeath = ReadByte(f)
-		SelectedDifficulty\saveType	= ReadByte(f)		
+		SelectedDifficulty\saveType	= ReadByte(f)
+		SelectedDifficulty\otherFactors = ReadByte(f)
 	EndIf
+	
+	MonitorTimer = ReadFloat(f)
 	
 	Sanity = ReadFloat(f)
 	
@@ -517,27 +535,27 @@ Function LoadGame(file$)
 		x = ReadFloat(f)
 		y = ReadFloat(f)
 		z = ReadFloat(f)
-		RotateEntity(n\collider, x, y, z)
+		RotateEntity(n\Collider, x, y, z)
 		
-		n\state = ReadFloat(f)
-		n\state2 = ReadFloat(f)	
-		n\state3 = ReadFloat(f)			
-		n\prevstate = ReadInt(f)
+		n\State = ReadFloat(f)
+		n\State2 = ReadFloat(f)	
+		n\State3 = ReadFloat(f)			
+		n\PrevState = ReadInt(f)
 		
-		n\idle = ReadByte(f)
-		n\lastDist = ReadFloat(f)
-		n\lastSeen = ReadInt(f)
+		n\Idle = ReadByte(f)
+		n\LastDist = ReadFloat(f)
+		n\LastSeen = ReadInt(f)
 		
-		n\currspeed = ReadInt(f)
-		n\angle = ReadFloat(f)
-		n\reload = ReadFloat(f)
+		n\CurrSpeed = ReadInt(f)
+		n\Angle = ReadFloat(f)
+		n\Reload = ReadFloat(f)
 		
-		n\id = ReadInt(f)
-		n\targetid = ReadInt(f)
+		n\ID = ReadInt(f)
+		n\TargetID = ReadInt(f)
 		
-		n\enemyX = ReadFloat(f)
-		n\enemyY = ReadFloat(f)
-		n\enemyz = ReadFloat(f)
+		n\EnemyX = ReadFloat(f)
+		n\EnemyY = ReadFloat(f)
+		n\EnemyZ = ReadFloat(f)
 		
 		n\texture = ReadString(f)
 		If n\texture <> "" Then
@@ -553,11 +571,11 @@ Function LoadGame(file$)
 		
 	Next
 	
-	For n.npcs = Each NPCs
-		If n\targetid <> 0 Then
+	For n.NPCs = Each NPCs
+		If n\TargetID <> 0 Then
 			For n2.npcs = Each NPCs
 				If n2<>n Then
-					If n2\id = n\targetid Then n\target = n2
+					If n2\id = n\TargetID Then n\Target = n2
 				EndIf
 			Next
 		EndIf
@@ -607,8 +625,8 @@ Function LoadGame(file$)
 		For x = 0 To 11
 			id = ReadInt(f)
 			If id > 0 Then
-				For n.npcs = Each NPCs
-					If n\id = id Then r\NPC[x]=n : Exit
+				For n.NPCs = Each NPCs
+					If n\ID = id Then r\NPC[x]=n : Exit
 				Next
 			EndIf
 		Next
@@ -740,6 +758,9 @@ Function LoadGame(file$)
 		Local timer% = ReadFloat(f)
 		Local timerstate# = ReadFloat(f)
 		
+		Local IsElevDoor = ReadByte(f)
+		Local MTFClose = ReadByte(f)
+		
 		For do.Doors = Each Doors
 			If EntityX(do\frameobj,True) = x And EntityY(do\frameobj,True) = y And EntityZ(do\frameobj,True) = z Then
 				do\open = open
@@ -748,6 +769,8 @@ Function LoadGame(file$)
 				do\AutoClose = autoclose
 				do\timer = timer
 				do\timerstate = timerstate
+				do\IsElevatorDoor = IsElevDoor
+				do\MTFClose = MTFClose
 				
 				PositionEntity(do\obj, objX, y, objZ, True)
 				If do\obj2 <> 0 Then PositionEntity(do\obj2, obj2X, y, obj2Z, True)
@@ -935,7 +958,7 @@ Function LoadGame(file$)
 		Next
 		
 		For do.Doors = Each Doors
-			If (do\keycard = 0) And (do\code="") Then
+			If (do\KeyCard = 0) And (do\Code="") Then
 				If EntityZ(do\frameobj,True)=r\z Then
 					If EntityX(do\frameobj,True)=r\x+4.0 Then
 						r\AdjDoor[0] = do
@@ -964,7 +987,7 @@ Function LoadGameQuick(file$)
 	ResetEntity Collider
 	
 	Local x#, y#, z#, i%, temp%, strtemp$, id%
-	Local player_x#,player_y#,player_z#
+	Local player_x#,player_y#,player_z#, r.Rooms, n.NPCs, do.Doors
 	Local f% = ReadFile(file + "save.txt")
 	
 	strtemp = ReadString(f)
@@ -1034,7 +1057,11 @@ Function LoadGameQuick(file$)
 	EyeIrritation= ReadFloat(f)
 	
 	Injuries = ReadFloat(f)
-	Bloodloss = ReadFloat(f)	
+	Bloodloss = ReadFloat(f)
+	
+	PrevInjuries = ReadFloat(f)
+	PrevBloodloss = ReadFloat(f)
+	
 	DeathMSG = ReadString(f)
 	
 	For i = 0 To 5
@@ -1048,8 +1075,11 @@ Function LoadGameQuick(file$)
 	If (difficultyIndex = CUSTOM) Then
 		SelectedDifficulty\aggressiveNPCs = ReadByte(f)
 		SelectedDifficulty\permaDeath = ReadByte(f)
-		SelectedDifficulty\saveType	= ReadByte(f)		
+		SelectedDifficulty\saveType	= ReadByte(f)
+		SelectedDifficulty\otherFactors = ReadByte(f)
 	EndIf
+	
+	MonitorTimer = ReadFloat(f)
 	
 	Sanity = ReadFloat(f)
 	
@@ -1294,6 +1324,9 @@ Function LoadGameQuick(file$)
 		Local timer% = ReadFloat(f)
 		Local timerstate# = ReadFloat(f)
 		
+		Local IsElevDoor = ReadByte(f)
+		Local MTFClose = ReadByte(f)
+		
 		For do.Doors = Each Doors
 			If EntityX(do\frameobj,True) = x Then 
 				If EntityZ(do\frameobj,True) = z Then	
@@ -1304,6 +1337,8 @@ Function LoadGameQuick(file$)
 						do\AutoClose = autoclose
 						do\timer = timer
 						do\timerstate = timerstate
+						do\IsElevatorDoor = IsElevDoor
+						do\MTFClose = MTFClose
 						
 						PositionEntity(do\obj, objX, EntityY(do\obj), objZ, True)
 						If do\obj2 <> 0 Then PositionEntity(do\obj2, obj2X, EntityY(do\obj2), obj2Z, True)
