@@ -7931,11 +7931,11 @@ Function RenderWorld2()
 		If hasBattery Then
 			CameraViewport Camera,1024.0-(GraphicWidth/8),1024.0-(GraphicHeight/8),GraphicWidth/4,GraphicHeight/4
 			RenderWorldToTexture()
-			TextureAnisotropy(-1, -1) ;uncomment this to disable filtering on the low-res display
+			;TextureAnisotropy(-1, -1) ;uncomment this to disable filtering on the low-res display
 			CameraProjMode Camera,0
 			ScaleRender(0.0,0.0,6.4*1280.0/GraphicWidth,6.4*1280.0/GraphicWidth)
 			CameraProjMode Camera,1
-			TextureAnisotropy(0, -1) ;uncomment this to re-enable filtering if it's disabled
+			;TextureAnisotropy(0, -1) ;uncomment this to re-enable filtering if it's disabled
 			CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
 		EndIf
 	Else
@@ -8113,5 +8113,5 @@ End Function
 ;~F#21#A6#126#12A#131#3C5#4DF#4FF#577#584#61B#692#6A9#6B6#6E8#78F#873#12F0#14DF#14EA
 ;~F#1615#1698#16C9#17BB#17CD#17E9#17F3#1800#1822#1841#1860#187E#1882#18A4#18AC#18D7#1A79#1B2E#1BFA#1C71
 ;~F#1C77#1C81#1C8D#1C98#1C9C#1CD7#1CDF#1CE7#1CEE#1CF5#1D04#1D13#1D31#1D5F#1D66#1D79#1D92#1DBF#1DCA#1DCF
-;~F#1DE9#1DF5#1E10#1E62#1E70#1E78#1E84#1E8D#1EB6#1EBB#1EC0#1EC5#1ECE#1ED6#1F60#1F6A#1F8F#1F9F#1FAA
+;~F#1DE9#1DF5#1E10#1E62#1E70#1E78#1E84#1E8D#1EB6#1EBB#1EC0#1EC5#1ECE#1F60#1F6A#1F8F#1F9F#1FAA
 ;~C#Blitz3D
