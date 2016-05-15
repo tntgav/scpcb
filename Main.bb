@@ -1193,6 +1193,12 @@ Global MonitorTimer# = 0.0
 Global PlayerDetected%
 Global PrevInjuries#,PrevBloodloss#
 Global NoTarget% = False
+
+Global NVGImages = LoadAnimImage("GFX\battery.png",64,64,0,2)
+MaskImage NVGImages,255,0,255
+
+Global Wearing1499% = False
+Global AmbientLightRoomTex%, AmbientLightRoomVal%
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1214,7 +1220,6 @@ MaskImage(Panel294, 255,0,255)
 
 DrawLoading(35, True)
 
-Global NTF_Wearing1499%
 Global NTF_1499PrevX#
 Global NTF_1499PrevY#
 Global NTF_1499PrevZ#
@@ -1222,7 +1227,7 @@ Global NTF_1499PrevRoom$
 Global NTF_1499X#
 Global NTF_1499Y#
 Global NTF_1499Z#
-Global NTF_PrevPlayerRoom$
+Global PrevPlayerRoom$
 
 Global OptionsMenu% = 0
 Global QuitMSG% = 0
@@ -2928,6 +2933,7 @@ Function MouseLook()
 	
 	If (Not WearingNightVision=0) Then
 		;AmbientLightRooms(60)
+		AmbientLightRooms(255)
 		ShowEntity(NVOverlay)
 		If WearingNightVision=2 Then
 			EntityColor(NVOverlay, 0,100,255)
@@ -2937,6 +2943,7 @@ Function MouseLook()
 		EntityTexture(Fog, FogNVTexture)
 	Else
 		;AmbientLightRooms(0)
+		AmbientLightRooms(130)
 		HideEntity(NVOverlay)
 		EntityTexture(Fog, FogTexture)
 	EndIf
@@ -3698,6 +3705,8 @@ Function DrawGUI()
 						If WearingNightVision=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "supernv"
 						If WearingNightVision=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
+					Case "scp1499"
+						If Wearing1499=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 				End Select
 			EndIf
 			
@@ -4273,7 +4282,7 @@ Function DrawGUI()
 					
 					Local loc% = GetINISectionLocation(iniStr, SelectedItem\name)
 					
-					Stop
+					;Stop
 					
 					strtemp = GetINIString2(iniStr, loc, "message")
 					If strtemp <> "" Then Msg = strtemp : MsgTimer = 70*6
@@ -4747,7 +4756,7 @@ Function DrawGUI()
 					EndIf
 				;new Items in SCP:CB 1.3
 				Case "scp1499"
-					If NTF_Wearing1499% Then
+					If Wearing1499% Then
 						Msg = "You took off SCP-1499 and you reappeared in the facility."
 						For r.Rooms = Each Rooms
 							If r\RoomTemplate\Name = NTF_1499PrevRoom$ Then
@@ -4797,7 +4806,7 @@ Function DrawGUI()
 						Next
 					EndIf
 					MsgTimer = 70 * 5
-					NTF_Wearing1499% = (Not NTF_Wearing1499%)
+					Wearing1499% = (Not Wearing1499%)
 					SelectedItem = Null	
 				Default
 					;check if the item is an inventory-type object
@@ -5354,6 +5363,14 @@ Function LoadEntities()
 	
 	TextureLodBias
 	
+	AmbientLightRoomTex% = CreateTexture(2,2,257)
+	TextureBlend AmbientLightRoomTex,2
+	SetBuffer(TextureBuffer(AmbientLightRoomTex))
+	ClsColor 0,0,0
+	Cls
+	SetBuffer BackBuffer()
+	AmbientLightRoomVal = 0
+	
 	SoundEmitter = CreatePivot()
 	
 	Camera = CreateCamera()
@@ -5687,7 +5704,7 @@ Function InitNewGame()
 	Next	
 	
 	For r.Rooms = Each Rooms
-		For i = 0 To 19
+		For i = 0 To MaxRoomLights
 			If r\Lights[i]<>0 Then EntityParent(r\Lights[i],0)
 		Next
 		
@@ -5715,10 +5732,10 @@ Function InitNewGame()
 		
 	Next
 	
-	Local rt.RoomTemplates
-	For rt.RoomTemplates = Each RoomTemplates
-		FreeEntity (rt\obj)
-	Next	
+	;Local rt.RoomTemplates
+	;For rt.RoomTemplates = Each RoomTemplates
+		;FreeEntity (rt\obj)
+	;Next	
 	
 	Local tw.TempWayPoints
 	For tw.TempWayPoints = Each TempWayPoints
@@ -5800,9 +5817,9 @@ Function InitLoadGame()
 	BlinkTimer = BLINKFREQ
 	Stamina = 100
 	
-	For rt.RoomTemplates = Each RoomTemplates
-		If rt\obj <> 0 Then FreeEntity(rt\obj) : rt\obj = 0
-	Next
+	;For rt.RoomTemplates = Each RoomTemplates
+	;	If rt\obj <> 0 Then FreeEntity(rt\obj) : rt\obj = 0
+	;Next
 	
 	DropSpeed = 0.0
 	
@@ -6027,7 +6044,6 @@ Function NullGame()
 	
 	;Deleting all Stuff for SCP:CB 1.3 (new additional stuff) - ENDSHN
 	;DL_Free()
-	NTF_Wearing1499% = False
 	NTF_1499PrevX# = 0.0
 	NTF_1499PrevY# = 0.0
 	NTF_1499PrevZ# = 0.0
@@ -6035,7 +6051,8 @@ Function NullGame()
 	NTF_1499X# = 0.0
 	NTF_1499Y# = 0.0
 	NTF_1499Z# = 0.0
-	NTF_PrevPlayerRoom$ = ""
+	PrevPlayerRoom$ = ""
+	Wearing1499% = False
 	
 	NoTarget% = False
 	Brightness = 40
@@ -6258,33 +6275,35 @@ End Function
 Function AnimateNPC(n.NPCs, start#, quit#, speed#, loop=True)
 	Local newTime#
 	
-	If speed > 0.0 Then 
-		newTime = Max(Min(n\Frame + speed * FPSfactor,quit),start)
-		
-		If loop And newTime => quit Then
-			newTime = start
-		EndIf
-	Else
-		If start < quit Then
-			temp% = start
-			start = quit
-			quit = temp
-		EndIf
-		
-		If loop Then
-			newTime = n\Frame + speed * FPSfactor
+	If EntityDistance(n\obj,Camera)<HideDistance
+		If speed > 0.0 Then 
+			newTime = Max(Min(n\Frame + speed * FPSfactor,quit),start)
 			
-			If newTime < quit Then 
+			If loop And newTime => quit Then
 				newTime = start
-			Else If newTime > start 
-				newTime = quit
 			EndIf
 		Else
-			newTime = Max(Min(n\Frame + speed * FPSfactor,start),quit)
+			If start < quit Then
+				temp% = start
+				start = quit
+				quit = temp
+			EndIf
+			
+			If loop Then
+				newTime = n\Frame + speed * FPSfactor
+				
+				If newTime < quit Then 
+					newTime = start
+				Else If newTime > start 
+					newTime = quit
+				EndIf
+			Else
+				newTime = Max(Min(n\Frame + speed * FPSfactor,start),quit)
+			EndIf
 		EndIf
+		SetNPCFrame(n, newTime)
 	EndIf
 	
-	SetNPCFrame(n, newTime)
 End Function
 
 Function SetNPCFrame(n.NPCs, frame#)
@@ -7886,6 +7905,7 @@ Function RenderWorld2()
 	EndIf
 	
 	Local hasBattery% = 2
+	Local power% = 0
 	If (WearingNightVision=1) Then ;fake a low-res display
 		
 		;hasBattery% = True
@@ -7894,6 +7914,7 @@ Function RenderWorld2()
 			If (Inventory(i)<>Null) Then
 				If Inventory(i)\itemtemplate\tempname="nvgoggles" Then
 					Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.02)
+					power%=Int(Inventory(i)\state)
 					If Inventory(i)\state<=0.0 Then ;this nvg can't be used
 						hasBattery = 0
 						Msg = "The Night Vision Goggles need new batteries"
@@ -7910,11 +7931,11 @@ Function RenderWorld2()
 		If hasBattery Then
 			CameraViewport Camera,1024.0-(GraphicWidth/8),1024.0-(GraphicHeight/8),GraphicWidth/4,GraphicHeight/4
 			RenderWorldToTexture()
-			;TextureAnisotropy(-1, -1) ;uncomment this to disable filtering on the low-res display
+			TextureAnisotropy(-1, -1) ;uncomment this to disable filtering on the low-res display
 			CameraProjMode Camera,0
 			ScaleRender(0.0,0.0,6.4*1280.0/GraphicWidth,6.4*1280.0/GraphicWidth)
 			CameraProjMode Camera,1
-				;TextureAnisotropy(0, -1) ;uncomment this to re-enable filtering if it's disabled
+			TextureAnisotropy(0, -1) ;uncomment this to re-enable filtering if it's disabled
 			CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
 		EndIf
 	Else
@@ -7981,6 +8002,16 @@ Function RenderWorld2()
 		FreeEntity (temp) : FreeEntity (temp2)
 		
 		Color 255,255,255
+	ElseIf WearingNightVision=1 And hasBattery<>0
+		Color 0,55,0
+		For k=0 To 10
+			Rect 45,GraphicHeight*0.5-(k*20),54,10,True
+		Next
+		Color 0,255,0
+		For l=0 To Ceil(power%*0.01)
+			Rect 45,GraphicHeight*0.5-(l*20),54,10,True
+		Next
+		DrawImage NVGImages,40,GraphicHeight*0.5+30
 	EndIf
 	
 	;render sprites
@@ -8079,6 +8110,8 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#4DA#4FA#572#57F#616#68D#6A4#6B1#6E3#78A#86E#14D6#1687#1811#1830
-;~F#184F#186D#1871#1891
+;~F#21#A6#126#12A#131#3C5#4DF#4FF#577#584#61B#692#6A9#6B6#6E8#78F#873#12F0#14DF#14EA
+;~F#1615#1698#16C9#17BB#17CD#17E9#17F3#1800#1822#1841#1860#187E#1882#18A4#18AC#18D7#1A79#1B2E#1BFA#1C71
+;~F#1C77#1C81#1C8D#1C98#1C9C#1CD7#1CDF#1CE7#1CEE#1CF5#1D04#1D13#1D31#1D5F#1D66#1D79#1D92#1DBF#1DCA#1DCF
+;~F#1DE9#1DF5#1E10#1E62#1E70#1E78#1E84#1E8D#1EB6#1EBB#1EC0#1EC5#1ECE#1ED6#1F60#1F6A#1F8F#1F9F#1FAA
 ;~C#Blitz3D

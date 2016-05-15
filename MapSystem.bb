@@ -528,6 +528,37 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		
 	Next
 	
+;	If BumpEnabled Then
+;		For i = 2 To CountSurfaces(Opaque)
+;			surf = GetSurface(Opaque,i)
+;			brush = GetSurfaceBrush(surf)
+;			tex[0] = GetBrushTexture(brush,1)
+;			temp1s$ =  StripPath(TextureName(tex[0]))
+;			
+;			If temp1s$<>0 Then 
+;				mat.Materials=GetCache(temp1s)
+;				If mat<>Null Then
+;					If mat\Bump<>0 Then
+;						tex[1] = GetBrushTexture(brush,0)
+;						
+;						BrushTexture brush, tex[1], 0, 1
+;						BrushTexture brush, mat\Bump, 0, 0
+;						BrushTexture brush, tex[0], 0, 2
+;						
+;						PaintSurface surf,brush
+;						
+;						If tex[1]<>0 Then FreeTexture tex[1] : tex[1]=0
+;					EndIf
+;				EndIf
+;				
+;				If tex[0]<>0 Then FreeTexture tex[0] : tex[0]=0
+;			EndIf
+;			
+;			If brush<>0 Then FreeBrush brush : brush=0
+;		Next
+;		
+;	EndIf
+	
 	If BumpEnabled Then
 		For i = 2 To CountSurfaces(Opaque)
 			surf = GetSurface(Opaque,i)
@@ -535,23 +566,53 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 			tex[0] = GetBrushTexture(brush,1)
 			temp1s$ =  StripPath(TextureName(tex[0]))
 			
-			If temp1s$<>0 Then 
+			If temp1s$<>"" Then 
 				mat.Materials=GetCache(temp1s)
-				If mat<>Null Then
-					If mat\Bump<>0 Then
-						tex[1] = GetBrushTexture(brush,0)
-						
-						BrushTexture brush, tex[1], 0, 1
-						BrushTexture brush, mat\Bump, 0, 0
-						BrushTexture brush, tex[0], 0, 2
-						
-						PaintSurface surf,brush
-						
-						If tex[1]<>0 Then FreeTexture tex[1] : tex[1]=0
+				
+				tex[1] = GetBrushTexture(brush,0)
+				If TextureName(tex[1])<>"" Then
+					BrushTexture brush, tex[0], 0, 2
+					BrushTexture brush, tex[1], 0, 1
+					BrushTexture brush, AmbientLightRoomTex,0
+					If mat<>Null Then
+						If mat\Bump<>0 Then
+							
+							BrushTexture brush, tex[0], 0, 3
+							BrushTexture brush, tex[1], 0, 2
+							BrushTexture brush, mat\Bump, 0, 1
+							
+						EndIf
 					EndIf
+					
+					PaintSurface surf,brush
 				EndIf
 				
-				If tex[0]<>0 Then FreeTexture tex[0] : tex[0]=0
+				If tex[1]<>0 Then FreeTexture tex[1] : tex[1]=0
+			EndIf
+			If tex[0]<>0 Then FreeTexture tex[0] : tex[0]=0
+			If brush<>0 Then FreeBrush brush : brush=0
+		Next
+	Else
+		For i = 1 To CountSurfaces(Opaque)
+			surf = GetSurface(Opaque,i)
+			brush = GetSurfaceBrush(surf)
+			tex[0] = GetBrushTexture(brush,1)
+			If tex[0]<>0 Then
+				If TextureName(tex[0])<>"" Then
+					tex[1] = GetBrushTexture(brush,0)
+					
+					If tex[1]<>0 Then
+						If TextureName(tex[1])<>"" Then
+							BrushTexture brush, tex[0], 0, 2
+							BrushTexture brush, tex[1], 0, 1
+							BrushTexture brush, AmbientLightRoomTex,0
+							
+							PaintSurface surf,brush
+						EndIf
+						FreeTexture tex[1] : tex[1]=0
+					EndIf
+				EndIf
+				FreeTexture tex[0] : tex[0]=0
 			EndIf
 			
 			If brush<>0 Then FreeBrush brush : brush=0
@@ -4222,6 +4283,11 @@ Function FillRoom(r.Rooms)
 			FreeTexture t
 			FreeEntity hallway
 			;[End Block]
+		Case "room4z3"
+			;[Block]
+			sc.SecurityCams = CreateSecurityCam(r\x + 600.0*RoomScale, r\y + 384.0*RoomScale, r\z, r)
+			sc\FollowPlayer = True
+			;[End Block]
 		;New rooms (in SCP:CB 1.3) - ENDSHN
 		Case "room1lifts"
 			;[Block]
@@ -6714,12 +6780,51 @@ Function TurnCheckpointMonitorsOff()
 	MonitorTimer# = 0.0
 	
 End Function
+
+Function AmbientLightRooms(value%=0)
+	Local mesh%,surf%,brush%,tex0%
+	
+	If value=AmbientLightRoomVal Then Return
+	AmbientLightRoomVal = value
+	
+	oldbuffer% = GetBuffer()
+	
+	SetBuffer TextureBuffer(AmbientLightRoomTex)
+	
+	ClsColor value,value,value
+	Cls
+	ClsColor 0,0,0
+	
+	SetBuffer oldbuffer
+	
+	For rt.RoomTemplates = Each RoomTemplates
+		If rt\obj <> 0 Then mesh = GetChild(rt\obj,2)
+		DebugLog mesh + " for rtemplate"
+		If mesh<>0 Then
+			For i = 1 To CountSurfaces(mesh)
+				surf = GetSurface(mesh,i)
+				brush = GetSurfaceBrush(surf)
+				tex0 = GetBrushTexture(brush,1)
+				If tex0<>0 Then
+					If Instr(TextureName(tex0),"_lm")<>0 Then
+						BrushTexture brush, AmbientLightRoomTex,0
+						
+						PaintSurface surf,brush
+					EndIf
+					
+					FreeTexture tex0 : tex0=0
+				EndIf
+				If brush<>0 Then FreeBrush brush : brush=0
+			Next
+		EndIf
+	Next
+End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#2FD#30E#31F#347#355#365#36A#375#41C
-;~F#526#545#566#577#582#5BB#5C9#5F1#623#62B#640#68D#6DE#720#742#79E#7B0#817#826#850
-;~F#861#878#896#8BD#8C4#8D2#8EE#903#920#93D#94A#95C#995#9BF#A0B#A61#A74#A8F#AE0#B39
-;~F#B48#B84#B8C#B9A#BAF#BEB#C0A#C1A#C32#C5A#C6D#C8F#D09#D35#D5C#D63#D68#D9F#DC6#DDB
-;~F#E0B#E89#EA4#F11#F63#F8E#FDF#FE8#1082#1089#1098#10B7#10C1#10D2#10D9#1180#11CD#11D8#11E9#11EE
-;~F#11FD#1214#128A#1293#1372#138F#1396#139C#13AA#13CE#13EA#14F8#1531#1546#15B7#164C#1651#1661#1932#1949
-;~F#1968#196F#19BC
+;~F#2#A#2D#FA#109#110#117#11E#12F#137#33A#34B#35C#384#392#3A2#3A7#3B2#459#563
+;~F#582#5A3#5B4#5BF#5F8#606#62E#660#668#67D#6C1#6CA#71B#75D#77F#7DB#7ED#854#863#88D
+;~F#89E#8B5#8D3#8FA#901#90F#92B#940#95D#97A#987#999#9D2#9FC#A48#A9E#AB1#ACC#B1D#B76
+;~F#B85#BC1#BC9#BD7#BEC#C28#C47#C57#C6F#C97#CAA#CCC#CF4#D46#D72#D99#DA0#DA5#DDC#E03
+;~F#E18#E48#EC6#EE1#F4E#FA0#FCB#101C#1025#10C4#10CB#10DA#10E4#10F9#1103#1114#111B#1145#11C2#11CE
+;~F#120F#121A#122B#1230#123F#1256#12CC#12D5#13B4#13D1#13D8#13DE#13EC#1410#142C#145F#153A#1573#1588#15F9
+;~F#168E#1693#16A3#1974#198B#19AA#19B1#19FE#1A4F#1A69#1A7F
 ;~C#Blitz3D

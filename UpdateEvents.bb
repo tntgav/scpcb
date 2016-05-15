@@ -1357,6 +1357,55 @@ Function UpdateEvents()
 						EndIf
 					EndIf
 					
+					If WearingNightVision>0 Then
+						If EntityVisible(Camera,e\room\Objects[2]) Then
+							If EntityInView(e\room\Objects[2], Camera) Then
+								
+								Sanity=Sanity-FPSfactor*1.1
+								BlurTimer = Sin(MilliSecs()/10)*Abs(Sanity)
+								
+								tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[2],True),EntityZ(e\room\Objects[2],True))
+								tempF2# = EntityYaw(Collider)
+								tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
+								
+								TurnEntity Collider, 0,tempF3/4,0,True
+								
+								tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[2],True),EntityZ(e\room\Objects[2],True)))
+								tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
+								
+								user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
+								
+								If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
+									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
+									PlaySound(HorrorSFX(1))
+									e\EventState3 = 10.0
+									EntityColor(NVOverlay, 255,255,255)
+								EndIf
+								If Sanity < (-1000) Then 
+									If WearingNightVision=2
+										DeathMSG = "''Class-D viewed SCP-895 through a pair of digital night vision goggles enhanced by SCP-914. It is possible that the Class-D"
+										DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles.''"
+									Else
+										DeathMSG = "''Class-D viewed SCP-895 through a pair of digital night vision goggles, which caused insanity similar to those who view"
+										DeathMSG = DeathMSG + "SCP-895 via a video feed.''"
+									EndIf
+									Kill()				
+								EndIf
+							EndIf
+						EndIf
+					EndIf
+					
+					If e\EventState3>0.0 Then e\EventState3=Max(e\EventState3-FPSfactor,0.0)
+					If e\EventState3=0.0 Then
+						e\EventState3=-1.0
+						EntityTexture(NVOverlay, NVTexture)
+						If WearingNightVision = 1 Then
+							EntityColor(NVOverlay, 0,255,0)
+						ElseIf WearingNightVision = 2 Then
+							EntityColor(NVOverlay, 0,100,255)
+						EndIf
+					EndIf
+					
 					ShouldPlay = 66
 					
 					If UpdateLever(e\room\Levers[0]) Then
@@ -7815,8 +7864,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4CC#4DC#52B#561#5C0#78E#975#99C#9AA#9B4#9C1#BAA#BCB#C1A#C68#C75#CAF#CC6
-;~F#CE6#CEF#CF9#D08#D9C#DBE#106A#10B0#10C6#10D2#10F0#1141#1158#1225#1326#13B7#13D0#13EF#1420#142D
-;~F#1446#14DE#1694#173E#1792#1843#18F3#19AB#19C3#1A84#1AB1#1ACE#1AF5#1B25#1B42#1B67#1BC1#1C01#1C32#1C45
-;~F#1CFD#1D55#1D68#1D7A#1D9F#1DBE
+;~F#11#F8#4CC#4DC#592#5F1#7BF#9A6#9CD#9DB#9E5#9F2#BDB#BFC#C4B#C99#CA6#CE0#CF7#D17
+;~F#D20#D2A#D39#DCD#DEF#109B#10E1#10F7#1103#1121#1172#1189#1256#1357#13E8#1401#1420#1451#145E#1477
+;~F#150F#16C5#176F#17C3#1874#1924#19DC#19F4#1AB5#1AE2#1AFF#1B26#1B56#1B73#1B98#1BF2#1C32#1C63#1C76#1D2E
+;~F#1D86#1D99#1DAB#1DD0#1DEF
 ;~C#Blitz3D

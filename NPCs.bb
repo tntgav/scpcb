@@ -1448,7 +1448,7 @@ Function UpdateNPCs()
 						If dist < HideDistance ;Checking if the player is in range
 							n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider)
 							PlayerSeeAble% = MeNPCSeesPlayer(n)
-							If PlayerSeeAble%=True ;Player is visible for 049's sight - attacking
+							If PlayerSeeAble%=True Or n\State2>0 ;Player is visible for 049's sight - attacking
 								;Playing a sound after detecting the player
 								If n\PrevState < 1 And ChannelPlaying(n\SoundChn2)=False
 									If n\Sound2 <> 0 Then FreeSound_Strict(n\Sound2)
@@ -1459,6 +1459,7 @@ Function UpdateNPCs()
 								n\PathStatus = 0
 								n\PathTimer# = 0.0
 								n\PathLocation = 0
+								If PlayerSeeAble%=True Then n\State2 = 70*2
 								PointEntity n\obj,Collider
 								RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),10.0),0
 								If dist < 0.5 Then
@@ -1677,7 +1678,7 @@ Function UpdateNPCs()
 								;If Rand(100-(30*SelectedDifficulty\aggressiveNPCs))=1 Then TeleportCloser(n)
 								If Rand(50-(20*SelectedDifficulty\aggressiveNPCs))=1
 									For w.waypoints = Each WayPoints
-										If w\door=Null And w\room\dist < 20 And Rand(5)=1 Then
+										If w\door=Null And w\room\dist < HideDistance And Rand(3)=1 Then
 											x = Abs(EntityX(n\Collider)-EntityX(w\obj,True))
 											If x < 12.0 And x > 4.0 Then
 												z = Abs(EntityZ(n\Collider)-EntityZ(w\obj,True))
@@ -1686,6 +1687,9 @@ Function UpdateNPCs()
 														DebugLog "MOVING 049 TO "+w\room\roomtemplate\name
 														PositionEntity n\Collider, EntityX(w\obj,True), EntityY(w\obj,True)+0.25,EntityZ(w\obj,True)
 														ResetEntity n\Collider
+														n\PathStatus = 0
+														n\PathTimer# = 0.0
+														n\PathLocation = 0
 														Exit
 													EndIf
 												EndIf
@@ -1708,7 +1712,7 @@ Function UpdateNPCs()
 							;Animate2(n\obj, AnimTime(n\obj), 18, 19, 0.05)
 							PointEntity n\obj, Collider	
 							RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 45.0), 0
-						ElseIf dist > 32.0
+						ElseIf dist > 15.0
 							n\State = 2
 						EndIf
 				End Select
@@ -1718,7 +1722,9 @@ Function UpdateNPCs()
 				RotateEntity n\obj, 0, EntityYaw(n\Collider), 0
 				
 				n\LastSeen = Max(n\LastSeen-FPSfactor,0)
-					
+				
+				n\State2 = Max(n\State2-FPSfactor,0)
+				
 				;[End Block]
 			Case NPCtypeZombie
 				;[Block]
@@ -4872,7 +4878,7 @@ Function PlayerInReachableRoom()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#44#6A#90#9E#CD#DD#E6#F4#114#131#15B#16F#18C#1C3#1DB#1FC#21F#23C
-;~F#260#351#43C#6BB#750#7FE#803#831#8D3#90E#99B#A07#B1C#BE2#C92#D45#E44#E63#E8A#EB8
-;~F#ECB#ECC#F1A#FC9#1095#1107#1167#116B#11C5#123D#124E#1269#1287#12C4#12E0
+;~F#0#A#44#6A#90#9E#CD#DD#E6#F4#103#114#131#15B#16F#18C#1C3#1DB#1FC#21F
+;~F#23C#257#260#351#43C#58B#6C1#756#804#809#837#8D9#914#9A1#A0D#B22#BE8#C98#D4B#E4A
+;~F#E69#E90#EBE#ED1#ED2#F20#FCF#109B#110D#116D#1171#11CB#1243#1254#126F#128D#12CA#12E6
 ;~C#Blitz3D
