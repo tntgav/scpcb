@@ -429,7 +429,7 @@ Function UpdateMainMenu()
 						EndIf
 						Local strtemp$ = ""
 						For i = 1 To Len(RandomSeed)
-							strtemp = strtemp+Asc(Mid(strtemp,i,1))
+							strtemp = strtemp+Asc(Mid(RandomSeed,i,1))
 						Next
 						SeedRnd Abs(Int(strtemp))
 						
