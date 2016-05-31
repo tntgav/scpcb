@@ -1305,7 +1305,7 @@ Function UpdateEvents()
 								If e\room\RoomDoors[0]\locked
 									MonitorTimer# = 0.0
 									;UpdateCheckpointMonitors()
-									TurnCheckPointMonitorsOff()
+									TurnCheckpointMonitorsOff()
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
@@ -1358,26 +1358,28 @@ Function UpdateEvents()
 					EndIf
 					
 					If WearingNightVision>0 Then
-						If EntityVisible(Camera,e\room\Objects[2]) Then
-							If EntityInView(e\room\Objects[2], Camera) Then
+						;If EntityVisible(Camera,e\room\Objects[2]) Then
+							;If EntityInView(e\room\Objects[2], Camera) Then
+						If EntityVisible(Camera,e\room\Objects[1])
+							If CoffinDistance<4.0
 								
 								Sanity=Sanity-FPSfactor*1.1
 								BlurTimer = Sin(MilliSecs()/10)*Abs(Sanity)
 								
-								tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[2],True),EntityZ(e\room\Objects[2],True))
+								tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
 								tempF2# = EntityYaw(Collider)
 								tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
 								
 								TurnEntity Collider, 0,tempF3/4,0,True
 								
-								tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[2],True),EntityZ(e\room\Objects[2],True)))
+								tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
 								tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
 								
 								user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
 								
 								If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
 									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
-									PlaySound(HorrorSFX(1))
+									PlaySound_Strict(HorrorSFX(1))
 									e\EventState3 = 10.0
 									EntityColor(NVOverlay, 255,255,255)
 								EndIf
@@ -1389,7 +1391,7 @@ Function UpdateEvents()
 										DeathMSG = "''Class-D viewed SCP-895 through a pair of digital night vision goggles, which caused insanity similar to those who view"
 										DeathMSG = DeathMSG + "SCP-895 via a video feed.''"
 									EndIf
-									Kill()				
+									Kill()
 								EndIf
 							EndIf
 						EndIf
@@ -7576,10 +7578,6 @@ Function UpdateEvents()
 				;[End Block]
 			Case "room2gw"
 				;[Block]
-				If PlayerRoom = e\room Then
-					
-                EndIf
-				
 				If e\room\dist < 8
 					If e\EventState = 0 Then
 						e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True)+0.5, EntityZ(e\room\Objects[2],True))
@@ -7826,6 +7824,66 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				;[End Block]
+			Case "room3gw"
+				;[Block]
+				;e\EventState: Determines if the airlock is in operation or not
+				;e\EventState2: The timer for the airlocks
+				;e\EventState3: Checks if the player had left the airlock or not
+				
+				If PlayerRoom = e\room
+					If e\EventState = 0.0
+						If EntityDistance(e\room\Objects[0],Collider)<1.4 And e\EventState3 = 0.0
+							e\EventState = 1.0
+							If e\Sound2 <> 0 Then FreeSound_Strict(e\Sound2) : e\Sound2 = 0
+							e\Sound2 = LoadSound_Strict("SFX\Doors\DoorSparks.ogg")
+							e\SoundCHN2 = PlaySound2(e\Sound2,Camera,e\room\Objects[1],5)
+						ElseIf EntityDistance(e\room\Objects[0],Collider)>2.4
+							e\EventState3 = 0.0
+						EndIf
+					Else
+						If e\EventState2 < 70*7
+							e\EventState2 = e\EventState2 + FPSfactor
+							e\room\RoomDoors[0]\open = False
+							e\room\RoomDoors[1]\open = False
+							If e\EventState2 < 70*1
+								For i = 0 To 3
+									pvt% = CreatePivot()
+									Local d_ent% = e\room\Objects[1]
+									PositionEntity(pvt, EntityX(d_ent%,True), EntityY(d_ent%,True)+Rnd(0.0,0.05), EntityZ(d_ent%,True))
+									RotateEntity(pvt, 0, EntityYaw(d_ent%,True)+90, 0)
+									MoveEntity pvt,0,0,0.15
+									
+									p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 7, 0.002, 0, 25)
+									p\speed = Rnd(0.01,0.05)
+									;RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
+									RotateEntity(p\pvt, Rnd(-45,0), EntityYaw(pvt)+Rnd(-10.0,10.0), 0)
+									
+									p\size = 0.0075
+									ScaleSprite p\obj,p\size,p\size
+									
+									;EntityOrder p\obj,-1
+									
+									p\Achange = -0.05
+									
+									FreeEntity pvt
+								Next
+							EndIf
+						Else
+							e\EventState = 0.0
+							e\EventState2 = 0.0
+							e\EventState3 = 1.0
+							e\room\RoomDoors[0]\open = True
+							e\room\RoomDoors[1]\open = True
+						EndIf
+					EndIf
+					
+					If ChannelPlaying(e\SoundCHN2)
+						UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\Objects[1],5)
+					EndIf
+				Else
+					e\EventState3 = 0.0
+				EndIf
+				;[End Block]
 		End Select
 		
 	Next
@@ -7864,8 +7922,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#F8#4CC#4DC#592#5F1#7BF#9A6#9CD#9DB#9E5#9F2#BDB#BFC#C4B#C99#CA6#CE0#CF7#D17
-;~F#D20#D2A#D39#DCD#DEF#109B#10E1#10F7#1103#1121#1172#1189#1256#1357#13E8#1401#1420#1451#145E#1477
-;~F#150F#16C5#176F#17C3#1874#1924#19DC#19F4#1AB5#1AE2#1AFF#1B26#1B56#1B73#1B98#1BF2#1C32#1C63#1C76#1D2E
-;~F#1D86#1D99#1DAB#1DD0#1DEF
+;~F#11#F8#4CC#4DC#52B#594#5F3#7C1#9A8#9CF#9DD#9E7#9F4#BDD#BFE#C4D#C9B#CA8#CE2#CF9
+;~F#D19#D22#D2C#D3B#DCF#DF1#109D#10E3#10F9#1105#1123#1174#118B#1258#1359#13EA#1403#1422#1453#1460
+;~F#1479#1511#16C7#1771#17C5#1876#1926#19DE#19F6#1AB7#1AE4#1B01#1B28#1B58#1B75#1B9A#1BF4#1C34#1C65#1C78
+;~F#1D30#1D88#1D9B#1DA9#1DCE#1DED
 ;~C#Blitz3D

@@ -560,7 +560,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 ;	EndIf
 	
 	If BumpEnabled Then
-		For i = 2 To CountSurfaces(Opaque)
+		For i = 1 To CountSurfaces(Opaque)
 			surf = GetSurface(Opaque,i)
 			brush = GetSurfaceBrush(surf)
 			tex[0] = GetBrushTexture(brush,1)
@@ -570,17 +570,26 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				mat.Materials=GetCache(temp1s)
 				
 				tex[1] = GetBrushTexture(brush,0)
-				If TextureName(tex[1])<>"" Then
-					BrushTexture brush, tex[0], 0, 2
-					BrushTexture brush, tex[1], 0, 1
+				If tex[1]<>0 Then TextureBlend tex[1],5
+				;If TextureName(tex[1])<>"" Then
+				If TextureName(tex[0])<>"" Then
+					If TextureName(tex[1])<>""
+						BrushTexture brush, tex[0], 0, 2
+						BrushTexture brush, tex[1], 0, 1
+					Else
+						BrushTexture brush, tex[0], 0, 1
+					EndIf
 					BrushTexture brush, AmbientLightRoomTex,0
 					If mat<>Null Then
 						If mat\Bump<>0 Then
-							
-							BrushTexture brush, tex[0], 0, 3
-							BrushTexture brush, tex[1], 0, 2
+							If TextureName(tex[1])<>""
+								BrushTexture brush, tex[0], 0, 3
+								BrushTexture brush, tex[1], 0, 2
+							Else
+								BrushTexture brush, tex[0], 0, 2
+							EndIf
 							BrushTexture brush, mat\Bump, 0, 1
-							
+							BrushTexture brush, AmbientLightRoomTex,0
 						EndIf
 					EndIf
 					
@@ -610,6 +619,11 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 							PaintSurface surf,brush
 						EndIf
 						FreeTexture tex[1] : tex[1]=0
+					Else
+						BrushTexture brush, tex[0], 0, 1
+						BrushTexture brush, AmbientLightRoomTex,0
+						
+						PaintSurface surf,brush
 					EndIf
 				EndIf
 				FreeTexture tex[0] : tex[0]=0
@@ -617,7 +631,6 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 			
 			If brush<>0 Then FreeBrush brush : brush=0
 		Next
-		
 	EndIf
 	
 	Local hiddenMesh%
@@ -2202,6 +2215,9 @@ Function FillRoom(r.Rooms)
 			r\Objects[0] = CreatePivot(r\obj)
 			PositionEntity (r\Objects[0], r\x + 720.0*RoomScale, 120.0*RoomScale, r\z+333.0*RoomScale, True)
 			
+			r\RoomDoors[0]\timer = 70 * 5
+			r\RoomDoors[1]\timer = 70 * 5
+			
 			;[End Block]
 		Case "checkpoint2"
 			;[Block]
@@ -2224,6 +2240,9 @@ Function FillRoom(r.Rooms)
 			PositionEntity (r\Objects[2], r\x + 152.0*RoomScale, 384.0*RoomScale, r\z+380.0*RoomScale, True)
 			RotateEntity (r\Objects[2],0,180,0)
 			EntityFX r\Objects[2],1
+			
+			r\RoomDoors[0]\timer = 70 * 5
+			r\RoomDoors[1]\timer = 70 * 5
 			
 			;[End Block]
 		Case "room2pit"
@@ -4332,14 +4351,27 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 459.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale, 90, r, False, False)
 			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
             PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[1],True), r\z - 606.679 * RoomScale, True)
-			r\RoomDoors[0]\dir = 1 : r\RoomDoors[0]\AutoClose = False	: r\RoomDoors[0]\open = True  : r\RoomDoors[0]\locked = True	
+			r\RoomDoors[0]\dir = 0 : r\RoomDoors[0]\AutoClose = False	: r\RoomDoors[0]\open = True  : r\RoomDoors[0]\locked = True	
 			r\RoomDoors[0]\MTFClose = False
 			
 			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 385.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale, 270, r, False, False)
 			PositionEntity(r\RoomDoors[1]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
             PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
-			r\RoomDoors[1]\dir = 2 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
+			r\RoomDoors[1]\dir = 0 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
 			r\RoomDoors[1]\MTFClose = False
+			FreeEntity r\RoomDoors[1]\obj2 : r\RoomDoors[1]\obj2 = 0
+			
+			r\Objects[0] = CreatePivot()
+			PositionEntity r\Objects[0],r\x-48.0*RoomScale,128.0*RoomScale,r\z+320.0*RoomScale
+			EntityParent r\Objects[0],r\obj
+			
+			r\Objects[1] = CopyEntity(DoorOBJ)
+			ScaleEntity(r\Objects[1], (204.0 * RoomScale) / MeshWidth(r\Objects[1]), 312.0 * RoomScale / MeshHeight(r\Objects[1]), 16.0 * RoomScale / MeshDepth(r\Objects[1]))
+			EntityType r\Objects[1], HIT_MAP
+			PositionEntity r\Objects[1], r\x + 385.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale
+			RotateEntity(r\Objects[1], 0, 270 + 180, 0)
+			EntityParent(r\Objects[1], r\obj)
+			MoveEntity r\Objects[1],120.0,0,5.0
 	        
 	        ;[End Block]
 		Case "room1162"
@@ -6787,7 +6819,7 @@ Function AmbientLightRooms(value%=0)
 	If value=AmbientLightRoomVal Then Return
 	AmbientLightRoomVal = value
 	
-	oldbuffer% = GetBuffer()
+	Local oldbuffer% = GetBuffer()
 	
 	SetBuffer TextureBuffer(AmbientLightRoomTex)
 	
@@ -6797,34 +6829,36 @@ Function AmbientLightRooms(value%=0)
 	
 	SetBuffer oldbuffer
 	
-	For rt.RoomTemplates = Each RoomTemplates
-		If rt\obj <> 0 Then mesh = GetChild(rt\obj,2)
-		DebugLog mesh + " for rtemplate"
-		If mesh<>0 Then
-			For i = 1 To CountSurfaces(mesh)
-				surf = GetSurface(mesh,i)
-				brush = GetSurfaceBrush(surf)
-				tex0 = GetBrushTexture(brush,1)
-				If tex0<>0 Then
-					If Instr(TextureName(tex0),"_lm")<>0 Then
-						BrushTexture brush, AmbientLightRoomTex,0
-						
-						PaintSurface surf,brush
-					EndIf
-					
-					FreeTexture tex0 : tex0=0
-				EndIf
-				If brush<>0 Then FreeBrush brush : brush=0
-			Next
-		EndIf
-	Next
+	;;For rt.RoomTemplates = Each RoomTemplates
+	;For rt.Rooms = Each Rooms
+	;	If rt\obj <> 0 Then mesh = GetChild(rt\obj,2)
+	;	DebugLog mesh + " for rtemplate"
+	;	If mesh<>0 Then
+	;		For i = 1 To CountSurfaces(mesh)
+	;			surf = GetSurface(mesh,i)
+	;			brush = GetSurfaceBrush(surf)
+	;			tex0 = GetBrushTexture(brush,1)
+	;			If tex0<>0 Then
+	;				If Instr(TextureName(tex0),"_lm")<>0 Then
+	;					BrushTexture brush, AmbientLightRoomTex,0
+	;					
+	;					PaintSurface surf,brush
+	;				EndIf
+	;				
+	;				FreeTexture tex0 : tex0=0
+	;			EndIf
+	;			If brush<>0 Then FreeBrush brush : brush=0
+	;		Next
+	;	EndIf
+	;Next
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#33A#34B#35C#384#392#3A2#3A7#3B2#459#563
-;~F#582#5A3#5B4#5BF#5F8#606#62E#660#668#67D#6C1#6CA#71B#75D#77F#7DB#7ED#854#863#88D
-;~F#89E#8B5#8D3#8FA#901#90F#92B#940#95D#97A#987#999#9D2#9FC#A48#A9E#AB1#ACC#B1D#B76
-;~F#B85#BC1#BC9#BD7#BEC#C28#C47#C57#C6F#C97#CAA#CCC#CF4#D46#D72#D99#DA0#DA5#DDC#E03
-;~F#E18#E48#EC6#EE1#F4E#FA0#FCB#101C#1025#10C4#10CB#10DA#10E4#10F9#1103#1114#111B#1145#11C2#11CE
-;~F#120F#121A#122B#1230#123F#1256#12CC#12D5#13B4#13D1#13D8#13DE#13EC#1410#142C#145F#153A#1573#1588#15F9
-;~F#168E#1693#16A3#1974#198B#19AA#19B1#19FE#1A4F#1A69#1A7F
+;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#347#358#369#391#39F#3AF#3B4#3BF#466
+;~F#570#58F#5B0#5C1#5CC#605#613#63B#66D#675#68A#6D7#728#76A#78C#7E8#7FA#861#870#89A
+;~F#8AE#8C8#8E6#90D#914#922#93E#953#970#98D#99A#9AC#9E5#A0F#A5B#AB1#AC4#ADF#B30#B89
+;~F#B98#BD4#BDC#BEA#BFF#C3B#C5A#C6A#C82#CAA#CBD#CDF#D07#D59#D85#DAC#DB3#DB8#DEF#E16
+;~F#E2B#E5B#ED9#EF4#F61#FB3#FDE#102F#1038#10D1#10D7#10DE#10ED#1119#1123#1134#113B#1165#11E2#11EE
+;~F#122F#123A#124B#1250#125F#1276#12EC#12F5#13D4#13F1#13F8#13FE#140C#1430#144C#147F#155A#1593#15A8#1619
+;~F#16AE#16B3#16C3#1994#19AB#19CA#19D1#1A1E#1A6F#1A89
+;~B#1115
 ;~C#Blitz3D

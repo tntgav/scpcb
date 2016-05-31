@@ -1541,7 +1541,7 @@ Function UpdateNPCs()
 												If n\Path[n\PathLocation]\door <> Null Then
 													If n\Path[n\PathLocation]\door\locked Or n\Path[n\PathLocation]\door\KeyCard>0 Or n\Path[n\PathLocation]\door\Code<>"" Then
 														temp = False
-														n\CurrSpeed = 0
+														;n\CurrSpeed = 0
 													Else
 														If n\Path[n\PathLocation]\door\open = False Then UseDoor(n\Path[n\PathLocation]\door, False)
 													EndIf
@@ -1620,7 +1620,7 @@ Function UpdateNPCs()
 												If n\Path[n\PathLocation]\door <> Null Then
 													If n\Path[n\PathLocation]\door\locked Or n\Path[n\PathLocation]\door\KeyCard>0 Or n\Path[n\PathLocation]\door\Code<>"" Then
 														temp = False
-														n\CurrSpeed = 0
+														;n\CurrSpeed = 0
 													Else
 														If n\Path[n\PathLocation]\door\open = False Then UseDoor(n\Path[n\PathLocation]\door, False)
 													EndIf
@@ -1672,6 +1672,10 @@ Function UpdateNPCs()
 								ElseIf (prevFrame < 431 And n\Frame=>431) Or (prevFrame < 447 And n\Frame=>447)
 									PlaySound2(StepSFX(3,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.8,1.0))
 								EndIf
+							EndIf
+							
+							If ChannelPlaying(n\SoundChn2)
+								UpdateSoundOrigin(n\SoundChn2,Camera,n\obj)
 							EndIf
 						Else
 							If PlayerInReachableRoom() ;Player is in a room where SCP-049 can teleport to
@@ -3743,6 +3747,7 @@ Function MeNPCSeesPlayer%(me.NPCs)
 		;True (=1): Player is detected by vision
 		;2: Player is detected by emitting a sound
 		;3: Player is detected by a camera (only for MTF Units!)
+		;4: Player is detected through glass
 	
 	If NoTarget Then Return False
 	
@@ -3990,7 +3995,7 @@ Function UpdateMTFUnit(n.NPCs)
 				
 				If NoTarget Then temp = False
 				
-                If temp Then
+                If temp>False Then
 					If n\LastSeen > 0 And n\LastSeen < 70*15 Then
 						If temp < 2
 							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
@@ -4879,6 +4884,6 @@ Function PlayerInReachableRoom()
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#44#6A#90#9E#CD#DD#E6#F4#103#114#131#15B#16F#18C#1C3#1DB#1FC#21F
-;~F#23C#257#260#351#43C#58B#6C1#756#804#809#837#8D9#914#9A1#A0D#B22#BE8#C98#D4B#E4A
-;~F#E69#E90#EBE#ED1#ED2#F20#FCF#109B#110D#116D#1171#11CB#1243#1254#126F#128D#12CA#12E6
+;~F#23C#260#351#43C#6C5#75A#808#80D#83B#8DD#918#9A5#A11#B26#BEC#C9C#D4F#E4E#E6D#E94
+;~F#E9F#EC3#ED6#ED7#FD4#10A0#1112#1172#1176#11D0#1248#1259#1274#1292#12CF#12EB
 ;~C#Blitz3D

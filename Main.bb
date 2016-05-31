@@ -1199,6 +1199,8 @@ MaskImage NVGImages,255,0,255
 
 Global Wearing1499% = False
 Global AmbientLightRoomTex%, AmbientLightRoomVal%
+
+;Global NVGImage% = CreateImage(GraphicWidth,GraphicHeight),NVGCam%
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1487,7 +1489,7 @@ Function UpdateDoors()
 						Case 1
 							d\openstate = Min(180, d\openstate + FPSfactor * 0.8)
 							MoveEntity(d\obj, Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, -Sin(d\openstate) * FPSfactor / 180.0, 0, 0)	
+							If d\obj2 <> 0 Then MoveEntity(d\obj2, -Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
 						Case 2
 							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen+1) * FPSfactor / 85.0, 0, 0)
@@ -1523,10 +1525,31 @@ Function UpdateDoors()
 							d\openstate = Max(0, d\openstate - FPSfactor*0.8)
 							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 180.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
+							If d\openstate < 15 And d\openstate+FPSfactor => 15
+								For i = 0 To 100
+									Local pvt% = CreatePivot()
+									PositionEntity(pvt, EntityX(d\frameobj,True)+Rnd(-0.2,0.2), EntityY(d\frameobj,True)+(0.025*i), EntityZ(d\frameobj,True)+Rnd(-0.2,0.2))
+									RotateEntity(pvt, 0, Rnd(360), 0)
+									
+									Local p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 2, 0.002, 0, 300)
+									p\speed = 0.005
+									RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
+									
+									p\SizeChange = -0.00001
+									p\size = 0.01
+									ScaleSprite p\obj,p\size,p\size
+									
+									p\Achange = -0.01
+									
+									EntityOrder p\obj,-1
+									
+									FreeEntity pvt
+								Next
+							EndIf
 						Case 2
 							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 85.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 120.0, 0, 0)	
+							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 120.0, 0, 0)
 					End Select
 					
 					If d\angle = 0 Or d\angle=180 Then
@@ -1928,6 +1951,7 @@ Function InitEvents()
 	CreateEvent("dimension1499","dimension1499",0)
 	CreateEvent("room1162","room1162",0)
 	CreateEvent("room2scps2","room2scps2",0)
+	CreateEvent("room3gw","room3gw",0)
 	
 End Function
 
@@ -2933,7 +2957,8 @@ Function MouseLook()
 	
 	If (Not WearingNightVision=0) Then
 		;AmbientLightRooms(60)
-		AmbientLightRooms(255)
+		;AmbientLightRooms(255)
+		AmbientLightRooms(Min(Brightness*2,255))
 		ShowEntity(NVOverlay)
 		If WearingNightVision=2 Then
 			EntityColor(NVOverlay, 0,100,255)
@@ -2943,7 +2968,7 @@ Function MouseLook()
 		EntityTexture(Fog, FogNVTexture)
 	Else
 		;AmbientLightRooms(0)
-		AmbientLightRooms(130)
+		AmbientLightRooms(Brightness)
 		HideEntity(NVOverlay)
 		EntityTexture(Fog, FogTexture)
 	EndIf
@@ -5364,7 +5389,7 @@ Function LoadEntities()
 	TextureLodBias
 	
 	AmbientLightRoomTex% = CreateTexture(2,2,257)
-	TextureBlend AmbientLightRoomTex,2
+	TextureBlend AmbientLightRoomTex,5
 	SetBuffer(TextureBuffer(AmbientLightRoomTex))
 	ClsColor 0,0,0
 	Cls
@@ -5626,6 +5651,22 @@ Function LoadEntities()
 	Cls
 	SetBuffer BackBuffer()
 	
+	For i = 2 To CountSurfaces(Monitor2)
+		sf = GetSurface(Monitor2,i)
+		b = GetSurfaceBrush(sf)
+		If b<>0 Then
+			t1 = GetBrushTexture(b,0)
+			If t1<>0 Then
+				If Lower(StripPath(TextureName(t1))) <> "MonitorTexture.jpg"
+					BrushTexture b, MonitorTextureOff, 0, 0
+					PaintSurface sf,b
+				EndIf
+				FreeTexture t1
+			EndIf
+			FreeBrush b
+		EndIf
+	Next
+	
 	InitItemTemplates()
 	
 	ParticleTextures(0) = LoadTexture_Strict("GFX\smoke.png", 1 + 2)
@@ -5635,6 +5676,7 @@ Function LoadEntities()
 	ParticleTextures(4) = LoadTexture_Strict("GFX\map\sun.jpg", 1 + 2)
 	ParticleTextures(5) = LoadTexture_Strict("GFX\bloodsprite.png", 1 + 2)
 	ParticleTextures(6) = LoadTexture_Strict("GFX\smoke2.png", 1 + 2)
+	ParticleTextures(7) = LoadTexture_Strict("GFX\spark.jpg", 1 + 2)
 	
 	LoadMaterials("DATA\materials.ini")
 	
@@ -6266,6 +6308,25 @@ Function GetStepSound(entity%)
 	Return 0
 End Function
 
+Function UpdateSoundOrigin(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
+	range# = Max(range,1.0)
+	
+	If volume>0 Then
+		
+		Local dist# = EntityDistance(cam, entity) / range#
+		If 1 - dist# > 0 And 1 - dist# < 1 Then
+			
+			Local panvalue# = Sin(-DeltaYaw(cam,entity))
+			
+			ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
+			ChannelPan(Chn, panvalue)
+		EndIf
+	Else
+		If Chn <> 0 Then
+			ChannelVolume (Chn, 0)
+		EndIf 
+	EndIf
+End Function
 ;--------------------------------------- random -------------------------------------------------------
 
 Function f2s$(n#, count%)
@@ -7942,76 +8003,78 @@ Function RenderWorld2()
 		RenderWorld()
 	EndIf
 	
-	If WearingNightVision=2 Then ;show a HUD
-		NVTimer=NVTimer-FPSfactor
-		
-		If NVTimer<=0.0 Then
-			For np.NPCs = Each NPCs
-				np\NVX = EntityX(np\Collider,True)
-				np\NVY = EntityY(np\Collider,True)
-				np\NVZ = EntityZ(np\Collider,True)
-			Next
-			NVTimer = 600.0
-		EndIf
-		
-		Color 255,255,255
-		
-		SetFont Font3
-		
-		Text GraphicWidth/2,20*MenuScale,"REFRESHING DATA IN",True,False
-		
-		Text GraphicWidth/2,60*MenuScale,f2s(NVTimer/60.0,1),True,False
-		Text GraphicWidth/2,100*MenuScale,"SECONDS",True,False
-		
-		temp% = CreatePivot() : temp2% = CreatePivot()
-		PositionEntity temp, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
-		
-		Color 255,255,255;*(NVTimer/600.0)
-		
-		For np.NPCs = Each NPCs
-			If np\NVName<>"" Then ;don't waste your time if the string is empty
-				PositionEntity temp2,np\NVX,np\NVY,np\NVZ
-				dist# = EntityDistance(temp2,Collider)
-				If dist<23.5 Then ;don't draw text if the NPC is too far away
-					PointEntity temp, temp2
-					yawvalue# = WrapAngle(EntityYaw(Camera) - EntityYaw(temp))
-					xvalue# = 0.0
-					If yawvalue > 90 And yawvalue <= 180 Then
-						xvalue# = Sin(90)/90*yawvalue
-					Else If yawvalue > 180 And yawvalue < 270 Then
-						xvalue# = Sin(270)/yawvalue*270
-					Else
-						xvalue = Sin(yawvalue)
-					EndIf
-					pitchvalue# = WrapAngle(EntityPitch(Camera) - EntityPitch(temp))
-					yvalue# = 0.0
-					If pitchvalue > 90 And pitchvalue <= 180 Then
-						yvalue# = Sin(90)/90*pitchvalue
-					Else If pitchvalue > 180 And pitchvalue < 270 Then
-						yvalue# = Sin(270)/pitchvalue*270
-					Else
-						yvalue# = Sin(pitchvalue)
-					EndIf
-					
-					Text GraphicWidth / 2 + xvalue * (GraphicWidth / 2),GraphicHeight / 2 - yvalue * (GraphicHeight / 2),np\NVName,True,True
-					Text GraphicWidth / 2 + xvalue * (GraphicWidth / 2),GraphicHeight / 2 - yvalue * (GraphicHeight / 2) + 30.0 * MenuScale,f2s(dist,1)+" m",True,True
-				EndIf
+	If BlinkTimer < - 16 Or BlinkTimer > - 6
+		If WearingNightVision=2 Then ;show a HUD
+			NVTimer=NVTimer-FPSfactor
+			
+			If NVTimer<=0.0 Then
+				For np.NPCs = Each NPCs
+					np\NVX = EntityX(np\Collider,True)
+					np\NVY = EntityY(np\Collider,True)
+					np\NVZ = EntityZ(np\Collider,True)
+				Next
+				NVTimer = 600.0
 			EndIf
-		Next
-		
-		FreeEntity (temp) : FreeEntity (temp2)
-		
-		Color 255,255,255
-	ElseIf WearingNightVision=1 And hasBattery<>0
-		Color 0,55,0
-		For k=0 To 10
-			Rect 45,GraphicHeight*0.5-(k*20),54,10,True
-		Next
-		Color 0,255,0
-		For l=0 To Ceil(power%*0.01)
-			Rect 45,GraphicHeight*0.5-(l*20),54,10,True
-		Next
-		DrawImage NVGImages,40,GraphicHeight*0.5+30
+			
+			Color 255,255,255
+			
+			SetFont Font3
+			
+			Text GraphicWidth/2,20*MenuScale,"REFRESHING DATA IN",True,False
+			
+			Text GraphicWidth/2,60*MenuScale,f2s(NVTimer/60.0,1),True,False
+			Text GraphicWidth/2,100*MenuScale,"SECONDS",True,False
+			
+			temp% = CreatePivot() : temp2% = CreatePivot()
+			PositionEntity temp, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
+			
+			Color 255,255,255;*(NVTimer/600.0)
+			
+			For np.NPCs = Each NPCs
+				If np\NVName<>"" Then ;don't waste your time if the string is empty
+					PositionEntity temp2,np\NVX,np\NVY,np\NVZ
+					dist# = EntityDistance(temp2,Collider)
+					If dist<23.5 Then ;don't draw text if the NPC is too far away
+						PointEntity temp, temp2
+						yawvalue# = WrapAngle(EntityYaw(Camera) - EntityYaw(temp))
+						xvalue# = 0.0
+						If yawvalue > 90 And yawvalue <= 180 Then
+							xvalue# = Sin(90)/90*yawvalue
+						Else If yawvalue > 180 And yawvalue < 270 Then
+							xvalue# = Sin(270)/yawvalue*270
+						Else
+							xvalue = Sin(yawvalue)
+						EndIf
+						pitchvalue# = WrapAngle(EntityPitch(Camera) - EntityPitch(temp))
+						yvalue# = 0.0
+						If pitchvalue > 90 And pitchvalue <= 180 Then
+							yvalue# = Sin(90)/90*pitchvalue
+						Else If pitchvalue > 180 And pitchvalue < 270 Then
+							yvalue# = Sin(270)/pitchvalue*270
+						Else
+							yvalue# = Sin(pitchvalue)
+						EndIf
+						
+						Text GraphicWidth / 2 + xvalue * (GraphicWidth / 2),GraphicHeight / 2 - yvalue * (GraphicHeight / 2),np\NVName,True,True
+						Text GraphicWidth / 2 + xvalue * (GraphicWidth / 2),GraphicHeight / 2 - yvalue * (GraphicHeight / 2) + 30.0 * MenuScale,f2s(dist,1)+" m",True,True
+					EndIf
+				EndIf
+			Next
+			
+			FreeEntity (temp) : FreeEntity (temp2)
+			
+			Color 255,255,255
+		ElseIf WearingNightVision=1 And hasBattery<>0
+			Color 0,55,0
+			For k=0 To 10
+				Rect 45,GraphicHeight*0.5-(k*20),54,10,True
+			Next
+			Color 0,255,0
+			For l=0 To Ceil(power%*0.01)
+				Rect 45,GraphicHeight*0.5-(l*20),54,10,True
+			Next
+			DrawImage NVGImages,40,GraphicHeight*0.5+30
+		EndIf
 	EndIf
 	
 	;render sprites
@@ -8020,12 +8083,14 @@ Function RenderWorld2()
 	RenderWorld()
 	CameraProjMode ark_blur_cam,0
 	
-	If (WearingNightVision=1) And (hasBattery=1) And ((MilliSecs() Mod 800) < 400) Then
-		Color 255,0,0
-		SetFont Font3
-		
-		Text GraphicWidth/2,20*MenuScale,"WARNING: LOW BATTERY",True,False
-		Color 255,255,255
+	If BlinkTimer < - 16 Or BlinkTimer > - 6
+		If (WearingNightVision=1) And (hasBattery=1) And ((MilliSecs() Mod 800) < 400) Then
+			Color 255,0,0
+			SetFont Font3
+			
+			Text GraphicWidth/2,20*MenuScale,"WARNING: LOW BATTERY",True,False
+			Color 255,255,255
+		EndIf
 	EndIf
 End Function
 
@@ -8079,18 +8144,16 @@ End Function
 
 Function RenderWorldToTexture()
 	
-   ;EntityAlpha ark_blur_image, 1.0
+	;EntityAlpha ark_blur_image, 1.0
 	HideEntity fresize_image
 	old_buffer% = GetBuffer()
 	SetBuffer(TextureBuffer(fresize_texture))
 	RenderWorld()
 	SetBuffer(old_buffer)
-   ;CopyRect ark_sw / 2 - 1024, ark_sh / 2 - 1024, 2048, 2048, 0, 0, BackBuffer(), TextureBuffer(ark_blur_texture)
-   ;CopyRect 0, 0, GraphicWidth, GraphicHeight, 1024.0 - GraphicWidth/2, 1024.0 - GraphicHeight/2, BackBuffer(), TextureBuffer(ark_blur_texture)
+	;CopyRect ark_sw / 2 - 1024, ark_sh / 2 - 1024, 2048, 2048, 0, 0, BackBuffer(), TextureBuffer(ark_blur_texture)
+	;CopyRect 0, 0, GraphicWidth, GraphicHeight, 1024.0 - GraphicWidth/2, 1024.0 - GraphicHeight/2, BackBuffer(), TextureBuffer(ark_blur_texture)
 	
 End Function
-
-
 
 
 Function UpdateScreenGamma()
@@ -8110,8 +8173,8 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#3C5#4DF#4FF#577#584#61B#692#6A9#6B6#6E8#78F#873#12F0#14DF#14EA
-;~F#1615#1698#16C9#17BB#17CD#17E9#17F3#1800#1822#1841#1860#187E#1882#18A4#18AC#18D7#1A79#1B2E#1BFA#1C71
-;~F#1C77#1C81#1C8D#1C98#1C9C#1CD7#1CDF#1CE7#1CEE#1CF5#1D04#1D13#1D31#1D5F#1D66#1D79#1D92#1DBF#1DCA#1DCF
-;~F#1DE9#1DF5#1E10#1E62#1E70#1E78#1E84#1E8D#1EB6#1EBB#1EC0#1EC5#1ECE#1F60#1F6A#1F8F#1F9F#1FAA
+;~F#21#A6#126#12A#131#3C5#4E1#579#632#6A9#6C0#6CD#7A7#88B#1309#14F8#163F#16C2#16F3#17E5
+;~F#17F7#1813#181D#182A#184C#186B#188A#18A6#18BB#18BF#18E1#18E9#1914#1AB6#1B6B#1C37#1CAE#1CB4#1CBE#1CCA
+;~F#1CD5#1CD9#1D14#1D1C#1D24#1D2B#1D32#1D41#1D50#1D6E#1D9C#1DA3#1DB6#1DCF#1DFC#1E07#1E0C#1E26#1E32#1E4D
+;~F#1E9F#1EAD#1EB5#1EC1#1ECA#1EF3#1EF8#1EFD#1F02#1F0B#1FAB#1FDE#1FE9
 ;~C#Blitz3D
