@@ -281,7 +281,7 @@ Function UpdateMainMenu()
 				Case 1
 					PutINIValue(OptionFile, "options", "intro enabled", IntroEnabled%)
 					MainMenuTab = 0
-				Case 3 ;save the options
+				Case 3,5,6,7 ;save the options
 					PutINIValue(OptionFile, "options", "music volume", MusicVolume)
 					PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
 					PutINIValue(OptionFile, "options", "invert mouse y", InvertMouse)
@@ -296,6 +296,8 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
 					PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
 					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
+					PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
+					PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
 					
 					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -305,6 +307,9 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "Sprint key", KEY_SPRINT)
 					PutINIValue(OptionFile, "options", "Inventory key", KEY_INV)
 					PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
+					
+					UserTrackCheck% = 0
+					UserTrackCheck2% = 0
 					
 					AntiAlias Opt_AntiAlias
 					MainMenuTab = 0
@@ -543,6 +548,11 @@ Function UpdateMainMenu()
 				SetFont Font1
 				y = y + 70 * MenuScale
 				
+				If MainMenuTab <> 5
+					UserTrackCheck% = 0
+					UserTrackCheck2% = 0
+				EndIf
+				
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
 					height = 280 * MenuScale
@@ -624,7 +634,7 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
-					height = 90 * MenuScale
+					height = 160 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
@@ -647,6 +657,50 @@ Function UpdateMainMenu()
 					;Else
 					;	PlayTestSound(False)
 					;EndIf
+					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					Text x + 20 * MenuScale, y, "Enable user tracks:"
+					EnableUserTracks = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableUserTracks)
+					
+					If EnableUserTracks
+						y = y + 30 * MenuScale
+						Color 255,255,255
+						Text x + 20 * MenuScale, y, "User track mode:"
+						UserTrackMode = DrawTick(x + 310 * MenuScale, y + MenuScale, UserTrackMode)
+						If UserTrackMode
+							Text x + 20 * MenuScale, y + 20 * MenuScale, "Repeat"
+						Else
+							Text x + 20 * MenuScale, y + 20 * MenuScale, "Random"
+						EndIf
+						If DrawButton(x + 340 * MenuScale, y, 175 * MenuScale, 25 * MenuScale, "Check user tracks",False)
+							DebugLog "User Tracks Check Started"
+							
+							UserTrackCheck% = 0
+							UserTrackCheck2% = 0
+							
+							Dir=ReadDir("SFX\Radio\UserTracks\")
+							Repeat
+								file$=NextFile(Dir)
+								If file$="" Then Exit
+								If FileType("SFX\Radio\UserTracks\"+file$) = 1 Then
+									UserTrackCheck = UserTrackCheck + 1
+									test = LoadSound("SFX\Radio\UserTracks\"+file$)
+									If test<>0
+										UserTrackCheck2 = UserTrackCheck2 + 1
+									EndIf
+									FreeSound test
+								EndIf
+							Forever
+							CloseDir Dir
+							
+							DebugLog "User Tracks Check Ended"
+						EndIf
+						If UserTrackCheck%>0
+							Text x + 180 * MenuScale, y + 30 * MenuScale, "User tracks found ("+UserTrackCheck2+"/"+UserTrackCheck+" successfully loaded)"
+						EndIf
+					EndIf
 					;[End Block]
 				ElseIf MainMenuTab = 6 ;Controls
 					;[Block]
@@ -1351,5 +1405,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31
+;~F#31#22D#2C2#302
 ;~C#Blitz3D

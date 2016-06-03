@@ -1201,6 +1201,12 @@ Global Wearing1499% = False
 Global AmbientLightRoomTex%, AmbientLightRoomVal%
 
 ;Global NVGImage% = CreateImage(GraphicWidth,GraphicHeight),NVGCam%
+
+Global EnableUserTracks% = GetINIInt(OptionFile,"options","enable user tracks")
+Global UserTrackMode% = GetINIInt(OptionFile,"options","user track setting")
+Global UserTrackCheck% = 0, UserTrackCheck2% = 0
+Global UserTrackMusicAmount% = 0, CurrUserTrack%, UserTrackFlag% = 0
+Dim UserTrackName$(256)
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2958,7 +2964,7 @@ Function MouseLook()
 	If (Not WearingNightVision=0) Then
 		;AmbientLightRooms(60)
 		;AmbientLightRooms(255)
-		AmbientLightRooms(Min(Brightness*2,255))
+		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
 		ShowEntity(NVOverlay)
 		If WearingNightVision=2 Then
 			EntityColor(NVOverlay, 0,100,255)
@@ -2968,10 +2974,12 @@ Function MouseLook()
 		EntityTexture(Fog, FogNVTexture)
 	Else
 		;AmbientLightRooms(0)
-		AmbientLightRooms(Brightness)
+		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
 		HideEntity(NVOverlay)
 		EntityTexture(Fog, FogTexture)
 	EndIf
+	
+	If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
 	
 	If Wearing178>0 Then
 		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\178ambient.ogg")
@@ -4376,13 +4384,37 @@ Function DrawGUI()
 					
 					If SelectedItem\state > 0 Then
 						If PlayerRoom\RoomTemplate\Name = "pocketdimension" Or CoffinDistance < 4.0 Then
-							ResumeChannel(RadioCHN(0))
-							If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)	
+							ResumeChannel(RadioCHN(5))
+							If ChannelPlaying(RadioCHN(5)) = False Then RadioCHN(5) = PlaySound_Strict(RadioStatic)	
 						Else
 							Select Int(SelectedItem\state2)
 								Case 0 ;randomkanava
 									ResumeChannel(RadioCHN(0))
-									If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
+									strtemp = "        USER TRACK PLAYER          "
+									If (Not EnableUserTracks) Or UserTrackMusicAmount<1
+										If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
+									Else
+										If (Not ChannelPlaying(RadioCHN(0)))
+											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
+											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
+											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
+											If (Not UserTrackFlag%)
+												If UserTrackMode
+													If RadioState(0)<(UserTrackMusicAmount-1)
+														RadioState(0) = RadioState(0) + 1
+													Else
+														RadioState(0) = 0
+													EndIf
+												Else
+													RadioState(0) = Rand(0,UserTrackMusicAmount-1)
+												EndIf
+												UserTrackFlag = True
+											EndIf
+											DebugLog "CurrTrack: "+RadioState(0)
+										Else
+											UserTrackFlag = False
+										EndIf
+									EndIf
 								Case 1 ;hälytyskanava
 									DebugLog RadioState(1) 
 									
@@ -5591,14 +5623,17 @@ Function LoadEntities()
 	
 	For i = 0 To 1
 		HideEntity BigDoorOBJ(i)
-		If BumpEnabled And 0 Then 
+		;If BumpEnabled And 0 Then
+		If BumpEnabled
 			Local bumptex = LoadTexture_Strict("GFX\map\containmentdoorsbump.jpg")
 			TextureBlend bumptex, FE_BUMP
 			Local tex = LoadTexture_Strict("GFX\map\containment_doors.jpg")	
 			EntityTexture BigDoorOBJ(i), bumptex, 0, 0
 			EntityTexture BigDoorOBJ(i), tex, 0, 1
-			FreeEntity tex
-			FreeEntity bumptex
+			;FreeEntity tex
+			;FreeEntity bumptex
+			FreeTexture tex
+			FreeTexture bumptex
 		EndIf
 	Next
 	
@@ -5666,6 +5701,25 @@ Function LoadEntities()
 			FreeBrush b
 		EndIf
 	Next
+	
+	UserTrackMusicAmount% = 0
+	If EnableUserTracks
+		Dir=ReadDir("SFX\Radio\UserTracks\")
+		Repeat
+			file$=NextFile(Dir)
+			If file$="" Then Exit
+			If FileType("SFX\Radio\UserTracks\"+file$) = 1 Then
+				test = LoadSound("SFX\Radio\UserTracks\"+file$)
+				If test<>0
+					UserTrackName$(UserTrackMusicAmount%) = file$
+					UserTrackMusicAmount% = UserTrackMusicAmount% + 1
+				EndIf
+				FreeSound test
+			EndIf
+		Forever
+		CloseDir Dir
+	EndIf
+	If EnableUserTracks Then DebugLog "User Tracks found: "+UserTrackMusicAmount
 	
 	InitItemTemplates()
 	
@@ -6098,6 +6152,10 @@ Function NullGame()
 	
 	NoTarget% = False
 	Brightness = 40
+	
+	AchievementsMenu = 0
+	QuitMSG = 0
+	OptionsMenu = 0
 	
 	DeInitExt
 	
@@ -8173,8 +8231,9 @@ Function Inverse#(number#)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#3C5#4E1#579#632#6A9#6C0#6CD#7A7#88B#1309#14F8#163F#16C2#16F3#17E5
-;~F#17F7#1813#181D#182A#184C#186B#188A#18A6#18BB#18BF#18E1#18E9#1914#1AB6#1B6B#1C37#1CAE#1CB4#1CBE#1CCA
-;~F#1CD5#1CD9#1D14#1D1C#1D24#1D2B#1D32#1D41#1D50#1D6E#1D9C#1DA3#1DB6#1DCF#1DFC#1E07#1E0C#1E26#1E32#1E4D
-;~F#1E9F#1EAD#1EB5#1EC1#1ECA#1EF3#1EF8#1EFD#1F02#1F0B#1FAB#1FDE#1FE9
+;~F#21#A6#126#12A#131#3C5#4E7#57F#638#6AF#6C6#6D3#7AD#891#1518#1675#16F8#181F#1831#184D
+;~F#1857#1864#1886#18A5#18C4#18E0#18F5#18F9#191B#1923#194E#1AF0#1BA5#1C71#1CE8#1CEE#1CF8#1D04#1D0F#1D13
+;~F#1D4E#1D56#1D5E#1D65#1D6C#1D7B#1D8A#1DA8#1DD6#1DDD#1DF0#1E09#1E36#1E41#1E46#1E60#1E6C#1E87#1ED9#1EE7
+;~F#1EEF#1EFB#1F04#1F2D#1F32#1F37#1F3C#1F45#1FE5#2018#2023
+;~B#1129
 ;~C#Blitz3D
