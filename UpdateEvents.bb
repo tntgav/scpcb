@@ -218,7 +218,7 @@ Function UpdateEvents()
 						If (e\EventState3<9) Then
 							If (Not ChannelPlaying(e\SoundCHN2)) Then
 								e\EventState3 = e\EventState3+1
-								Stop
+								
 								If (e\Sound2 <> 0) Then
 									FreeSound_Strict(e\Sound2)
 									e\Sound2 = 0
