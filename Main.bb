@@ -1118,7 +1118,7 @@ IntroSFX(15) = LoadSound_Strict("SFX\intro\metal173.ogg")
 
 Dim AlarmSFX%(5)
 AlarmSFX(0) = LoadSound_Strict("SFX\alarm.ogg")
-AlarmSFX(1) = LoadSound_Strict("SFX\alarm2.ogg")
+;AlarmSFX(1) = LoadSound_Strict("SFX\alarm2.ogg")
 AlarmSFX(2) = LoadSound_Strict("SFX\alarm3.ogg")
 
 Global HeartBeatSFX = LoadSound_Strict("SFX\heartbeat.ogg")

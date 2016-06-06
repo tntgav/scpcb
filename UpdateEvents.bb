@@ -127,7 +127,6 @@ Function UpdateEvents()
 						If e\EventState2 = 0 Then
 							If e\EventState > 900 And e\room\RoomDoors[5]\open Then
 								If e\EventState - FPSfactor <= 900 Then 
-									e\SoundCHN2 = PlaySound_Strict(AlarmSFX(1))
 									e\room\NPC[1]\Sound = LoadSound_Strict("SFX\intro\173scene1.ogg")
 									e\room\NPC[1]\SoundChn = PlaySound2(e\room\NPC[1]\Sound, Camera, e\room\NPC[1]\Collider)
 								EndIf
@@ -216,6 +215,19 @@ Function UpdateEvents()
 							If Rand(300)=2 Then PlaySound2(DecaySFX(Rand(1,3)),Camera,e\room\Objects[0], 3.0)
 						EndIf
 						
+						If (e\EventState3<9) Then
+							If (Not ChannelPlaying(e\SoundCHN2)) Then
+								e\EventState3 = e\EventState3+1
+								Stop
+								If (e\Sound2 <> 0) Then
+									FreeSound_Strict(e\Sound2)
+									e\Sound2 = 0
+								EndIf
+								
+								e\Sound2 = LoadSound_Strict("SFX\Alarm\Alarm2_"+Int(e\EventState3)+".ogg")
+								e\SoundCHN2 = PlaySound_Strict(e\Sound2)
+							EndIf
+						EndIf
 						
 						If ((e\EventState Mod 600 > 300) And ((e\EventState+FPSfactor) Mod 600 < 300)) Then
 							i = Floor((e\EventState-5000)/600)+1
