@@ -1310,28 +1310,28 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 					EndIf
-				EndIf
-				
-				If e\room\RoomTemplate\Name = "checkpoint2"
-					For e2.Events = Each Events
-						If e2\EventName = "008"
-							If e2\EventState = 2
-								If e\room\RoomDoors[0]\locked
-									MonitorTimer# = 0.0
+					
+					If e\room\RoomTemplate\Name = "checkpoint2"
+						For e2.Events = Each Events
+							If e2\EventName = "008"
+								If e2\EventState = 2
+									If e\room\RoomDoors[0]\locked
+										MonitorTimer# = 0.0
 									;UpdateCheckpointMonitors()
-									TurnCheckpointMonitorsOff()
-									e\room\RoomDoors[0]\locked = False
-									e\room\RoomDoors[1]\locked = False
-								EndIf
-							Else
-								If e\room\dist < 12
-									UpdateCheckpointMonitors()
-									e\room\RoomDoors[0]\locked = True
-									e\room\RoomDoors[1]\locked = True
+										TurnCheckpointMonitorsOff()
+										e\room\RoomDoors[0]\locked = False
+										e\room\RoomDoors[1]\locked = False
+									EndIf
+								Else
+									If e\room\dist < 12
+										UpdateCheckpointMonitors()
+										e\room\RoomDoors[0]\locked = True
+										e\room\RoomDoors[1]\locked = True
+									EndIf
 								EndIf
 							EndIf
-						EndIf
-					Next
+						Next
+					EndIf
 				EndIf
 				;[End Block]
 			Case "coffin", "coffin106"
@@ -7871,13 +7871,14 @@ Function UpdateEvents()
 							e\room\RoomDoors[0]\open = False
 							e\room\RoomDoors[1]\open = False
 							If e\EventState2 < 70*1
-								For i = 0 To 3
-									pvt% = CreatePivot()
-									Local d_ent% = e\room\Objects[1]
-									PositionEntity(pvt, EntityX(d_ent%,True), EntityY(d_ent%,True)+Rnd(0.0,0.05), EntityZ(d_ent%,True))
-									RotateEntity(pvt, 0, EntityYaw(d_ent%,True)+90, 0)
-									MoveEntity pvt,0,0,0.2
-									
+								
+								pvt% = CreatePivot()
+								Local d_ent% = e\room\Objects[1]
+								PositionEntity(pvt, EntityX(d_ent%,True), EntityY(d_ent%,True)+Rnd(0.0,0.05), EntityZ(d_ent%,True))
+								RotateEntity(pvt, 0, EntityYaw(d_ent%,True)+90, 0)
+								MoveEntity pvt,0,0,0.2
+								
+								For i = 0 To 3									
 									p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 7, 0.002, 0, 25)
 									p\speed = Rnd(0.01,0.05)
 									;RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
@@ -7889,27 +7890,27 @@ Function UpdateEvents()
 									;EntityOrder p\obj,-1
 									
 									p\Achange = -0.05
-									
-									FreeEntity pvt
 								Next
+								
+								FreeEntity pvt
+									
 							ElseIf e\EventState2 > 70*3 And e\EventState < 70*5.5
+								pvt% = CreatePivot(e\room\obj)								
 								For i = 0 To 1
-									pvt% = CreatePivot()
 									If i = 0
-										PositionEntity pvt%,e\room\x-288.0*RoomScale,416.0*RoomScale,e\room\z+320.0*RoomScale
+										PositionEntity pvt%,-288.0,416.0,320.0,False
 									Else
-										PositionEntity pvt%,e\room\x+192.0*RoomScale,416.0*RoomScale,e\room\z+320.0*RoomScale
+										PositionEntity pvt%,192.0,416.0,320.0,False
 									EndIf
-									EntityParent pvt%,e\room\obj
 									
 									p.Particles = CreateParticle(EntityX(pvt,True), EntityY(pvt,True), EntityZ(pvt,True),  6, 0.8, 0, 50)
 									p\speed = 0.025
 									RotateEntity(p\pvt, 90, 0, 0)
 									
 									p\Achange = -0.02
-									
-									FreeEntity pvt
 								Next
+								
+								FreeEntity pvt
 								If e\SoundCHN = 0 Then e\SoundCHN = PlaySound2(e\Sound,Camera,e\room\Objects[0],5)
 							EndIf
 						Else

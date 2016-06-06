@@ -8,20 +8,19 @@ Const HIT_PLAYER%=2
 Collisions HIT_PLAYER,HIT_MAP,2,2
 
 Function StripPath$(file$) 
-	
+	Local name$=""
 	If Len(file$)>0 
-		
 		For i=Len(file$) To 1 Step -1 
 			
 			mi$=Mid$(file$,i,1) 
-			If mi$="\" Or mi$="/" Then Return name$ Else name$=mi$+name$ 
+			If mi$="\" Or mi$="/" Then Return name$
 			
+			name$=mi$+name$ 
 		Next 
 		
 	EndIf 
 	
 	Return name$ 
-	
 End Function 
 
 Function StripFilename$(file$)

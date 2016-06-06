@@ -528,37 +528,6 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		
 	Next
 	
-;	If BumpEnabled Then
-;		For i = 2 To CountSurfaces(Opaque)
-;			surf = GetSurface(Opaque,i)
-;			brush = GetSurfaceBrush(surf)
-;			tex[0] = GetBrushTexture(brush,1)
-;			temp1s$ =  StripPath(TextureName(tex[0]))
-;			
-;			If temp1s$<>0 Then 
-;				mat.Materials=GetCache(temp1s)
-;				If mat<>Null Then
-;					If mat\Bump<>0 Then
-;						tex[1] = GetBrushTexture(brush,0)
-;						
-;						BrushTexture brush, tex[1], 0, 1
-;						BrushTexture brush, mat\Bump, 0, 0
-;						BrushTexture brush, tex[0], 0, 2
-;						
-;						PaintSurface surf,brush
-;						
-;						If tex[1]<>0 Then FreeTexture tex[1] : tex[1]=0
-;					EndIf
-;				EndIf
-;				
-;				If tex[0]<>0 Then FreeTexture tex[0] : tex[0]=0
-;			EndIf
-;			
-;			If brush<>0 Then FreeBrush brush : brush=0
-;		Next
-;		
-;	EndIf
-	
 	If BumpEnabled Then
 		For i = 1 To CountSurfaces(Opaque)
 			surf = GetSurface(Opaque,i)
@@ -566,12 +535,14 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 			tex[0] = GetBrushTexture(brush,1)
 			temp1s$ =  StripPath(TextureName(tex[0]))
 			
+			DebugLog(temp1s)
+			
 			If temp1s$<>"" Then 
 				mat.Materials=GetCache(temp1s)
 				
 				tex[1] = GetBrushTexture(brush,0)
 				If tex[1]<>0 Then TextureBlend tex[1],5
-				;If TextureName(tex[1])<>"" Then
+				
 				If TextureName(tex[0])<>"" Then
 					If TextureName(tex[1])<>""
 						BrushTexture brush, tex[0], 0, 2
@@ -596,9 +567,9 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 					PaintSurface surf,brush
 				EndIf
 				
+				If tex[0]<>0 Then FreeTexture tex[0] : tex[0]=0
 				If tex[1]<>0 Then FreeTexture tex[1] : tex[1]=0
 			EndIf
-			If tex[0]<>0 Then FreeTexture tex[0] : tex[0]=0
 			If brush<>0 Then FreeBrush brush : brush=0
 		Next
 	Else
@@ -617,16 +588,17 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 							BrushTexture brush, AmbientLightRoomTex,0
 							
 							PaintSurface surf,brush
+							FreeTexture tex[1] : tex[1]=0							
 						EndIf
-						FreeTexture tex[1] : tex[1]=0
+						
 					Else
 						BrushTexture brush, tex[0], 0, 1
 						BrushTexture brush, AmbientLightRoomTex,0
 						
 						PaintSurface surf,brush
 					EndIf
+					FreeTexture tex[0] : tex[0]=0					
 				EndIf
-				FreeTexture tex[0] : tex[0]=0
 			EndIf
 			
 			If brush<>0 Then FreeBrush brush : brush=0
@@ -838,21 +810,20 @@ End Function
 ;-----------;;;;
 
 Function StripPath$(file$) 
-	
+	Local name$=""
 	If Len(file$)>0 
-		
 		For i=Len(file$) To 1 Step -1 
 			
 			mi$=Mid$(file$,i,1) 
-			If mi$="\" Or mi$="/" Then Return name$ Else name$=mi$+name$ 
+			If mi$="\" Or mi$="/" Then Return name$
 			
+			name$=mi$+name$ 
 		Next 
 		
 	EndIf 
 	
 	Return name$ 
-	
-End Function 
+End Function
 
 Function Piece$(s$,entry,char$=" ")
 	While Instr(s,char+char)
@@ -6774,7 +6745,8 @@ Function UpdateCheckpointMonitors()
 		If b<>0 Then
 			t1 = GetBrushTexture(b,0)
 			If t1<>0 Then
-				If Lower(StripPath(TextureName(t1))) <> "MonitorTexture.jpg"
+				name$ = StripPath(TextureName(t1))
+				If Lower(name) <> "monitortexture.jpg"
 					If MonitorTimer# < 50
 						BrushTexture b, MonitorTexture2, 0, 0
 					Else
@@ -6782,7 +6754,7 @@ Function UpdateCheckpointMonitors()
 					EndIf
 					PaintSurface sf,b
 				EndIf
-				FreeTexture t1
+				If name<>"" Then FreeTexture t1
 			EndIf
 			FreeBrush b
 		EndIf
@@ -6800,11 +6772,12 @@ Function TurnCheckpointMonitorsOff()
 		If b<>0 Then
 			t1 = GetBrushTexture(b,0)
 			If t1<>0 Then
-				If Lower(StripPath(TextureName(t1))) <> "MonitorTexture.jpg"
+				name$ = StripPath(TextureName(t1))
+				If Lower(name) <> "monitortexture.jpg"
 					BrushTexture b, MonitorTextureOff, 0, 0
 					PaintSurface sf,b
 				EndIf
-				FreeTexture t1
+				If name<>"" Then FreeTexture t1
 			EndIf
 			FreeBrush b
 		EndIf

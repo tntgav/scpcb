@@ -5561,9 +5561,6 @@ Function LoadEntities()
 					BrushTexture b, bump1, 0, 0
 					BrushTexture b, t1, 0, 1
 					PaintSurface sf,b
-					
-					If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
-					FreeBrush b	
 			End Select
 			FreeBrush b
 			FreeTexture t1
@@ -5625,11 +5622,13 @@ Function LoadEntities()
 		HideEntity BigDoorOBJ(i)
 		;If BumpEnabled And 0 Then
 		If BumpEnabled
+			
 			Local bumptex = LoadTexture_Strict("GFX\map\containmentdoorsbump.jpg")
 			TextureBlend bumptex, FE_BUMP
 			Local tex = LoadTexture_Strict("GFX\map\containment_doors.jpg")	
 			EntityTexture BigDoorOBJ(i), bumptex, 0, 0
 			EntityTexture BigDoorOBJ(i), tex, 0, 1
+			
 			;FreeEntity tex
 			;FreeEntity bumptex
 			FreeTexture tex
@@ -5692,11 +5691,12 @@ Function LoadEntities()
 		If b<>0 Then
 			t1 = GetBrushTexture(b,0)
 			If t1<>0 Then
-				If Lower(StripPath(TextureName(t1))) <> "MonitorTexture.jpg"
+				name$ = StripPath(TextureName(t1))
+				If Lower(name) <> "monitortexture.jpg"
 					BrushTexture b, MonitorTextureOff, 0, 0
 					PaintSurface sf,b
 				EndIf
-				FreeTexture t1
+				If name<>"" Then FreeTexture t1
 			EndIf
 			FreeBrush b
 		EndIf
