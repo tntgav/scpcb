@@ -7657,8 +7657,8 @@ Function UpdateEvents()
 					If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\s_gasmask_amb.ogg")
 					ShouldPlay = 18
 					CameraFogRange Camera,40,80
-					CameraFogColor Camera,100,100,100
-					CameraClsColor Camera,100,100,100
+					CameraFogColor Camera,96,97,104
+					CameraClsColor Camera,96,97,104
 					CameraRange Camera,0.01,90
 					
 					For r.Rooms = Each Rooms
