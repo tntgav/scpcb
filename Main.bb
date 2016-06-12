@@ -543,7 +543,8 @@ Function UpdateConsole()
 					
 					For r.Rooms = Each Rooms
 						If r\RoomTemplate\Name = StrTemp Then
-							PositionEntity (Collider, EntityX(r\obj), 0.7, EntityZ(r\obj))
+							;PositionEntity (Collider, EntityX(r\obj), 0.7, EntityZ(r\obj))
+							PositionEntity (Collider, EntityX(r\obj), EntityY(r\obj)+0.7, EntityZ(r\obj))
 							ResetEntity(Collider)
 							UpdateDoors()
 							UpdateRooms()
@@ -775,28 +776,7 @@ Function UpdateConsole()
 					CreateConsoleMsg("Brightness set to " + Brightness)
 				Case "spawn"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					Select StrTemp 
-						Case "mtf"
-							n.NPCs = CreateNPC(NPCtypeMTF, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-						Case "173","scp173","scp-173"
-							n.NPCs = CreateNPC(NPCtype173, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-						Case "106","scp106","scp-106","larry"
-							n.NPCs = CreateNPC(NPCtypeOldMan, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))	
-						Case "guard"
-							n.NPCs = CreateNPC(NPCtypeGuard, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))		
-						Case "096","scp096","scp-096"
-							n.NPCs = CreateNPC(NPCtype096, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))			
-						Case "049","scp049","scp-049"
-							n.NPCs = CreateNPC(NPCtype049, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))		
-							n\state = 2
-						Case "zombie","scp-049-2"
-							n.NPCs = CreateNPC(NPCtypeZombie, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))			
-							n\state = 1
-						Case "966", "scp966", "scp-966"
-							n.NPCs = CreateNPC(NPCtype966, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-						Default 
-							CreateConsoleMsg("NPC type not found")
-					End Select
+					Console_SpawnNPC(StrTemp$)
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
 				Case "infinitestamina"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -875,6 +855,7 @@ Function UpdateConsole()
 					StrTemp2$ = Piece$(args$,2," ")
 					StrTemp3$ = Piece$(args$,3," ")
 					PositionEntity Collider,StrTemp$,StrTemp2$,StrTemp3$
+					PositionEntity Camera,StrTemp$,StrTemp2$,StrTemp3$
 					CreateConsoleMsg("Teleported to coordinates (X|Y|Z): "+EntityX(Collider)+"|"+EntityY(Collider)+"|"+EntityZ(Collider))
 				Case "notarget"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -894,6 +875,24 @@ Function UpdateConsole()
 								CreateConsoleMsg("NOTARGET ON")	
 							EndIf
 					End Select
+				Case "spawnradio"
+					it.Items = CreateItem("Radio Transceiver", "fineradio", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
+					EntityType(it\obj, HIT_ITEM)
+					it\state = 101
+				Case "spawnnvg"
+					it.Items = CreateItem("Night Vision Goggles", "nvgoggles", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
+					EntityType(it\obj, HIT_ITEM)
+					it\state = 1000
+				Case "teleportguard"
+					For n.NPCs = Each NPCs
+						If n\NPCtype = NPCtypeGuard
+							If n\State < 1 Or n\State > 10
+								PositionEntity n\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
+								ResetEntity n\Collider
+								Exit
+							EndIf
+						EndIf
+					Next
 				Default
 					CreateConsoleMsg("Command not found")
 			End Select
@@ -1005,8 +1004,10 @@ For i = 0 To 2
 	OpenDoorSFX(2,i) = LoadSound_Strict("SFX\Doors\Door2Open" + (i + 1) + ".ogg")
 	CloseDoorSFX(2,i) = LoadSound_Strict("SFX\Doors\Door2Close" + (i + 1) + ".ogg")
 Next
-OpenDoorSFX(1,0) = LoadSound_Strict("SFX\Doors\BigDoorOpen.ogg")
-CloseDoorSFX(1,0) = LoadSound_Strict("SFX\Doors\BigDoorClose.ogg")
+For i = 0 To 1
+	OpenDoorSFX(1,i) = LoadSound_Strict("SFX\Doors\BigDoorOpen" + (i + 1) + ".ogg")
+	CloseDoorSFX(1,i) = LoadSound_Strict("SFX\Doors\BigDoorClose" + (i + 1) + ".ogg")
+Next
 
 Global KeyCardSFX1 = LoadSound_Strict("SFX\Doors\KeyCardUse1.ogg"), KeyCardSFX2 = LoadSound_Strict("SFX\Doors\KeyCardUse2.ogg")
 
@@ -1154,8 +1155,8 @@ Global MachineSFX% = LoadSound_Strict("SFX\Machine.ogg")
 Global ApacheSFX = LoadSound_Strict("SFX\apache.ogg")
 
 Global CurrStepSFX
-Dim StepSFX%(4, 2, 4) ;(normal/metal, walk/run, id)
-For i = 0 To 3
+Dim StepSFX%(4, 2, 8) ;(normal/metal, walk/run, id)
+For i = 0 To 7
 	StepSFX(0, 0, i) = LoadSound_Strict("SFX\step" + (i + 1) + ".ogg")
 	StepSFX(1, 0, i) = LoadSound_Strict("SFX\stepmetal" + (i + 1) + ".ogg")
 	StepSFX(0, 1, i)= LoadSound_Strict("SFX\run" + (i + 1) + ".ogg")
@@ -1236,6 +1237,7 @@ Global NTF_1499X#
 Global NTF_1499Y#
 Global NTF_1499Z#
 Global PrevPlayerRoom$
+Global NTF_1499Sky%
 
 Global OptionsMenu% = 0
 Global QuitMSG% = 0
@@ -1510,7 +1512,7 @@ Function UpdateDoors()
 						If d\timerstate + FPSfactor > 110 And d\timerstate <= 110 Then PlaySound2(CautionSFX, Camera, d\obj)
 						;If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(Min(d\dir,1),Rand(0, 2)), Camera, d\obj)
 						Local sound%
-						If d\dir = 1 Then sound% = 0 Else sound% = Rand(0, 2)
+						If d\dir = 1 Then sound% = Rand(0, 1) Else sound% = Rand(0, 2)
 						If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
 					EndIf
 					If d\AutoClose And RemoteDoorOn = True Then
@@ -1696,7 +1698,8 @@ Function UseDoor(d.Doors, showmsg%=True)
 	If d\LinkedDoor <> Null Then d\LinkedDoor\open = (Not d\LinkedDoor\open)
 	
 	Local sound = 0
-	If d\dir = 1 Then sound = 0 Else sound=Rand(0, 2)
+	;If d\dir = 1 Then sound = 0 Else sound=Rand(0, 2)
+	If d\dir = 1 Then sound=Rand(0, 1) Else sound=Rand(0, 2)
 	
 	If d\open Then
 		If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer
@@ -2653,11 +2656,11 @@ Function MovePlayer()
 					
 					If Sprint = 1.0 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
-						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 3)))
+						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 7)))
 						ChannelVolume tempchn, 1.0-(Crouch*0.6)
 					Else
 						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
-						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 3)))
+						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 7)))
 						ChannelVolume tempchn, 1.0-(Crouch*0.6)
 					End If
 				ElseIf CurrStepSFX=1
@@ -2666,6 +2669,16 @@ Function MovePlayer()
 				ElseIf CurrStepSFX=2
 					tempchn% = PlaySound_Strict(Step2SFX(Rand(3,5)))
 					ChannelVolume tempchn, 1.0-(Crouch*0.4)
+				ElseIf CurrStepSFX=3
+					If Sprint = 1.0 Then
+						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
+						tempchn% = PlaySound_Strict(StepSFX(0, 0, Rand(0, 7)))
+						ChannelVolume tempchn, 1.0-(Crouch*0.6)
+					Else
+						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
+						tempchn% = PlaySound_Strict(StepSFX(0, 1, Rand(0, 7)))
+						ChannelVolume tempchn, 1.0-(Crouch*0.6)
+					End If
 				EndIf
 				
 			EndIf	
@@ -2742,11 +2755,13 @@ Function MovePlayer()
 		If CollidedFloor = True Then
 			If DropSpeed# < - 0.07 Then 
 				If CurrStepSFX=0 Then
-					PlaySound_Strict(StepSFX(GetStepSound(Collider), 0, Rand(0, 3)))					
+					PlaySound_Strict(StepSFX(GetStepSound(Collider), 0, Rand(0, 7)))					
 				ElseIf CurrStepSFX=1
 					PlaySound_Strict(Step2SFX(Rand(0, 2)))
 				ElseIf CurrStepSFX=2
 					PlaySound_Strict(Step2SFX(Rand(3, 5)))
+				ElseIf CurrStepSFX=3
+					PlaySound_Strict(StepSFX(0, 0, Rand(0, 7)))
 				EndIf
 				PlayerSoundVolume = Max(3.0,PlayerSoundVolume)
 			EndIf
@@ -6149,6 +6164,7 @@ Function NullGame()
 	NTF_1499Z# = 0.0
 	PrevPlayerRoom$ = ""
 	Wearing1499% = False
+	DeleteChunks()
 	
 	NoTarget% = False
 	Brightness = 40
@@ -8230,10 +8246,21 @@ Function Inverse#(number#)
 	Return Float(1.0-number#)
 	
 End Function
+
+Function Rnd_Array(numb1#,numb2#,Array1#,Array2#)
+	Local whatarray% = Rand(1,2)
+	
+	If whatarray% = 1
+		Return Rnd(numb1#,Array1#)
+	Else
+		Return Rnd(Array2#,numb2#)
+	EndIf
+	
+End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#3C5#4E7#57F#638#6AF#6C6#6D3#7AD#891#1518#1675#16F8#181F#1831#184D
-;~F#1857#1864#1886#18A5#18C4#18E0#18F5#18F9#191B#1923#194E#1AF0#1BA5#1C71#1CE8#1CEE#1CF8#1D04#1D0F#1D13
-;~F#1D4E#1D56#1D5E#1D65#1D6C#1D7B#1D8A#1DA8#1DD6#1DDD#1DF0#1E09#1E36#1E41#1E46#1E60#1E6C#1E87#1ED9#1EE7
-;~F#1EEF#1EFB#1F04#1F2D#1F32#1F37#1F3C#1F45#1FE5#2018#2023
-;~B#1129
+;~F#21#A6#126#12A#3C4#4E9#509#581#58E#63A#6B2#6C9#6D6#708#7B0#894#1527#1684#1707#182F
+;~F#1841#185D#1867#1874#1896#18B5#18D4#18F0#1905#1909#192B#1933#195E#1B00#1BB5#1C81#1CF8#1CFE#1D08#1D14
+;~F#1D1F#1D23#1D5E#1D66#1D6E#1D75#1D7C#1D8B#1D9A#1DB8#1DE6#1DED#1E00#1E19#1E46#1E51#1E56#1E70#1E7C#1E97
+;~F#1EE9#1EF7#1EFF#1F0B#1F14#1F3D#1F42#1F47#1F4C#1F55#1FF5#2028#2033
+;~B#1138
 ;~C#Blitz3D

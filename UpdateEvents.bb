@@ -1,6 +1,6 @@
 
 Function UpdateEvents()
-	Local dist#, i%, temp%, pvt%, strtemp$
+	Local dist#, i%, temp%, pvt%, strtemp$, j%, k%
 	
 	Local p.Particles, n.NPCs, r.Rooms, e.Events, e2.Events, it.Items, em.Emitters
 	
@@ -7082,8 +7082,7 @@ Function UpdateEvents()
 							;LoadEventSound(e,"SFX\SuicideGuard2.ogg",1)
 							e\room\NPC[0]\Sound = LoadSound_Strict("SFX\SuicideGuard2.ogg")
 							e\SoundCHN2 = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 15.0)
-							RemoveEvent(e)
-							
+							If (Not ChannelPlaying(e\SoundCHN2)) Then RemoveEvent(e)
 						EndIf						
 					EndIf
 				EndIf
@@ -7619,9 +7618,42 @@ Function UpdateEvents()
 			Case "dimension1499"
 				;[Block]
 				;e\EventState: If player entered dimension (will be resetted after the player leaves it)
-					;0: The player hasn't (no 1499-1 instances spawned)
-					;1: The player is in dimension
+					;0: The player never entered SCP-1499
+					;1: The player had already entered the dimension at least once
+					;2: The player is in dimension
 				If PlayerRoom = e\room Then
+					If e\EventState < 2.0
+						;For i = 0 To 99
+						;	n.NPCs = CreateNPC(NPCtype1499,EntityX(e\room\obj)+Rnd(-40.0,40.0),EntityY(e\room\obj)+0.2,EntityZ(e\room\obj)+Rnd(-40.0,40.0))
+						;Next
+						
+						;1499 random generator
+						;[Block]
+						If e\EventState = 0.0
+							e\room\Objects[0] = CreatePlane()
+							Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
+							EntityTexture e\room\Objects[0],planetex%
+							FreeTexture planetex%
+							PositionEntity e\room\Objects[0],0,EntityY(e\room\obj),0
+							EntityType e\room\Objects[0],HIT_MAP
+							;EntityParent e\room\Objects[0],e\room\obj
+							NTF_1499Sky = sky_CreateSky("GFX\map\sky\1499sky")
+							;Generating chunk parts for 1499 (using e\room\Objects[i])
+							For i = 1 To 15
+								e\room\Objects[i] = LoadMesh_Strict("GFX\map\dimension1499\1499object"+(i)+".b3d")
+								HideEntity e\room\Objects[i]
+							Next
+							CreateChunkParts(e\room)
+							x# = EntityX(e\room\obj)
+							z# = EntityZ(e\room\obj)
+							Local ch.Chunk
+							For i = -2 To 2 Step 2
+								ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
+							Next
+						EndIf
+						;[End Block]
+						e\EventState = 2.0
+					EndIf
 					If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\s_gasmask_amb.ogg")
 					ShouldPlay = 18
 					CameraFogRange Camera,40,80
@@ -7633,23 +7665,20 @@ Function UpdateEvents()
 						HideEntity r\obj
 					Next
 					ShowEntity e\room\obj
-					;ShowEntity NTF_1499Sky
-					;Update1499Sky()
-					If e\EventState = 0.0
-						;For i = 0 To 99
-						;	n.NPCs = CreateNPC(NPCtype1499,EntityX(e\room\obj)+Rnd(-40.0,40.0),EntityY(e\room\obj)+0.2,EntityZ(e\room\obj)+Rnd(-40.0,40.0))
-						;Next
-						e\EventState = 1.0
-					EndIf
+					ShowEntity NTF_1499Sky
+					Update1499Sky()
+					UpdateChunks(e\room,15)
+					CurrStepSFX=3
 				Else
-					;HideEntity NTF_1499Sky
-					If e\EventState = 1.0
+					If e\EventState = 2.0
+						HideEntity NTF_1499Sky
+						HideChunks()
 						For n.NPCs = Each NPCs
 							;If n\NPCtype = NPCtype1499
 							;	RemoveNPC(n)
 							;EndIf
 						Next
-						e\EventState = 0.0
+						e\EventState = 1.0
 					EndIf
 				EndIf
 				;[End Block]
@@ -7986,8 +8015,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#311#4DA#4EA#539#5A2#601#7CF#9B6#9DD#9EB#9F5#A02#BEB#C0C#C5B#CA9#CB6#CF0#D07
-;~F#D27#D30#D3A#D49#DDD#DFF#10AB#10F1#1107#1113#1131#1182#1199#1266#1367#13F8#1411#1430#1461#146E
-;~F#1487#151F#16D5#177F#17D3#1884#1934#19EC#1A04#1AC5#1AF2#1B0F#1B36#1B66#1B83#1BA8#1C02#1C42#1C73#1C86
-;~F#1D3E#1D96#1DA9#1DB7#1DDC#1DFB
+;~F#11#104#4E6#4F6#545#5AE#60D#7DB#9C2#9E9#9F7#A01#A0E#BF7#C18#C67#CB5#CC2#CFC#D13
+;~F#D33#D3C#D46#D55#DE9#E0B#10B7#10FD#1113#111F#113D#118E#11A5#1272#1373#1404#141D#143C#146D#147A
+;~F#1493#152B#16E1#178B#17DF#1890#1940#19F8#1A10#1AD1#1AFE#1B1B#1B42#1B72#1B8F#1BB3#1C0D#1C4D#1C7E#1C91
+;~F#1D49#1DA1#1DB4#1E05#1E24#1ECA
 ;~C#Blitz3D

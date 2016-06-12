@@ -149,11 +149,13 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;EntityRadius Collider, 0.15, 0.30
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = CopyEntity(GuardObj) ;LoadAnimMesh_Strict("GFX\npcs\mtf.b3d")
-			MeshCullBox (n\obj, -MeshWidth(GuardObj), -MeshHeight(GuardObj), -MeshDepth(GuardObj), MeshWidth(GuardObj)*2, MeshHeight(GuardObj)*2, MeshDepth(GuardObj)*2)
+			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "Guard", "speed") / 100.0)
-			temp# = (GetINIFloat("DATA\NPCs.ini", "MTF", "scale") / 2.5)
+			temp# = (GetINIFloat("DATA\NPCs.ini", "Guard", "scale") / 2.5)
 			
 			ScaleEntity n\obj, temp, temp, temp
+			
+			MeshCullBox (n\obj, -MeshWidth(GuardObj), -MeshHeight(GuardObj), -MeshDepth(GuardObj), MeshWidth(GuardObj)*2, MeshHeight(GuardObj)*2, MeshDepth(GuardObj)*2)
 			;[End Block]
 		Case NPCtypeMTF
 			;[Block]
@@ -164,13 +166,14 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider, HIT_PLAYER
 			;EntityPickMode n\Collider, 1
 			n\obj = CopyEntity(MTFObj) ;LoadAnimMesh_Strict("GFX\npcs\mtf.b3d")
-			MeshCullBox (n\obj, -MeshWidth(MTFObj), -MeshHeight(MTFObj), -MeshDepth(MTFObj), MeshWidth(MTFObj)*2, MeshHeight(MTFObj)*2, MeshDepth(MTFObj)*2) 
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "MTF", "speed") / 100.0)
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "MTF", "scale") / 2.5)
 			
 			ScaleEntity n\obj, temp, temp, temp
+			
+			MeshCullBox (n\obj, -MeshWidth(MTFObj), -MeshHeight(MTFObj), -MeshDepth(MTFObj), MeshWidth(MTFObj)*2, MeshHeight(MTFObj)*2, MeshDepth(MTFObj)*2) 
 			
 			If MTFSFX(0)=0 Then
 				MTFSFX(0)=LoadSound_Strict("SFX\MTF\ClassD1.ogg")
@@ -211,12 +214,12 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			n\obj = CopyEntity(ClassDObj)
 			
-			MeshCullBox (n\obj, -MeshWidth(ClassDObj), -MeshHeight(ClassDObj), -MeshDepth(ClassDObj), MeshWidth(ClassDObj)*2, MeshHeight(ClassDObj)*2, MeshDepth(ClassDObj)*2)
-			
 			temp# = 0.5 / MeshWidth(n\obj)
 			ScaleEntity n\obj, temp, temp, temp
 			
 			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(ClassDObj), -MeshHeight(ClassDObj), -MeshDepth(ClassDObj), MeshWidth(ClassDObj)*2, MeshHeight(ClassDObj)*2, MeshDepth(ClassDObj)*2)
 			;[End Block]
 		Case NPCtype372
 			;[Block]
@@ -249,12 +252,12 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\scp096.b3d")
 			
-			MeshCullBox (n\obj, -MeshWidth(n\obj)*2, -MeshHeight(n\obj)*2, -MeshDepth(n\obj)*2, MeshWidth(n\obj)*2, MeshHeight(n\obj)*4, MeshDepth(n\obj)*4)
-			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-096", "speed") / 100.0)
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-096", "scale") / 3.0)
 			ScaleEntity n\obj, temp, temp, temp	
+			
+			MeshCullBox (n\obj, -MeshWidth(n\obj)*2, -MeshHeight(n\obj)*2, -MeshDepth(n\obj)*2, MeshWidth(n\obj)*2, MeshHeight(n\obj)*4, MeshDepth(n\obj)*4)
 			;[End Block]
 		Case NPCtype049
 			;[Block]
@@ -290,10 +293,10 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			If n\obj = 0 Then 
 				n\obj = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
 				
-				MeshCullBox (n\obj, -MeshWidth(n\obj), -MeshHeight(n\obj), -MeshDepth(n\obj), MeshWidth(n\obj)*2, MeshHeight(n\obj)*2, MeshDepth(n\obj)*2)
-				
 				temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-049-2", "scale") / 2.5)
 				ScaleEntity n\obj, temp, temp, temp
+				
+				MeshCullBox (n\obj, -MeshWidth(n\obj), -MeshHeight(n\obj), -MeshDepth(n\obj), MeshWidth(n\obj)*2, MeshHeight(n\obj)*2, MeshDepth(n\obj)*2)
 			EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-049-2", "speed") / 100.0)
@@ -386,12 +389,12 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityBlend(n\obj2, BLEND_ADD)
 			SpriteViewMode(n\obj2, 2)
 			
-			MeshCullBox (n\obj, -MeshWidth(n\obj)*2, -MeshHeight(n\obj)*2, -MeshDepth(n\obj)*2, MeshWidth(n\obj)*2, MeshHeight(n\obj)*4, MeshDepth(n\obj)*4)
-			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "forestmonster", "speed") / 100.0)
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "forestmonster", "scale") / 20.0)
 			ScaleEntity n\obj, temp, temp, temp	
+			
+			MeshCullBox (n\obj, -MeshWidth(n\obj)*2, -MeshHeight(n\obj)*2, -MeshDepth(n\obj)*2, MeshWidth(n\obj)*2, MeshHeight(n\obj)*4, MeshDepth(n\obj)*4)
 			;[End Block]
 		Case NPCtype939
 			;[Block]
@@ -4829,11 +4832,14 @@ Function ManipulateNPCBones()
 					PointEntity pvt%,Camera
 					n\BonePitch# = CurveAngle(EntityYaw(pvt%),n\BonePitch#,10.0)
 					n\BoneYaw# = CurveAngle(EntityPitch(pvt%)-20,n\BoneYaw#,10.0)
-					n\BonePitch# = Max(Min(n\BonePitch#,WrapAngle(EntityYaw(n\obj)+90)),WrapAngle(EntityYaw(n\obj)-90))
+					n\BonePitch# = Max(Min(n\BonePitch#,WrapAngle(EntityYaw(n\obj)+85)),WrapAngle(EntityYaw(n\obj)-85))
 					RotateEntity bone%,WrapAngle(n\BonePitch#-n\Angle),-n\BoneYaw#,0
 				Case 1 ;<--- looking at player #2
-					PointEntity bone%,Collider
-					RotateEntity bone%,0,EntityYaw(bone%),0
+					;PointEntity bone%,Collider
+					;RotateEntity bone%,0,EntityYaw(bone%),0
+					PointEntity pvt%,Camera
+					n\BoneYaw# = CurveAngle(EntityPitch(pvt%),n\BoneYaw#,10.0)
+					RotateEntity bone%,0,n\BoneYaw#,0
 			End Select
 			FreeEntity pvt%
 		EndIf
@@ -4867,6 +4873,7 @@ Function PlayerInReachableRoom()
 	If RN = "exit1" And EntityY(Collider)>1040.0*RoomScale
 		Return False
 	EndIf
+	;Player is in 860's test room and inside the forest, returning false
 	temp = False
 	For e = Each Events
 		If e\EventName$ = "room860" And e\EventState = 1.0
@@ -4874,7 +4881,6 @@ Function PlayerInReachableRoom()
 			Exit
 		EndIf
 	Next
-	;Player is in 860's test room and inside the forest, returning false
 	If RN = "room860" And temp
 		Return False
 	EndIf
@@ -4883,7 +4889,7 @@ Function PlayerInReachableRoom()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#44#6A#90#9E#CD#DD#E6#F4#103#114#131#15B#16F#18C#1C3#1DB#1FC#21F
-;~F#23C#260#351#43C#58B#6C5#808#80D#83B#8DD#918#9A5#A11#B26#BEC#C9C#D4F#E4E#E6D#E94
-;~F#E9F#EC3#ED6#ED7#FD4#10A0#1112#1172#1176#11D0#1248#1259#1274#1292#12CF#12EB
+;~F#0#A#44#6A#90#A0#D0#E0#E9#F7#106#117#134#15E#172#18F#1C6#1DE#1FF#222
+;~F#23F#263#354#43F#58E#6C8#75D#80B#810#83E#8E0#91B#9A8#A14#B29#BEF#C9F#D52#E51#E70
+;~F#E97#EA2#EC6#ED9#EDA#FD7#10A3#1115#1175#1179#11D3#124B#125C#1277#12D2#12F1#12FF
 ;~C#Blitz3D

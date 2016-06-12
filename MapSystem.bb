@@ -1420,6 +1420,7 @@ End Function
 
 Const MaxRoomLights% = 20
 Const MaxRoomEmitters% = 8
+Const MaxRoomObjects% = 30
 
 
 Const ROOM1% = 1, ROOM2% = 2, ROOM2C% = 3, ROOM3% = 4, ROOM4% = 5
@@ -1585,12 +1586,12 @@ Type Rooms
 	Field SoundEmitterRange#[MaxRoomEmitters]
 	Field SoundEmitterCHN%[MaxRoomEmitters]
 	
-	Field Lights%[20]
-	Field LightIntensity#[20]
+	Field Lights%[MaxRoomLights]
+	Field LightIntensity#[MaxRoomLights]
 	
-	Field LightSprites%[20]	
+	Field LightSprites%[MaxRoomLights]	
 	
-	Field Objects%[21]
+	Field Objects%[MaxRoomObjects]
 	Field Levers%[11]
 	Field RoomDoors.Doors[7]
 	Field NPC.NPCs[12]
@@ -6427,6 +6428,9 @@ Function CreateMap()
 	r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "173")
 	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
 	
+	r = CreateRoom(0, ROOM1, 8, 800, 0, "dimension1499")
+	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+	
 	If 0 Then 
 		Repeat
 			Cls
@@ -6825,13 +6829,209 @@ Function AmbientLightRooms(value%=0)
 	;	EndIf
 	;Next
 End Function
+
+Type ChunkPart
+	Field Amount%
+	Field obj%[128]
+	Field RandomYaw#[128]
+	Field ID
+End Type
+
+Function CreateChunkParts(r.Rooms)
+	Local File$ = "Data\1499chunks.INI"
+	Local ChunkAmount% = GetINIInt(File$,"general","count")
+	Local i%,StrTemp$,j%
+	Local chp.ChunkPart,chp2.ChunkPart
+	Local obj%
+	
+	SeedRnd RandomSeed
+	
+	For i = 0 To ChunkAmount%
+		Local loc% = GetINISectionLocation(File$,"chunk"+i)
+		If loc > 0 Then
+			StrTemp$ = GetINIString2(File,loc%,"count")
+			chp = New ChunkPart
+			chp\Amount% = Int(StrTemp$)
+			DebugLog "------------------"
+			For j = 0 To Int(StrTemp$)
+				Local objID% = GetINIString2(File$,loc%,"obj"+j)
+				Local x$ = GetINIString2(File$,loc%,"obj"+j+"-x")
+				Local z$ = GetINIString2(File$,loc%,"obj"+j+"-z")
+				Local yaw$ = GetINIString2(File$,loc%,"obj"+j+"-yaw")
+				DebugLog "1499 chunk X/Z/Yaw: "+x$+"|"+z$+"|"+yaw$
+				chp\obj%[j] = CopyEntity(r\Objects[objID%])
+				If Lower(yaw$) = "random"
+					chp\RandomYaw#[j] = Rnd(360)
+					RotateEntity chp\obj[j],0,chp\RandomYaw[j],0
+				Else
+					RotateEntity chp\obj[j],0,Float(yaw),0
+				EndIf
+				PositionEntity chp\obj[j],Float(x),0,Float(z)
+				ScaleEntity chp\obj[j],RoomScale,RoomScale,RoomScale
+				EntityType chp\obj[j],HIT_MAP
+				EntityPickMode chp\obj[j],2
+				;EntityParent chp\obj[j],r\obj
+			Next
+			chp2 = Before(chp)
+			If chp2 <> Null
+				chp\ID = chp2\ID+1
+			EndIf
+			DebugLog "<<<<<<<<<<<<<<<<"
+			DebugLog "Generated 1499 chunk "+chp\ID+" sucessfully"
+		EndIf
+	Next
+	
+	SeedRnd MilliSecs()
+	
+End Function
+
+Type Chunk
+	Field obj%[128]
+	Field x#,z#,y#
+	Field Amount%
+	;Field debugobj%
+End Type
+
+Function CreateChunk.Chunk(obj%,x#,y#,z#)
+	Local ch.Chunk = New Chunk
+	Local chp.ChunkPart,i
+	
+	;If obj%<>0
+	;	ch\obj% = CopyEntity(obj%)
+	;	PositionEntity ch\obj%,x,y,z
+	;	ScaleEntity ch\obj%,RoomScale,RoomScale,RoomScale
+	;	EntityType ch\obj%,HIT_MAP
+	;EndIf
+	
+	;ch\debugobj% = CreateCube()
+	;ScaleEntity ch\debugobj%,20,20,20
+	;PositionEntity ch\debugobj%,x#,y#+20,z#
+	;EntityColor ch\debugobj%,Rand(0,255),Rand(0,255),Rand(0,255)
+	;EntityFX ch\debugobj%,1+FE_WIRE
+	
+	If obj% > -1
+		For chp = Each ChunkPart
+			If chp\ID = obj%
+				ch\Amount% = chp\Amount%
+				For i = 0 To chp\Amount
+					ch\obj[i] = CopyEntity(chp\obj[i])
+					PositionEntity ch\obj[i],x#,y#,z#
+					;ScaleEntity ch\obj[i],RoomScale,RoomScale,RoomScale
+					MoveEntity ch\obj[i],EntityX(chp\obj[i]),0,EntityZ(chp\obj[i])
+				Next
+				Exit
+			EndIf
+		Next
+	EndIf
+	
+	ch\x = x
+	ch\z = z
+	ch\y = y
+	
+	Return ch
+End Function
+
+Function UpdateChunks(r.Rooms,ChunkPartAmount%)
+	Local ch.Chunk, ch2.Chunk, chp.ChunkPart, ChunkPartAmount2%
+	Local ChunkHideDistance% = 120
+	Local temp% = False, temp2% = False
+	Local x#,z#,i%,y#,CurrChunkX#,CurrChunkZ#
+	Local obj%
+	
+	For ch = Each Chunk
+		;If Distance(EntityX(Collider),EntityZ(Collider),ch\x,ch\z)<ChunkHideDistance
+		;	;If ch\obj <> 0 Then ShowEntity ch\obj
+		;	If ch\obj[0]<>0
+		;		For i = 0 To ch\Amount
+		;			ShowEntity ch\obj[i]
+		;		Next
+		;	EndIf
+		;Else
+		;	;If ch\obj <> 0 Then HideEntity ch\obj
+		;	If ch\obj[0]<>0
+		;		For i = 0 To ch\Amount
+		;			HideEntity ch\obj[i]
+		;		Next
+		;	EndIf
+		;EndIf
+		If ch\obj[0]<>0
+			For i = 0 To ch\Amount
+				ShowEntity ch\obj[i]
+			Next
+		EndIf
+		y# = ch\y
+		If Abs(EntityX(Collider)-ch\x)<20
+			If Abs(EntityZ(Collider)-ch\z)<20
+				CurrChunkX# = ch\x
+				CurrChunkZ# = ch\z
+			EndIf
+		EndIf
+	Next
+	
+	;CurrChunkX# = Int(EntityX(Collider)/40)*40
+	;CurrChunkZ# = Int(EntityZ(Collider)/40)*40
+	
+	x# = -(ChunkHideDistance+(CurrChunkX#))
+	z# = -(ChunkHideDistance+(CurrChunkZ#))
+	
+	SeedRnd RandomSeed
+	
+	Repeat
+		temp2% = False
+		For ch = Each Chunk
+			If (ch\x=x#) And (ch\z=z#)
+				temp2% = True
+				Exit
+			EndIf
+		Next
+		If (Not temp2%)
+			;ch2 = CreateChunk(r\Objects[Rand(1,ChunkPartAmount%)],x#,y#,z#)
+			ChunkPartAmount2 = GetINIInt("Data\1499chunks.INI","general","count")
+			ch2 = CreateChunk(Rand(0,ChunkPartAmount2),x#,y#,z#)
+		EndIf
+		If x# < (ChunkHideDistance+(CurrChunkX#))
+			x# = x# + 40
+		Else
+			If z# < (ChunkHideDistance+(CurrChunkZ#))
+				x# = -(ChunkHideDistance+(CurrChunkX#))
+				z# = z# + 40
+			Else
+				Exit
+			EndIf
+		EndIf
+	Forever
+	
+	SeedRnd MilliSecs()
+	
+End Function
+
+Function HideChunks()
+	Local ch.Chunk,i
+	
+	For ch = Each Chunk
+		;If ch\obj <> 0 Then HideEntity ch\obj
+		If ch\obj[0]<>0
+			For i = 0 To ch\Amount
+				HideEntity ch\obj[i]
+			Next
+		EndIf
+	Next
+	
+End Function
+
+Function DeleteChunks()
+	
+	Delete Each Chunk
+	Delete Each ChunkPart
+	
+End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#347#358#369#391#39F#3AF#3B4#3BF#466
-;~F#570#58F#5B0#5C1#5CC#605#613#63B#66D#675#68A#6D7#728#76A#78C#7E8#7FA#861#870#89A
-;~F#8AE#8C8#8E6#90D#914#922#93E#953#970#98D#99A#9AC#9E5#A0F#A5B#AB1#AC4#ADF#B30#B89
-;~F#B98#BD4#BDC#BEA#BFF#C3B#C5A#C6A#C82#CAA#CBD#CDF#D07#D59#D85#DAC#DB3#DB8#DEF#E16
-;~F#E2B#E5B#ED9#EF4#F61#FB3#FDE#102F#1038#10D1#10D7#10DE#10ED#1119#1123#1134#113B#1165#11E2#11EE
-;~F#122F#123A#124B#1250#125F#1276#12EC#12F5#13D4#13F1#13F8#13FE#140C#1430#144C#147F#155A#1593#15A8#1619
-;~F#16AE#16B3#16C3#1994#19AB#19CA#19D1#1A1E#1A6F#1A89
-;~B#1115
+;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#32B#33B#34C#374#382#392#397#3A2#449
+;~F#553#572#594#5A5#5B0#5E9#5F7#61F#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#87E
+;~F#892#8AC#8CA#8F1#8F8#906#922#937#954#971#97E#990#9C9#9F3#A3F#A95#AA8#AC3#B14#B6D
+;~F#B7C#BB8#BC0#BCE#BE3#C1F#C3E#C4E#C66#C8E#CA1#CC3#CEB#D3D#D69#D90#D97#D9C#DD3#DFA
+;~F#E0F#E3F#EBD#ED8#F45#F97#FC2#1013#101C#10B5#10BB#10C2#10D1#10DB#10FD#1107#1118#111F#1149#11C6
+;~F#11D2#1213#121E#122F#1234#1243#125A#12D0#12D9#13B8#13D5#13DC#13E2#13F0#1414#1430#1463#153E#1577#158C
+;~F#15FD#1692#1697#197B#1992#19B1#19B8#1A05#1A56#1A71#1A88
+;~B#1116
 ;~C#Blitz3D
