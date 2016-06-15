@@ -5864,6 +5864,7 @@ Function UpdateEvents()
 						If Music(8)=0 Then Music(8) = LoadSound_Strict("SFX\Music\SCP-049 Tension.ogg") 
 						ShouldPlay = 8
 						
+						InFacility = 2
 						
 						If e\EventState = 0 Then
 							n.NPCs = CreateNPC(NPCtypeZombie, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
@@ -5982,16 +5983,17 @@ Function UpdateEvents()
 									If n\NPCtype = NPCtypeZombie Then
 										PositionEntity n\Collider, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True),True
 										ResetEntity n\Collider
+										n\State = 4
 										DebugLog "moving zombie"
 									EndIf
 								Next
 								
 								n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[5],True), EntityY(e\room\Objects[5],True)+0.2, EntityZ(e\room\Objects[5],True))
-								n\State = 2
-								n\LastSeen = (70*35)
+								n\State = 6
+								;n\LastSeen = (70*35)
 								n\Reload = 6*70
-								n\State3 = 70*145
-								n\Idle = True
+								;n\State3 = 70*145
+								;n\Idle = True
 								e\room\NPC[1]=n
 								
 								PointEntity Collider, e\room\NPC[1]\Collider
@@ -7621,12 +7623,9 @@ Function UpdateEvents()
 					;0: The player never entered SCP-1499
 					;1: The player had already entered the dimension at least once
 					;2: The player is in dimension
+				;e\EventState2: A timer for the brightness change (stores Brightness value for a "blending" effect)
 				If PlayerRoom = e\room Then
 					If e\EventState < 2.0
-						;For i = 0 To 99
-						;	n.NPCs = CreateNPC(NPCtype1499,EntityX(e\room\obj)+Rnd(-40.0,40.0),EntityY(e\room\obj)+0.2,EntityZ(e\room\obj)+Rnd(-40.0,40.0))
-						;Next
-						
 						;1499 random generator
 						;[Block]
 						If e\EventState = 0.0
@@ -7652,6 +7651,15 @@ Function UpdateEvents()
 							Next
 						EndIf
 						;[End Block]
+						For i = 0 To 99
+							n.NPCs = CreateNPC(NPCtype1499,EntityX(e\room\obj)+Rnd(-60.0,60.0),EntityY(e\room\obj)+0.5,EntityZ(e\room\obj)+Rnd(-60.0,60.0))
+							If Rand(2)=1 Then n\State2 = 500*3
+							n\Angle = Rnd(360)
+						Next
+						
+						StoredBrightness = Brightness
+						Brightness = 255
+						e\EventState2 = 255
 						e\EventState = 2.0
 					EndIf
 					If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\s_gasmask_amb.ogg")
@@ -7669,14 +7677,21 @@ Function UpdateEvents()
 					Update1499Sky()
 					UpdateChunks(e\room,15)
 					CurrStepSFX=3
+					If e\EventState2 > StoredBrightness
+						e\EventState2 = Max(e\EventState2-(0.75*FPSfactor),StoredBrightness)
+						Brightness = Int(e\EventState2)
+					Else
+						Brightness = StoredBrightness
+					EndIf
+					InFacility = False
 				Else
 					If e\EventState = 2.0
 						HideEntity NTF_1499Sky
 						HideChunks()
 						For n.NPCs = Each NPCs
-							;If n\NPCtype = NPCtype1499
-							;	RemoveNPC(n)
-							;EndIf
+							If n\NPCtype = NPCtype1499
+								RemoveNPC(n)
+							EndIf
 						Next
 						e\EventState = 1.0
 					EndIf
@@ -8017,6 +8032,6 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#11#104#4E6#4F6#545#5AE#60D#7DB#9C2#9E9#9F7#A01#A0E#BF7#C18#C67#CB5#CC2#CFC#D13
 ;~F#D33#D3C#D46#D55#DE9#E0B#10B7#10FD#1113#111F#113D#118E#11A5#1272#1373#1404#141D#143C#146D#147A
-;~F#1493#152B#16E1#178B#17DF#1890#1940#19F8#1A10#1AD1#1AFE#1B1B#1B42#1B72#1B8F#1BB3#1C0D#1C4D#1C7E#1C91
-;~F#1D49#1DA1#1DB4#1E05#1E24#1ECA
+;~F#1493#152B#178D#17E1#1892#1942#19FA#1A12#1AD3#1B00#1B1D#1B44#1B74#1B91#1BB5#1C0F#1C4F#1C80#1C93#1D4B
+;~F#1DA3#1DB6#1DC4#1DCD#1E14#1E33#1ED9
 ;~C#Blitz3D

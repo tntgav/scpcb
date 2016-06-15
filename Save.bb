@@ -86,6 +86,20 @@ Function SaveGame(file$)
 	
 	WriteByte f, Wearing178
 	WriteByte f, WearingNightVision
+	WriteByte f, Wearing1499
+	WriteFloat f,NTF_1499PrevX#
+	WriteFloat f,NTF_1499PrevY#
+	WriteFloat f,NTF_1499PrevZ#
+	WriteFloat f,NTF_1499X#
+	WriteFloat f,NTF_1499Y#
+	WriteFloat f,NTF_1499Z#
+	If NTF_1499PrevRoom <> Null
+		WriteFloat f,NTF_1499PrevRoom\x
+		WriteFloat f,NTF_1499PrevRoom\z
+	Else
+		WriteFloat f,0.0
+		WriteFloat f,0.0
+	EndIf
 	
 	WriteByte f, SuperMan
 	WriteFloat f, SuperManTimer
@@ -308,16 +322,17 @@ Function SaveGame(file$)
 		WriteFloat f, d\lifetime
 	Next
 	
+	Local e.Events
 	temp = 0
-	For e.events = Each Events
+	For e.Events = Each Events
 		temp=temp+1
 	Next	
 	WriteInt f, temp
-	For e.events = Each Events
-		WriteString f, e\eventName		
-		WriteFloat f, e\eventstate
-		WriteFloat f, e\eventstate2	
-		WriteFloat f, e\eventstate3	
+	For e.Events = Each Events
+		WriteString f, e\EventName
+		WriteFloat f, e\EventState
+		WriteFloat f, e\EventState2	
+		WriteFloat f, e\EventState3	
 		WriteFloat f, EntityX(e\room\obj)
 		WriteFloat f, EntityZ(e\room\obj)
 	Next
@@ -487,6 +502,15 @@ Function LoadGame(file$)
 	
 	Wearing178 = ReadByte(f)
 	WearingNightVision = ReadByte(f)
+	Wearing1499 = ReadByte(f)
+	NTF_1499PrevX# = ReadFloat(f)
+	NTF_1499PrevY# = ReadFloat(f)
+	NTF_1499PrevZ# = ReadFloat(f)
+	NTF_1499X# = ReadFloat(f)
+	NTF_1499Y# = ReadFloat(f)
+	NTF_1499Z# = ReadFloat(f)
+	Local r1499_x# = ReadFloat(f)
+	Local r1499_z# = ReadFloat(f)
 	
 	SuperMan = ReadByte(f)
 	SuperManTimer = ReadFloat(f)
@@ -699,6 +723,13 @@ Function LoadGame(file$)
 		
 	Next
 	
+	For r.Rooms = Each Rooms
+		If r\x = r1499_x# And r\z = r1499_z#
+			NTF_1499PrevRoom = r
+			Exit
+		EndIf
+	Next
+	
 	If ReadInt(f) <> 954 Then RuntimeError("Couldn't load the game, save file may be corrupted (error 2)")
 	
 	Local spacing# = 8.0
@@ -822,7 +853,10 @@ Function LoadGame(file$)
 				e\room = r
 				Exit
 			EndIf
-		Next	
+		Next
+		If e\EventName = "dimension1499"
+			e\EventState = 0.0
+		EndIf
 	Next
 	
 	Local it.Items
@@ -1089,6 +1123,15 @@ Function LoadGameQuick(file$)
 	
 	Wearing178 = ReadByte(f)
 	WearingNightVision = ReadByte(f)
+	Wearing1499 = ReadByte(f)
+	NTF_1499PrevX# = ReadFloat(f)
+	NTF_1499PrevY# = ReadFloat(f)
+	NTF_1499PrevZ# = ReadFloat(f)
+	NTF_1499X# = ReadFloat(f)
+	NTF_1499Y# = ReadFloat(f)
+	NTF_1499Z# = ReadFloat(f)
+	Local r1499_x# = ReadFloat(f)
+	Local r1499_z# = ReadFloat(f)
 	
 	SuperMan = ReadByte(f)
 	SuperManTimer = ReadFloat(f)
@@ -1119,7 +1162,7 @@ Function LoadGameQuick(file$)
 	
 	If ReadInt(f) <> 113 Then RuntimeError("Couldn't load the game, save file corrupted (error 2.5)")
 	
-	For n.npcs = Each NPCs
+	For n.NPCs = Each NPCs
 		RemoveNPC(n)
 	Next
 	
@@ -1143,27 +1186,27 @@ Function LoadGameQuick(file$)
 		x = ReadFloat(f)
 		y = ReadFloat(f)
 		z = ReadFloat(f)
-		RotateEntity(n\collider, x, y, z)
+		RotateEntity(n\Collider, x, y, z)
 		
-		n\state = ReadFloat(f)
-		n\state2 = ReadFloat(f)	
-		n\state3 = ReadFloat(f)			
-		n\prevstate = ReadInt(f)
+		n\State = ReadFloat(f)
+		n\State2 = ReadFloat(f)	
+		n\State3 = ReadFloat(f)			
+		n\PrevState = ReadInt(f)
 		
-		n\idle = ReadByte(f)
-		n\lastDist = ReadFloat(f)
-		n\lastSeen = ReadInt(f)
+		n\Idle = ReadByte(f)
+		n\LastDist = ReadFloat(f)
+		n\LastSeen = ReadInt(f)
 		
-		n\currspeed = ReadInt(f)
-		n\angle = ReadFloat(f)
-		n\reload = ReadFloat(f)
+		n\CurrSpeed = ReadInt(f)
+		n\Angle = ReadFloat(f)
+		n\Reload = ReadFloat(f)
 		
-		n\id = ReadInt(f)
-		n\targetid = ReadInt(f)
+		n\ID = ReadInt(f)
+		n\TargetID = ReadInt(f)
 		
-		n\enemyX = ReadFloat(f)
-		n\enemyY = ReadFloat(f)
-		n\enemyz = ReadFloat(f)
+		n\EnemyX = ReadFloat(f)
+		n\EnemyY = ReadFloat(f)
+		n\EnemyZ = ReadFloat(f)
 		
 		n\texture = ReadString(f)
 		If n\texture <> "" Then
@@ -1179,11 +1222,11 @@ Function LoadGameQuick(file$)
 		
 	Next
 	
-	For n.npcs = Each NPCs
-		If n\targetid <> 0 Then
+	For n.NPCs = Each NPCs
+		If n\TargetID <> 0 Then
 			For n2.npcs = Each NPCs
 				If n2<>n Then
-					If n2\id = n\targetid Then n\target = n2
+					If n2\id = n\TargetID Then n\Target = n2
 				EndIf
 			Next
 		EndIf
@@ -1228,7 +1271,7 @@ Function LoadGameQuick(file$)
 			id = ReadInt(f)
 			If id>0 Then
 				For n.NPCs = Each NPCs
-					If n\id = id Then
+					If n\ID = id Then
 						;For r.Rooms = Each Rooms
 						;	If r\x = x And r\z = z Then
 						r\NPC[x]=n
@@ -1278,7 +1321,7 @@ Function LoadGameQuick(file$)
 					EndIf
 				Next
 				Delete r\grid
-				r\Grid=Null
+				r\grid=Null
 			EndIf
 		EndIf
 		
@@ -1297,6 +1340,13 @@ Function LoadGameQuick(file$)
 		EndIf
 		
 		If temp2 = 1 Then PlayerRoom = r.Rooms
+	Next
+	
+	For r.Rooms = Each Rooms
+		If r\x = r1499_x# And r\z = r1499_z#
+			NTF_1499PrevRoom = r
+			Exit
+		EndIf
 	Next
 	
 	InitWayPoints()

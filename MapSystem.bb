@@ -2905,7 +2905,15 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[3] = CreateDoor(r\zone, r\x + 2360.0 * RoomScale, -3520.0 * RoomScale, r\z + 656.0 * RoomScale, 90, r, False)
 			r\RoomDoors[3]\AutoClose = False : r\RoomDoors[3]\open = False		
 			PositionEntity(r\RoomDoors[3]\buttons[0], r\x + 2432.0 * RoomScale, EntityY(r\RoomDoors[3]\buttons[0],True), r\z + 816.0 * RoomScale, True)
-			PositionEntity(r\RoomDoors[3]\buttons[1], r\x + 2312.0 * RoomScale, EntityY(r\RoomDoors[3]\buttons[1],True), r\z + 472.0 * RoomScale, True)				
+			PositionEntity(r\RoomDoors[3]\buttons[1], r\x + 2312.0 * RoomScale, EntityY(r\RoomDoors[3]\buttons[1],True), r\z + 472.0 * RoomScale, True)	
+			
+			For i = 0 To 3
+				If (i Mod 2) = 1
+					AssignElevatorObj(r\Objects[i],r\RoomDoors[i],2)
+				Else
+					AssignElevatorObj(r\Objects[i],r\RoomDoors[i],True)
+				EndIf
+			Next
 			
 			;storage room door
 			r\RoomDoors[4] = CreateDoor(r\zone, r\x + 272.0 * RoomScale, -3552.0 * RoomScale, r\z + 104.0 * RoomScale, 90, r, False)
@@ -5515,7 +5523,7 @@ Function UpdateButton(obj)
 End Function
 
 Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.Events)
-	Local x#, z#
+	Local x#, z#, n.NPCs, NPC_inside.NPCs
 	
 	door1\IsElevatorDoor = 1
 	door2\IsElevatorDoor = 1
@@ -5524,10 +5532,18 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 		If (ClosestButton = door2\buttons[0] Or ClosestButton = door2\buttons[1]) And MouseHit1 Then
 			UseDoor(door1,False)
 		EndIf
+		If door2\NPCCalledElevator = True
+			UseDoor(door1,False)
+			door2\NPCCalledElevator = 2
+		EndIf
 	ElseIf door2\open = True And door1\open = False
 		State = 1
 		If (ClosestButton = door1\buttons[0] Or ClosestButton = door1\buttons[1]) And MouseHit1 Then
 			UseDoor(door2,False)
+		EndIf
+		If door1\NPCCalledElevator = True
+			UseDoor(door2,False)
+			door1\NPCCalledElevator = 2
 		EndIf
 	ElseIf Abs(door1\openstate-door2\openstate)<0.2 Then
 		door1\IsElevatorDoor = 2
@@ -5535,11 +5551,14 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 	EndIf
 	
 	Local inside = False
+	NPC_inside = Null
 	
 	;molemmat ovet kiinni = hissi liikkuu
 	If door1\open = False And door2\open = False Then
 		door1\locked = True 
-		door2\locked = True 
+		door2\locked = True
+		door1\NPCCalledElevator = 2
+		door2\NPCCalledElevator = 2
 		If State < 0 Then ;ylhäältä alas
 			State = State - FPSfactor
 			;pelaaja hissin sisällä
@@ -5559,9 +5578,29 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 				EndIf
 			EndIf
 			
+			For n.NPCs = Each NPCs
+				If n\CanUseElevator
+					If Abs(EntityX(n\Collider)-EntityX(room1,True))<280.0*RoomScale
+						If Abs(EntityZ(n\Collider)-EntityZ(room1,True))<280.0*RoomScale Then
+							If Abs(EntityY(n\Collider)-EntityY(room1,True))<280.0*RoomScale Then
+								NPC_inside = n
+							EndIf
+						EndIf
+					EndIf
+				EndIf
+			Next
+			
+			If NPC_inside <> Null And (Not inside)
+				NPC_inside\Idle = True
+			ElseIf NPC_inside <> Null And inside
+				NPC_inside\Idle = False
+			EndIf
+			
 			If State < -400 Then
 				door1\locked = False
-				door2\locked = False				
+				door2\locked = False
+				door1\NPCCalledElevator = False
+				door2\NPCCalledElevator = False
 				State = 0
 				
 				UseDoor(door2,False)							
@@ -5575,6 +5614,21 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 					DropSpeed = 0
 					UpdateDoors()
 					UpdateRooms()
+				EndIf
+				
+				If NPC_inside <> Null
+					x# = Max(Min((EntityX(NPC_inside\Collider)-EntityX(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+					z# = Max(Min((EntityZ(NPC_inside\Collider)-EntityZ(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+					PositionEntity(NPC_inside\Collider, EntityX(room2,True)+x,0.1+EntityY(room2,True)+(EntityY(NPC_inside\Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,True)
+					ResetEntity NPC_inside\Collider	
+					UpdateDoorsTimer = 0
+					NPC_inside\DropSpeed = 0
+					If NPC_inside\Idle
+						TurnEntity NPC_inside\obj,0,180,0
+						TurnEntity NPC_inside\Collider,0,180,0
+						NPC_inside\Idle = False
+					EndIf
+					NPC_inside\CurrElevator = Null
 				EndIf
 				
 				PlaySound2(ElevatorBeepSFX, Camera, room1, 4.0)
@@ -5598,9 +5652,29 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 				EndIf
 			EndIf	
 			
+			For n.NPCs = Each NPCs
+				If n\CanUseElevator
+					If Abs(EntityX(n\Collider)-EntityX(room2,True))<280.0*RoomScale
+						If Abs(EntityZ(n\Collider)-EntityZ(room2,True))<280.0*RoomScale Then
+							If Abs(EntityY(n\Collider)-EntityY(room2,True))<280.0*RoomScale Then
+								NPC_inside = n
+							EndIf
+						EndIf
+					EndIf
+				EndIf
+			Next
+			
+			If NPC_inside <> Null And (Not inside)
+				NPC_inside\Idle = True
+			ElseIf NPC_inside <> Null And inside
+				NPC_inside\Idle = False
+			EndIf
+			
 			If State > 400 Then 
 				door1\locked = False
-				door2\locked = False				
+				door2\locked = False
+				door1\NPCCalledElevator = False
+				door2\NPCCalledElevator = False
 				State = 0
 				
 				UseDoor(door1,False)
@@ -5615,6 +5689,21 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 					DropSpeed = 0
 					UpdateDoors()
 					UpdateRooms()
+				EndIf
+				
+				If NPC_inside <> Null
+					x# = Max(Min((EntityX(NPC_inside\Collider)-EntityX(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+					z# = Max(Min((EntityZ(NPC_inside\Collider)-EntityZ(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+					PositionEntity(NPC_inside\Collider, EntityX(room1,True)+x,0.1+EntityY(room1,True)+(EntityY(NPC_inside\Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,True)
+					ResetEntity NPC_inside\Collider
+					UpdateDoorsTimer = 0
+					NPC_inside\DropSpeed = 0
+					If NPC_inside\Idle
+						TurnEntity NPC_inside\obj,0,180,0
+						TurnEntity NPC_inside\Collider,0,180,0
+						NPC_inside\Idle = False
+					EndIf
+					NPC_inside\CurrElevator = Null
 				EndIf
 				
 				PlaySound2(ElevatorBeepSFX, Camera, room2, 4.0)				
@@ -7025,13 +7114,36 @@ Function DeleteChunks()
 	Delete Each ChunkPart
 	
 End Function
+
+Type ElevatorObj
+	Field obj%
+	Field InFacility%
+	Field door.Doors
+End Type
+
+Function AssignElevatorObj.ElevatorObj(obj%,door.Doors,in_facility%)
+	Local eo.ElevatorObj = New ElevatorObj
+	
+	eo\obj% = obj%
+	eo\door = door
+	eo\InFacility% = in_facility%
+	
+	Return eo
+End Function
+
+Function DeleteElevatorObjects()
+	
+	Delete Each ElevatorObj
+	
+End Function
+	
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#32B#33B#34C#374#382#392#397#3A2#449
 ;~F#553#572#594#5A5#5B0#5E9#5F7#61F#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#87E
-;~F#892#8AC#8CA#8F1#8F8#906#922#937#954#971#97E#990#9C9#9F3#A3F#A95#AA8#AC3#B14#B6D
-;~F#B7C#BB8#BC0#BCE#BE3#C1F#C3E#C4E#C66#C8E#CA1#CC3#CEB#D3D#D69#D90#D97#D9C#DD3#DFA
-;~F#E0F#E3F#EBD#ED8#F45#F97#FC2#1013#101C#10B5#10BB#10C2#10D1#10DB#10FD#1107#1118#111F#1149#11C6
-;~F#11D2#1213#121E#122F#1234#1243#125A#12D0#12D9#13B8#13D5#13DC#13E2#13F0#1414#1430#1463#153E#1577#158C
-;~F#15FD#1692#1697#197B#1992#19B1#19B8#1A05#1A56#1A71#1A88
-;~B#1116
+;~F#892#8AC#8CA#8F1#8F8#906#922#937#954#971#97E#990#9C9#9F3#A3F#A95#AA8#AC3#B75#B84
+;~F#BC0#BC8#BD6#BEB#C27#C46#C56#C6E#C96#CA9#CCB#CF3#D45#D71#D98#D9F#DA4#DDB#E02#E17
+;~F#E47#EC5#EE0#F4D#F9F#FCA#101B#1024#10BD#10C3#10CA#10D9#10E3#1105#110F#1120#1127#1151#11CE#11DA
+;~F#121B#1226#1237#123C#124B#1262#12D8#12E1#13C0#13DD#13E4#13EA#13F8#141C#1438#146B#1546#157F#1594#1656
+;~F#16EB#16F0#1700#19D4#19EB#1A0A#1A11#1A5E#1AAF#1ACA#1AE1#1B09#1B10#1B40#1B47#1B6E#1BB8#1BC6
+;~B#111E
 ;~C#Blitz3D

@@ -606,9 +606,11 @@ Function DropItem(item.Items)
 			Wearing714 = False
 		Case "scp178"
 			Wearing178 = False
+		Case "scp1499"
+			Wearing1499 = false
 	End Select
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#155#196
+;~F#B#1E#76#13B#155#196#1B1#1ED
 ;~C#Blitz3D

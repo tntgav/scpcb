@@ -458,6 +458,7 @@ Function UpdateConsole()
 							StopChannel e\soundchn2
 							e\SoundCHN2 = 0
 							e\eventstate = 4000
+							e\EventState3 = 9
 							Exit
 						EndIf
 					Next
@@ -988,6 +989,9 @@ Music(11) = LoadSound_Strict("SFX\Music\MenuAmbience.ogg")
 ;Music(14) = LoadSound("SFX\178ambient.ogg")
 ;Music(15) = LoadSound("SFX\Music\PDTrenchAmbience.ogg")
 ;Music(15) = LoadSound("SFX\Music\205_music.ogg")
+;
+;Music(18): Dimension1499 normal theme
+;Music(19): Dimension1499 aggressive theme
 
 
 Global MusicVolume# = GetINIFloat(OptionFile, "options", "music volume")
@@ -1206,8 +1210,23 @@ Global AmbientLightRoomTex%, AmbientLightRoomVal%
 Global EnableUserTracks% = GetINIInt(OptionFile,"options","enable user tracks")
 Global UserTrackMode% = GetINIInt(OptionFile,"options","user track setting")
 Global UserTrackCheck% = 0, UserTrackCheck2% = 0
-Global UserTrackMusicAmount% = 0, CurrUserTrack%, UserTrackFlag% = 0
+Global UserTrackMusicAmount% = 0, CurrUserTrack%, UserTrackFlag% = False
 Dim UserTrackName$(256)
+
+Global NTF_1499PrevX#
+Global NTF_1499PrevY#
+Global NTF_1499PrevZ#
+Global NTF_1499PrevRoom.Rooms
+Global NTF_1499X#
+Global NTF_1499Y#
+Global NTF_1499Z#
+Global NTF_1499Sky%
+
+Global OptionsMenu% = 0
+Global QuitMSG% = 0
+
+Global StoredBrightness% = 40
+Global InFacility% = True
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1228,19 +1247,6 @@ Global Panel294 = LoadImage_Strict("GFX\294panel.jpg"), Using294%, Input294$
 MaskImage(Panel294, 255,0,255)
 
 DrawLoading(35, True)
-
-Global NTF_1499PrevX#
-Global NTF_1499PrevY#
-Global NTF_1499PrevZ#
-Global NTF_1499PrevRoom$
-Global NTF_1499X#
-Global NTF_1499Y#
-Global NTF_1499Z#
-Global PrevPlayerRoom$
-Global NTF_1499Sky%
-
-Global OptionsMenu% = 0
-Global QuitMSG% = 0
 
 ;----------------------------------------------  Items  -----------------------------------------------------
 
@@ -1283,6 +1289,7 @@ Type Doors
 	Field IsElevatorDoor% = False
 	
 	Field MTFClose% = True
+	Field NPCCalledElevator% = False
 End Type 
 
 Dim BigDoorOBJ(2), HeavyDoorObj(2)
@@ -2164,6 +2171,8 @@ Repeat
 			AmbientLight Brightness, Brightness, Brightness	
 			PlayerSoundVolume = CurveValue(0.0, PlayerSoundVolume, 5.0)
 			
+			InFacility% = True
+			
 			UpdateEmitters()
 			MouseLook()			
 			MovePlayer()
@@ -2177,7 +2186,7 @@ Repeat
 			UpdateScreens()
 			;DL_Update()
 			UpdateRoomLights()
-			
+			UpdateLeave1499()
 		EndIf
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
@@ -2963,7 +2972,7 @@ Function MouseLook()
 		MoveMouse viewport_center_x, viewport_center_y
 	EndIf
 	
-	If WearingGasMask Or WearingHazmat Then
+	If WearingGasMask Or WearingHazmat Or Wearing1499 Then
 		If WearingGasMask = 2 Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		If WearingHazmat = 2 Then 
 			Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
@@ -3385,6 +3394,7 @@ Function DrawGUI()
 				If KeypadTimer =<0 Then
 					KeypadMSG = ""
 					SelectedDoor = Null
+					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 				EndIf
 			Else
 				Text GraphicWidth/2, y+70*scale, "ACCESS CODE: ",True,True	
@@ -3425,6 +3435,7 @@ Function DrawGUI()
 										SelectedDoor\locked = 0
 										UseDoor(SelectedDoor,True)
 										SelectedDoor = Null
+										MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 									Else
 										PlaySound_Strict KeyCardSFX2
 										KeypadMSG = "ACCESS DENIED"
@@ -3985,8 +3996,9 @@ Function DrawGUI()
 						CameraFogFar = StoredCameraFogFar
 					Else
 						Msg = "You put on the goggles and can see easier."
-						WearingGasMask = 0
-						Wearing178 = False
+						;WearingGasMask = 0
+						;Wearing178 = False
+						TakeOffStuff(1+2+8+64)
 						StoredCameraFogFar = CameraFogFar
 						CameraFogFar = 30
 					EndIf
@@ -4006,9 +4018,10 @@ Function DrawGUI()
 						GiveAchievement(Achv178)
 						Msg = "You put on the glasses"
 						Wearing178 = 1
-						WearingGasMask = 0
+						;WearingGasMask = 0
 						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-						WearingNightVision = 0
+						;WearingNightVision = 0
+						TakeOffStuff(1+2+32+64)
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
@@ -4034,6 +4047,7 @@ Function DrawGUI()
 						;Achievements(Achv714)=True
 						Msg = "You put on the ring."
 						Wearing714 = 2
+						TakeOffStuff(1+2+8+32+64)
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
@@ -4405,11 +4419,16 @@ Function DrawGUI()
 							Select Int(SelectedItem\state2)
 								Case 0 ;randomkanava
 									ResumeChannel(RadioCHN(0))
-									strtemp = "        USER TRACK PLAYER          "
+									;strtemp = "        USER TRACK PLAYER          "
+									strtemp = "        USER TRACK PLAYER - "
 									If (Not EnableUserTracks) Or UserTrackMusicAmount<1
 										If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
+										strtemp = strtemp + "NOT ENABLED          "
 									Else
 										If (Not ChannelPlaying(RadioCHN(0)))
+											If (Not UserTrackMode)
+												RadioState(0) = Rand(0,UserTrackMusicAmount-1)
+											EndIf
 											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
 											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
 											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
@@ -4420,13 +4439,12 @@ Function DrawGUI()
 													Else
 														RadioState(0) = 0
 													EndIf
-												Else
-													RadioState(0) = Rand(0,UserTrackMusicAmount-1)
+													UserTrackFlag = True
 												EndIf
-												UserTrackFlag = True
 											EndIf
 											DebugLog "CurrTrack: "+RadioState(0)
 										Else
+											strtemp = strtemp + Upper(UserTrackName$(RadioState(0))) + "          "
 											UserTrackFlag = False
 										EndIf
 									EndIf
@@ -4651,6 +4669,7 @@ Function DrawGUI()
 						Msg = "You take off the hazmat suit."
 					Else
 						Msg = "You put on the hazmat suit."
+						TakeOffStuff(16)
 					EndIf
 					MsgTimer = 70 * 5
 					If SelectedItem\itemtemplate\tempname="hazmatsuit3" Then
@@ -4668,6 +4687,7 @@ Function DrawGUI()
 					Else
 						Msg = "You put on the vest and feel slightly encumbered."
 						WearingVest = True
+						TakeOffStuff(2)
 					EndIf
 					MsgTimer = 70 * 7
 					SelectedItem = Null
@@ -4678,6 +4698,7 @@ Function DrawGUI()
 					Else
 						Msg = "You put on the vest and feel heavily encumbered."
 						WearingVest = 2
+						TakeOffStuff(2)
 					EndIf
 					SelectedItem = Null	
 				Case "gasmask", "supergasmask", "gasmask3"
@@ -4685,9 +4706,10 @@ Function DrawGUI()
 						Msg = "You took off the gas mask."
 					Else
 						Msg = "You put on the gas mask."
-						Wearing178 = 0
+						;Wearing178 = 0
 						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-						WearingNightVision = 0
+						;WearingNightVision = 0
+						TakeOffStuff(2+8+32+64)
 					EndIf
 					MsgTimer = 70 * 5
 					If SelectedItem\itemtemplate\tempname="gasmask3" Then
@@ -4828,40 +4850,23 @@ Function DrawGUI()
 					EndIf
 				;new Items in SCP:CB 1.3
 				Case "scp1499"
-					If Wearing1499% Then
-						Msg = "You took off SCP-1499 and you reappeared in the facility."
-						For r.Rooms = Each Rooms
-							If r\RoomTemplate\Name = NTF_1499PrevRoom$ Then
-								NTF_1499X# = EntityX(Collider)
-								NTF_1499Y# = EntityY(Collider)
-								NTF_1499Z# = EntityZ(Collider)
-								PositionEntity (Collider, NTF_1499PrevX#, NTF_1499PrevY#+0.05, NTF_1499PrevZ#)
-								ResetEntity(Collider)
-								UpdateDoors()
-								UpdateRooms()
-								For it.Items = Each Items
-									it\disttimer = 0
-								Next
-								PlayerRoom = r
-								PlaySound_Strict NTF_1499LeaveSFX%
-								Exit
-							EndIf
-						Next
-					Else
+					If (Not Wearing1499%) Then
 						Msg = "You took on SCP-1499 and you appeared in a strange dimension."
-						Wearing178 = 0
-						WearingGasMask = 0
+						;Wearing178 = 0
+						;WearingGasMask = 0
 						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-						WearingNightVision = 0
+						;WearingNightVision = 0
+						TakeOffStuff(1+2+8+32)
 						For r.Rooms = Each Rooms
 							If r\RoomTemplate\Name = "dimension1499" Then
-								NTF_1499PrevRoom = PlayerRoom\RoomTemplate\Name
+								BlinkTimer = -1
+								NTF_1499PrevRoom = PlayerRoom
 								NTF_1499PrevX# = EntityX(Collider)
 								NTF_1499PrevY# = EntityY(Collider)
 								NTF_1499PrevZ# = EntityZ(Collider)
 								
 								If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0
-									PositionEntity (Collider, r\x+15616.0*RoomScale, r\y+192.0*RoomScale, r\z-1536.0*RoomScale)
+									PositionEntity (Collider, r\x+676.0*RoomScale, r\y+314.0*RoomScale, r\z-2080.0*RoomScale)
 								Else
 									PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
 								EndIf
@@ -4873,6 +4878,9 @@ Function DrawGUI()
 								Next
 								PlayerRoom = r
 								PlaySound_Strict NTF_1499EnterSFX%
+								NTF_1499X# = 0.0
+								NTF_1499Y# = 0.0
+								NTF_1499Z# = 0.0
 								Exit
 							EndIf
 						Next
@@ -6158,16 +6166,18 @@ Function NullGame()
 	NTF_1499PrevX# = 0.0
 	NTF_1499PrevY# = 0.0
 	NTF_1499PrevZ# = 0.0
-	NTF_1499PrevRoom$ = ""
+	NTF_1499PrevRoom = Null
 	NTF_1499X# = 0.0
 	NTF_1499Y# = 0.0
 	NTF_1499Z# = 0.0
-	PrevPlayerRoom$ = ""
 	Wearing1499% = False
 	DeleteChunks()
 	
+	DeleteElevatorObjects()
+	
 	NoTarget% = False
 	Brightness = 40
+	StoredBrightness% = 40
 	
 	AchievementsMenu = 0
 	QuitMSG = 0
@@ -6410,7 +6420,7 @@ End Function
 Function AnimateNPC(n.NPCs, start#, quit#, speed#, loop=True)
 	Local newTime#
 	
-	If EntityDistance(n\obj,Camera)<HideDistance
+	If EntityDistance(n\obj,Camera)<HideDistance Or PlayerRoom\RoomTemplate\Name$ = "dimension1499"
 		If speed > 0.0 Then 
 			newTime = Max(Min(n\Frame + speed * FPSfactor,quit),start)
 			
@@ -7099,7 +7109,7 @@ Function UpdateMTF%()
 	
 	;mtf ei vielä spawnannut, spawnataan jos pelaaja menee tarpeeksi lähelle gate b:tä
 	If MTFtimer = 0 Then
-		If Rand(30)=1 Then
+		If Rand(30)=1 And PlayerRoom\RoomTemplate\Name$ <> "dimension1499" Then
 			
 			Local entrance.Rooms = Null
 			For r.Rooms = Each Rooms
@@ -7108,7 +7118,8 @@ Function UpdateMTF%()
 			
 			If entrance <> Null Then 
 				If Abs(EntityZ(entrance\obj)-EntityZ(Collider))<30.0 Then
-					If PlayerRoom\RoomTemplate\Name<>"room860" And PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then
+					;If PlayerRoom\RoomTemplate\Name<>"room860" And PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then
+					If PlayerInReachableRoom()
 						PlaySound_Strict LoadTempSound("SFX\MTF\Announc.ogg")
 					EndIf
 					
@@ -8257,10 +8268,104 @@ Function Rnd_Array(numb1#,numb2#,Array1#,Array2#)
 	EndIf
 	
 End Function
+
+Function TakeOffStuff(flag%=0)
+	;FLAG variables:
+		;1: GasMask
+		;2: Hazmat Suit
+		;4: SCP-714
+		;8: SCP-178
+		;16: Kevlar Vest
+		;32: Night Vision Goggles
+		;64: SCP-1499
+	
+	Local numb_flag% = Bin(flag%)
+	
+	If Right(numb_flag%,1) = 1
+		WearingGasMask = False
+		DebugLog "GasMask Off"
+	EndIf
+	If Len(numb_flag%)>1
+		If Mid(numb_flag%,Len(numb_flag%)-1,1) = 1
+			WearingHazmat = False
+			DebugLog "Hazmat Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>2
+		If Mid(numb_flag%,Len(numb_flag%)-2,1) = 1
+			Wearing714 = False
+			DebugLog "SCP-714 Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>3
+		If Mid(numb_flag%,Len(numb_flag%)-3,1) = 1
+			Wearing178 = False
+			DebugLog "SCP-178 Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>4
+		If Mid(numb_flag%,Len(numb_flag%)-4,1) = 1
+			WearingVest = False
+			DebugLog "Kevlar Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>5
+		If Mid(numb_flag%,Len(numb_flag%)-5,1) = 1
+			WearingNightVision = False
+			DebugLog "NVG Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>6
+		If Mid(numb_flag%,Len(numb_flag%)-6,1) = 1
+			Wearing1499 = False
+			DebugLog "SCP-1499 Off"
+		EndIf
+	EndIf
+	
+End Function
+
+Function UpdateLeave1499()
+	Local r.Rooms, it.Items
+	
+	If (Not Wearing1499) And PlayerRoom\RoomTemplate\Name$ = "dimension1499"
+		For r.Rooms = Each Rooms
+			If r = NTF_1499PrevRoom
+				BlinkTimer = -1
+				Msg = "You took off SCP-1499 and you reappeared in the facility."
+				MsgTimer = 70 * 5
+				NTF_1499X# = EntityX(Collider)
+				NTF_1499Y# = EntityY(Collider)
+				NTF_1499Z# = EntityZ(Collider)
+				PositionEntity (Collider, NTF_1499PrevX#, NTF_1499PrevY#+0.05, NTF_1499PrevZ#)
+				ResetEntity(Collider)
+				UpdateDoors()
+				UpdateRooms()
+				For it.Items = Each Items
+					it\disttimer = 0
+					If it\itemtemplate\tempname = "scp1499"
+						If EntityY(it\obj) >= EntityY(PlayerRoom\obj)-5
+							PositionEntity it\obj,NTF_1499PrevX#,NTF_1499PrevY#+(EntityY(it\obj)-EntityY(PlayerRoom\obj)),NTF_1499PrevZ#
+							ResetEntity it\obj
+						EndIf
+					EndIf
+				Next
+				PlayerRoom = r
+				PlaySound_Strict NTF_1499LeaveSFX%
+				NTF_1499PrevX# = 0.0
+				NTF_1499PrevY# = 0.0
+				NTF_1499PrevZ# = 0.0
+				NTF_1499PrevRoom = Null
+				Brightness = StoredBrightness
+				Exit
+			EndIf
+		Next
+	EndIf
+	
+End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#3C4#4E9#509#581#58E#63A#6B2#6C9#6D6#708#7B0#894#1527#1684#1707#182F
-;~F#1841#185D#1867#1874#1896#18B5#18D4#18F0#1905#1909#192B#1933#195E#1B00#1BB5#1C81#1CF8#1CFE#1D08#1D14
-;~F#1D1F#1D23#1D5E#1D66#1D6E#1D75#1D7C#1D8B#1D9A#1DB8#1DE6#1DED#1E00#1E19#1E46#1E51#1E56#1E70#1E7C#1E97
-;~F#1EE9#1EF7#1EFF#1F0B#1F14#1F3D#1F42#1F47#1F4C#1F55#1FF5#2028#2033
-;~B#1138
+;~F#21#126#12A#3C5#4EF#510#588#595#641#6B9#6D0#6DD#70F#7B7#89D#152F#168C#170F#1839#184B
+;~F#1867#1871#187E#18A0#18BF#18DE#18FA#190F#1913#1935#193D#1968#1B0A#1C8C#1D03#1D09#1D13#1D1F#1D2A#1D2E
+;~F#1D69#1D71#1D79#1D80#1D87#1D96#1DA5#1DC3#1DF1#1DF8#1E0B#1E24#1E51#1E5C#1E61#1E7B#1E87#1EA2#1EF4#1F02
+;~F#1F0A#1F16#1F1F#1F48#1F4D#1F52#1F57#1F60#1F68#1FF6#2000#2025#2033#203E
+;~B#1147
 ;~C#Blitz3D
