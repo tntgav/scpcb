@@ -5249,7 +5249,7 @@ Function UpdateSecurityCams()
 			If close Or sc=CoffinCam Then 
 				If sc\FollowPlayer Then
 					If sc<>CoffinCam
-						If EntityVisible(sc\obj,Camera)
+						If EntityVisible(sc\CameraObj,Camera)
 							PlayerDetected = True
 						EndIf
 					EndIf
@@ -5285,8 +5285,8 @@ Function UpdateSecurityCams()
 					EndIf
 					
 					If sc<>CoffinCam
-						If (Abs(DeltaYaw(sc\obj,Camera))<60.0)
-							If EntityVisible(sc\obj,Camera)
+						If (Abs(DeltaYaw(sc\CameraObj,Camera))<60.0)
+							If EntityVisible(sc\CameraObj,Camera)
 								PlayerDetected = True
 							EndIf
 						EndIf
@@ -7143,7 +7143,7 @@ End Function
 ;~F#892#8AC#8CA#8F1#8F8#906#922#937#954#971#97E#990#9C9#9F3#A3F#A95#AA8#AC3#B75#B84
 ;~F#BC0#BC8#BD6#BEB#C27#C46#C56#C6E#C96#CA9#CCB#CF3#D45#D71#D98#D9F#DA4#DDB#E02#E17
 ;~F#E47#EC5#EE0#F4D#F9F#FCA#101B#1024#10BD#10C3#10CA#10D9#10E3#1105#110F#1120#1127#1151#11CE#11DA
-;~F#121B#1226#1237#123C#124B#1262#12D8#12E1#13C0#13DD#13E4#13EA#13F8#141C#1438#146B#1546#157F#1594#1656
-;~F#16EB#16F0#1700#19D4#19EB#1A0A#1A11#1A5E#1AAF#1ACA#1AE1#1B09#1B10#1B40#1B47#1B6E#1BB8#1BC6
+;~F#121B#1226#1237#123C#124B#1262#12D8#12E1#13C0#13DD#13E4#13EA#13F8#141C#1438#1546#157F#1594#1656#16EB
+;~F#16F0#1700#19D4#19EB#1A0A#1A11#1A5E#1AAF#1ACA#1AE1#1B09#1B10#1B40#1B47#1B6E#1BB8#1BC6
 ;~B#111E
 ;~C#Blitz3D

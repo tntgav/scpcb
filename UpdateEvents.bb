@@ -5864,8 +5864,6 @@ Function UpdateEvents()
 						If Music(8)=0 Then Music(8) = LoadSound_Strict("SFX\Music\SCP-049 Tension.ogg") 
 						ShouldPlay = 8
 						
-						InFacility = 2
-						
 						If e\EventState = 0 Then
 							n.NPCs = CreateNPC(NPCtypeZombie, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
 							PointEntity n\Collider, e\room\obj
@@ -5990,11 +5988,18 @@ Function UpdateEvents()
 								
 								n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[5],True), EntityY(e\room\Objects[5],True)+0.2, EntityZ(e\room\Objects[5],True))
 								n\State = 6
-								;n\LastSeen = (70*35)
 								n\Reload = 6*70
-								;n\State3 = 70*145
-								;n\Idle = True
-								e\room\NPC[1]=n
+								PointEntity n\Collider,Collider
+								e\room\NPC[1] = n
+								
+								For i = -1 To 1 Step 2
+									n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[5],True), EntityY(e\room\Objects[5],True)+0.2, EntityZ(e\room\Objects[5],True))
+									n\State = 6
+									n\Reload = (6*70)+Rnd(15,30)
+									RotateEntity n\Collider,0,EntityYaw(e\room\NPC[1]\Collider),0
+									MoveEntity n\Collider,0.5*i,0,0
+									PointEntity n\Collider,Collider
+								Next
 								
 								PointEntity Collider, e\room\NPC[1]\Collider
 								
@@ -6009,7 +6014,7 @@ Function UpdateEvents()
 						Injuries = Max(2.0,Injuries)
 						Bloodloss = 0
 						
-						Msg = ""
+						;Msg = ""
 						
 						PointEntity Collider, e\room\NPC[1]\Collider
 						If KillTimer < 0 Then
@@ -7683,7 +7688,6 @@ Function UpdateEvents()
 					Else
 						Brightness = StoredBrightness
 					EndIf
-					InFacility = False
 				Else
 					If e\EventState = 2.0
 						HideEntity NTF_1499Sky
@@ -8032,6 +8036,6 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#11#104#4E6#4F6#545#5AE#60D#7DB#9C2#9E9#9F7#A01#A0E#BF7#C18#C67#CB5#CC2#CFC#D13
 ;~F#D33#D3C#D46#D55#DE9#E0B#10B7#10FD#1113#111F#113D#118E#11A5#1272#1373#1404#141D#143C#146D#147A
-;~F#1493#152B#178D#17E1#1892#1942#19FA#1A12#1AD3#1B00#1B1D#1B44#1B74#1B91#1BB5#1C0F#1C4F#1C80#1C93#1D4B
-;~F#1DA3#1DB6#1DC4#1DCD#1E14#1E33#1ED9
+;~F#1493#152B#16E1#1792#17E6#1897#1947#19FF#1A17#1AD8#1B05#1B22#1B49#1B79#1B96#1BBA#1C14#1C54#1C85#1C98
+;~F#1D50#1DA8#1DBB#1DC9#1DD2#1E18#1E37#1EDD
 ;~C#Blitz3D

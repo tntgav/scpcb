@@ -3807,7 +3807,7 @@ Function UpdateNPCs()
 						If n\CurrSpeed = 0.0
 							AnimateNPC(n,296,317,0.2)
 						Else
-							AnimateNPC(n,1,62,n\CurrSpeed*30)
+							AnimateNPC(n,1,62,(n\CurrSpeed*28)*Rnd(0.95,1.05))
 						EndIf
 						
 						dist = EntityDistance(n\Collider,Collider)
@@ -3842,7 +3842,7 @@ Function UpdateNPCs()
 						If n\State2 = 0.0
 							n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
 							
-							AnimateNPC(n,1,62,n\CurrSpeed*30)
+							AnimateNPC(n,1,62,(n\CurrSpeed*28)*Rnd(0.95,1.05))
 						Else
 							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
 							AnimateNPC(n,63,100,0.6,False)
@@ -3852,6 +3852,12 @@ Function UpdateNPCs()
 								Else
 									Injuries = Injuries + Rnd(0.75,1.5)
 									PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
+									If Injuries > 10.0
+										Kill()
+										DeathMSG = "A dispatch team has been sent in order to find SCP-1499 after it was reported stolen. The dispatch team "
+										DeathMSG = DeathMSG + "couldn't find SCP-1499 anywhere. It is believed that somebody wore SCP-1499 and might be killed "
+										DeathMSG = DeathMSG + "by an SCP-1499-1 instance. SCP-1499 right now is reported as "+Chr(34)+"Lost"+Chr(34)+"."
+									EndIf
 								EndIf
 							ElseIf n\Frame => 99
 								n\State2 = 0.0
@@ -4725,10 +4731,11 @@ Function UpdateMTFUnit(n.NPCs)
 				AnimateNPC(n, 346, 351, 0.2, False)
 				
 				If n\Reload =< 0 And KillTimer = 0 Then
-					If EntityVisible(n\Collider, Camera) Then
-						angle# = WrapAngle(angle - EntityYaw(n\Collider))
-						If angle < 5 Or angle > 355 Then 
-							prev% = KillTimer
+					If EntityVisible(n\Collider, Collider) Then
+						;angle# = WrapAngle(angle - EntityYaw(n\Collider))
+						;If angle < 5 Or angle > 355 Then
+						If (Abs(DeltaYaw(n\Collider,Collider))<50.0)
+							;prev% = KillTimer
 							
 							PlaySound2(GunshotSFX, Camera, n\Collider, 15)
 							
@@ -5139,12 +5146,11 @@ Function CheckForNPCInFacility(n.NPCs)
 	If EntityY(n\Collider)< -10.0
 		Return 2
 	EndIf
-	If EntityY(n\Collider)> 10.0 And EntityY(n\Collider)<=100.0
+	If EntityY(n\Collider)> 7.0 And EntityY(n\Collider)<=100.0
 		Return 2
 	EndIf
 	
 	Return True
-	
 End Function
 
 Function FindNextElevator(n.NPCs)
@@ -5167,10 +5173,14 @@ Function FindNextElevator(n.NPCs)
 						EndIf
 					EndIf
 				Next
-				If n\PathStatus = 0
+				If n\CurrElevator = Null
 					n\PathStatus = FindPath(n, EntityX(eo\obj,True),EntityY(eo\obj,True),EntityZ(eo\obj,True))
 					n\CurrElevator = eo
 					DebugLog "eo found for "+n\NPCtype
+				EndIf
+				If n\PathStatus <> 1
+					n\CurrElevator = Null
+					DebugLog "Unable to find elevator path: Resetting CurrElevator"
 				EndIf
 				Exit
 			EndIf
@@ -5214,8 +5224,9 @@ Function GoToElevator(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#47#6D#93#A3#D3#E3#EC#FA#109#11C#139#163#177#194#1CB#1E3#204#227#230
-;~F#25B#283#374#45F#5AE#7BE#86C#871#89F#941#97C#A09#A75#B8A#C50#D00#DB3#EB2#F38#F5F
-;~F#F6A#F8E#FA2#FF0#109F#116B#11DD#123D#1241#12C2#133A#134B#1366#1384#13E0#13EE
-;~B#668#F20#1456
+;~F#0#A#3D#47#6D#93#A3#D3#E3#EC#FA#109#11C#139#163#177#194#1CB#1E3#204
+;~F#227#230#25B#276#283#374#45F#5AE#7BE#86C#871#89F#941#97C#A09#A75#B8A#C50#D00#DB3
+;~F#EB2#F3E#F65#F94#FA8#10A5#1171#11E3#1243#1247#1274#12C9#1341#1352#136D#138B#13C8#13E7#13F5#1423
+;~F#1447
+;~B#668#F26#1460
 ;~C#Blitz3D

@@ -2090,6 +2090,8 @@ Repeat
 	
 	UpdateMusic()
 	
+	AutoReleaseSounds()
+	
 	If MainMenuOpen Then
 		ShouldPlay = 11
 		UpdateMainMenu()
@@ -2171,11 +2173,10 @@ Repeat
 			AmbientLight Brightness, Brightness, Brightness	
 			PlayerSoundVolume = CurveValue(0.0, PlayerSoundVolume, 5.0)
 			
-			InFacility% = True
-			
 			UpdateEmitters()
 			MouseLook()			
 			MovePlayer()
+			InFacility = CheckForPlayerInFacility()
 			UpdateDoors()
 			UpdateEvents()
 			UpdateDecals()
@@ -8362,10 +8363,28 @@ Function UpdateLeave1499()
 	EndIf
 	
 End Function
+
+Function CheckForPlayerInFacility()
+	;False (=0): NPC is not in facility (mostly meant for "dimension1499")
+	;True (=1): NPC is in facility
+	;2: NPC is in tunnels (maintenance tunnels/049 tunnels/939 storage room, etc...)
+	
+	If EntityY(Collider)>100.0
+		Return False
+	EndIf
+	If EntityY(Collider)< -10.0
+		Return 2
+	EndIf
+	If EntityY(Collider)> 7.0 And EntityY(Collider)<=100.0
+		Return 2
+	EndIf
+	
+	Return True
+End Function
 ;~IDEal Editor Parameters:
-;~F#21#126#12A#3C5#4EF#510#588#595#641#6B9#6D0#6DD#70F#7B7#89D#152F#168C#170F#1839#184B
-;~F#1867#1871#187E#18A0#18BF#18DE#18FA#190F#1913#1935#193D#1968#1B0A#1C8C#1D03#1D09#1D13#1D1F#1D2A#1D2E
-;~F#1D69#1D71#1D79#1D80#1D87#1D96#1DA5#1DC3#1DF1#1DF8#1E0B#1E24#1E51#1E5C#1E61#1E7B#1E87#1EA2#1EF4#1F02
-;~F#1F0A#1F16#1F1F#1F48#1F4D#1F52#1F57#1F60#1F68#1FF6#2000#2025#2033#203E
-;~B#1147
+;~F#21#A6#126#12A#131#3C5#4EF#510#588#595#641#6B9#6D0#6DD#70F#7B7#89E#1530#168D#1710
+;~F#183A#184C#1868#1872#187F#18A1#18C0#18DF#18FB#1910#1914#1936#193E#1969#1B0B#1C8D#1D04#1D0A#1D14#1D20
+;~F#1D2B#1D2F#1D6A#1D72#1D7A#1D81#1D88#1D97#1DA6#1DC4#1DF2#1DF9#1E0C#1E25#1E52#1E5D#1E62#1E7C#1E88#1EA3
+;~F#1EF5#1F03#1F0B#1F17#1F20#1F49#1F4E#1F53#1F58#1F61#1F69#1FF7#2001#2026#2034#203F
+;~B#1148
 ;~C#Blitz3D
