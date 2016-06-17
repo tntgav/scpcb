@@ -298,6 +298,7 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 					PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
 					PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
+					PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
 					
 					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -323,6 +324,7 @@ Function UpdateMainMenu()
 		
 		Select MainMenuTab
 			Case 1 ; New game
+				;[Block]
 				
 				x = 159 * MenuScale
 				y = 286 * MenuScale
@@ -458,7 +460,9 @@ Function UpdateMainMenu()
 					
 				EndIf
 				
+				;[End Block]
 			Case 2 ;load game
+				;[Block]
 				
 				y = y + height + 20 * MenuScale
 				width = 580 * MenuScale
@@ -514,7 +518,9 @@ Function UpdateMainMenu()
 					Next
 				EndIf
 				
+				;[End Block]
 			Case 3,5,6,7 ;options
+				;[Block]
 				
 				x = 159 * MenuScale
 				y = 286 * MenuScale
@@ -634,7 +640,7 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
-					height = 160 * MenuScale
+					height = 200 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
@@ -658,6 +664,34 @@ Function UpdateMainMenu()
 					;	PlayTestSound(False)
 					;EndIf
 					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					Text x + 20 * MenuScale, y, "Sound auto-release:"
+					EnableSFXRelease = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableSFXRelease)
+					If EnableSFXRelease_Prev% <> EnableSFXRelease
+						If EnableSFXRelease%
+							For snd.Sound = Each Sound
+								For i=0 To 31
+									If snd\channels[i]<>0 Then
+										If ChannelPlaying(snd\channels[i]) Then
+											StopChannel(snd\channels[i])
+										EndIf
+									EndIf
+								Next
+								If snd\internalHandle<>0 Then
+									FreeSound snd\internalHandle
+									snd\internalHandle = 0
+								EndIf
+								snd\releaseTime = 0
+							Next
+						Else
+							For snd.Sound = Each Sound
+								If snd\internalHandle = 0 Then snd\internalHandle = LoadSound(snd\name)
+							Next
+						EndIf
+						EnableSFXRelease_Prev% = EnableSFXRelease
+					EndIf
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
@@ -700,6 +734,8 @@ Function UpdateMainMenu()
 						If UserTrackCheck%>0
 							Text x + 180 * MenuScale, y + 30 * MenuScale, "User tracks found ("+UserTrackCheck2+"/"+UserTrackCheck+" successfully loaded)"
 						EndIf
+					Else
+						UserTrackCheck%=0
 					EndIf
 					;[End Block]
 				ElseIf MainMenuTab = 6 ;Controls
@@ -811,7 +847,9 @@ Function UpdateMainMenu()
 					
 					;[End Block]
 				EndIf
+				;[End Block]
 			Case 4 ; load map
+				;[Block]
 				y = y + height + 20 * MenuScale
 				width = 580 * MenuScale
 				height = 350 * MenuScale
@@ -861,6 +899,7 @@ Function UpdateMainMenu()
 				EndIf
 				
 				
+				;[End Block]
 		End Select
 		
 	End If
@@ -1405,5 +1444,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#22D#2C2#302
+;~F#31#146#1D1#233#2E6#326#354
 ;~C#Blitz3D

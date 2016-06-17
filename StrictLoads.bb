@@ -82,7 +82,7 @@ Function PlaySound_Strict%(sndHandle%)
 								ConsoleOpen = True
 							EndIf
 						Else
-							snd\internalHandle = LoadSound(snd\name)
+							If EnableSFXRelease Then snd\internalHandle = LoadSound(snd\name)
 						EndIf
 						If snd\internalHandle = 0 Then
 							CreateConsoleMsg("Failed to load Sound: "+snd\name)
@@ -104,7 +104,7 @@ Function PlaySound_Strict%(sndHandle%)
 							ConsoleOpen = True
 						EndIf
 					Else
-						snd\internalHandle = LoadSound(snd\name)
+						If EnableSFXRelease Then snd\internalHandle = LoadSound(snd\name)
 					EndIf
 						
 					If snd\internalHandle = 0 Then
@@ -130,6 +130,7 @@ Function LoadSound_Strict(file$)
 	snd\name = file
 	snd\internalHandle = 0
 	snd\releaseTime = 0
+	If (Not EnableSFXRelease) Then snd\internalHandle = LoadSound(snd\name)
 	
 	Return Handle(snd)
 End Function

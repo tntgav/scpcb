@@ -29,6 +29,9 @@ Global ButtonSFX%
 
 BumpPower 0.03
 
+Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
+Global EnableSFXRelease_Prev% = EnableSFXRelease%
+
 Dim ArrowIMG(4)
 
 ;[Block]
@@ -2023,10 +2026,6 @@ Global ApacheObj%,ApacheRotorObj%
 
 Global UnableToMove% = False
 
-;--------------------------------------- DL_Light (for Flashlight) ------------------------------------------------------------
-;The Flashlight-Thingy is a new feature in version 1.3.0 - ENDSHN
-Include "DL_Lights.bb"
-
 ;---------------------------------------------------------------------------------------------------
 
 Include "menu.bb"
@@ -2089,8 +2088,7 @@ Repeat
 	If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
 	
 	UpdateMusic()
-	
-	AutoReleaseSounds()
+	If EnableSFXRelease Then AutoReleaseSounds()
 	
 	If MainMenuOpen Then
 		ShouldPlay = 11
@@ -2185,7 +2183,6 @@ Repeat
 			UpdateItems()
 			UpdateParticles()
 			UpdateScreens()
-			;DL_Update()
 			UpdateRoomLights()
 			UpdateLeave1499()
 		EndIf
@@ -5017,6 +5014,9 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
 				PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
 				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
+				PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
+				PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
+				PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
 				
 				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -5764,10 +5764,6 @@ Function LoadEntities()
 	
 	;LoadRoomMeshes()
 	
-	;New Stuff for Loading in SCP:CB 1.3 - ENDSHN
-	;DL_Init()
-	;DL_SetReceiver(renderbrushes,RoomScale#,RoomScale#,RoomScale#)
-	;DL_SetLight(Camera,40,0.5)
 	
 End Function
 
@@ -5852,10 +5848,10 @@ Function InitNewGame()
 		
 	Next
 	
-	;Local rt.RoomTemplates
-	;For rt.RoomTemplates = Each RoomTemplates
-		;FreeEntity (rt\obj)
-	;Next	
+	Local rt.RoomTemplates
+	For rt.RoomTemplates = Each RoomTemplates
+		FreeEntity (rt\obj)
+	Next	
 	
 	Local tw.TempWayPoints
 	For tw.TempWayPoints = Each TempWayPoints
@@ -5877,8 +5873,6 @@ Function InitNewGame()
 	BlinkTimer = -10
 	BlurTimer = 100
 	Stamina = 100
-	
-	;DL_SetReceiver(BigRoomMesh)
 	
 	For i% = 0 To 70
 		FPSfactor = 1.0
@@ -5937,9 +5931,9 @@ Function InitLoadGame()
 	BlinkTimer = BLINKFREQ
 	Stamina = 100
 	
-	;For rt.RoomTemplates = Each RoomTemplates
-	;	If rt\obj <> 0 Then FreeEntity(rt\obj) : rt\obj = 0
-	;Next
+	For rt.RoomTemplates = Each RoomTemplates
+		If rt\obj <> 0 Then FreeEntity(rt\obj) : rt\obj = 0
+	Next
 	
 	DropSpeed = 0.0
 	
@@ -6162,8 +6156,6 @@ Function NullGame()
 		If ChannelPlaying(RadioCHN(i)) Then StopChannel(RadioCHN(i))
 	Next
 	
-	;Deleting all Stuff for SCP:CB 1.3 (new additional stuff) - ENDSHN
-	;DL_Free()
 	NTF_1499PrevX# = 0.0
 	NTF_1499PrevY# = 0.0
 	NTF_1499PrevZ# = 0.0
@@ -6180,7 +6172,7 @@ Function NullGame()
 	Brightness = 40
 	StoredBrightness% = 40
 	
-	AchievementsMenu = 0
+	AchievementsMenu = -1
 	QuitMSG = 0
 	OptionsMenu = 0
 	
@@ -8382,9 +8374,9 @@ Function CheckForPlayerInFacility()
 	Return True
 End Function
 ;~IDEal Editor Parameters:
-;~F#21#A6#126#12A#131#3C5#4EF#510#588#595#641#6B9#6D0#6DD#70F#7B7#89E#1530#168D#1710
-;~F#183A#184C#1868#1872#187F#18A1#18C0#18DF#18FB#1910#1914#1936#193E#1969#1B0B#1C8D#1D04#1D0A#1D14#1D20
-;~F#1D2B#1D2F#1D6A#1D72#1D7A#1D81#1D88#1D97#1DA6#1DC4#1DF2#1DF9#1E0C#1E25#1E52#1E5D#1E62#1E7C#1E88#1EA3
-;~F#1EF5#1F03#1F0B#1F17#1F20#1F49#1F4E#1F53#1F58#1F61#1F69#1FF7#2001#2026#2034#203F
-;~B#1148
+;~F#129#12D#4F2#513#58B#598#644#6BC#6D3#6E0#712#7BA#89B#1530#1832#1844#1860#186A#1877#1899
+;~F#18B8#18D7#18F3#1908#190C#192E#1936#1961#1B03#1C85#1CFC#1D02#1D0C#1D18#1D23#1D27#1D62#1D6A#1D72#1D79
+;~F#1D80#1D8F#1D9E#1DBC#1DEA#1DF1#1E04#1E1D#1E4A#1E55#1E5A#1E74#1E80#1E9B#1EED#1EFB#1F03#1F0F#1F18#1F41
+;~F#1F46#1F4B#1F50#1F59#1F61#1FEF#1FF9#201E#202C#2037
+;~B#1145
 ;~C#Blitz3D

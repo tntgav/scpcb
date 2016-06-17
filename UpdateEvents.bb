@@ -5992,15 +5992,21 @@ Function UpdateEvents()
 								PointEntity n\Collider,Collider
 								e\room\NPC[1] = n
 								
-								For i = -1 To 1 Step 2
-									n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[5],True), EntityY(e\room\Objects[5],True)+0.2, EntityZ(e\room\Objects[5],True))
-									n\State = 6
-									n\Reload = (6*70)+Rnd(15,30)
-									RotateEntity n\Collider,0,EntityYaw(e\room\NPC[1]\Collider),0
-									MoveEntity n\Collider,0.5*i,0,0
-									PointEntity n\Collider,Collider
-								Next
+								n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[5],True), EntityY(e\room\Objects[5],True)+0.2, EntityZ(e\room\Objects[5],True))
+								n\State = 6
+								n\Reload = (6*70)+Rnd(15,30)
+								RotateEntity n\Collider,0,EntityYaw(e\room\NPC[1]\Collider),0
+								MoveEntity n\Collider,0.5,0,0
+								PointEntity n\Collider,Collider
 								
+								n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[5],True), EntityY(e\room\Objects[5],True)+0.2, EntityZ(e\room\Objects[5],True))
+								n\State = 7
+								n\Reload = 70*2
+								RotateEntity n\Collider,0,EntityYaw(e\room\NPC[1]\Collider),0
+								MoveEntity n\Collider,-0.65,0,0
+								e\room\NPC[2] = n
+								
+								MoveEntity e\room\NPC[1]\Collider,0,0,0.1
 								PointEntity Collider, e\room\NPC[1]\Collider
 								
 								PlaySound_Strict LoadTempSound("SFX\049\MTF_1.ogg")
@@ -6016,7 +6022,23 @@ Function UpdateEvents()
 						
 						;Msg = ""
 						
+						If e\room\NPC[2]\State = 7
+							If e\room\NPC[2]\State3 < 70*4
+								e\room\NPC[2]\State3 = e\room\NPC[2]\State3 + FPSfactor
+							Else
+								e\room\NPC[2]\State = 6
+								e\room\NPC[2]\Reload = e\room\NPC[1]\Reload+Rnd(15,30)
+							EndIf
+						EndIf
+						
+						pvt% = CreatePivot()
+						PositionEntity pvt%,EntityX(e\room\NPC[1]\Collider),EntityY(e\room\NPC[1]\Collider)+0.2,EntityZ(e\room\NPC[1]\Collider)
+						
 						PointEntity Collider, e\room\NPC[1]\Collider
+						PointEntity Camera, pvt%
+						
+						FreeEntity pvt%
+						
 						If KillTimer < 0 Then
 							If ChannelPlaying(e\room\NPC[1]\SoundChn) Then StopChannel(e\room\NPC[1]\SoundChn)
 							PlaySound_Strict LoadTempSound("SFX\049\MTF_2.ogg")
@@ -8036,6 +8058,6 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#11#104#4E6#4F6#545#5AE#60D#7DB#9C2#9E9#9F7#A01#A0E#BF7#C18#C67#CB5#CC2#CFC#D13
 ;~F#D33#D3C#D46#D55#DE9#E0B#10B7#10FD#1113#111F#113D#118E#11A5#1272#1373#1404#141D#143C#146D#147A
-;~F#1493#152B#16E1#1792#17E6#1897#1947#19FF#1A17#1AD8#1B05#1B22#1B49#1B79#1B96#1BBA#1C14#1C54#1C85#1C98
-;~F#1D50#1DA8#1DBB#1DC9#1DD2#1E18#1E37#1EDD
+;~F#1493#152B#17A8#17FC#18AD#195D#1A15#1A2D#1AEE#1B1B#1B38#1B5F#1B8F#1BAC#1BD0#1C2A#1C6A#1C9B#1CAE#1D66
+;~F#1DBE#1DD1#1DDF#1DE8#1E2E#1E4D#1EF3
 ;~C#Blitz3D

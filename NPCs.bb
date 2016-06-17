@@ -1944,7 +1944,8 @@ Function UpdateNPCs()
 						;65, 80, 93, 109, 123
 							If n\CurrSpeed > 0.005 Then
 								If (prevFrame < 977 And n\Frame=>977) Or (prevFrame > 1010 And n\Frame<940) Then
-									PlaySound2(StepSFX(0,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+									;PlaySound2(StepSFX(0,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+									PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 								EndIf
 							EndIf						
 						Case 3
@@ -4759,6 +4760,30 @@ Function UpdateMTFUnit(n.NPCs)
 				EndIf
 				
 				;[End Block]
+			Case 7 ;just shooting
+				;[Block]
+				AnimateNPC(n, 346, 351, 0.2, False)
+				
+				n\Angle = EntityYaw(n\Collider)
+				
+				If n\Reload =< 0 
+					LightVolume = TempLightVolume*1.2
+					PlaySound2(GunshotSFX, Camera, n\Collider, 20)
+					
+					pvt% = CreatePivot()
+					
+					RotateEntity(pvt, EntityPitch(n\Collider), EntityYaw(n\Collider), 0, True)
+					PositionEntity(pvt, EntityX(n\obj), EntityY(n\obj), EntityZ(n\obj))
+					MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
+					
+					p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 1, Rnd(0.08,0.1), 0.0, 5)
+					TurnEntity p\obj, 0,0,Rnd(360)
+					p\Achange = -0.15
+					
+					FreeEntity(pvt)
+					n\Reload = 7
+				End If
+				;[End Block]
 		End Select
 		
 		If n\CurrSpeed > 0.01 Then
@@ -4794,7 +4819,7 @@ Function UpdateMTFUnit(n.NPCs)
 		EndIf
 		
 		;teleport back to the facility if fell through the floor
-		If n\State <> 6
+		If n\State <> 6 And n\State <> 7
 			If (EntityY(n\Collider) < -10.0) Then
 				TeleportCloser(n)
 			EndIf
@@ -5225,8 +5250,8 @@ Function GoToElevator(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#3D#47#6D#93#A3#D3#E3#EC#FA#109#11C#139#163#177#194#1CB#1E3#204
-;~F#227#230#25B#276#283#374#45F#5AE#7BE#86C#871#89F#941#97C#A09#A75#B8A#C50#D00#DB3
-;~F#EB2#F3E#F65#F94#FA8#10A5#1171#11E3#1243#1247#1274#12C9#1341#1352#136D#138B#13C8#13E7#13F5#1423
-;~F#1447
-;~B#668#F26#1460
+;~F#227#230#25B#283#374#45F#5AE#729#7BF#86D#872#8A0#942#97D#A0A#A76#B8B#C51#D01#DB4
+;~F#EB3#F3F#F66#F95#FA9#FF7#10A6#1172#11E4#1244#1248#1275#12E2#135A#136B#1386#13A4#13E1#1400#140E
+;~F#143C#1460
+;~B#668#F27#1479
 ;~C#Blitz3D
