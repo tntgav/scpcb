@@ -1451,9 +1451,18 @@ Function UpdateDoors()
 				If d\frameobj <> 0 Then ShowEntity d\frameobj
 				If d\obj2 <> 0 Then ShowEntity d\obj2
 				If d\buttons[0] <> 0 Then ShowEntity d\buttons[0]
-				If d\buttons[1] <> 0 Then ShowEntity d\buttons[1]							
+				If d\buttons[1] <> 0 Then ShowEntity d\buttons[1]
 			EndIf
 			
+			If PlayerRoom\RoomTemplate\Name$ = "room2sl"
+				If ValidRoom2slCamRoom(d\room)
+					If d\obj <> 0 Then ShowEntity d\obj
+					If d\frameobj <> 0 Then ShowEntity d\frameobj
+					If d\obj2 <> 0 Then ShowEntity d\obj2
+					If d\buttons[0] <> 0 Then ShowEntity d\buttons[0]
+					If d\buttons[1] <> 0 Then ShowEntity d\buttons[1]
+				EndIf
+			EndIf
 		Next
 		
 		UpdateDoorsTimer = 30
@@ -1971,6 +1980,17 @@ Function InitEvents()
 	CreateEvent("room1162","room1162",0)
 	CreateEvent("room2scps2","room2scps2",0)
 	CreateEvent("room3gw","room3gw",0)
+	CreateEvent("room2sl","room2sl",0)
+	
+	CreateEvent("096spawn","room4pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","room3pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","room2pipes",0,0.4+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","room2pit",0,0.5+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","room3tunnel",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","room4tunnels",0,0.7+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","tunnel",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","tunnel2",0,0.4+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","room3z2",0,0.7+(0.2*SelectedDifficulty\aggressiveNPCs))
 	
 End Function
 
@@ -2183,7 +2203,7 @@ Repeat
 			UpdateItems()
 			UpdateParticles()
 			UpdateScreens()
-			UpdateRoomLights()
+			UpdateRoomLights(Camera)
 			UpdateLeave1499()
 		EndIf
 		
@@ -4445,6 +4465,27 @@ Function DrawGUI()
 											strtemp = strtemp + Upper(UserTrackName$(RadioState(0))) + "          "
 											UserTrackFlag = False
 										EndIf
+										
+										If KeyHit(2) Then
+											PlaySound_Strict RadioSquelch
+											If (Not UserTrackMode)
+												RadioState(0) = Rand(0,UserTrackMusicAmount-1)
+											EndIf
+											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
+											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
+											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
+											If (Not UserTrackFlag%)
+												If UserTrackMode
+													If RadioState(0)<(UserTrackMusicAmount-1)
+														RadioState(0) = RadioState(0) + 1
+													Else
+														RadioState(0) = 0
+													EndIf
+													UserTrackFlag = True
+												EndIf
+											EndIf
+											DebugLog "CurrTrack: "+RadioState(0)
+										EndIf
 									EndIf
 								Case 1 ;hälytyskanava
 									DebugLog RadioState(1) 
@@ -6172,7 +6213,6 @@ Function NullGame()
 	Brightness = 40
 	StoredBrightness% = 40
 	
-	AchievementsMenu = -1
 	QuitMSG = 0
 	OptionsMenu = 0
 	
@@ -8374,9 +8414,9 @@ Function CheckForPlayerInFacility()
 	Return True
 End Function
 ;~IDEal Editor Parameters:
-;~F#129#12D#4F2#513#58B#598#644#6BC#6D3#6E0#712#7BA#89B#1530#1832#1844#1860#186A#1877#1899
-;~F#18B8#18D7#18F3#1908#190C#192E#1936#1961#1B03#1C85#1CFC#1D02#1D0C#1D18#1D23#1D27#1D62#1D6A#1D72#1D79
-;~F#1D80#1D8F#1D9E#1DBC#1DEA#1DF1#1E04#1E1D#1E4A#1E55#1E5A#1E74#1E80#1E9B#1EED#1EFB#1F03#1F0F#1F18#1F41
-;~F#1F46#1F4B#1F50#1F59#1F61#1FEF#1FF9#201E#202C#2037
-;~B#1145
+;~F#24#A9#129#12D#134#3C8#4F2#513#58B#64D#6C5#6DC#6E9#7CE#8AF#96B#982#A15#B34#DBF
+;~F#FA8#1367#1559#185A#186C#1888#1892#189F#18C1#18E0#18FF#191B#1930#1934#1956#195E#1989#1B2B#1CAD#1D24
+;~F#1D2A#1D34#1D40#1D4B#1D4F#1D8A#1D92#1D9A#1DA1#1DA8#1DB7#1DC6#1DE4#1E12#1E19#1E2C#1E45#1E72#1E7D#1E82
+;~F#1E9C#1EA8#1EC3#1F15#1F23#1F2B#1F37#1F40#1F69#1F6E#1F73#1F78#1F81#1F89#2017#2021#2046#2054#205F
+;~B#1159
 ;~C#Blitz3D
