@@ -5768,8 +5768,13 @@ Function LoadEntities()
 	Next
 	
 	UserTrackMusicAmount% = 0
-	If EnableUserTracks
-		Dir=ReadDir("SFX\Radio\UserTracks\")
+	If EnableUserTracks Then
+		Local dirPath$ = "SFX\Radio\UserTracks\"
+		If FileType(dirPath)<>2 Then
+			CreateDir(dirPath)
+		EndIf
+		
+		Local Dir% = ReadDir("SFX\Radio\UserTracks\")
 		Repeat
 			file$=NextFile(Dir)
 			If file$="" Then Exit
