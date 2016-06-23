@@ -3977,9 +3977,9 @@ Function UpdateNPCs()
 									PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
 									If Injuries > 10.0
 										Kill()
-										DeathMSG = "A dispatch team has been sent in order to find SCP-1499 after it was reported stolen. The dispatch team "
-										DeathMSG = DeathMSG + "couldn't find SCP-1499 anywhere. It is believed that somebody wore SCP-1499 and might be killed "
-										DeathMSG = DeathMSG + "by an SCP-1499-1 instance. SCP-1499 right now is reported as "+Chr(34)+"Lost"+Chr(34)+"."
+										DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
+										DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
+										DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
 									EndIf
 								EndIf
 							ElseIf n\Frame => 99

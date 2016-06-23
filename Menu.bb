@@ -585,7 +585,7 @@ Function UpdateMainMenu()
 					y=y+30*MenuScale
 					
 					Color 255,255,255
-					Text(x + 20 * MenuScale, y, "Antialias:")
+					Text(x + 20 * MenuScale, y, "Anti-aliasing:")
 					Opt_AntiAlias = DrawTick(x + 310 * MenuScale, y + MenuScale, Opt_AntiAlias%)
 					Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
 					
@@ -830,7 +830,7 @@ Function UpdateMainMenu()
 					Color 255,255,255
 					Text(x + 20 * MenuScale, y, "Framelimit:")
 					Color 255,255,255
-					If DrawTick(x + 270 * MenuScale, y, CurrFrameLimit > 0.0) Then
+					If DrawTick(x + 310 * MenuScale, y, CurrFrameLimit > 0.0) Then
 						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+23*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
 						CurrFrameLimit = Max(CurrFrameLimit, 0.1)
 						Framelimit% = CurrFrameLimit#*100.0
@@ -1335,13 +1335,16 @@ Function DrawFrame(x%, y%, width%, height%, xoffset%=0, yoffset%=0)
 	DrawTiledImageRect(MenuBlack, yoffset, (y Mod 256), 512, 512, x+3*MenuScale, y+3*MenuScale, width-6*MenuScale, height-6*MenuScale)	
 End Function
 
-Function DrawButton%(x%, y%, width%, height%, txt$, bigfont% = True)
+Function DrawButton%(x%, y%, width%, height%, txt$, bigfont% = True, waitForMouseUp%=False)
 	Local clicked% = False
 	
 	DrawFrame (x, y, width, height)
 	If MouseOn(x, y, width, height) Then
 		Color(30, 30, 30)
-		If MouseHit1 Then clicked = True : PlaySound_Strict(ButtonSFX)
+		If (MouseHit1 And (Not waitForMouseUp)) Or (MouseUp1 And waitForMouseUp) Then 
+			clicked = True
+			PlaySound_Strict(ButtonSFX)
+		EndIf
 		Rect(x + 4, y + 4, width - 8, height - 8)	
 	Else
 		Color(0, 0, 0)
