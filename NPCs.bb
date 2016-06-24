@@ -573,8 +573,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 				n\obj = LoadAnimMesh_Strict("GFX\npcs\1499-1.b3d")
 			EndIf
 			
-			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "speed") / 100.0)
-			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 6.0)
+			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "speed") / 100.0) * Rnd(0.9,1.1)
+			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 6.0) * Rnd(0.8,1.0)
 			
 			ScaleEntity n\obj, temp, temp, temp
 			
@@ -3930,26 +3930,57 @@ Function UpdateNPCs()
 						If n\CurrSpeed = 0.0
 							AnimateNPC(n,296,317,0.2)
 						Else
-							AnimateNPC(n,1,62,(n\CurrSpeed*28)*Rnd(0.95,1.05))
-						EndIf
-						
-						dist = EntityDistance(n\Collider,Collider)
-						If (Not NoTarget) And dist < 5.0
-							If EntityVisible(n\Collider,Collider)
-								n\State = 1
-								n\State2 = 0
-								PlaySound_Strict NTF_1499FuckedSFX
+							If (n\ID Mod 2 = 0) Then
+								AnimateNPC(n,1,62,(n\CurrSpeed*28))
+							Else
+								AnimateNPC(n,100,167,(n\CurrSpeed*28))
 							EndIf
 						EndIf
 						
-						For n2.NPCs = Each NPCs
-							If n2\NPCtype = n\NPCtype And n2 <> n
-								If n2\State = 1
-									n\State = 1
-									n\State2 = 0
+						;randomly play the "screaming animation" and revert back to state 0
+						If (Rand(5000)=1) Then
+							n\State = 2
+							n\State2 = 0
+							
+							If Not ChannelPlaying(n\SoundChn) Then
+								dist = EntityDistance(n\Collider,Collider)
+								If (dist < 20.0) Then
+									If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+									n\Sound = LoadSound_Strict("SFX\1499\1499_"+Rand(1,4)+".ogg")
+									n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider, 20.0)
 								EndIf
 							EndIf
-						Next
+						EndIf
+						
+						If (n\ID Mod 2 = 0) And (Not NoTarget) Then
+							dist = EntityDistance(n\Collider,Collider)
+							If dist < 10.0 Then
+								If EntityVisible(n\Collider,Collider) Then
+									;play the "screaming animation"
+									n\State = 2
+									If dist < 5.0 Then
+										If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+										n\Sound = LoadSound_Strict("SFX\1499\1499_alarm.ogg")
+										n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
+										
+										n\State2 = 1 ;if player is too close, switch to attack after screaming
+										
+										PlaySound_Strict NTF_1499FuckedSFX
+										
+										For n2.NPCs = Each NPCs
+											If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
+												n2\State = 1
+												n2\State2 = 0
+											EndIf
+										Next
+									Else
+										n\State2 = 0 ;otherwise keep idling
+									EndIf
+									
+									n\Frame = 203
+								EndIf
+							EndIf
+						EndIf
 					Case 1
 						If NoTarget Then n\State = 0
 						
@@ -3965,7 +3996,11 @@ Function UpdateNPCs()
 						If n\State2 = 0.0
 							n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
 							
-							AnimateNPC(n,1,62,(n\CurrSpeed*28)*Rnd(0.95,1.05))
+							If (n\ID Mod 2 = 0) Then
+								AnimateNPC(n,1,62,(n\CurrSpeed*28))
+							Else
+								AnimateNPC(n,100,167,(n\CurrSpeed*28))
+							EndIf
 						Else
 							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
 							AnimateNPC(n,63,100,0.6,False)
@@ -3986,7 +4021,19 @@ Function UpdateNPCs()
 								n\State2 = 0.0
 							EndIf
 						EndIf
+					Case 2 ;play the "screaming animation" and switch to n\state2 after it's finished
+						n\CurrSpeed = 0.0
+						AnimateNPC(n,203,295,0.1,False)
+						
+						If n\Frame > 294.0 Then
+							n\State = n\State2
+						EndIf
 				End Select
+				
+				
+				If n\SoundChn <> 0 And ChannelPlaying(n\SoundChn) Then
+					UpdateSoundOrigin(n\SoundChn,Camera,n\Collider,20.0)
+				EndIf
 				
 				MoveEntity n\Collider,0,0,n\CurrSpeed*FPSfactor
 				

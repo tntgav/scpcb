@@ -7686,7 +7686,7 @@ Function UpdateEvents()
 							Next
 						EndIf
 						;[End Block]
-						For i = 0 To 99
+						For i = 0 To 50
 							n.NPCs = CreateNPC(NPCtype1499,EntityX(e\room\obj)+Rnd(-60.0,60.0),EntityY(e\room\obj)+0.5,EntityZ(e\room\obj)+Rnd(-60.0,60.0))
 							If Rand(2)=1 Then n\State2 = 500*3
 							n\Angle = Rnd(360)
