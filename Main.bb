@@ -3208,7 +3208,7 @@ Function DrawGUI()
 	EndIf
 	
 	
-	If ClosestButton <> 0 And SelectedDoor = Null And InvOpen = False And OtherOpen = Null Then
+	If ClosestButton <> 0 And SelectedDoor = Null And InvOpen = False And MenuOpen = False And OtherOpen = Null Then
 		temp% = CreatePivot()
 		PositionEntity temp, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
 		PointEntity temp, ClosestButton
@@ -4909,7 +4909,6 @@ Function DrawGUI()
 				;new Items in SCP:CB 1.3
 				Case "scp1499"
 					If (Not Wearing1499%) Then
-						Msg = "You took on SCP-1499 and you appeared in a strange dimension."
 						;Wearing178 = 0
 						;WearingGasMask = 0
 						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
@@ -5179,7 +5178,7 @@ Function DrawMenu()
 					y=y+45*MenuScale
 					
 					Color 255,255,255
-					Text(x, y, "Texture details:")
+					Text(x, y, "Texture quality:")
 					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
 					If MouseHit1
 						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, MouseX(),MouseY(),0,0)
@@ -5409,7 +5408,7 @@ Function DrawMenu()
 		If AchievementsMenu<=0 And OptionsMenu<=0 And QuitMSG<=0 Then
 			If KillTimer >= 0 Then	
 				y = y+ 104*MenuScale
-				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Resume") Then
+				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Resume", True, True) Then
 					MenuOpen = False
 					ResumeSounds()
 					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
@@ -5798,8 +5797,13 @@ Function LoadEntities()
 	Next
 	
 	UserTrackMusicAmount% = 0
-	If EnableUserTracks
-		Dir=ReadDir("SFX\Radio\UserTracks\")
+	If EnableUserTracks Then
+		Local dirPath$ = "SFX\Radio\UserTracks\"
+		If FileType(dirPath)<>2 Then
+			CreateDir(dirPath)
+		EndIf
+		
+		Local Dir% = ReadDir("SFX\Radio\UserTracks\")
 		Repeat
 			file$=NextFile(Dir)
 			If file$="" Then Exit
