@@ -651,7 +651,9 @@ Function UpdateMainMenu()
 					
 					y = y + 30*MenuScale
 					
-					SFXVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, SFXVolume*100.0)/100.0)
+					;SFXVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, SFXVolume*100.0)/100.0)
+					PrevSFXVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, SFXVolume*100.0)/100.0)
+					SFXVolume = PrevSFXVolume
 					Color 255,255,255
 					Text(x + 20 * MenuScale, y, "Sound volume:")
 					;If MouseDown1 Then
@@ -999,16 +1001,43 @@ Function UpdateLauncher()
 			y=y+20
 		Next
 		
-		Fullscreen = DrawTick(40 + 430 - 15, 260 - 55, Fullscreen)
-		FakeFullScreen = DrawTick(40 + 430 - 15, 260 - 55 + 30, FakeFullScreen)		
-		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 70, LauncherEnabled)
+		Fullscreen = DrawTick(40 + 430 - 15, 260 - 55 - 10, Fullscreen, FakeFullScreen)
+		FakeFullScreen = DrawTick(40 + 430 - 15, 260 - 55 + 20, FakeFullScreen)
+		lock% = False
+		If FakeFullScreen Or (Not Fullscreen) Then lock% = True
+		Bit16Mode = DrawTick(40 + 430 - 15, 260 - 55 + 50, Bit16Mode,lock%)
+		Win8Mode = DrawTick(40 + 430 - 15, 260 - 55 + 80, Win8Mode)
+		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 110, LauncherEnabled)
 		
-		
+		If FakeFullScreen
+			Color 255, 0, 0
+			Fullscreen = False
+		Else
+			Color 255, 255, 255
+		EndIf
+		Text(40 + 430 + 15, 262 - 55 - 10, "Fullscreen")
 		Color 255, 255, 255
-		Text(40 + 430 + 15, 262 - 55, "Fullscreen")
-		Text(40 + 430 + 15, 262 - 55 + 30, "Fake Fullscreen")		
-		Text(40 + 430 + 15, 262 - 55 + 70, "Use launcher")
+		Text(40 + 430 + 15, 262 - 55 + 20, "Fake fullscreen")
+		If FakeFullScreen Or (Not Fullscreen)
+			Color 255, 0, 0
+			Bit16Mode = False
+		Else
+			Color 255, 255, 255
+		EndIf
+		Text(40 + 430 + 15, 262 - 55 + 50, "16 Bit")
+		Color 255, 255, 255
+		Text(40 + 430 + 15, 262 - 55 + 80, "Win8 mode")
+		Text(40 + 430 + 15, 262 - 55 + 110, "Use launcher")
 		
+		If (Not FakeFullScreen)
+			If Fullscreen
+				Text(40+ 260 + 15, 262 - 55 + 140, "Current Reolsution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + (16+(16*(Not Bit16Mode)))))
+			Else
+				Text(40+ 260 + 15, 262 - 55 + 140, "Current Reolsution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + 32))
+			EndIf
+		Else
+			Text(40+ 260 + 15, 262 - 55 + 140, "Current Reolsution: "+(G_viewport_width + "x" + G_viewport_height + "," + 32))
+		EndIf
 		
 		If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 55, 100, 30, "LAUNCH", False) Then
 			GraphicWidth = GfxModeWidths(SelectedGFXMode)
@@ -1037,7 +1066,16 @@ Function UpdateLauncher()
 	Else
 		PutINIValue(OptionFile, "options", "fakefullscreen", "false")
 	EndIf
-	
+	If Win8Mode Then
+		PutINIValue(OptionFile, "options", "compability mode", "true")
+	Else
+		PutINIValue(OptionFile, "options", "compability mode", "false")
+	EndIf
+	If Bit16Mode Then
+		PutINIValue(OptionFile, "options", "16bit", "true")
+	Else
+		PutINIValue(OptionFile, "options", "16bit", "false")
+	EndIf
 	PutINIValue(OptionFile, "options", "gfx driver", SelectedGFXDriver)
 	
 End Function
@@ -1444,5 +1482,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#146#1D1#233#2E6#326#354
+;~F#31#76#146#1D1#233#2E8#328#356
 ;~C#Blitz3D

@@ -2194,6 +2194,10 @@ Function FillRoom(r.Rooms)
 			sc\angle = 45
 			sc\turn = 0
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			
+			r\Objects[3] = CreatePivot()
+			PositionEntity r\Objects[3],r\x-152.0*RoomScale,r\y+160.0*RoomScale,r\z-128.0*RoomScale,True
+			EntityParent r\Objects[3],r\obj
 			;[End Block]
 		Case "checkpoint2"
 			;[Block]
@@ -2219,6 +2223,10 @@ Function FillRoom(r.Rooms)
 			
 			r\RoomDoors[0]\timer = 70 * 5
 			r\RoomDoors[1]\timer = 70 * 5
+			
+			r\Objects[3] = CreatePivot()
+			PositionEntity r\Objects[3],r\x+152.0*RoomScale,r\y+160.0*RoomScale,r\z+128.0*RoomScale,True
+			EntityParent r\Objects[3],r\obj
 			
 			;[End Block]
 		Case "room2pit"
@@ -4339,7 +4347,7 @@ Function FillRoom(r.Rooms)
 			r\Objects[1] = CreateButton(r\x - 96.0*RoomScale, r\y + 160.0 * RoomScale, r\z + 64.0 * RoomScale, 0,0,0)
 			EntityParent (r\Objects[1],r\obj)
 			
-			sc.SecurityCams = CreateSecurityCam(r\x+384.0*RoomScale, r\y+448.0*RoomScale, r\z-960.0*RoomScale, r, True)
+			sc.SecurityCams = CreateSecurityCam(r\x+384.0*RoomScale, r\y+(448-64)*RoomScale, r\z-960.0*RoomScale, r, True)
 			sc\angle = 45
 			sc\turn = 45
 			sc\room = r
@@ -4361,15 +4369,30 @@ Function FillRoom(r.Rooms)
 			RotateEntity it\obj, 0, r\angle+Rand(245), 0
 			EntityParent(it\obj, r\obj)
 			;[End Block]
-		Case "room2gw"
+		Case "room2gw","room2gw_b"
 		    ;[Block]
-            r\Objects[2] = CreatePivot(r\obj)
-			PositionEntity (r\Objects[2], r\x - 156.825*RoomScale, -37.3458*RoomScale, r\z+121.364*RoomScale, True)
+			If r\RoomTemplate\Name = "room2gw_b"
+				r\Objects[2] = CreatePivot(r\obj)
+				PositionEntity (r\Objects[2], r\x - 156.825*RoomScale, -37.3458*RoomScale, r\z+121.364*RoomScale, True)
+				
+				de.Decals = CreateDecal(3,  r\x - 156.825*RoomScale, -37.3458*RoomScale, r\z+121.364*RoomScale,90,Rnd(360),0)
+				de\Size = 0.5
+				ScaleSprite(de\obj, de\Size,de\Size)
+				EntityParent de\obj, r\obj
+			EndIf
 			
-			de.Decals = CreateDecal(3,  r\x - 156.825*RoomScale, -37.3458*RoomScale, r\z+121.364*RoomScale,90,Rnd(360),0)
-			de\Size = 0.5
-			ScaleSprite(de\obj, de\Size,de\Size)
-			EntityParent de\obj, r\obj
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, 0.0, r\z - 382.0 * RoomScale, 90, r, False, False)
+			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
+            PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			r\RoomDoors[0]\dir = 0 : r\RoomDoors[0]\AutoClose = False	: r\RoomDoors[0]\open = True  : r\RoomDoors[0]\locked = True	
+			r\RoomDoors[0]\MTFClose = False
+			
+			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, 0.0, r\z + 462.0 * RoomScale, 270, r, False, False)
+			PositionEntity(r\RoomDoors[1]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
+            PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			r\RoomDoors[1]\dir = 0 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
+			r\RoomDoors[1]\MTFClose = False
+			FreeEntity r\RoomDoors[1]\obj2 : r\RoomDoors[1]\obj2 = 0
 			;[End Block]
 		Case "room3gw"
 	        ;[Block]
@@ -4494,24 +4517,28 @@ Function FillRoom(r.Rooms)
 			;Doors for room
 			r\RoomDoors[0] = CreateDoor(r\zone,r\x+480.0*RoomScale,r\y,r\z-640.0*RoomScale,90,r,False,False,3)
 			r\RoomDoors[0]\AutoClose = False
-			d = CreateDoor(r\zone,r\x+544.0*RoomScale,r\y+480.0*RoomScale,r\z+256.0*RoomScale,90,r,False,False,3)
-			d\AutoClose = False
+			r\RoomDoors[1] = CreateDoor(r\zone,r\x+544.0*RoomScale,r\y+480.0*RoomScale,r\z+256.0*RoomScale,270,r,False,False,3)
+			r\RoomDoors[1]\AutoClose = False
+			FreeEntity r\RoomDoors[1]\obj2 : r\RoomDoors[1]\obj2 = 0
 			d = CreateDoor(r\zone,r\x+1504.0*RoomScale,r\y+480.0*RoomScale,r\z+960.0*RoomScale,0,r)
 			d\AutoClose = False : d\locked = True
 			
-			;Spawnpoint for hallucination
+			;Spawnpoint for SCP-049
 			r\Objects[7] = CreatePivot()
 			;PositionEntity r\Objects[7],r\x,r\y+200.0*RoomScale,r\z+700.0*RoomScale,True
 			PositionEntity r\Objects[7],r\x,r\y+200.0*RoomScale,r\z+200.0*RoomScale,True
 			EntityParent r\Objects[7],r\obj
 			
-			;PathPoint for hallucination
+			;PathPoints for SCP-049
 			r\Objects[15] = CreatePivot()
-			PositionEntity r\Objects[15],r\x+600.0*RoomScale,r\y+700.0*RoomScale,r\z+256.0*RoomScale,True
+			PositionEntity r\Objects[15],r\x+700.0*RoomScale,r\y+700.0*RoomScale,r\z+256.0*RoomScale,True
 			EntityParent r\Objects[15],r\obj
+			r\Objects[16] = CreatePivot()
+			PositionEntity r\Objects[16],r\x-100.0*RoomScale,r\y+700.0*RoomScale,r\z+256.0*RoomScale,True
+			EntityParent r\Objects[16],r\obj
 			
 			;Faked room409
-			r\Objects[16] = LoadMesh_Strict("GFX\map\room2sl_2.b3d",r\obj)
+			r\Objects[17] = LoadMesh_Strict("GFX\map\room2sl_2.b3d",r\obj)
 			sc.SecurityCams = CreateSecurityCam(r\x-160.0*RoomScale,r\y-22689.1*RoomScale,r\z-288.0*RoomScale,Null)
 			sc\angle = 225
 			TurnEntity sc\CameraObj, 20, 0, 0
@@ -4529,6 +4556,14 @@ Function FillRoom(r.Rooms)
 			PositionEntity(sc\ScrObj, r\x-231.489*RoomScale, r\y+760.0*RoomScale, r\z+255.744*RoomScale)
 			TurnEntity(sc\ScrObj, 0, 90, 0)
 			EntityParent(sc\ScrObj, r\obj)
+			
+			For tw.TempWayPoints = Each TempWayPoints
+				If tw\roomtemplate = r\RoomTemplate
+					If tw\y > 480.0*RoomScale
+						tw\y = 540.0*RoomScale
+					EndIf
+				EndIf
+			Next
 			;[End Block]
 	End Select
 	
@@ -6444,7 +6479,7 @@ Function CreateMap()
 	SetRoom("room2elevator",ROOM2,Floor(0.85*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2test1074",ROOM2,Floor(0.95*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2scps2",ROOM2,Floor(0.6*Float(Room2Amount[0])),min_pos,max_pos)
-	SetRoom("room2gw", ROOM2, Floor(0.4*Float(Room2Amount[0])),min_pos,max_pos)
+	;SetRoom("room2gw", ROOM2, Floor(0.4*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2sl", ROOM2, Floor(0.5*Float(Room2Amount[0])),min_pos,max_pos)
 	
 	MapRoom(ROOM3, Floor(Rnd(0.2,0.8)*Float(Room3Amount[0]))) = "room3storage"
@@ -6499,7 +6534,7 @@ Function CreateMap()
 	
 	MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]+Floor(0.3*Float(Room3Amount[2]))) = "room3servers"
 	MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]+Floor(0.7*Float(Room3Amount[2]))) = "room3servers2"
-	MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]) = "room3gw"
+	;MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]) = "room3gw"
 	MapRoom(ROOM3, Room3Amount[0]+Room3Amount[1]+Floor(0.5*Float(Room3Amount[2]))) = "room3offices"
 	
 	;----------------------- luodaan kartta --------------------------------
@@ -7375,12 +7410,12 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#32B#33B#34C#374#382#392#397#3A2#449
-;~F#553#572#594#5A5#5B0#5E9#5F7#61F#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#87E
-;~F#896#8B0#8CE#8F5#8FC#90A#926#93B#958#975#982#994#9D2#9FC#A4D#AA3#AB6#AD4#B25#B86
-;~F#B95#BD1#BD9#BE7#BFC#C38#C57#C67#C7F#CAA#CBD#CDF#D07#D59#D85#DAC#DB3#DB8#DEF#E16
-;~F#E2B#E5B#ED9#EF9#F6D#FC4#FEF#1040#1049#10E2#10EA#10EF#10FD#110C#1116#1138#1147#1158#115F#11DA
-;~F#1257#1263#12A4#12AF#12C0#12C5#12D4#12EB#1361#136A#1449#1466#146D#1473#1481#14A5#14C5#14F8#1603#163C
-;~F#1651#1713#17A8#17AD#17BD#1A92#1AA9#1AC8#1ACF#1B1C#1B6D#1B88#1B9F#1BC7#1BCE#1C02#1C09#1C30#1C7E#1C8C
-;~F#1C93#1C99#1CA3
-;~B#1156
+;~F#553#572#594#5A5#5B0#5E9#5F7#61F#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#8B8
+;~F#8D6#8FD#904#912#92E#943#960#97D#98A#99C#9DA#A04#A55#AAB#ABE#ADC#B2D#B8E#B9D#BD9
+;~F#BE1#BEF#C04#C40#C5F#C6F#C87#CB2#CC5#CE7#D0F#D61#D8D#DB4#DBB#DC0#DF7#E1E#E33#E63
+;~F#EE1#F01#F75#FCC#FF7#1048#1051#10EA#10F2#10F7#1105#1114#112D#114F#115E#116F#1176#11FD#127A#1286
+;~F#12C7#12D2#12E3#12E8#12F7#130E#1384#138D#146C#1489#1490#1496#14A4#14C8#14E8#151B#1626#165F#1674#1736
+;~F#17CB#17D0#17E0#1AB5#1ACC#1AEB#1AF2#1B3F#1B90#1BAB#1BC2#1BEA#1BF1#1C25#1C2C#1C53#1CA1#1CAF#1CB6#1CBC
+;~F#1CC6
+;~B#116D
 ;~C#Blitz3D

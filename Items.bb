@@ -295,6 +295,8 @@ Function InitItemTemplates()
 	CreateItemTemplate("Emily Ross's Badge", "badge", "GFX\items\badge.x", "GFX\items\INVpaper.jpg", "GFX\items\badge1.jpg", 0.0001, "GFX\items\badge1_tex.jpg")
 	it = CreateItemTemplate("Forgotten Key", "key", "GFX\items\key.b3d", "GFX\items\INVkey.jpg", "", 0.001, "GFX\items\key2.png","","",0,1+2+8)
 	it\sound = 3
+	;oldmask
+	;oldpaper
 	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -607,10 +609,10 @@ Function DropItem(item.Items)
 		Case "scp178"
 			Wearing178 = False
 		Case "scp1499"
-			Wearing1499 = false
+			Wearing1499 = False
 	End Select
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#1E#76#13B#155#196#1B1#1ED
+;~F#B#1E#13D#157#198#1B3#1EF#232
 ;~C#Blitz3D

@@ -75,6 +75,9 @@ End Select
 Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
 Global SFXVolume# = GetINIFloat(OptionFile, "options", "sound volume")
 
+Global Win8Mode = GetINIInt(OptionFile, "options", "compability mode")
+Global Bit16Mode = GetINIInt(OptionFile, "options", "16bit")
+
 If LauncherEnabled Then 
 	UpdateLauncher()
 	
@@ -93,9 +96,9 @@ If LauncherEnabled Then
 		Fullscreen = False
 	Else
 		If Fullscreen Then
-			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+			Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
 		Else
-			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
+			Graphics3DExt(GraphicWidth, GraphicHeight, 0, 2)
 		End If
 	EndIf
 	
@@ -131,9 +134,9 @@ Else
 		Fullscreen = False
 	Else
 		If Fullscreen Then
-			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 1)
+			Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
 		Else
-			Graphics3DExt(GraphicWidth, GraphicHeight, Depth, 2)
+			Graphics3DExt(GraphicWidth, GraphicHeight, 0, 2)
 		End If
 	EndIf
 	
@@ -995,6 +998,7 @@ Music(11) = LoadSound_Strict("SFX\Music\MenuAmbience.ogg")
 ;
 ;Music(18): Dimension1499 normal theme
 ;Music(19): Dimension1499 aggressive theme
+;Music(20): SCP-049 tension theme (for "room2sl")
 
 
 Global MusicVolume# = GetINIFloat(OptionFile, "options", "music volume")
@@ -1230,6 +1234,13 @@ Global QuitMSG% = 0
 
 Global StoredBrightness% = 40
 Global InFacility% = True
+
+Global PrevMusicVolume# = MusicVolume#
+Global PrevSFXVolume# = SFXVolume#
+Global DeafPlayer% = False
+Global DeafTimer# = 0.0
+
+Global IsZombie% = False
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1992,6 +2003,8 @@ Function InitEvents()
 	CreateEvent("096spawn","tunnel2",0,0.4+(0.2*SelectedDifficulty\aggressiveNPCs))
 	CreateEvent("096spawn","room3z2",0,0.7+(0.2*SelectedDifficulty\aggressiveNPCs))
 	
+	CreateEvent("room2pit","room2_4",0,0.4 + (0.4*SelectedDifficulty\aggressiveNPCs))
+	
 End Function
 
 Include "UpdateEvents.bb"
@@ -2191,6 +2204,7 @@ Repeat
 			AmbientLight Brightness, Brightness, Brightness	
 			PlayerSoundVolume = CurveValue(0.0, PlayerSoundVolume, 5.0)
 			
+			UpdateDeafPlayer()
 			UpdateEmitters()
 			MouseLook()			
 			MovePlayer()
@@ -2622,11 +2636,11 @@ Function MovePlayer()
 			ElseIf Stamina < 50
 				If BreathCHN=0 Then
 					BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask>0), Rand(1,3)))
-					ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)
+					ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)*SFXVolume
 				Else
 					If ChannelPlaying(BreathCHN)=False Then
 						BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask>0), Rand(1,3)))
-						ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)				
+						ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)*SFXVolume			
 					EndIf
 				EndIf
 			EndIf
@@ -2684,27 +2698,27 @@ Function MovePlayer()
 					If Sprint = 1.0 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
 						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 7)))
-						ChannelVolume tempchn, 1.0-(Crouch*0.6)
+						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					Else
 						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
 						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 7)))
-						ChannelVolume tempchn, 1.0-(Crouch*0.6)
+						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					End If
 				ElseIf CurrStepSFX=1
 					tempchn% = PlaySound_Strict(Step2SFX(Rand(0, 2)))
-					ChannelVolume tempchn, 1.0-(Crouch*0.4)
+					ChannelVolume tempchn, (1.0-(Crouch*0.4))*SFXVolume#
 				ElseIf CurrStepSFX=2
 					tempchn% = PlaySound_Strict(Step2SFX(Rand(3,5)))
-					ChannelVolume tempchn, 1.0-(Crouch*0.4)
+					ChannelVolume tempchn, (1.0-(Crouch*0.4))*SFXVolume#
 				ElseIf CurrStepSFX=3
 					If Sprint = 1.0 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
 						tempchn% = PlaySound_Strict(StepSFX(0, 0, Rand(0, 7)))
-						ChannelVolume tempchn, 1.0-(Crouch*0.6)
+						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					Else
 						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
 						tempchn% = PlaySound_Strict(StepSFX(0, 1, Rand(0, 7)))
-						ChannelVolume tempchn, 1.0-(Crouch*0.6)
+						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					End If
 				EndIf
 				
@@ -2746,23 +2760,28 @@ Function MovePlayer()
 		EndIf
 		
 		temp = False
-		If KeyDown(KEY_DOWN) And Playable Then 
-			temp = True 
-			angle = 180
-			If KeyDown(KEY_LEFT) Then angle = 135 
-			If KeyDown(KEY_RIGHT) Then angle = -135 
-		ElseIf (KeyDown(KEY_UP) And Playable) Then; Or ForceMove>0
-			temp = True
-			angle = 0
-			If KeyDown(KEY_LEFT) Then angle = 45 
-			If KeyDown(KEY_RIGHT) Then angle = -45 
-		ElseIf ForceMove>0 Then
+		If (Not IsZombie%)
+			If KeyDown(KEY_DOWN) And Playable Then
+				temp = True 
+				angle = 180
+				If KeyDown(KEY_LEFT) Then angle = 135 
+				If KeyDown(KEY_RIGHT) Then angle = -135 
+			ElseIf (KeyDown(KEY_UP) And Playable) Then; Or ForceMove>0
+				temp = True
+				angle = 0
+				If KeyDown(KEY_LEFT) Then angle = 45 
+				If KeyDown(KEY_RIGHT) Then angle = -45 
+			ElseIf ForceMove>0 Then
+				temp=True
+				angle = ForceAngle
+			Else If Playable Then
+				If KeyDown(KEY_LEFT) Then angle = 90 : temp = True
+				If KeyDown(KEY_RIGHT) Then angle = -90 : temp = True 
+			EndIf
+		Else
 			temp=True
 			angle = ForceAngle
-		Else If Playable Then
-			If KeyDown(KEY_LEFT) Then angle = 90 : temp = True
-			If KeyDown(KEY_RIGHT) Then angle = -90 : temp = True 
-		EndIf		
+		EndIf
 		
 		angle = WrapAngle(EntityYaw(Collider,True)+angle+90.0)
 		
@@ -2824,7 +2843,7 @@ Function MovePlayer()
 			de.decals = CreateDecal(Rand(15,16), PickedX(), PickedY()+0.005, PickedZ(), 90, Rand(360), 0)
 			de\size = Rnd(0.03,0.08)*Min(Injuries,3.0) : EntityAlpha(de\obj, 1.0) : ScaleSprite de\obj, de\size, de\size
 			tempchn% = PlaySound_Strict (DripSFX(Rand(0,2)))
-			ChannelVolume tempchn, Rnd(0.0,0.8)
+			ChannelVolume tempchn, Rnd(0.0,0.8)*SFXVolume
 			ChannelPitch tempchn, Rand(20000,30000)
 			
 			FreeEntity pvt
@@ -2854,7 +2873,7 @@ Function MovePlayer()
 	If HeartBeatVolume > 0 Then
 		If HeartBeatTimer <= 0 Then
 			tempchn = PlaySound_Strict (HeartBeatSFX)
-			ChannelVolume tempchn, HeartBeatVolume
+			ChannelVolume tempchn, HeartBeatVolume*SFXVolume#
 			
 			HeartBeatTimer = 70.0*(60.0/Max(HeartBeatRate,1.0))
 		Else
@@ -4926,7 +4945,16 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					Wearing1499% = (Not Wearing1499%)
-					SelectedItem = Null	
+					SelectedItem = Null
+				Case "badge"
+					If SelectedItem\itemtemplate\img=0 Then
+						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
+						
+						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
+					EndIf
+					
+					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 				Default
 					;check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
@@ -4943,7 +4971,7 @@ Function DrawGUI()
 			If MouseHit2 Then
 				EntityAlpha Dark, 0.0
 				
-				If SelectedItem\itemtemplate\tempname = "paper" Or SelectedItem\itemtemplate\tempname = "scp1025"  Then
+				If SelectedItem\itemtemplate\tempname = "paper" Or SelectedItem\itemtemplate\tempname = "scp1025" Or SelectedItem\itemtemplate\tempname = "badge" Then
 					If SelectedItem\itemtemplate\img<>0 Then FreeImage(SelectedItem\itemtemplate\img)
 					SelectedItem\itemtemplate\img=0
 				EndIf
@@ -5187,7 +5215,9 @@ Function DrawMenu()
 					
 					y = y + 30*MenuScale
 					
-					SFXVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, SFXVolume*100.0)/100.0)
+					;SFXVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, SFXVolume*100.0)/100.0)
+					PrevSFXVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, SFXVolume*100.0)/100.0)
+					If (Not DeafPlayer) Then SFXVolume# = PrevSFXVolume#
 					Color 255,255,255
 					Text(x, y, "Sound volume:")
 					;[End Block]
@@ -6216,6 +6246,13 @@ Function NullGame()
 	QuitMSG = 0
 	OptionsMenu = 0
 	
+	MusicVolume# = PrevMusicVolume
+	SFXVolume# = PrevSFXVolume
+	DeafPlayer% = False
+	DeafTimer# = 0.0
+	
+	IsZombie% = False
+	
 	DeInitExt
 	
 	ClearWorld
@@ -6423,6 +6460,26 @@ Function GetStepSound(entity%)
 	EndIf
 	
 	Return 0
+End Function
+
+Function UpdateSoundOrigin2(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
+	range# = Max(range,1.0)
+	
+	If volume>0 Then
+		
+		Local dist# = EntityDistance(cam, entity) / range#
+		If 1 - dist# > 0 And 1 - dist# < 1 Then
+			
+			Local panvalue# = Sin(-DeltaYaw(cam,entity))
+			
+			ChannelVolume(Chn, volume# * (1 - dist#))
+			ChannelPan(Chn, panvalue)
+		EndIf
+	Else
+		If Chn <> 0 Then
+			ChannelVolume (Chn, 0)
+		EndIf 
+	EndIf
 End Function
 
 Function UpdateSoundOrigin(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
@@ -8085,7 +8142,7 @@ Function RenderWorld2()
 	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision=1) Then ;fake a low-res display
+	If (WearingNightVision=1) And (Not Win8Mode) Then ;fake a low-res display
 		
 		;hasBattery% = True
 		
@@ -8118,6 +8175,26 @@ Function RenderWorld2()
 			CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
 		EndIf
 	Else
+		If (WearingNightVision=1)
+			For i=0 To MaxItemAmount-1
+				If (Inventory(i)<>Null) Then
+					If Inventory(i)\itemtemplate\tempname="nvgoggles" Then
+						Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.02)
+						power%=Int(Inventory(i)\state)
+						If Inventory(i)\state<=0.0 Then ;this nvg can't be used
+							hasBattery = 0
+							Msg = "The Night Vision Goggles need new batteries"
+							BlinkTimer = -1.0
+							MsgTimer = 350
+							Exit
+						ElseIf Inventory(i)\state<=100.0 Then
+							hasBattery = 1
+						EndIf
+						
+					EndIf
+				EndIf
+			Next
+		EndIf
 		RenderWorld()
 	EndIf
 	
@@ -8188,7 +8265,7 @@ Function RenderWorld2()
 				Rect 45,GraphicHeight*0.5-(k*20),54,10,True
 			Next
 			Color 0,255,0
-			For l=0 To Ceil(power%*0.01)
+			For l=0 To Floor((power%+50)*0.01)
 				Rect 45,GraphicHeight*0.5-(l*20),54,10,True
 			Next
 			DrawImage NVGImages,40,GraphicHeight*0.5+30
@@ -8413,10 +8490,66 @@ Function CheckForPlayerInFacility()
 	
 	Return True
 End Function
+
+Function IsItemGoodFor1162(itt.ItemTemplates)
+	Local IN$ = itt\tempname$
+	
+	If itt\tempname = "1123" Then Return False
+	If itt\tempname = "scp714" Then Return False
+	If itt\tempname = "scp1025" Then Return False
+	If itt\tempname = "scp513" Then Return False
+	If itt\tempname = "scp178" Then Return False
+	If itt\tempname = "scp1499" Then Return False
+	If itt\tempname = "scp860" Then Return False
+	If itt\tempname = "veryfinevest" Then Return False
+	If itt\tempname = "killbat" Then Return False
+	
+	Return True
+	
+End Function
+
+Function ControlSoundVolume()
+	Local snd.Sound,i
+	
+	For snd.Sound = Each Sound
+		For i=0 To 31
+			;If snd\channels[i]<>0 Then
+			;	ChannelVolume snd\channels[i],SFXVolume#
+			;Else
+				ChannelVolume snd\channels[i],SFXVolume#
+			;EndIf
+		Next
+	Next
+	
+End Function
+
+Function UpdateDeafPlayer()
+	
+	If DeafTimer > 0
+		DeafTimer = DeafTimer-FPSfactor
+		SFXVolume# = 0.0
+		If SFXVolume# > 0.0
+			ControlSoundVolume()
+		EndIf
+		DebugLog DeafTimer
+	Else
+		DeafTimer = 0
+		;If SFXVolume# < PrevSFXVolume#
+		;	SFXVolume# = Min(SFXVolume# + (0.001*PrevSFXVolume)*FPSfactor,PrevSFXVolume#)
+		;	ControlSoundVolume()
+		;Else
+			SFXVolume# = PrevSFXVolume#
+			If DeafPlayer Then ControlSoundVolume()
+			DeafPlayer = False
+		;EndIf
+	EndIf
+	
+End Function
 ;~IDEal Editor Parameters:
-;~F#24#A9#129#12D#134#3C8#4F2#513#58B#64D#6C5#6DC#6E9#7CE#8AF#96B#982#A15#B34#DBF
-;~F#FA8#1367#1559#185A#186C#1888#1892#189F#18C1#18E0#18FF#191B#1930#1934#1956#195E#1989#1B2B#1CAD#1D24
-;~F#1D2A#1D34#1D40#1D4B#1D4F#1D8A#1D92#1D9A#1DA1#1DA8#1DB7#1DC6#1DE4#1E12#1E19#1E2C#1E45#1E72#1E7D#1E82
-;~F#1E9C#1EA8#1EC3#1F15#1F23#1F2B#1F37#1F40#1F69#1F6E#1F73#1F78#1F81#1F89#2017#2021#2046#2054#205F
-;~B#1159
+;~F#24#AC#12C#130#137#3CB#4FD#51E#596#5A3#658#6D0#6E7#6F4#726#7DB#8BD#979#990#B47
+;~F#DD2#FBB#1577#1582#16D0#1751#18AD#18B7#18E6#1905#1924#1969#196D#198F#1997#19C2#1B64#1C19#1CE6#1D5D
+;~F#1D63#1D6D#1D79#1D84#1D88#1DC3#1DCB#1DD3#1DDA#1DE1#1DF0#1DFF#1E1D#1E4B#1E52#1E65#1E7E#1EAB#1EB6#1EBB
+;~F#1ED5#1EE1#1EFC#1F4E#1F5C#1F64#1F70#1F79#1FA2#1FA7#1FAC#1FB1#1FBA#2064#206E#2093#20A1#20AC#20B2#20BD
+;~F#20F4#211B#212D#213E#214D
+;~B#116C
 ;~C#Blitz3D

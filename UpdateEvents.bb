@@ -1270,12 +1270,10 @@ Function UpdateEvents()
 			Case "checkpoint"
 				;[Block]
 				If PlayerRoom = e\room Then
-					If e\room\RoomDoors[0]\open <> e\EventState Then
-						If e\Sound = 0 Then LoadEventSound(e,"SFX\Doors\DoorCheckpoint.Ogg");e\Sound = LoadSound_Strict("SFX\Door\DoorCheckpoint.Ogg")
-						PlaySound_Strict e\Sound
-					EndIf
-					
-					e\EventState = e\room\RoomDoors[0]\open
+					;If e\room\RoomDoors[0]\open <> e\EventState Then
+					;	If e\Sound = 0 Then LoadEventSound(e,"SFX\Doors\DoorCheckpoint.Ogg");e\Sound = LoadSound_Strict("SFX\Door\DoorCheckpoint.Ogg")
+					;	PlaySound_Strict e\Sound
+					;EndIf
 					
 					;play a sound clip when the player passes through the gate
 					If e\EventState2 = 0 Then
@@ -1322,28 +1320,45 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 					EndIf
-					
-					If e\room\RoomTemplate\Name = "checkpoint2"
-						For e2.Events = Each Events
-							If e2\EventName = "008"
-								If e2\EventState = 2
-									If e\room\RoomDoors[0]\locked
-										MonitorTimer# = 0.0
+				EndIf
+				
+				If e\room\RoomTemplate\Name = "checkpoint2"
+					For e2.Events = Each Events
+						If e2\EventName = "008"
+							If e2\EventState = 2
+								If e\room\RoomDoors[0]\locked
+									MonitorTimer# = 0.0
 									;UpdateCheckpointMonitors()
-										TurnCheckpointMonitorsOff()
-										e\room\RoomDoors[0]\locked = False
-										e\room\RoomDoors[1]\locked = False
-									EndIf
-								Else
-									If e\room\dist < 12
-										UpdateCheckpointMonitors()
-										e\room\RoomDoors[0]\locked = True
-										e\room\RoomDoors[1]\locked = True
-									EndIf
+									TurnCheckpointMonitorsOff()
+									e\room\RoomDoors[0]\locked = False
+									e\room\RoomDoors[1]\locked = False
+								EndIf
+							Else
+								If e\room\dist < 12
+									UpdateCheckpointMonitors()
+									e\room\RoomDoors[0]\locked = True
+									e\room\RoomDoors[1]\locked = True
 								EndIf
 							EndIf
-						Next
-					EndIf
+						EndIf
+					Next
+				Else
+					For e2.Events = Each Events
+						If e2\EventName = "room2sl"
+							
+						EndIf
+					Next
+				EndIf
+				
+				If e\room\RoomDoors[0]\open <> e\EventState Then
+					If e\Sound = 0 Then LoadEventSound(e,"SFX\Doors\DoorCheckpoint.ogg")
+					e\SoundCHN = PlaySound2(e\Sound,Camera,e\room\Objects[3])
+				EndIf
+				
+				e\EventState = e\room\RoomDoors[0]\open
+				
+				If ChannelPlaying(e\SoundCHN)
+					UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[3])
 				EndIf
 				;[End Block]
 			Case "coffin", "coffin106"
@@ -1390,7 +1405,7 @@ Function UpdateEvents()
 					If WearingNightVision>0 Then
 						;If EntityVisible(Camera,e\room\Objects[2]) Then
 							;If EntityInView(e\room\Objects[2], Camera) Then
-						If EntityVisible(Camera,e\room\Objects[1])
+						;If EntityVisible(Camera,e\room\Objects[1])
 							If CoffinDistance<4.0
 								
 								Sanity=Sanity-FPSfactor*1.1
@@ -1424,7 +1439,7 @@ Function UpdateEvents()
 									Kill()
 								EndIf
 							EndIf
-						EndIf
+						;EndIf
 					EndIf
 					
 					If e\EventState3>0.0 Then e\EventState3=Max(e\EventState3-FPSfactor,0.0)
@@ -1442,13 +1457,17 @@ Function UpdateEvents()
 					
 					If UpdateLever(e\room\Levers[0]) Then
 						For sc.SecurityCams = Each SecurityCams
-							If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" Then sc\CoffinEffect = 2
-							If sc\room = e\room Then sc\screen = True
+							If (Not sc\SpecialCam)
+								If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" Then sc\CoffinEffect = 2
+								If sc\room = e\room Then sc\Screen = True
+							EndIf
 						Next
 					Else
 						For sc.SecurityCams = Each SecurityCams
-							If sc\CoffinEffect<>1 Then sc\CoffinEffect = 0
-							If sc\room = e\room Then sc\screen = False
+							If (Not sc\SpecialCam)
+								If sc\CoffinEffect<>1 Then sc\CoffinEffect = 0
+								If sc\room = e\room Then sc\Screen = False
+							EndIf
 						Next
 					EndIf
 				Else
@@ -6016,6 +6035,8 @@ Function UpdateEvents()
 								PlaySound_Strict LoadTempSound("SFX\049\MTF_1.ogg")
 								
 								LoadEventSound(e,"SFX\zombiebreath.ogg")
+								
+								IsZombie = True
 							EndIf
 						EndIf
 					Else
@@ -7638,7 +7659,7 @@ Function UpdateEvents()
 					RemoveEvent(e)
 				EndIf
 				;[End Block]
-			Case "room2gw"
+			Case "room2gw_b"
 				;[Block]
 				If e\room\dist < 8
 					If e\EventState = 0 Then
@@ -7770,6 +7791,8 @@ Function UpdateEvents()
 				;- 0.0 = no item "trade" will happen
 				;- 1.0 = item "trade" will happen
 				;- 2.0 = the player doesn't has any items in the Inventory, giving him heavily Injuries and giving him a random item
+				;- 3.0 = player got a memorial item (to explain a bit D-9341's background)
+				;- 3.1 = player got a memorial item + injuries (because he didn't had any item in his inventory before)
 				If PlayerRoom = e\room
 					
 					GrabbedEntity = 0
@@ -7804,6 +7827,9 @@ Function UpdateEvents()
 								EndIf
 							Next
 						EndIf
+						
+						If e\EventState3 = 1.0 And Rand(10)=1 Then e\EventState3 = 3.0
+						If e\EventState3 = 2.0 And Rand(10)=1 Then e\EventState3 = 3.1
 					EndIf
 					
 					If e\EventState > 0.0
@@ -7821,6 +7847,7 @@ Function UpdateEvents()
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
 										e\EventState = e\EventState + 1.0
+										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
@@ -7835,6 +7862,7 @@ Function UpdateEvents()
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
 										e\EventState = e\EventState + 1.0
+										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
@@ -7849,6 +7877,7 @@ Function UpdateEvents()
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
 										e\EventState = e\EventState + 1.0
+										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
@@ -7863,6 +7892,7 @@ Function UpdateEvents()
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
 										e\EventState = e\EventState + 1.0
+										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
@@ -7877,6 +7907,7 @@ Function UpdateEvents()
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
 										e\EventState = e\EventState + 1.0
+										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
@@ -7891,6 +7922,7 @@ Function UpdateEvents()
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
 										e\EventState = e\EventState + 1.0
+										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
@@ -7909,24 +7941,71 @@ Function UpdateEvents()
 						de\size = 0.75 : ScaleSprite de\obj, de\size, de\size
 						FreeEntity pvt
 						For itt.ItemTemplates = Each ItemTemplates
-							If itt\tempname <> "1123" And itt\tempname <> "scp714" And itt\tempname <> "scp1025" And itt\tempname <> "scp513" And itt\tempname <> "scp178" And itt\tempname <> "scp1499" And itt\tempname <> "scp860" And itt\tempname <> "veryfinevest" And itt\tempname <> "killbat" And Rand(6)=1
+							If IsItemGoodFor1162(itt) And Rand(6)=1
 								Inventory(0) = CreateItem(itt\name, itt\tempname, 1,1,1)
 								EntityType(Inventory(0)\obj, HIT_ITEM)
 								HideEntity Inventory(0)\obj
 								Inventory(0)\Picked = True
 								e\EventState = e\EventState + 1.0
 								e\EventState3 = 0.0
+								If Injuries > 20
+									DeathMSG = "A big chunk of body parts were found next to SCP-1162. DNA testing identified that the body parts were all from "
+									DeathMSG = DeathMSG + "test subject D-9341. He seems to have used SCP-1162 without anything to trade with."
+									;PlaySound_Strict LoadTempSound("SFX\1162\")
+									Kill()
+								Else
+									PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
+									LightFlash = 5.0
+									Msg = "Something is now in your Inventory and you have high injuries"
+									MsgTimer = 70*5
+								EndIf
+								Exit
+							EndIf
+						Next
+					ElseIf e\EventState3 >= 3.0
+						If e\EventState3 < 3.1
+							Msg = "Something changed in your Inventory"
+							MsgTimer = 70*5
+						Else
+							Injuries = Injuries + 5.0
+							pvt = CreatePivot()
+							PositionEntity pvt, EntityX(Collider),EntityY(Collider)-0.05,EntityZ(Collider)
+							TurnEntity pvt, 90, 0, 0
+							EntityPick(pvt,0.3)
+							de.decals = CreateDecal(3, PickedX(), PickedY()+0.005, PickedZ(), 90, Rand(360), 0)
+							de\size = 0.75 : ScaleSprite de\obj, de\size, de\size
+							FreeEntity pvt
+							If Injuries > 20
+								DeathMSG = "A big chunk of body parts were found next to SCP-1162. DNA testing identified that the body parts were all from "
+								DeathMSG = DeathMSG + "test subject D-9341. He seems to have used SCP-1162 without anything to trade with."
+								;PlaySound_Strict LoadTempSound("SFX\1162\")
+								Kill()
+							Else
 								PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
 								LightFlash = 5.0
 								Msg = "Something is now in your Inventory and you have high injuries"
 								MsgTimer = 70*5
-								DeathMSG = "A Class-D was found dead with large amount of wounds and with some missing flesh and bone parts."
-								DeathMSG = DeathMSG + " It seems that he had put his hand in SCP-1162 without any items."
-								Exit
 							EndIf
-						Next
+						EndIf
+						While Inventory(0)=Null
+							For itt.ItemTemplates = Each ItemTemplates
+								If itt\tempname = "oldpaper" Or itt\tempname = "key" Or itt\tempname = "oldmask" And Rand(6)=1
+									Inventory(0) = CreateItem(itt\name, itt\tempname, 1,1,1)
+									EntityType(Inventory(0)\obj, HIT_ITEM)
+									HideEntity Inventory(0)\obj
+									Inventory(0)\Picked = True
+									Exit
+								EndIf
+							Next
+						Wend
+						e\EventState = e\EventState + 1.0
+						e\EventState3 = 0.0
 					EndIf
 				EndIf
+				;[End Block]
+			Case "room2gw"
+				;[Block]
+				
 				;[End Block]
 			Case "room3gw"
 				;[Block]
@@ -8029,9 +8108,9 @@ Function UpdateEvents()
 			Case "room2sl"
 				;[Block]
 				;e\EventState: Determines if the player already entered the room or not (0 = No, 1 = Yes)
-				;e\EventState2: Variable used for the hallucination event
+				;e\EventState2: Variable used for the SCP-049 event
 				
-				;Camera-Spawning Code + Hallucination-Spawning (it is a little messy!)
+				;Camera-Spawning Code + SCP-049-Spawning (it is a little messy!)
 				;[Block]
 				If PlayerRoom = e\room
 					If e\EventState = 0
@@ -8225,49 +8304,56 @@ Function UpdateEvents()
 								Exit
 							EndIf
 						Next
-						;For hallucination
-						e\room\NPC[0] = CreateNPC(NPCtypeD,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True))
-						RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
-						tex=LoadTexture("GFX\NPCs\corpse.jpg")
-						e\room\NPC[0]\texture = "GFX\NPCs\corpse.jpg"
-						EntityTexture e\room\NPC[0]\obj, tex
-						e\room\NPC[0]\State2 = 2
-						FreeTexture tex
-						e\EventState = 1
-						e\EventState2 = -(70*5)
+						;For SCP-049
+						If e\EventState2 = 0 And e\room\NPC[0]=Null
+							For n.NPCs = Each NPCs
+								If n\NPCtype = NPCtype049
+									e\room\NPC[0] = n
+									Exit
+								EndIf
+							Next
+							
+							If e\room\NPC[0]=Null
+								e\room\NPC[0] = CreateNPC(NPCtype049,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True))
+							Else
+								PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
+								ResetEntity e\room\NPC[0]\Collider
+							EndIf
+							RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
+							e\room\NPC[0]\State = 0
+							e\EventState = 1
+							e\EventState2 = -(70*5)
+						EndIf
 					EndIf
 				EndIf
 				;[End Block]
 				
-				;The hallucination event
+				;SCP-049
 				;[Block]
 				If e\EventState2 < 0
-					For sc.SecurityCams = Each SecurityCams
-						If sc\room = e\room
-							If EntityDistance(sc\ScrObj,Camera)<5.0
-								If EntityInView(sc\ScrObj, Camera) And EntityVisible(sc\ScrObj, Camera)
-									e\EventState2 = Min(e\EventState2+FPSfactor,0)
-									Exit
+					If e\EventState2 = -(70*5)
+						For sc.SecurityCams = Each SecurityCams
+							If sc\room = e\room
+								If EntityDistance(sc\ScrObj,Camera)<5.0
+									If EntityVisible(sc\ScrObj,Camera)
+										e\EventState2 = Min(e\EventState2+FPSfactor,0)
+										Exit
+									EndIf
 								EndIf
 							EndIf
-						EndIf
-					Next
+						Next
+					Else
+						e\EventState2 = Min(e\EventState2+FPSfactor,0)
+					EndIf
 				ElseIf e\EventState2 = 0
-					For sc.SecurityCams = Each SecurityCams
-						If sc\room = e\room
-							If EntityDistance(sc\ScrObj,Camera)<5.0
-								If EntityInView(sc\ScrObj, Camera) And EntityVisible(sc\ScrObj, Camera)
-									PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\NPC[0]\Collider),EntityY(e\room\Objects[7],True),EntityZ(e\room\NPC[0]\Collider)
-									ResetEntity e\room\NPC[0]\Collider
-									e\room\RoomDoors[0]\open = True
-									e\room\NPC[0]\State = 1
-									DebugLog "aaaaaaaaa"
-									e\EventState2 = 1
-									Exit
-								EndIf
-							EndIf
-						EndIf
-					Next
+					If e\room\NPC[0] <> Null
+						PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\NPC[0]\Collider),EntityY(e\room\Objects[7],True),EntityZ(e\room\NPC[0]\Collider)
+						ResetEntity e\room\NPC[0]\Collider
+						;e\room\RoomDoors[0]\open = True
+						e\room\NPC[0]\State = 5
+						DebugLog "aaaaaaaaa"
+						e\EventState2 = 1
+					EndIf
 				ElseIf e\EventState2 = 1
 					If e\room\NPC[0]\PathStatus <> 1
 						;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
@@ -8281,54 +8367,83 @@ Function UpdateEvents()
 						e\EventState2 = 2
 					EndIf
 				ElseIf e\EventState2 = 2
-					If e\room\NPC[0]\PathStatus = 1
-						If e\room\NPC[0]\Path[e\room\NPC[0]\PathLocation]=Null Then 
-							If e\room\NPC[0]\PathLocation > 19 Then 
-								e\room\NPC[0]\PathLocation = 0 : e\room\NPC[0]\PathStatus = 0
-							Else
-								e\room\NPC[0]\PathLocation = e\room\NPC[0]\PathLocation + 1
-							EndIf
-						Else
-							PointEntity e\room\NPC[0]\obj, e\room\NPC[0]\Path[e\room\NPC[0]\PathLocation]\obj
-							RotateEntity e\room\NPC[0]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[0]\obj), EntityYaw(e\room\NPC[0]\Collider), 20.0), 0
-							
-							If EntityDistance(e\room\NPC[0]\Collider,e\room\NPC[0]\Path[e\room\NPC[0]\PathLocation]\obj) < 0.5 Then
-								e\room\NPC[0]\PathLocation = e\room\NPC[0]\PathLocation + 1
-							EndIf
-							
-							If e\room\RoomDoors[0]\open = True
-								If e\room\NPC[0]\Path[e\room\NPC[0]\PathLocation-1]<>Null
-									If e\room\NPC[0]\Path[e\room\NPC[0]\PathLocation-1]\door<>Null
-										If e\room\NPC[0]\Path[e\room\NPC[0]\PathLocation-1]\door = e\room\RoomDoors[0]
-											dist# = EntityDistance(e\room\NPC[0]\Path[e\room\NPC[0]\PathLocation-1]\door\frameobj,e\room\NPC[0]\Collider)
-											If dist# > 0.3 And dist# < 0.6
-												e\room\RoomDoors[0]\open = False
-											EndIf
-										EndIf
-									EndIf
-								EndIf
-							Else
-								dist# = EntityDistance(e\room\RoomDoors[0]\frameobj,e\room\NPC[0]\Collider)
-								If dist# > 2.0
-									DebugLog "ccccccccc"
-									e\EventState2 = 3
-								EndIf
-							EndIf
-							
-							dist# = EntityDistance(e\room\NPC[0]\Collider,Collider)
-							If dist#<1.0 Or EntityVisible(e\room\NPC[0]\Collider,Camera) Or Abs(EntityY(e\room\NPC[0]\Collider)-EntityY(Collider))<1.0
-								DebugLog "ccccccccc"
-								e\EventState2 = 3
-							EndIf
-						EndIf
-					Else
-						DebugLog "ccccccccc"
+					If e\room\NPC[0]\PathStatus <> 1
+						e\room\NPC[0]\State3 = 1.0
 						e\EventState2 = 3
+						e\room\NPC[0]\PathTimer# = 0.0
+						DebugLog "ccccccccc"
+					Else
+						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 2.0
+							If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 0.6
+								If (Not e\room\RoomDoors[0]\open)
+									e\room\RoomDoors[0]\open = True
+									sound=Rand(0, 2)
+									PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
+								EndIf
+							EndIf
+							e\room\NPC[0]\DropSpeed = 0
+						EndIf
 					EndIf
 				ElseIf e\EventState2 = 3
-					RemoveNPC(e\room\NPC[0])
+					If e\room\NPC[0]\State <> 5
+						e\EventState2 = 6
+						DebugLog "fffffffff"
+					EndIf
+					
+					If e\room\NPC[0]\PathStatus <> 1
+						If e\room\NPC[0]\PathTimer# < 70*3
+							e\room\NPC[0]\PathTimer# = e\room\NPC[0]\PathTimer# + FPSfactor
+						Else
+							Select e\room\NPC[0]\State3
+								Case 1
+									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[16],True),EntityY(e\room\Objects[16],True),EntityZ(e\room\Objects[16],True))
+									DebugLog "Path1"
+								Case 2
+									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[15],True),EntityY(e\room\Objects[15],True),EntityZ(e\room\Objects[15],True))
+									DebugLog "Path2"
+								Case 3
+									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
+									DebugLog "Path3"
+								Case 4
+									e\EventState2 = 4
+							End Select
+							e\room\NPC[0]\PathTimer# = 0.0
+							e\room\NPC[0]\State3 = e\room\NPC[0]\State3 + 1
+						EndIf
+					Else
+						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[1]\frameobj) < 0.6
+							If (Not e\room\RoomDoors[1]\open)
+								e\room\RoomDoors[1]\open = True
+								sound=Rand(0, 2)
+								PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[1]\obj)
+							EndIf
+						EndIf
+					EndIf
+				ElseIf e\EventState2 = 4
+					;RemoveNPC(e\room\NPC[0])
 					DebugLog "ddddddddd"
-					e\EventState2 = 4
+					e\room\NPC[0]\State = 2
+					For r.Rooms = Each Rooms
+						If EntityDistance(r\obj,e\room\NPC[0]\Collider)<12.0 And EntityDistance(r\obj,e\room\NPC[0]\Collider)>4.0
+							e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(r\obj),EntityY(r\obj),EntityZ(r\obj))
+							e\room\NPC[0]\PathTimer = 0.0
+							Exit
+						EndIf
+					Next
+					e\EventState2 = 5
+				ElseIf e\EventState2 = 5
+					If MeNPCSeesPlayer(e\room\NPC[0]) Or e\room\NPC[0]\State2 > 0 Or e\room\NPC[0]\LastSeen > 0
+						DebugLog "fffffffff"
+						e\EventState2 = 6
+					Else
+						If e\room\NPC[0]\PathStatus <> 1
+							e\room\NPC[0]\Idle = 70*60 ;(Making SCP-049 idle for one minute (twice as fast for aggressive NPCs = True))
+							PositionEntity e\room\NPC[0]\Collider,0,500,0
+							ResetEntity e\room\NPC[0]\Collider
+							DebugLog "eeeeeeeee"
+							e\EventState2 = 6
+						EndIf
+					EndIf
 				EndIf
 				;[End Block]
 				
@@ -8339,11 +8454,40 @@ Function UpdateEvents()
 				;[Block]
 				Local xspawn#,zspawn#,place%
 				If e\room\dist < HideDistance
-					If Curr096<>Null
-						If EntityDistance(Curr096\Collider,Collider)<HideDistance
-							e\EventState = 2
+					;Checking some statements in order to determine if SCP-096 can spawn in this room
+					;[Block]
+					If e\EventState <> 2
+						If Curr096<>Null
+							If EntityDistance(Curr096\Collider,Collider)<HideDistance
+								e\EventState = 2
+								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
+								DebugLog "- SCP-096 too close to player"
+							EndIf
+							
+							For e2.Events = Each Events
+								If e2\EventName = "room2servers"
+									If e2\EventState > 0 And e2\room\NPC[0]<>Null
+										e\EventState = 2
+										DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
+										DebugLog "- room2servers event still in progress"
+										Exit
+									EndIf
+								EndIf
+							Next
 						EndIf
+						For e2.Events = Each Events
+							If e2\EventName = "room2servers"
+								If e2\EventState = 0 And (Abs(e2\room\dist-e\room\dist)<HideDistance)
+									e\EventState = 2
+									DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
+									DebugLog "- room2servers event not activated + room is too close to room2servers"
+									Exit
+								EndIf
+							EndIf
+						Next
+						If PlayerRoom = e\room Then e\EventState = 2
 					EndIf
+					;[End Block]
 					
 					If e\EventState = 0
 						Select e\room\RoomTemplate\Name
@@ -8384,7 +8528,7 @@ Function UpdateEvents()
 						RotateEntity Curr096\Collider,0,EntityYaw(Curr096\Collider)+180,0
 						FreeEntity pvt%
 						Curr096\State = 5
-						DebugLog "096 placed in "+Chr(34)+e\room\RoomTemplate\Name+Chr(34)
+						DebugLog "SCP-096 successfully placed in "+Chr(34)+e\room\RoomTemplate\Name+Chr(34)
 						e\EventState = 1
 					ElseIf e\EventState = 1
 						PointEntity Curr096\Collider,Collider
@@ -8392,6 +8536,8 @@ Function UpdateEvents()
 						
 						If EntityDistance(Curr096\Collider,Collider)<HideDistance*0.5
 							If EntityVisible(Curr096\Collider,Camera)
+								PointEntity Curr096\Collider,Collider
+								RotateEntity Curr096\Collider,0,EntityYaw(Curr096\Collider)+Rnd(170,190),0
 								e\EventState = 2
 							EndIf
 						EndIf
@@ -8446,8 +8592,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#104#4E6#4F6#5B2#611#7DF#9C6#9ED#9FB#A05#A12#BFB#C1C#C6B#CB9#CC6#D00#D17#D37
-;~F#D40#D4A#D59#DED#E0F#10BB#1101#1117#1123#1141#1192#11A9#1276#1377#1408#1421#1440#1471#147E#1497
-;~F#152F#16E5#17AC#1800#18B1#1961#1A19#1A31#1AF2#1B1F#1B3C#1B63#1B93#1BB0#1BD8#1C32#1C72#1CA3#1CB6#1D6E
-;~F#1DC6#1DD9#1DE7#1DF0#1E36#1E55#1EFB#2092
+;~F#11#104#4E6#554#5C5#624#7F2#9D9#A00#A0E#A18#A25#C0E#C2F#C7E#CCC#CD9#D13#D2A#D4A
+;~F#D53#D5D#D6C#E00#E22#10CE#1114#112A#1136#1154#11A5#11BC#1289#138A#141B#1434#1453#1484#1491#14AA
+;~F#1542#17C1#1815#18C6#1976#1A2E#1A46#1B07#1B34#1B51#1B78#1BA8#1BC5#1BED#1C47#1C87#1CB8#1CCB#1D83#1DDB
+;~F#1DEE#1DFC#1E05#1E4B#1E6A#1F4A#1FB1#2105#2109
 ;~C#Blitz3D
