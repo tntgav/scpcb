@@ -3415,7 +3415,7 @@ Function UpdateNPCs()
 										Case 1
 											If n\Sound2=0 Then n\Sound2=LoadSound_Strict("SFX\066\beethoven.ogg")
 											n\SoundChn2 = PlaySound2(n\Sound2, Camera, n\Collider)
-											DeafTimer# = 70*5
+											DeafTimer# = 70*(8+(4*SelectedDifficulty\aggressiveNPCs))
 											DeafPlayer = True
 											CameraShake = 10.0
 										Case 2
@@ -3974,147 +3974,162 @@ Function UpdateNPCs()
 				
 				prevFrame# = n\Frame
 				
-				Select n\State
-					Case 0
-						If n\CurrSpeed = 0.0
-							If n\State2 < 500.0*Rnd(1,3)
-								n\CurrSpeed = 0.0
-								n\State2 = n\State2 + FPSfactor
-							Else
-								If n\CurrSpeed = 0.0 Then n\CurrSpeed = n\CurrSpeed + 0.0001
-							EndIf
-						Else
-							If n\State2 < 10000.0*Rnd(1,3)
-								n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
-								n\State2 = n\State2 + FPSfactor
-							Else
-								n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,50.0)
-							EndIf
-							
-							RotateEntity n\Collider,0,CurveAngle(n\Angle,EntityYaw(n\Collider),10.0),0
-							
-							If Rand(200) = 1 Then n\Angle = n\Angle + Rnd(-45,45)
-							
-							HideEntity n\Collider
-							EntityPick(n\Collider, 1.5)
-							If PickedEntity() <> 0 Then
-								n\Angle = EntityYaw(n\Collider)+Rnd(80,110)
-							EndIf
-							ShowEntity n\Collider
-						EndIf
-						
-						If n\CurrSpeed = 0.0
-							AnimateNPC(n,296,317,0.2)
-						Else
-							If (n\ID Mod 2 = 0) Then
-								AnimateNPC(n,1,62,(n\CurrSpeed*28))
-							Else
-								AnimateNPC(n,100,167,(n\CurrSpeed*28))
+				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*2
+					For n2.NPCs = Each NPCs
+						If n2\NPCtype = n\NPCtype And n2 <> n
+							If n2\State = 1
+								n\State = 1
+								n\State2 = 0
+								Exit
 							EndIf
 						EndIf
-						
-						;randomly play the "screaming animation" and revert back to state 0
-						If (Rand(5000)=1) Then
-							n\State = 2
-							n\State2 = 0
-							
-							If Not ChannelPlaying(n\SoundChn) Then
-								dist = EntityDistance(n\Collider,Collider)
-								If (dist < 20.0) Then
-									If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-									n\Sound = LoadSound_Strict("SFX\1499\1499_"+Rand(1,4)+".ogg")
-									n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider, 20.0)
-								EndIf
-							EndIf
-						EndIf
-						
-						If (n\ID Mod 2 = 0) And (Not NoTarget) Then
-							dist = EntityDistance(n\Collider,Collider)
-							If dist < 10.0 Then
-								If EntityVisible(n\Collider,Collider) Then
-									;play the "screaming animation"
-									n\State = 2
-									If dist < 5.0 Then
-										If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-										n\Sound = LoadSound_Strict("SFX\1499\1499_alarm.ogg")
-										n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
-										
-										n\State2 = 1 ;if player is too close, switch to attack after screaming
-										
-										PlaySound_Strict NTF_1499FuckedSFX
-										
-										For n2.NPCs = Each NPCs
-											If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
-												n2\State = 1
-												n2\State2 = 0
-											EndIf
-										Next
-									Else
-										n\State2 = 0 ;otherwise keep idling
-									EndIf
-									
-									n\Frame = 203
-								EndIf
-							EndIf
-						EndIf
-					Case 1
-						If NoTarget Then n\State = 0
-						
-						If Music(19)=0 Then Music(19) = LoadSound_Strict("SFX\Music\s_gasmask_comb.ogg")
-						ShouldPlay = 19
-						
-						PointEntity n\obj,Collider
-						RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
-						
-						dist = EntityDistance(n\Collider,Collider)
-						
-						If dist < 0.75 Then n\State2 = 1.0
-						If n\State2 = 0.0
-							n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
-							
-							If (n\ID Mod 2 = 0) Then
-								AnimateNPC(n,1,62,(n\CurrSpeed*28))
-							Else
-								AnimateNPC(n,100,167,(n\CurrSpeed*28))
-							EndIf
-						Else
-							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
-							AnimateNPC(n,63,100,0.6,False)
-							If prevFrame < 89 And n\Frame=>89
-								If dist > 1.0 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
-									;Miss
+					Next
+					
+					Select n\State
+						Case 0
+							If n\CurrSpeed = 0.0
+								If n\State2 < 500.0*Rnd(1,3)
+									n\CurrSpeed = 0.0
+									n\State2 = n\State2 + FPSfactor
 								Else
-									Injuries = Injuries + Rnd(0.75,1.5)
-									PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
-									If Injuries > 10.0
-										Kill()
-										DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
-										DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
-										DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+									If n\CurrSpeed = 0.0 Then n\CurrSpeed = n\CurrSpeed + 0.0001
+								EndIf
+							Else
+								If n\State2 < 10000.0*Rnd(1,3)
+									n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
+									n\State2 = n\State2 + FPSfactor
+								Else
+									n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,50.0)
+								EndIf
+								
+								RotateEntity n\Collider,0,CurveAngle(n\Angle,EntityYaw(n\Collider),10.0),0
+								
+								If Rand(200) = 1 Then n\Angle = n\Angle + Rnd(-45,45)
+								
+								HideEntity n\Collider
+								EntityPick(n\Collider, 1.5)
+								If PickedEntity() <> 0 Then
+									n\Angle = EntityYaw(n\Collider)+Rnd(80,110)
+								EndIf
+								ShowEntity n\Collider
+							EndIf
+							
+							If n\CurrSpeed = 0.0
+								AnimateNPC(n,296,317,0.2)
+							Else
+								If (n\ID Mod 2 = 0) Then
+									AnimateNPC(n,1,62,(n\CurrSpeed*28))
+								Else
+									AnimateNPC(n,100,167,(n\CurrSpeed*28))
+								EndIf
+							EndIf
+							
+							;randomly play the "screaming animation" and revert back to state 0
+							If (Rand(5000)=1) Then
+								n\State = 2
+								n\State2 = 0
+								
+								If Not ChannelPlaying(n\SoundChn) Then
+									dist = EntityDistance(n\Collider,Collider)
+									If (dist < 20.0) Then
+										If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+										n\Sound = LoadSound_Strict("SFX\1499\1499_"+Rand(1,4)+".ogg")
+										n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider, 20.0)
 									EndIf
 								EndIf
-							ElseIf n\Frame => 99
-								n\State2 = 0.0
 							EndIf
-						EndIf
-					Case 2 ;play the "screaming animation" and switch to n\state2 after it's finished
-						n\CurrSpeed = 0.0
-						AnimateNPC(n,203,295,0.1,False)
-						
-						If n\Frame > 294.0 Then
-							n\State = n\State2
-						EndIf
-				End Select
-				
-				
-				If n\SoundChn <> 0 And ChannelPlaying(n\SoundChn) Then
-					UpdateSoundOrigin(n\SoundChn,Camera,n\Collider,20.0)
+							
+							If (n\ID Mod 2 = 0) And (Not NoTarget) Then
+								dist = EntityDistance(n\Collider,Collider)
+								If dist < 10.0 Then
+									If EntityVisible(n\Collider,Collider) Then
+										;play the "screaming animation"
+										n\State = 2
+										If dist < 5.0 Then
+											If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+											n\Sound = LoadSound_Strict("SFX\1499\1499_alarm.ogg")
+											n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
+											
+											n\State2 = 1 ;if player is too close, switch to attack after screaming
+											
+											;PlaySound_Strict NTF_1499FuckedSFX
+											
+											For n2.NPCs = Each NPCs
+												If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
+													n2\State = 1
+													n2\State2 = 0
+												EndIf
+											Next
+										Else
+											n\State2 = 0 ;otherwise keep idling
+										EndIf
+										
+										n\Frame = 203
+									EndIf
+								EndIf
+							EndIf
+						Case 1 ;attacking the player
+							If NoTarget Then n\State = 0
+							
+							If Music(19)=0 Then Music(19) = LoadSound_Strict("SFX\Music\s_gasmask_comb.ogg")
+							ShouldPlay = 19
+							
+							PointEntity n\obj,Collider
+							RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
+							
+							dist = EntityDistance(n\Collider,Collider)
+							
+							If dist < 0.75 Then n\State2 = 1.0
+							If n\State2 = 0.0
+								n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
+								
+								If (n\ID Mod 2 = 0) Then
+									AnimateNPC(n,1,62,(n\CurrSpeed*28))
+								Else
+									AnimateNPC(n,100,167,(n\CurrSpeed*28))
+								EndIf
+							Else
+								n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
+								AnimateNPC(n,63,100,0.6,False)
+								If prevFrame < 89 And n\Frame=>89
+									If dist > 1.0 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
+										;Miss
+									Else
+										Injuries = Injuries + Rnd(0.75,1.5)
+										PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
+										If Injuries > 10.0
+											Kill()
+											DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
+											DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
+											DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+										EndIf
+									EndIf
+								ElseIf n\Frame => 99
+									n\State2 = 0.0
+								EndIf
+							EndIf
+						Case 2 ;play the "screaming animation" and switch to n\state2 after it's finished
+							n\CurrSpeed = 0.0
+							AnimateNPC(n,203,295,0.1,False)
+							
+							If n\Frame > 294.0 Then
+								n\State = n\State2
+							EndIf
+					End Select
+					
+					If n\SoundChn <> 0 And ChannelPlaying(n\SoundChn) Then
+						UpdateSoundOrigin(n\SoundChn,Camera,n\Collider,20.0)
+					EndIf
+					
+					MoveEntity n\Collider,0,0,n\CurrSpeed*FPSfactor
+					
+					RotateEntity n\obj,0,EntityYaw(n\Collider)-180,0
+					PositionEntity n\obj,EntityX(n\Collider),EntityY(n\Collider)-0.2,EntityZ(n\Collider)
+					
+					ShowEntity n\obj
+				Else
+					HideEntity n\obj
 				EndIf
-				
-				MoveEntity n\Collider,0,0,n\CurrSpeed*FPSfactor
-				
-				RotateEntity n\obj,0,EntityYaw(n\Collider)-180,0
-				PositionEntity n\obj,EntityX(n\Collider),EntityY(n\Collider)-0.2,EntityZ(n\Collider)
 				
 				;[End Block]
 		End Select
@@ -5495,8 +5510,7 @@ Function GoToElevator(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#47#6D#93#A3#D3#E3#EC#FA#109#11C#139#163#177#194#1CB#1E3#204#227
-;~F#230#25B#283#374#45F#774#80A#92A#92F#95F#A01#A3C#AC9#B35#C4A#D10#DC7#E7A#F79#F82
-;~F#1005#102C#1037#105B#106E#106F#10BD#116C#1238#12AA#130A#130E#133B#1361#13A8#1420#1431#144C#146A#14A7
-;~F#14C6#14D4#14F0#1502#1526
-;~B#FED#153F
+;~F#230#25B#283#374#45F#5B4#774#80A#92A#92F#95F#A01#A3C#AC9#B35#C4A#D10#DC7#E7A#F79
+;~F#106A
+;~B#154E
 ;~C#Blitz3D

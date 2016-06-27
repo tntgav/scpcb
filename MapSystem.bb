@@ -7212,7 +7212,7 @@ End Type
 
 Function CreateChunk.Chunk(obj%,x#,y#,z#)
 	Local ch.Chunk = New Chunk
-	Local chp.ChunkPart,i
+	Local chp.ChunkPart,i,n.NPCs
 	
 	;If obj%<>0
 	;	ch\obj% = CopyEntity(obj%)
@@ -7239,6 +7239,11 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#)
 				Next
 				Exit
 			EndIf
+		Next
+		For i = 0 To Rand(5,10)
+			n.NPCs = CreateNPC(NPCtype1499,x+Rnd(-60.0,60.0),y+0.5,z+Rnd(-60.0,60.0))
+			If Rand(2)=1 Then n\State2 = 500*3
+			n\Angle = Rnd(360)
 		Next
 	EndIf
 	
@@ -7415,7 +7420,7 @@ End Function
 ;~F#BE1#BEF#C04#C40#C5F#C6F#C87#CB2#CC5#CE7#D0F#D61#D8D#DB4#DBB#DC0#DF7#E1E#E33#E63
 ;~F#EE1#F01#F75#FCC#FF7#1048#1051#10EA#10F2#10F7#1105#1114#112D#114F#115E#116F#1176#11FD#127A#1286
 ;~F#12C7#12D2#12E3#12E8#12F7#130E#1384#138D#146C#1489#1490#1496#14A4#14C8#14E8#151B#1626#165F#1674#1736
-;~F#17CB#17D0#17E0#1AB5#1ACC#1AEB#1AF2#1B3F#1B90#1BAB#1BC2#1BEA#1BF1#1C25#1C2C#1C53#1CA1#1CAF#1CB6#1CBC
-;~F#1CC6
+;~F#17CB#17D0#17E0#1AB5#1ACC#1AEB#1AF2#1B3F#1B90#1BAB#1BC2#1BEA#1BF1#1C25#1C58#1CA6#1CB4#1CBB#1CC1#1CCB
+;~F#1CD1#1CE4
 ;~B#116D
 ;~C#Blitz3D

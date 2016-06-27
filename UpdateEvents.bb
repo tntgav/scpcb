@@ -7707,10 +7707,15 @@ Function UpdateEvents()
 							Next
 						EndIf
 						;[End Block]
-						For i = 0 To 50
-							n.NPCs = CreateNPC(NPCtype1499,EntityX(e\room\obj)+Rnd(-60.0,60.0),EntityY(e\room\obj)+0.5,EntityZ(e\room\obj)+Rnd(-60.0,60.0))
-							If Rand(2)=1 Then n\State2 = 500*3
-							n\Angle = Rnd(360)
+						For n.NPCs = Each NPCs
+							If n\NPCtype = NPCtype1499
+								n\Idle = False
+								n\State = 0
+								If Rand(2)=1 Then n\State2 = 500*3
+								n\Angle = Rnd(360)
+								PositionEntity n\Collider,EntityX(n\Collider)+Rnd(-60.0,60.0),EntityY(n\Collider)+0.05,EntityZ(n\Collider)+Rnd(-60.0,60.0)
+								ResetEntity n\Collider
+							EndIf
 						Next
 						
 						StoredBrightness = Brightness
@@ -7723,7 +7728,7 @@ Function UpdateEvents()
 					CameraFogRange Camera,40,80
 					CameraFogColor Camera,96,97,104
 					CameraClsColor Camera,96,97,104
-					CameraRange Camera,0.01,90
+					CameraRange Camera,0.05,90
 					
 					For r.Rooms = Each Rooms
 						HideEntity r\obj
@@ -7745,7 +7750,8 @@ Function UpdateEvents()
 						HideChunks()
 						For n.NPCs = Each NPCs
 							If n\NPCtype = NPCtype1499
-								RemoveNPC(n)
+								;RemoveNPC(n)
+								n\Idle = True
 							EndIf
 						Next
 						e\EventState = 1.0
@@ -7817,19 +7823,24 @@ Function UpdateEvents()
 								If Inventory(i)<>Null
 									;sucessfull
 									e\EventState2 = i
-									e\EventState3 = 1.0
+									If Rand(10)=1
+										e\EventState3 = 3.0
+									Else
+										e\EventState3 = 1.0
+									EndIf
 									DebugLog "pick2"
 									Exit
 								Else
 									;not sucessful
-									e\EventState3 = 2.0
+									If Rand(10)=1
+										e\EventState3 = 3.1
+									Else
+										e\EventState3 = 2.0
+									EndIf
 									DebugLog "pick3"
 								EndIf
 							Next
 						EndIf
-						
-						If e\EventState3 = 1.0 And Rand(10)=1 Then e\EventState3 = 3.0
-						If e\EventState3 = 2.0 And Rand(10)=1 Then e\EventState3 = 3.1
 					EndIf
 					
 					If e\EventState > 0.0
@@ -7966,6 +7977,7 @@ Function UpdateEvents()
 						If e\EventState3 < 3.1
 							Msg = "Something changed in your Inventory"
 							MsgTimer = 70*5
+							RemoveItem(Inventory(e\EventState2))
 						Else
 							Injuries = Injuries + 5.0
 							pvt = CreatePivot()
@@ -8474,6 +8486,12 @@ Function UpdateEvents()
 									EndIf
 								EndIf
 							Next
+							
+							If Curr096\State <> 5
+								e\EventState = 2
+								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
+								DebugLog "- SCP-096 enraged"
+							EndIf
 						EndIf
 						For e2.Events = Each Events
 							If e2\EventName = "room2servers"
@@ -8487,6 +8505,7 @@ Function UpdateEvents()
 						Next
 						If PlayerRoom = e\room Then e\EventState = 2
 					EndIf
+					
 					;[End Block]
 					
 					If e\EventState = 0
@@ -8592,8 +8611,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#104#4E6#554#5C5#624#7F2#9D9#A00#A0E#A18#A25#C0E#C2F#C7E#CCC#CD9#D13#D2A#D4A
-;~F#D53#D5D#D6C#E00#E22#10CE#1114#112A#1136#1154#11A5#11BC#1289#138A#141B#1434#1453#1484#1491#14AA
-;~F#1542#17C1#1815#18C6#1976#1A2E#1A46#1B07#1B34#1B51#1B78#1BA8#1BC5#1BED#1C47#1C87#1CB8#1CCB#1D83#1DDB
-;~F#1DEE#1DFC#1E05#1E4B#1E6A#1F4A#1FB1#2105#2109
+;~F#11#104#4E6#4F6#554#5C5#624#7F2#9D9#A00#A0E#A18#A25#C0E#C2F#C7E#CCC#CD9#D13#D2A
+;~F#D4A#D53#D5D#D6C#E00#E22#10CE#1114#112A#1136#1154#11A5#11BC#1289#138A#141B#1434#1453#1484#1491
+;~F#14AA#1542#16F8#17C1#1815#18C6#1976#1A2E#1A46#1B07#1B34#1B51#1B78#1BA8#1BC5#1BED#1C47#1C87#1CB8#1CCB
+;~F#1D83#1DDB#1DEE#1DFC#1E05#1E51#1F56#1FB8#1FBD#2097#2111#2115
 ;~C#Blitz3D
