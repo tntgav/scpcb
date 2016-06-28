@@ -826,6 +826,7 @@ Function UpdateConsole()
 					Next
 				Case "kill","suicide"
 					KillTimer = -1
+					DeathMSG = "[REDACTED]"
 				Case "playmusic"
 					If Instr(ConsoleInput, " ")<>0 Then
 						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -4942,7 +4943,6 @@ Function DrawGUI()
 							EndIf
 						Next
 					EndIf
-					MsgTimer = 70 * 5
 					Wearing1499% = (Not Wearing1499%)
 					SelectedItem = Null
 				Case "badge"
@@ -7664,6 +7664,78 @@ Function angleDist#(a0#,a1#)
 	Return bb
 End Function
 
+Function Inverse#(number#)
+	
+	Return Float(1.0-number#)
+	
+End Function
+
+Function Rnd_Array(numb1#,numb2#,Array1#,Array2#)
+	Local whatarray% = Rand(1,2)
+	
+	If whatarray% = 1
+		Return Rnd(numb1#,Array1#)
+	Else
+		Return Rnd(Array2#,numb2#)
+	EndIf
+	
+End Function
+
+Function TakeOffStuff(flag%=0)
+	;FLAG variables:
+		;1: GasMask
+		;2: Hazmat Suit
+		;4: SCP-714
+		;8: SCP-178
+		;16: Kevlar Vest
+		;32: Night Vision Goggles
+		;64: SCP-1499
+	
+	Local numb_flag% = Bin(flag%)
+	
+	If Right(numb_flag%,1) = 1
+		WearingGasMask = False
+		DebugLog "GasMask Off"
+	EndIf
+	If Len(numb_flag%)>1
+		If Mid(numb_flag%,Len(numb_flag%)-1,1) = 1
+			WearingHazmat = False
+			DebugLog "Hazmat Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>2
+		If Mid(numb_flag%,Len(numb_flag%)-2,1) = 1
+			Wearing714 = False
+			DebugLog "SCP-714 Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>3
+		If Mid(numb_flag%,Len(numb_flag%)-3,1) = 1
+			Wearing178 = False
+			DebugLog "SCP-178 Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>4
+		If Mid(numb_flag%,Len(numb_flag%)-4,1) = 1
+			WearingVest = False
+			DebugLog "Kevlar Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>5
+		If Mid(numb_flag%,Len(numb_flag%)-5,1) = 1
+			WearingNightVision = False
+			DebugLog "NVG Off"
+		EndIf
+	EndIf
+	If Len(numb_flag%)>6
+		If Mid(numb_flag%,Len(numb_flag%)-6,1) = 1
+			Wearing1499 = False
+			DebugLog "SCP-1499 Off"
+		EndIf
+	EndIf
+	
+End Function
+
 ;--------------------------------------- decals -------------------------------------------------------
 
 Type Decals
@@ -8366,77 +8438,6 @@ Function UpdateScreenGamma()
 	UpdateGamma
 End Function
 
-Function Inverse#(number#)
-	
-	Return Float(1.0-number#)
-	
-End Function
-
-Function Rnd_Array(numb1#,numb2#,Array1#,Array2#)
-	Local whatarray% = Rand(1,2)
-	
-	If whatarray% = 1
-		Return Rnd(numb1#,Array1#)
-	Else
-		Return Rnd(Array2#,numb2#)
-	EndIf
-	
-End Function
-
-Function TakeOffStuff(flag%=0)
-	;FLAG variables:
-		;1: GasMask
-		;2: Hazmat Suit
-		;4: SCP-714
-		;8: SCP-178
-		;16: Kevlar Vest
-		;32: Night Vision Goggles
-		;64: SCP-1499
-	
-	Local numb_flag% = Bin(flag%)
-	
-	If Right(numb_flag%,1) = 1
-		WearingGasMask = False
-		DebugLog "GasMask Off"
-	EndIf
-	If Len(numb_flag%)>1
-		If Mid(numb_flag%,Len(numb_flag%)-1,1) = 1
-			WearingHazmat = False
-			DebugLog "Hazmat Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>2
-		If Mid(numb_flag%,Len(numb_flag%)-2,1) = 1
-			Wearing714 = False
-			DebugLog "SCP-714 Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>3
-		If Mid(numb_flag%,Len(numb_flag%)-3,1) = 1
-			Wearing178 = False
-			DebugLog "SCP-178 Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>4
-		If Mid(numb_flag%,Len(numb_flag%)-4,1) = 1
-			WearingVest = False
-			DebugLog "Kevlar Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>5
-		If Mid(numb_flag%,Len(numb_flag%)-5,1) = 1
-			WearingNightVision = False
-			DebugLog "NVG Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>6
-		If Mid(numb_flag%,Len(numb_flag%)-6,1) = 1
-			Wearing1499 = False
-			DebugLog "SCP-1499 Off"
-		EndIf
-	EndIf
-	
-End Function
 
 Function UpdateLeave1499()
 	Local r.Rooms, it.Items
@@ -8445,8 +8446,8 @@ Function UpdateLeave1499()
 		For r.Rooms = Each Rooms
 			If r = NTF_1499PrevRoom
 				BlinkTimer = -1
-				Msg = "You took off SCP-1499 and you reappeared in the facility."
-				MsgTimer = 70 * 5
+				;Msg = "You took off SCP-1499 and you reappeared in the facility."
+				;MsgTimer = 70 * 5
 				NTF_1499X# = EntityX(Collider)
 				NTF_1499Y# = EntityY(Collider)
 				NTF_1499Z# = EntityZ(Collider)
@@ -8550,10 +8551,10 @@ Function UpdateDeafPlayer()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3CB#4FD#51E#596#5A3#658#6D0#6E7#6F4#726#7DB#8BD#979#990#B47
-;~F#DD2#FBB#1577#1582#16D0#1751#18AD#18B7#18E6#1905#1924#1969#196D#198F#1997#19C2#1B64#1C19#1CE6#1D5D
-;~F#1D63#1D6D#1D79#1D84#1D88#1DC3#1DCB#1DD3#1DDA#1DE1#1DF0#1DFF#1E1D#1E4B#1E52#1E65#1E7E#1EAB#1EB6#1EBB
-;~F#1ED5#1EE1#1EFC#1F4E#1F5C#1F64#1F70#1F79#1FA2#1FA7#1FAC#1FB1#1FBA#2064#206E#2093#20A1#20AC#20B2#20BD
-;~F#20F4#211B#212D#213E#214D
-;~B#116C
+;~F#24#AC#12C#130#137#3CC#4A8#4FE#51F#597#5A4#659#6D1#6E8#6F5#727#7DC#8BE#97A#991
+;~F#A24#B48#DD3#FBC#1382#140D#1457#1469#14A8#1576#1581#16D4#1755#1786#1883#1895#18B1#18BB#18C8#18EA
+;~F#1909#1928#1944#1958#196D#1971#1993#199B#19C6#1B68#1C1D#1CEA#1D61#1D67#1D71#1D7D#1D88#1D8C#1DC7#1DCF
+;~F#1DD7#1DDE#1DE5#1DF2#1DF8#1E03#1E3C#1E4B#1E69#1E97#1E9E#1EB1#1ECA#1EF7#1F02#1F07#1F21#1F2D#1F48#1F9A
+;~F#1FA8#1FB0#1FBC#1FC5#1FEE#1FF3#1FF8#1FFD#2006#200E#20B0#20BA#20DF#20ED#20F9#2120#2143#2152
+;~B#116D#19C6
 ;~C#Blitz3D
