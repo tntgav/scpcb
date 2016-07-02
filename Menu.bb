@@ -1031,12 +1031,12 @@ Function UpdateLauncher()
 		
 		If (Not FakeFullScreen)
 			If Fullscreen
-				Text(40+ 260 + 15, 262 - 55 + 140, "Current Reolsution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + (16+(16*(Not Bit16Mode)))))
+				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + (16+(16*(Not Bit16Mode)))))
 			Else
-				Text(40+ 260 + 15, 262 - 55 + 140, "Current Reolsution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + 32))
+				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + 32))
 			EndIf
 		Else
-			Text(40+ 260 + 15, 262 - 55 + 140, "Current Reolsution: "+(G_viewport_width + "x" + G_viewport_height + "," + 32))
+			Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(G_viewport_width + "x" + G_viewport_height + "," + 32))
 		EndIf
 		
 		If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 55, 100, 30, "LAUNCH", False) Then
