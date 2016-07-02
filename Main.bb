@@ -2402,10 +2402,23 @@ Repeat
 		UpdateConsole()
 		
 		If MsgTimer > 0 Then
+			Local temp% = False
+			If (Not InvOpen%)
+				If SelectedItem <> Null
+					If SelectedItem\itemtemplate\tempname = "paper" Or SelectedItem\itemtemplate\tempname = "oldpaper"
+						temp% = True
+					EndIf
+				EndIf
+			EndIf
+			
 			Color 0,0,0
-			Text((GraphicWidth / 2)+1, (GraphicHeight / 2) + 201, Msg, True) 			
+			Text((GraphicWidth / 2)+1, (GraphicHeight / 2) + 201, Msg, True)
 			Color Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255)
-			Text((GraphicWidth / 2), (GraphicHeight / 2) + 200, Msg, True) 
+			If (Not temp%)
+				Text((GraphicWidth / 2), (GraphicHeight / 2) + 200, Msg, True)
+			Else
+				Text((GraphicWidth / 2), (GraphicHeight * 0.95), Msg, True)
+			EndIf
 			MsgTimer=MsgTimer-FPSfactor2 
 		End If
 		
@@ -4990,7 +5003,7 @@ Function DrawGUI()
 					If SelectedItem\state = 0
 						Select SelectedItem\itemtemplate\name
 							Case "Disciplinary Hearing DH-S-4137-17092"
-								Msg = "New info learned: Disciplinary Hearing DH-S-4137-17092"
+								Msg = "New info learned: "+Chr(34)+"Disciplinary Hearing DH-S-4137-17092"+Chr(34)
 								MsgTimer = 70*10
 								PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
 								SelectedItem\state = 1
@@ -8433,10 +8446,10 @@ Function UpdateDeafPlayer()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#3CF#4AB#501#522#59A#5A7#65C#6D4#6EB#6F8#7DF#8C2#97E#995#A28#B4C
-;~F#DD7#FC0#13AD#1438#1482#1494#14D3#15A1#15AC#16FF#1780#17B1#18AE#18C0#18DC#18E6#18F3#1915#1934#1953
-;~F#196F#1983#1998#19BE#19C6#19F1#1B93#1C73#1CEA#1CF0#1CFA#1D06#1D11#1D15#1D50#1D58#1D60#1D67#1D6E#1D7B
-;~F#1D81#1D8C#1DC5#1DD4#1DF2#1E20#1E27#1E3A#1E53#1E80#1E8B#1E90#1EAA#1EB6#1ED1#1F23#1F31#1F39#1F45#1F4E
-;~F#1F77#1F7C#1F81#1F86#1F8F#1F97#2039#2043#2068#2076#2083#20AA#20BC#20CD#20DC
-;~B#1171#19F1
+;~F#24#AC#12C#130#137#3CF#4AB#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7DF#8C2#98B#9A2
+;~F#A35#B59#DE4#FCD#13BA#1445#148F#14A1#14E0#15AE#15B9#170C#178D#17BE#18BB#18CD#18E9#18F3#1900#1922
+;~F#1941#1960#197C#1990#19A5#19CB#19D3#19FE#1BA0#1C80#1CF7#1CFD#1D07#1D13#1D1E#1D22#1D5D#1D65#1D6D#1D74
+;~F#1D7B#1D88#1D8E#1D99#1DD2#1DE1#1DFF#1E2D#1E34#1E47#1E60#1E8D#1E98#1E9D#1EB7#1EC3#1EDE#1F30#1F3E#1F46
+;~F#1F52#1F5B#1F84#1F89#1F8E#1F93#1F9C#1FA4#2046#2050#2075#2083#2090#20B7#20C9#20DA#20E9
+;~B#117E#19FE
 ;~C#Blitz3D
