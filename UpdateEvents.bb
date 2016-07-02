@@ -708,7 +708,7 @@ Function UpdateEvents()
 							
 							If Distance(EntityX(e\room\NPC[3]\Collider), EntityZ(e\room\NPC[3]\Collider), EntityX(e\room\RoomDoors[2]\frameobj,True), EntityZ(e\room\RoomDoors[2]\frameobj,True)) < 4.5 And dist < 5.0 Then
 								
-								e\room\NPC[3]\State = 7
+								e\room\NPC[3]\State = 9
 								
 								If e\room\NPC[7]\SoundChn<>0 Then
 									If ChannelPlaying(e\room\NPC[7]\SoundChn) Then
@@ -740,12 +740,12 @@ Function UpdateEvents()
 								e\room\RoomDoors[2]\locked = True
 							EndIf
 						Else
-							e\room\NPC[3]\State = 7
-							PointEntity e\room\NPC[3]\obj, Collider
-							RotateEntity e\room\NPC[3]\Collider,0,CurveAngle(EntityYaw(e\room\NPC[3]\obj),EntityYaw(e\room\NPC[3]\Collider),20.0),0,True							
-							e\room\NPC[4]\State = 7
-							PointEntity e\room\NPC[4]\obj, Collider
-							RotateEntity e\room\NPC[4]\Collider,0,CurveAngle(EntityYaw(e\room\NPC[4]\obj),EntityYaw(e\room\NPC[4]\Collider),20.0),0,True	
+							e\room\NPC[3]\State = 9
+							;PointEntity e\room\NPC[3]\obj, Collider
+							;RotateEntity e\room\NPC[3]\Collider,0,CurveAngle(EntityYaw(e\room\NPC[3]\obj),EntityYaw(e\room\NPC[3]\Collider),20.0),0,True	
+							e\room\NPC[4]\State = 9
+							;PointEntity e\room\NPC[4]\obj, Collider
+							;RotateEntity e\room\NPC[4]\Collider,0,CurveAngle(EntityYaw(e\room\NPC[4]\obj),EntityYaw(e\room\NPC[4]\Collider),20.0),0,True
 							
 							If Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\obj), EntityZ(e\room\obj)) < 4.0 Then
 								e\room\RoomDoors[2]\locked = False
@@ -931,12 +931,16 @@ Function UpdateEvents()
 									ElseIf e\EventState => 650 And e\EventState - (FPSfactor/3) < 650 ;"viimeinen varoitus, 5 sek aikaa"
 										e\room\NPC[6]\SoundChn = PlaySound_Strict(IntroSFX(5))
 									ElseIf e\EventState => 850 And e\EventState - (FPSfactor/3) < 850 ;"fire at will"
-										;UseDoor(e\room\RoomDoors[1])
-										e\room\RoomDoors[1]\open = False
+										UseDoor(e\room\RoomDoors[1],False)
+										;e\room\RoomDoors[1]\open = False
 										e\room\NPC[6]\SoundChn = PlaySound_Strict(IntroSFX(6))
 									ElseIf e\EventState > 1000
 										e\room\NPC[0]\State = 1
 										e\room\NPC[0]\State3= 1
+										e\room\NPC[3]\State = 11
+										e\room\RoomDoors[2]\locked = False
+										UseDoor(e\room\RoomDoors[2],False)
+										e\room\RoomDoors[2]\locked = True
 										e\EventState2 = 1
 										Exit
 									EndIf
@@ -1352,13 +1356,17 @@ Function UpdateEvents()
 				
 				If e\room\RoomDoors[0]\open <> e\EventState Then
 					If e\Sound = 0 Then LoadEventSound(e,"SFX\Doors\DoorCheckpoint.ogg")
-					e\SoundCHN = PlaySound2(e\Sound,Camera,e\room\Objects[3])
+					e\SoundCHN = PlaySound2(e\Sound,Camera,e\room\RoomDoors[0]\obj)
+					e\SoundCHN2 = PlaySound2(e\Sound,Camera,e\room\RoomDoors[1]\obj)
 				EndIf
 				
 				e\EventState = e\room\RoomDoors[0]\open
 				
 				If ChannelPlaying(e\SoundCHN)
-					UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[3])
+					UpdateSoundOrigin(e\SoundCHN,Camera,e\room\RoomDoors[0]\obj)
+				EndIf
+				If ChannelPlaying(e\SoundCHN2)
+					UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[1]\obj)
 				EndIf
 				;[End Block]
 			Case "coffin", "coffin106"
@@ -7791,7 +7799,9 @@ Function UpdateEvents()
 				;[End Block]
 			Case "room1162"
 				;[Block]
-				;e\EventState = Counting how often the player used SCP-1162
+				;e\EventState = A variable to determine the "nostalgia" items
+				;- 0.0 = No nostalgia item
+				;- 1.0 = Lost key
 				;e\EventState2 = Defining which slot from the Inventory should be picked
 				;e\EventState3 = A check for if a item should be removed
 				;- 0.0 = no item "trade" will happen
@@ -7802,6 +7812,8 @@ Function UpdateEvents()
 				If PlayerRoom = e\room
 					
 					GrabbedEntity = 0
+					
+					e\EventState = 0
 					
 					;EntityPick(Camera, 1.0)
 					
@@ -7825,6 +7837,18 @@ Function UpdateEvents()
 									e\EventState2 = i
 									If Rand(10)=1
 										e\EventState3 = 3.0
+										e\EventState = Rand(1,1)
+										;Checking if the selected nostalgia item already exists or not
+										For it.Items = Each Items
+											Select e\EventState
+												Case 1
+													If it\itemtemplate\tempname = "key"
+														e\EventState3 = 1.0
+														e\EventState = 0.0
+														Exit
+													EndIf
+											End Select
+										Next
 									Else
 										e\EventState3 = 1.0
 									EndIf
@@ -7834,6 +7858,18 @@ Function UpdateEvents()
 									;not sucessful
 									If Rand(10)=1
 										e\EventState3 = 3.1
+										e\EventState = Rand(1,1)
+										;Checking if the selected nostalgia item already exists or not
+										For it.Items = Each Items
+											Select e\EventState
+												Case 1
+													If it\itemtemplate\tempname = "key"
+														e\EventState3 = 2.0
+														e\EventState = 0.0
+														Exit
+													EndIf
+											End Select
+										Next
 									Else
 										e\EventState3 = 2.0
 									EndIf
@@ -7843,10 +7879,7 @@ Function UpdateEvents()
 						EndIf
 					EndIf
 					
-					If e\EventState > 0.0
-						GiveAchievement(NTF_Achv1162)
-					EndIf
-					
+					;trade successful
 					If e\EventState3 = 1.0
 						For itt.ItemTemplates = Each ItemTemplates
 							Select Inventory(e\EventState2)\itemtemplate\tempname
@@ -7857,11 +7890,11 @@ Function UpdateEvents()
 										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
-										e\EventState = e\EventState + 1.0
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
+										GiveAchievement(NTF_Achv1162)
 										Exit
 										DebugLog "paper"
 									EndIf
@@ -7872,11 +7905,11 @@ Function UpdateEvents()
 										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
-										e\EventState = e\EventState + 1.0
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
+										GiveAchievement(NTF_Achv1162)
 										Exit
 										DebugLog "gasmask hazmat"
 									EndIf
@@ -7887,11 +7920,11 @@ Function UpdateEvents()
 										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
-										e\EventState = e\EventState + 1.0
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
+										GiveAchievement(NTF_Achv1162)
 										Exit
 										DebugLog "key"
 									EndIf
@@ -7902,11 +7935,11 @@ Function UpdateEvents()
 										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
-										e\EventState = e\EventState + 1.0
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
+										GiveAchievement(NTF_Achv1162)
 										Exit
 										DebugLog "key #2"
 									EndIf
@@ -7917,11 +7950,11 @@ Function UpdateEvents()
 										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
-										e\EventState = e\EventState + 1.0
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
+										GiveAchievement(NTF_Achv1162)
 										Exit
 										DebugLog "vest"
 									EndIf
@@ -7932,16 +7965,17 @@ Function UpdateEvents()
 										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
 										HideEntity Inventory(e\EventState2)\obj
 										Inventory(e\EventState2)\Picked = True
-										e\EventState = e\EventState + 1.0
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
 										Msg = "Something changed in your Inventory"
 										MsgTimer = 70*5
+										GiveAchievement(NTF_Achv1162)
 										Exit
 										DebugLog "default"
 									EndIf
 							End Select
 						Next
+					;trade not sucessful (player got in return to injuries a new item)
 					ElseIf e\EventState3 = 2.0
 						Injuries = Injuries + 5.0
 						pvt = CreatePivot()
@@ -7957,7 +7991,7 @@ Function UpdateEvents()
 								EntityType(Inventory(0)\obj, HIT_ITEM)
 								HideEntity Inventory(0)\obj
 								Inventory(0)\Picked = True
-								e\EventState = e\EventState + 1.0
+								GiveAchievement(NTF_Achv1162)
 								e\EventState3 = 0.0
 								If Injuries > 20
 									DeathMSG = "A big chunk of body parts were found next to SCP-1162. DNA testing identified that the body parts were all from "
@@ -7973,8 +8007,10 @@ Function UpdateEvents()
 								Exit
 							EndIf
 						Next
+					;trade with nostalgia item
 					ElseIf e\EventState3 >= 3.0
 						If e\EventState3 < 3.1
+							PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 							Msg = "Something changed in your Inventory"
 							MsgTimer = 70*5
 							RemoveItem(Inventory(e\EventState2))
@@ -7998,19 +8034,16 @@ Function UpdateEvents()
 								Msg = "Something is now in your Inventory and you have high injuries"
 								MsgTimer = 70*5
 							EndIf
+							e\EventState2 = 0.0
 						EndIf
-						While Inventory(0)=Null
-							For itt.ItemTemplates = Each ItemTemplates
-								If itt\tempname = "oldpaper" Or itt\tempname = "key" Or itt\tempname = "oldmask" And Rand(6)=1
-									Inventory(0) = CreateItem(itt\name, itt\tempname, 1,1,1)
-									EntityType(Inventory(0)\obj, HIT_ITEM)
-									HideEntity Inventory(0)\obj
-									Inventory(0)\Picked = True
-									Exit
-								EndIf
-							Next
-						Wend
-						e\EventState = e\EventState + 1.0
+						Select e\EventState
+							Case 1
+								Inventory(e\EventState2) = CreateItem("Lost Key","key",1,1,1)
+						End Select
+						EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
+						HideEntity Inventory(e\EventState2)\obj
+						Inventory(e\EventState2)\Picked = True
+						GiveAchievement(NTF_Achv1162)
 						e\EventState3 = 0.0
 					EndIf
 				EndIf
@@ -8611,8 +8644,8 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#11#104#4E6#4F6#554#5C5#624#7F2#9D9#A00#A0E#A18#A25#C0E#C2F#C7E#CCC#CD9#D13#D2A
-;~F#D4A#D53#D5D#D6C#E00#E22#10CE#1114#112A#1136#1154#11A5#11BC#1289#138A#141B#1434#1453#1484#1491
-;~F#14AA#1542#16F8#17C1#1815#18C6#1976#1A2E#1A46#1B07#1B34#1B51#1B78#1BA8#1BC5#1BED#1C47#1C87#1CB8#1CCB
-;~F#1D83#1DDB#1DEE#1DFC#1E05#1E51#1F56#1FB8#1FBD#2097#2111#2115
+;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
+;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#148C#1499
+;~F#14B2#154A#1700#17C9#181D#18CE#197E#1A36#1A4E#1B0F#1B3C#1B59#1B80#1BB0#1BCD#1BF5#1C4F#1C8F#1CC0#1CD3
+;~F#1D8B#1DE3#1DF6#1E04#1E0D#1E59#1E78#1F77#1FD9#1FDE#20B8#2132#2136
 ;~C#Blitz3D

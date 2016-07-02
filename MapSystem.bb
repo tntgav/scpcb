@@ -2195,9 +2195,9 @@ Function FillRoom(r.Rooms)
 			sc\turn = 0
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			
-			r\Objects[3] = CreatePivot()
-			PositionEntity r\Objects[3],r\x-152.0*RoomScale,r\y+160.0*RoomScale,r\z-128.0*RoomScale,True
-			EntityParent r\Objects[3],r\obj
+			;r\Objects[3] = CreatePivot()
+			;PositionEntity r\Objects[3],r\x-152.0*RoomScale,r\y+160.0*RoomScale,r\z-128.0*RoomScale,True
+			;EntityParent r\Objects[3],r\obj
 			;[End Block]
 		Case "checkpoint2"
 			;[Block]
@@ -2224,9 +2224,9 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[0]\timer = 70 * 5
 			r\RoomDoors[1]\timer = 70 * 5
 			
-			r\Objects[3] = CreatePivot()
-			PositionEntity r\Objects[3],r\x+152.0*RoomScale,r\y+160.0*RoomScale,r\z+128.0*RoomScale,True
-			EntityParent r\Objects[3],r\obj
+			;r\Objects[3] = CreatePivot()
+			;PositionEntity r\Objects[3],r\x+152.0*RoomScale,r\y+160.0*RoomScale,r\z+128.0*RoomScale,True
+			;EntityParent r\Objects[3],r\obj
 			
 			;[End Block]
 		Case "room2pit"
@@ -4330,7 +4330,7 @@ Function FillRoom(r.Rooms)
 		Case "room3z3"
 			;[Block]
 			sc.SecurityCams = CreateSecurityCam(r\x-320.0*RoomScale, r\y+384.0*RoomScale, r\z+512.25*RoomScale, r)
-			sc\angle = 270
+			sc\angle = 225
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
@@ -4381,13 +4381,13 @@ Function FillRoom(r.Rooms)
 				EntityParent de\obj, r\obj
 			EndIf
 			
-			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, 0.0, r\z - 382.0 * RoomScale, 90, r, False, False)
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, 0.0, r\z - 382.0 * RoomScale, 0, r, False, False)
 			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
             PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[1],True), r\z - 606.679 * RoomScale, True)
 			r\RoomDoors[0]\dir = 0 : r\RoomDoors[0]\AutoClose = False	: r\RoomDoors[0]\open = True  : r\RoomDoors[0]\locked = True	
 			r\RoomDoors[0]\MTFClose = False
 			
-			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, 0.0, r\z + 462.0 * RoomScale, 270, r, False, False)
+			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, 0.0, r\z + 462.0 * RoomScale, 180, r, False, False)
 			PositionEntity(r\RoomDoors[1]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
             PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
 			r\RoomDoors[1]\dir = 0 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
@@ -4564,6 +4564,12 @@ Function FillRoom(r.Rooms)
 					EndIf
 				EndIf
 			Next
+			;[End Block]
+		Case "room2_4"
+			;[Block]
+			r\Objects[6] = CreatePivot()
+			PositionEntity(r\Objects[6], r\x + 640.0 * RoomScale, 8.0 * RoomScale, r\z - 896.0 * RoomScale)
+			EntityParent(r\Objects[6], r\obj)
 			;[End Block]
 	End Select
 	
@@ -7415,12 +7421,12 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#32B#33B#34C#374#382#392#397#3A2#449
-;~F#553#572#594#5A5#5B0#5E9#5F7#61F#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#8B8
-;~F#8D6#8FD#904#912#92E#943#960#97D#98A#99C#9DA#A04#A55#AAB#ABE#ADC#B2D#B8E#B9D#BD9
-;~F#BE1#BEF#C04#C40#C5F#C6F#C87#CB2#CC5#CE7#D0F#D61#D8D#DB4#DBB#DC0#DF7#E1E#E33#E63
-;~F#EE1#F01#F75#FCC#FF7#1048#1051#10EA#10F2#10F7#1105#1114#112D#114F#115E#116F#1176#11FD#127A#1286
-;~F#12C7#12D2#12E3#12E8#12F7#130E#1384#138D#146C#1489#1490#1496#14A4#14C8#14E8#151B#1626#165F#1674#1736
-;~F#17CB#17D0#17E0#1AB5#1ACC#1AEB#1AF2#1B3F#1B90#1BAB#1BC2#1BEA#1BF1#1C25#1C58#1CA6#1CB4#1CBB#1CC1#1CCB
-;~F#1CD1#1CE4
+;~F#553#572#594#5A5#5B0#5E9#5F7#61F#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#87E
+;~F#89A#8B8#8D6#8FD#904#912#92E#943#960#97D#98A#99C#9DA#A04#A55#AAB#ABE#ADC#B2D#B8E
+;~F#B9D#BD9#BE1#BEF#C04#C40#C5F#C6F#C87#CB2#CC5#CE7#D0F#D61#D8D#DB4#DBB#DC0#DF7#E1E
+;~F#E33#E63#EE1#F01#F75#FCC#FF7#1048#1051#10EA#10F2#10F7#1105#1114#112D#114F#115E#116F#1176#117B
+;~F#11D8#1203#1280#128C#12CD#12D8#12E9#12EE#12FD#1314#138A#1393#1472#148F#1496#149C#14AA#14CE#14EE#1521
+;~F#162C#1665#167A#173C#17D1#17D6#17E6#1ABB#1AD2#1AF1#1AF8#1B45#1B96#1BB1#1BC8#1BF0#1BF7#1C2B#1C5E#1CAC
+;~F#1CBA#1CC1#1CC7#1CD1#1CD7#1CEA
 ;~B#116D
 ;~C#Blitz3D

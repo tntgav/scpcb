@@ -649,6 +649,9 @@ Function UpdateConsole()
 					Contained106 = True
 				Case "enable106"
 					Curr106\Idle = False
+					Contained106 = False
+					ShowEntity Curr106\Collider
+					ShowEntity Curr106\obj
 				Case "halloween"
 					Local tex = LoadTexture("GFX\npcs\173h.pt")
 					EntityTexture Curr173\obj, tex, 0, 2
@@ -2188,7 +2191,8 @@ Repeat
 				AmbientSFXCHN = PlaySound2(AmbientSFX(PlayerZone,CurrAmbientSFX), Camera, SoundEmitter)
 			EndIf
 			If Rand(40000) = 3 Then
-				If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "room860" And PlayerRoom\RoomTemplate\Name <> "173" Then
+				Local RN$ = PlayerRoom\RoomTemplate\Name$
+				If RN$ <> "pocketdimension" And RN$ <> "room860" And RN$ <> "173" And RN$ <> "dimension1499" Then
 					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
 					PlaySound_Strict  LoadTempSound("SFX\079_"+Rand(7,10)+".ogg")
 				EndIf 
@@ -4954,6 +4958,22 @@ Function DrawGUI()
 					EndIf
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
+					
+					If SelectedItem\state = 0
+						Msg = "New info learned: Assistant researcher "+Chr(34)+"Emily Sharon Ross"+Chr(34)
+						MsgTimer = 70*10
+						SelectedItem\state = 1
+					EndIf
+				Case "key"
+					If SelectedItem\state = 0
+						PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+					EndIf
+					
+					Msg = "Isn't this the key to that old shack? The one where I... No, it can't be."
+					MsgTimer = 70*10
+					
+					SelectedItem\state = 1
+					SelectedItem = Null
 				Default
 					;check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
@@ -7228,175 +7248,13 @@ Function UpdateMTF%()
 							n\MTFLeader = leader
 						EndIf
 						
-						n\PrevState = 0
 						n\PrevX = i
 					Next
 				EndIf
 			EndIf
 		EndIf
-	Else
-		Return
-		
-		;mtf spawnannut, aletaan p‰ivitt‰‰ teko‰ly‰
-		
-		MTFtimer=MTFtimer+FPSfactor
-		
-		;mtfroomstate 0 = huonetta ei ole alettu viel‰ etsi‰
-		;mtfroomstate 1 = joku tiimi on menossa huoneeseen
-		;mtfroomstate 2 = huone on tarkistettu
-		;mtfroomstate 3 = huoneeseen ei lˆydetty reitti‰ -> yritet‰‰n v‰h‰n ajan p‰‰st‰ uudestaan
-		
-		;prevstate 0 = k‰y l‰pi tutkimattomia huoneita
-		
-		;p‰ivitet‰‰n kymmenen sekunnin v‰lein MTF:n "kollektiivinen teko‰ly"
-		If MTFtimer > (70*10) Then
-			
-			DebugLog "MTF update"
-			
-			;tiimi saapunut 106:n huoneeseen, "pyydystet‰‰n" se
-			If MTFrooms[0]<>Null Then
-				If MTFroomState[0]=2 Then
-					If PlayerRoom\RoomTemplate\Name<>"room106" Then
-						If Contained106 Then
-							PlayMTFSound(LoadTempSound("SFX\MTF\Oldman2.ogg"),Null)
-							MTFroomState[0]=4
-						ElseIf Curr106\State>0 
-							PlayMTFSound(LoadTempSound("SFX\MTF\Oldman1.ogg"),Null)
-							Contained106=True
-							MTFroomState[0]=4
-						EndIf
-					EndIf
-				EndIf
-			EndIf
-			
-			For i = 0 To 6
-				If MTFroomState[i]=1 Then MTFroomState[i] = 0
-				
-				If MTFroomState[i]=3 Then
-					DebugLog "ei reitti‰ ("+MTFrooms[i]\RoomTemplate\Name+"), ohitetaan"
-					If Rand(8)=1 Then MTFroomState[i] = 0
-				EndIf		
-			Next
-			
-			For n.NPCs = Each NPCs
-				If n\NPCtype = NPCtypeMTF And n\PrevX = 0 And n\LastSeen =< 0 And n\Target = Null And n\PathStatus <> 1 Then
-					;etsit‰‰n reitti l‰himp‰‰n huoneeseen jota ei ole viet‰ k‰yty tutkimassa
-					Local targetRoom%, targetRoomDist#=500.0
-					For i = 0 To 6
-						If MTFrooms[i]<>Null Then
-							If MTFroomState[i] = 0 Then 
-								dist# = EntityDistance(n\Collider, MTFrooms[i]\obj)
-								If dist < targetRoomDist Then
-									targetRoomDist = dist
-									targetRoom = i
-								EndIf
-							EndIf
-						EndIf
-					Next
-					
-					If targetRoomDist < 500.0 Then
-						If Distance(EntityX(MTFrooms[targetRoom]\obj,True),EntityZ(MTFrooms[targetRoom]\obj,True),EntityX(n\Collider),EntityZ(n\Collider))< 8.0 Then
-							;tiimi saapunut huoneeseen, merkataan ett‰ se on tarkistettu
-							MTFroomState[targetRoom]=2
-							
-							Select MTFrooms[targetRoom]\RoomTemplate\Name 
-								Case "room106"
-									PlayMTFSound(LoadTempSound("SFX\MTF\Oldman0.ogg"),n)
-									
-									n\PathStatus = FindPath(n, EntityX(MTFrooms[targetRoom]\Objects[9],True),EntityY(MTFrooms[targetRoom]\Objects[9],True),EntityZ(MTFrooms[targetRoom]\Objects[9],True))
-									n\PathTimer = 70*30
-									n\State=3
-								Case "start"
-									If (Curr173\Idle<3) Then
-										PlayMTFSound(LoadTempSound("SFX\MTF\173cont"+Rand(1,4)+".ogg"),n)
-									EndIf
-									
-									PositionEntity Curr173\Collider, EntityX(r\obj,True)+4736*RoomScale,450*RoomScale,EntityZ(r\obj,True)+1692*RoomScale
-									Curr173\Idle = 3
-								Default
-									For n2.npcs = Each NPCs
-										If n2 <> n And n2\PrevState = n\PrevState And n2\NPCtype = NPCtypeMTF Then
-											n2\state = 0
-										EndIf
-									Next															
-							End Select
-						Else
-							
-							Local currentRoom.Rooms, currentRoomDist#
-							Local closestRoom.Rooms, closestRoomDist# = 500								
-							If targetRoomDist < 16.0 Then 
-								closestRoom = MTFrooms[targetRoom]
-							Else
-								
-								For r.Rooms = Each Rooms
-									If Abs(EntityX(n\Collider)-EntityX(r\obj))<4.0 Then
-										If Abs(EntityZ(n\Collider)-EntityZ(r\obj))<4.0 Then
-											currentRoom = r
-											currentRoomDist = EntityDistance(r\obj, MTFrooms[targetRoom]\obj)
-											Exit
-										EndIf
-									EndIf
-								Next
-								
-								If currentRoom <> Null Then
-									For r.Rooms = Each Rooms
-										If r<>MTFrooms[targetRoom] Then
-											If EntityDistance(r\obj, MTFrooms[targetRoom]\obj)<currentRoomDist Then
-												dist = EntityDistance(r\obj, currentRoom\obj)
-												If dist < closestRoomDist Then
-													closestRoom = r
-													closestRoomDist = dist
-												EndIf
-											EndIf
-										EndIf
-									Next										
-								EndIf									
-							EndIf
-							
-							If closestRoom <> Null Then
-								If EntityDistance(Collider, n\Collider)<HideDistance Then
-									n\PathStatus = FindPath(n, EntityX(closestRoom\obj,True)+Rnd(-0.3,0.3), 0.4, EntityZ(closestRoom\obj,True)+Rnd(-0.3,0.3))
-									
-									If n\PathStatus = 2 Then 
-										;MTFroomState[targetRoom]=3
-									ElseIf n\PathStatus = 1
-										;For n2.npcs = Each NPCs
-										;	If n2 <> n And n2\NPCtype = NPCtypeMTF And n2\State = 0 Then
-										;		n2\state = 4
-										;		n2\target = n
-										;	EndIf
-										;Next
-										MTFroomState[targetRoom]=1 
-										n\State = 3
-									EndIf		
-									
-								Else
-									PositionEntity n\Collider, EntityX(closestRoom\obj), 0.5, EntityZ(closestRoom\obj)
-									ResetEntity n\Collider
-									
-									For n2.npcs = Each NPCs
-										If n2 <> n And n2\NPCtype = NPCtypeMTF Then
-											If EntityDistance(n2\collider, Collider)>HideDistance Then
-												PositionEntity n2\Collider, EntityX(closestRoom\obj)+Rnd(-0.2,0.2), 0.5, EntityZ(closestRoom\obj)+Rnd(-0.2,0.2)
-												ResetEntity n2\Collider
-											EndIf
-										EndIf
-									Next										
-								EndIf
-							EndIf
-							
-							
-						EndIf
-					EndIf
-						
-					Exit
-				EndIf
-			Next
-			
-			MTFtimer = 1.0
-		EndIf
-		
 	EndIf
+	
 End Function
 
 
@@ -8551,10 +8409,10 @@ Function UpdateDeafPlayer()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3CC#4A8#4FE#51F#597#5A4#659#6D1#6E8#6F5#727#7DC#8BE#97A#991
-;~F#A24#B48#DD3#FBC#1382#140D#1457#1469#14A8#1576#1581#16D4#1755#1786#1883#1895#18B1#18BB#18C8#18EA
-;~F#1909#1928#1944#1958#196D#1971#1993#199B#19C6#1B68#1C1D#1CEA#1D61#1D67#1D71#1D7D#1D88#1D8C#1DC7#1DCF
-;~F#1DD7#1DDE#1DE5#1DF2#1DF8#1E03#1E3C#1E4B#1E69#1E97#1E9E#1EB1#1ECA#1EF7#1F02#1F07#1F21#1F2D#1F48#1F9A
-;~F#1FA8#1FB0#1FBC#1FC5#1FEE#1FF3#1FF8#1FFD#2006#200E#20B0#20BA#20DF#20ED#20F9#2120#2143#2152
-;~B#116D#19C6
+;~F#24#AC#12C#130#3CF#4AB#501#522#59A#5A7#65C#6D4#6EB#6F8#7DF#8C2#97E#995#A28#B4C
+;~F#DD7#FC0#1396#1421#146B#147D#14BC#158A#1595#16E8#1769#179A#1897#18A9#18C5#18CF#18DC#18FE#191D#193C
+;~F#1958#196C#1981#19A7#19AF#19DA#1B7C#1C5C#1CD3#1CD9#1CE3#1CEF#1CFA#1CFE#1D39#1D41#1D49#1D50#1D57#1D64
+;~F#1D6A#1D75#1DAE#1DBD#1DDB#1E09#1E10#1E23#1E3C#1E69#1E74#1E79#1E93#1E9F#1EBA#1F0C#1F1A#1F22#1F2E#1F37
+;~F#1F60#1F65#1F6A#1F6F#1F78#1F80#2022#202C#2051#205F#206B#2092#20A4#20B5#20C4
+;~B#1171#19DA
 ;~C#Blitz3D
