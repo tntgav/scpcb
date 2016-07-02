@@ -4960,9 +4960,12 @@ Function DrawGUI()
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
 					If SelectedItem\state = 0
-						Msg = "New info learned: Assistant researcher "+Chr(34)+"Emily Sharon Ross"+Chr(34)
-						MsgTimer = 70*10
-						SelectedItem\state = 1
+						Select SelectedItem\itemtemplate\name
+							Case "Emily Ross's Badge"
+								Msg = "New info learned: Assistant researcher "+Chr(34)+"Emily Sharon Ross"+Chr(34)
+								MsgTimer = 70*10
+								SelectedItem\state = 1
+						End Select
 					EndIf
 				Case "key"
 					If SelectedItem\state = 0
@@ -4974,6 +4977,25 @@ Function DrawGUI()
 					
 					SelectedItem\state = 1
 					SelectedItem = Null
+				Case "oldpaper"
+					If SelectedItem\itemtemplate\img=0 Then
+						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
+						
+						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
+					EndIf
+					
+					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
+					
+					If SelectedItem\state = 0
+						Select SelectedItem\itemtemplate\name
+							Case "Disciplinary Hearing DH-S-4137-17092"
+								Msg = "New info learned: Disciplinary Hearing DH-S-4137-17092"
+								MsgTimer = 70*10
+								PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+								SelectedItem\state = 1
+						End Select
+					EndIf
 				Default
 					;check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
@@ -4990,7 +5012,8 @@ Function DrawGUI()
 			If MouseHit2 Then
 				EntityAlpha Dark, 0.0
 				
-				If SelectedItem\itemtemplate\tempname = "paper" Or SelectedItem\itemtemplate\tempname = "scp1025" Or SelectedItem\itemtemplate\tempname = "badge" Then
+				Local IN$ = SelectedItem\itemtemplate\tempname
+				If IN$ = "paper" Or IN$ = "scp1025" Or IN$ = "badge" Or IN$ = "oldpaper" Then
 					If SelectedItem\itemtemplate\img<>0 Then FreeImage(SelectedItem\itemtemplate\img)
 					SelectedItem\itemtemplate\img=0
 				EndIf
@@ -8296,6 +8319,7 @@ Function UpdateScreenGamma()
 	UpdateGamma
 End Function
 
+;--------------------------------------- Some new 1.3 -functions -------------------------------------------------------
 
 Function UpdateLeave1499()
 	Local r.Rooms, it.Items
@@ -8410,9 +8434,9 @@ Function UpdateDeafPlayer()
 End Function
 ;~IDEal Editor Parameters:
 ;~F#24#AC#12C#130#3CF#4AB#501#522#59A#5A7#65C#6D4#6EB#6F8#7DF#8C2#97E#995#A28#B4C
-;~F#DD7#FC0#1396#1421#146B#147D#14BC#158A#1595#16E8#1769#179A#1897#18A9#18C5#18CF#18DC#18FE#191D#193C
-;~F#1958#196C#1981#19A7#19AF#19DA#1B7C#1C5C#1CD3#1CD9#1CE3#1CEF#1CFA#1CFE#1D39#1D41#1D49#1D50#1D57#1D64
-;~F#1D6A#1D75#1DAE#1DBD#1DDB#1E09#1E10#1E23#1E3C#1E69#1E74#1E79#1E93#1E9F#1EBA#1F0C#1F1A#1F22#1F2E#1F37
-;~F#1F60#1F65#1F6A#1F6F#1F78#1F80#2022#202C#2051#205F#206B#2092#20A4#20B5#20C4
-;~B#1171#19DA
+;~F#DD7#FC0#13AD#1438#1482#1494#14D3#15A1#15AC#16FF#1780#17B1#18AE#18C0#18DC#18E6#18F3#1915#1934#1953
+;~F#196F#1983#1998#19BE#19C6#19F1#1B93#1C73#1CEA#1CF0#1CFA#1D06#1D11#1D15#1D50#1D58#1D60#1D67#1D6E#1D7B
+;~F#1D81#1D8C#1DC5#1DD4#1DF2#1E20#1E27#1E3A#1E53#1E80#1E8B#1E90#1EAA#1EB6#1ED1#1F23#1F31#1F39#1F45#1F4E
+;~F#1F77#1F7C#1F81#1F86#1F8F#1F97#2039#2043#2068#2076#2083#20AA#20BC#20CD#20DC
+;~B#1171#19F1
 ;~C#Blitz3D

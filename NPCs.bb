@@ -5739,14 +5739,10 @@ Function ManipulateNPCBones()
 			Select n\ManipulationType
 				Case 0 ;<--- looking at player
 					PointEntity bone%,Camera
+					PointEntity pvt%,Camera
 					n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
-					n\BonePitch# = CurveAngle(EntityYaw(bone%),n\BonePitch#,10.0)
-					RotateEntity bone%,n\BoneYaw#,n\BonePitch#,0
-					;PointEntity pvt%,Camera
-					;n\BonePitch# = CurveAngle(EntityYaw(pvt%),n\BonePitch#,10.0)
-					;n\BoneYaw# = CurveAngle(EntityPitch(pvt%)-20,n\BoneYaw#,10.0)
-					;n\BonePitch# = Max(Min(n\BonePitch#,WrapAngle(n\Angle+60)),WrapAngle(n\Angle-60))
-					;RotateEntity bone%,WrapAngle(n\BonePitch#),-n\BoneYaw#,0
+					n\BonePitch# = CurveAngle(EntityPitch(pvt%),n\BonePitch#,10.0)
+					RotateEntity bone%,n\BoneYaw#,-n\BonePitch#+20,0
 				Case 1 ;<--- looking at player #2
 					;PointEntity bone%,Collider
 					;RotateEntity bone%,0,EntityYaw(bone%),0
@@ -5898,6 +5894,6 @@ End Function
 ;~F#0#A#3D#47#6D#93#A3#D3#E3#EC#FA#109#11C#139#163#177#194#1CB#1E3#204
 ;~F#227#230#25B#276#283#374#45F#5B4#774#80A#92A#92F#95F#A01#A3C#AC9#B35#C4A#D10#DC7
 ;~F#E7A#F79#F82#1043#106A#1075#1099#10AC#10AD#1103#11DC#12F7#1369#13C9#144B#1478#149E#14B6#1561#15D9
-;~F#15EA#1605#1623#1686#1694#16B0#16C2#16E6
-;~B#11B4#1220#142C#166F#16D0
+;~F#15EA#1605#1623#1682#1690#16AC#16BE#16E2
+;~B#11B4#1220#142C#1670#16CC
 ;~C#Blitz3D

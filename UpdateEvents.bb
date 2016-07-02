@@ -7837,7 +7837,7 @@ Function UpdateEvents()
 									e\EventState2 = i
 									If Rand(10)=1
 										e\EventState3 = 3.0
-										e\EventState = Rand(1,1)
+										e\EventState = Rand(1,2)
 										;Checking if the selected nostalgia item already exists or not
 										For it.Items = Each Items
 											Select e\EventState
@@ -7846,6 +7846,11 @@ Function UpdateEvents()
 														e\EventState3 = 1.0
 														e\EventState = 0.0
 														Exit
+													EndIf
+												Case 2
+													If it\itemtemplate\tempname = "oldpaper"
+														e\EventState3 = 1.0
+														e\EventState = 0.0
 													EndIf
 											End Select
 										Next
@@ -7858,7 +7863,7 @@ Function UpdateEvents()
 									;not sucessful
 									If Rand(10)=1
 										e\EventState3 = 3.1
-										e\EventState = Rand(1,1)
+										e\EventState = Rand(1,2)
 										;Checking if the selected nostalgia item already exists or not
 										For it.Items = Each Items
 											Select e\EventState
@@ -7867,6 +7872,11 @@ Function UpdateEvents()
 														e\EventState3 = 2.0
 														e\EventState = 0.0
 														Exit
+													EndIf
+												Case 2
+													If it\itemtemplate\tempname = "oldpaper"
+														e\EventState3 = 2.0
+														e\EventState = 0.0
 													EndIf
 											End Select
 										Next
@@ -8039,6 +8049,8 @@ Function UpdateEvents()
 						Select e\EventState
 							Case 1
 								Inventory(e\EventState2) = CreateItem("Lost Key","key",1,1,1)
+							Case 2
+								Inventory(e\EventState2) = CreateItem("Disciplinary Hearing DH-S-4137-17092","oldpaper",1,1,1)
 						End Select
 						EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
 						HideEntity Inventory(e\EventState2)\obj
@@ -8647,5 +8659,5 @@ End Function
 ;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
 ;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#148C#1499
 ;~F#14B2#154A#1700#17C9#181D#18CE#197E#1A36#1A4E#1B0F#1B3C#1B59#1B80#1BB0#1BCD#1BF5#1C4F#1C8F#1CC0#1CD3
-;~F#1D8B#1DE3#1DF6#1E04#1E0D#1E59#1E78#1F77#1FD9#1FDE#20B8#2132#2136
+;~F#1D8B#1DE3#1DF6#1E04#1E0D#1E59#1F83#1FE5#1FEA#20C4#213E#2142
 ;~C#Blitz3D

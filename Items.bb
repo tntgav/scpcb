@@ -292,8 +292,7 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Document SCP-1162", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1162.jpg", 0.003) : it\sound = 0
 	CreateItemTemplate("Emily Ross's Badge", "badge", "GFX\items\badge.x", "GFX\items\INVpaper.jpg", "GFX\items\badge1.jpg", 0.0001, "GFX\items\badge1_tex.jpg")
 	it = CreateItemTemplate("Lost Key", "key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, "GFX\items\key2.png","","",0,1+2+8) : it\sound = 3
-	;oldmask
-	;oldpaper
+	it = CreateItemTemplate("Disciplinary Hearing DH-S-4137-17092", "oldpaper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docDH.jpg", 0.003) : it\sound = 0
 	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -611,5 +610,5 @@ Function DropItem(item.Items)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#1E#13A#154#195#1B0#1EC#22F
+;~F#B#1E#139#153#194#1AF#1EB#22E
 ;~C#Blitz3D
