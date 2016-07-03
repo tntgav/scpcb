@@ -8380,6 +8380,7 @@ Function UpdateEvents()
 							e\room\NPC[0]\State = 0
 							e\EventState = 1
 							e\EventState2 = -(70*5)
+							e\room\NPC[0]\PrevState = 2
 						EndIf
 					EndIf
 				EndIf
@@ -8448,18 +8449,31 @@ Function UpdateEvents()
 					EndIf
 					
 					If e\room\NPC[0]\PathStatus <> 1
-						If e\room\NPC[0]\PathTimer# < 70*3
-							e\room\NPC[0]\PathTimer# = e\room\NPC[0]\PathTimer# + FPSfactor
+						;If e\room\NPC[0]\PathTimer# < 70*3
+						If e\room\NPC[0]\PathTimer# = 0.0
+							;e\room\NPC[0]\PathTimer# = e\room\NPC[0]\PathTimer# + FPSfactor
+							If e\room\NPC[0]\PrevState = 1
+								If e\room\NPC[0]\Frame >= 890
+									e\room\NPC[0]\PathTimer# = 1.0
+								EndIf
+							ElseIf e\room\NPC[0]\PrevState = 2
+								If e\room\NPC[0]\Frame >= 1121
+									e\room\NPC[0]\PathTimer# = 1.0
+								EndIf
+							EndIf
 						Else
 							Select e\room\NPC[0]\State3
 								Case 1
 									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[16],True),EntityY(e\room\Objects[16],True),EntityZ(e\room\Objects[16],True))
+									e\room\NPC[0]\PrevState = 1
 									DebugLog "Path1"
 								Case 2
 									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[15],True),EntityY(e\room\Objects[15],True),EntityZ(e\room\Objects[15],True))
+									e\room\NPC[0]\PrevState = 2
 									DebugLog "Path2"
 								Case 3
 									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
+									e\room\NPC[0]\PrevState = 1
 									DebugLog "Path3"
 								Case 4
 									e\EventState2 = 4
@@ -8468,7 +8482,7 @@ Function UpdateEvents()
 							e\room\NPC[0]\State3 = e\room\NPC[0]\State3 + 1
 						EndIf
 					Else
-						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[1]\frameobj) < 0.6
+						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[1]\frameobj) < 1.1
 							If (Not e\room\RoomDoors[1]\open)
 								e\room\RoomDoors[1]\open = True
 								sound=Rand(0, 2)
@@ -8659,5 +8673,5 @@ End Function
 ;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
 ;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#148C#1499
 ;~F#14B2#154A#1700#17C9#181D#18CE#197E#1A36#1A4E#1B0F#1B3C#1B59#1B80#1BB0#1BCD#1BF5#1C4F#1C8F#1CC0#1CD3
-;~F#1D8B#1DE3#1DF6#1E04#1E0D#1E59#1E78#1F83#1FE5#1FEA#20C4#213E#2142
+;~F#1D8B#1DE3#1DF6#1E04#1E0D#1E59#1E78#1F83#1FEA#214C#2150
 ;~C#Blitz3D

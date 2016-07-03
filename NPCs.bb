@@ -1855,7 +1855,7 @@ Function UpdateNPCs()
 								n\State2 = 70*2
 								PlaySound_Strict LoadTempSound("SFX\049\misc_shot1.ogg")
 							ElseIf PlayerSeeAble% = 2 And n\State3 > 0.0
-								n\PathStatus = FindPath(n,EntityX(Collider),EntityY(Collider),EntityZ(Collider))
+								;n\PathStatus = FindPath(n,EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 							Else
 								If n\PathStatus = 1
 									If n\Path[n\PathLocation]=Null
@@ -1878,7 +1878,14 @@ Function UpdateNPCs()
 										AnimateNPC(n, Max(Min(AnimTime(n\obj),358.0),346), 393.0, n\CurrSpeed*38)
 									EndIf
 								Else
-									AnimateNPC(n, 269, 345, 0.2)
+									Select n\PrevState
+										Case 0
+											AnimateNPC(n, 269, 345, 0.2)
+										Case 1
+											AnimateNPC(n, 661, 891, 0.4, False)
+										Case 2
+											AnimateNPC(n, 892, 1122, 0.4, False)
+									End Select
 								EndIf
 							EndIf
 							
@@ -6120,8 +6127,8 @@ Function GoToElevator(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#48#6E#94#A4#D4#E4#ED#FB#10A#11D#13C#166#17A#197#1CE#1E6#207#22A
-;~F#233#25E#286#377#462#5B7#777#811#931#936#966#A08#A43#AD0#B3C#C51#D17#DCE#E81#F80
-;~F#F89#104A#1071#107C#10A0#10B4#110A#1213#135E#13D0#1430#14B0#14DD#1503#151B#1597#1645#16BD#16CE#16E9
-;~F#1707#1745#1766#1774#1790#17A2#17C6
-;~B#11BB#1257#1491#1597#1754#17B0
+;~F#233#25E#286#377#462#77E#818#938#93D#96D#A0F#A4A#AD7#B43#C58#D1E#DD5#E88#F87#F90
+;~F#1051#1078#1083#10A7#10BB#1111#121A#1365#13D7#1437#14B7#14E4#150A#1522#159E#164C#16C4#16D5#16F0#170E
+;~F#174C#176D#177B#1797#17A9#17CD
+;~B#11C2#125E#1498#159E#175B#17B7
 ;~C#Blitz3D
