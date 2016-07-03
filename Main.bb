@@ -2411,13 +2411,16 @@ Repeat
 				EndIf
 			EndIf
 			
-			Color 0,0,0
-			Text((GraphicWidth / 2)+1, (GraphicHeight / 2) + 201, Msg, True)
-			Color Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255)
 			If (Not temp%)
+				Color 0,0,0
+				Text((GraphicWidth / 2)+1, (GraphicHeight / 2) + 201, Msg, True)
+				Color Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255)
 				Text((GraphicWidth / 2), (GraphicHeight / 2) + 200, Msg, True)
 			Else
-				Text((GraphicWidth / 2), (GraphicHeight * 0.95), Msg, True)
+				Color 0,0,0
+				Text((GraphicWidth / 2)+1, (GraphicHeight * 0.94) + 1, Msg, True)
+				Color Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255)
+				Text((GraphicWidth / 2), (GraphicHeight * 0.94), Msg, True)
 			EndIf
 			MsgTimer=MsgTimer-FPSfactor2 
 		End If
@@ -6570,34 +6573,32 @@ End Function
 Function AnimateNPC(n.NPCs, start#, quit#, speed#, loop=True)
 	Local newTime#
 	
-	If EntityDistance(n\obj,Camera)<HideDistance Or PlayerRoom\RoomTemplate\Name$ = "dimension1499"
-		If speed > 0.0 Then 
-			newTime = Max(Min(n\Frame + speed * FPSfactor,quit),start)
+	If speed > 0.0 Then 
+		newTime = Max(Min(n\Frame + speed * FPSfactor,quit),start)
+		
+		If loop And newTime => quit Then
+			newTime = start
+		EndIf
+	Else
+		If start < quit Then
+			temp% = start
+			start = quit
+			quit = temp
+		EndIf
+		
+		If loop Then
+			newTime = n\Frame + speed * FPSfactor
 			
-			If loop And newTime => quit Then
+			If newTime < quit Then 
 				newTime = start
+			Else If newTime > start 
+				newTime = quit
 			EndIf
 		Else
-			If start < quit Then
-				temp% = start
-				start = quit
-				quit = temp
-			EndIf
-			
-			If loop Then
-				newTime = n\Frame + speed * FPSfactor
-				
-				If newTime < quit Then 
-					newTime = start
-				Else If newTime > start 
-					newTime = quit
-				EndIf
-			Else
-				newTime = Max(Min(n\Frame + speed * FPSfactor,start),quit)
-			EndIf
+			newTime = Max(Min(n\Frame + speed * FPSfactor,start),quit)
 		EndIf
-		SetNPCFrame(n, newTime)
 	EndIf
+	SetNPCFrame(n, newTime)
 	
 End Function
 
@@ -8446,10 +8447,10 @@ Function UpdateDeafPlayer()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3CF#4AB#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7DF#8C2#98B#9A2
-;~F#A35#B59#DE4#FCD#13BA#1445#148F#14A1#14E0#15AE#15B9#170C#178D#17BE#18BB#18CD#18E9#18F3#1900#1922
-;~F#1941#1960#197C#1990#19A5#19CB#19D3#19FE#1BA0#1C80#1CF7#1CFD#1D07#1D13#1D1E#1D22#1D5D#1D65#1D6D#1D74
-;~F#1D7B#1D88#1D8E#1D99#1DD2#1DE1#1DFF#1E2D#1E34#1E47#1E60#1E8D#1E98#1E9D#1EB7#1EC3#1EDE#1F30#1F3E#1F46
-;~F#1F52#1F5B#1F84#1F89#1F8E#1F93#1F9C#1FA4#2046#2050#2075#2083#2090#20B7#20C9#20DA#20E9
-;~B#117E#19FE
+;~F#24#AC#12C#130#137#3CF#4AB#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7DF#8C2#98E#9A5
+;~F#A38#B5C#C7B#DE7#FD0#13BD#1448#1492#14A4#14E3#15B1#15BC#170F#1790#17C1#18BE#18D0#18EC#18F6#1903
+;~F#1925#1944#1963#197F#1993#19A8#19AC#19CC#19D4#19FF#1BA1#1C56#1C81#1CF8#1CFE#1D08#1D14#1D1F#1D23#1D5E
+;~F#1D66#1D6E#1D75#1D7C#1D89#1D8F#1D9A#1DD3#1DE2#1E00#1E2E#1E35#1E48#1E61#1E8E#1E99#1E9E#1EB8#1EC4#1EDF
+;~F#1F31#1F3F#1F47#1F53#1F5C#1F85#1F8A#1F8F#1F94#1F9D#1FA5#2047#2051#2076#2084#2091#20B8#20CA#20DB#20EA
+;~B#1181#19FF
 ;~C#Blitz3D
