@@ -138,6 +138,9 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 	
 	Local drawnmesh% = CreateMesh()
 	Local hiddenmesh% = CreateMesh()
+	Local TriggerboxAmount% = 0
+	Local Triggerbox[128]
+	Local TriggerboxName$[128]
 	
 	For c%=1 To CountChildren(tempmesh)
 		
@@ -158,6 +161,13 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 				RotateMesh node,EntityPitch(node),EntityYaw(node),EntityRoll(node)
 				PositionMesh node,EntityX(node),EntityY(node),EntityZ(node)
 				AddMesh node,hiddenmesh
+			Case "trigger"
+				Triggerbox[TriggerboxAmount] = CreateMesh()
+				RotateMesh node,EntityPitch(node),EntityYaw(node),EntityRoll(node)
+				PositionMesh node,EntityX(node),EntityY(node),EntityZ(node)
+				AddMesh node,Triggerbox[TriggerboxAmount]
+				TriggerboxName[TriggerboxAmount] = String(KeyValue(node,"event","event"))
+				TriggerboxAmount=TriggerboxAmount+1
 		End Select
 		
 	Next
@@ -226,7 +236,7 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 	
 	;WriteString f,"hidden"
 	
-	WriteInt f,CountSurfaces(hiddenmesh)
+	WriteInt f,CountSurfaces(hiddenmesh) : DebugLog CountSurfaces(hiddenmesh)
 	For i%=1 To CountSurfaces(hiddenmesh)
 		surf=GetSurface(hiddenmesh,i)
 		WriteInt f,CountVertices(surf)
@@ -244,6 +254,32 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 			WriteInt f,TriangleVertex(surf,j,2)
 		Next
 	Next
+	
+	If TriggerboxAmount > 0
+		WriteString f,"TriggerBoxEnable" : DebugLog "TriggerBoxEnable"
+		WriteInt f,TriggerboxAmount
+		For z=0 To TriggerboxAmount-1
+			WriteInt f,CountSurfaces(Triggerbox[z]) : DebugLog CountSurfaces(Triggerbox[z])
+			For i%=1 To CountSurfaces(Triggerbox[z])
+				surf=GetSurface(Triggerbox[z],i)
+				WriteInt f,CountVertices(surf)
+				For j%=0 To CountVertices(surf)-1
+					;world coords
+					WriteFloat f,VertexX(surf,j)
+					WriteFloat f,VertexY(surf,j)
+					WriteFloat f,VertexZ(surf,j)
+				Next
+				
+				WriteInt f,CountTriangles(surf)
+				For j%=0 To CountTriangles(surf)-1
+					WriteInt f,TriangleVertex(surf,j,0)
+					WriteInt f,TriangleVertex(surf,j,1)
+					WriteInt f,TriangleVertex(surf,j,2)
+				Next
+			Next
+			WriteString f,TriggerboxName
+		Next
+	EndIf
 	
 	;WriteString f,"point_ents"
 	
@@ -618,5 +654,5 @@ Else If state=2
 	CloseFile(f)
 EndIf
 ;~IDEal Editor Parameters:
-;~F#9#1A#2A#2F#34#39#4A#60#164#179#187#18B#1DC#1EA
+;~F#9#19#29#2E#33#38#49#5F#187#19C#1AA#1AE#1FF#20D#215#21D#221#238
 ;~C#Blitz3D
