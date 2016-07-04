@@ -317,7 +317,6 @@ Function FreeTextureCache()
 	Next
 End Function
 
-
 Function LoadRMesh(file$,rt.RoomTemplates)
 	
 	;generate a texture made of white
@@ -347,6 +346,8 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 	
 	Local collisionMeshes% = CreatePivot()
 	
+	Local hasTriggerBox% = False
+	
 	For i=0 To 3 ;reattempt up to 3 times
 		If f=0 Then
 			f=ReadFile(file)
@@ -355,7 +356,14 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		EndIf
 	Next
 	If f=0 Then RuntimeError "Error reading file "+Chr(34)+file+Chr(34)
-	If ReadString(f)<>"RoomMesh" Then RuntimeError Chr(34)+file+Chr(34)+" is not RMESH"
+	Local isRMesh$ = ReadString(f)
+	If isRMesh$="RoomMesh"
+		;Continue
+	ElseIf isRMesh$="RoomMesh.HasTriggerBox"
+		hasTriggerBox% = True
+	Else
+		RuntimeError Chr(34)+file+Chr(34)+" is Not RMESH"
+	EndIf
 	
 	file=StripFilename(file)
 	
@@ -625,6 +633,31 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 			AddTriangle(surf,temp1i,temp3i,temp2i)
 		Next
 	Next
+	
+	;trigger boxes
+	If hasTriggerBox
+		DebugLog "TriggerBoxEnable"
+		rt\TempTriggerboxAmount = ReadInt(f)
+		For tb = 0 To rt\TempTriggerboxAmount-1
+			rt\TempTriggerbox[tb] = CreateMesh()
+			count = ReadInt(f)
+			For i%=1 To count
+				surf=CreateSurface(rt\TempTriggerbox[tb])
+				count2=ReadInt(f)
+				For j%=1 To count2
+					x=ReadFloat(f) : y=ReadFloat(f) : z=ReadFloat(f)
+					vertex=AddVertex(surf,x,y,z)
+				Next
+				count2=ReadInt(f)
+				For j%=1 To count2
+					temp1i = ReadInt(f) : temp2i = ReadInt(f) : temp3i = ReadInt(f)
+					AddTriangle(surf,temp1i,temp2i,temp3i)
+					AddTriangle(surf,temp1i,temp3i,temp2i)
+				Next
+			Next
+			rt\TempTriggerboxName[tb] = ReadString(f)
+		Next
+	EndIf
 	
 	count=ReadInt(f) ;point entities
 	For i%=1 To count
@@ -1441,6 +1474,10 @@ Type RoomTemplates
 	Field Shape%, Name$
 	Field Commonness%, Large%
 	Field DisableDecals%
+	
+	Field TempTriggerboxAmount
+	Field TempTriggerbox[128]
+	Field TempTriggerboxName$[128]
 End Type 	
 
 Function CreateRoomTemplate.RoomTemplates(meshpath$)
@@ -1612,6 +1649,9 @@ Type Rooms
 	Field LightFlicker%[MaxRoomLights]
 	Field AlarmRotor%[1]
 	Field AlarmRotorLight%[1]
+	Field TriggerboxAmount
+	Field Triggerbox[128]
+	Field TriggerboxName$[128]
 End Type 
 
 Const gridsz%=20
@@ -4597,6 +4637,16 @@ Function FillRoom(r.Rooms)
 		EndIf
 	Next
 	
+	If r\RoomTemplate\TempTriggerboxAmount > 0
+		r\TriggerboxAmount = r\RoomTemplate\TempTriggerboxAmount
+		For i = 0 To r\TriggerboxAmount-1
+			r\Triggerbox[i] = r\RoomTemplate\TempTriggerbox[i]
+			r\TriggerboxName[i] = r\RoomTemplate\TempTriggerboxName[i]
+			DebugLog "Triggerbox found: "+i
+			DebugLog "Triggerbox "+i+" name: "+r\TriggerboxName[i]
+		Next
+	EndIf
+	
 	For i = 0 To MaxRoomEmitters-1
 		If r\RoomTemplate\TempSoundEmitter[i]<>0 Then
 			r\SoundEmitterObj[i]=CreatePivot(r\obj)
@@ -7420,13 +7470,13 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#140#32B#33B#34C#374#382#392#397#3A2#449
-;~F#553#572#594#5A5#5B0#5E9#5F7#61F#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#87E
-;~F#89A#8B8#8D6#8FD#904#912#92E#943#960#97D#98A#99C#9DA#A04#A55#AAB#ABE#ADC#B2D#B8E
-;~F#B9D#BD9#BE1#BEF#C04#C40#C5F#C6F#C87#CB2#CC5#CE7#D0F#D61#D8D#DB4#DBB#DC0#DF7#E1E
-;~F#E33#E63#EE1#F01#F75#FCC#FF7#1048#1051#10EA#10F2#10F7#1105#1114#112D#114F#115E#116F#1176#117B
-;~F#11D8#1203#1280#128C#12CD#12D8#12E9#12EE#12FD#1314#138A#1393#1472#148F#1496#149C#14AA#14CE#14EE#1521
-;~F#162C#1665#167A#173C#17D1#17D6#17E6#1ABB#1AD2#1AF1#1AF8#1B45#1B96#1BB1#1BC8#1BF0#1BF7#1C2B#1C5E#1CAC
-;~F#1CBA#1CC1#1CC7#1CD1#1CD7#1CEA
-;~B#116D
+;~F#2#A#2D#FA#109#110#117#11E#12F#137#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A#574
+;~F#593#5B5#5CA#5D5#60E#61C#644#679#681#696#6E3#734#776#798#7F4#806#86D#87C#8A6#8C2
+;~F#8E0#8FE#925#92C#93A#956#96B#988#9A5#9B2#9C4#A02#A2C#A7D#AD3#AE6#B04#B55#BB6#BC5
+;~F#C01#C09#C17#C2C#C68#C87#C97#CAF#CDA#CED#D0F#D37#D89#DB5#DDC#DE3#DE8#E1F#E46#E5B
+;~F#E8B#F09#F29#F9D#FF4#101F#1070#1079#1112#111A#111F#112D#113C#1155#1177#1186#1197#119E#11A3#1200
+;~F#1235#12B2#12BE#12FF#130A#131B#1320#132F#1346#13BC#13C5#14A4#14C1#14C8#14CE#14DC#1500#1520#1553#165E
+;~F#1697#16AC#176E#1803#1808#1818#1AED#1B04#1B23#1B2A#1B77#1BC8#1BE3#1BFA#1C22#1C29#1C5D#1C64#1C90#1CDE
+;~F#1CEC#1CF3#1CF9#1D03#1D09#1D1C
+;~B#1195
 ;~C#Blitz3D
