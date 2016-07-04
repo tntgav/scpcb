@@ -172,7 +172,11 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 		
 	Next
 	
-	WriteString f,"RoomMesh"
+	If TriggerboxAmount% = 0
+		WriteString f,"RoomMesh"
+	Else
+		WriteString f,"RoomMesh.HasTriggerBox"
+	EndIf
 	
 	;WriteString f,"drawn"
 	
@@ -256,7 +260,6 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 	Next
 	
 	If TriggerboxAmount > 0
-		WriteString f,"TriggerBoxEnable" : DebugLog "TriggerBoxEnable"
 		WriteInt f,TriggerboxAmount
 		For z=0 To TriggerboxAmount-1
 			WriteInt f,CountSurfaces(Triggerbox[z]) : DebugLog CountSurfaces(Triggerbox[z])
@@ -654,5 +657,5 @@ Else If state=2
 	CloseFile(f)
 EndIf
 ;~IDEal Editor Parameters:
-;~F#9#19#29#2E#33#38#49#5F#187#19C#1AA#1AE#1FF#20D#215#21D#221#238
+;~F#9#19#29#2E#33#38#49#5F#18A#19F#1AD#1B1#202#210#218#220#224#23B
 ;~C#Blitz3D
