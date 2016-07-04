@@ -166,7 +166,7 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 				RotateMesh node,EntityPitch(node),EntityYaw(node),EntityRoll(node)
 				PositionMesh node,EntityX(node),EntityY(node),EntityZ(node)
 				AddMesh node,Triggerbox[TriggerboxAmount]
-				TriggerboxName[TriggerboxAmount] = String(KeyValue(node,"event","event"))
+				TriggerboxName[TriggerboxAmount] = String(KeyValue(node,"event","event"),1)
 				TriggerboxAmount=TriggerboxAmount+1
 		End Select
 		
@@ -280,7 +280,7 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 					WriteInt f,TriangleVertex(surf,j,2)
 				Next
 			Next
-			WriteString f,TriggerboxName
+			WriteString f,TriggerboxName[z]
 		Next
 	EndIf
 	
