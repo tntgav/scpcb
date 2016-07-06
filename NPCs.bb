@@ -1867,7 +1867,7 @@ Function UpdateNPCs()
 							ElseIf PlayerSeeAble% = 2 And n\State3 > 0.0
 								n\PathStatus = FindPath(n,EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 							Else
-								If n\State3 = 2.0
+								If n\State3 = 5.0
 									If EntityDistance(n\Collider,Collider)>HideDistance
 										n\State = 2
 										n\PathStatus = 0
@@ -6176,8 +6176,8 @@ Function GoToElevator(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#48#6E#94#A4#D4#E4#ED#FB#10A#11D#13C#166#17A#197#1CE#1E6#207#22A
-;~F#233#25E#286#377#462#5B7#5D1#5E1#72A#732#73E#7AC#847#967#96C#99C#A3E#A79#B08#B74
-;~F#D4F#E06#EB9#FB8#FC1#1082#10A9#10B4#10D8#10EC#1142#124B#1396#1408#1468#14E8#1515#153B#1553#15CF
-;~F#167D#16F5#1706#1721#173F#177D#179E#17AC#17C8#17DA#17FE
+;~F#233#25E#286#377#462#5D1#5E1#72A#732#7AC#847#967#96C#99C#A3E#A79#B08#B74#C89#D4F
+;~F#E06#EB9#FB8#FC1#1082#10A9#10B4#10D8#10EC#1142#124B#1396#1408#1468#14E8#1515#153B#1553#15CF#167D
+;~F#16F5#1706#1721#173F#177D#179E#17AC#17C8#17DA#17FE
 ;~B#11F3#128F#14C9#15CF#178C#17E8
 ;~C#Blitz3D

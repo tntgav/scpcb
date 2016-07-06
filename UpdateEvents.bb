@@ -8212,7 +8212,7 @@ Function UpdateEvents()
 												EndIf
 											EndIf
 										Next
-										If (Not HasCamera%)
+										If (Not HasCamera%) And (Not Win8Mode)
 											sc\Screen = True
 											sc\AllowSaving = False
 											
@@ -8337,7 +8337,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 						For sc.SecurityCams = Each SecurityCams
-							If sc\SpecialCam
+							If sc\SpecialCam And (Not Win8Mode)
 								sc\Screen = True
 								sc\AllowSaving = False
 								
@@ -8542,7 +8542,7 @@ Function UpdateEvents()
 				ElseIf e\EventState2 = 4
 					If e\room\NPC[0]\State <> 5
 						e\EventState2 = 7
-						e\room\NPC[0]\State3 = 2.0
+						e\room\NPC[0]\State3 = 5.0
 						DebugLog "fffffffff"
 					EndIf
 				ElseIf e\EventState2 = 5
@@ -8726,8 +8726,8 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
-;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#14A2#14AF#14C8
-;~F#1560#1716#17E2#1836#18E7#1997#1A4F#1A67#1B28#1B55#1B72#1B99#1BC9#1BE6#1C0E#1C68#1CA8#1CD9#1CEC#1DA4
-;~F#1DFC#1E0F#1E1D#1E26#1E72#1E91#1F9C#2003#20DE#2183#2187
+;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#14A2#14AF
+;~F#14C8#1560#1716#17E2#1836#18E7#1997#1A4F#1A67#1B28#1B55#1B72#1B99#1BC9#1BE6#1C0E#1C68#1CA8#1CD9#1CEC
+;~F#1DA4#1DFC#1E0F#1E1D#1E26#1E72#1E91#1F9C#2003#2183#2187
 ;~B#147E#210C
 ;~C#Blitz3D
