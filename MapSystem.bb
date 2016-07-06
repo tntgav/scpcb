@@ -1652,6 +1652,7 @@ Type Rooms
 	Field TriggerboxAmount
 	Field Triggerbox[128]
 	Field TriggerboxName$[128]
+	Field MaxWayPointY#
 End Type 
 
 Const gridsz%=20
@@ -2829,7 +2830,8 @@ Function FillRoom(r.Rooms)
 			PositionEntity(r\Objects[2], r\x + 608.0 * RoomScale, 240.0 * RoomScale, r\z - 624.0 * RoomScale, True)
 			
 			r\Objects[3] = CreatePivot(r\obj)
-			PositionEntity(r\Objects[3], r\x + 720.0 * RoomScale, -5392.0 * RoomScale, r\z + 752.0 * RoomScale, True)
+			;PositionEntity(r\Objects[3], r\x + 720.0 * RoomScale, -5392.0 * RoomScale, r\z + 752.0 * RoomScale, True)
+			PositionEntity(r\Objects[3], r\x - 456.0 * RoomScale, -5392.0 * RoomScale, r\z - 1136 * RoomScale, True)
 			
 			;"waypoints"
 			r\Objects[4] = CreatePivot(r\obj)
@@ -2863,10 +2865,15 @@ Function FillRoom(r.Rooms)
 			PositionEntity(r\RoomDoors[2]\buttons[1], r\x + 448.0 * RoomScale, 0.7, r\z - 272.0 * RoomScale, True)	
 			PositionEntity(r\RoomDoors[2]\buttons[0], r\x + 768.0 * RoomScale, 0.7, r\z - 352.0 * RoomScale, True)
 			
-			r\RoomDoors[3] = CreateDoor(r\zone, r\x + 720.0 * RoomScale,  -5632.0 * RoomScale, r\z + 1064.0 * RoomScale, 0, r, False)
-			r\RoomDoors[3]\AutoClose = False : r\RoomDoors[3]\open = False		
-			PositionEntity(r\RoomDoors[3]\buttons[0], r\x + 896.0 * RoomScale, EntityY(r\RoomDoors[3]\buttons[0],True), r\z + 1024.0 * RoomScale, True)
-			PositionEntity(r\RoomDoors[3]\buttons[1], r\x + 544.0 * RoomScale, EntityY(r\RoomDoors[3]\buttons[1],True), r\z + 1104.0 * RoomScale, True)
+			;r\RoomDoors[3] = CreateDoor(r\zone, r\x + 720.0 * RoomScale,  -5632.0 * RoomScale, r\z + 1064.0 * RoomScale, 0, r, False)
+			;PositionEntity(r\RoomDoors[3]\buttons[0], r\x + 896.0 * RoomScale, EntityY(r\RoomDoors[3]\buttons[0],True), r\z + 1024.0 * RoomScale, True)
+			;PositionEntity(r\RoomDoors[3]\buttons[1], r\x + 544.0 * RoomScale, EntityY(r\RoomDoors[3]\buttons[1],True), r\z + 1104.0 * RoomScale, True)
+			r\RoomDoors[3] = CreateDoor(r\zone, r\x - 456.0 * RoomScale,  -5632.0 * RoomScale, r\z - 824.0 * RoomScale, 0, r, False)
+			r\RoomDoors[3]\AutoClose = False : r\RoomDoors[3]\open = False
+			;X=+176 | Z=-40
+			PositionEntity r\RoomDoors[3]\buttons[0], r\x - 280.0*RoomScale, EntityY(r\RoomDoors[3]\buttons[0],True), r\z - 864.0 * RoomScale, True
+			;X=-176 | Z=+40
+			PositionEntity r\RoomDoors[3]\buttons[1], r\x - 632.0*RoomScale, EntityY(r\RoomDoors[3]\buttons[1],True), r\z - 784.0 * RoomScale, True
 			
 			em.Emitters = CreateEmitter(r\x + 5218.0 * RoomScale, -5584.0*RoomScale, r\z - 600* RoomScale, 0)
 			TurnEntity(em\Obj, 20, -100, 0, True)
@@ -2897,6 +2904,55 @@ Function FillRoom(r.Rooms)
 			de\Size = 0.5
 			ScaleSprite(de\obj, de\Size,de\Size)
 			EntityParent de\obj, r\obj
+			
+			For n% = 10 To 11
+				r\Objects[n * 2] = CopyEntity(LeverBaseOBJ)
+				r\Objects[n * 2 + 1] = CopyEntity(LeverOBJ)
+				
+				r\Levers[n-10] = r\Objects[n * 2 + 1]
+				
+				For  i% = 0 To 1
+					ScaleEntity(r\Objects[n * 2 + i], 0.04, 0.04, 0.04)
+					If n% = 10
+						;r\z+6578
+						PositionEntity r\Objects[n * 2 + i],r\x+3101*RoomScale,r\y-5461*RoomScale,r\z+6568*RoomScale,True
+					Else
+						;r\z+3174
+						PositionEntity r\Objects[n * 2 + i],r\x+1209*RoomScale,r\y-5461*RoomScale,r\z+3164*RoomScale,True
+					EndIf
+					
+					EntityParent(r\Objects[n * 2 + i], r\obj)
+				Next
+				RotateEntity(r\Objects[n * 2], 0, 0, 0)
+				RotateEntity(r\Objects[n * 2 + 1], -10, 0 - 180, 0)
+				
+				EntityPickMode r\Objects[n * 2 + 1], 1, False
+				EntityRadius r\Objects[n * 2 + 1], 0.1
+			Next
+			
+			r\RoomDoors[4] = CreateDoor(r\zone,r\x+56*RoomScale,r\y-5632*RoomScale,r\z+6344*RoomScale,90,r,False,2)
+			r\RoomDoors[4]\AutoClose = False : r\RoomDoors[4]\open = False
+			For i = 0 To 1
+				FreeEntity r\RoomDoors[4]\buttons[i] : r\RoomDoors[4]\buttons[i] = 0
+			Next
+			
+			d = CreateDoor(r\zone,r\x+1157.0*RoomScale,r\y-5632.0*RoomScale,r\z+660.0*RoomScale,0,r,False,2)
+			d\locked = True : d\open = False : d\AutoClose = False
+			For i = 0 To 1
+				FreeEntity d\buttons[i] : d\buttons[i]=0
+			Next
+			
+			d = CreateDoor(r\zone,r\x+234.0*RoomScale,r\y-5632.0*RoomScale,r\z+5239.0*RoomScale,90,r,False,2)
+			d\locked = True : d\open = False : d\AutoClose = False
+			For i = 0 To 1
+				FreeEntity d\buttons[i] : d\buttons[i]=0
+			Next
+			
+			d = CreateDoor(r\zone,r\x+3446.0*RoomScale,r\y-5632.0*RoomScale,r\z+6369.0*RoomScale,90,r,False,2)
+			d\locked = True : d\open = False : d\AutoClose = False
+			For i = 0 To 1
+				FreeEntity d\buttons[i] : d\buttons[i]=0
+			Next
 			;[End Block]
 		Case "room049"
 			;[Block]
@@ -4565,8 +4621,7 @@ Function FillRoom(r.Rooms)
 			
 			;Spawnpoint for SCP-049
 			r\Objects[7] = CreatePivot()
-			;PositionEntity r\Objects[7],r\x,r\y+200.0*RoomScale,r\z+700.0*RoomScale,True
-			PositionEntity r\Objects[7],r\x,r\y+200.0*RoomScale,r\z+200.0*RoomScale,True
+			PositionEntity r\Objects[7],r\x,r\y+200.0*RoomScale,r\z+600.0*RoomScale,True
 			EntityParent r\Objects[7],r\obj
 			
 			;PathPoints for SCP-049
@@ -4604,6 +4659,14 @@ Function FillRoom(r.Rooms)
 					EndIf
 				EndIf
 			Next
+			
+			w.waypoints = CreateWaypoint(r\x, r\y + 64.0 * RoomScale, r\z - 640.0 * RoomScale, Null, r)
+			w2.waypoints = CreateWaypoint(r\x + 1024.0*RoomScale, r\y + 320.0 * RoomScale, r\z - 640.0 * RoomScale, Null, r)
+			w3.waypoints = CreateWaypoint(r\x + 1552.0*RoomScale, r\y + 540.0 * RoomScale, r\z - 636.0*RoomScale, Null, r)
+			w3\connected[0] = w2 : w3\dist[0] = EntityDistance(w3\obj, w2\obj)
+			w2\connected[1] = w3 : w2\dist[1] = w3\dist[0]
+			
+			r\MaxWayPointY# = 400.0*RoomScale
 			;[End Block]
 		Case "room2_4"
 			;[Block]
@@ -4993,32 +5056,43 @@ Function InitWayPoints(loadingstart=45)
 		
 		w2.WayPoints = After(w)
 		
+		Local canCreateWayPoint% = False
+		
 		While (w2<>Null)
 			
 			If (w\room=w2\room Or w\door<>Null Or w2\door<>Null)
 				
 				dist# = EntityDistance(w\obj, w2\obj);;Sqr(x*x+y*y+z*z)
-							
-				If dist < 7.0 Then
-					If EntityVisible(w\obj, w2\obj) Then;e=w2\obj Then 
-						For i = 0 To 4
-							If w\connected[i] = Null Then
-								w\connected[i] = w2.WayPoints 
-								w\dist[i] = dist
-								Exit
-							EndIf
-						Next
-						
-						For n = 0 To 4
-							If w2\connected[n] = Null Then 
-								w2\connected[n] = w.WayPoints 
-								w2\dist[n] = dist
-								Exit
-							EndIf					
-						Next
-					EndIf
-				EndIf	
 				
+				If w\room\MaxWayPointY# = 0.0 Or w2\room\MaxWayPointY# = 0.0
+					canCreateWayPoint = True
+				Else
+					If Abs(EntityY(w\obj)-EntityY(w2\obj))<=w\room\MaxWayPointY
+						canCreateWayPoint = True
+					EndIf
+				EndIf
+				
+				If dist < 7.0 Then
+					If canCreateWayPoint
+						If EntityVisible(w\obj, w2\obj) Then;e=w2\obj Then 
+							For i = 0 To 4
+								If w\connected[i] = Null Then
+									w\connected[i] = w2.WayPoints 
+									w\dist[i] = dist
+									Exit
+								EndIf
+							Next
+							
+							For n = 0 To 4
+								If w2\connected[n] = Null Then 
+									w2\connected[n] = w.WayPoints 
+									w2\dist[n] = dist
+									Exit
+								EndIf					
+							Next
+						EndIf
+					EndIf	
+				EndIf
 			EndIf
 			w2 = After(w2)
 		Wend
@@ -7470,13 +7544,13 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A#574
-;~F#593#5B5#5CA#5D5#60E#61C#644#679#681#696#6E3#734#776#798#7F4#806#86D#87C#8A6#8C2
-;~F#8E0#8FE#925#92C#93A#956#96B#988#9A5#9B2#9C4#A02#A2C#A7D#AD3#AE6#B04#B55#BB6#BC5
-;~F#C01#C09#C17#C2C#C68#C87#C97#CAF#CDA#CED#D0F#D37#D89#DB5#DDC#DE3#DE8#E1F#E46#E5B
-;~F#E8B#F09#F29#F9D#FF4#101F#1070#1079#1112#111A#111F#112D#113C#1155#1177#1186#1197#119E#11A3#1200
-;~F#1235#12B2#12BE#12FF#130A#131B#1320#132F#1346#13BC#13C5#14A4#14C1#14C8#14CE#14DC#1500#1520#1553#165E
-;~F#1697#16AC#176E#1803#1808#1818#1AED#1B04#1B23#1B2A#1B77#1BC8#1BE3#1BFA#1C22#1C29#1C5D#1C64#1C90#1CDE
-;~F#1CEC#1CF3#1CF9#1D03#1D09#1D1C
-;~B#1195
+;~F#2#A#2D#FA#109#110#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A
+;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
+;~F#8C3#8E1#8FF#926#92D#93B#957#96C#989#9A6#9B3#9C5#A03#A2D#A7E#AD4#AE7#B8D#BEE#BFD
+;~F#C39#C41#C4F#C64#CA0#CBF#CCF#CE7#D12#D25#D47#D6F#DC1#DED#E14#E1B#E20#E57#E7E#E93
+;~F#EC3#F41#F61#FD5#102C#1057#10A8#10B1#114A#1152#1157#1165#1174#118D#11AF#11BE#11CF#11D6#11DB#123F
+;~F#1274#12F1#12FD#133E#1349#135A#135F#136E#1385#1406#140F#14EE#150B#1512#1518#1526#154A#156A#159D#16A8
+;~F#16E1#16F6#17B8#184D#1852#1862#1B37#1B4E#1B6D#1B74#1BC1#1C12#1C2D#1C44#1C6C#1C73#1CA7#1CAE#1CDA#1D28
+;~F#1D36#1D3D#1D43#1D4D#1D53#1D66
+;~B#11CD
 ;~C#Blitz3D

@@ -5240,8 +5240,30 @@ Function UpdateEvents()
 							PositionEntity(e\room\NPC[1]\Collider, EntityX(e\room\Objects[6],True),EntityY(e\room\Objects[6],True)+0.2,EntityZ(e\room\Objects[6],True))
 							ResetEntity e\room\NPC[1]\Collider
 							e\room\NPC[1]\State = 2
-							e\room\NPC[1]\State2 = 7							
+							e\room\NPC[1]\State2 = 7
 							e\EventState = 1
+						EndIf
+						
+						If e\room\RoomDoors[4]\open = False
+							If UpdateLever(e\room\Levers[0])
+								e\room\RoomDoors[4]\open = True
+								If e\Sound2 <> 0 Then FreeSound_Strict e\Sound2 : e\Sound2=0
+								e\Sound2 = LoadSound_Strict("SFX\Doors\Door2Open1_dist.ogg")
+								e\SoundCHN2 = PlaySound2(e\Sound2,Camera,e\room\RoomDoors[4]\obj,400)
+							EndIf
+							If UpdateLever(e\room\Levers[1])
+								e\room\RoomDoors[4]\open = True
+								If e\Sound2 <> 0 Then FreeSound_Strict e\Sound2 : e\Sound2=0
+								e\Sound2 = LoadSound_Strict("SFX\Doors\Door2Open1_dist.ogg")
+								e\SoundCHN2 = PlaySound2(e\Sound2,Camera,e\room\RoomDoors[4]\obj,400)
+							EndIf
+						EndIf
+						
+						UpdateLever(e\room\Levers[0])
+						UpdateLever(e\room\Levers[1])
+						
+						If ChannelPlaying(e\SoundCHN2)
+							UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[4]\obj,200)
 						EndIf
 						
 						If EntityY(Collider)<-6400*RoomScale And KillTimer=>0 Then
@@ -5980,6 +6002,9 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 					EndIf
+				Else
+					e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1],e\room\Objects[0],e\room\Objects[1], e)
+					e\EventState3 = UpdateElevators(e\EventState3, e\room\RoomDoors[2], e\room\RoomDoors[3],e\room\Objects[2],e\room\Objects[3], e)
 				EndIf 
 				
 				If e\EventState < 0 Then
@@ -8405,21 +8430,35 @@ Function UpdateEvents()
 					EndIf
 				ElseIf e\EventState2 = 0
 					If e\room\NPC[0] <> Null
-						PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\NPC[0]\Collider),EntityY(e\room\Objects[7],True),EntityZ(e\room\NPC[0]\Collider)
+						;PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\NPC[0]\Collider),EntityY(e\room\Objects[7],True),EntityZ(e\room\NPC[0]\Collider)
+						Local AdjDist1# = 0.0
+						Local AdjDist2# = 0.0
+						Local Adj1% = -1
+						Local Adj2% = -1
+						For i = 0 To 3
+							If e\room\Adjacent[i]<>Null
+								If Adj1 = -1
+									AdjDist1# = EntityDistance(e\room\Objects[7],e\room\Adjacent[i]\obj)
+									Adj1 = i
+								Else
+									AdjDist2# = EntityDistance(e\room\Objects[7],e\room\Adjacent[i]\obj)
+									Adj2 = i
+								EndIf
+							EndIf
+						Next
+						If AdjDist1# < AdjDist2#
+							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Adjacent[Adj1]\obj),EntityY(e\room\Objects[7],True),EntityZ(e\room\Adjacent[Adj1]\obj)
+						Else
+							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Adjacent[Adj2]\obj),EntityY(e\room\Objects[7],True),EntityZ(e\room\Adjacent[Adj2]\obj)
+						EndIf
 						ResetEntity e\room\NPC[0]\Collider
-						;e\room\RoomDoors[0]\open = True
 						e\room\NPC[0]\State = 5
 						DebugLog "aaaaaaaaa"
 						e\EventState2 = 1
 					EndIf
 				ElseIf e\EventState2 = 1
 					If e\room\NPC[0]\PathStatus <> 1
-						;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 						e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[15],True),EntityY(e\room\Objects[15],True),EntityZ(e\room\Objects[15],True))
-						If e\room\NPC[0]\PathTimer = 0
-							MoveEntity e\room\NPC[0]\Collider,0,0,-500*RoomScale
-							e\room\NPC[0]\PathTimer = 1
-						EndIf
 					Else
 						DebugLog "bbbbbbbbb"
 						e\EventState2 = 2
@@ -8442,10 +8481,20 @@ Function UpdateEvents()
 							e\room\NPC[0]\DropSpeed = 0
 						EndIf
 					EndIf
+					
+					If e\room\NPC[0]\State <> 5
+						e\EventState2 = 7
+						DebugLog "fffffffff"
+					EndIf
 				ElseIf e\EventState2 = 3
 					If e\room\NPC[0]\State <> 5
-						e\EventState2 = 6
+						e\EventState2 = 7
 						DebugLog "fffffffff"
+					EndIf
+					
+					If MeNPCSeesPlayer(e\room\NPC[0])=2
+						e\EventState2 = 4
+						DebugLog "ddddddddd"
 					EndIf
 					
 					If e\room\NPC[0]\PathStatus <> 1
@@ -8476,7 +8525,7 @@ Function UpdateEvents()
 									e\room\NPC[0]\PrevState = 1
 									DebugLog "Path3"
 								Case 4
-									e\EventState2 = 4
+									e\EventState2 = 5
 							End Select
 							e\room\NPC[0]\PathTimer# = 0.0
 							e\room\NPC[0]\State3 = e\room\NPC[0]\State3 + 1
@@ -8491,6 +8540,12 @@ Function UpdateEvents()
 						EndIf
 					EndIf
 				ElseIf e\EventState2 = 4
+					If e\room\NPC[0]\State <> 5
+						e\EventState2 = 7
+						e\room\NPC[0]\State3 = 2.0
+						DebugLog "fffffffff"
+					EndIf
+				ElseIf e\EventState2 = 5
 					;RemoveNPC(e\room\NPC[0])
 					DebugLog "ddddddddd"
 					e\room\NPC[0]\State = 2
@@ -8501,18 +8556,18 @@ Function UpdateEvents()
 							Exit
 						EndIf
 					Next
-					e\EventState2 = 5
-				ElseIf e\EventState2 = 5
+					e\EventState2 = 6
+				ElseIf e\EventState2 = 6
 					If MeNPCSeesPlayer(e\room\NPC[0]) Or e\room\NPC[0]\State2 > 0 Or e\room\NPC[0]\LastSeen > 0
 						DebugLog "fffffffff"
-						e\EventState2 = 6
+						e\EventState2 = 7
 					Else
 						If e\room\NPC[0]\PathStatus <> 1
 							e\room\NPC[0]\Idle = 70*60 ;(Making SCP-049 idle for one minute (twice as fast for aggressive NPCs = True))
 							PositionEntity e\room\NPC[0]\Collider,0,500,0
 							ResetEntity e\room\NPC[0]\Collider
 							DebugLog "eeeeeeeee"
-							e\EventState2 = 6
+							e\EventState2 = 7
 						EndIf
 					EndIf
 				EndIf
@@ -8671,7 +8726,8 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
-;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#148C#1499
-;~F#14B2#154A#1700#17C9#181D#18CE#197E#1A36#1A4E#1B0F#1B3C#1B59#1B80#1BB0#1BCD#1BF5#1C4F#1C8F#1CC0#1CD3
-;~F#1D8B#1DE3#1DF6#1E04#1E0D#1E59#1E78#1F83#1FEA#214C#2150
+;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#14A2#14AF#14C8
+;~F#1560#1716#17E2#1836#18E7#1997#1A4F#1A67#1B28#1B55#1B72#1B99#1BC9#1BE6#1C0E#1C68#1CA8#1CD9#1CEC#1DA4
+;~F#1DFC#1E0F#1E1D#1E26#1E72#1E91#1F9C#2003#20DE#2183#2187
+;~B#147E#210C
 ;~C#Blitz3D
