@@ -639,7 +639,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		DebugLog "TriggerBoxEnable"
 		rt\TempTriggerboxAmount = ReadInt(f)
 		For tb = 0 To rt\TempTriggerboxAmount-1
-			rt\TempTriggerbox[tb] = CreateMesh()
+			rt\TempTriggerbox[tb] = CreateMesh(rt\obj)
 			count = ReadInt(f)
 			For i%=1 To count
 				surf=CreateSurface(rt\TempTriggerbox[tb])
@@ -2833,7 +2833,7 @@ Function FillRoom(r.Rooms)
 			;PositionEntity(r\Objects[3], r\x + 720.0 * RoomScale, -5392.0 * RoomScale, r\z + 752.0 * RoomScale, True)
 			PositionEntity(r\Objects[3], r\x - 456.0 * RoomScale, -5392.0 * RoomScale, r\z - 1136 * RoomScale, True)
 			
-			;"waypoints"
+			;"waypoints" # 1
 			r\Objects[4] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[4], r\x + 2128.0 * RoomScale, -5550.0 * RoomScale, r\z + 2048.0 * RoomScale, True)
 			
@@ -2849,7 +2849,33 @@ Function FillRoom(r.Rooms)
 			r\Objects[8] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[8], r\x + 4848.0 * RoomScale, -5550.0 * RoomScale, r\z + 112.0 * RoomScale, True)
 			
+			;"waypoints" # 2
+			r\Objects[9] = CreatePivot(r\obj)
+			PositionEntity(r\Objects[9], r\x + 592.0 * RoomScale, -5550.0 * RoomScale, r\z + 6352.0 * RoomScale, True)
 			
+			r\Objects[10] = CreatePivot(r\obj)
+			PositionEntity(r\Objects[10], r\x + 2928.0 * RoomScale, -5550.0 * RoomScale, r\z + 6352.0 * RoomScale, True)
+			
+			r\Objects[11] = CreatePivot(r\obj)
+			PositionEntity(r\Objects[11], r\x + 2928.0 * RoomScale, -5550.0 * RoomScale, r\z + 5200.0 * RoomScale, True)
+			
+			r\Objects[12] = CreatePivot(r\obj)
+			PositionEntity(r\Objects[12], r\x + 592.0 * RoomScale, -5550.0 * RoomScale, r\z + 5200.0 * RoomScale, True)
+			
+			;"waypoints" # 3
+			r\Objects[13] = CreatePivot(r\obj)
+			PositionEntity(r\Objects[13], r\x + 1136.0 * RoomScale, -5550.0 * RoomScale, r\z + 2944.0 * RoomScale, True)
+			
+			r\Objects[14] = CreatePivot(r\obj)
+			PositionEntity(r\Objects[14], r\x + 1104.0 * RoomScale, -5550.0 * RoomScale, r\z + 1184.0 * RoomScale, True)
+			
+			r\Objects[15] = CreatePivot(r\obj)
+			PositionEntity(r\Objects[15], r\x - 464.0 * RoomScale,  -5550.0 * RoomScale, r\z + 1216.0 * RoomScale, True)
+			
+			r\Objects[16] = CreatePivot(r\obj)
+			PositionEntity(r\Objects[16], r\x - 432.0 * RoomScale, -5550.0 * RoomScale, r\z + 2976.0 * RoomScale, True)
+			
+			;Doors
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x, 0.0, r\z + 448.0 * RoomScale, 0, r, True)
 			r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = True
 			PositionEntity(r\RoomDoors[0]\buttons[1], r\x - 160.0 * RoomScale, 0.7, r\z + 480.0 * RoomScale, True)
@@ -2905,6 +2931,7 @@ Function FillRoom(r.Rooms)
 			ScaleSprite(de\obj, de\Size,de\Size)
 			EntityParent de\obj, r\obj
 			
+			;Objects [20],[21],[22],[23]
 			For n% = 10 To 11
 				r\Objects[n * 2] = CopyEntity(LeverBaseOBJ)
 				r\Objects[n * 2 + 1] = CopyEntity(LeverOBJ)
@@ -4703,7 +4730,8 @@ Function FillRoom(r.Rooms)
 	If r\RoomTemplate\TempTriggerboxAmount > 0
 		r\TriggerboxAmount = r\RoomTemplate\TempTriggerboxAmount
 		For i = 0 To r\TriggerboxAmount-1
-			r\Triggerbox[i] = r\RoomTemplate\TempTriggerbox[i]
+			r\Triggerbox[i] = CopyEntity(r\RoomTemplate\TempTriggerbox[i],r\obj)
+			EntityAlpha r\Triggerbox[i],0.0
 			r\TriggerboxName[i] = r\RoomTemplate\TempTriggerboxName[i]
 			DebugLog "Triggerbox found: "+i
 			DebugLog "Triggerbox "+i+" name: "+r\TriggerboxName[i]
@@ -7546,11 +7574,11 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A
 ;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
-;~F#8C3#8E1#8FF#926#92D#93B#957#96C#989#9A6#9B3#9C5#A03#A2D#A7E#AD4#AE7#B8D#BEE#BFD
-;~F#C39#C41#C4F#C64#CA0#CBF#CCF#CE7#D12#D25#D47#D6F#DC1#DED#E14#E1B#E20#E57#E7E#E93
-;~F#EC3#F41#F61#FD5#102C#1057#10A8#10B1#114A#1152#1157#1165#1174#118D#11AF#11BE#11CF#11D6#11DB#123F
-;~F#1274#12F1#12FD#133E#1349#135A#135F#136E#1385#1406#140F#14EE#150B#1512#1518#1526#154A#156A#159D#16A8
-;~F#16E1#16F6#17B8#184D#1852#1862#1B37#1B4E#1B6D#1B74#1BC1#1C12#1C2D#1C44#1C6C#1C73#1CA7#1CAE#1CDA#1D28
-;~F#1D36#1D3D#1D43#1D4D#1D53#1D66
-;~B#11CD
+;~F#8C3#8E1#8FF#926#92D#93B#957#96C#989#9A6#9B3#9C5#A03#A2D#A7E#AD4#AE7#B05#BA8#C09
+;~F#C18#C54#C5C#C6A#C7F#CBB#CDA#CEA#D02#D2D#D40#D62#D8A#DDC#E08#E2F#E36#E3B#E72#E99
+;~F#EAE#EDE#F5C#F7C#FF0#1047#1072#10C3#10CC#1165#116D#1172#1180#118F#11A8#11CA#11D9#11EA#11F1#11F6
+;~F#125A#1290#130D#1319#135A#1365#1376#137B#138A#13A1#1422#142B#150A#1527#152E#1534#1542#1566#1586#15B9
+;~F#16C4#16FD#1712#17D4#1869#186E#187E#1B53#1B6A#1B89#1B90#1BDD#1C2E#1C49#1C60#1C88#1C8F#1CC3#1CCA#1CF6
+;~F#1D44#1D52#1D59#1D5F#1D69#1D6F#1D82
+;~B#11E8
 ;~C#Blitz3D

@@ -5229,18 +5229,32 @@ Function UpdateEvents()
 							DrawLoading(20, True)
 							e\room\NPC[1]=CreateNPC(NPCtype939, 0,0,0)
 							
+							DrawLoading(50, True)
+							e\room\NPC[2]=CreateNPC(NPCtype939, 0,0,0)
+							
 							DrawLoading(100, True)
 						EndIf
 						
 						If e\EventState = 0 Then
+							;Instance 1
 							PositionEntity(e\room\NPC[0]\Collider, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+0.2,EntityZ(e\room\Objects[4],True))
 							ResetEntity e\room\NPC[0]\Collider
 							e\room\NPC[0]\State = 2
-							e\room\NPC[0]\State2 = 5							
-							PositionEntity(e\room\NPC[1]\Collider, EntityX(e\room\Objects[6],True),EntityY(e\room\Objects[6],True)+0.2,EntityZ(e\room\Objects[6],True))
+							e\room\NPC[0]\State2 = 5
+							e\room\NPC[0]\PrevState = 7
+							;Instance 2
+							PositionEntity(e\room\NPC[1]\Collider, EntityX(e\room\Objects[9],True),EntityY(e\room\Objects[9],True)+0.2,EntityZ(e\room\Objects[9],True))
 							ResetEntity e\room\NPC[1]\Collider
 							e\room\NPC[1]\State = 2
-							e\room\NPC[1]\State2 = 7
+							e\room\NPC[1]\State2 = 10
+							e\room\NPC[1]\PrevState = 12
+							;Instance 3
+							PositionEntity(e\room\NPC[2]\Collider, EntityX(e\room\Objects[13],True),EntityY(e\room\Objects[13],True)+0.2,EntityZ(e\room\Objects[13],True))
+							ResetEntity e\room\NPC[2]\Collider
+							e\room\NPC[2]\State = 2
+							e\room\NPC[2]\State2 = 14
+							e\room\NPC[2]\PrevState = 16
+							;Other
 							e\EventState = 1
 						EndIf
 						
@@ -5262,8 +5276,20 @@ Function UpdateEvents()
 						UpdateLever(e\room\Levers[0])
 						UpdateLever(e\room\Levers[1])
 						
+						e\room\NPC[0]\IgnorePlayer = False
+						e\room\NPC[2]\IgnorePlayer = False
+						
+						Local CurrTrigger$ = CheckTriggers()
+						
+						Select CurrTrigger$
+							Case "939-1_fix"
+								e\room\NPC[0]\IgnorePlayer = True
+							Case "939-3_fix"
+								e\room\NPC[2]\IgnorePlayer = True
+						End Select
+						
 						If ChannelPlaying(e\SoundCHN2)
-							UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[4]\obj,200)
+							UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[4]\obj,400)
 						EndIf
 						
 						If EntityY(Collider)<-6400*RoomScale And KillTimer=>0 Then
@@ -5277,6 +5303,7 @@ Function UpdateEvents()
 				Else
 					If e\room\NPC[0]<>Null Then e\room\NPC[0]\State = 66
 					If e\room\NPC[1]<>Null Then e\room\NPC[1]\State = 66
+					If e\room\NPC[2]<>Null Then e\room\NPC[2]\State = 66
 				EndIf 
 				;[End Block]
 			Case "room3tunnel"
@@ -8726,8 +8753,8 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
-;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#14A2#14AF
-;~F#14C8#1560#1716#17E2#1836#18E7#1997#1A4F#1A67#1B28#1B55#1B72#1B99#1BC9#1BE6#1C0E#1C68#1CA8#1CD9#1CEC
-;~F#1DA4#1DFC#1E0F#1E1D#1E26#1E72#1E91#1F9C#20DE#2183#2187
-;~B#147E#210C
+;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#14BD#14CA#14E3
+;~F#157B#1731#17FD#1851#1902#19B2#1A6A#1A82#1B43#1B70#1B8D#1BB4#1BE4#1C01#1C29#1C83#1CC3#1CF4#1D07#1DBF
+;~F#1E17#1E2A#1E38#1E41#1E8D#1EAC#1FB7#2019#201E#20F9#219E#21A2
+;~B#148C#2127
 ;~C#Blitz3D

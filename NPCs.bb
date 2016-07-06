@@ -3219,8 +3219,9 @@ Function UpdateNPCs()
 						Case 1
 							
 							If n\Frame=>644 And n\Frame<683 Then ;finish the walking animation
-								n\CurrSpeed = CurveValue(n\Speed*0.2, n\CurrSpeed, 10.0)
-								AnimateNPC(n, 644,683,28*n\CurrSpeed,False)
+								;n\CurrSpeed = CurveValue(n\Speed*0.2, n\CurrSpeed, 10.0)
+								n\CurrSpeed = CurveValue(n\Speed*0.05, n\CurrSpeed, 10.0)
+								AnimateNPC(n, 644,683,28*n\CurrSpeed*4,False)
 								If n\Frame=683 Then n\Frame =175
 								
 								;Animate2(n\obj,AnimTime(n\obj),644,683,28*n\CurrSpeed,False)
@@ -3239,7 +3240,7 @@ Function UpdateNPCs()
 							MoveEntity n\Collider, 0,0,n\CurrSpeed*FPSfactor						
 							
 						Case 2
-							n\State2 = Max(n\State2, 4)
+							n\State2 = Max(n\State2, (n\PrevState-3))
 							
 							dist = EntityDistance(n\Collider, PlayerRoom\Objects[n\State2])
 							
@@ -3274,7 +3275,7 @@ Function UpdateNPCs()
 							
 							If dist<0.4 Then
 								n\State2 = n\State2 + 1
-								If n\State2 > 7 Then n\State2 = 4
+								If n\State2 > n\PrevState Then n\State2 = (n\PrevState-3)
 								n\State = 1
 							EndIf
 							
@@ -3287,7 +3288,7 @@ Function UpdateNPCs()
 								n\LastSeen = 10*7
 							EndIf
 							
-							If n\LastSeen > 0 Then
+							If n\LastSeen > 0 And (Not NoTarget) Then
 								prevFrame = n\Frame
 								
 								If (n\Frame=>18.0 And n\Frame<68.0) Then
@@ -3368,7 +3369,7 @@ Function UpdateNPCs()
 							
 					End Select
 					
-					If n\State < 3 Then
+					If n\State < 3 And (Not NoTarget) And (Not n\IgnorePlayer) Then
 						dist = EntityDistance(n\Collider, Collider)
 						
 						If dist < 4.0 Then dist = dist - EntityVisible(Collider, n\Collider)
@@ -6176,8 +6177,8 @@ Function GoToElevator(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#48#6E#94#A4#D4#E4#ED#FB#10A#11D#13C#166#17A#197#1CE#1E6#207#22A
-;~F#233#25E#286#377#462#5D1#5E1#72A#732#7AC#847#967#96C#99C#A3E#A79#B08#B74#C89#D4F
-;~F#E06#EB9#FB8#FC1#1082#10A9#10B4#10D8#10EC#1142#124B#1396#1408#1468#14E8#1515#153B#1553#15CF#167D
-;~F#16F5#1706#1721#173F#177D#179E#17AC#17C8#17DA#17FE
-;~B#11F3#128F#14C9#15CF#178C#17E8
+;~F#233#25E#286#377#462#5B7#5D1#5E1#72A#732#7AC#847#967#96C#99C#A3E#A79#B08#B74#D50
+;~F#E07#EBA#FB9#FC2#1083#10AA#10B5#10D9#10ED#1143#124C#1397#1409#1469#14E9#1516#153C#1554#15D0#167E
+;~F#16F6#1707#1722#1740#177E#179F#17AD#17C9#17DB#17FF
+;~B#196#11F4#1290#14CA#15D0#178D#17E9
 ;~C#Blitz3D

@@ -8446,6 +8446,35 @@ Function UpdateDeafPlayer()
 	EndIf
 	
 End Function
+
+Function CheckTriggers$()
+	Local i%,sx#,sy#,sz#
+	Local inside% = -1
+	
+	If PlayerRoom\TriggerboxAmount = 0
+		Return ""
+	Else
+		For i = 0 To PlayerRoom\TriggerboxAmount-1
+			EntityAlpha PlayerRoom\Triggerbox[i],1.0
+			sx# = EntityScaleX(PlayerRoom\Triggerbox[i], 1)
+			sy# = Max(EntityScaleY(PlayerRoom\Triggerbox[i], 1), 0.001)
+			sz# = EntityScaleZ(PlayerRoom\Triggerbox[i], 1)
+			GetMeshExtents(PlayerRoom\Triggerbox[i])
+			EntityAlpha PlayerRoom\Triggerbox[i],0.0
+			If EntityX(Collider)>((sx#*Mesh_MinX)+PlayerRoom\x) And EntityX(Collider)<((sx#*Mesh_MaxX)+PlayerRoom\x)
+				If EntityY(Collider)>((sy#*Mesh_MinY)+PlayerRoom\y) And EntityY(Collider)<((sy#*Mesh_MaxY)+PlayerRoom\y)
+					If EntityZ(Collider)>((sz#*Mesh_MinZ)+PlayerRoom\z) And EntityZ(Collider)<((sz#*Mesh_MaxZ)+PlayerRoom\z)
+						inside% = i%
+						Exit
+					EndIf
+				EndIf
+			EndIf
+		Next
+		
+		If inside% > -1 Then Return PlayerRoom\TriggerboxName[inside%]
+	EndIf
+	
+End Function
 ;~IDEal Editor Parameters:
 ;~F#24#AC#12C#130#137#3CF#4AB#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7DF#8C2#98E#9A5
 ;~F#A38#B5C#C7B#DE7#FD0#13BD#1448#1492#14A4#14E3#15B1#15BC#170F#1790#17C1#18BE#18D0#18EC#18F6#1903
