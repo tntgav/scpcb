@@ -406,10 +406,20 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[End Block]
 		Case NPCtype939
 			;[Block]
-			i = 53
+			;i = 53
+			;For n2.NPCs = Each NPCs
+			;	If (n\NPCtype = n2\NPCtype) And (n<>n2) Then i=i+36
+			;Next
+			;n\NVName = "SCP-939-"+i
+			Local amount939% = 0
 			For n2.NPCs = Each NPCs
-				If (n\NPCtype = n2\NPCtype) And (n<>n2) Then i=i+36
+				If (n\NPCtype = n2\NPCtype) And (n<>n2)
+					amount939% = amount939% + 1
+				EndIf
 			Next
+			If amount939% = 0 Then i = 53
+			If amount939% = 1 Then i = 89
+			If amount939% = 2 Then i = 96
 			n\NVName = "SCP-939-"+i
 			
 			n\Collider = CreatePivot()
@@ -3222,14 +3232,14 @@ Function UpdateNPCs()
 								;n\CurrSpeed = CurveValue(n\Speed*0.2, n\CurrSpeed, 10.0)
 								n\CurrSpeed = CurveValue(n\Speed*0.05, n\CurrSpeed, 10.0)
 								AnimateNPC(n, 644,683,28*n\CurrSpeed*4,False)
-								If n\Frame=683 Then n\Frame =175
+								If n\Frame=>682 Then n\Frame =175
 								
 								;Animate2(n\obj,AnimTime(n\obj),644,683,28*n\CurrSpeed,False)
 								;If AnimTime(n\obj)=683 Then SetAnimTime(n\obj,175)
 							Else
 								n\CurrSpeed = CurveValue(0, n\CurrSpeed, 5.0)
 								AnimateNPC(n, 175,297,0.22,False)
-								If n\Frame=297 Then n\State = 2
+								If n\Frame=>296 Then n\State = 2
 								
 								;Animate2(n\obj,AnimTime(n\obj),175,297,0.22,False)
 								;If AnimTime(n\obj)=297 Then n\State = 2
@@ -3264,7 +3274,7 @@ Function UpdateNPCs()
 									EndIf
 									If temp Then
 										If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-										n\Sound = LoadSound_Strict("SFX\939\"+(n\ID Mod 2)+"Lure"+Rand(1,10)+".ogg")
+										n\Sound = LoadSound_Strict("SFX\939\"+(n\ID Mod 3)+"Lure"+Rand(1,10)+".ogg")
 										n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider)
 									EndIf
 								EndIf
@@ -3376,7 +3386,7 @@ Function UpdateNPCs()
 						If PlayerSoundVolume*1.2>dist Or dist < 1.5 Then
 							If n\State3 = 0 Then
 								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-								n\Sound = LoadSound_Strict("SFX\939\"+(n\ID Mod 2)+"Attack"+Rand(1,3)+".ogg")
+								n\Sound = LoadSound_Strict("SFX\939\"+(n\ID Mod 3)+"Attack"+Rand(1,3)+".ogg")
 								n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider)										
 								
 								PlaySound_Strict(LoadTempSound("SFX\939\attack.ogg"))
@@ -3387,7 +3397,7 @@ Function UpdateNPCs()
 						ElseIf PlayerSoundVolume*1.6>dist
 							If n\State<>1 Then
 								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-								n\Sound = LoadSound_Strict("SFX\939\"+(n\ID Mod 2)+"Alert"+Rand(1,3)+".ogg")
+								n\Sound = LoadSound_Strict("SFX\939\"+(n\ID Mod 3)+"Alert"+Rand(1,3)+".ogg")
 								n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider)	
 								
 								n\Frame = 175
@@ -6176,9 +6186,9 @@ Function GoToElevator(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#48#6E#94#A4#D4#E4#ED#FB#10A#11D#13C#166#17A#197#1CE#1E6#207#22A
-;~F#233#25E#286#377#462#5B7#5D1#5E1#72A#732#7AC#847#967#96C#99C#A3E#A79#B08#B74#D50
-;~F#E07#EBA#FB9#FC2#1083#10AA#10B5#10D9#10ED#1143#124C#1397#1409#1469#14E9#1516#153C#1554#15D0#167E
-;~F#16F6#1707#1722#1740#177E#179F#17AD#17C9#17DB#17FF
-;~B#196#11F4#1290#14CA#15D0#178D#17E9
+;~F#0#A#3E#48#6E#94#A4#D4#E4#ED#FB#10A#11D#13C#166#17A#197#1D8#1F0#211
+;~F#234#23D#268#290#381#46C#5C1#5DB#5EB#734#73C#7B6#851#971#976#9A6#A48#A83#B12#B7E
+;~F#D5A#E11#EC4#FC3#FCC#108D#10B4#10BF#10E3#10F6#10F7#114D#1256#13A1#1413#1473#14F3#1520#1546#155E
+;~F#15DA#1688#1700#1711#172C#174A#1788#17A9#17B7#17D3#17E5#1809
+;~B#196#11FE#129A#14D4#15DA#1797#17F3
 ;~C#Blitz3D
