@@ -56,4 +56,5 @@ difficulties(SAFE)\otherFactors = EASY
 
 SelectedDifficulty = difficulties(SAFE)
 ;~IDEal Editor Parameters:
+;~F#0
 ;~C#Blitz3D

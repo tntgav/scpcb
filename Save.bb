@@ -854,7 +854,7 @@ Function LoadGame(file$)
 				Exit
 			EndIf
 		Next
-		If e\EventName = "dimension1499"
+		If e\EventName = "dimension1499" Or e\EventName = "room2sl"
 			e\EventState = 0.0
 		EndIf
 	Next
@@ -1771,4 +1771,5 @@ Function LoadMap(file$)
 	
 End Function
 ;~IDEal Editor Parameters:
+;~F#2#1A2#3F6#629#651#66F
 ;~C#Blitz3D

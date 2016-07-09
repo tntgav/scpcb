@@ -184,4 +184,5 @@ Function LoadFont_Strict(file$="Tahoma", height=13, bold=0, italic=0, underline=
 	Return tmp
 End Function
 ;~IDEal Editor Parameters:
+;~F#F#27#2E#46#7F#89#94#9B#A4#AB#B3
 ;~C#Blitz3D

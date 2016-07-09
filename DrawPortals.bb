@@ -105,5 +105,5 @@ Function UpdateDrawPortal(ndp.DrawPortal);,passive%=True)
 	;ClsColor 0,0,0
 End Function
 ;~IDEal Editor Parameters:
-;~F#40
+;~F#0#E#40#4C
 ;~C#Blitz3D

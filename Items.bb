@@ -610,5 +610,5 @@ Function DropItem(item.Items)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#1E#139#153#194#1AF#1EB#22E
+;~F#B#1E#76#139#153#194#1AF#1EB#22E
 ;~C#Blitz3D
