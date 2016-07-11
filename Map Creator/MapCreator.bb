@@ -269,11 +269,13 @@ For rt.RoomTemplates = Each RoomTemplates
 	RoomTemplateAmount = RoomTemplateAmount + 1
 Next
 
-Global MouseDown1%, MouseHit1%, MouseDown2%, MouseSpeedX#, MouseSpeedY#
+Global MouseDown1%, MouseHit1%, MouseDown2%, MouseSpeedX#, MouseSpeedY#, MouseSpeedZ#
 Global SelectedTextBox% = 0
 Global TickIMG = LoadImage_Strict("tickimg.png")
 
 strtemp$ = "aaaa"
+
+Global OnSideBar% = False
 
 Repeat
 	
@@ -285,6 +287,7 @@ Repeat
 	MouseDown2 = MouseDown(2)
 	MouseSpeedX# = MouseXSpeed()
 	MouseSpeedY# = MouseYSpeed()
+	MouseSpeedZ# = MouseZSpeed()
 	
 	
 	Cls
@@ -296,7 +299,9 @@ Repeat
 	height = 768-70
 	TextBox (x,y,width,height,"")
 	
-	y = y-(ScrollMenuY#*height)
+	Local RA# = Max(RoomTemplateAmount/67.0,1)
+	
+	y = y-((ScrollMenuY#*RA)*height)
 	For rt.RoomTemplates = Each RoomTemplates
 		;DebugLog rt\name
 		If y > 40 And y < 30+height Then 
@@ -308,20 +313,27 @@ Repeat
 			
 			If MouseY()>y+9 And MouseY()<y+9+18 Then
 				If MouseX()>x+1 And MouseX()<x+(width-1) Then
-					Rect x+1,y+9,width-3,18,False
-					If MouseHit1 Then
-						PlaySound ButtonSFX
-						If SelectedRoomTemplate = rt Then
-							SelectedRoomTemplate = Null
-						Else
-							SelectedRoomTemplate = rt
-							SelectedX=0
-							SelectedY=0
+					If (Not LockRoom(rt))
+						Rect x+1,y+9,width-3,18,False
+						If MouseHit1 Then
+							PlaySound ButtonSFX
+							If SelectedRoomTemplate = rt Then
+								SelectedRoomTemplate = Null
+							Else
+								SelectedRoomTemplate = rt
+								SelectedX=0
+								SelectedY=0
+							EndIf
 						EndIf
 					EndIf
 				EndIf
 			EndIf
 			
+			If LockRoom(rt)
+				Color 255,0,0
+				Rect x+1,y+9,width-3,18,True
+			EndIf
+			Color 0,0,0
 			Text x+10, y+10, rt\Name
 		EndIf
 		y=y+18
@@ -333,7 +345,7 @@ Repeat
 	
 	ScrollMenuY# = DrawScrollBar(x,y,width,height,x, y + ((height - ScrollMenuHeight) * ScrollMenuY),20,ScrollMenuHeight,ScrollMenuY,1)
 	
-	ScrollMenuHeight = height * ((height / 15) / Max(RoomTemplateAmount, height / 15)) ;' palkin korkeus	 
+	ScrollMenuHeight = height * ((height / 15) / Max(RoomTemplateAmount, height / 15)) ;' palkin korkeus
 	
 	x = 20+240
 	y = 50
@@ -560,9 +572,24 @@ Repeat
 		If CurrMap = "" Then CurrMap = SavePath
 		SaveMap("Maps\"+SavePath)
 		LoadSavedMaps()
-	EndIf	
+	EndIf
 	
 	SavePath$ = Left(InputBox(x,y+25,width,height,SavePath),15)
+	
+	y = y + 80
+	
+	If Button(x,y,width,height, "New map") Then
+		CurrMap = ""
+		SavePath = ""
+		For i = 0 To MapWidth-1
+			For j = 0 To MapHeight-1
+				Map(i, j) = Null
+				MapAngle(i, j) = 0
+				MapEvent$(i, j) = ""
+				MapEventProb#(i, j) = 0
+			Next
+		Next
+	EndIf
 	
 	If Button(x+width/2, 15, width/2, height, "QUIT") Then End
 	
@@ -732,14 +759,28 @@ Function DrawScrollBar#(x, y, width, height, barx, bary, barwidth, barheight, ba
 	If MouseDown1 Then
 		If MouseX()>barx And MouseX()<barx+barwidth Then
 			If MouseY()>bary And MouseY()<bary+barheight Then
-				If dir = 0 Then
-					Return Min(Max(bar + MouseSpeedX / Float(width - barwidth), 0), 1)
-				Else
-					Return Min(Max(bar + MouseSpeedY / Float(height - barheight), 0), 1)
-				End If				
+				OnSideBar% = True
 			EndIf
 		EndIf
+		
+		If OnSideBar
+			If dir = 0 Then
+				Return Min(Max(bar + MouseSpeedX / Float(width - barwidth), 0), 1)
+			Else
+				Return Min(Max(bar + MouseSpeedY / Float(height - barheight), 0), 1)
+			End If
+		EndIf
+	Else
+		OnSideBar = False
 	End If
+	
+	If MouseSpeedZ <> 0
+		If dir = 0 Then
+			Return Min(Max(bar + -(MouseSpeedZ*10) / Float(width - barwidth), 0), 1)
+		Else
+			Return Min(Max(bar + -(MouseSpeedZ*10) / Float(height - barheight), 0), 1)
+		End If
+	EndIf
 	
 	Return bar
 
@@ -1016,10 +1057,18 @@ End Function
 
 
 
-
+Function LockRoom(rt.RoomTemplates)
+	
+	If rt\Name = "173" Then Return True
+	If rt\Name = "start" Then Return True
+	If rt\Name = "gatea" Then Return True
+	If rt\Name = "pocketdimension" Then Return True
+	If rt\Name = "dimension1499" Then Return True
+	
+End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#C#1E#23E#26C#27D#294#2A7#2B3#2C4#347#35C#36A#370#374#378#382#386#38B#3DB#3E9
-;~F#3F1
+;~F#C#15#1E#49#259#287#298#2AF#2C2#2CE#316#32B#348#360#370#385#393#399#39D#3A1
+;~F#3AB#3AF#3B4#404#412#41A
 ;~C#Blitz3D
