@@ -1582,7 +1582,11 @@ Function LoadSaveGames()
 		file$=NextFile$(myDir) 
 		If file$="" Then Exit 
 		If FileType(SavePath+"\"+file$) = 2 Then 
-			If file <> "." And file <> ".." Then SaveGameAmount=SaveGameAmount+1
+			If file <> "." And file <> ".." Then 
+				If (FileType(SavePath + file + "\save.txt")>0) Then
+					SaveGameAmount=SaveGameAmount+1
+				EndIf
+			EndIf
 		End If 
 	Forever 
 	CloseDir myDir 
@@ -1596,8 +1600,10 @@ Function LoadSaveGames()
 		If file$="" Then Exit 
 		If FileType(SavePath+"\"+file$) = 2 Then 
 			If file <> "." And file <> ".." Then 
-				SaveGames(i) = file
-				i=i+1
+				If (FileType(SavePath + file + "\save.txt")>0) Then
+					SaveGames(i) = file
+					i=i+1
+				EndIf
 			EndIf
 		End If 
 	Forever 
