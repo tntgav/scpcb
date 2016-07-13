@@ -1,12 +1,15 @@
 
-Graphics 150,100,0,2
+Graphics 480,240,0,2
 SetBuffer BackBuffer()
+
+AppTitle "SCP-CB Map Creator - Select Resolution"
 
 Global ResolutionSelect% = GetINIInt("..\options.INI","map creator","resolution select")
 Global ResWidth2% = GetINIInt("..\options.INI","map creator","width")
 Global ResHeight2% = GetINIInt("..\options.INI","map creator","height")
 Global ResWidth% = 150
 Global ResHeight% = 100
+Global ResolutionSelect2% = ResolutionSelect%
 
 Global MouseDown1%, MouseHit1%, MouseDown2%, MouseSpeedX#, MouseSpeedY#, MouseSpeedZ#
 Global SelectedTextBox% = 0
@@ -14,57 +17,116 @@ Global PrevSelectedTextBox% = 0
 
 Global ResFactor# = 1.0
 
-Global CorrectRatio% = 1
-
 Global G_desktop_screen_width
 Global G_desktop_screen_height
 GetDesktopSize()
 
+Global Modes = CountGfxModes()
+
+Dim IsGoodMode(Modes+1)
+Global ValidModes = 0
+Dim HasDepth(3)
+
+If ResolutionSelect%
+	For i = 1 To Modes
+		If Float(GfxModeWidth(i))/Float(GfxModeHeight(i)) < 1.34 And Float(GfxModeWidth(i))/Float(GfxModeHeight(i)) > 1.32
+			IsGoodMode(i)=True
+			ValidModes = i
+		EndIf
+		If GfxModeDepth(i)=16
+			HasDepth(0)=True
+		EndIf
+		If GfxModeDepth(i)=24
+			HasDepth(1)=True
+		EndIf
+		If GfxModeDepth(i)=32
+			HasDepth(2)=True
+		EndIf
+		
+	Next
+	
+	DebugLog ValidModes
+	
+	If HasDepth(0)=True And HasDepth(1)=True And HasDepth(2)=True
+		ValidModes = ValidModes/3
+	ElseIf HasDepth(0)=True And HasDepth(1)=True
+		ValidModes = ValidModes/2
+	ElseIf HasDepth(0)=True And HasDepth(2)=True
+		ValidModes = ValidModes/2
+	ElseIf HasDepth(1)=True And HasDepth(2)=True
+		ValidModes = ValidModes/2
+	EndIf
+	
+	DebugLog ValidModes
+EndIf
+
+ChangeDir ".."
+
+Global ButtonSFX% = LoadSound_Strict("SFX\Button.ogg")
+
+ChangeDir "Map Creator"
+
+If Not ResolutionSelect Then Goto Skip
+
 Repeat
 	Cls
-	Local x2 = 15
-	Local y2 = 30
-	Local width2 = 50
-	Local height2 = 25
+	Local x2 = 0
+	Local y2 = 0
+	Local width2 = 80
+	Local height2 = 50
 	MouseDown1 = MouseDown(1)
 	MouseHit1 = MouseHit(1)
 	
-	PrevSelectedTextBox% = SelectedTextBox%
-	
-	Color 200,200,200
-	Text 75,0,"Correct Aspect",1
-	Text 75,12,"Ratio: 4/3",1
-	
-	ResWidth2% = Int(Left(InputBox(0,y2,width2,height2,ResWidth2%,1),5))
-	ResHeight2% = Int(Left(InputBox(150-width2,y2,width2,height2,ResHeight2%,2),5))
-	
-	If ResHeight2% <> 0 Then
-		If Left(Float(ResWidth2%)/Float(ResHeight2%),5) = 1.333 Then
-			CorrectRatio% = True
-		Else
-			CorrectRatio% = False
+	For i = 1 To ValidModes
+		;x2 = (width2/ValidModes) Mod 6
+		If IsGoodMode(i)
+			If Button(x2,y2,width2,height2,GfxModeWidth(i)+"X"+GfxModeHeight(i))
+				ResWidth2 = GfxModeWidth(i)
+				ResHeight2 = GfxModeHeight(i)
+			EndIf
+			x2=x2+width2
+			If x2 > 460
+				x2=0
+				y2=y2+height2
+			EndIf
 		EndIf
-	Else
-		CorrectRatio% = False
-	EndIf
-	
-	If SelectedTextBox% = 0
-		If PrevSelectedTextBox% = 1
-			ResHeight2% = Floor(ResWidth2%/1.33333333)
-		ElseIf PrevSelectedTextBox% = 2
-			ResWidth2% = Ceil(ResHeight2%*1.33333333)
+		Color 255,255,255
+		If GfxModeWidth(i)=ResWidth2 And GfxModeHeight(i)=ResHeight2
+			Text 240,240-height2-20,"Selected Resolution: "+GfxModeWidth(i)+"X"+GfxModeHeight(i),1,1
 		EndIf
-	EndIf
+	Next
 	
-	If Button(0,100-height2,width2,height2,"QUIT") Then End
+	If Button(0,240-height2,width2,height2,"QUIT") Then End
 	
-	If Button(150-width2,100-height2,width2,height2,"START",Not CorrectRatio) Then
+	If Button(480-width2,240-height2,width2,height2,"START") Then
 		PutINIValue("..\options.INI","map creator","width",ResWidth2%)
 		PutINIValue("..\options.INI","map creator","height",ResHeight2%)
+		PutINIValue("..\options.INI","map creator","resolution select",ResolutionSelect2%)
 		ResolutionSelect% = False
 	EndIf
+	
+	Color 255,255,255
+	Text 150,240-height2,"Resolution"
+	Text 150,255-height2,"Selection:"
+	
+	If ResolutionSelect2
+		Color 0,255,0
+		Text 150,270-height2,"Enabled"
+		If Button(240,240-height2,width2,height2,"Disable")
+			ResolutionSelect2 = False
+		EndIf
+	Else
+		Color 255,0,0
+		Text 150,270-height2,"Disabled"
+		If Button(240,240-height2,width2,height2,"Enable")
+			ResolutionSelect2 = True
+		EndIf
+	EndIf
+	
 	Flip
 Until ResolutionSelect% = False
+
+.Skip
 
 ResWidth = ResWidth2
 ResHeight = ResHeight2
@@ -178,6 +240,7 @@ Function InitEvents()
 			Case "tunnel2"
 				rt\events[0]="tunnel2"
 				rt\events[1]="tunnel2smoke"
+				rt\events[2]="096spawn"
 			Case "roompj"
 				rt\events[0]="pj"
 			Case "room012"
@@ -222,9 +285,12 @@ Function InitEvents()
 			Case "room2offices3"
 				rt\events[0]="room2offices3"
 			Case "room2pipes"
-				rt\events[0]="room2pipes106"	
+				rt\events[0]="room2pipes106"
+				rt\events[1]="096spawn"
 			Case "room2pit"
 				rt\events[0]="room2pit"	
+				rt\events[1]="room2pit106"
+				rt\events[2]="096spawn"
 			Case "room2poffices2"
 				rt\events[0]="room2poffices2"					
 			Case "room2servers"
@@ -251,8 +317,10 @@ Function InitEvents()
 			Case "room3pit"
 				rt\events[0]="room3pitduck"
 				rt\events[1]="room3pit1048"
+				rt\events[2]="096spawn"
 			Case "room3tunnel"
 				rt\events[0]="room3tunnel"
+				rt\events[1]="096spawn"
 			Case "room3","room3_2" 
 				rt\events[0]="106victim"
 				rt\events[1]="106sinkhole"
@@ -262,7 +330,33 @@ Function InitEvents()
 			Case "room860"
 				rt\events[0]="room860"
 			Case "tunnel"
-				rt\events[0]="tunnel106"				
+				rt\events[0]="tunnel106"
+				rt\events[1]="096spawn"
+			Case "room2tesla_lcz"
+				rt\events[0]="room2tesla"
+			Case "room2tesla_hcz"
+				rt\events[0]="room2tesla"
+			Case "room4tunnels"
+				rt\events[0]="room4tunnels"
+				rt\events[1]="096spawn"
+			Case "room2gw"
+				rt\events[0]="room2gw"
+			Case "room2gw_b"
+				rt\events[0]="room2gw_b"
+			Case "room1162"
+				rt\events[0]="room1162"
+			Case "room2scps2"
+				rt\events[0]="room2scps2"
+			Case "room3gw"
+				rt\events[0]="room3gw"
+			Case "room2sl"
+				rt\events[0]="room2sl"
+			Case "room2_4"
+				rt\events[0]="room2pit"
+			Case "room4pit"
+				rt\events[0]="096spawn"
+			Case "room3z2"
+				rt\events[0]="096spawn"
 		End Select
 	Next
 	
@@ -271,7 +365,6 @@ End Function
 ChangeDir ".."
 
 Global Font1 = LoadFont_Strict("GFX\cour.ttf", 16*ResFactor)
-Global ButtonSFX% = LoadSound_Strict("SFX\Button.ogg")
 
 ChangeDir "Map Creator"
 SetFont Font1
@@ -566,8 +659,9 @@ Repeat
 		Text (x+130)*ResFactor, (y+80)*ResFactor, MapAngle(SelectedX,SelectedY), True
 		If Button(x+160, y+80-4, 20,20, "+") Then MapAngle(SelectedX,SelectedY)=WrapAngle(MapAngle(SelectedX,SelectedY)+90)
 		
-		Text (x+20)*ResFactor, (y+110)*ResFactor, "Events: "
-		y=y+110+20
+		Text (x+20)*ResFactor, (y+100)*ResFactor, "Events: "
+		;y=y+110+20
+		y=y+100+20
 		For i = 0 To 4
 			If Map(SelectedX,SelectedY)\events[i]<>"" Then
 				Text (x+50)*ResFactor, y*ResFactor, Map(SelectedX,SelectedY)\events[i]
@@ -722,7 +816,7 @@ Function Button%(x,y,width,height,txt$, disabled%=False)
 End Function
 
 Function Tick(x,y,selected%)
-	TextBox(x*ResFactor,y*ResFactor,13*ResFactor,13*ResFactor,"")
+	TextBox(x,y,13,13,"")
 	
 	If selected Then
 		DrawImage TickIMG, x*ResFactor, y*ResFactor
@@ -1154,6 +1248,6 @@ Function GetDesktopSize()
 	FreeBank rectangle
 End Function
 ;~IDEal Editor Parameters:
-;~F#53#5C#65#90#2D3#2E4#2FB#30E#31A#32B#362#377#394#3AC#3BC#3D1#3DF#3E5#3E9#3ED
-;~F#3F7#3FB#400#450#45E#466#46F#479
+;~F#91#9A#A3#CE#303#331#342#359#36C#378#389#3C0#3D5#3F2#40A#41A#42F#43D#443#447
+;~F#44B#455#459#45E#4AE#4BC#4C4#4CD#4D7
 ;~C#Blitz3D
