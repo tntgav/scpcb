@@ -2455,7 +2455,8 @@ Function Kill()
 		KillAnim = Rand(0,1)
 		PlaySound_Strict(DamageSFX(0))
 		If SelectedDifficulty\permaDeath Then
-			DeleteDir(SavePath + CurrSave + "\")
+			DeleteFile(CurrentDir() + SavePath + CurrSave+"\save.txt") 
+			DeleteDir(SavePath + CurrSave)
 			LoadSaveGames()
 		End If
 		
@@ -5479,7 +5480,7 @@ Function DrawMenu()
 				y = y + 80*MenuScale
 			Else
 				y = y+104*MenuScale
-				If GameSaved Then
+				If GameSaved And (Not SelectedDifficulty\permaDeath) Then
 					If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Load Game") Then
 						DrawLoading(0)
 						
