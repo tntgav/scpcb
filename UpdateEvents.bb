@@ -6083,9 +6083,11 @@ Function UpdateEvents()
 								PointEntity n\Collider,Collider
 								
 								n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[5],True), EntityY(e\room\Objects[5],True)+0.2, EntityZ(e\room\Objects[5],True))
-								n\State = 7
-								n\Reload = 70*2
+								n\State = 6
+								;n\Reload = 70*4.75
+								n\Reload = 10000
 								RotateEntity n\Collider,0,EntityYaw(e\room\NPC[1]\Collider),0
+								n\State2 = EntityYaw(n\Collider)
 								MoveEntity n\Collider,-0.65,0,0
 								e\room\NPC[2] = n
 								
@@ -6108,11 +6110,19 @@ Function UpdateEvents()
 						;Msg = ""
 						
 						If e\room\NPC[2]\State = 7
-							If e\room\NPC[2]\State3 < 70*4
+							If e\room\NPC[2]\State3 < 70*1.75
 								e\room\NPC[2]\State3 = e\room\NPC[2]\State3 + FPSfactor
 							Else
 								e\room\NPC[2]\State = 6
-								e\room\NPC[2]\Reload = e\room\NPC[1]\Reload+Rnd(15,30)
+								e\room\NPC[2]\Reload = e\room\NPC[1]\Reload+Rnd(5,10)
+							EndIf
+						ElseIf e\room\NPC[2]\State = 6 And e\room\NPC[2]\Reload > 70*4
+							If e\room\NPC[2]\State3 > -(70*4)
+								e\room\NPC[2]\State3 = e\room\NPC[2]\State3 - FPSfactor
+							Else
+								e\room\NPC[2]\State3 = 0.0
+								e\room\NPC[2]\Reload = 45
+								e\room\NPC[2]\State = 7
 							EndIf
 						EndIf
 						
@@ -7867,10 +7877,19 @@ Function UpdateEvents()
 					
 					e\EventState = 0
 					
-					;EntityPick(Camera, 1.0)
+					Local Pick1162% = True
+					Local pp% = CreatePivot(e\room\obj)
+					PositionEntity pp,976,128,-640,False
 					
-					;If PickedEntity() = e\room\Objects[0] Then
-					If EntityDistance(e\room\Objects[0],Collider)<0.75
+					For it.Items = Each Items
+						If (Not it\Picked)
+							If EntityDistance(it\obj,e\room\Objects[0])<0.75
+								Pick1162% = False
+							EndIf
+						EndIf
+					Next
+					
+					If EntityDistance(e\room\Objects[0],Collider)<0.75 And Pick1162%
 						DrawHandIcon = True
 						If MouseHit1 Then GrabbedEntity = e\room\Objects[0]
 					EndIf
@@ -7945,95 +7964,89 @@ Function UpdateEvents()
 					If e\EventState3 = 1.0
 						For itt.ItemTemplates = Each ItemTemplates
 							Select Inventory(e\EventState2)\itemtemplate\tempname
-								Case "paper"
-									If itt\tempname = "paper" And Rand(12)=1
+								Case "key"
+									If itt\tempname = "key1" Or itt\tempname = "key2" And Rand(2)=1
 										RemoveItem(Inventory(e\EventState2))
-										Inventory(e\EventState2)=CreateItem(itt\name,itt\tempname,1,1,1)
-										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
-										HideEntity Inventory(e\EventState2)\obj
-										Inventory(e\EventState2)\Picked = True
+										it.Items=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										Msg = "Something changed in your Inventory"
-										MsgTimer = 70*5
 										GiveAchievement(NTF_Achv1162)
+										MouseHit1 = False
+										DebugLog "lostkey"
 										Exit
+									EndIf
+								Case "paper","oldpaper"
+									If itt\tempname = "paper" And Rand(12)=1
+										RemoveItem(Inventory(e\EventState2))
+										it.Items=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+										EntityType(it\obj, HIT_ITEM)
+										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
+										e\EventState3 = 0.0
+										GiveAchievement(NTF_Achv1162)
+										MouseHit1 = False
 										DebugLog "paper"
+										Exit
 									EndIf
 								Case "gasmask","gasmask3","supergasmask","hazmatsuit","hazmatsuit2","hazmatsuit3"
 									If itt\tempname = "gasmask" Or itt\tempname = "gasmask3" Or itt\tempname = "supergasmask" Or itt\tempname = "hazmatsuit" Or itt\tempname = "hazmatsuit2" Or itt\tempname = "hazmatsuit3" And Rand(2)=1
 										RemoveItem(Inventory(e\EventState2))
-										Inventory(e\EventState2)=CreateItem(itt\name,itt\tempname,1,1,1)
-										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
-										HideEntity Inventory(e\EventState2)\obj
-										Inventory(e\EventState2)\Picked = True
+										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										Msg = "Something changed in your Inventory"
-										MsgTimer = 70*5
 										GiveAchievement(NTF_Achv1162)
-										Exit
+										MouseHit1 = False
 										DebugLog "gasmask hazmat"
+										Exit
 									EndIf
 								Case "key1","key2","key3"
 									If itt\tempname = "key1" Or itt\tempname = "key2" Or itt\tempname = "key3" Or itt\tempname = "misc" And Rand(6)=1
 										RemoveItem(Inventory(e\EventState2))
-										Inventory(e\EventState2)=CreateItem(itt\name,itt\tempname,1,1,1)
-										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
-										HideEntity Inventory(e\EventState2)\obj
-										Inventory(e\EventState2)\Picked = True
+										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										Msg = "Something changed in your Inventory"
-										MsgTimer = 70*5
 										GiveAchievement(NTF_Achv1162)
-										Exit
+										MouseHit1 = False
 										DebugLog "key"
+										Exit
 									EndIf
 								Case "key4","key5","key6"
 									If itt\tempname = "key4" Or itt\tempname = "key5" Or itt\tempname = "key6" Or itt\tempname = "misc" And Rand(6)=1
 										RemoveItem(Inventory(e\EventState2))
-										Inventory(e\EventState2)=CreateItem(itt\name,itt\tempname,1,1,1)
-										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
-										HideEntity Inventory(e\EventState2)\obj
-										Inventory(e\EventState2)\Picked = True
+										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										Msg = "Something changed in your Inventory"
-										MsgTimer = 70*5
 										GiveAchievement(NTF_Achv1162)
-										Exit
+										MouseHit1 = False
 										DebugLog "key #2"
+										Exit
 									EndIf
 								Case "vest","finevest"
 									If itt\tempname = "vest" Or itt\tempname = "finevest" And Rand(1)=1
 										RemoveItem(Inventory(e\EventState2))
-										Inventory(e\EventState2)=CreateItem(itt\name,itt\tempname,1,1,1)
-										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
-										HideEntity Inventory(e\EventState2)\obj
-										Inventory(e\EventState2)\Picked = True
+										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										Msg = "Something changed in your Inventory"
-										MsgTimer = 70*5
 										GiveAchievement(NTF_Achv1162)
-										Exit
+										MouseHit1 = False
 										DebugLog "vest"
+										Exit
 									EndIf
 								Default
 									If itt\tempname = "misc" And Rand(6)=1
 										RemoveItem(Inventory(e\EventState2))
-										Inventory(e\EventState2)=CreateItem(itt\name,itt\tempname,1,1,1)
-										EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
-										HideEntity Inventory(e\EventState2)\obj
-										Inventory(e\EventState2)\Picked = True
+										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										Msg = "Something changed in your Inventory"
-										MsgTimer = 70*5
 										GiveAchievement(NTF_Achv1162)
-										Exit
+										MouseHit1 = False
 										DebugLog "default"
+										Exit
 									EndIf
 							End Select
 						Next
@@ -8049,21 +8062,21 @@ Function UpdateEvents()
 						FreeEntity pvt
 						For itt.ItemTemplates = Each ItemTemplates
 							If IsItemGoodFor1162(itt) And Rand(6)=1
-								Inventory(0) = CreateItem(itt\name, itt\tempname, 1,1,1)
-								EntityType(Inventory(0)\obj, HIT_ITEM)
-								HideEntity Inventory(0)\obj
-								Inventory(0)\Picked = True
+								it = CreateItem(itt\name, itt\tempname, EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+								EntityType(it\obj, HIT_ITEM)
 								GiveAchievement(NTF_Achv1162)
+								MouseHit1 = False
 								e\EventState3 = 0.0
-								If Injuries > 20
+								If Injuries > 15
 									DeathMSG = "A big chunk of body parts were found next to SCP-1162. DNA testing identified that the body parts were all from "
 									DeathMSG = DeathMSG + "test subject D-9341. He seems to have used SCP-1162 without anything to trade with."
-									;PlaySound_Strict LoadTempSound("SFX\1162\")
+									PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
+									LightFlash = 5.0
 									Kill()
 								Else
 									PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
 									LightFlash = 5.0
-									Msg = "Something is now in your Inventory and you have high injuries"
+									Msg = "You suddenly have high injuries"
 									MsgTimer = 70*5
 								EndIf
 								Exit
@@ -8073,8 +8086,6 @@ Function UpdateEvents()
 					ElseIf e\EventState3 >= 3.0
 						If e\EventState3 < 3.1
 							PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
-							Msg = "Something changed in your Inventory"
-							MsgTimer = 70*5
 							RemoveItem(Inventory(e\EventState2))
 						Else
 							Injuries = Injuries + 5.0
@@ -8085,10 +8096,11 @@ Function UpdateEvents()
 							de.decals = CreateDecal(3, PickedX(), PickedY()+0.005, PickedZ(), 90, Rand(360), 0)
 							de\size = 0.75 : ScaleSprite de\obj, de\size, de\size
 							FreeEntity pvt
-							If Injuries > 20
+							If Injuries > 15
 								DeathMSG = "A big chunk of body parts were found next to SCP-1162. DNA testing identified that the body parts were all from "
 								DeathMSG = DeathMSG + "test subject D-9341. He seems to have used SCP-1162 without anything to trade with."
-								;PlaySound_Strict LoadTempSound("SFX\1162\")
+								PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
+								LightFlash = 5.0
 								Kill()
 							Else
 								PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
@@ -8100,16 +8112,16 @@ Function UpdateEvents()
 						EndIf
 						Select e\EventState
 							Case 1
-								Inventory(e\EventState2) = CreateItem("Lost Key","key",1,1,1)
+								it = CreateItem("Lost Key","key",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 							Case 2
-								Inventory(e\EventState2) = CreateItem("Disciplinary Hearing DH-S-4137-17092","oldpaper",1,1,1)
+								it = CreateItem("Disciplinary Hearing DH-S-4137-17092","oldpaper",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 						End Select
-						EntityType(Inventory(e\EventState2)\obj, HIT_ITEM)
-						HideEntity Inventory(e\EventState2)\obj
-						Inventory(e\EventState2)\Picked = True
+						EntityType(it\obj, HIT_ITEM)
 						GiveAchievement(NTF_Achv1162)
+						MouseHit1 = False
 						e\EventState3 = 0.0
 					EndIf
+					FreeEntity pp
 				EndIf
 				;[End Block]
 			Case "room2gw"
@@ -8752,9 +8764,9 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#1#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B
-;~F#D32#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#14BD#14CA
-;~F#14E3#157B#1731#17FD#1851#1902#19B2#1A6A#1A82#1B43#1B70#1B8D#1BB4#1BE4#1C01#1C29#1C83#1CC3#1CF4#1D07
-;~F#1DBF#1E17#1E2A#1E38#1E41#1E8D#1EAC#1FB7#2019#201E#20F9#219E#21A2
-;~B#148C#2127
+;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
+;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#14BD#14CA
+;~F#14E3#157B#1807#185B#190C#19BC#1A74#1A8C#1B4D#1B7A#1B97#1BBE#1BEE#1C0B#1C33#1C8D#1CCD#1CFE#1D11#1DC9
+;~F#1E21#1E34#1E42#1E4B#1E97#1EB6#1FC3#2025#202A#2105#21AA#21AE
+;~B#148C#2133
 ;~C#Blitz3D

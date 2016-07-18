@@ -1,5 +1,138 @@
 
-Graphics 1024,768,0,2
+Graphics 480,240,0,2
+SetBuffer BackBuffer()
+
+AppTitle "SCP-CB Map Creator - Select Resolution"
+
+Global ResolutionSelect% = GetINIInt("..\options.INI","map creator","resolution select")
+Global ResWidth2% = GetINIInt("..\options.INI","map creator","width")
+Global ResHeight2% = GetINIInt("..\options.INI","map creator","height")
+Global ResWidth% = 150
+Global ResHeight% = 100
+Global ResolutionSelect2% = ResolutionSelect%
+
+Global MouseDown1%, MouseHit1%, MouseDown2%, MouseSpeedX#, MouseSpeedY#, MouseSpeedZ#
+Global SelectedTextBox% = 0
+Global PrevSelectedTextBox% = 0
+
+Global ResFactor# = 1.0
+
+Global G_desktop_screen_width
+Global G_desktop_screen_height
+GetDesktopSize()
+
+Global Modes = CountGfxModes()
+
+Dim IsGoodMode(Modes+1)
+Global ValidModes = 0
+Dim HasDepth(3)
+
+If ResolutionSelect%
+	For i = 1 To Modes
+		If Float(GfxModeWidth(i))/Float(GfxModeHeight(i)) < 1.34 And Float(GfxModeWidth(i))/Float(GfxModeHeight(i)) > 1.32
+			IsGoodMode(i)=True
+			ValidModes = i
+		EndIf
+		If GfxModeDepth(i)=16
+			HasDepth(0)=True
+		EndIf
+		If GfxModeDepth(i)=24
+			HasDepth(1)=True
+		EndIf
+		If GfxModeDepth(i)=32
+			HasDepth(2)=True
+		EndIf
+		
+	Next
+	
+	DebugLog ValidModes
+	
+	If HasDepth(0)=True And HasDepth(1)=True And HasDepth(2)=True
+		ValidModes = ValidModes/3
+	ElseIf HasDepth(0)=True And HasDepth(1)=True
+		ValidModes = ValidModes/2
+	ElseIf HasDepth(0)=True And HasDepth(2)=True
+		ValidModes = ValidModes/2
+	ElseIf HasDepth(1)=True And HasDepth(2)=True
+		ValidModes = ValidModes/2
+	EndIf
+	
+	DebugLog ValidModes
+EndIf
+
+ChangeDir ".."
+
+Global ButtonSFX% = LoadSound_Strict("SFX\Button.ogg")
+
+ChangeDir "Map Creator"
+
+If Not ResolutionSelect Then Goto Skip
+
+Repeat
+	Cls
+	Local x2 = 0
+	Local y2 = 0
+	Local width2 = 80
+	Local height2 = 50
+	MouseDown1 = MouseDown(1)
+	MouseHit1 = MouseHit(1)
+	
+	For i = 1 To ValidModes
+		;x2 = (width2/ValidModes) Mod 6
+		If IsGoodMode(i)
+			If Button(x2,y2,width2,height2,GfxModeWidth(i)+"X"+GfxModeHeight(i))
+				ResWidth2 = GfxModeWidth(i)
+				ResHeight2 = GfxModeHeight(i)
+			EndIf
+			x2=x2+width2
+			If x2 > 460
+				x2=0
+				y2=y2+height2
+			EndIf
+		EndIf
+		Color 255,255,255
+		If GfxModeWidth(i)=ResWidth2 And GfxModeHeight(i)=ResHeight2
+			Text 240,240-height2-20,"Selected Resolution: "+GfxModeWidth(i)+"X"+GfxModeHeight(i),1,1
+		EndIf
+	Next
+	
+	If Button(0,240-height2,width2,height2,"QUIT") Then End
+	
+	If Button(480-width2,240-height2,width2,height2,"START") Then
+		PutINIValue("..\options.INI","map creator","width",ResWidth2%)
+		PutINIValue("..\options.INI","map creator","height",ResHeight2%)
+		PutINIValue("..\options.INI","map creator","resolution select",ResolutionSelect2%)
+		ResolutionSelect% = False
+	EndIf
+	
+	Color 255,255,255
+	Text 150,240-height2,"Resolution"
+	Text 150,255-height2,"Selection:"
+	
+	If ResolutionSelect2
+		Color 0,255,0
+		Text 150,270-height2,"Enabled"
+		If Button(240,240-height2,width2,height2,"Disable")
+			ResolutionSelect2 = False
+		EndIf
+	Else
+		Color 255,0,0
+		Text 150,270-height2,"Disabled"
+		If Button(240,240-height2,width2,height2,"Enable")
+			ResolutionSelect2 = True
+		EndIf
+	EndIf
+	
+	Flip
+Until ResolutionSelect% = False
+
+.Skip
+
+ResWidth = ResWidth2
+ResHeight = ResHeight2
+ResFactor# = ResHeight/768.0
+
+Graphics ResWidth,ResHeight,0,2
 SetBuffer BackBuffer()
 
 AppTitle "SCP-CB Map Creator"
@@ -107,6 +240,7 @@ Function InitEvents()
 			Case "tunnel2"
 				rt\events[0]="tunnel2"
 				rt\events[1]="tunnel2smoke"
+				rt\events[2]="096spawn"
 			Case "roompj"
 				rt\events[0]="pj"
 			Case "room012"
@@ -151,9 +285,12 @@ Function InitEvents()
 			Case "room2offices3"
 				rt\events[0]="room2offices3"
 			Case "room2pipes"
-				rt\events[0]="room2pipes106"	
+				rt\events[0]="room2pipes106"
+				rt\events[1]="096spawn"
 			Case "room2pit"
 				rt\events[0]="room2pit"	
+				rt\events[1]="room2pit106"
+				rt\events[2]="096spawn"
 			Case "room2poffices2"
 				rt\events[0]="room2poffices2"					
 			Case "room2servers"
@@ -180,8 +317,10 @@ Function InitEvents()
 			Case "room3pit"
 				rt\events[0]="room3pitduck"
 				rt\events[1]="room3pit1048"
+				rt\events[2]="096spawn"
 			Case "room3tunnel"
 				rt\events[0]="room3tunnel"
+				rt\events[1]="096spawn"
 			Case "room3","room3_2" 
 				rt\events[0]="106victim"
 				rt\events[1]="106sinkhole"
@@ -191,7 +330,33 @@ Function InitEvents()
 			Case "room860"
 				rt\events[0]="room860"
 			Case "tunnel"
-				rt\events[0]="tunnel106"				
+				rt\events[0]="tunnel106"
+				rt\events[1]="096spawn"
+			Case "room2tesla_lcz"
+				rt\events[0]="room2tesla"
+			Case "room2tesla_hcz"
+				rt\events[0]="room2tesla"
+			Case "room4tunnels"
+				rt\events[0]="room4tunnels"
+				rt\events[1]="096spawn"
+			Case "room2gw"
+				rt\events[0]="room2gw"
+			Case "room2gw_b"
+				rt\events[0]="room2gw_b"
+			Case "room1162"
+				rt\events[0]="room1162"
+			Case "room2scps2"
+				rt\events[0]="room2scps2"
+			Case "room3gw"
+				rt\events[0]="room3gw"
+			Case "room2sl"
+				rt\events[0]="room2sl"
+			Case "room2_4"
+				rt\events[0]="room2pit"
+			Case "room4pit"
+				rt\events[0]="096spawn"
+			Case "room3z2"
+				rt\events[0]="096spawn"
 		End Select
 	Next
 	
@@ -199,8 +364,7 @@ End Function
 
 ChangeDir ".."
 
-Global Font1 = LoadFont_Strict("GFX\cour.ttf", 16)
-Global ButtonSFX% = LoadSound_Strict("SFX\Button.ogg")
+Global Font1 = LoadFont_Strict("GFX\cour.ttf", 16*ResFactor)
 
 ChangeDir "Map Creator"
 SetFont Font1
@@ -214,25 +378,29 @@ MapIcons(ROOM4, 0)=LoadImage_Strict("room4.png")
 
 For i = ROOM1 To ROOM4
 	MaskImage MapIcons(i,0), 255,255,255
-	HandleImage MapIcons(i,0),8,8
+	ScaleImage MapIcons(i,0),ResFactor,ResFactor
+	HandleImage MapIcons(i,0),Floor(ImageWidth(MapIcons(i,0))/2.0),Floor(ImageHeight(MapIcons(i,0))/2.0)
 	For n = 1 To 3
 		MapIcons(i,n)=CopyImage(MapIcons(i,0))
 		MaskImage MapIcons(i,n), 255,255,255
 		RotateImage(MapIcons(i,n),90*n)
+		;ScaleImage MapIcons(i,n),ResFactor,ResFactor
 		If n = 2 
-			HandleImage MapIcons(i,n),9,9
+			HandleImage MapIcons(i,n),Ceil(ImageWidth(MapIcons(i,n))/2.0),Ceil(ImageHeight(MapIcons(i,n))/2.0)
 		Else
-			HandleImage MapIcons(i,n),8,8
+			HandleImage MapIcons(i,n),Floor(ImageWidth(MapIcons(i,n))/2.0),Floor(ImageHeight(MapIcons(i,n))/2.0)
 		EndIf
 	Next
 Next
 
 Dim Arrows(4)
 Arrows(0) = LoadImage_Strict("arrows.png")
+ScaleImage Arrows(0),ResFactor,ResFactor
 HandleImage Arrows(0),ImageWidth(Arrows(0))/2,ImageHeight(Arrows(0))/2
 For i = 1 To 3
 	Arrows(i)=CopyImage(Arrows(0))
-	HandleImage Arrows(i), ImageWidth(Arrows(0))/2,ImageHeight(Arrows(0))/2
+	;ScaleImage Arrows(i),ResFactor,ResFactor
+	HandleImage Arrows(i), ImageWidth(Arrows(i))/2,ImageHeight(Arrows(i))/2
 	RotateImage Arrows(i), i*90
 Next
 
@@ -269,11 +437,12 @@ For rt.RoomTemplates = Each RoomTemplates
 	RoomTemplateAmount = RoomTemplateAmount + 1
 Next
 
-Global MouseDown1%, MouseHit1%, MouseDown2%, MouseSpeedX#, MouseSpeedY#
-Global SelectedTextBox% = 0
 Global TickIMG = LoadImage_Strict("tickimg.png")
+ScaleImage TickIMG,ResFactor,ResFactor
 
 strtemp$ = "aaaa"
+
+Global OnSideBar% = False
 
 Repeat
 	
@@ -285,6 +454,7 @@ Repeat
 	MouseDown2 = MouseDown(2)
 	MouseSpeedX# = MouseXSpeed()
 	MouseSpeedY# = MouseYSpeed()
+	MouseSpeedZ# = MouseZSpeed()
 	
 	
 	Cls
@@ -296,33 +466,42 @@ Repeat
 	height = 768-70
 	TextBox (x,y,width,height,"")
 	
-	y = y-(ScrollMenuY#*height)
+	Local RA# = Max(RoomTemplateAmount/67.0,1)
+	
+	y = y-((ScrollMenuY#*RA)*height)
 	For rt.RoomTemplates = Each RoomTemplates
 		;DebugLog rt\name
 		If y > 40 And y < 30+height Then 
 			If SelectedRoomTemplate = rt Then 
 				Color 170, 170, 170
-				Rect x+2,y+10,width-4,16
+				Rect (x+2)*ResFactor,(y+10)*ResFactor,(width-4)*ResFactor,FontHeight()+1*ResFactor
 				Color 0,0,0
 			EndIf			
 			
-			If MouseY()>y+9 And MouseY()<y+9+18 Then
-				If MouseX()>x+1 And MouseX()<x+(width-1) Then
-					Rect x+1,y+9,width-3,18,False
-					If MouseHit1 Then
-						PlaySound ButtonSFX
-						If SelectedRoomTemplate = rt Then
-							SelectedRoomTemplate = Null
-						Else
-							SelectedRoomTemplate = rt
-							SelectedX=0
-							SelectedY=0
+			If MouseY()>(y+9)*ResFactor And MouseY()<(y+9+18)*ResFactor Then
+				If MouseX()>(x+1)*ResFactor And MouseX()<(x+(width-1))*ResFactor Then
+					If (Not LockRoom(rt))
+						Rect (x+1)*ResFactor,(y+9)*ResFactor,(width-3)*ResFactor,FontHeight()+2*ResFactor,False
+						If MouseHit1 Then
+							PlaySound ButtonSFX
+							If SelectedRoomTemplate = rt Then
+								SelectedRoomTemplate = Null
+							Else
+								SelectedRoomTemplate = rt
+								SelectedX=0
+								SelectedY=0
+							EndIf
 						EndIf
 					EndIf
 				EndIf
 			EndIf
 			
-			Text x+10, y+10, rt\Name
+			If LockRoom(rt)
+				Color 255,0,0
+				Rect (x+1)*ResFactor,(y+9)*ResFactor,(width-3)*ResFactor,FontHeight()+2*ResFactor,True
+			EndIf
+			Color 0,0,0
+			Text (x+10)*ResFactor, (y+10)*ResFactor, rt\Name
 		EndIf
 		y=y+18
 	Next
@@ -333,7 +512,7 @@ Repeat
 	
 	ScrollMenuY# = DrawScrollBar(x,y,width,height,x, y + ((height - ScrollMenuHeight) * ScrollMenuY),20,ScrollMenuHeight,ScrollMenuY,1)
 	
-	ScrollMenuHeight = height * ((height / 15) / Max(RoomTemplateAmount, height / 15)) ;' palkin korkeus	 
+	ScrollMenuHeight = (height * ((height / 15) / Max(RoomTemplateAmount, height / 15))) ;' palkin korkeus
 	
 	x = 20+240
 	y = 50
@@ -342,9 +521,9 @@ Repeat
 	TextBox (x,y,width,height,"")
 	
 	If Saved Then 
-		Text x+width/2, y+15, CurrMap, True
+		Text (x+width/2)*ResFactor, (y+15)*ResFactor, CurrMap, True
 	ElseIf CurrMap<>""
-		Text x+width/2, y+15, CurrMap+"*", True
+		Text (x+width/2)*ResFactor, (y+15)*ResFactor, CurrMap+"*", True
 	EndIf
 	
 	
@@ -371,7 +550,7 @@ Repeat
 			If SelectedX> 0 Then 
 				If mx=SelectedX And my=SelectedY Then
 					Color 200,200,200
-					Rect(x + mx * 20+1, y + my * 20+1, 17, 17)
+					Rect((x + mx * 20+1)*ResFactor, (y + my * 20+1)*ResFactor, 17*ResFactor, 17*ResFactor)
 				EndIf
 			EndIf			
 			
@@ -382,21 +561,21 @@ Repeat
 					Color 170, 170, 170
 				EndIf
 				
-				Rect(x + mx * 20, y + my * 20, 19, 19,False)
+				Rect((x + mx * 20)*ResFactor, (y + my * 20)*ResFactor, 19*ResFactor, 19*ResFactor,False)
 			Else
 				Color 0,0,0
-				DrawImage(MapIcons(Map(mx,my)\Shape, Floor(MapAngle(mx,my)/90.0)), x + mx * 20 + 9, y + my * 20 + 9)
+				DrawImage(MapIcons(Map(mx,my)\Shape, Floor(MapAngle(mx,my)/90.0)), (x + mx * 20 + 9)*ResFactor, (y + my * 20 + 9)*ResFactor)
 				Color 100,100,100
-				If Map(mx,my)\Large Then Rect (x + mx * 20 - 9, y + my * 20 - 9, 38, 38,False)
+				If Map(mx,my)\Large Then Rect ((x + mx * 20 - 9)*ResFactor, (y + my * 20 - 9)*ResFactor, 38*ResFactor, 38*ResFactor,False)
 				;Rect(x + mx * 20, y + my * 20, 19, 19,False)
 			End If
 			
-			If MouseX()>x + mx * 20 And mx>0 And mx<MapWidth Then
-				If MouseX()<x + mx * 20+19 Then
-					If MouseY()>y + my * 20 And my > 0 And my < MapHeight Then
-						If MouseY()<y + my * 20+19 Then
+			If MouseX()>(x + mx * 20)*ResFactor And mx>0 And mx<MapWidth Then
+				If MouseX()<(x + mx * 20+19)*ResFactor Then
+					If MouseY()>(y + my * 20)*ResFactor And my > 0 And my < MapHeight Then
+						If MouseY()<(y + my * 20+19)*ResFactor Then
 							Color 0,0,0
-							Rect(x + mx * 20+1, y + my * 20+1, 17, 17,False)
+							Rect((x + mx * 20+1)*ResFactor, (y + my * 20+1)*ResFactor, 17*ResFactor, 17*ResFactor,False)
 							
 							If MouseHit1 Then
 								If SelectedRoomTemplate <> Null Then
@@ -447,11 +626,11 @@ Repeat
 	
 	If MouseDown1 And Map(SelectedX, SelectedY)<>Null Then
 		If RotateRoom Then 
-			DrawImage Arrows(Floor(MapAngle(SelectedX, SelectedY)/90)), x + SelectedX*20 + 10, y + SelectedY*20 + 10
+			DrawImage Arrows(Floor(MapAngle(SelectedX, SelectedY)/90)), (x + SelectedX*20 + 10)*ResFactor, (y + SelectedY*20 + 10)*ResFactor
 			
-			If Distance(x + SelectedX*20 + 10, y + SelectedY*20 + 10, MouseX(), MouseY())>15 Then
+			If Distance((x + SelectedX*20 + 10)*ResFactor, (y + SelectedY*20 + 10)*ResFactor, MouseX(), MouseY())>15*ResFactor Then
 				Saved = False
-				MapAngle(SelectedX, SelectedY) = WrapAngle(Floor((GetAngle(x + SelectedX*20 + 10, y + SelectedY*20 + 10, MouseX(), MouseY())+45.0)/90.0)*90.0-90)
+				MapAngle(SelectedX, SelectedY) = WrapAngle(Floor((GetAngle((x + SelectedX*20 + 10)*ResFactor, (y + SelectedY*20 + 10)*ResFactor, MouseX(), MouseY())+45.0)/90.0)*90.0-90)
 			EndIf
 		EndIf
 	Else
@@ -466,32 +645,33 @@ Repeat
 	TextBox (x,y,width,height,"")
 	
 	If SelectedRoomTemplate <> Null Then
-		Text x+20, y+20, "Selected room template: "+SelectedRoomTemplate\Name
-		Text x+20, y+50, SelectedRoomTemplate\Description
+		Text (x+20)*ResFactor, (y+20)*ResFactor, "Selected room template: "+SelectedRoomTemplate\Name
+		Text (x+20)*ResFactor, (y+50)*ResFactor, SelectedRoomTemplate\Description
 		
 		If Button(x+20, y+80, 150,25, "Deselect") Then SelectedRoomTemplate = Null
 		
 	ElseIf SelectedX <> 0
-		Text x+20, y+20, "Selected room: " +Map(SelectedX,SelectedY)\Name
-		Text x+20, y+50, Map(SelectedX,SelectedY)\Description
+		Text (x+20)*ResFactor, (y+20)*ResFactor, "Selected room: " +Map(SelectedX,SelectedY)\Name
+		Text (x+20)*ResFactor, (y+50)*ResFactor, Map(SelectedX,SelectedY)\Description
 		
-		Text x+20, y+80, "Angle: "
+		Text (x+20)*ResFactor, (y+80)*ResFactor, "Angle: "
 		If Button(x+80, y+80-4, 20,20, "-") Then MapAngle(SelectedX,SelectedY)=WrapAngle(MapAngle(SelectedX,SelectedY)-90)
-		Text x+130, y+80, MapAngle(SelectedX,SelectedY), True
+		Text (x+130)*ResFactor, (y+80)*ResFactor, MapAngle(SelectedX,SelectedY), True
 		If Button(x+160, y+80-4, 20,20, "+") Then MapAngle(SelectedX,SelectedY)=WrapAngle(MapAngle(SelectedX,SelectedY)+90)
 		
-		Text x+20, y+110, "Events: "
-		y=y+110+20
+		Text (x+20)*ResFactor, (y+100)*ResFactor, "Events: "
+		;y=y+110+20
+		y=y+100+20
 		For i = 0 To 4
 			If Map(SelectedX,SelectedY)\events[i]<>"" Then
-				Text x+50, y, Map(SelectedX,SelectedY)\events[i]
+				Text (x+50)*ResFactor, y*ResFactor, Map(SelectedX,SelectedY)\events[i]
 				If Tick(x+20, y, (MapEvent(SelectedX,SelectedY)=Map(SelectedX,SelectedY)\events[i])) Then
 					MapEvent(SelectedX,SelectedY)=Map(SelectedX,SelectedY)\events[i]
 					If Button(x+240, y-4, 20,20, "-") Then 
 						MapEventProb(SelectedX,SelectedY) = Max(MapEventProb(SelectedX,SelectedY)-0.1, 0.0)
 						Saved = False
 					EndIf
-					Text x+335, y, "Probability: "+ MapEventProb(SelectedX,SelectedY), True
+					Text (x+335)*ResFactor, y*ResFactor, "Probability: "+ MapEventProb(SelectedX,SelectedY), True
 					If Button(x+410, y-4, 20,20, "+") Then 
 						MapEventProb(SelectedX,SelectedY) = Min(MapEventProb(SelectedX,SelectedY)+0.1, 1.0)		
 						Saved = False
@@ -512,27 +692,27 @@ Repeat
 	TextBox (x,y,width,height,"")
 	
 	
-	Text x+20,y+20,"Saved maps: "
+	Text (x+20)*ResFactor,(y+20)*ResFactor,"Saved maps: "
 	y=y+40
 	For i = 0 To 20
 		If SavedMaps(i)<>"" Then
 			If CurrMap = SavedMaps(i) Then 
 				Color 170, 170, 170
-				Rect x+2,y,width-4,20
+				Rect (x+2)*ResFactor,y*ResFactor,(width-4)*ResFactor,20*ResFactor
 				Color 0,0,0
 				If Saved Then 
-					Text x+20, y+2, SavedMaps(i)
+					Text (x+20)*ResFactor, (y+2)*ResFactor, SavedMaps(i)
 				Else
-					Text x+20, y+2, SavedMaps(i)+"*"	
+					Text (x+20)*ResFactor, (y+2)*ResFactor, SavedMaps(i)+"*"	
 				EndIf
 			Else
-				Text x+20, y+2, SavedMaps(i)
+				Text (x+20)*ResFactor, (y+2)*ResFactor, SavedMaps(i)
 			EndIf
 			
 			
-			If MouseX()>x And MouseX()<x+width Then
-				If MouseY()> y And MouseY()<y+19 Then
-					Rect x+1,y,width-3,20,False
+			If MouseX()>x*ResFactor And MouseX()<(x+width)*ResFactor Then
+				If MouseY()> y*ResFactor And MouseY()<(y+19)*ResFactor Then
+					Rect (x+1)*ResFactor,y*ResFactor,(width-3)*ResFactor,20*ResFactor,False
 					If MouseHit1 Then 
 						PlaySound ButtonSFX
 						SavePath = SavedMaps(i)
@@ -560,9 +740,26 @@ Repeat
 		If CurrMap = "" Then CurrMap = SavePath
 		SaveMap("Maps\"+SavePath)
 		LoadSavedMaps()
-	EndIf	
+	EndIf
 	
 	SavePath$ = Left(InputBox(x,y+25,width,height,SavePath),15)
+	
+	y = y + 80
+	
+	If Button(x,y,width,height, "New map") Then
+		CurrMap = ""
+		SavePath = ""
+		SelectedX = 0
+		SelectedY = 0
+		For i = 0 To MapWidth-1
+			For j = 0 To MapHeight-1
+				Map(i, j) = Null
+				MapAngle(i, j) = 0
+				MapEvent$(i, j) = ""
+				MapEventProb#(i, j) = 0
+			Next
+		Next
+	EndIf
 	
 	If Button(x+width/2, 15, width/2, height, "QUIT") Then End
 	
@@ -577,8 +774,8 @@ Function Button%(x,y,width,height,txt$, disabled%=False)
 	
 	Color ClrR, ClrG, ClrB
 	If Not disabled Then 
-		If MouseX() > x And MouseX() < x+width Then
-			If MouseY() > y And MouseY() < y+height Then
+		If MouseX() > x*ResFactor And MouseX() < (x+width)*ResFactor Then
+			If MouseY() > y*ResFactor And MouseY() < (y+height)*ResFactor Then
 				If MouseDown1 Then
 					Pushed = True
 					Color ClrR*0.6, ClrG*0.6, ClrB*0.6
@@ -590,28 +787,28 @@ Function Button%(x,y,width,height,txt$, disabled%=False)
 	EndIf
 	
 	If Pushed Then 
-		Rect x,y,width,height
+		Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor
 		Color 133,130,125
-		Rect x+1,y+1,width-1,height-1,False	
+		Rect (x+1)*ResFactor,(y+1)*ResFactor,(width-1)*ResFactor,(height-1)*ResFactor,False	
 		Color 10,10,10
-		Rect x,y,width,height,False
+		Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor,False
 		Color 250,250,250
-		Line x,y+height-1,x+width-1,y+height-1
-		Line x+width-1,y,x+width-1,y+height-1
+		Line x*ResFactor,(y+height-1)*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor
+		Line (x+width-1)*ResFactor,y*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor
 	Else
-		Rect x,y,width,height
+		Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor
 		Color 133,130,125
-		Rect x,y,width-1,height-1,False	
+		Rect x*ResFactor,y*ResFactor,(width-1)*ResFactor,(height-1)*ResFactor,False	
 		Color 250,250,250
-		Rect x,y,width,height,False
+		Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor,False
 		Color 10,10,10
-		Line x,y+height-1,x+width-1,y+height-1
-		Line x+width-1,y,x+width-1,y+height-1		
+		Line x*ResFactor,(y+height-1)*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor
+		Line (x+width-1)*ResFactor,y*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor		
 	EndIf
 	
 	Color 255,255,255
 	If disabled Then Color 70,70,70
-	Text x+width/2, y+height/2-1, txt, True, True
+	Text (x+width/2)*ResFactor,(y+height/2-1)*ResFactor, txt, True, True
 	
 	Color 0,0,0
 	
@@ -622,11 +819,11 @@ Function Tick(x,y,selected%)
 	TextBox(x,y,13,13,"")
 	
 	If selected Then
-		DrawImage TickIMG, x, y
+		DrawImage TickIMG, x*ResFactor, y*ResFactor
 	EndIf
 	
-	If MouseX() > x And MouseX() < x+13 Then
-		If MouseY() > y And MouseY() < y+13 Then
+	If MouseX() > x*ResFactor And MouseX() < (x+13)*ResFactor Then
+		If MouseY() > y*ResFactor And MouseY() < (y+13)*ResFactor Then
 			If MouseHit1 Then PlaySound ButtonSFX : Return (Not selected)
 		EndIf
 	EndIf	
@@ -640,8 +837,8 @@ Function InputBox$(x,y,width,height,Txt$,ID=0)
 	
 	Local MouseOnBox = False
 	
-	If MouseX() > x And MouseX() < x+width Then
-		If MouseY() > y And MouseY() < y+height Then
+	If MouseX() > x*ResFactor And MouseX() < (x+width)*ResFactor Then
+		If MouseY() > y*ResFactor And MouseY() < (y+height)*ResFactor Then
 			MouseOnBox = True
 			If MouseHit1 Then SelectedTextBox = ID : FlushKeys
 		EndIf
@@ -652,7 +849,7 @@ Function InputBox$(x,y,width,height,Txt$,ID=0)
 	If SelectedTextBox = ID Then
 		Txt = rInput(Txt)
 		Color 0,0,0
-		If (MilliSecs() Mod 800) < 400 Then  Rect x+width/2 + StringWidth(Txt)/2 + 2, y+height/2-5, 2, 12
+		If (MilliSecs() Mod 800) < 400 Then  Rect ((x+width/2 + StringWidth(Txt)/2 + 2))*ResFactor, (y+height/2-5)*ResFactor, 2*ResFactor, 12*ResFactor
 	EndIf
 	
 	Return Txt
@@ -660,21 +857,21 @@ End Function
 
 Function TextBox(x,y,width,height,Txt$)
 	Color 255,255,255
-	Rect x,y,width,height
+	Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor
 	
 	Color 128,128,128
-	Rect x,y,width,height,False
+	Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor,False
 	Color 64,64,64
-	Rect x+1,y+1,width-2,height-2,False	
+	Rect (x+1)*ResFactor,(y+1)*ResFactor,(width-2)*ResFactor,(height-2)*ResFactor,False	
 	Color 255,255,255
-	Line x+width-1,y,x+width-1, y+height-1
-	Line x, y+height-1, x+width-1, y+height-1	
+	Line (x+width-1)*ResFactor,y*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor
+	Line x*ResFactor,(y+height-1)*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor
 	Color 212, 208, 199
-	Line x+width-2,y+1,x+width-2, y+height-2
-	Line x+1, y+height-2, x+width-2, y+height-2
+	Line (x+width-2)*ResFactor,(y+1)*ResFactor,(x+width-2)*ResFactor,(y+height-2)*ResFactor
+	Line (x+1)*ResFactor,(y+height-2)*ResFactor,(x+width-2)*ResFactor,(y+height-2)*ResFactor
 	
 	Color 0,0,0
-	Text x+width/2, y+height/2, Txt, True, True
+	Text (x+width/2)*ResFactor,(y+height/2)*ResFactor, Txt, True, True
 End Function
 
 Function rInput$(aString$)
@@ -692,7 +889,7 @@ End Function
 Function SlideBar#(x, y, leveys, arvo)
 	
 	If MouseDown(1) Then
-		If MouseX() >= x-5 And MouseX() <= x+leveys+15 And MouseY() >= y-5 And MouseY() <= y+5 Then
+		If MouseX() >= (x-5)*ResFactor And MouseX() <= (x+leveys+15)*ResFactor And MouseY() >= (y-5)*ResFactor And MouseY() <= (y+5)*ResFactor Then
 			arvo = Min(Max((MouseX()-x-5)*100/leveys, 0), 100)
 		EndIf
 	EndIf
@@ -710,36 +907,50 @@ Function DrawScrollBar#(x, y, width, height, barx, bary, barwidth, barheight, ba
 	;0 = vaakasuuntainen, 1 = pystysuuntainen
 	
 	Color(0, 0, 0)
-	Rect(x, y, width, height)
+	Rect(x*ResFactor, y*ResFactor, width*ResFactor, height*ResFactor)
 	Button(barx, bary, barwidth, barheight, "")
 	
 	If dir = 0 Then ;vaakasuunnassa
 		If height > 10 Then
 			Color 250,250,250
-			Rect(barx + barwidth / 2, bary + 5, 2, barheight - 10)
-			Rect(barx + barwidth / 2 - 3, bary + 5, 2, barheight - 10)
-			Rect(barx + barwidth / 2 + 3, bary + 5, 2, barheight - 10)
+			Rect((barx + barwidth / 2)*ResFactor, (bary + 5)*ResFactor, 2*ResFactor, (barheight - 10)*ResFactor)
+			Rect((barx + barwidth / 2 - 3)*ResFactor, (bary + 5)*ResFactor, 2*ResFactor, (barheight - 10)*ResFactor)
+			Rect((barx + barwidth / 2 + 3)*ResFactor, (bary + 5)*ResFactor, 2*ResFactor, (barheight - 10)*ResFactor)
 		EndIf
 	Else ;pystysuunnassa
 		If width > 10 Then
 			Color 250,250,250
-			Rect(barx + 4, bary + barheight / 2, barwidth - 10, 2)
-			Rect(barx + 4, bary + barheight / 2 - 3, barwidth - 10, 2)
-			Rect(barx + 4, bary + barheight / 2 + 3, barwidth - 10, 2)
+			Rect((barx + 4)*ResFactor, (bary + barheight / 2)*ResFactor, (barwidth - 10)*ResFactor, 2*ResFactor)
+			Rect((barx + 4)*ResFactor, (bary + barheight / 2 - 3)*ResFactor, (barwidth - 10)*ResFactor, 2*ResFactor)
+			Rect((barx + 4)*ResFactor, (bary + barheight / 2 + 3)*ResFactor, (barwidth - 10)*ResFactor, 2*ResFactor)
 		EndIf
 	EndIf
 	
 	If MouseDown1 Then
-		If MouseX()>barx And MouseX()<barx+barwidth Then
-			If MouseY()>bary And MouseY()<bary+barheight Then
-				If dir = 0 Then
-					Return Min(Max(bar + MouseSpeedX / Float(width - barwidth), 0), 1)
-				Else
-					Return Min(Max(bar + MouseSpeedY / Float(height - barheight), 0), 1)
-				End If				
+		If MouseX()>barx*ResFactor And MouseX()<(barx+barwidth)*ResFactor Then
+			If MouseY()>bary*ResFactor And MouseY()<(bary+barheight)*ResFactor Then
+				OnSideBar% = True
 			EndIf
 		EndIf
+		
+		If OnSideBar
+			If dir = 0 Then
+				Return Min(Max(bar + MouseSpeedX / Float(width - barwidth), 0), 1)
+			Else
+				Return Min(Max(bar + MouseSpeedY / Float(height - barheight), 0), 1)
+			End If
+		EndIf
+	Else
+		OnSideBar = False
 	End If
+	
+	If MouseSpeedZ <> 0
+		If dir = 0 Then
+			Return Min(Max(bar + -(MouseSpeedZ*10) / Float(width - barwidth), 0), 1)
+		Else
+			Return Min(Max(bar + -(MouseSpeedZ*10) / Float(height - barheight), 0), 1)
+		End If
+	EndIf
 	
 	Return bar
 
@@ -1016,10 +1227,27 @@ End Function
 
 
 
+Function LockRoom(rt.RoomTemplates)
+	
+	If rt\Name = "173" Then Return True
+	If rt\Name = "start" Then Return True
+	If rt\Name = "gatea" Then Return True
+	If rt\Name = "pocketdimension" Then Return True
+	If rt\Name = "dimension1499" Then Return True
+	
+End Function
 
-
-
+Function GetDesktopSize()
+	; Gets the width and height of the desktop on the main monitor and returns them in
+	; the globals G_desktop_screen_width and G_desktop_screen_height.
+	
+	Local rectangle = CreateBank( 16 )
+	api_GetClientRect( api_GetDesktopWindow(), rectangle )
+	G_desktop_screen_width = PeekInt( rectangle, 8 ) - PeekInt( rectangle, 0 )
+	G_desktop_screen_height = PeekInt( rectangle, 12 ) - PeekInt( rectangle, 4 )
+	FreeBank rectangle
+End Function
 ;~IDEal Editor Parameters:
-;~F#C#1E#23E#26C#27D#294#2A7#2B3#2C4#347#35C#36A#370#374#378#382#386#38B#3DB#3E9
-;~F#3F1
+;~F#91#9A#A3#CE#303#331#342#359#36C#378#389#3C0#3D5#3F2#40A#41A#42F#43D#443#447
+;~F#44B#455#459#45E#4AE#4BC#4C4#4CD#4D7
 ;~C#Blitz3D
