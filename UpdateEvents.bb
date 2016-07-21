@@ -8129,11 +8129,7 @@ Function UpdateEvents()
 					FreeEntity pp
 				EndIf
 				;[End Block]
-			Case "room2gw"
-				;[Block]
-				
-				;[End Block]
-			Case "room3gw"
+			Case "room_gw"
 				;[Block]
 				;e\EventState: Determines if the airlock is in operation or not
 				;e\EventState2: The timer for the airlocks
@@ -8142,13 +8138,18 @@ Function UpdateEvents()
 				e\room\RoomDoors[0]\locked = True
 				e\room\RoomDoors[1]\locked = True
 				
+				Local brokendoor% = False
+				If e\room\Objects[1]<>0 Then brokendoor% = True
+				
 				If PlayerRoom = e\room
 					If e\EventState = 0.0
 						If EntityDistance(e\room\Objects[0],Collider)<1.4 And e\EventState3 = 0.0
 							e\EventState = 1.0
-							If e\Sound2 <> 0 Then FreeSound_Strict(e\Sound2) : e\Sound2 = 0
-							e\Sound2 = LoadSound_Strict("SFX\Doors\DoorSparks.ogg")
-							e\SoundCHN2 = PlaySound2(e\Sound2,Camera,e\room\Objects[1],5)
+							If brokendoor
+								If e\Sound2 <> 0 Then FreeSound_Strict(e\Sound2) : e\Sound2 = 0
+								e\Sound2 = LoadSound_Strict("SFX\Doors\DoorSparks.ogg")
+								e\SoundCHN2 = PlaySound2(e\Sound2,Camera,e\room\Objects[1],5)
+							EndIf
 							StopChannel e\SoundCHN
 							e\SoundCHN = 0
 							If e\Sound <> 0 Then FreeSound_Strict(e\Sound) : e\Sound = 0
@@ -8167,35 +8168,45 @@ Function UpdateEvents()
 							e\room\RoomDoors[1]\open = False
 							If e\EventState2 < 70*1
 								
-								pvt% = CreatePivot()
-								Local d_ent% = e\room\Objects[1]
-								PositionEntity(pvt, EntityX(d_ent%,True), EntityY(d_ent%,True)+Rnd(0.0,0.05), EntityZ(d_ent%,True))
-								RotateEntity(pvt, 0, EntityYaw(d_ent%,True)+90, 0)
-								MoveEntity pvt,0,0,0.2
-								
-								For i = 0 To 3									
-									p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 7, 0.002, 0, 25)
-									p\speed = Rnd(0.01,0.05)
-									;RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
-									RotateEntity(p\pvt, Rnd(-45,0), EntityYaw(pvt)+Rnd(-10.0,10.0), 0)
+								If brokendoor
+									pvt% = CreatePivot()
+									Local d_ent% = e\room\Objects[1]
+									PositionEntity(pvt, EntityX(d_ent%,True), EntityY(d_ent%,True)+Rnd(0.0,0.05), EntityZ(d_ent%,True))
+									RotateEntity(pvt, 0, EntityYaw(d_ent%,True)+90, 0)
+									MoveEntity pvt,0,0,0.2
 									
-									p\size = 0.0075
-									ScaleSprite p\obj,p\size,p\size
+									For i = 0 To 3									
+										p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 7, 0.002, 0, 25)
+										p\speed = Rnd(0.01,0.05)
+										;RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
+										RotateEntity(p\pvt, Rnd(-45,0), EntityYaw(pvt)+Rnd(-10.0,10.0), 0)
+										
+										p\size = 0.0075
+										ScaleSprite p\obj,p\size,p\size
+										
+										;EntityOrder p\obj,-1
+										
+										p\Achange = -0.05
+									Next
 									
-									;EntityOrder p\obj,-1
-									
-									p\Achange = -0.05
-								Next
-								
-								FreeEntity pvt
+									FreeEntity pvt
+								EndIf
 									
 							ElseIf e\EventState2 > 70*3 And e\EventState < 70*5.5
 								pvt% = CreatePivot(e\room\obj)								
 								For i = 0 To 1
-									If i = 0
-										PositionEntity pvt%,-288.0,416.0,320.0,False
+									If e\room\RoomTemplate\Name$ = "room3gw"
+										If i = 0
+											PositionEntity pvt%,-288.0,416.0,320.0,False
+										Else
+											PositionEntity pvt%,192.0,416.0,320.0,False
+										EndIf
 									Else
-										PositionEntity pvt%,192.0,416.0,320.0,False
+										If i = 0
+											PositionEntity pvt%,0.0,416.0,0.0,False
+										Else
+											PositionEntity pvt%,0.0,416.0,0.0,False
+										EndIf
 									EndIf
 									
 									p.Particles = CreateParticle(EntityX(pvt,True), EntityY(pvt,True), EntityZ(pvt,True),  6, 0.8, 0, 50)
@@ -8221,8 +8232,10 @@ Function UpdateEvents()
 						EndIf
 					EndIf
 					
-					If ChannelPlaying(e\SoundCHN2)
-						UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\Objects[1],5)
+					If brokendoor
+						If ChannelPlaying(e\SoundCHN2)
+							UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\Objects[1],5)
+						EndIf
 					EndIf
 					If ChannelPlaying(e\SoundCHN)
 						UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[0],5)
@@ -8771,7 +8784,7 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
 ;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#14C0#14CD
-;~F#14E6#157E#1734#180A#185E#190F#19BF#1A77#1A8F#1B50#1B7D#1B9A#1BC1#1BF1#1C0E#1C36#1C90#1CD0#1D01#1DCE
-;~F#1E26#1E39#1E47#1E50#1E9C#1EBB#1FC8#202A#202F#210A#21AF#21B3
-;~B#148C#2138
+;~F#14E6#157E#1734#180A#185E#190F#19BF#1A77#1A8F#1B50#1B7D#1B9A#1BC1#1BF1#1C0E#1C36#1C90#1CD0#1D01#1D14
+;~F#1DCE#1E26#1E39#1E47#1E50#1E9C#1EBB#2037#203C#2117#21BC#21C0
+;~B#148C#2145
 ;~C#Blitz3D

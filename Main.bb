@@ -1238,6 +1238,10 @@ Global DeafPlayer% = False
 Global DeafTimer# = 0.0
 
 Global IsZombie% = False
+
+Global room2gw_brokendoor% = False
+Global room2gw_x# = 0.0
+Global room2gw_z# = 0.0
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1857,7 +1861,8 @@ Function InitEvents()
 	CreateEvent("room2fan", "room2_2", 0, 1.0)
 	
 	CreateEvent("room2elevator2", "room2elevator", 0)
-	CreateEvent("room2elevator", "room2elevator", 0, 1)
+	;CreateEvent("room2elevator", "room2elevator", 0, 1)
+	CreateEvent("room2elevator", "room2elevator", Rand(1,2))
 	
 	CreateEvent("room3storage", "room3storage", 0, 0)
 	
@@ -1983,12 +1988,13 @@ Function InitEvents()
 	
 	;New Events in SCP:CB Version 1.3 - ENDSHN
 	CreateEvent("room4tunnels","room4tunnels",0)
-	CreateEvent("room2gw","room2gw",0)
+	CreateEvent("room_gw","room2gw",0,1.0)
 	CreateEvent("dimension1499","dimension1499",0)
 	CreateEvent("room1162","room1162",0)
 	CreateEvent("room2scps2","room2scps2",0)
-	CreateEvent("room3gw","room3gw",0)
+	CreateEvent("room_gw","room3gw",0,1.0)
 	CreateEvent("room2sl","room2sl",0)
+	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
 	
 	CreateEvent("096spawn","room4pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
 	CreateEvent("096spawn","room3pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
@@ -8475,10 +8481,6 @@ Function CheckTriggers$()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3C8#4A4#4FA#51B#593#655#6CD#6E4#6F1#723#7D8#8BC#98A#9A1#B5A
-;~F#C79#DE5#FCE#13BB#1446#1490#14A2#14E1#15AF#15BA#170D#178E#17BF#18BC#18CE#18EA#18F4#1901#1923#1942
-;~F#1961#197D#1991#19A6#19AA#19CA#19D2#19FD#1B9F#1C54#1C7F#1CF6#1CFC#1D06#1D12#1D1D#1D21#1D5C#1D64#1D6C
-;~F#1D73#1D7A#1D87#1D8D#1D98#1DD1#1DE0#1DFE#1E2C#1E33#1E46#1E5F#1E8C#1E97#1E9C#1EB6#1EC2#1EDD#1F2F#1F3D
-;~F#1F45#1F51#1F5A#1F83#1F88#1F8D#1F92#1F9B#1FA3#2045#204F#2074#2082#208F#20B6#20C8#20D9#20E8#20FF
-;~B#117F#19FD
+;~F#24#AC#12C#130#137#3C8#4A4#4FE#51F#597#5A4#659#6D1#6E8#6F5#727#7DE#8C2#990
+;~B#1185#1A03
 ;~C#Blitz3D
