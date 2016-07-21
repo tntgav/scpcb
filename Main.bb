@@ -159,7 +159,7 @@ Global CurrFrameLimit# = Framelimit%
 Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
 If Fullscreen Then UpdateScreenGamma()
 
-Const HIT_MAP% = 1, HIT_PLAYER% = 2, HIT_ITEM% = 3, HIT_APACHE% = 4, HIT_178% = 5
+Const HIT_MAP% = 1, HIT_PLAYER% = 2, HIT_ITEM% = 3, HIT_APACHE% = 4, HIT_178% = 5, HIT_DEAD% = 6
 SeedRnd MilliSecs()
 
 ;[End block]
@@ -894,16 +894,9 @@ Function UpdateConsole()
 					it.Items = CreateItem("Night Vision Goggles", "nvgoggles", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
 					EntityType(it\obj, HIT_ITEM)
 					it\state = 1000
-				Case "teleportguard"
-					For n.NPCs = Each NPCs
-						If n\NPCtype = NPCtypeGuard
-							If n\State < 1 Or n\State > 10
-								PositionEntity n\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
-								ResetEntity n\Collider
-								Exit
-							EndIf
-						EndIf
-					Next
+				Case "teleport173"
+					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
+					ResetEntity Curr173\Collider
 				Default
 					CreateConsoleMsg("Command not found")
 			End Select
@@ -1568,9 +1561,9 @@ Function UpdateDoors()
 							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 180.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
 							If d\openstate < 15 And d\openstate+FPSfactor => 15
-								For i = 0 To 100
+								For i = 0 To Rand(75,99)
 									Local pvt% = CreatePivot()
-									PositionEntity(pvt, EntityX(d\frameobj,True)+Rnd(-0.2,0.2), EntityY(d\frameobj,True)+(0.025*i), EntityZ(d\frameobj,True)+Rnd(-0.2,0.2))
+									PositionEntity(pvt, EntityX(d\frameobj,True)+Rnd(-0.2,0.2), EntityY(d\frameobj,True)+Rnd(0.0,1.2), EntityZ(d\frameobj,True)+Rnd(-0.2,0.2))
 									RotateEntity(pvt, 0, Rnd(360), 0)
 									
 									Local p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 2, 0.002, 0, 300)
@@ -2026,6 +2019,7 @@ Collisions HIT_ITEM, HIT_MAP, 2, 2
 Collisions HIT_APACHE, HIT_APACHE, 1, 2
 Collisions HIT_178, HIT_MAP, 2, 2
 Collisions HIT_178, HIT_178, 1, 3
+Collisions HIT_DEAD, HIT_MAP, 2, 2
 
 DrawLoading(90, True)
 
@@ -8481,10 +8475,10 @@ Function CheckTriggers$()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3CF#4AB#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7DF#8C2#990#9A7
-;~F#B60#C7F#DEB#FD4#13C1#144C#1496#14A8#14E7#15B5#15C0#1713#1794#17C5#18C2#18D4#18F0#18FA#1907#1929
-;~F#1948#1967#1983#1997#19AC#19B0#19D0#19D8#1A03#1BA5#1C5A#1C85#1CFC#1D02#1D0C#1D18#1D23#1D27#1D62#1D6A
-;~F#1D72#1D79#1D80#1D8D#1D93#1D9E#1DD7#1DE6#1E04#1E32#1E39#1E4C#1E65#1E92#1E9D#1EA2#1EBC#1EC8#1EE3#1F35
-;~F#1F43#1F4B#1F57#1F60#1F89#1F8E#1F93#1F98#1FA1#1FA9#204B#2055#207A#2088#2095#20BC#20CE#20DF#20EE#2105
-;~B#1185#1A03
+;~F#24#AC#12C#130#137#3C8#4A4#4FA#51B#593#655#6CD#6E4#6F1#723#7D8#8BC#98A#9A1#B5A
+;~F#C79#DE5#FCE#13BB#1446#1490#14A2#14E1#15AF#15BA#170D#178E#17BF#18BC#18CE#18EA#18F4#1901#1923#1942
+;~F#1961#197D#1991#19A6#19AA#19CA#19D2#19FD#1B9F#1C54#1C7F#1CF6#1CFC#1D06#1D12#1D1D#1D21#1D5C#1D64#1D6C
+;~F#1D73#1D7A#1D87#1D8D#1D98#1DD1#1DE0#1DFE#1E2C#1E33#1E46#1E5F#1E8C#1E97#1E9C#1EB6#1EC2#1EDD#1F2F#1F3D
+;~F#1F45#1F51#1F5A#1F83#1F88#1F8D#1F92#1F9B#1FA3#2045#204F#2074#2082#208F#20B6#20C8#20D9#20E8#20FF
+;~B#117F#19FD
 ;~C#Blitz3D
