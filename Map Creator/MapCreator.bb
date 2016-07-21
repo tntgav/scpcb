@@ -340,7 +340,7 @@ Function InitEvents()
 				rt\events[0]="room4tunnels"
 				rt\events[1]="096spawn"
 			Case "room2gw"
-				rt\events[0]="room2gw"
+				rt\events[0]="room_gw"
 			Case "room2gw_b"
 				rt\events[0]="room2gw_b"
 			Case "room1162"
@@ -348,7 +348,7 @@ Function InitEvents()
 			Case "room2scps2"
 				rt\events[0]="room2scps2"
 			Case "room3gw"
-				rt\events[0]="room3gw"
+				rt\events[0]="room_gw"
 			Case "room2sl"
 				rt\events[0]="room2sl"
 			Case "room2_4"
@@ -1248,6 +1248,6 @@ Function GetDesktopSize()
 	FreeBank rectangle
 End Function
 ;~IDEal Editor Parameters:
-;~F#91#9A#A3#CE#303#331#342#359#36C#378#389#3C0#3D5#3F2#40A#41A#42F#43D#443#447
-;~F#44B#455#459#45E#4AE#4BC#4C4#4CD#4D7
+;~F#91#9A#A3#303#331#342#359#36C#378#389#3C0#3D5#3F2#40A#41A#42F#43D#443#447#44B
+;~F#455#459#45E#4AE#4BC#4C4#4CD#4D7
 ;~C#Blitz3D

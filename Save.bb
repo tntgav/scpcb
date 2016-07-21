@@ -189,6 +189,10 @@ Function SaveGame(file$)
 	
 	WriteInt f, 632
 	
+	WriteInt f, room2gw_brokendoor
+	WriteFloat f,room2gw_x
+	WriteFloat f,room2gw_z
+	
 	temp = 0
 	For r.Rooms = Each Rooms
 		temp=temp+1
@@ -619,6 +623,10 @@ Function LoadGame(file$)
 	Next
 	
 	If ReadInt(f) <> 632 Then RuntimeError("Couldn't load the game, save file corrupted (error 1)")
+	
+	room2gw_brokendoor = ReadInt(f)
+	room2gw_x = ReadFloat(f)
+	room2gw_z = ReadFloat(f)
 	
 	temp = ReadInt(f)
 	For i = 1 To temp
@@ -1247,6 +1255,10 @@ Function LoadGameQuick(file$)
 	
 	If ReadInt(f) <> 632 Then RuntimeError("Couldn't load the game, save file corrupted (error 1)")
 	
+	room2gw_brokendoor = ReadInt(f)
+	room2gw_x = ReadFloat(f)
+	room2gw_z = ReadFloat(f)
+	
 	temp = ReadInt(f)
 	For i = 1 To temp
 		Local roomtemplateID% = ReadInt(f)
@@ -1777,5 +1789,5 @@ Function LoadMap(file$)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#1A2#3F6#629#651#66F
+;~F#2#1A6#3FE#635#663#681
 ;~C#Blitz3D

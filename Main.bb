@@ -894,6 +894,10 @@ Function UpdateConsole()
 					it.Items = CreateItem("Night Vision Goggles", "nvgoggles", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
 					EntityType(it\obj, HIT_ITEM)
 					it\state = 1000
+				Case "spawnnav"
+					it.Items = CreateItem("S-NAV Navigator Ultimate", "nav", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
+					EntityType(it\obj, HIT_ITEM)
+					it\state = 101
 				Case "teleport173"
 					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
 					ResetEntity Curr173\Collider
@@ -1238,6 +1242,10 @@ Global DeafPlayer% = False
 Global DeafTimer# = 0.0
 
 Global IsZombie% = False
+
+Global room2gw_brokendoor% = False
+Global room2gw_x# = 0.0
+Global room2gw_z# = 0.0
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1857,7 +1865,8 @@ Function InitEvents()
 	CreateEvent("room2fan", "room2_2", 0, 1.0)
 	
 	CreateEvent("room2elevator2", "room2elevator", 0)
-	CreateEvent("room2elevator", "room2elevator", 0, 1)
+	;CreateEvent("room2elevator", "room2elevator", 0, 1)
+	CreateEvent("room2elevator", "room2elevator", Rand(1,2))
 	
 	CreateEvent("room3storage", "room3storage", 0, 0)
 	
@@ -1983,12 +1992,13 @@ Function InitEvents()
 	
 	;New Events in SCP:CB Version 1.3 - ENDSHN
 	CreateEvent("room4tunnels","room4tunnels",0)
-	CreateEvent("room2gw","room2gw",0)
+	CreateEvent("room_gw","room2gw",0,1.0)
 	CreateEvent("dimension1499","dimension1499",0)
 	CreateEvent("room1162","room1162",0)
 	CreateEvent("room2scps2","room2scps2",0)
-	CreateEvent("room3gw","room3gw",0)
+	CreateEvent("room_gw","room3gw",0,1.0)
 	CreateEvent("room2sl","room2sl",0)
+	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
 	
 	CreateEvent("096spawn","room4pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
 	CreateEvent("096spawn","room3pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
@@ -4847,6 +4857,7 @@ Function DrawGUI()
 							EndIf
 							
 							Local PlayerX% = Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5), PlayerZ% = Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5)
+							Local SCPs_found% = 0
 							If SelectedItem\itemtemplate\name = "S-NAV Navigator Ultimate" And (MilliSecs() Mod 600) < 400 Then
 								Local dist# = EntityDistance(Camera, Curr173\obj)
 								dist = Ceil(dist / 8.0) * 8.0
@@ -4854,28 +4865,42 @@ Function DrawGUI()
 									Color 100, 0, 0
 									Oval(x - dist * 3, y - 7 - dist * 3, dist * 3 * 2, dist * 3 * 2, False)
 									Text(x - width / 2 + 20, y - height / 2 + 20, "SCP-173")
+									SCPs_found% = SCPs_found% + 1
 								EndIf
 								dist# = EntityDistance(Camera, Curr106\obj)
 								If dist < 8.0 * 4 Then
 									Color 100, 0, 0
 									Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-									Text(x - width / 2 + 20, y - height / 2 + 40, "SCP-106")
+									Text(x - width / 2 + 20, y - height / 2 + 20 + (20*SCPs_found), "SCP-106")
+									SCPs_found% = SCPs_found% + 1
 								EndIf
 								If Curr096<>Null Then 
 									dist# = EntityDistance(Camera, Curr096\obj)
 									If dist < 8.0 * 4 Then
 										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-										Text(x - width / 2 + 20, y - height / 2 + 40, "SCP-096")
+										Text(x - width / 2 + 20, y - height / 2 + 20 + (20*SCPs_found), "SCP-096")
+										SCPs_found% = SCPs_found% + 1
 									EndIf
 								EndIf
+								For np.NPCs = Each NPCs
+									If np\NPCtype = NPCtype049
+										dist# = EntityDistance(Camera, np\obj)
+										If dist < 8.0 * 4 Then
+											Color 100, 0, 0
+											Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
+											Text(x - width / 2 + 20, y - height / 2 + 20 + (20*SCPs_found), "SCP-049")
+											SCPs_found% = SCPs_found% + 1
+										EndIf
+									EndIf
+								Next
 								
 								If PlayerRoom\RoomTemplate\Name = "coffin" Then
 									If CoffinDistance < 8.0 Then
 										dist = Rnd(4.0, 8.0)
 										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-										Text(x - width / 2 + 20, y - height / 2 + 40, "SCP-895")
+										Text(x - width / 2 + 20, y - height / 2 + 20 + (20*SCPs_found), "SCP-895")
 									EndIf
 								EndIf
 							End If
@@ -4975,12 +5000,13 @@ Function DrawGUI()
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
 					If SelectedItem\state = 0
+						Msg = "New info learned: "
 						Select SelectedItem\itemtemplate\name
 							Case "Emily Ross's Badge"
-								Msg = "New info learned: Assistant researcher "+Chr(34)+"Emily Sharon Ross"+Chr(34)
-								MsgTimer = 70*10
-								SelectedItem\state = 1
+								Msg = Msg+"Assistant researcher "+Chr(34)+"Emily Sharon Ross"+Chr(34)
 						End Select
+						MsgTimer = 70*10
+						SelectedItem\state = 1
 					EndIf
 				Case "key"
 					If SelectedItem\state = 0
@@ -5054,6 +5080,8 @@ Function DrawMenu()
 	Local x%, y%, width%, height%
 	
 	If MenuOpen Then
+		
+		;DebugLog AchievementsMenu+"|"+OptionsMenu+"|"+QuitMSG
 		
 		If StopHidingTimer = 0 Then
 			If EntityDistance(Curr173\Collider, Collider)<4.0 Or EntityDistance(Curr106\Collider, Collider)<4.0 Then 
@@ -5427,7 +5455,7 @@ Function DrawMenu()
 			EndIf
 			
 			If AchievementsMenu>0 Then
-				DebugLog AchievementsMenu
+				;DebugLog AchievementsMenu
 				If AchievementsMenu <= Floor(Float(MAXACHIEVEMENTS-1)/12.0) Then 
 					If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
 						AchievementsMenu = AchievementsMenu+1
@@ -6305,8 +6333,9 @@ Function NullGame()
 	Brightness = 40
 	StoredBrightness% = 40
 	
-	QuitMSG = 0
-	OptionsMenu = 0
+	OptionsMenu% = -1
+	QuitMSG% = -1
+	AchievementsMenu% = -1
 	
 	MusicVolume# = PrevMusicVolume
 	SFXVolume# = PrevSFXVolume
@@ -8475,10 +8504,10 @@ Function CheckTriggers$()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3C8#4A4#4FA#51B#593#655#6CD#6E4#6F1#723#7D8#8BC#98A#9A1#B5A
-;~F#C79#DE5#FCE#13BB#1446#1490#14A2#14E1#15AF#15BA#170D#178E#17BF#18BC#18CE#18EA#18F4#1901#1923#1942
-;~F#1961#197D#1991#19A6#19AA#19CA#19D2#19FD#1B9F#1C54#1C7F#1CF6#1CFC#1D06#1D12#1D1D#1D21#1D5C#1D64#1D6C
-;~F#1D73#1D7A#1D87#1D8D#1D98#1DD1#1DE0#1DFE#1E2C#1E33#1E46#1E5F#1E8C#1E97#1E9C#1EB6#1EC2#1EDD#1F2F#1F3D
-;~F#1F45#1F51#1F5A#1F83#1F88#1F8D#1F92#1F9B#1FA3#2045#204F#2074#2082#208F#20B6#20C8#20D9#20E8#20FF
-;~B#117F#19FD
+;~F#24#AC#12C#130#137#3CC#4A8#502#523#59B#5A8#65D#6D5#6EC#6F9#72B#7E2#8C6#994#9AC
+;~F#A3F#B65#C84#DF0#1463#14AD#14BF#14FE#15CC#15D7#172A#17AB#18DA#18EC#1908#1912#191F#1941#1960#197F
+;~F#199B#19AF#19C4#19C8#19E8#19F0#1A1B#1BBD#1C72#1C9D#1D14#1D1A#1D24#1D30#1D3B#1D3F#1D7A#1D82#1D8A#1D91
+;~F#1D98#1DA5#1DAB#1DB6#1DEF#1DFE#1E1C#1E4A#1E51#1E64#1E7D#1EAA#1EB5#1EBA#1ED4#1EE0#1EFB#1F4D#1F5B#1F63
+;~F#1F6F#1F78#1FA1#1FA6#1FAB#1FB0#1FB9#1FC1#2063#206D#2092#20A0#20AD#20D4#20E6#20F7#2106#211D
+;~B#1189#1A1A
 ;~C#Blitz3D

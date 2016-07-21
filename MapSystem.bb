@@ -4519,7 +4519,36 @@ Function FillRoom(r.Rooms)
             PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
 			r\RoomDoors[1]\dir = 0 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
 			r\RoomDoors[1]\MTFClose = False
-			FreeEntity r\RoomDoors[1]\obj2 : r\RoomDoors[1]\obj2 = 0
+			
+			If r\RoomTemplate\Name = "room2gw"
+				r\Objects[0] = CreatePivot()
+				;PositionEntity r\Objects[0],r\x-48.0*RoomScale,128.0*RoomScale,r\z+320.0*RoomScale
+				PositionEntity r\Objects[0],r\x+344.0*RoomScale,128.0*RoomScale,r\z
+				EntityParent r\Objects[0],r\obj
+				
+				Local bd_temp% = False
+				If room2gw_brokendoor
+					If room2gw_x = r\x
+						If room2gw_z = r\z
+							bd_temp% = True
+						EndIf
+					EndIf
+				EndIf
+				
+				If (room2gw_brokendoor = 0 And Rand(1,2)=1) Or bd_temp%
+					r\Objects[1] = CopyEntity(DoorOBJ)
+					ScaleEntity(r\Objects[1], (204.0 * RoomScale) / MeshWidth(r\Objects[1]), 312.0 * RoomScale / MeshHeight(r\Objects[1]), 16.0 * RoomScale / MeshDepth(r\Objects[1]))
+					EntityType r\Objects[1], HIT_MAP
+					PositionEntity r\Objects[1], r\x + 336.0 * RoomScale, 0.0, r\z + 462.0 * RoomScale
+					RotateEntity(r\Objects[1], 0, 180 + 180, 0)
+					EntityParent(r\Objects[1], r\obj)
+					MoveEntity r\Objects[1],120.0,0,5.0
+					room2gw_brokendoor = True
+					room2gw_x# = r\x
+					room2gw_z# = r\z
+					FreeEntity r\RoomDoors[1]\obj2 : r\RoomDoors[1]\obj2 = 0
+				EndIf
+			EndIf
 			;[End Block]
 		Case "room3gw"
 	        ;[Block]
@@ -4545,15 +4574,6 @@ Function FillRoom(r.Rooms)
 			r\Objects[0] = CreatePivot()
 			PositionEntity r\Objects[0],r\x-48.0*RoomScale,128.0*RoomScale,r\z+320.0*RoomScale
 			EntityParent r\Objects[0],r\obj
-			
-			r\Objects[1] = CopyEntity(DoorOBJ)
-			ScaleEntity(r\Objects[1], (204.0 * RoomScale) / MeshWidth(r\Objects[1]), 312.0 * RoomScale / MeshHeight(r\Objects[1]), 16.0 * RoomScale / MeshDepth(r\Objects[1]))
-			EntityType r\Objects[1], HIT_MAP
-			PositionEntity r\Objects[1], r\x + 385.0 * RoomScale, 0.0, r\z + 339.0 * RoomScale
-			RotateEntity(r\Objects[1], 0, 270 + 180, 0)
-			EntityParent(r\Objects[1], r\obj)
-			MoveEntity r\Objects[1],120.0,0,5.0
-	        
 	        ;[End Block]
 		Case "room1162"
 			;[Block]
@@ -6641,7 +6661,7 @@ Function CreateMap()
 	SetRoom("room2elevator",ROOM2,Floor(0.85*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2test1074",ROOM2,Floor(0.95*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2scps2",ROOM2,Floor(0.6*Float(Room2Amount[0])),min_pos,max_pos)
-	;SetRoom("room2gw", ROOM2, Floor(0.4*Float(Room2Amount[0])),min_pos,max_pos)
+	SetRoom("room2gw_b", ROOM2, Floor(0.4*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2sl", ROOM2, Floor(0.5*Float(Room2Amount[0])),min_pos,max_pos)
 	
 	MapRoom(ROOM3, Floor(Rnd(0.2,0.8)*Float(Room3Amount[0]))) = "room3storage"
@@ -7577,12 +7597,12 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A
-;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
-;~F#8C3#8E1#8FF#926#92D#93B#957#96C#989#9A6#9B3#9C5#A03#A2D#A7E#AD4#AE7#B05#BA8#C09
-;~F#C18#C54#C5C#C6A#C7F#CBB#CDA#CEA#D02#D2D#D40#D62#D8A#DDC#E08#E2F#E36#E3B#E72#E99
-;~F#EE2#F60#F80#FF4#104B#1076#10C7#10D0#1169#1171#1176#1184#1193#11AC#11CE#11DD#11EE#11F5#11FA#125E
-;~F#1294#1311#131D#135E#1369#137A#137F#138E#13A5#1426#142F#150E#152B#1532#1538#1546#156A#158A#15BD#16C8
-;~F#1701#1716#17D8#186D#1872#1882#1B57#1B6E#1B8D#1B94#1BE1#1C32#1C4D#1C64#1C8C#1C93#1CC7#1CCE#1CFA#1D48
-;~F#1D56#1D5D#1D63#1D6D#1D73#1D86
-;~B#11EC
+;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6DB#6E4#735#777#799#7F5#807#86E#87D
+;~F#8A7#8C3#8E1#8FF#926#92D#93B#957#96C#989#9A6#9B3#9C5#A03#A2D#A7E#AD4#AE7#B05#BA8
+;~F#C09#C18#C54#C5C#C6A#C7F#CBB#CDA#CEA#D02#D2D#D40#D62#D8A#DDC#E08#E2F#E36#E3B#E72
+;~F#E99#EAE#EE2#F60#F80#FF4#104B#1076#10C7#10D0#1169#1171#1176#1184#1193#11C9#11E2#11F1#1202#1209
+;~F#120E#1272#12A8#1325#1331#1372#137D#138E#1393#13A2#13B9#143A#1443#1522#153F#1546#154C#155A#157E#159E
+;~F#15D1#16DC#1715#172A#17EC#1881#1886#1B6B#1B82#1BA1#1BA8#1BF5#1C46#1C61#1C78#1CA0#1CA7#1CDB#1CE2#1D0E
+;~F#1D5C#1D6A#1D71#1D77#1D81#1D87#1D9A
+;~B#1200
 ;~C#Blitz3D
