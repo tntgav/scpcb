@@ -7160,13 +7160,20 @@ Function UpdateEvents()
 							e\EventState = 1
 						Else
 							ShowEntity (e\room\Objects[2])
-							e\EventState = e\EventState+1
+							;start a timer for 173 breaking through the window
+							e\EventState = e\EventState + 1
 							dist# = EntityDistance(Collider, e\room\Objects[1])
 							If dist <1.0 Then
+								;if close, increase the timer so that 173 is ready to attack
 								e\EventState = Max(e\EventState, 70*12)
 							ElseIf dist > 1.4
-								If e\EventState > 70*12 Then
-									If BlinkTimer =< -10 Then
+								;if the player moves a bit further and blinks, 173 attacks
+								If e\EventState > 70*12 And BlinkTimer =< -10 Then
+									If (EntityDistance(Curr173\Collider, e\room\Objects[0]) > 5.0) Then
+										;if 173 is far away from the room (perhaps because the player 
+										;left and 173 moved to some other room?) -> disable the event
+										RemoveEvent(e)
+									Else
 										PlaySound2(LoadTempSound("SFX\GlassBreak.ogg"), Camera, Curr173\obj) 
 										FreeEntity(e\room\Objects[2])
 										PositionEntity(Curr173\Collider, EntityX(e\room\Objects[1], True), 0.5, EntityZ(e\room\Objects[1], True))
