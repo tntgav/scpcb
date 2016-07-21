@@ -141,6 +141,8 @@ Include "StrictLoads.bb"
 
 Const ROOM1% = 1, ROOM2% = 2, ROOM2C% = 3, ROOM3% = 4, ROOM4% = 5
 
+Const ZONEAMOUNT = 3
+
 
 Global RoomTempID%
 Type RoomTemplates
@@ -384,12 +386,8 @@ For i = ROOM1 To ROOM4
 		MapIcons(i,n)=CopyImage(MapIcons(i,0))
 		MaskImage MapIcons(i,n), 255,255,255
 		RotateImage(MapIcons(i,n),90*n)
-		;ScaleImage MapIcons(i,n),ResFactor,ResFactor
-		If n = 2 
-			HandleImage MapIcons(i,n),Ceil(ImageWidth(MapIcons(i,n))/2.0),Ceil(ImageHeight(MapIcons(i,n))/2.0)
-		Else
-			HandleImage MapIcons(i,n),Floor(ImageWidth(MapIcons(i,n))/2.0),Floor(ImageHeight(MapIcons(i,n))/2.0)
-		EndIf
+		;If n = 2
+		HandleImage MapIcons(i,n),Floor(ImageWidth(MapIcons(i,n))/2.0),Floor(ImageHeight(MapIcons(i,n))/2.0)
 	Next
 Next
 
@@ -547,6 +545,15 @@ Repeat
 	
 	For mx = 0 To MapWidth
 		For my = 0 To MapHeight
+			If GetZone(my)=0
+				Color 255,255,255
+			ElseIf GetZone(my)=1
+				Color 255,200,200
+			Else
+				Color 255,255,200
+			EndIf
+			Rect((x + mx * 20+1)*ResFactor, (y + my * 20+1)*ResFactor, 17*ResFactor, 17*ResFactor)
+			
 			If SelectedX> 0 Then 
 				If mx=SelectedX And my=SelectedY Then
 					Color 200,200,200
@@ -565,9 +572,9 @@ Repeat
 			Else
 				Color 0,0,0
 				DrawImage(MapIcons(Map(mx,my)\Shape, Floor(MapAngle(mx,my)/90.0)), (x + mx * 20 + 9)*ResFactor, (y + my * 20 + 9)*ResFactor)
-				Color 100,100,100
-				If Map(mx,my)\Large Then Rect ((x + mx * 20 - 9)*ResFactor, (y + my * 20 - 9)*ResFactor, 38*ResFactor, 38*ResFactor,False)
-				;Rect(x + mx * 20, y + my * 20, 19, 19,False)
+				;Color 100,100,100
+				;If Map(mx,my)\Large Then Rect ((x + mx * 20 - 9)*ResFactor, (y + my * 20 - 9)*ResFactor, 38*ResFactor, 38*ResFactor,False)
+				;;Rect(x + mx * 20, y + my * 20, 19, 19,False)
 			End If
 			
 			If MouseX()>(x + mx * 20)*ResFactor And mx>0 And mx<MapWidth Then
@@ -620,6 +627,15 @@ Repeat
 						EndIf
 					EndIf
 				EndIf
+			EndIf
+		Next
+	Next
+	
+	For mx = 0 To MapWidth
+		For my = 0 To MapHeight
+			If Map(mx,my)<>Null
+				Color 100,100,100
+				If Map(mx,my)\Large Then Rect ((x + mx * 20 - 9)*ResFactor, (y + my * 20 - 9)*ResFactor, 38*ResFactor, 38*ResFactor,False)
 			EndIf
 		Next
 	Next
@@ -944,11 +960,12 @@ Function DrawScrollBar#(x, y, width, height, barx, bary, barwidth, barheight, ba
 		OnSideBar = False
 	End If
 	
+	;Speed = 10 (Prev)
 	If MouseSpeedZ <> 0
 		If dir = 0 Then
-			Return Min(Max(bar + -(MouseSpeedZ*10) / Float(width - barwidth), 0), 1)
+			Return Min(Max(bar + -(MouseSpeedZ*15) / Float(width - barwidth), 0), 1)
 		Else
-			Return Min(Max(bar + -(MouseSpeedZ*10) / Float(height - barheight), 0), 1)
+			Return Min(Max(bar + -(MouseSpeedZ*15) / Float(height - barheight), 0), 1)
 		End If
 	EndIf
 	
@@ -1247,7 +1264,11 @@ Function GetDesktopSize()
 	G_desktop_screen_height = PeekInt( rectangle, 12 ) - PeekInt( rectangle, 4 )
 	FreeBank rectangle
 End Function
+
+Function GetZone(y%)
+	Return Min(Floor((Float(MapWidth-y)/MapWidth*ZONEAMOUNT)),ZONEAMOUNT-1)
+End Function
 ;~IDEal Editor Parameters:
-;~F#91#9A#A3#303#331#342#359#36C#378#389#3C0#3D5#3F2#40A#41A#42F#43D#443#447#44B
-;~F#455#459#45E#4AE#4BC#4C4#4CD#4D7
+;~F#93#9C#A5#D0#313#341#352#369#37C#388#3D1#3E6#403#41B#42B#440#44E#454#458#45C
+;~F#466#46A#46F#4BF#4CD#4D5#4DE#4E8
 ;~C#Blitz3D
