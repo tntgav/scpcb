@@ -2686,7 +2686,7 @@ Function UpdateEvents()
 						RotateEntity e\room\Objects[10],0,e\EventState * 2,0
 						
 						If e\EventState3 = 1 Or e\EventState3 = 2 Then ;the "trick room"
-							If e\EventState3 = 1  And e\room\RoomDoors[0]\openstate>150 Or e\room\RoomDoors[1]\openstate>150 Then
+							If e\EventState3 = 1 And (e\room\RoomDoors[0]\openstate>150 Or e\room\RoomDoors[1]\openstate>150) Then
 								PlaySound_Strict LoadTempSound("SFX\Horror16.ogg")
 								BlurTimer = 800
 								e\EventState3=2
@@ -2947,8 +2947,8 @@ Function UpdateEvents()
 						If dist > 1700*RoomScale Then
 							BlinkTimer = -10
 							
-							Select 24;Rand(25)
-								Case 1,2,3,4 ;isosta huoneesta isoon huoneeseen
+							Select Rand(25)
+								Case 1,2,3,4
 									PlaySound_Strict(OldManSFX(3))
 									
 									pvt = CreatePivot()
@@ -2964,14 +2964,14 @@ Function UpdateEvents()
 									RotateEntity e\room\Objects[10], 0, EntityYaw(pvt), 0, True	
 									
 									FreeEntity pvt
-								Case 5,6,7,8,9,10 ;isosta huoneesta pieneen huoneeseen
+								Case 5,6,7,8,9,10 
 									e\EventState2=1
 									BlinkTimer = -10
 									PlaySound_Strict(OldManSFX(3))
 									
 									PositionEntity(Collider, EntityX(e\room\Objects[8],True), 0.5, EntityZ(e\room\Objects[8],True))
 									ResetEntity Collider
-								Case 11,12 ;ison huoneen keskelle
+								Case 11,12 ;middle of the large starting room
 									BlurTimer = 500
 									PositionEntity Collider,EntityX(e\room\obj), 0.5, EntityZ(e\room\obj)
 								Case 13,14,15 ;"exit room"
@@ -2995,7 +2995,7 @@ Function UpdateEvents()
 											Exit
 										EndIf
 									Next
-								Case 20,21,22 ;tornihuoneeseen
+								Case 20,21,22 ;the tower room
 									BlinkTimer = -10
 									PositionEntity(Collider, EntityX(e\room\Objects[12],True), 0.6, EntityZ(e\room\Objects[12],True))
 									ResetEntity Collider
