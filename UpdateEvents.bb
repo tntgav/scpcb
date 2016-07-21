@@ -5299,6 +5299,9 @@ Function UpdateEvents()
 						EndIf
 					Else
 						e\EventState = 0
+						If e\room\NPC[0]<>Null Then e\room\NPC[0]\State = 66
+						If e\room\NPC[1]<>Null Then e\room\NPC[1]\State = 66
+						If e\room\NPC[2]<>Null Then e\room\NPC[2]\State = 66
 					EndIf
 				Else
 					If e\room\NPC[0]<>Null Then e\room\NPC[0]\State = 66
@@ -7441,7 +7444,9 @@ Function UpdateEvents()
 			Case "914"
 				;[Block]
 				If PlayerRoom = e\room Then
-					GiveAchievement(Achv914)
+					;GiveAchievement(Achv914)
+					
+					If e\room\RoomDoors[2]\open Then GiveAchievement(Achv914)
 					
 					EntityPick(Camera, 1.0)
 					If PickedEntity() = e\room\Objects[0] Then
@@ -8765,8 +8770,8 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#11#104#4EA#4FA#55C#5CD#62C#7FA#9E1#A08#A16#A20#A2D#C16#C37#C86#CD4#CE1#D1B#D32
-;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#14BD#14CA
-;~F#14E3#157B#1807#185B#190C#19BC#1A74#1A8C#1B4D#1B7A#1B97#1BBE#1BEE#1C0B#1C33#1C8D#1CCD#1CFE#1D11#1DC9
-;~F#1E21#1E34#1E42#1E4B#1E97#1EB6#1FC3#2025#202A#2105#21AA#21AE
-;~B#148C#2133
+;~F#D52#D5B#D65#D74#E08#E2A#10D6#111C#1132#113E#115C#11AD#11C4#1291#1392#1423#143C#145B#14C0#14CD
+;~F#14E6#157E#1734#180A#185E#190F#19BF#1A77#1A8F#1B50#1B7D#1B9A#1BC1#1BF1#1C0E#1C36#1C90#1CD0#1D01#1DCE
+;~F#1E26#1E39#1E47#1E50#1E9C#1EBB#1FC8#202A#202F#210A#21AF#21B3
+;~B#148C#2138
 ;~C#Blitz3D

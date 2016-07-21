@@ -3757,10 +3757,14 @@ Function FillRoom(r.Rooms)
 			;[End Block]
 		Case "914"
 			;[Block]
-			d = CreateDoor(r\zone, r\x, 0, r\z - 368.0 * RoomScale, 0, r, False, True, 2)
-			d\dir = 1 : d\AutoClose = False : d\open = False
-			PositionEntity (d\buttons[0], r\x - 496.0 * RoomScale, 0.7, r\z - 272.0 * RoomScale, True)
-			TurnEntity(d\buttons[0], 0, 90, 0)
+			;d = CreateDoor(r\zone, r\x, 0, r\z - 368.0 * RoomScale, 0, r, False, True, 2)
+			;d\dir = 1 : d\AutoClose = False : d\open = False
+			;PositionEntity (d\buttons[0], r\x - 496.0 * RoomScale, 0.7, r\z - 272.0 * RoomScale, True)
+			;TurnEntity(d\buttons[0], 0, 90, 0)
+			r\RoomDoors[2] = CreateDoor(r\zone,r\x,0,r\z-368.0*RoomScale,0,r,False,True,2)
+			r\RoomDoors[2]\dir=1 : r\RoomDoors[2]\AutoClose=False : r\RoomDoors[2]\open=False
+			PositionEntity (r\RoomDoors[2]\buttons[0], r\x - 496.0 * RoomScale, 0.7, r\z - 272.0 * RoomScale, True)
+			TurnEntity(r\RoomDoors[2]\buttons[0], 0, 90, 0)
 			
 			r\Objects[0] = LoadMesh_Strict("GFX\map\914key.x")
 			r\Objects[1] = LoadMesh_Strict("GFX\map\914knob.x")
@@ -7576,9 +7580,9 @@ End Function
 ;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
 ;~F#8C3#8E1#8FF#926#92D#93B#957#96C#989#9A6#9B3#9C5#A03#A2D#A7E#AD4#AE7#B05#BA8#C09
 ;~F#C18#C54#C5C#C6A#C7F#CBB#CDA#CEA#D02#D2D#D40#D62#D8A#DDC#E08#E2F#E36#E3B#E72#E99
-;~F#EAE#EDE#F5C#F7C#FF0#1047#1072#10C3#10CC#1165#116D#1172#1180#118F#11A8#11CA#11D9#11EA#11F1#11F6
-;~F#125A#1290#130D#1319#135A#1365#1376#137B#138A#13A1#1422#142B#150A#1527#152E#1534#1542#1566#1586#15B9
-;~F#16C4#16FD#1712#17D4#1869#186E#187E#1B53#1B6A#1B89#1B90#1BDD#1C2E#1C49#1C60#1C88#1C8F#1CC3#1CCA#1CF6
-;~F#1D44#1D52#1D59#1D5F#1D69#1D6F#1D82
-;~B#11E8
+;~F#EE2#F60#F80#FF4#104B#1076#10C7#10D0#1169#1171#1176#1184#1193#11AC#11CE#11DD#11EE#11F5#11FA#125E
+;~F#1294#1311#131D#135E#1369#137A#137F#138E#13A5#1426#142F#150E#152B#1532#1538#1546#156A#158A#15BD#16C8
+;~F#1701#1716#17D8#186D#1872#1882#1B57#1B6E#1B8D#1B94#1BE1#1C32#1C4D#1C64#1C8C#1C93#1CC7#1CCE#1CFA#1D48
+;~F#1D56#1D5D#1D63#1D6D#1D73#1D86
+;~B#11EC
 ;~C#Blitz3D

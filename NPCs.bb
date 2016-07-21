@@ -58,6 +58,7 @@ Type NPCs
 	Field CanUseElevator% = False
 	Field CurrElevator.ElevatorObj
 	Field HP%
+	Field PathX#,PathZ#
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -858,28 +859,39 @@ Function UpdateNPCs()
 					Else ;idle = 2
 						
 						If n\Target <> Null Then
-							If dist < HideDistance<0.7 Then
+							Local tmp = False
+							If dist > HideDistance*0.7
+								If EntityVisible(n\obj,Collider)=False
+									tmp = True
+								EndIf
+							EndIf
+							If (Not tmp)
 								PointEntity n\obj, n\Target\Collider
 								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),10.0), 0, True								
 								dist = EntityDistance(n\Collider, n\Target\Collider)
-								MoveEntity n\Collider, 0, 0, 0.008*FPSfactor*Max(Min((dist*2-1.0)*0.5,1.0),-0.5) 								
+								;MoveEntity n\Collider, 0, 0, 0.008*FPSfactor*Max(Min((dist*2-1.0)*0.5,1.0),-0.5)
+								MoveEntity n\Collider, 0, 0, 0.016*FPSfactor*Max(Min((dist*2-1.0)*0.5,1.0),-0.5)
+								n\GravityMult = 1.0
 							Else
-								PointEntity n\Collider, n\Target\Collider
-								RotateEntity n\Collider, 0, n\Collider, 0, True			
-								dist = EntityDistance(n\Collider, n\Target\Collider)
-								MoveEntity n\Collider, 0, 0, dist-0.6
+								PositionEntity n\Collider,EntityX(n\Target\Collider),EntityY(n\Target\Collider)+0.3,EntityZ(n\Target\Collider)
+								ResetEntity n\Collider
+								n\DropSpeed = 0
+								n\GravityMult = 0.0
+								;PointEntity n\Collider, n\Target\Collider
+								;RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),10.0), 0, True
+								;dist = EntityDistance(n\Collider, n\Target\Collider)
+								;MoveEntity n\Collider, 0, 0, dist-0.6
 							EndIf
 							
-							
-							For r.Rooms = Each Rooms
-								If r\RoomTemplate\Name = "start" Then
-									If Distance(EntityX(n\Collider),EntityZ(n\Collider),EntityX(r\obj,True)+1024*RoomScale,EntityZ(r\obj,True)+384*RoomScale)<1.6 Then
-										n\Idle = 3
-										n\Target = Null
-									EndIf
-									Exit
-								EndIf
-							Next
+							;For r.Rooms = Each Rooms
+							;	If r\RoomTemplate\Name = "start" Then
+							;		If Distance(EntityX(n\Collider),EntityZ(n\Collider),EntityX(r\obj,True)+1024*RoomScale,EntityZ(r\obj,True)+384*RoomScale)<1.6 Then
+							;			n\Idle = 3
+							;			n\Target = Null
+							;		EndIf
+							;		Exit
+							;	EndIf
+							;Next
 						EndIf
 						
 						PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) + 0.05 + Sin(MilliSecs()*0.08)*0.02, EntityZ(n\Collider))
@@ -2459,6 +2471,13 @@ Function UpdateNPCs()
 							EndIf
 						EndIf
 					EndIf
+				EndIf
+				
+				If n\Frame = 19 Or n\Frame = 60
+					n\IsDead = True
+				EndIf
+				If AnimTime(n\obj)=19 Or AnimTime(n\obj)=60
+					n\IsDead = True
 				EndIf
 				
 				MoveEntity(n\Collider, 0, 0, n\CurrSpeed * FPSfactor)
@@ -4208,6 +4227,10 @@ Function UpdateNPCs()
 				;[End Block]
 		End Select
 		
+		If n\IsDead
+			EntityType n\Collider,HIT_DEAD
+		EndIf
+		
 		Local gravityDist = Distance(EntityX(Collider),EntityZ(Collider),EntityX(n\Collider),EntityZ(n\Collider))
 		
 		If gravityDist<HideDistance*0.7 Or n\NPCtype = NPCtype1499 Then
@@ -4433,16 +4456,73 @@ Function UpdateMTFUnit(n.NPCs)
 					If n\MTFLeader<>Null Then ;i'll follow the leader
 						n\PathStatus = FindPath(n,EntityX(n\MTFLeader\Collider,True),EntityY(n\MTFLeader\Collider,True)+0.1,EntityZ(n\MTFLeader\Collider,True)) ;whatever you say boss
 					Else ;i am the leader
-						For r = Each Rooms
-							If ((Abs(r\x-EntityX(n\Collider,True))>12.0) Or (Abs(r\z-EntityZ(n\Collider,True))>12.0)) And (Rand(1,Max(4-Int(Abs(r\z-EntityZ(n\Collider,True)/8.0)),2))=1) Then
-								x = r\x
-								y = 0.1
-								z = r\z
-								DebugLog r\RoomTemplate\Name
-								Exit
+						If Curr173\Idle<>2
+							For r = Each Rooms
+								If ((Abs(r\x-EntityX(n\Collider,True))>12.0) Or (Abs(r\z-EntityZ(n\Collider,True))>12.0)) And (Rand(1,Max(4-Int(Abs(r\z-EntityZ(n\Collider,True)/8.0)),2))=1) Then
+									x = r\x
+									y = 0.1
+									z = r\z
+									DebugLog r\RoomTemplate\Name
+									Exit
+								EndIf
+							Next
+						Else
+							Local tmp = False
+							If EntityDistance(n\Collider,Curr173\Collider)>4.0
+								If (Not EntityVisible(n\Collider,Curr173\Collider))
+									tmp = True
+								EndIf
 							EndIf
-						Next
-						n\PathStatus = FindPath(n,x,y,z) ;we're going to this room for no particular reason
+							
+							If (Not tmp)
+								For r = Each Rooms
+									If r\RoomTemplate\Name$ = "start"
+										Local foundChamber% = False
+										Local pvt% = CreatePivot()
+										PositionEntity pvt%,EntityX(r\obj,True)+4736*RoomScale,0.5,EntityZ(r\obj,True)+1692*RoomScale
+										
+										If Distance(EntityX(pvt%),EntityZ(pvt%),EntityX(n\Collider),EntityZ(n\Collider))<3.5
+											foundChamber% = True
+											DebugLog Distance(EntityX(pvt%),EntityZ(pvt%),EntityX(n\Collider),EntityZ(n\Collider))
+										EndIf
+										
+										If Curr173\Idle=3 And Distance(EntityX(pvt%),EntityZ(pvt%),EntityX(n\Collider),EntityZ(n\Collider))>4.0
+											If r\RoomDoors[1]\open=True Then UseDoor(r\RoomDoors[1],False)
+										EndIf
+										
+										FreeEntity pvt%
+										
+										If Distance(EntityX(n\Collider),EntityZ(n\Collider),EntityX(r\obj,True)+4736*RoomScale,EntityZ(r\obj,True)+1692*RoomScale)>1.6 And (Not foundChamber)
+											x = EntityX(r\obj,True)+4736*RoomScale
+											y = 0.1
+											z = EntityZ(r\obj,True)+1692*RoomScale
+											DebugLog "Move to 173's chamber"
+											Exit
+										ElseIf Distance(EntityX(n\Collider),EntityZ(n\Collider),EntityX(r\obj,True)+4736*RoomScale,EntityZ(r\obj,True)+1692*RoomScale)>1.6 And foundChamber
+											n\PathX = EntityX(r\obj,True)+4736*RoomScale
+											n\PathZ = EntityZ(r\obj,True)+1692*RoomScale
+											DebugLog "Move inside 173's chamber"
+											Exit
+										Else
+											Curr173\Idle = 3
+											Curr173\Target = Null
+											Curr173\IsDead = True
+											If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+											n\Sound = LoadSound_Strict("SFX\MTF\173cont"+Rand(1,4)+".ogg")
+											PlayMTFSound(n\Sound, n)
+											DebugLog "173 contained"
+											Exit
+										EndIf
+									EndIf
+								Next
+							Else
+								x = EntityX(Curr173\Collider)
+								y = 0.1
+								z = EntityZ(Curr173\Collider)
+								DebugLog "Going back to 173's cage"
+							EndIf
+						EndIf
+						If n\PathX=0 Then n\PathStatus = FindPath(n,x,y,z) ;we're going to this room for no particular reason
 					EndIf
 					If n\PathStatus = 1 Then
 						While n\Path[n\PathLocation]=Null
@@ -4518,6 +4598,26 @@ Function UpdateMTFUnit(n.NPCs)
 							EndIf
 						EndIf
 						n\PathTimer=n\PathTimer-FPSfactor ;timer goes down slow
+					ElseIf n\PathX#<>0.0
+						pvt = CreatePivot()
+						PositionEntity pvt,n\PathX#,0.5,n\PathZ#
+						
+						PointEntity n\Collider,pvt
+						RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
+						n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
+						RotateEntity n\obj,-90.0,n\Angle,0.0,True
+						
+						n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,20.0)
+						TranslateEntity n\Collider, Cos(EntityYaw(n\Collider,True)+90.0)*n\CurrSpeed * FPSfactor, 0, Sin(EntityYaw(n\Collider,True)+90.0)*n\CurrSpeed * FPSfactor, True
+						AnimateNPC(n,488, 522, n\CurrSpeed*26)
+						
+						If Distance(EntityX(n\Collider),EntityZ(n\Collider),n\PathX#,n\PathZ#)<0.2
+							n\PathX# = 0.0
+							n\PathZ# = 0.0
+							n\PathTimer = 70.0 * Rnd(6.0,10.0)
+						EndIf
+						
+						FreeEntity pvt
 					Else
 						n\PathTimer=n\PathTimer-(FPSfactor*2.0) ;timer goes down fast
 						If n\MTFLeader = Null Then
@@ -4584,11 +4684,12 @@ Function UpdateMTFUnit(n.NPCs)
 					;	TeleportMTFGroup(n)
 					;EndIf
                 EndIf
-                
+				
 				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
                 If Curr173\Idle<2 Then
-					If OtherNPCSeesMeNPC(Curr173,n) Then
-						If EntityVisible(n\Collider,Curr173\Collider) Then							
+					Local SoundVol173# = Max(Min((Distance(EntityX(Curr173\Collider), EntityZ(Curr173\Collider), Curr173\PrevX, Curr173\PrevZ) * 2.5), 1.0), 0.0)
+					If OtherNPCSeesMeNPC(Curr173,n) Or (SoundVol173#>0.0 And EntityDistance(n\Collider,Curr173\Collider)<6.0) Then
+						If EntityVisible(n\Collider,Curr173\Collider) Or SoundVol173#>0.0 Then							
 							n\State = 2
 							n\EnemyX = EntityX(Curr173\Collider,True)
 							n\EnemyY = EntityY(Curr173\Collider,True)
@@ -4596,7 +4697,11 @@ Function UpdateMTFUnit(n.NPCs)
 							n\State2 = 70.0*15.0 ;give up after 15 seconds
 							n\State3 = 0.0
 							n\PathTimer=0.0
-							n\PathStatus=0	
+							n\PathStatus=0
+							DebugLog "173 spotted :"+n\State2
+							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+							n\Sound = LoadSound_Strict("SFX\MTF\173spotted"+Rand(1,2)+".ogg")
+							PlayMTFSound(n\Sound, n)
 						EndIf
 					EndIf
 				EndIf
@@ -4680,11 +4785,9 @@ Function UpdateMTFUnit(n.NPCs)
 								n\Target = n2
 								n\Reload = 70*5
 								DebugLog "049-2 spotted :"+n\State2
-								;If n\MTFLeader=Null
-									If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-									n\Sound = LoadSound_Strict("SFX\049\MTF_1.ogg")
-									PlayMTFSound(n\Sound, n)
-								;EndIf
+								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+								n\Sound = LoadSound_Strict("SFX\049\MTF_1.ogg")
+								PlayMTFSound(n\Sound, n)
 								Exit
 							EndIf
 						EndIf
@@ -4713,7 +4816,7 @@ Function UpdateMTFUnit(n.NPCs)
 									
 									PlaySound2(GunshotSFX, Camera, n\Collider, 15)
 									
-									Local pvt% = CreatePivot()
+									pvt% = CreatePivot()
 									
 									RotateEntity(pvt, EntityPitch(n\Collider), EntityYaw(n\Collider), 0, True)
 									PositionEntity(pvt, EntityX(n\obj), EntityY(n\obj), EntityZ(n\obj))
@@ -4908,24 +5011,24 @@ Function UpdateMTFUnit(n.NPCs)
 					n\State = 0
                 EndIf
                 
-				If (Curr173\Idle<2) Then
-					If (OtherNPCSeesMeNPC(Curr173,n)) Then
-						If EntityVisible(n\Collider,Curr173\Collider) Then
-							If n\LastSeen>10.0 Then ;if chasing the player, play the "stop chasing the d" -clip
-								PlayMTFSound(LoadTempSound("SFX\MTF\173spotted3.ogg"), n)
-							Else
-								PlayMTFSound(LoadTempSound("SFX\MTF\173spotted"+Rand(1,2)+".ogg"), n)	
-							EndIf
-							
+				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
+                If Curr173\Idle<2 Then
+					SoundVol173# = Max(Min((Distance(EntityX(Curr173\Collider), EntityZ(Curr173\Collider), Curr173\PrevX, Curr173\PrevZ) * 2.5), 1.0), 0.0)
+					If OtherNPCSeesMeNPC(Curr173,n) Or (SoundVol173#>0.0 And EntityDistance(n\Collider,Curr173\Collider)<6.0) Then
+						If EntityVisible(n\Collider,Curr173\Collider) Or SoundVol173#>0.0 Then	
 							n\State = 2
 							n\EnemyX = EntityX(Curr173\Collider,True)
 							n\EnemyY = EntityY(Curr173\Collider,True)
 							n\EnemyZ = EntityZ(Curr173\Collider,True)
 							n\State2 = 70.0*15.0 ;give up after 15 seconds
+							DebugLog "173 spotted :"+n\State2
+							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+							n\Sound = LoadSound_Strict("SFX\MTF\173spotted3.ogg")
+							PlayMTFSound(n\Sound, n)
 							n\State3 = 0.0
 							n\PathTimer=0.0
 							n\PathStatus=0
-						EndIf						
+						EndIf
 					EndIf
 				EndIf
 				
@@ -5038,6 +5141,7 @@ Function UpdateMTFUnit(n.NPCs)
 					Local curr173Dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(Curr173\Collider,True),EntityZ(Curr173\Collider,True))
 					
 					If curr173Dist<5.0 Then
+						If Curr173\Idle <> 2 Then Curr173\Idle = True
 						n\State2 = 70.0*15.0
 						n\PathTimer = 0.0
 						Local tempDist# = 1.0
@@ -5046,10 +5150,20 @@ Function UpdateMTFUnit(n.NPCs)
 							If n\MTFLeader = Null Then
 								n\State3=n\State3+FPSfactor
 								DebugLog "CONTAINING 173: "+n\State3
-								If n\State3>=70.0*10.0 Then
+								;If n\State3>=70.0*10.0 Then
+								If n\State3>=70.0*15.0 Then
 									Curr173\Idle = 2
+									If n\MTFLeader = Null Then Curr173\Target = n
+									If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+									n\Sound = LoadSound_Strict("SFX\MTF\173box"+Rand(1,3)+".ogg")
+									PlayMTFSound(n\Sound, n)
 								EndIf
 							EndIf
+							PositionEntity n\obj,EntityX(Curr173\Collider,True),EntityY(Curr173\Collider,True),EntityZ(Curr173\Collider,True),True
+							PointEntity n\Collider,n\obj
+							RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
+							n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
+							RotateEntity n\obj,-90.0,n\Angle,0.0,True
 						Else
 							PositionEntity n\obj,EntityX(Curr173\Collider,True),EntityY(Curr173\Collider,True),EntityZ(Curr173\Collider,True),True
 							PointEntity n\Collider,n\obj
@@ -5062,6 +5176,7 @@ Function UpdateMTFUnit(n.NPCs)
 							AnimateNPC(n,488, 522, n\CurrSpeed*26)
 						EndIf
 					Else
+						If Curr173\Idle <> 2 Then Curr173\Idle = False
 						If n\PathTimer<=0.0 Then ;update path
 							n\PathStatus = FindPath(n,EntityX(Curr173\Collider,True),EntityY(Curr173\Collider,True)+0.1,EntityZ(Curr173\Collider,True))
 							n\PathTimer = 70.0 * Rnd(6.0,10.0) ;search again after 6 seconds
@@ -5742,7 +5857,7 @@ Function UpdateMTFUnit(n.NPCs)
 				EndIf
 			Else
 				For n2.NPCs = Each NPCs
-					If n2<>n Then
+					If n2<>n And n2\IsDead=False Then
 						If Abs(DeltaYaw(n\Collider,n2\Collider))<80.0 Then
 							If EntityDistance(n\Collider,n2\Collider)<0.7 Then							
 								TranslateEntity n2\Collider, Cos(EntityYaw(n\Collider,True)+90)* 0.01 * FPSfactor, 0, Sin(EntityYaw(n\Collider,True)+90)* 0.01 * FPSfactor, True
@@ -6187,9 +6302,9 @@ Function GoToElevator(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#3E#48#6E#94#A4#D4#E4#ED#FB#10A#11D#13C#166#17A#197#1D8#1F0#211
-;~F#234#23D#268#283#290#381#46C#5C1#5DB#5EB#734#73C#7B6#851#971#976#9A6#A48#A83#B12
-;~F#B7E#D5A#E11#EC4#FC3#FCC#108D#10B4#10BF#10E3#10F7#114D#1256#13A1#1413#1473#14F3#1520#1546#155F
-;~F#15DB#1689#1701#1712#172D#174B#1789#17AA#17B8#17D4#17E6#180A
-;~B#196#11FE#129A#14D4#15DB#1798#17F4
+;~F#0#A#3F#49#6F#95#A5#D5#E5#EE#FC#10B#11E#13D#167#17B#198#1D9#1F1#212
+;~F#235#23E#269#284#291#38D#478#5CD#5E7#5F7#740#748#7C2#85D#97D#982#9B9#A5B#A96#B25
+;~F#B91#CA6#D6D#E24#ED7#FD6#FDF#10A4#10CB#10D6#10FA#110D#110E#12BD#1408#1486#14E6#1566#1593#15B9
+;~F#15D2#164E#16FC#1774#1785#17A0#17BE#17FC#181D#182B#1847#1859#187D
+;~B#197#1267#1301#1397#1547#164E#180B#1867
 ;~C#Blitz3D
