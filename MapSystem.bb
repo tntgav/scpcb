@@ -7551,6 +7551,10 @@ Function DeleteElevatorObjects()
 End Function
 
 Function ValidRoom2slCamRoom(r.Rooms)
+	If (r = Null) Then
+		Return False
+	EndIf
+	
 	Local RN$ = r\RoomTemplate\Name$
 	
 	If RN$ = "room2closets" Then Return True
