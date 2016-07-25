@@ -2236,9 +2236,9 @@ Function FillRoom(r.Rooms)
 			sc\turn = 0
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			
-			;r\Objects[3] = CreatePivot()
-			;PositionEntity r\Objects[3],r\x-152.0*RoomScale,r\y+160.0*RoomScale,r\z-128.0*RoomScale,True
-			;EntityParent r\Objects[3],r\obj
+			If MapTemp(Floor(r\x / 8.0),Floor(r\z /8.0)-1)=0 Then
+				CreateDoor(r\zone, r\x, 0, r\z  - 4.0, 0, r, 0, False, 0, "GEAR")
+			EndIf
 			;[End Block]
 		Case "checkpoint2"
 			;[Block]
@@ -2265,10 +2265,9 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[0]\timer = 70 * 5
 			r\RoomDoors[1]\timer = 70 * 5
 			
-			;r\Objects[3] = CreatePivot()
-			;PositionEntity r\Objects[3],r\x+152.0*RoomScale,r\y+160.0*RoomScale,r\z+128.0*RoomScale,True
-			;EntityParent r\Objects[3],r\obj
-			
+			If MapTemp(Floor(r\x / 8.0),Floor(r\z /8.0)-1)=0 Then
+				CreateDoor(r\zone, r\x, 0, r\z  - 4.0, 0, r, 0, False, 0, "GEAR")
+			EndIf
 			;[End Block]
 		Case "room2pit"
 			;[Block]
@@ -6739,14 +6738,8 @@ Function CreateMap()
 			If MapTemp(x, y) = 255 Then
 				If y>MapHeight/2 Then ;zone = 2
 					r = CreateRoom(zone, ROOM2, x * 8, 0, y * 8, "checkpoint1")
-					If MapTemp(x,y-1)=0 Then
-						CreateDoor(r\zone, x * spacing, 0, y * spacing - spacing / 2.0, 0, r, 0, temp, 0, "GEAR")
-					EndIf
 				Else ;If zone = 3
 					r = CreateRoom(zone, ROOM2, x * 8, 0, y * 8, "checkpoint2")
-					If MapTemp(x,y-1)=0 Then
-						CreateDoor(r\zone, x * spacing, 0, y * spacing - spacing / 2.0, 0, r, 0, temp, 0, "GEAR")
-					EndIf
 				EndIf
 				
 			ElseIf MapTemp(x, y) > 0
