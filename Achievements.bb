@@ -1,15 +1,15 @@
 ;achievement menu & messages by InnocentSam
 
-Const MAXACHIEVEMENTS=39
+Const MAXACHIEVEMENTS=36
 Dim Achievements%(MAXACHIEVEMENTS)
 
 Const Achv008%=0, Achv012%=1, Achv035%=2, Achv049%=3, Achv055=4,  Achv079%=5, Achv096%=6, Achv106%=7, Achv148%=8, Achv178=9, Achv205=10
 Const Achv294%=11, Achv372%=12, Achv420%=13, Achv500%=14, Achv513%=15, Achv714%=16, Achv789%=17, Achv860%=18, Achv895%=19
-Const Achv914%=20, Achv939%=21, Achv966%=22, Achv970=23, Achv1025%=24, Achv1048=25, Achv1074=26, Achv1123=27
+Const Achv914%=20, Achv939%=21, Achv966%=22, Achv970=23, Achv1025%=24, Achv1048=25, Achv1123=26
 
-Const AchvMaynard%=28, AchvHarp%=29, AchvSNAV%=30, AchvOmni%=31, AchvConsole%=32, AchvTesla%=33, AchvPD%=34
+Const AchvMaynard%=27, AchvHarp%=28, AchvSNAV%=29, AchvOmni%=30, AchvConsole%=31, AchvTesla%=32, AchvPD%=33
 
-Const NTF_Achv1162% = 35, NTF_AchvMassage% = 36, NTF_AchvReal% = 37, NTF_AchvRage% = 38
+Const Achv1162% = 34, Achv1499% = 35
 
 Global UsedConsole
 

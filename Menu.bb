@@ -812,13 +812,13 @@ Function UpdateMainMenu()
 					y = y + 20*MenuScale
 					
 					Color 255,255,255
-					Text(x + 20 * MenuScale, y, "Console auto-opening:")
+					Text(x + 20 * MenuScale, y, "Open console on error:")
 					ConsoleOpening = DrawTick(x + 310 * MenuScale, y + MenuScale, ConsoleOpening)
 					
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
-					Text(x + 20 * MenuScale, y, "Achievement popup:")
+					Text(x + 20 * MenuScale, y, "Achievement popups:")
 					AchvMSGenabled% = DrawTick(x + 310 * MenuScale, y + MenuScale, AchvMSGenabled%)
 					
 					y = y + 30*MenuScale

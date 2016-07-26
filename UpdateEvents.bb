@@ -7983,7 +7983,7 @@ Function UpdateEvents()
 										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										GiveAchievement(NTF_Achv1162)
+										GiveAchievement(Achv1162)
 										MouseHit1 = False
 										DebugLog "lostkey"
 										Exit
@@ -7995,7 +7995,7 @@ Function UpdateEvents()
 										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										GiveAchievement(NTF_Achv1162)
+										GiveAchievement(Achv1162)
 										MouseHit1 = False
 										DebugLog "paper"
 										Exit
@@ -8007,7 +8007,7 @@ Function UpdateEvents()
 										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										GiveAchievement(NTF_Achv1162)
+										GiveAchievement(Achv1162)
 										MouseHit1 = False
 										DebugLog "gasmask hazmat"
 										Exit
@@ -8019,7 +8019,7 @@ Function UpdateEvents()
 										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										GiveAchievement(NTF_Achv1162)
+										GiveAchievement(Achv1162)
 										MouseHit1 = False
 										DebugLog "key"
 										Exit
@@ -8031,7 +8031,7 @@ Function UpdateEvents()
 										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										GiveAchievement(NTF_Achv1162)
+										GiveAchievement(Achv1162)
 										MouseHit1 = False
 										DebugLog "key #2"
 										Exit
@@ -8043,7 +8043,7 @@ Function UpdateEvents()
 										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										GiveAchievement(NTF_Achv1162)
+										GiveAchievement(Achv1162)
 										MouseHit1 = False
 										DebugLog "vest"
 										Exit
@@ -8055,7 +8055,7 @@ Function UpdateEvents()
 										EntityType(it\obj, HIT_ITEM)
 										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 										e\EventState3 = 0.0
-										GiveAchievement(NTF_Achv1162)
+										GiveAchievement(Achv1162)
 										MouseHit1 = False
 										DebugLog "default"
 										Exit
@@ -8076,19 +8076,20 @@ Function UpdateEvents()
 							If IsItemGoodFor1162(itt) And Rand(6)=1
 								it = CreateItem(itt\name, itt\tempname, EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 								EntityType(it\obj, HIT_ITEM)
-								GiveAchievement(NTF_Achv1162)
+								GiveAchievement(Achv1162)
 								MouseHit1 = False
 								e\EventState3 = 0.0
 								If Injuries > 15
-									DeathMSG = "A big chunk of body parts were found next to SCP-1162. DNA testing identified that the body parts were all from "
-									DeathMSG = DeathMSG + "test subject D-9341. He seems to have used SCP-1162 without anything to trade with."
+									DeathMSG = "A dead Class D subject was discovered within the containment chamber of SCP-1162."
+									DeathMSG = DeathMSG + " An autopsy revealed that his right lung was missing, which suggests"
+									DeathMSG = DeathMSG + " interaction with SCP-1162."
 									PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
 									LightFlash = 5.0
 									Kill()
 								Else
 									PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
 									LightFlash = 5.0
-									Msg = "You suddenly have high injuries"
+									Msg = "You feel a sudden overwhelming pain in you chest"
 									MsgTimer = 70*5
 								EndIf
 								Exit
@@ -8109,15 +8110,16 @@ Function UpdateEvents()
 							de\size = 0.75 : ScaleSprite de\obj, de\size, de\size
 							FreeEntity pvt
 							If Injuries > 15
-								DeathMSG = "A big chunk of body parts were found next to SCP-1162. DNA testing identified that the body parts were all from "
-								DeathMSG = DeathMSG + "test subject D-9341. He seems to have used SCP-1162 without anything to trade with."
+								DeathMSG = "A dead Class D subject was discovered within the containment chamber of SCP-1162."
+								DeathMSG = DeathMSG + " An autopsy revealed that his right lung was missing, which suggests"
+								DeathMSG = DeathMSG + " interaction with SCP-1162."
 								PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
 								LightFlash = 5.0
 								Kill()
 							Else
 								PlaySound_Strict LoadTempSound("SFX\1162\s12_phit+"+Rand(0,1)+"_mod"+Rand(1,2)+".ogg")
 								LightFlash = 5.0
-								Msg = "Something is now in your Inventory and you have high injuries"
+								Msg = "You notice something moving in your pockets and a sudden pain in your chest"
 								MsgTimer = 70*5
 							EndIf
 							e\EventState2 = 0.0
@@ -8129,7 +8131,7 @@ Function UpdateEvents()
 								it = CreateItem("Disciplinary Hearing DH-S-4137-17092","oldpaper",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 						End Select
 						EntityType(it\obj, HIT_ITEM)
-						GiveAchievement(NTF_Achv1162)
+						GiveAchievement(Achv1162)
 						MouseHit1 = False
 						e\EventState3 = 0.0
 					EndIf

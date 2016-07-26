@@ -4954,6 +4954,8 @@ Function DrawGUI()
 				;new Items in SCP:CB 1.3
 				Case "scp1499"
 					If (Not Wearing1499%) Then
+						GiveAchievement(Achv1499)
+						
 						;Wearing178 = 0
 						;WearingGasMask = 0
 						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
@@ -5376,13 +5378,13 @@ Function DrawMenu()
 					y = y + 50*MenuScale
 					
 					Color 255,255,255
-					Text(x, y, "Console auto-opening:")
+					Text(x, y, "Open console on error:")
 					ConsoleOpening = DrawTick(x + 270 * MenuScale, y, ConsoleOpening)
 					
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
-					Text(x, y, "Achievement popup:")
+					Text(x, y, "Achievement popups:")
 					AchvMSGenabled% = DrawTick(x + 270 * MenuScale, y, AchvMSGenabled%)
 					
 					y = y + 30*MenuScale
