@@ -4,6 +4,8 @@ Function UpdateEvents()
 	
 	Local p.Particles, n.NPCs, r.Rooms, e.Events, e2.Events, it.Items, em.Emitters, sc.SecurityCams, sc2.SecurityCams
 	
+	Local CurrTrigger$ = ""
+	
 	Local x#, y#, z#
 	
 	Local angle#
@@ -114,8 +116,17 @@ Function UpdateEvents()
 					
 					If e\room\NPC[0] <> Null Then AnimateNPC(e\room\NPC[0], 113, 151, 0.4, False)
 					
-					e\EventState=e\EventState+FPSfactor
-					If e\EventState > 500 Then
+					CurrTrigger = CheckTriggers()
+					
+					If (CurrTrigger = "173scene_timer") Then
+						e\EventState=e\EventState+FPSfactor
+					Else If (CurrTrigger = "173scene_activated")
+						e\EventState = Max(e\EventState, 500)
+					EndIf
+					
+					
+					If e\EventState >= 500 Then
+						e\EventState=e\EventState+FPSfactor
 						If e\EventState < 2000 Then
 							If e\SoundCHN = 0 Then
 								e\SoundCHN = PlaySound_Strict(AlarmSFX(0))
@@ -170,7 +181,7 @@ Function UpdateEvents()
 									
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
 									
-									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1142*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
+									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-304*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
 										e\room\RoomDoors[5]\open = False
 										LightBlink = 3.0
 										PlaySound_Strict(IntroSFX(11))
@@ -5279,7 +5290,7 @@ Function UpdateEvents()
 						e\room\NPC[0]\IgnorePlayer = False
 						e\room\NPC[2]\IgnorePlayer = False
 						
-						Local CurrTrigger$ = CheckTriggers()
+						CurrTrigger$ = CheckTriggers()
 						
 						Select CurrTrigger$
 							Case "939-1_fix"
