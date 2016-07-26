@@ -5730,12 +5730,13 @@ Function UpdateSecurityCams()
 										
 										UpdateRoomLights(sc\Cam)
 										
-										SetBuffer TextureBuffer(sc\Room2slTexs[sc\ScrTexture])
 										RenderWorld
-										SetBuffer BackBuffer()
 										
 										HideEntity(sc\Cam)
 										ShowEntity(Camera)	
+										
+										CopyRect(0,0,GraphicWidth,GraphicHeight,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
+										
 									EndIf
 								Else
 									HideEntity(Camera)
@@ -5746,13 +5747,13 @@ Function UpdateSecurityCams()
 									
 									UpdateRoomLights(sc\Cam)
 									
-									SetBuffer TextureBuffer(sc\Room2slTexs[sc\ScrTexture])
 									RenderWorld
-									SetBuffer BackBuffer()
 									
 									HideEntity (sc\room\obj)
 									HideEntity(sc\Cam)
 									ShowEntity(Camera)	
+									
+									CopyRect(0,0,GraphicWidth,GraphicHeight,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
 								EndIf
 								
 							EndIf

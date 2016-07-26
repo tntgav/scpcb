@@ -8278,7 +8278,7 @@ Function UpdateEvents()
 												EndIf
 											EndIf
 										Next
-										If (Not HasCamera%) And (Not Win8Mode)
+										If (Not HasCamera%) Then
 											sc\Screen = True
 											sc\AllowSaving = False
 											
@@ -8312,7 +8312,7 @@ Function UpdateEvents()
 											HideEntity(sc\Cam)
 											
 											sc\IsRoom2slCam = True
-											sc\Room2slTexs%[0] = CreateTexture(512, 512, 1+256+FE_RENDER+FE_ZRENDER)
+											sc\Room2slTexs%[0] = CreateTexture(512, 512, 1+256)
 											EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
 											
 											pvt% = CreatePivot(e\room\obj)
@@ -8403,7 +8403,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 						For sc.SecurityCams = Each SecurityCams
-							If sc\SpecialCam And (Not Win8Mode)
+							If sc\SpecialCam Then
 								sc\Screen = True
 								sc\AllowSaving = False
 								
@@ -8435,7 +8435,7 @@ Function UpdateEvents()
 								CameraZoom(sc\Cam, 0.8)
 								HideEntity(sc\Cam)
 								
-								sc\Room2slTexs%[0] = CreateTexture(512, 512, 1+256+FE_RENDER+FE_ZRENDER)
+								sc\Room2slTexs%[0] = CreateTexture(512, 512, 1+256)
 								EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
 								
 								pvt% = CreatePivot(e\room\obj)
