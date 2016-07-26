@@ -1932,9 +1932,7 @@ Function UpdateNPCs()
 										dist2# = EntityDistance(n\Collider,n\Path[n\PathLocation]\obj)
 										If dist2 < 0.6 Then
 											If n\Path[n\PathLocation]\door <> Null Then
-												If n\Path[n\PathLocation]\door\KeyCard=0
-													If n\Path[n\PathLocation]\door\open = False Then UseDoor(n\Path[n\PathLocation]\door, False)
-												EndIf
+												If n\Path[n\PathLocation]\door\open = False Then UseDoor(n\Path[n\PathLocation]\door, False)
 											EndIf
 										EndIf
 										
@@ -4430,7 +4428,11 @@ Function UpdateMTFUnit(n.NPCs)
 	n\BlinkTimer = n\BlinkTimer - FPSfactor
 	If n\BlinkTimer<=-5.0 Then 
 		;only play the "blinking" sound clip if searching/containing 173
-		If n\State = 2 Then PlayMTFSound(LoadTempSound("SFX\MTF\173blinking.ogg"),n)
+		If n\State = 2
+			If OtherNPCSeesMeNPC(Curr173,n)
+				PlayMTFSound(LoadTempSound("SFX\MTF\173blinking.ogg"),n)
+			EndIf
+		EndIf
 		n\BlinkTimer = 70.0*Rnd(10.0,15.0)
 	EndIf	
 	
@@ -4445,6 +4447,7 @@ Function UpdateMTFUnit(n.NPCs)
 	If Int(n\State) <> 1 Then n\PrevState = 0
 	
 	If n\Idle>0.0 Then
+		FinishWalking(n,488,522,0.015*26)
 		n\Idle=n\Idle-FPSfactor
 		If n\Idle<=0.0 Then n\Idle = 0.0
 	Else
@@ -4546,6 +4549,7 @@ Function UpdateMTFUnit(n.NPCs)
 					If Rand(1,35)=1 Then
 						RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 					EndIf
+					FinishWalking(n,488,522,n\Speed*26)
 					n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 					RotateEntity n\obj,-90.0,n\Angle,0.0,True
                 Else
@@ -4555,6 +4559,7 @@ Function UpdateMTFUnit(n.NPCs)
 						If Rand(1,35)=1 Then
 							RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 						EndIf
+						FinishWalking(n,488,522,n\Speed*26)
 						n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 						RotateEntity n\obj,-90.0,n\Angle,0.0,True
 					ElseIf n\PathStatus=1 Then
@@ -4569,11 +4574,16 @@ Function UpdateMTFUnit(n.NPCs)
 							
 							PointEntity n\Collider,n\Path[n\PathLocation]\obj
 							RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
+							
+							RotateToDirection(n)
+							
 							n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
+							
 							RotateEntity n\obj,-90.0,n\Angle,0.0,True
 							
 							n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,20.0)
 							;MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+							
 							TranslateEntity n\Collider, Cos(EntityYaw(n\Collider,True)+90.0)*n\CurrSpeed * FPSfactor, 0, Sin(EntityYaw(n\Collider,True)+90.0)*n\CurrSpeed * FPSfactor, True
 							AnimateNPC(n,488, 522, n\CurrSpeed*26)
 							
@@ -4624,6 +4634,7 @@ Function UpdateMTFUnit(n.NPCs)
 							If Rand(1,35)=1 Then
 								RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 							EndIf
+							FinishWalking(n,488,522,n\Speed*26)
 							n\CurrSpeed = 0.0
 						ElseIf EntityDistance(n\Collider,n\MTFLeader\Collider)>1.0 Then
 							PointEntity n\Collider,n\MTFLeader\Collider
@@ -4636,6 +4647,7 @@ Function UpdateMTFUnit(n.NPCs)
 							If Rand(1,35)=1 Then
 								RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 							EndIf
+							FinishWalking(n,488,522,n\Speed*26)
 							n\CurrSpeed = 0.0
 						EndIf
 						n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
@@ -4907,6 +4919,7 @@ Function UpdateMTFUnit(n.NPCs)
 						If Rand(1,35)=1 Then
 							RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 						EndIf
+						FinishWalking(n,488,522,n\Speed*26)
 						n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 						RotateEntity n\obj,-90.0,n\Angle,0.0,True
 					Else
@@ -4916,6 +4929,7 @@ Function UpdateMTFUnit(n.NPCs)
 							If Rand(1,35)=1 Then
 								RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 							EndIf
+							FinishWalking(n,488,522,n\Speed*26)
 							n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 							RotateEntity n\obj,-90.0,n\Angle,0.0,True
 						ElseIf n\PathStatus=1 Then
@@ -4965,6 +4979,7 @@ Function UpdateMTFUnit(n.NPCs)
 								If Rand(1,35)=1 Then
 									RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 								EndIf
+								FinishWalking(n,488,522,n\Speed*26)
 								If Rand(1,35)=1 Then
 									For wp.Waypoints = Each WayPoints
 										If (Rand(1,3)=1) Then
@@ -5163,6 +5178,7 @@ Function UpdateMTFUnit(n.NPCs)
 							PointEntity n\Collider,n\obj
 							RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
 							n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
+							FinishWalking(n,488,522,n\Speed*26)
 							RotateEntity n\obj,-90.0,n\Angle,0.0,True
 						Else
 							PositionEntity n\obj,EntityX(Curr173\Collider,True),EntityY(Curr173\Collider,True),EntityZ(Curr173\Collider,True),True
@@ -5186,6 +5202,7 @@ Function UpdateMTFUnit(n.NPCs)
 							If Rand(1,35)=1 Then
 								RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 							EndIf
+							FinishWalking(n,488,522,n\Speed*26)
 							n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 							RotateEntity n\obj,-90.0,n\Angle,0.0,True
 						Else
@@ -5195,6 +5212,7 @@ Function UpdateMTFUnit(n.NPCs)
 								If Rand(1,35)=1 Then
 									RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 								EndIf
+								FinishWalking(n,488,522,n\Speed*26)
 								n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 								RotateEntity n\obj,-90.0,n\Angle,0.0,True
 							ElseIf n\PathStatus=1 Then
@@ -5244,6 +5262,7 @@ Function UpdateMTFUnit(n.NPCs)
 								If Rand(1,35)=1 Then
 									RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 								EndIf
+								FinishWalking(n,488,522,n\Speed*26)
 								n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 								RotateEntity n\obj,-90.0,n\Angle,0.0,True
 							EndIf
@@ -5626,6 +5645,7 @@ Function UpdateMTFUnit(n.NPCs)
 					;If Rand(1,35)=1 Then
 					;	RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 					;EndIf
+					FinishWalking(n,488,522,n\Speed*26)
 					n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 					RotateEntity n\obj,-90.0,n\Angle,0.0,True
                 Else
@@ -5635,6 +5655,7 @@ Function UpdateMTFUnit(n.NPCs)
 						;If Rand(1,35)=1 Then
 						;	RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 						;EndIf
+						FinishWalking(n,488,522,n\Speed*26)
 						n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 						RotateEntity n\obj,-90.0,n\Angle,0.0,True
 					ElseIf n\PathStatus=1 Then
@@ -5684,6 +5705,7 @@ Function UpdateMTFUnit(n.NPCs)
 							;If Rand(1,35)=1 Then
 							;	RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 							;EndIf
+							FinishWalking(n,488,522,n\Speed*26)
 							n\CurrSpeed = 0.0
 						ElseIf EntityDistance(n\Collider,n\MTFLeader\Collider)>1.0 Then
 							PointEntity n\Collider,n\MTFLeader\Collider
@@ -5696,6 +5718,7 @@ Function UpdateMTFUnit(n.NPCs)
 							;If Rand(1,35)=1 Then
 							;	RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 							;EndIf
+							FinishWalking(n,488,522,n\Speed*26)
 							n\CurrSpeed = 0.0
 						EndIf
 						n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
@@ -6301,10 +6324,46 @@ Function GoToElevator(n.NPCs)
 	EndIf
 	
 End Function
+
+Function FinishWalking(n.NPCs,startframe#,endframe#,speed#)
+	Local centerframe#
+	
+	If n<>Null
+		centerframe# = (endframe#-startframe#)/2
+		If n\Frame >= centerframe#
+			AnimateNPC(n,startframe#,endframe#,speed#,False)
+		Else
+			AnimateNPC(n,endframe#,startframe#,-speed#,False)
+		EndIf
+	EndIf
+	
+End Function
+
+Function RotateToDirection(n.NPCs)
+	
+	HideEntity n\Collider
+	EntityPick(n\Collider, 1.0)
+	If PickedEntity() <> 0 Then
+		Local turnToSide% = 0
+		TurnEntity n\Collider,0,90,0
+		EntityPick(n\Collider,1.0)
+		If PickedEntity()=0
+			turnToSide% = 1
+		EndIf
+		TurnEntity n\Collider,0,270,0
+		If turnToSide% = 1
+			TurnEntity n\Collider,0.0,45,0.0,True
+		Else
+			TurnEntity n\Collider,0.0,-45,0.0,True
+		EndIf
+	EndIf
+	ShowEntity n\Collider
+	
+End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#3F#49#6F#95#A5#D5#E5#EE#FC#10B#11E#13D#167#17B#198#1D9#1F1#212
-;~F#235#23E#269#284#291#38D#478#5CD#5E7#5F7#740#748#7C2#85D#97D#982#9B9#A5B#A96#B25
-;~F#B91#CA6#D6D#E24#ED7#FD6#FDF#10A4#10CB#10D6#10FA#110D#110E#12BD#1408#1486#14E6#1566#1593#15B9
-;~F#15D2#164E#16FC#1774#1785#17A0#17BE#17FC#181D#182B#1847#1859#187D
-;~B#197#1267#1301#1397#1547#164E#180B#1867
+;~F#235#23E#269#284#291#38D#478#5CD#5E7#5F7#740#748#7C0#85B#97B#980#9B7#A59#A94#B23
+;~F#B8F#CA4#D6B#E22#ED5#FD4#FDD#10A2#10C9#10D4#10F8#110B#110C#1167#12C9#1417#1499#14F9#1579#15A6
+;~F#15CC#15E5#1665#1713#178B#179C#17B7#17D5#1813#1834#1842#185E#1870#1894#18B7#18C5
+;~B#197#1273#130D#13A6#155A#1665#1822#187E
 ;~C#Blitz3D
