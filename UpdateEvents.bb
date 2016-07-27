@@ -7666,8 +7666,61 @@ Function UpdateEvents()
 						EndIf
 					EndIf
 				Else
+					e\EventState3 = 1
+					Select e\EventState
+						Case 1
+							Animate2(e\room\Objects[0], AnimTime(e\room\Objects[0]), 2.0, 395.0, 1.0)
+							
+							If (EntityDistance(Collider, e\room\Objects[0])<2.5) Then e\EventState = 2
+						Case 2
+							Local prevFrame# = AnimTime(e\room\Objects[0]) 
+							Animate2(e\room\Objects[0], prevFrame, 2.0, 647.0, 1.0, False)
+							
+							If (prevFrame <= 400.0 And AnimTime(e\room\Objects[0])>400.0) Then
+								e\SoundCHN = PlaySound_Strict(e\Sound)
+							EndIf
+							
+							Local volume# = Max(1.0 - Abs(prevFrame - 600.0)/100.0, 0.0)
+							
+							BlurTimer = volume*1000.0
+							CameraShake = volume*10.0
+							
+							PointEntity(e\room\Objects[0], Collider)
+							RotateEntity(e\room\Objects[0], -90.0, EntityYaw(e\room\Objects[0]), 0.0)
+							
+							If (prevFrame>646.0) Then
+								If (PlayerRoom = e\room) Then
+									e\EventState = 3	
+									PlaySound_Strict e\Sound2
+									
+									Msg = "Something is growing all around your body!"
+									MsgTimer = 70.0 * 3.0
+								Else
+									e\EventState3 = 70*30
+								EndIf
+							EndIf
+						Case 3
+							e\EventState2 = e\EventState2 + FPSfactor
+							
+							BlurTimer = e\EventState2*2.0
+							
+							If (e\EventState2>250.0 And e\EventState2-FPSfactor <= 250.0) Then
+								Msg = "THEY LOOK LIKE EARS"
+								MsgTimer = 70.0 * 3.0
+							Else If (e\EventState2>600.0 And e\EventState2-FPSfactor <= 600.0)
+								Msg = "IT'S GETTING HARD TO BREATHE"
+								MsgTimer = 70.0 * 5.0
+							EndIf
+							
+							If (e\EventState2>70*15) Then
+								Kill()
+								e\EventState = 4
+								RemoveEvent(e)
+							EndIf
+					End Select 
+					
+					
 					If PlayerRoom <> e\room Then
-						
 						If e\EventState3>0 Then
 							e\EventState3 = e\EventState3+FPSfactor
 							
