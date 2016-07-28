@@ -3,7 +3,7 @@
 v1.3
 - SCP-1162, SCP-1499
 - new rooms
-- expanded SCP-939 area
+- expanded SCP-[REDACTED] area
 - some new sounds
 - nicer looking lights
 - more graphics options
