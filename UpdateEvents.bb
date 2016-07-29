@@ -127,13 +127,6 @@ Function UpdateEvents()
 					
 					If e\EventState >= 500 Then
 						e\EventState=e\EventState+FPSfactor
-						If e\EventState < 2000 Then
-							If e\SoundCHN = 0 Then
-								e\SoundCHN = PlaySound_Strict(AlarmSFX(0))
-							Else
-								If Not ChannelPlaying(e\SoundCHN) Then e\SoundCHN = PlaySound_Strict(AlarmSFX(0))
-							End If
-						EndIf
 						
 						If e\EventState2 = 0 Then
 							If e\EventState > 900 And e\room\RoomDoors[5]\open Then
@@ -225,47 +218,54 @@ Function UpdateEvents()
 						If EntityDistance(e\room\Objects[0],Collider)<2.5 Then
 							If Rand(300)=2 Then PlaySound2(DecaySFX(Rand(1,3)),Camera,e\room\Objects[0], 3.0)
 						EndIf
-						
-						If (e\EventState3<9) Then
-							If (Not ChannelPlaying(e\SoundCHN2)) Then
-								e\EventState3 = e\EventState3+1
-								
-								If (e\Sound2 <> 0) Then
-									FreeSound_Strict(e\Sound2)
-									e\Sound2 = 0
-								EndIf
-								
-								e\Sound2 = LoadSound_Strict("SFX\Alarm\Alarm2_"+Int(e\EventState3)+".ogg")
-								e\SoundCHN2 = PlaySound_Strict(e\Sound2)
-							EndIf
-						EndIf
-						
-						If ((e\EventState Mod 600 > 300) And ((e\EventState+FPSfactor) Mod 600 < 300)) Then
-							i = Floor((e\EventState-5000)/600)+1
-							
-							If i = 0 Then PlaySound_Strict(LoadTempSound("SFX\Intro\PA\scripted\scripted6.ogg"))
-							
-							If (i>0 And i<22) Then
-								PlaySound_Strict(LoadTempSound("SFX\Intro\Commotion\Commotion"+i+".ogg"))
-							EndIf
-							
-							;If i = 21 Then DebugLog "Commotion21"
-							
-							If (i>23) Then
-								If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
-								If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
-								If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
-								
-								FreeEntity e\room\Objects[0]
-								FreeEntity e\room\Objects[1]
-								
-								DebugLog "delete alarm"
-								
-								RemoveEvent(e)							
-							EndIf
-						EndIf
 					End If
 					
+					If (e\EventState < 2000) Then
+						If e\SoundCHN = 0 Then
+							e\SoundCHN = PlaySound_Strict(AlarmSFX(0))
+						Else
+							If Not ChannelPlaying(e\SoundCHN) Then e\SoundCHN = PlaySound_Strict(AlarmSFX(0))
+						End If
+					EndIf
+					
+					If (e\EventState3<9) Then
+						If (Not ChannelPlaying(e\SoundCHN2)) Then
+							e\EventState3 = e\EventState3+1
+							
+							If (e\Sound2 <> 0) Then
+								FreeSound_Strict(e\Sound2)
+								e\Sound2 = 0
+							EndIf
+							
+							e\Sound2 = LoadSound_Strict("SFX\Alarm\Alarm2_"+Int(e\EventState3)+".ogg")
+							e\SoundCHN2 = PlaySound_Strict(e\Sound2)
+						EndIf
+					EndIf
+					
+					If ((e\EventState Mod 600 > 300) And ((e\EventState+FPSfactor) Mod 600 < 300)) Then
+						i = Floor((e\EventState-5000)/600)+1
+						
+						If i = 0 Then PlaySound_Strict(LoadTempSound("SFX\Intro\PA\scripted\scripted6.ogg"))
+						
+						If (i>0 And i<22) Then
+							PlaySound_Strict(LoadTempSound("SFX\Intro\Commotion\Commotion"+i+".ogg"))
+						EndIf
+						
+							;If i = 21 Then DebugLog "Commotion21"
+						
+						If (i>23) Then
+							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
+							If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
+							If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
+							
+							FreeEntity e\room\Objects[0]
+							FreeEntity e\room\Objects[1]
+							
+							DebugLog "delete alarm"
+							
+							RemoveEvent(e)							
+						EndIf
+					EndIf					
 				End If
 				;[End Block]
 			Case "173" ;the intro sequence
@@ -7719,7 +7719,6 @@ Function UpdateEvents()
 							EndIf
 					End Select 
 					
-					
 					If PlayerRoom <> e\room Then
 						If e\EventState3>0 Then
 							e\EventState3 = e\EventState3+FPSfactor
@@ -7730,59 +7729,8 @@ Function UpdateEvents()
 								RemoveEvent(e)
 							EndIf
 						EndIf
-					Else
-							e\EventState3 = 1
-						Select e\EventState
-							Case 1
-								Animate2(e\room\Objects[0], AnimTime(e\room\Objects[0]), 2.0, 395.0, 1.0)
-								
-								If (EntityDistance(Collider, e\room\Objects[0])<2.5) Then e\EventState = 2
-							Case 2
-								Local prevFrame# = AnimTime(e\room\Objects[0]) 
-								Animate2(e\room\Objects[0], prevFrame, 2.0, 647.0, 1.0, False)
-								
-								If (prevFrame <= 400.0 And AnimTime(e\room\Objects[0])>400.0) Then
-									e\SoundCHN = PlaySound_Strict(e\Sound)
-								EndIf
-								
-								Local volume# = Max(1.0 - Abs(prevFrame - 600.0)/100.0, 0.0)
-								
-								BlurTimer = volume*1000.0
-								CameraShake = volume*10.0
-								
-								PointEntity(e\room\Objects[0], Collider)
-								RotateEntity(e\room\Objects[0], -90.0, EntityYaw(e\room\Objects[0]), 0.0)
-								
-								If (prevFrame>646.0) Then
-									e\EventState = 3	
-									PlaySound_Strict e\Sound2
-									
-									Msg = "Something is growing all around your body!"
-									MsgTimer = 70.0 * 3.0
-								EndIf
-							Case 3
-								e\EventState2 = e\EventState2 + FPSfactor
-								
-								BlurTimer = e\EventState2*2.0
-								
-								If (e\EventState2>250.0 And e\EventState2-FPSfactor <= 250.0) Then
-									Msg = "THEY LOOK LIKE EARS"
-									MsgTimer = 70.0 * 3.0
-								Else If (e\EventState2>600.0 And e\EventState2-FPSfactor <= 600.0)
-									Msg = "IT'S GETTING HARD TO BREATHE"
-									MsgTimer = 70.0 * 5.0
-								EndIf
-								
-								If (e\EventState2>70*15) Then
-									Kill()
-									e\EventState = 4
-									RemoveEvent(e)
-								EndIf
-						End Select 
 					EndIf
 				EndIf
-				
-				
 				
 				;[End Block]
 			;New Events in SCP:CB version 1.3 - ENDSHN	

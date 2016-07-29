@@ -1,21 +1,25 @@
 ----------------------------------------------------------------------------------
 
 v1.3
-- SCP-1162, SCP-1499
-- new rooms
+- some additions from the Nine Tailed Fox mod 
+(http://undertowgames.com/forum/viewtopic.php?f=11&t=4358):
+	- SCP-1162, SCP-1499
+	- new rooms
+	- more graphics options
+	- borderless windowed mode
 - expanded SCP-[REDACTED] area
 - some new sounds
 - nicer looking lights
-- more graphics options
-- borderless windowed mode
 - Map Creator improvements
 - options can be accessed from the pause menu
 - optimization to sound loading by juanjpro
-- getting Key Card Omni is slightly harder now
+- getting Key Card Omni is slightly harder now (depending on the difficulty)
 - more SCP-096 spawns
 - more SCP-049 spawns
-- MTF AI bugfixes and optimization
-- cameras are now a threat if the MTF Units have spawned
+- MTF improvements
+	- AI bugfixes and optimization
+	- more reactions to SCPs
+	- cameras are now a threat if the MTF Units have spawned
 - fixed Class D step sounds 
 - removed SCP-1074
 - improved SCP-049 AI
