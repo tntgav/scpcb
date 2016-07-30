@@ -1197,7 +1197,7 @@ Global NTF_1499FuckedSFX% = LoadSound_Strict("SFX\1499\fuckedup.ogg")
 
 Global PlayCustomMusic% = False, CustomMusic% = 0
 
-Global Monitor2, MonitorTexture2, MonitorTexture3, MonitorTextureOff
+Global Monitor2, MonitorTexture2, MonitorTexture3, MonitorTexture4, MonitorTextureOff
 Global MonitorTimer# = 0.0
 
 ;This variable is for when a camera detected the player
@@ -1915,8 +1915,7 @@ Function InitEvents()
 	
 	CreateEvent("room2tesla", "room2tesla", 0, 0.9)
 	
-	e = CreateEvent("room2nuke", "room2nuke", 0, 0)	
-	If e <> Null Then e\EventState = 1
+	CreateEvent("room2nuke", "room2nuke", 0, 0)
 	
 	If Rand(5) < 5 Then 
 		CreateEvent("coffin106", "coffin", 0, 0)
@@ -1949,8 +1948,7 @@ Function InitEvents()
 	
 	CreateEvent("008", "008", 0, 0)
 	
-	e.Events = CreateEvent("room106", "room106", 0, 0)	
-	If e <> Null Then e\EventState2 = 1
+	CreateEvent("room106", "room106", 0, 0)	
 	
 	CreateEvent("pj", "roompj", 0, 0)
 	
@@ -1998,6 +1996,7 @@ Function InitEvents()
 	CreateEvent("room2scps2","room2scps2",0)
 	CreateEvent("room_gw","room3gw",0,1.0)
 	CreateEvent("room2sl","room2sl",0)
+	
 	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
 	
 	CreateEvent("096spawn","room4pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
@@ -5861,6 +5860,7 @@ Function LoadEntities()
 	HideEntity Monitor2
 	MonitorTexture2 = LoadTexture_Strict("GFX\map\LockdownScreen2.jpg")
 	MonitorTexture3 = LoadTexture_Strict("GFX\map\LockdownScreen.jpg")
+	MonitorTexture4 = LoadTexture_Strict("GFX\map\LockdownScreen3.jpg")
 	MonitorTextureOff = CreateTexture(1,1)
 	SetBuffer TextureBuffer(MonitorTextureOff)
 	ClsColor 0,0,0
@@ -5932,7 +5932,7 @@ End Function
 
 Function InitNewGame()
 	
-	Local i%, de.Decals, d.Doors, it.Items, r.Rooms, sc.SecurityCams 
+	Local i%, de.Decals, d.Doors, it.Items, r.Rooms, sc.SecurityCams, e.Events
 	
 	DrawLoading(45)
 	
@@ -6026,6 +6026,21 @@ Function InitNewGame()
 	ResetEntity Collider
 	
 	If SelectedMap = "" Then InitEvents()
+	
+	For e.Events = Each Events
+		If e\EventName = "room2nuke"
+			e\EventState = 1
+			DebugLog "room2nuke"
+		EndIf
+		If e\EventName = "room106"
+			e\EventState2 = 1
+			DebugLog "room106"
+		EndIf	
+		If e\EventName = "room2sl"
+			e\EventState3 = 1
+			DebugLog "room2sl"
+		EndIf
+	Next
 	
 	MoveMouse viewport_center_x,viewport_center_y;320, 240
 	
@@ -8506,10 +8521,10 @@ Function CheckTriggers$()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3CC#4A8#502#523#59B#5A8#65D#6D5#6EC#6F9#72B#7E2#8C6#994#9AC
-;~F#A3F#B65#C84#DF0#1463#14AD#14BF#14FE#15CC#15D7#172A#17AB#18DA#18EC#1908#1912#191F#1941#1960#197F
-;~F#199B#19AF#19C4#19C8#19E8#19F0#1A1B#1BBD#1C72#1C9D#1D14#1D1A#1D24#1D30#1D3B#1D3F#1D7A#1D82#1D8A#1D91
-;~F#1D98#1DA5#1DAB#1DB6#1DEF#1DFE#1E1C#1E4A#1E51#1E64#1E7D#1EAA#1EB5#1EBA#1ED4#1EE0#1EFB#1F4D#1F5B#1F63
-;~F#1F6F#1F78#1FA1#1FA6#1FAB#1FB0#1FB9#1FC1#2063#206D#2092#20A0#20AD#20D4#20E6#20F7#2106#211D
-;~B#1189#1A1A
+;~F#24#AC#12C#130#137#3CC#4A8#502#523#59B#5A8#65D#6D5#6EC#6F9#7E1#8C5#993#9AB#A3E
+;~F#B64#C83#DEF#13D7#15CD#15D8#17BC#17ED#18EB#18FD#1919#1923#1930#1952#1971#1990#19AC#19C0#19D5#19D9
+;~F#19F9#1A01#1A2C#1BCE#1C83#1CAE#1D25#1D2B#1D35#1D41#1D4C#1D50#1D8B#1D93#1D9B#1DA2#1DA9#1DB6#1DBC#1DC7
+;~F#1E00#1E0F#1E2D#1E5B#1E62#1E75#1E8E#1EBB#1EC6#1ECB#1EE5#1EF1#1F0C#1F5E#1F6C#1F74#1F80#1F89#1FB2#1FB7
+;~F#1FBC#1FC1#1FCA#1FD2#2074#207E#20A3#20B1#20BE#20E5#20F7#2108#2117#212E
+;~B#1188#1A29
 ;~C#Blitz3D

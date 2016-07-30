@@ -1343,14 +1343,13 @@ Function UpdateEvents()
 							If e2\EventState = 2
 								If e\room\RoomDoors[0]\locked
 									MonitorTimer# = 0.0
-									;UpdateCheckpointMonitors()
 									TurnCheckpointMonitorsOff()
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
 							Else
 								If e\room\dist < 12
-									UpdateCheckpointMonitors()
+									UpdateCheckpointMonitors(0)
 									e\room\RoomDoors[0]\locked = True
 									e\room\RoomDoors[1]\locked = True
 								EndIf
@@ -1360,7 +1359,20 @@ Function UpdateEvents()
 				Else
 					For e2.Events = Each Events
 						If e2\EventName = "room2sl"
-							
+							If e2\EventState3 = 0
+								If e\room\dist < 12
+									MonitorTimer# = 0.0
+									TurnCheckpointMonitorsOff()
+									e\room\RoomDoors[0]\locked = False
+									e\room\RoomDoors[1]\locked = False
+								EndIf
+							Else
+								If e\room\dist < 12
+									UpdateCheckpointMonitors(1)
+									e\room\RoomDoors[0]\locked = True
+									e\room\RoomDoors[1]\locked = True
+								EndIf
+							EndIf
 						EndIf
 					Next
 				EndIf
@@ -8268,6 +8280,7 @@ Function UpdateEvents()
 				;[Block]
 				;e\EventState: Determines if the player already entered the room or not (0 = No, 1 = Yes)
 				;e\EventState2: Variable used for the SCP-049 event
+				;e\EventState3: Checks if Lever is activated or not
 				
 				;Camera-Spawning Code + SCP-049-Spawning (it is a little messy!)
 				;[Block]
@@ -8583,7 +8596,7 @@ Function UpdateEvents()
 									e\room\NPC[0]\PathTimer# = 1.0
 								EndIf
 							ElseIf e\room\NPC[0]\PrevState = 2
-								If e\room\NPC[0]\Frame >= 1121
+								If e\room\NPC[0]\Frame >= 1118
 									e\room\NPC[0]\PathTimer# = 1.0
 								EndIf
 							EndIf
@@ -8627,13 +8640,15 @@ Function UpdateEvents()
 					DebugLog "ddddddddd"
 					e\room\NPC[0]\State = 2
 					For r.Rooms = Each Rooms
-						If EntityDistance(r\obj,e\room\NPC[0]\Collider)<12.0 And EntityDistance(r\obj,e\room\NPC[0]\Collider)>4.0
-							e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(r\obj),EntityY(r\obj),EntityZ(r\obj))
-							e\room\NPC[0]\PathTimer = 0.0
-							Exit
+						If r <> PlayerRoom
+							If (EntityDistance(r\obj,e\room\NPC[0]\Collider)<15.0 And EntityDistance(r\obj,e\room\NPC[0]\Collider)>5.0) And Rand(1,2)=1
+								e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(r\obj),EntityY(r\obj),EntityZ(r\obj))
+								e\room\NPC[0]\PathTimer = 0.0
+								If e\room\NPC[0]\PathStatus = 1 Then e\EventState2 = 6
+								Exit
+							EndIf
 						EndIf
 					Next
-					e\EventState2 = 6
 				ElseIf e\EventState2 = 6
 					If MeNPCSeesPlayer(e\room\NPC[0]) Or e\room\NPC[0]\State2 > 0 Or e\room\NPC[0]\LastSeen > 0
 						DebugLog "fffffffff"
@@ -8650,7 +8665,8 @@ Function UpdateEvents()
 				EndIf
 				;[End Block]
 				
-				
+				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint got locked again)
+				e\EventState3 = UpdateLever(e\room\Levers[0])
 				
 				;[End Block]
 			Case "096spawn"
@@ -8802,9 +8818,9 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#13#10F#4F5#505#567#5D8#637#805#9EC#A13#A21#A2B#A38#C21#C42#C91#CDF#CEC#D26#D3D
-;~F#D5D#D66#D70#D7F#E13#E35#10E1#1127#113D#1149#1167#11B8#11CF#129C#139D#142E#1447#1466#14CB#14D8
-;~F#14F1#1589#173F#1815#1869#191A#19CA#1A82#1A9A#1B5B#1B88#1BA5#1BCC#1BFC#1C20#1C48#1CA2#1CE2#1D13#1D26
-;~F#1DE0#1E38#1E4B#1E59#1E62#1EAE#1ECD#1FD8#204B#21D0
-;~B#148C#2145
+;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
+;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
+;~F#14FD#1595#174B#1821#1875#1926#19D6#1A8E#1AA6#1B67#1B94#1BB1#1BD8#1C08#1C2C#1C54#1CAE#1CEE#1D1F#1D32
+;~F#1DEC#1E44#1E57#1E65#1E6E#1EBA#1ED9#1FE4#205D#2138#21E0
+;~B#1498#2152
 ;~C#Blitz3D

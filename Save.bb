@@ -1789,5 +1789,5 @@ Function LoadMap(file$)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#1A6#3FE#635#663#681
+;~F#2#1A6#3FE#635#663
 ;~C#Blitz3D

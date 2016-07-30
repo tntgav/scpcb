@@ -2236,6 +2236,12 @@ Function FillRoom(r.Rooms)
 			sc\turn = 0
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			
+			r\Objects[2] = CopyEntity(Monitor2,r\obj)
+			ScaleEntity(r\Objects[2], 2.0, 2.0, 2.0)
+			PositionEntity (r\Objects[2], r\x - 152.0*RoomScale, 384.0*RoomScale, r\z+124.0*RoomScale, True)
+			RotateEntity (r\Objects[2],0,180,0)
+			EntityFX r\Objects[2],1
+			
 			If MapTemp(Floor(r\x / 8.0),Floor(r\z /8.0)-1)=0 Then
 				CreateDoor(r\zone, r\x, 0, r\z  - 4.0, 0, r, 0, False, 0, "GEAR")
 			EndIf
@@ -3081,7 +3087,7 @@ Function FillRoom(r.Rooms)
 			;[Block]
 			For r2.Rooms = Each Rooms
 				If r2<>r Then
-					If r2\roomtemplate\name = "room2_2" Then
+					If r2\RoomTemplate\Name = "room2_2" Then
 						r\Objects[0] = CopyEntity(r2\Objects[0]) ;don't load the mesh again
 						Exit
 					EndIf
@@ -4519,6 +4525,9 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[1]\dir = 0 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
 			r\RoomDoors[1]\MTFClose = False
 			
+			r\Objects[3] = LoadMesh_Strict("GFX\map\room2gw_pipes.b3d",r\obj)
+			EntityPickMode r\Objects[3],2
+			
 			If r\RoomTemplate\Name = "room2gw"
 				r\Objects[0] = CreatePivot()
 				;PositionEntity r\Objects[0],r\x-48.0*RoomScale,128.0*RoomScale,r\z+320.0*RoomScale
@@ -4573,6 +4582,9 @@ Function FillRoom(r.Rooms)
 			r\Objects[0] = CreatePivot()
 			PositionEntity r\Objects[0],r\x-48.0*RoomScale,128.0*RoomScale,r\z+320.0*RoomScale
 			EntityParent r\Objects[0],r\obj
+			
+			r\Objects[3] = LoadMesh_Strict("GFX\map\room3gw_pipes.b3d",r\obj)
+			EntityPickMode r\Objects[3],2
 	        ;[End Block]
 		Case "room1162"
 			;[Block]
@@ -4669,9 +4681,9 @@ Function FillRoom(r.Rooms)
 			d = CreateDoor(r\zone,r\x+1504.0*RoomScale,r\y+480.0*RoomScale,r\z+960.0*RoomScale,0,r)
 			d\AutoClose = False : d\locked = True
 			
-			;Spawnpoint for SCP-049
+			;PathPoint 1 for SCP-049
 			r\Objects[7] = CreatePivot()
-			PositionEntity r\Objects[7],r\x,r\y+200.0*RoomScale,r\z+600.0*RoomScale,True
+			PositionEntity r\Objects[7],r\x,r\y+100.0*RoomScale,r\z-640.0*RoomScale,True
 			EntityParent r\Objects[7],r\obj
 			
 			;PathPoints for SCP-049
@@ -4689,6 +4701,25 @@ Function FillRoom(r.Rooms)
 			TurnEntity sc\CameraObj, 20, 0, 0
 			EntityParent sc\obj,r\obj
 			sc\SpecialCam = True
+			
+			;-49.0 689.0 912.0
+			;Objects [18],[19]
+			r\Objects[9 * 2] = CopyEntity(LeverBaseOBJ)
+			r\Objects[9 * 2 + 1] = CopyEntity(LeverOBJ)
+			
+			r\Levers[0] = r\Objects[9 * 2 + 1]
+			
+			For  i% = 0 To 1
+				ScaleEntity(r\Objects[9 * 2 + i], 0.04, 0.04, 0.04)
+				PositionEntity r\Objects[9 * 2 + i],r\x-49*RoomScale,r\y+689*RoomScale,r\z+912*RoomScale,True
+				
+				EntityParent(r\Objects[9 * 2 + i], r\obj)
+			Next
+			RotateEntity(r\Objects[9 * 2], 0, 0, 0)
+			RotateEntity(r\Objects[9 * 2 + 1], 10, 0 - 180, 0)
+				
+			EntityPickMode r\Objects[9 * 2 + 1], 1, False
+			EntityRadius r\Objects[9 * 2 + 1], 0.1
 			
 			;Camera in the room itself
 			sc.SecurityCams = CreateSecurityCam(r\x-159.0*RoomScale, r\y+384.0*RoomScale, r\z-929.0*RoomScale, r, True)
@@ -7230,7 +7261,7 @@ Function UpdateRoomLights(cam%)
 	
 End Function
 
-Function UpdateCheckpointMonitors()
+Function UpdateCheckpointMonitors(numb%)
 	Local i,sf,b,t1
 	
 	For i = 2 To CountSurfaces(Monitor2)
@@ -7244,7 +7275,11 @@ Function UpdateCheckpointMonitors()
 					If MonitorTimer# < 50
 						BrushTexture b, MonitorTexture2, 0, 0
 					Else
-						BrushTexture b, MonitorTexture3, 0, 0
+						If numb%=0
+							BrushTexture b, MonitorTexture3, 0, 0
+						Else
+							BrushTexture b, MonitorTexture4, 0, 0
+						EndIf
 					EndIf
 					PaintSurface sf,b
 				EndIf
@@ -7595,12 +7630,12 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A
-;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6DB#6E4#735#777#799#7F5#807#86E#87D
-;~F#8A7#8C3#8E1#8FF#926#92D#93B#957#96C#989#9A6#9B3#9C5#A03#A2D#A7E#AD4#AE7#B05#BA8
-;~F#C09#C18#C54#C5C#C6A#C7F#CBB#CDA#CEA#D02#D2D#D40#D62#D8A#DDC#E08#E2F#E36#E3B#E72
-;~F#E99#EAE#EE2#F60#F80#FF4#104B#1076#10C7#10D0#1169#1171#1176#1184#1193#11C9#11E2#11F1#1202#1209
-;~F#120E#1272#12A8#1325#1331#1372#137D#138E#1393#13A2#13B9#143A#1443#1522#153F#1546#154C#155A#157E#159E
-;~F#15D1#16DC#1715#172A#17EC#1881#1886#1B6B#1B82#1BA1#1BA8#1BF5#1C46#1C61#1C78#1CA0#1CA7#1CDB#1CE2#1D0E
-;~F#1D5C#1D6A#1D71#1D77#1D81#1D87#1D9A
-;~B#1200
+;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
+;~F#8C9#8E6#904#92B#932#940#95C#971#98E#9AB#9B8#9CA#A08#A32#A83#AD9#AEC#B0A#BAD#C0E
+;~F#C1D#C59#C61#C6F#C84#CC0#CDF#CEF#D07#D32#D45#D67#D8F#DE1#E0D#E34#E3B#E40#E77#E9E
+;~F#EB3#EE7#F65#F85#FF9#1050#107B#10CC#10D5#116E#1176#117B#1189#1198#11D1#11ED#11FC#120D#1214#1219
+;~F#1290#12C6#1343#134F#1390#139B#13AC#13B1#13C0#13D7#1458#1461#1540#155D#1564#156A#1578#159C#15BC#15EF
+;~F#16FB#1734#1749#180B#18A0#18A5#18B5#1B84#1B9B#1BBA#1BC1#1C0E#1C5F#1C7E#1C95#1CBD#1CC4#1CF8#1CFF#1D2B
+;~F#1D79#1D87#1D8E#1D94#1D9E#1DA4#1DBB
+;~B#120C
 ;~C#Blitz3D
