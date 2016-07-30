@@ -1,3 +1,44 @@
+----------------------------------------------------------------------------------
+
+v1.3
+- some additions from the Nine Tailed Fox mod 
+(http://undertowgames.com/forum/viewtopic.php?f=11&t=4358):
+	- SCP-1162, SCP-1499
+	- new rooms
+	- more graphics options
+	- borderless windowed mode
+	- new key card textures by Anon4743
+- expanded SCP-[REDACTED] area
+- some new sounds
+- nicer looking lights
+- Map Creator improvements
+- options can be accessed from the pause menu
+- optimization to sound loading by juanjpro
+- getting Key Card Omni is slightly harder now (depending on the difficulty)
+- more SCP-096 spawns
+- 096 model with lower polycount
+- more SCP-049 spawns
+- MTF improvements
+	- AI bugfixes and optimization
+	- more reactions to SCPs
+	- cameras are now a threat if the MTF Units have spawned
+- fixed Class D step sounds 
+- removed SCP-1074
+- improved SCP-049 AI
+- door buttons can't be accidentally clicked by closing the pause menu anymore
+- fixed checkpoints occasionally leading into "nothingness"
+- fixed saves not being deleted even if permadeath is on
+- fixed a bug with SCP-372 chamber collision
+- SCP-1123 can't be grabbed through the glass
+- fixed a bug with duplicate "Incident Report SCP-1048-A" in clipboard
+- bugfixes to MTFs at Gate A and Gate B
+- the second sound clip in the "suicide guard" event is now played correctly
+- fixed "buttghost" event sound
+- "SCP-106's escape sound" is no longer played at Gate A if SCP-106 has been contained
+- fixed a bug that caused SCP-860-2 not to spawn
+- SCP-106 will no longer spawn in the forest
+
+----------------------------------------------------------------------------------
 
 v1.2.2
 - improved MTF AI by juanjpro

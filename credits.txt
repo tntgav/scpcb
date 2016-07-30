@@ -1,4 +1,17 @@
 
+*********************************************************
+
+	A big thank you to everyone who's supported the project during these years 
+	- it would have	never gotten to where it is now without your help. 
+	
+	SCP-CB has been a big collaborative effort with dozens (maybe even hundreds?) 
+	of people creating material and giving ideas and feedback for the game, and 
+	I'm sure I've forgotten to mention some of you here. If you've contributed 
+	something to the game and would like your name to be added here, drop 
+	me a message on the Undertow Games forum or contact@undertowgames.com!
+	
+	- Joonas Rikkonen ("Regalis")
+
 **** CREDITS ********************************************
 
 
@@ -35,6 +48,8 @@
 		SCP-1048 is based on "SCP-1048 - Builder Bear" by "Researcher Dios" (http://www.scp-wiki.net/scp-1048)
 		SCP-1074  is based on "SCP-1074  - Stendhal's Nightmare" by "Smapti" (http://www.scp-wiki.net/scp-1074)
 		SCP-1123 is based on "SCP-1123 - Atrocity Skull" by "sandrewswann" (http://www.scp-wiki.net/scp-1123)
+		SCP-1162 is based on "SCP-1162 - A Hole in the Wall" by "Dedaluminus" (http://www.scp-wiki.net/scp-1162)
+		SCP-1499 is based on "SCP-1499 - The Gas Mask" by "Trasknari" (http://www.scp-wiki.net/scp-1499)
 		
 		The Anomalous Ducks are based on "Log of Anomalous Ducks" by "Skara Brae" (http://www.scp-wiki.net/log-of-anomalous-ducks)
 
@@ -45,11 +60,11 @@
 
 	3D modeling
 
-		Prosth
-
 		Reilly Grindle ("Mirocaine")
-
+		
 		Night (http://goldenmech.deviantart.com/)
+
+		Prosth
 
 		Micro
 
@@ -78,7 +93,7 @@
 
 		Aaron Mckee ("TheVolgun")		
 
-		Brendan Sussman (DukeLovesYou)
+		Brendan Sussman ("DukeLovesYou")
 
 		ItsDuke
 	
@@ -104,10 +119,8 @@
 
 		Walach
 
-		Simon Kostoski ("undead003")
-
 	Other
-
+	
 		Dr. Gears
 			writing (backstory, documents and computer screens), ideas, + SCP-914, SCP-106 and SCP-682
 
@@ -152,16 +165,7 @@
 
 
 	SCP-1074, SCP-1123, SCP-178, Night Vision Goggles, Clipboard, Achievement system and other minor additions 
-	are from the mod called Box of Horrors (http://undertowgames.com/forum/viewtopic.php?f=11&t=3404)
-
-
-	Big thank you to everyone who's supported the project during these years, the game would have
-	never gotten never gotten to where it is now without your help. 
-	
-	SCP-CB has been a big collaborative effort with dozens (maybe even hundreds?) of people 
-	creating material and giving ideas and feedback for the game, and I'm sure I've forgotten 
-	to mention some of you here. If you've contributed something to the game and would like your
-	name to be in the credits as well, send me (Regalis) a PM in the forum.
+	are from the Box of Horrors mod (http://undertowgames.com/forum/viewtopic.php?f=11&t=3404)
 
 
 
