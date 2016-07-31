@@ -40,7 +40,12 @@ v1.3
 
 ----------------------------------------------------------------------------------
 
-v1.2.2
+v1.2.4
+- fixed guard getting stuck in the doorway in the intro
+
+----------------------------------------------------------------------------------
+
+v1.2.3
 - improved MTF AI by juanjpro
 - fixed a game-crashing bug when entering 079's or 895's chamber
 - 895's camera feed isn't shown in the SCP-205 "shadow scene"
