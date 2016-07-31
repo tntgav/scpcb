@@ -7944,7 +7944,7 @@ Function UpdateEvents()
 									e\EventState2 = i
 									If Rand(10)=1
 										e\EventState3 = 3.0
-										e\EventState = Rand(1,2)
+										e\EventState = Rand(1,3)
 										;Checking if the selected nostalgia item already exists or not
 										For it.Items = Each Items
 											Select e\EventState
@@ -7958,6 +7958,12 @@ Function UpdateEvents()
 													If it\itemtemplate\tempname = "oldpaper"
 														e\EventState3 = 1.0
 														e\EventState = 0.0
+													EndIf
+												Case 3
+													If it\itemtemplate\tempname = "coin"
+														e\EventState3 = 1.0
+														e\EventState = 0.0
+														Exit
 													EndIf
 											End Select
 										Next
@@ -8153,6 +8159,9 @@ Function UpdateEvents()
 								it = CreateItem("Lost Key","key",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 							Case 2
 								it = CreateItem("Disciplinary Hearing DH-S-4137-17092","oldpaper",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+							Case 3
+								it = CreateItem("Coin","coin",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+								
 						End Select
 						EntityType(it\obj, HIT_ITEM)
 						GiveAchievement(Achv1162)
