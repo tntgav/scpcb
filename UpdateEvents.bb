@@ -174,7 +174,7 @@ Function UpdateEvents()
 									
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
 									
-									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-304*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
+									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
 										e\room\RoomDoors[5]\open = False
 										LightBlink = 3.0
 										PlaySound_Strict(IntroSFX(11))
