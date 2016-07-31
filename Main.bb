@@ -75,7 +75,6 @@ End Select
 Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
 Global SFXVolume# = GetINIFloat(OptionFile, "options", "sound volume")
 
-Global Win8Mode = GetINIInt(OptionFile, "options", "compability mode")
 Global Bit16Mode = GetINIInt(OptionFile, "options", "16bit")
 
 If LauncherEnabled Then 
@@ -5626,7 +5625,7 @@ Function LoadEntities()
 	ScreenTexs[0] = CreateTexture(512, 512, 1+256+FE_RENDER+FE_ZRENDER)
 	ScreenTexs[1] = CreateTexture(512, 512, 1+256+FE_RENDER+FE_ZRENDER)
 	
-	InitFastResize()
+	;InitFastResize()
 	
 	CreateBlurImage()
 	;Listener = CreateListener(Camera)
@@ -8163,7 +8162,7 @@ Function RenderWorld2()
 	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision=1) And (Not Win8Mode) Then ;fake a low-res display
+	If (WearingNightVision=1) Then ;fake a low-res display
 		
 		;hasBattery% = True
 		
@@ -8186,14 +8185,11 @@ Function RenderWorld2()
 			EndIf
 		Next
 		If hasBattery Then
-			CameraViewport Camera,1024.0-(GraphicWidth/8),1024.0-(GraphicHeight/8),GraphicWidth/4,GraphicHeight/4
-			RenderWorldToTexture()
-			;TextureAnisotropy(-1, -1) ;uncomment this to disable filtering on the low-res display
-			CameraProjMode Camera,0
-			ScaleRender(0.0,0.0,6.4*1280.0/GraphicWidth,6.4*1280.0/GraphicWidth)
-			CameraProjMode Camera,1
-			;TextureAnisotropy(0, -1) ;uncomment this to re-enable filtering if it's disabled
+			CameraViewport Camera,GraphicWidth/2-(GraphicWidth/8),GraphicHeight/2-(GraphicHeight/8),GraphicWidth/4,GraphicHeight/4
+			RenderWorld()
 			CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
+			
+			CopyRectStretch(GraphicWidth/2-(GraphicWidth/8),GraphicHeight/2-(GraphicHeight/8),GraphicWidth/4,GraphicHeight/4,0,0,GraphicWidth,GraphicHeight,BackBuffer(),BackBuffer())
 		EndIf
 	Else
 		If (WearingNightVision=1)
@@ -8311,52 +8307,52 @@ Function RenderWorld2()
 End Function
 
 
-Function ScaleRender(x#,y#,hscale#=1.0,vscale#=1.0)
-	ShowEntity fresize_image
-	ScaleEntity fresize_image,hscale,vscale,1.0
-	PositionEntity fresize_image, x, y, 1.0001
-	ShowEntity fresize_cam
-	RenderWorld()
-	HideEntity fresize_cam
-	HideEntity fresize_image
-End Function
+;Function ScaleRender(x#,y#,hscale#=1.0,vscale#=1.0)
+;	ShowEntity fresize_image
+;	ScaleEntity fresize_image,hscale,vscale,1.0
+;	PositionEntity fresize_image, x, y, 1.0001
+;	ShowEntity fresize_cam
+;	RenderWorld()
+;	HideEntity fresize_cam
+;	HideEntity fresize_image
+;End Function
 
-Function InitFastResize()
-   ;Create Camera
-	Local cam% = CreateCamera()
-	CameraProjMode cam, 2
-	CameraZoom cam, 0.1
-	CameraClsMode cam, 0, 0
-	CameraRange cam, 0.1, 1.5
-	MoveEntity cam, 0, 0, -10000
-	fresize_cam = cam
-	
-   ;ark_sw = GraphicsWidth()
-   ;ark_sh = GraphicsHeight()
-	
-   ;Create sprite
-	Local spr% = CreateMesh(cam)
-	Local sf% = CreateSurface(spr)
-	AddVertex sf, -1, 1, 0, 0, 0
-	AddVertex sf, 1, 1, 0, 1, 0
-	AddVertex sf, -1, -1, 0, 0, 1
-	AddVertex sf, 1, -1, 0, 1, 1
-	AddTriangle sf, 0, 1, 2
-	AddTriangle sf, 3, 2, 1
-	EntityFX spr, 17
-	ScaleEntity spr, 2048.0 / Float(GraphicWidth), 2048.0 / Float(GraphicHeight), 1
-	PositionEntity spr, 0, 0, 1.0001
-	EntityOrder spr, -100001
-	EntityBlend spr, 1
-	fresize_image = spr
-	
-   ;Create texture
-	fresize_texture = CreateTexture(2048, 2048, 1+256+FE_RENDER+FE_ZRENDER)
-	;TextureAnisotropy(fresize_texture)
-	EntityTexture spr, fresize_texture
-	
-	HideEntity fresize_cam
-End Function
+;Function InitFastResize()
+;   ;Create Camera
+;	Local cam% = CreateCamera()
+;	CameraProjMode cam, 2
+;	CameraZoom cam, 0.1
+;	CameraClsMode cam, 0, 0
+;	CameraRange cam, 0.1, 1.5
+;	MoveEntity cam, 0, 0, -10000
+;	fresize_cam = cam
+;	
+;   ;ark_sw = GraphicsWidth()
+;   ;ark_sh = GraphicsHeight()
+;	
+;   ;Create sprite
+;	Local spr% = CreateMesh(cam)
+;	Local sf% = CreateSurface(spr)
+;	AddVertex sf, -1, 1, 0, 0, 0
+;	AddVertex sf, 1, 1, 0, 1, 0
+;	AddVertex sf, -1, -1, 0, 0, 1
+;	AddVertex sf, 1, -1, 0, 1, 1
+;	AddTriangle sf, 0, 1, 2
+;	AddTriangle sf, 3, 2, 1
+;	EntityFX spr, 17
+;	ScaleEntity spr, 2048.0 / Float(GraphicWidth), 2048.0 / Float(GraphicHeight), 1
+;	PositionEntity spr, 0, 0, 1.0001
+;	EntityOrder spr, -100001
+;	EntityBlend spr, 1
+;	fresize_image = spr
+;	
+;   ;Create texture
+;	fresize_texture = CreateTexture(2048, 2048, 1+256+FE_RENDER+FE_ZRENDER)
+;	;TextureAnisotropy(fresize_texture)
+;	EntityTexture spr, fresize_texture
+;	
+;	HideEntity fresize_cam
+;End Function
 
 Function RenderWorldToTexture()
 	

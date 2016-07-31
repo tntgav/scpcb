@@ -1006,7 +1006,6 @@ Function UpdateLauncher()
 		lock% = False
 		If FakeFullScreen Or (Not Fullscreen) Then lock% = True
 		Bit16Mode = DrawTick(40 + 430 - 15, 260 - 55 + 50, Bit16Mode,lock%)
-		Win8Mode = DrawTick(40 + 430 - 15, 260 - 55 + 80, Win8Mode)
 		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 110, LauncherEnabled)
 		
 		If FakeFullScreen
@@ -1065,11 +1064,6 @@ Function UpdateLauncher()
 		PutINIValue(OptionFile, "options", "fakefullscreen", "true")
 	Else
 		PutINIValue(OptionFile, "options", "fakefullscreen", "false")
-	EndIf
-	If Win8Mode Then
-		PutINIValue(OptionFile, "options", "compability mode", "true")
-	Else
-		PutINIValue(OptionFile, "options", "compability mode", "false")
 	EndIf
 	If Bit16Mode Then
 		PutINIValue(OptionFile, "options", "16bit", "true")
