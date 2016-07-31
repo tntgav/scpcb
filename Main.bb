@@ -6891,19 +6891,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					;EndIf
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(5)=1 Then
+							If Rand(5)=5 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case NORMAL
-							If Rand(7)=1 Then
+							If Rand(7)=7 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case HARD
-							If Rand(10)=1 Then
+							If Rand(10)=10 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -8521,10 +8521,10 @@ Function CheckTriggers$()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3CC#4A8#502#523#59B#5A8#65D#6D5#6EC#6F9#7E1#8C5#993#9AB#A3E
-;~F#B64#C83#DEF#13D7#15CD#15D8#17BC#17ED#18EB#18FD#1919#1923#1930#1952#1971#1990#19AC#19C0#19D5#19D9
-;~F#19F9#1A01#1A2C#1BCE#1C83#1CAE#1D25#1D2B#1D35#1D41#1D4C#1D50#1D8B#1D93#1D9B#1DA2#1DA9#1DB6#1DBC#1DC7
-;~F#1E00#1E0F#1E2D#1E5B#1E62#1E75#1E8E#1EBB#1EC6#1ECB#1EE5#1EF1#1F0C#1F5E#1F6C#1F74#1F80#1F89#1FB2#1FB7
-;~F#1FBC#1FC1#1FCA#1FD2#2074#207E#20A3#20B1#20BE#20E5#20F7#2108#2117#212E
+;~F#24#AC#12C#130#137#3CC#4A8#502#523#59B#5A8#65D#6D5#6EC#6F9#72B#7E1#8C5#993#9AB
+;~F#A3E#B64#C83#DEF#13D7#15CD#15D8#17BC#17ED#18EB#18FD#1919#1923#1930#1952#1971#1990#19AC#19C0#19D5
+;~F#19D9#19F9#1A01#1A2C#1BCE#1C83#1CAE#1D25#1D2B#1D35#1D41#1D4C#1D50#1D8B#1D93#1D9B#1DA2#1DA9#1DB6#1DBC
+;~F#1DC7#1E00#1E0F#1E2D#1E5B#1E62#1E75#1E8E#1EBB#1EC6#1ECB#1EE5#1EF1#1F0C#1F5E#1F6C#1F74#1F80#1F89#1FB2
+;~F#1FB7#1FBC#1FC1#1FCA#1FD2#2074#207E#20A3#20B1#20BE#20E5#20F7#2108#2117#212E
 ;~B#1188#1A29
 ;~C#Blitz3D

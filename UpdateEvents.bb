@@ -8527,21 +8527,23 @@ Function UpdateEvents()
 						Local Adj1% = -1
 						Local Adj2% = -1
 						For i = 0 To 3
-							If e\room\Adjacent[i]<>Null
+							If e\room\AdjDoor[i]<>Null
 								If Adj1 = -1
-									AdjDist1# = EntityDistance(e\room\Objects[7],e\room\Adjacent[i]\obj)
+									AdjDist1# = EntityDistance(e\room\Objects[7],e\room\AdjDoor[i]\frameobj)
 									Adj1 = i
 								Else
-									AdjDist2# = EntityDistance(e\room\Objects[7],e\room\Adjacent[i]\obj)
+									AdjDist2# = EntityDistance(e\room\Objects[7],e\room\AdjDoor[i]\frameobj)
 									Adj2 = i
 								EndIf
 							EndIf
 						Next
-						If AdjDist1# < AdjDist2#
-							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Adjacent[Adj1]\obj),EntityY(e\room\Objects[7],True),EntityZ(e\room\Adjacent[Adj1]\obj)
+						If AdjDist1# > AdjDist2#
+							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\AdjDoor[Adj1]\frameobj),EntityY(e\room\Objects[7],True),EntityZ(e\room\AdjDoor[Adj1]\frameobj)
 						Else
-							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Adjacent[Adj2]\obj),EntityY(e\room\Objects[7],True),EntityZ(e\room\Adjacent[Adj2]\obj)
+							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\AdjDoor[Adj2]\frameobj),EntityY(e\room\Objects[7],True),EntityZ(e\room\AdjDoor[Adj2]\frameobj)
 						EndIf
+						PointEntity e\room\NPC[0]\Collider,e\room\obj
+						MoveEntity e\room\NPC[0]\Collider,0,0,-2
 						ResetEntity e\room\NPC[0]\Collider
 						e\room\NPC[0]\State = 5
 						DebugLog "aaaaaaaaa"
@@ -8612,7 +8614,8 @@ Function UpdateEvents()
 									e\room\NPC[0]\PrevState = 2
 									DebugLog "Path2"
 								Case 3
-									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
+									;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
+									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\obj,True),EntityY(e\room\Objects[7],True),EntityZ(e\room\obj,True))
 									e\room\NPC[0]\PrevState = 1
 									DebugLog "Path3"
 								Case 4
@@ -8642,7 +8645,7 @@ Function UpdateEvents()
 					e\room\NPC[0]\State = 2
 					For r.Rooms = Each Rooms
 						If r <> PlayerRoom
-							If (EntityDistance(r\obj,e\room\NPC[0]\Collider)<15.0 And EntityDistance(r\obj,e\room\NPC[0]\Collider)>5.0) And Rand(1,2)=1
+							If (EntityDistance(r\obj,e\room\NPC[0]\Collider)<HideDistance*2 And EntityDistance(r\obj,e\room\NPC[0]\Collider)>HideDistance)
 								e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(r\obj),EntityY(r\obj),EntityZ(r\obj))
 								e\room\NPC[0]\PathTimer = 0.0
 								If e\room\NPC[0]\PathStatus = 1 Then e\EventState2 = 6
@@ -8655,6 +8658,9 @@ Function UpdateEvents()
 						DebugLog "fffffffff"
 						e\EventState2 = 7
 					Else
+						;Still playing the Music for SCP-049 (in the real, SCP-049's State will be set to 2, causing it to stop playing the chasing track)
+						If Music(20) = 0 Then Music(20) = LoadSound_Strict("SFX\Music\SCP-049 Chase.ogg")
+						ShouldPlay = 20
 						If e\room\NPC[0]\PathStatus <> 1
 							e\room\NPC[0]\Idle = 70*60 ;(Making SCP-049 idle for one minute (twice as fast for aggressive NPCs = True))
 							PositionEntity e\room\NPC[0]\Collider,0,500,0
@@ -8822,6 +8828,6 @@ End Function
 ;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
 ;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
 ;~F#14FD#1595#174B#1821#1875#1926#19D6#1A8E#1AA6#1B67#1B94#1BB1#1BD8#1C08#1C2C#1C54#1CAE#1CEE#1D1F#1D32
-;~F#1DEC#1E44#1E57#1E65#1E6E#1EBA#1ED9#1FE4#205D#2138#21E0
-;~B#1498#2152
+;~F#1DEC#1E45#1E58#1E66#1E6F#1EBB#1EDA#1FE5#205E#21E7#21EB
+;~B#1498#214C
 ;~C#Blitz3D

@@ -294,7 +294,7 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Lost Key", "key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, "GFX\items\key2.png","","",0,1+2+8) : it\sound = 3
 	it = CreateItemTemplate("Disciplinary Hearing DH-S-4137-17092", "oldpaper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docDH.jpg", 0.003) : it\sound = 0
 	
-	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.001, "GFX\items\coin.png","","",0,1+2+8) : it\sound = 3
+	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0006, "GFX\items\coin.png","","",0,1+2+8) : it\sound = 3
 		
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -575,11 +575,15 @@ Function DropItem(item.Items)
 	For it.Items = Each Items
 		If it <> item And it\Picked = False Then
 			x = Abs(EntityX(item\obj, True)-EntityX(it\obj, True))
-			If x < 0.2 Then 
+			;If x < 0.2 Then 
+			If x < 0.01 Then
 				z = Abs(EntityZ(item\obj, True)-EntityZ(it\obj, True))
-				If z < 0.2 Then
-					While (x+z)<0.25
-						MoveEntity(item\obj, 0, 0, 0.025)
+				;If z < 0.2 Then
+				If z < 0.01 Then
+					;While (x+z)<0.25
+					While (x+z)<0.05
+						;MoveEntity(item\obj, 0, 0, 0.025)
+						MoveEntity(item\obj, 0, 0, 0.005)
 						x = Abs(EntityX(item\obj, True)-EntityX(it\obj, True))
 						z = Abs(EntityZ(item\obj, True)-EntityZ(it\obj, True))
 					Wend
@@ -612,5 +616,5 @@ Function DropItem(item.Items)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#1E#76#139#153#194#1AF#1EB#22E
+;~F#B#1E#13B#155#196#1B1#1ED#230
 ;~C#Blitz3D
