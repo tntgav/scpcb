@@ -4349,7 +4349,7 @@ Function DrawGUI()
 					EndIf
 					BlurTimer = 1000
 					RemoveItem(SelectedItem)					
-				Case "paper"
+				Case "paper", "ticket"
 					If SelectedItem\itemtemplate\img=0 Then
 						Select SelectedItem\itemtemplate\name
 							Case "Burnt Note" 
@@ -4371,6 +4371,9 @@ Function DrawGUI()
 								Text 333*MenuScale, 714*MenuScale, temp, True, True
 								Color 255,255,255
 								SetBuffer BackBuffer()
+							Case "Movie Ticket"
+								;don't resize because it messes up the masking
+								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 							Default 
 								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 								SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
@@ -5032,7 +5035,9 @@ Function DrawGUI()
 					If SelectedItem\state = 0
 						Select SelectedItem\itemtemplate\name
 							Case "Disciplinary Hearing DH-S-4137-17092"
-								Msg = "New info learned: "+Chr(34)+"Disciplinary Hearing DH-S-4137-17092"+Chr(34)
+								BlurTimer = 1000
+								
+								Msg = "Why does this seem so familiar?"
 								MsgTimer = 70*10
 								PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
 								SelectedItem\state = 1
@@ -6928,7 +6933,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 			End Select			
 			
 			RemoveItem(item)
-		Case "Playing Card", "Mastercard"
+		Case "Playing Card", "Mastercard", "Coin"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
@@ -8440,18 +8445,26 @@ End Function
 Function IsItemGoodFor1162(itt.ItemTemplates)
 	Local IN$ = itt\tempname$
 	
-	If itt\tempname = "1123" Then Return False
-	If itt\tempname = "scp714" Then Return False
-	If itt\tempname = "scp1025" Then Return False
-	If itt\tempname = "scp513" Then Return False
-	If itt\tempname = "scp178" Then Return False
-	If itt\tempname = "scp1499" Then Return False
-	If itt\tempname = "scp860" Then Return False
-	If itt\tempname = "veryfinevest" Then Return False
-	If itt\tempname = "killbat" Then Return False
-	
-	Return True
-	
+	Select itt\tempname
+		Case "key1", "key2", "key3"
+			Return True
+		Case "misc", "420", "cigarette"
+			Return True
+		Case "vest", "finevest","gasmask"
+			Return True
+		Case "radio","18vradio"
+			Return True
+		Case "clipboard","eyedrops","nvgoggles"
+			Return True
+		Default
+			If itt\tempname <> "paper" Then
+				Return False
+			Else
+				;if the item is a paper, only allow spawning it if the name contains the word "note" or "log"
+				;(because those are items created recently, which D-9341 has most likely never seen)
+				Return ((Not Instr(itt\name, "Note")) And (Not Instr(itt\name, "Log")))
+			EndIf
+	End Select
 End Function
 
 Function ControlSoundVolume()

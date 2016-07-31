@@ -7939,158 +7939,111 @@ Function UpdateEvents()
 						Else
 							;randomly picked item slot is empty, getting the first available slot
 							For i = 0 To MaxItemAmount-1
-								If Inventory(i)<>Null
-									;sucessfull
-									e\EventState2 = i
-									If Rand(10)=1
+								Local isSlotEmpty% = (Inventory((i+e\EventState2) Mod MaxItemAmount) = Null)
+								
+								If (Not isSlotEmpty) Then
+									;successful
+									e\EventState2 = (i+e\EventState2) Mod MaxItemAmount
+								EndIf
+								
+								If Rand(8)=1 Then
+									If isSlotEmpty Then
+										e\EventState3 = 3.1
+									Else
 										e\EventState3 = 3.0
-										e\EventState = Rand(1,3)
-										;Checking if the selected nostalgia item already exists or not
-										For it.Items = Each Items
-											Select e\EventState
-												Case 1
-													If it\itemtemplate\tempname = "key"
-														e\EventState3 = 1.0
-														e\EventState = 0.0
-														Exit
-													EndIf
-												Case 2
-													If it\itemtemplate\tempname = "oldpaper"
-														e\EventState3 = 1.0
-														e\EventState = 0.0
-													EndIf
-												Case 3
-													If it\itemtemplate\tempname = "coin"
-														e\EventState3 = 1.0
-														e\EventState = 0.0
-														Exit
-													EndIf
-											End Select
-										Next
+									EndIf
+									
+									e\EventState = Rand(1,4)
+									
+									;Checking if the selected nostalgia item already exists or not
+									Local itemName$ = ""
+									Select (e\EventState)
+										Case 1
+											itemName = "key"
+										Case 2
+											itemName = "oldpaper"
+										Case 3
+											itemName = "coin"
+										Case 4
+											itemName = "ticket"
+									End Select
+									
+									Local itemExists% = False
+									For it.Items = Each Items
+										If (it\name = itemName) Then
+											itemExists = True
+											e\EventState3 = 1.0
+											e\EventState = 0.0
+											Exit
+										EndIf
+									Next
+									
+									If ((Not itemExists) And (Not isSlotEmpty)) Exit
+								Else
+									If isSlotEmpty Then
+										e\EventState3 = 2.0
 									Else
 										e\EventState3 = 1.0
+										Exit
 									EndIf
-									DebugLog "pick2"
-									Exit
-								Else
-									;not sucessful
-									If Rand(10)=1
-										e\EventState3 = 3.1
-										e\EventState = Rand(1,2)
-										;Checking if the selected nostalgia item already exists or not
-										For it.Items = Each Items
-											Select e\EventState
-												Case 1
-													If it\itemtemplate\tempname = "key"
-														e\EventState3 = 2.0
-														e\EventState = 0.0
-														Exit
-													EndIf
-												Case 2
-													If it\itemtemplate\tempname = "oldpaper"
-														e\EventState3 = 2.0
-														e\EventState = 0.0
-													EndIf
-											End Select
-										Next
-									Else
-										e\EventState3 = 2.0
-									EndIf
-									DebugLog "pick3"
 								EndIf
 							Next
 						EndIf
 					EndIf
 					
+					
 					;trade successful
 					If e\EventState3 = 1.0
+						Local shouldCreateItem% = False
+						
 						For itt.ItemTemplates = Each ItemTemplates
-							Select Inventory(e\EventState2)\itemtemplate\tempname
-								Case "key"
-									If itt\tempname = "key1" Or itt\tempname = "key2" And Rand(2)=1
-										RemoveItem(Inventory(e\EventState2))
-										it.Items=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-										EntityType(it\obj, HIT_ITEM)
-										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
-										e\EventState3 = 0.0
-										GiveAchievement(Achv1162)
-										MouseHit1 = False
-										DebugLog "lostkey"
-										Exit
-									EndIf
-								Case "paper","oldpaper"
-									If itt\tempname = "paper" And Rand(12)=1
-										RemoveItem(Inventory(e\EventState2))
-										it.Items=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-										EntityType(it\obj, HIT_ITEM)
-										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
-										e\EventState3 = 0.0
-										GiveAchievement(Achv1162)
-										MouseHit1 = False
-										DebugLog "paper"
-										Exit
-									EndIf
-								Case "gasmask","gasmask3","supergasmask","hazmatsuit","hazmatsuit2","hazmatsuit3"
-									If itt\tempname = "gasmask" Or itt\tempname = "gasmask3" Or itt\tempname = "supergasmask" Or itt\tempname = "hazmatsuit" Or itt\tempname = "hazmatsuit2" Or itt\tempname = "hazmatsuit3" And Rand(2)=1
-										RemoveItem(Inventory(e\EventState2))
-										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-										EntityType(it\obj, HIT_ITEM)
-										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
-										e\EventState3 = 0.0
-										GiveAchievement(Achv1162)
-										MouseHit1 = False
-										DebugLog "gasmask hazmat"
-										Exit
-									EndIf
-								Case "key1","key2","key3"
-									If itt\tempname = "key1" Or itt\tempname = "key2" Or itt\tempname = "key3" Or itt\tempname = "misc" And Rand(6)=1
-										RemoveItem(Inventory(e\EventState2))
-										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-										EntityType(it\obj, HIT_ITEM)
-										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
-										e\EventState3 = 0.0
-										GiveAchievement(Achv1162)
-										MouseHit1 = False
-										DebugLog "key"
-										Exit
-									EndIf
-								Case "key4","key5","key6"
-									If itt\tempname = "key4" Or itt\tempname = "key5" Or itt\tempname = "key6" Or itt\tempname = "misc" And Rand(6)=1
-										RemoveItem(Inventory(e\EventState2))
-										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-										EntityType(it\obj, HIT_ITEM)
-										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
-										e\EventState3 = 0.0
-										GiveAchievement(Achv1162)
-										MouseHit1 = False
-										DebugLog "key #2"
-										Exit
-									EndIf
-								Case "vest","finevest"
-									If itt\tempname = "vest" Or itt\tempname = "finevest" And Rand(1)=1
-										RemoveItem(Inventory(e\EventState2))
-										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-										EntityType(it\obj, HIT_ITEM)
-										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
-										e\EventState3 = 0.0
-										GiveAchievement(Achv1162)
-										MouseHit1 = False
-										DebugLog "vest"
-										Exit
-									EndIf
-								Default
-									If itt\tempname = "misc" And Rand(6)=1
-										RemoveItem(Inventory(e\EventState2))
-										it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-										EntityType(it\obj, HIT_ITEM)
-										PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
-										e\EventState3 = 0.0
-										GiveAchievement(Achv1162)
-										MouseHit1 = False
-										DebugLog "default"
-										Exit
-									EndIf
-							End Select
+							If (IsItemGoodFor1162(itt)) Then
+								Select Inventory(e\EventState2)\itemtemplate\tempname
+									Case "key"
+										If itt\tempname = "key1" Or itt\tempname = "key2" And Rand(2)=1
+											shouldCreateItem = True
+											DebugLog "lostkey"
+										EndIf
+									Case "paper","oldpaper"
+										If itt\tempname = "paper" And Rand(12)=1 Then
+											shouldCreateItem = True
+											DebugLog "paper"
+										EndIf
+									Case "gasmask","gasmask3","supergasmask","hazmatsuit","hazmatsuit2","hazmatsuit3"
+										If itt\tempname = "gasmask" Or itt\tempname = "gasmask3" Or itt\tempname = "supergasmask" Or itt\tempname = "hazmatsuit" Or itt\tempname = "hazmatsuit2" Or itt\tempname = "hazmatsuit3" And Rand(2)=1
+											shouldCreateItem = True
+											DebugLog "gasmask hazmat"
+										EndIf
+									Case "key1","key2","key3"
+										If itt\tempname = "key1" Or itt\tempname = "key2" Or itt\tempname = "key3" Or itt\tempname = "misc" And Rand(6)=1
+											shouldCreateItem = True
+											DebugLog "key"
+										EndIf
+									Case "vest","finevest"
+										If itt\tempname = "vest" Or itt\tempname = "finevest" And Rand(1)=1
+											shouldCreateItem = True
+											DebugLog "vest"
+										EndIf
+									Default
+										If itt\tempname = "misc" And Rand(6)=1
+											shouldCreateItem = True
+											DebugLog "default"
+										EndIf
+								End Select
+							EndIf
+							
+							If (shouldCreateItem) Then
+								RemoveItem(Inventory(e\EventState2))
+								it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+								EntityType(it\obj, HIT_ITEM)
+								PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
+								e\EventState3 = 0.0
+								
+								
+								GiveAchievement(Achv1162)
+								MouseHit1 = False
+								Exit
+							EndIf
 						Next
 					;trade not sucessful (player got in return to injuries a new item)
 					ElseIf e\EventState3 = 2.0
@@ -8161,7 +8114,8 @@ Function UpdateEvents()
 								it = CreateItem("Disciplinary Hearing DH-S-4137-17092","oldpaper",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 							Case 3
 								it = CreateItem("Coin","coin",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-								
+							Case 4
+								it = CreateItem("Movie Ticket","ticket",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 						End Select
 						EntityType(it\obj, HIT_ITEM)
 						GiveAchievement(Achv1162)

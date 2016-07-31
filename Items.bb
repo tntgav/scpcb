@@ -295,7 +295,9 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Disciplinary Hearing DH-S-4137-17092", "oldpaper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\dh.s", 0.003) : it\sound = 0
 	
 	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.png", "", 0.0005, "GFX\items\coin.png","","",0,1+2+8) : it\sound = 3
-		
+	
+	it = CreateItemTemplate("Movie Ticket", "ticket", "GFX\items\key.b3d", "GFX\items\INVticket.png", "GFX\items\ticket.png", 0.002, "GFX\items\tickettexture.png","","",0,1+2+8) : it\sound = 0
+	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
 			If (it\texpath<>"") Then
