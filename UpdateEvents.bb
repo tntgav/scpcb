@@ -5979,11 +5979,27 @@ Function UpdateEvents()
 							TurnEntity n\Collider, 0, 20, 0
 							e\EventState=1
 							
-							n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True), EntityZ(e\room\Objects[4],True))
-							PointEntity n\Collider, e\room\obj
+							;n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True), EntityZ(e\room\Objects[4],True))
+							;PointEntity n\Collider, e\room\obj
 							;n\State = 2
-							SetNPCFrame(n, 659)
-							e\room\NPC[0]=n
+							;SetNPCFrame(n, 659)
+							;e\room\NPC[0]=n
+							For n.NPCs = Each NPCs
+								If n\NPCtype = NPCtype049
+									e\room\NPC[0]=n
+									e\room\NPC[0]\State = 0
+									SetNPCFrame(e\room\NPC[0],659)
+									PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True)
+									ResetEntity e\room\NPC[0]\Collider
+									Exit
+								EndIf
+							Next
+							If e\room\NPC[0]=Null
+								n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True), EntityZ(e\room\Objects[4],True))
+								PointEntity n\Collider, e\room\obj
+								SetNPCFrame(n, 659)
+								e\room\NPC[0]=n
+							EndIf
 							
 						ElseIf e\EventState > 0
 							
@@ -8199,9 +8215,9 @@ Function UpdateEvents()
 										EndIf
 									Else
 										If i = 0
-											PositionEntity pvt%,0.0,416.0,0.0,False
+											PositionEntity pvt%,312.0,416.0,-128.0,False
 										Else
-											PositionEntity pvt%,0.0,416.0,0.0,False
+											PositionEntity pvt%,312.0,416.0,224.0,False
 										EndIf
 									EndIf
 									
@@ -8790,7 +8806,7 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
 ;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
-;~F#14FD#1595#174B#1821#1875#1926#19D6#1A8E#1AA6#1B67#1B94#1BB1#1BD8#1C08#1C2C#1C54#1CAE#1CEE#1D1F#1D32
-;~F#1DEC#1E45#1E58#1E66#1E6F#1EBB#1EDA#1FE5#205E#21E7#21EB
-;~B#1498#214C
+;~F#14FD#1595#1831#1885#1936#19E6#1A9E#1AB6#1B77#1BA4#1BC1#1BE8#1C18#1C3C#1C64#1CBE#1CFE#1D2F#1D42#1DFC
+;~F#1E55#1E68#1E76#1E7F#1ECB#1EEA#1FD0#2043#2049#2124#21D2#21D6
+;~B#1498#215C
 ;~C#Blitz3D

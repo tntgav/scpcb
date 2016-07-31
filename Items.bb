@@ -294,15 +294,10 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Lost Key", "key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, "GFX\items\key2.png","","",0,1+2+8) : it\sound = 3
 	it = CreateItemTemplate("Disciplinary Hearing DH-S-4137-17092", "oldpaper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\dh.s", 0.003) : it\sound = 0
 	
-	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.png", "", 0.0005, "GFX\items\coin.png","","",0,1+2+8) : it\sound = 3
+	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","","",0,1+2+8) : it\sound = 3
 	
-	it = CreateItemTemplate("Movie Ticket", "ticket", "GFX\items\key.b3d", "GFX\items\INVticket.png", "GFX\items\ticket.png", 0.002, "GFX\items\tickettexture.png","","",0,1+2+8) : it\sound = 0
+	it = CreateItemTemplate("Movie Ticket", "ticket", "GFX\items\key.b3d", "GFX\items\INVticket.jpg", "GFX\items\ticket.png", 0.002, "GFX\items\tickettexture.png","","",0,1+2+8) : it\sound = 0
 	
-<<<<<<< HEAD
-	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0006, "GFX\items\coin.png","","",0,1+2+8) : it\sound = 3
-		
-=======
->>>>>>> 007b7fe151654eada9ff03838aeceddec7cd822c
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
 			If (it\texpath<>"") Then
@@ -623,5 +618,5 @@ Function DropItem(item.Items)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#1E#13B#155#196#1B1#1ED#230
+;~F#B#1E
 ;~C#Blitz3D
