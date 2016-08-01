@@ -1025,7 +1025,6 @@ Function UpdateLauncher()
 		EndIf
 		Text(40 + 430 + 15, 262 - 55 + 50, "16 Bit")
 		Color 255, 255, 255
-		Text(40 + 430 + 15, 262 - 55 + 80, "Win8 mode")
 		Text(40 + 430 + 15, 262 - 55 + 110, "Use launcher")
 		
 		If (Not FakeFullScreen)
