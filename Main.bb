@@ -4373,6 +4373,13 @@ Function DrawGUI()
 							Case "Movie Ticket"
 								;don't resize because it messes up the masking
 								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+								
+								If (SelectedItem\state = 0) Then
+									Msg = "Hey, I remember this movie!"
+									MsgTimer = 70*10
+									PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+									SelectedItem\state = 1
+								EndIf
 							Default 
 								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 								SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
