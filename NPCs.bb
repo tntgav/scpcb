@@ -3236,6 +3236,10 @@ Function UpdateNPCs()
 			Case NPCtype939
 				;[Block]
 				
+				If PlayerRoom\RoomTemplate\Name <> "room3storage"
+					n\State = 66
+				EndIf
+				
 				;state is set to 66 in the room3storage-event if player isn't inside the room
 				If n\State < 66 Then 
 					Select n\State
@@ -3506,7 +3510,7 @@ Function UpdateNPCs()
 										Case 1
 											If n\Sound2=0 Then n\Sound2=LoadSound_Strict("SFX\066\beethoven.ogg")
 											n\SoundChn2 = PlaySound2(n\Sound2, Camera, n\Collider)
-											DeafTimer# = 70*(8+(4*SelectedDifficulty\aggressiveNPCs))
+											DeafTimer# = 70*(45+(15*SelectedDifficulty\aggressiveNPCs))
 											DeafPlayer = True
 											CameraShake = 10.0
 										Case 2
@@ -6362,8 +6366,8 @@ Function RotateToDirection(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#3F#49#6F#95#A5#D5#E5#EE#FC#10B#11E#13D#167#17B#198#1D9#1F1#212
-;~F#235#23E#269#291#38D#478#5E7#5F7#740#748#7C0#85B#97B#980#9B7#A59#A94#B23#B8F#CA4
-;~F#D6B#E22#ED5#FD4#FDD#10A2#10C9#10D4#10F8#110B#110C#1167#12C9#1417#1499#14F9#1579#15A6#15CC#15E5
-;~F#1665#1713#178B#179C#17B7#17D5#1813#1834#1842#185E#1870#1894#18B7#18C5
-;~B#197#1273#130D#13A6#155A#1665#1822#187E
+;~F#235#23E#269#291#38D#478#5CD#5E7#5F7#740#748#754#7C0#85B#97B#980#9B7#A59#A94#B23
+;~F#B8F#CA4#D6F#E26#ED9#FD8#FE1#10A6#10CD#10D8#10FC#110F#1110#116B#12CD#141B#149D#14FD#157D#15AA
+;~F#15D0#15E9#1669#1717#178F#17A0#17BB#17D9#1817#1838#1846#1862#1874#1898#18BB#18C9
+;~B#197#1277#1311#13AA#155E#1669#1826#1882
 ;~C#Blitz3D

@@ -3547,6 +3547,10 @@ Function DrawGUI()
 		EndIf
 		MenuOpen = (Not MenuOpen)
 		
+		AchievementsMenu = 0
+		OptionsMenu = 0
+		QuitMSG = 0
+		
 		SelectedDoor = Null
 		SelectedScreen = Null
 		SelectedMonitor = Null
@@ -4377,7 +4381,7 @@ Function DrawGUI()
 								If (SelectedItem\state = 0) Then
 									Msg = "Hey, I remember this movie!"
 									MsgTimer = 70*10
-									PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+									PlaySound_Strict LoadTempSound("SFX\1162\bf1_"+Rand(1,5)+".ogg")
 									SelectedItem\state = 1
 								EndIf
 							Default 
@@ -5020,7 +5024,7 @@ Function DrawGUI()
 					EndIf
 				Case "key"
 					If SelectedItem\state = 0
-						PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
 					EndIf
 					
 					Msg = "Isn't this the key to that old shack? The one where I... No, it can't be."
@@ -5045,10 +5049,20 @@ Function DrawGUI()
 								
 								Msg = "Why does this seem so familiar?"
 								MsgTimer = 70*10
-								PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+								PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
 								SelectedItem\state = 1
 						End Select
 					EndIf
+				Case "coin"
+					If SelectedItem\state = 0
+						PlaySound_Strict LoadTempSound("SFX\1162\bf1_"+Rand(1,5)+".ogg")
+					EndIf
+					
+					Msg = ""
+					MsgTimer = 70*10
+					
+					SelectedItem\state = 1
+					SelectedItem = Null
 				Default
 					;check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
@@ -5127,15 +5141,15 @@ Function DrawMenu()
 		x = x+132*MenuScale
 		y = y+122*MenuScale	
 		
-		If AchievementsMenu Then
+		If AchievementsMenu > 0 Then
 			SetFont Font2
 			Text(x, y-(122-45)*MenuScale, "ACHIEVEMENTS",False,True)
 			SetFont Font1
-		ElseIf OptionsMenu Then
+		ElseIf OptionsMenu > 0 Then
 			SetFont Font2
 			Text(x, y-(122-45)*MenuScale, "OPTIONS",False,True)
 			SetFont Font1
-		ElseIf QuitMSG Then
+		ElseIf QuitMSG > 0 Then
 			SetFont Font2
 			Text(x, y-(122-45)*MenuScale, "SAVE & QUIT?",False,True)
 			SetFont Font1
@@ -8537,10 +8551,10 @@ Function CheckTriggers$()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AC#12C#130#137#3CC#4A8#502#523#59B#5A8#65D#6D5#6EC#6F9#72B#7E1#8C5#993#9AB
-;~F#A3E#B64#C83#DEF#13D7#15CD#15D8#17BC#17ED#18EB#18FD#1919#1923#1930#1952#1971#1990#19AC#19C0#19D5
-;~F#19D9#19F9#1A01#1A2C#1BCE#1C83#1CAE#1D25#1D2B#1D35#1D41#1D4C#1D50#1D8B#1D93#1D9B#1DA2#1DA9#1DB6#1DBC
-;~F#1DC7#1E00#1E0F#1E2D#1E5B#1E62#1E75#1E8E#1EBB#1EC6#1ECB#1EE5#1EF1#1F0C#1F5E#1F6C#1F74#1F80#1F89#1FB2
-;~F#1FB7#1FBC#1FC1#1FCA#1FD2#2074#207E#20A3#20B1#20BE#20E5#20F7#2108#2117#212E
-;~B#1188#1A29
+;~F#24#AB#12B#12F#136#3CB#4A7#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7E0#8C4#992#9AA
+;~F#A3D#B63#DF2#FDB#13F0#15E6#15F1#1745#17D5#1806#1904#1916#1932#193C#1949#196B#198A#19A9#19C5#19D9
+;~F#19EE#19F2#1A12#1A1A#1BE7#1C9C#1CC7#1D3E#1D44#1D4E#1D5A#1D65#1D69#1DA4#1DAC#1DB4#1DBB#1DC2#1DCF#1DD5
+;~F#1DE0#1E19#1E28#1E46#1E74#1E7B#1E8E#1EA7#1ED4#1EDF#1EE4#1EFE#1F0A#1F25#1F77#1F85#1F8D#1F99#1FA2#1FCB
+;~F#1FD0#1FD5#1FDA#1FE3#1FEB#20B9#20C7#20D4#20FB#210D#2126#2135#214C
+;~B#118C#13C4#1A37
 ;~C#Blitz3D
