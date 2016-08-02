@@ -4381,7 +4381,7 @@ Function DrawGUI()
 								If (SelectedItem\state = 0) Then
 									Msg = "Hey, I remember this movie!"
 									MsgTimer = 70*10
-									PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+									PlaySound_Strict LoadTempSound("SFX\1162\bf1_"+Rand(1,5)+".ogg")
 									SelectedItem\state = 1
 								EndIf
 							Default 
@@ -5024,7 +5024,7 @@ Function DrawGUI()
 					EndIf
 				Case "key"
 					If SelectedItem\state = 0
-						PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
 					EndIf
 					
 					Msg = "Isn't this the key to that old shack? The one where I... No, it can't be."
@@ -5049,10 +5049,20 @@ Function DrawGUI()
 								
 								Msg = "Why does this seem so familiar?"
 								MsgTimer = 70*10
-								PlaySound_Strict LoadTempSound("SFX\1162\bf"+Rand(1,2)+"_"+Rand(1,5)+".ogg")
+								PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
 								SelectedItem\state = 1
 						End Select
 					EndIf
+				Case "coin"
+					If SelectedItem\state = 0
+						PlaySound_Strict LoadTempSound("SFX\1162\bf1_"+Rand(1,5)+".ogg")
+					EndIf
+					
+					Msg = ""
+					MsgTimer = 70*10
+					
+					SelectedItem\state = 1
+					SelectedItem = Null
 				Default
 					;check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
@@ -8542,9 +8552,9 @@ Function CheckTriggers$()
 End Function
 ;~IDEal Editor Parameters:
 ;~F#24#AB#12B#12F#136#3CB#4A7#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7E0#8C4#992#9AA
-;~F#A3D#B63#DF2#13DF#146C#14B6#14C8#1507#15D5#15E0#1734#17C4#17F5#18F3#1905#1921#192B#1938#195A#1979
-;~F#1998#19B4#19C8#19DD#19E1#1A01#1A09#1A34#1BD6#1C8B#1CB6#1D2D#1D33#1D3D#1D49#1D54#1D58#1D93#1D9B#1DA3
-;~F#1DAA#1DB1#1DBE#1DC4#1DCF#1E08#1E17#1E35#1E63#1E6A#1E7D#1E96#1EC3#1ECE#1ED3#1EED#1EF9#1F14#1F66#1F74
-;~F#1F7C#1F88#1F91#1FBA#1FBF#1FC4#1FC9#1FD2#1FDA#20A8#20B6#20C3#20EA#20FC#2115#2124#213B
-;~B#118C#1A2D
+;~F#A3D#B63#DF2#FDB#13F0#15E6#15F1#1745#17D5#1806#1904#1916#1932#193C#1949#196B#198A#19A9#19C5#19D9
+;~F#19EE#19F2#1A12#1A1A#1BE7#1C9C#1CC7#1D3E#1D44#1D4E#1D5A#1D65#1D69#1DA4#1DAC#1DB4#1DBB#1DC2#1DCF#1DD5
+;~F#1DE0#1E19#1E28#1E46#1E74#1E7B#1E8E#1EA7#1ED4#1EDF#1EE4#1EFE#1F0A#1F25#1F77#1F85#1F8D#1F99#1FA2#1FCB
+;~F#1FD0#1FD5#1FDA#1FE3#1FEB#20B9#20C7#20D4#20FB#210D#2126#2135#214C
+;~B#118C#13C4#1A37
 ;~C#Blitz3D

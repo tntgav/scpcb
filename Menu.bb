@@ -1025,11 +1025,7 @@ Function UpdateLauncher()
 		EndIf
 		Text(40 + 430 + 15, 262 - 55 + 65, "16 Bit")
 		Color 255, 255, 255
-<<<<<<< HEAD
 		Text(40 + 430 + 15, 262 - 55 + 95, "Use launcher")
-=======
-		Text(40 + 430 + 15, 262 - 55 + 110, "Use launcher")
->>>>>>> 839d77a060c1120429411bfb8d4a2f0b0b5335f1
 		
 		If (Not FakeFullScreen)
 			If Fullscreen
@@ -1482,6 +1478,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#76#1D1#20B#233#2E8#328#356#394#435#447#451#484#522#535#552#559#56F#590#5A8
-;~F#5AF
+;~F#31#76#1D1#20B#233#2E8#328#356#435#447#451#484#522#535#552#559#56F#590#5A8#5AF
 ;~C#Blitz3D
