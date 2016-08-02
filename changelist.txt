@@ -7,10 +7,10 @@ v1.3
 	- new rooms
 	- more graphics options
 	- borderless windowed mode
+	- nicer looking lights
 	- new key card textures by Anon4743
 - expanded SCP-[REDACTED] area
 - some new sounds
-- nicer looking lights
 - Map Creator improvements
 - options can be accessed from the pause menu
 - optimization to sound loading by juanjpro
@@ -30,6 +30,7 @@ v1.3
 - fixed saves not being deleted even if permadeath is on
 - fixed a bug with SCP-372 chamber collision
 - fixed UI messages overlapping with documents that are being read
+- more characters in the intro
 - SCP-1123 can't be grabbed through the glass
 - fixed a bug with duplicate "Incident Report SCP-1048-A" in clipboard
 - bugfixes to MTFs at Gate A and Gate B

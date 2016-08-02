@@ -8183,10 +8183,7 @@ Function RenderWorld2()
 	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision=1) Then ;fake a low-res display
-		
-		;hasBattery% = True
-		
+	If (WearingNightVision=1)
 		For i=0 To MaxItemAmount-1
 			If (Inventory(i)<>Null) Then
 				If Inventory(i)\itemtemplate\tempname="nvgoggles" Then
@@ -8205,34 +8202,11 @@ Function RenderWorld2()
 				EndIf
 			EndIf
 		Next
-		If hasBattery Then
-			CameraViewport Camera,GraphicWidth/2-(GraphicWidth/8),GraphicHeight/2-(GraphicHeight/8),GraphicWidth/4,GraphicHeight/4
+		
+		If (hasBattery) Then
 			RenderWorld()
-			CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
-			
-			CopyRectStretch(GraphicWidth/2-(GraphicWidth/8),GraphicHeight/2-(GraphicHeight/8),GraphicWidth/4,GraphicHeight/4,0,0,GraphicWidth,GraphicHeight,BackBuffer(),BackBuffer())
 		EndIf
 	Else
-		If (WearingNightVision=1)
-			For i=0 To MaxItemAmount-1
-				If (Inventory(i)<>Null) Then
-					If Inventory(i)\itemtemplate\tempname="nvgoggles" Then
-						Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.02)
-						power%=Int(Inventory(i)\state)
-						If Inventory(i)\state<=0.0 Then ;this nvg can't be used
-							hasBattery = 0
-							Msg = "The Night Vision Goggles need new batteries"
-							BlinkTimer = -1.0
-							MsgTimer = 350
-							Exit
-						ElseIf Inventory(i)\state<=100.0 Then
-							hasBattery = 1
-						EndIf
-						
-					EndIf
-				EndIf
-			Next
-		EndIf
 		RenderWorld()
 	EndIf
 	

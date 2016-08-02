@@ -4733,21 +4733,21 @@ Function FillRoom(r.Rooms)
 			TurnEntity(sc\ScrObj, 0, 90, 0)
 			EntityParent(sc\ScrObj, r\obj)
 			
-			For tw.TempWayPoints = Each TempWayPoints
-				If tw\roomtemplate = r\RoomTemplate
-					If tw\y > 480.0*RoomScale
-						tw\y = 540.0*RoomScale
-					EndIf
-				EndIf
-			Next
+			;For tw.TempWayPoints = Each TempWayPoints
+			;	If tw\roomtemplate = r\RoomTemplate
+			;		If tw\y > 480.0*RoomScale
+			;			tw\y = 540.0*RoomScale
+			;		EndIf
+			;	EndIf
+			;Next
 			
-			w.waypoints = CreateWaypoint(r\x, r\y + 64.0 * RoomScale, r\z - 640.0 * RoomScale, Null, r)
-			w2.waypoints = CreateWaypoint(r\x + 1024.0*RoomScale, r\y + 320.0 * RoomScale, r\z - 640.0 * RoomScale, Null, r)
-			w3.waypoints = CreateWaypoint(r\x + 1552.0*RoomScale, r\y + 540.0 * RoomScale, r\z - 636.0*RoomScale, Null, r)
-			w3\connected[0] = w2 : w3\dist[0] = EntityDistance(w3\obj, w2\obj)
-			w2\connected[1] = w3 : w2\dist[1] = w3\dist[0]
+			;w.waypoints = CreateWaypoint(r\x, r\y + 64.0 * RoomScale, r\z - 640.0 * RoomScale, Null, r)
+			;w2.waypoints = CreateWaypoint(r\x + 1024.0*RoomScale, r\y + 320.0 * RoomScale, r\z - 640.0 * RoomScale, Null, r)
+			;w3.waypoints = CreateWaypoint(r\x + 1552.0*RoomScale, r\y + 540.0 * RoomScale, r\z - 636.0*RoomScale, Null, r)
+			;w3\connected[0] = w2 : w3\dist[0] = EntityDistance(w3\obj, w2\obj)
+			;w2\connected[1] = w3 : w2\dist[1] = w3\dist[0]
 			
-			r\MaxWayPointY# = 400.0*RoomScale
+			;r\MaxWayPointY# = 400.0*RoomScale
 			;[End Block]
 		Case "room2_4"
 			;[Block]
