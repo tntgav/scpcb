@@ -1001,12 +1001,12 @@ Function UpdateLauncher()
 			y=y+20
 		Next
 		
-		Fullscreen = DrawTick(40 + 430 - 15, 260 - 55 - 10, Fullscreen, FakeFullScreen)
-		FakeFullScreen = DrawTick(40 + 430 - 15, 260 - 55 + 20, FakeFullScreen)
+		Fullscreen = DrawTick(40 + 430 - 15, 260 - 55 + 5, Fullscreen, FakeFullScreen)
+		FakeFullScreen = DrawTick(40 + 430 - 15, 260 - 55 + 35, FakeFullScreen)
 		lock% = False
 		If FakeFullScreen Or (Not Fullscreen) Then lock% = True
-		Bit16Mode = DrawTick(40 + 430 - 15, 260 - 55 + 50, Bit16Mode,lock%)
-		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 110, LauncherEnabled)
+		Bit16Mode = DrawTick(40 + 430 - 15, 260 - 55 + 65, Bit16Mode,lock%)
+		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 95, LauncherEnabled)
 		
 		If FakeFullScreen
 			Color 255, 0, 0
@@ -1014,19 +1014,18 @@ Function UpdateLauncher()
 		Else
 			Color 255, 255, 255
 		EndIf
-		Text(40 + 430 + 15, 262 - 55 - 10, "Fullscreen")
+		Text(40 + 430 + 15, 262 - 55 + 5, "Fullscreen")
 		Color 255, 255, 255
-		Text(40 + 430 + 15, 262 - 55 + 20, "Fake fullscreen")
+		Text(40 + 430 + 15, 262 - 55 + 35, "Fake fullscreen")
 		If FakeFullScreen Or (Not Fullscreen)
 			Color 255, 0, 0
 			Bit16Mode = False
 		Else
 			Color 255, 255, 255
 		EndIf
-		Text(40 + 430 + 15, 262 - 55 + 50, "16 Bit")
+		Text(40 + 430 + 15, 262 - 55 + 65, "16 Bit")
 		Color 255, 255, 255
-		Text(40 + 430 + 15, 262 - 55 + 80, "Win8 mode")
-		Text(40 + 430 + 15, 262 - 55 + 110, "Use launcher")
+		Text(40 + 430 + 15, 262 - 55 + 95, "Use launcher")
 		
 		If (Not FakeFullScreen)
 			If Fullscreen
@@ -1479,5 +1478,6 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#1D1#20B#233#2E8#328#356#394#43C#44E#458#48B#529#53C#559#560#576#597#5AF#5B6
+;~F#31#76#1D1#20B#233#2E8#328#356#394#435#447#451#484#522#535#552#559#56F#590#5A8
+;~F#5AF
 ;~C#Blitz3D

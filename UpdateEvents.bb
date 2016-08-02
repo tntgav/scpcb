@@ -5296,8 +5296,8 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 						
-						UpdateLever(e\room\Levers[0])
-						UpdateLever(e\room\Levers[1])
+						UpdateLever(e\room\Levers[0],e\room\RoomDoors[4]\open)
+						UpdateLever(e\room\Levers[1],e\room\RoomDoors[4]\open)
 						
 						e\room\NPC[0]\IgnorePlayer = False
 						e\room\NPC[2]\IgnorePlayer = False
@@ -7890,7 +7890,7 @@ Function UpdateEvents()
 					If e\EventState < 2.0
 						If e\EventState = 0.0
 							LoadEventSound(e,"SFX\screamEmily.ogg")
-							e\SoundCHN = PlaySound2(e\Sound, Camera, e\room\Objects[0], 10, 1.0)
+							e\SoundCHN = PlaySound2(e\Sound, Camera, e\room\Objects[0], 100, 1.0)
 							de.Decals = CreateDecal(0, EntityX(e\room\Objects[0],True), e\room\y+2.0*RoomScale, EntityZ(e\room\Objects[0],True), 90, Rand(360), 0)
 							de\Size = 0.5 : EntityAlpha(de\obj, 0.8)
 							EntityFX de\obj,1
@@ -7899,6 +7899,8 @@ Function UpdateEvents()
 							If (Not ChannelPlaying(e\SoundCHN))
 								e\EventState = 2.0
 								e\room\RoomDoors[0]\locked = False
+							Else
+								UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[0],100,1.0)
 							EndIf
 						EndIf
 					Else
@@ -8806,7 +8808,7 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
 ;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
-;~F#14FD#1595#1831#1885#1936#19E6#1A9E#1AB6#1B77#1BA4#1BC1#1BE8#1C18#1C3C#1C64#1CBE#1CFE#1D2F#1D42#1DFC
-;~F#1E55#1E68#1E76#1E7F#1ECB#1EEA#1FD0#2043#2049#2124#21D2#21D6
-;~B#1498#215C
+;~F#14FD#1595#174B#1831#1885#1936#19E6#1A9E#1AB6#1B77#1BA4#1BC1#1BE8#1C18#1C3C#1C64#1CBE#1CFE#1D2F#1D42
+;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD2#2045#204B#2126#21D4#21D8
+;~B#1498#215E
 ;~C#Blitz3D
