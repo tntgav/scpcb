@@ -8465,18 +8465,22 @@ Function UpdateEvents()
 								EndIf
 							Next
 							
-							If e\room\NPC[0]=Null
+							If e\room\NPC[0]=Null Then
 								e\room\NPC[0] = CreateNPC(NPCtype049,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True))
-							Else
-								PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
-								ResetEntity e\room\NPC[0]\Collider
 							EndIf
-							RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
-							e\room\NPC[0]\State = 0
-							e\EventState = 1
-							e\EventState2 = -(70*5)
-							e\room\NPC[0]\PrevState = 2
 						EndIf
+						
+						PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
+						ResetEntity e\room\NPC[0]\Collider
+						RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
+						
+						DebugLog(EntityX(e\room\Objects[7],True)+", "+EntityY(e\room\Objects[7],True)+", "+EntityZ(e\room\Objects[7],True))
+						
+						e\room\NPC[0]\State = 0
+						e\room\NPC[0]\PrevState = 2
+						
+						e\EventState = 1
+						e\EventState2 = -(70*5)
 					EndIf
 				EndIf
 				;[End Block]
