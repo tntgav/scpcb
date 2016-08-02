@@ -1025,7 +1025,11 @@ Function UpdateLauncher()
 		EndIf
 		Text(40 + 430 + 15, 262 - 55 + 65, "16 Bit")
 		Color 255, 255, 255
+<<<<<<< HEAD
 		Text(40 + 430 + 15, 262 - 55 + 95, "Use launcher")
+=======
+		Text(40 + 430 + 15, 262 - 55 + 110, "Use launcher")
+>>>>>>> 839d77a060c1120429411bfb8d4a2f0b0b5335f1
 		
 		If (Not FakeFullScreen)
 			If Fullscreen

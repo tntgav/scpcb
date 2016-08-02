@@ -29,6 +29,7 @@ v1.3
 - fixed checkpoints occasionally leading into "nothingness"
 - fixed saves not being deleted even if permadeath is on
 - fixed a bug with SCP-372 chamber collision
+- fixed UI messages overlapping with documents that are being read
 - SCP-1123 can't be grabbed through the glass
 - fixed a bug with duplicate "Incident Report SCP-1048-A" in clipboard
 - bugfixes to MTFs at Gate A and Gate B
