@@ -7971,19 +7971,21 @@ Function UpdateEvents()
 										e\EventState3 = 3.0
 									EndIf
 									
-									e\EventState = Rand(1,4)
+									e\EventState = Rand(1,5)
 									
 									;Checking if the selected nostalgia item already exists or not
 									Local itemName$ = ""
 									Select (e\EventState)
 										Case 1
-											itemName = "key"
+											itemName = "Lost Key"
 										Case 2
-											itemName = "oldpaper"
+											itemName = "Disciplinary Hearing DH-S-4137-17092"
 										Case 3
-											itemName = "coin"
+											itemName = "Coin"
 										Case 4
-											itemName = "ticket"
+											itemName = "Movie Ticket"
+										Case 5
+											itemName = "Old Badge"
 									End Select
 									
 									Local itemExists% = False
@@ -8134,6 +8136,8 @@ Function UpdateEvents()
 								it = CreateItem("Coin","coin",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 							Case 4
 								it = CreateItem("Movie Ticket","ticket",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
+							Case 5
+								it = CreateItem("Old Badge","badge",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 						End Select
 						EntityType(it\obj, HIT_ITEM)
 						GiveAchievement(Achv1162)

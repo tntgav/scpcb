@@ -5006,29 +5006,30 @@ Function DrawGUI()
 				Case "badge"
 					If SelectedItem\itemtemplate\img=0 Then
 						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
-						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
+						;SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
 						
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
-					If SelectedItem\state = 0
-						Msg = "New info learned: "
+					If SelectedItem\state = 0 Then
+						PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
 						Select SelectedItem\itemtemplate\name
-							Case "Emily Ross's Badge"
-								Msg = Msg+"Assistant researcher "+Chr(34)+"Emily Sharon Ross"+Chr(34)
+							Case "Old Badge"
+								Msg = "Huh? This guy looks just like me!"
+								MsgTimer = 70*10
 						End Select
-						MsgTimer = 70*10
+						
 						SelectedItem\state = 1
 					EndIf
 				Case "key"
-					If SelectedItem\state = 0
+					If SelectedItem\state = 0 Then
 						PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
+						
+						Msg = "Isn't this the key to that old shack? The one where I... No, it can't be."
+						MsgTimer = 70*10						
 					EndIf
-					
-					Msg = "Isn't this the key to that old shack? The one where I... No, it can't be."
-					MsgTimer = 70*10
 					
 					SelectedItem\state = 1
 					SelectedItem = Null

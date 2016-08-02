@@ -11,19 +11,20 @@ v1.3
 	- new key card textures by Anon4743
 - expanded SCP-[REDACTED] area
 - some new sounds
+- some clues about D-9341s past
 - Map Creator improvements
 - options can be accessed from the pause menu
 - optimization to sound loading by juanjpro
 - getting Key Card Omni is slightly harder now (depending on the difficulty)
 - more SCP-096 spawns
 - 096 model with lower polycount
-- more SCP-049 spawns
 - MTF improvements
 	- AI bugfixes and optimization
 	- more reactions to SCPs
 	- cameras are now a threat if the MTF Units have spawned
 - fixed Class D step sounds 
 - removed SCP-1074
+- more SCP-049 spawns
 - improved SCP-049 AI
 - door buttons can't be accidentally clicked by closing the pause menu anymore
 - fixed checkpoints occasionally leading into "nothingness"
