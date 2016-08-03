@@ -1,6 +1,8 @@
 ----------------------------------------------------------------------------------
 
 v1.3
+This update was mostly created by Third Subvision Team
+
 - some additions from the Nine Tailed Fox mod 
 (http://undertowgames.com/forum/viewtopic.php?f=11&t=4358):
 	- SCP-1162, SCP-1499
@@ -40,6 +42,7 @@ v1.3
 - "SCP-106's escape sound" is no longer played at Gate A if SCP-106 has been contained
 - fixed a bug that caused SCP-860-2 not to spawn
 - SCP-106 will no longer spawn in the forest
+- miscellaneous minor fixes
 
 ----------------------------------------------------------------------------------
 

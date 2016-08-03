@@ -8585,9 +8585,17 @@ Function UpdateEvents()
 						;If e\room\NPC[0]\PathTimer# < 70*3
 						If e\room\NPC[0]\PathTimer# = 0.0
 							;e\room\NPC[0]\PathTimer# = e\room\NPC[0]\PathTimer# + FPSfactor
-							If e\room\NPC[0]\PrevState = 1
-								If e\room\NPC[0]\Frame >= 890
-									e\room\NPC[0]\PathTimer# = 1.0
+							If e\room\NPC[0]\PrevState = 1 Then
+								If (e\SoundCHN2 = 0) Then
+									e\Sound2 = LoadSound_Strict("SFX\049\room2slplaceholder.ogg")
+									e\SoundCHN2 = PlaySound2(e\Sound2, Camera, e\room\NPC[0]\Collider)
+								Else
+									If (ChannelPlaying(e\SoundCHN2)) Then
+										UpdateSoundOrigin2(e\SoundCHN2, Camera, e\room\NPC[0]\Collider)
+										
+									Else
+										e\room\NPC[0]\PathTimer# = 1.0
+									EndIf
 								EndIf
 							ElseIf e\room\NPC[0]\PrevState = 2
 								If e\room\NPC[0]\Frame >= 1118
