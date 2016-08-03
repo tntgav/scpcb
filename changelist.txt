@@ -24,21 +24,23 @@ This update was mostly created by Third Subvision Team
 	- AI bugfixes and optimization
 	- more reactions to SCPs
 	- cameras are now a threat if the MTF Units have spawned
-- fixed Class D step sounds 
 - removed SCP-1074
 - more SCP-049 spawns
 - improved SCP-049 AI
 - door buttons can't be accidentally clicked by closing the pause menu anymore
+- fixed Class D step sounds 
+- fixed random Class Ds and scientists occasionally appearing in places they shouldn't
 - fixed checkpoints occasionally leading into "nothingness"
 - fixed saves not being deleted even if permadeath is on
 - fixed a bug with SCP-372 chamber collision
 - fixed UI messages overlapping with documents that are being read
+- fixed "buttghost" event sound
+- the radio transceivers can be used for playing your own sound clips
 - more characters in the intro
 - SCP-1123 can't be grabbed through the glass
 - fixed a bug with duplicate "Incident Report SCP-1048-A" in clipboard
 - bugfixes to MTFs at Gate A and Gate B
 - the second sound clip in the "suicide guard" event is now played correctly
-- fixed "buttghost" event sound
 - "SCP-106's escape sound" is no longer played at Gate A if SCP-106 has been contained
 - fixed a bug that caused SCP-860-2 not to spawn
 - SCP-106 will no longer spawn in the forest
