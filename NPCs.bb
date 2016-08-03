@@ -601,14 +601,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 	
 	ResetEntity(n\Collider)
 	
-	temp = 1
-	For n2.NPCs = Each NPCs
-		If n2\ID > 0 Then
-			temp=temp+1
-		EndIf
-	Next
+	n\ID = FindFreeNPCID()
 	
-	n\ID = temp
+	DebugLog ("Created NPC "+n\NVName+" (ID: "+n\ID+")")
 	
 	NPCSpeedChange(n)
 	
@@ -6072,6 +6067,32 @@ Function MoveToPocketDimension()
 	Next		
 End Function
 
+Function FindFreeNPCID%()
+	Local id% = 1
+	While (True)
+		Local taken% = False
+		For n2.NPCs = Each NPCs
+			If n2\ID = id Then
+				taken = True
+				Exit
+			EndIf
+		Next
+		If (Not taken) Then
+			Return id
+		EndIf
+		id = id + 1
+	Wend
+End Function
+
+Function ForceSetNPCID(n.NPCs, newID%)
+	n\ID = newID
+	
+	For n2.NPCs = Each NPCs
+		If n2 <> n And n\ID = newID Then
+			n2\id = FindFreeNPCID()
+		EndIf
+	Next
+End Function
 
 Function Find860Angle(n.NPCs, fr.Forest)
 	TFormPoint(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,PlayerRoom\obj)

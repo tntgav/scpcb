@@ -142,6 +142,27 @@
 		Ryan Stillings
 			programming
 
+		ENDSHN
+			programming, GFX, SFX, animation
+
+		Vane Brain 
+			room modeling, GFX, music, ideas
+
+		revo794 
+			SFX, Music (SCP-1499 themes)
+
+		Turtle Sandwich/Catnipbuddy 
+			"Airlock.ogg" and "body1.jpg"
+
+		Anon4743
+			New Keycard Textures
+
+		Redbull.Ivan and TheKMan
+			SCP-1499 Model (Gas Mask)
+
+		Christian Rieﬂ
+			v1.3 quality assurance
+
 		Caleb Yu
 			some of the documents
 

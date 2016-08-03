@@ -137,6 +137,8 @@ Function SaveGame(file$)
 	
 	WriteInt f, temp
 	For n.NPCs = Each NPCs
+		DebugLog("Saving NPC " +n\NVName+ " (ID "+n\ID+")")
+		
 		WriteByte f, n\NPCtype
 		WriteFloat f, EntityX(n\Collider,True)
 		WriteFloat f, EntityY(n\Collider,True)
@@ -578,8 +580,10 @@ Function LoadGame(file$)
 		n\Angle = ReadFloat(f)
 		n\Reload = ReadFloat(f)
 		
-		n\ID = ReadInt(f)
+		ForceSetNPCID(n, ReadInt(f))
 		n\TargetID = ReadInt(f)
+		
+		DebugLog("Loading NPC " +n\NVName+ " (ID "+n\ID+")")
 		
 		n\EnemyX = ReadFloat(f)
 		n\EnemyY = ReadFloat(f)
@@ -1209,7 +1213,7 @@ Function LoadGameQuick(file$)
 		n\Angle = ReadFloat(f)
 		n\Reload = ReadFloat(f)
 		
-		n\ID = ReadInt(f)
+		ForceSetNPCID(n, ReadInt(f))
 		n\TargetID = ReadInt(f)
 		
 		n\EnemyX = ReadFloat(f)
