@@ -4525,7 +4525,15 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[1]\dir = 0 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
 			r\RoomDoors[1]\MTFClose = False
 			
-			r\Objects[3] = LoadMesh_Strict("GFX\map\room2gw_pipes.b3d",r\obj)
+			For r2.Rooms = Each Rooms
+				If r2<>r Then
+					If r2\RoomTemplate\Name = "room2gw" Or r2\RoomTemplate\Name = "room2gw_b" Then
+						r\Objects[3] = CopyEntity(r2\Objects[3],r\obj) ;don't load the mesh again
+						Exit
+					EndIf
+				EndIf
+			Next
+			If r\Objects[3]=0 Then r\Objects[3] = LoadMesh_Strict("GFX\map\room2gw_pipes.b3d",r\obj)
 			EntityPickMode r\Objects[3],2
 			
 			If r\RoomTemplate\Name = "room2gw"
@@ -4583,7 +4591,15 @@ Function FillRoom(r.Rooms)
 			PositionEntity r\Objects[0],r\x-48.0*RoomScale,128.0*RoomScale,r\z+320.0*RoomScale
 			EntityParent r\Objects[0],r\obj
 			
-			r\Objects[3] = LoadMesh_Strict("GFX\map\room3gw_pipes.b3d",r\obj)
+			For r2.Rooms = Each Rooms
+				If r2<>r Then
+					If r2\RoomTemplate\Name = "room3gw" Then
+						r\Objects[3] = CopyEntity(r2\Objects[3],r\obj) ;don't load the mesh again
+						Exit
+					EndIf
+				EndIf
+			Next
+			If r\Objects[3]=0 Then r\Objects[3] = LoadMesh_Strict("GFX\map\room3gw_pipes.b3d",r\obj)
 			EntityPickMode r\Objects[3],2
 	        ;[End Block]
 		Case "room1162"
@@ -7646,9 +7662,9 @@ End Function
 ;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
 ;~F#8C9#8E6#904#92B#932#940#95C#971#98E#9AB#9B8#9CA#A08#A32#A83#AD9#AEC#B0A#BAD#C0E
 ;~F#C1D#C59#C61#C6F#C84#CC0#CDF#CEF#D07#D32#D45#D67#D8F#DE1#E0D#E34#E3B#E40#E77#E9E
-;~F#EB3#EE7#F65#F85#FF9#1050#107B#10CC#10D5#116E#1176#117B#1189#1198#11D1#11ED#11FC#120D#1214#129D
-;~F#12D3#1350#135C#139D#13A8#13B9#13BE#13CD#13E4#1465#146E#154D#156A#1571#1577#1585#15A9#15C9#15FC#1708
-;~F#1741#1756#1818#18AD#18B2#18C2#1B91#1BA8#1BC7#1BCE#1C1B#1C6C#1C8B#1CA2#1CCA#1CD1#1D05#1D0C#1D38#1D86
-;~F#1D94#1D9B#1DA1#1DAB#1DB1#1DC8
-;~B#120C
+;~F#EB3#EE7#F65#F85#FF9#1050#107B#10CC#10D5#116E#1176#117B#1189#1198#11D9#11FD#120C#121D#1224#1229
+;~F#12AD#12E3#1360#136C#13AD#13B8#13C9#13CE#13DD#13F4#1475#147E#155D#157A#1581#1587#1595#15B9#15D9#160C
+;~F#1718#1751#1766#1828#18BD#18C2#18D2#1BA1#1BB8#1BD7#1BDE#1C2B#1C7C#1C9B#1CB2#1CDA#1CE1#1D15#1D1C#1D48
+;~F#1D96#1DA4#1DAB#1DB1#1DBB#1DC1#1DD8
+;~B#121C
 ;~C#Blitz3D
