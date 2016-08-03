@@ -1365,7 +1365,7 @@ Function LoadGameQuick(file$)
 		EndIf
 	Next
 	
-	InitWayPoints()
+	;InitWayPoints()
 	
 	If ReadInt(f) <> 954 Then RuntimeError("Couldn't load the game, save file may be corrupted (error 2)")
 	
