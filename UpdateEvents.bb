@@ -8624,6 +8624,15 @@ Function UpdateEvents()
 								PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[1]\obj)
 							EndIf
 						EndIf
+						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 2.0
+							If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 0.6
+								If (Not e\room\RoomDoors[0]\open)
+									e\room\RoomDoors[0]\open = True
+									sound=Rand(0, 2)
+									PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
+								EndIf
+							EndIf
+						EndIf
 					EndIf
 				ElseIf e\EventState2 = 4
 					If e\room\NPC[0]\State <> 5
@@ -8820,6 +8829,6 @@ End Function
 ;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
 ;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
 ;~F#14FD#1595#174B#1831#1885#1936#19E6#1A9E#1AB6#1B77#1BA4#1BC1#1BE8#1C18#1C3C#1C64#1CBE#1CFE#1D2F#1D42
-;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD6#204F#21DF#21E3
+;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD6#204F#21E8#21EC
 ;~B#1498#2160
 ;~C#Blitz3D
