@@ -16,7 +16,20 @@
 Function LoadImage_Strict(file$)
 	If FileType(file$)<>1 Then RuntimeError "Image " + file$ + " missing. "
 	tmp = LoadImage(file$)
-	If tmp = 0 Then RuntimeError "Failed to load Image: " + file$ 
+	
+	;attempt to load the image again
+	If tmp = 0 Then LoadImage(file)
+	
+	If tmp = 0 Then
+		;if loading failed again, add an error message to the console and return a black image
+		CreateConsoleMsg("Loading image ''"+file+"'' failed")
+		If ConsoleOpening Then
+			ConsoleOpen = True
+		EndIf
+		
+		Return MenuBlack
+	EndIf
+	
 	Return tmp
 End Function
 
