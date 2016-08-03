@@ -8463,7 +8463,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 						;For SCP-049
-						If e\EventState2 = 0 And e\room\NPC[0]=Null
+						If e\room\NPC[0]=Null Then
 							For n.NPCs = Each NPCs
 								If n\NPCtype = NPCtype049
 									e\room\NPC[0] = n
