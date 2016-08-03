@@ -8675,6 +8675,12 @@ Function UpdateEvents()
 				
 				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint got locked again)
 				e\EventState3 = UpdateLever(e\room\Levers[0])
+				If e\EventState3 = 1 Then
+					UpdateCheckpointMonitors(1)
+				Else
+					MonitorTimer# = 0.0
+					TurnCheckpointMonitorsOff()
+				EndIf
 				
 				;[End Block]
 			Case "096spawn"
@@ -8829,6 +8835,6 @@ End Function
 ;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
 ;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
 ;~F#14FD#1595#174B#1831#1885#1936#19E6#1A9E#1AB6#1B77#1BA4#1BC1#1BE8#1C18#1C3C#1C64#1CBE#1CFE#1D2F#1D42
-;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD6#204F#21E8#21EC
+;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD6#204F#212E#21EE#21F2
 ;~B#1498#2160
 ;~C#Blitz3D

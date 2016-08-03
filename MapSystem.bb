@@ -2242,6 +2242,12 @@ Function FillRoom(r.Rooms)
 			RotateEntity (r\Objects[2],0,180,0)
 			EntityFX r\Objects[2],1
 			
+			r\Objects[3] = CopyEntity(Monitor2,r\obj)
+			ScaleEntity(r\Objects[3], 2.0, 2.0, 2.0)
+			PositionEntity (r\Objects[3], r\x - 152.0*RoomScale, 384.0*RoomScale, r\z-380.0*RoomScale, True)
+			RotateEntity (r\Objects[3],0,0,0)
+			EntityFX r\Objects[3],1
+			
 			If MapTemp(Floor(r\x / 8.0),Floor(r\z /8.0)-1)=0 Then
 				CreateDoor(r\zone, r\x, 0, r\z  - 4.0, 0, r, 0, False, 0, "GEAR")
 			EndIf
@@ -2267,6 +2273,12 @@ Function FillRoom(r.Rooms)
 			PositionEntity (r\Objects[2], r\x + 152.0*RoomScale, 384.0*RoomScale, r\z+380.0*RoomScale, True)
 			RotateEntity (r\Objects[2],0,180,0)
 			EntityFX r\Objects[2],1
+			
+			r\Objects[3] = CopyEntity(Monitor2,r\obj)
+			ScaleEntity(r\Objects[3], 2.0, 2.0, 2.0)
+			PositionEntity (r\Objects[3], r\x + 152.0*RoomScale, 384.0*RoomScale, r\z-124.0*RoomScale, True)
+			RotateEntity (r\Objects[3],0,0,0)
+			EntityFX r\Objects[3],1
 			
 			r\RoomDoors[0]\timer = 70 * 5
 			r\RoomDoors[1]\timer = 70 * 5
@@ -7660,11 +7672,11 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#110#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A
 ;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
-;~F#8C9#8E6#904#92B#932#940#95C#971#98E#9AB#9B8#9CA#A08#A32#A83#AD9#AEC#B0A#BAD#C0E
-;~F#C1D#C59#C61#C6F#C84#CC0#CDF#CEF#D07#D32#D45#D67#D8F#DE1#E0D#E34#E3B#E40#E77#E9E
-;~F#EB3#EE7#F65#F85#FF9#1050#107B#10CC#10D5#116E#1176#117B#1189#1198#11D9#11FD#120C#121D#1224#1229
-;~F#12AD#12E3#1360#136C#13AD#13B8#13C9#13CE#13DD#13F4#1475#147E#155D#157A#1581#1587#1595#15B9#15D9#160C
-;~F#1718#1751#1766#1828#18BD#18C2#18D2#1BA1#1BB8#1BD7#1BDE#1C2B#1C7C#1C9B#1CB2#1CDA#1CE1#1D15#1D1C#1D48
-;~F#1D96#1DA4#1DAB#1DB1#1DBB#1DC1#1DD8
-;~B#121C
+;~F#8CF#8F2#910#937#93E#94C#968#97D#99A#9B7#9C4#9D6#A14#A3E#A8F#AE5#AF8#B16#BB9#C1A
+;~F#C29#C65#C6D#C7B#C90#CCC#CEB#CFB#D13#D3E#D51#D73#D9B#DED#E19#E40#E47#E4C#E83#EAA
+;~F#EBF#EF3#F71#F91#1005#105C#1087#10D8#10E1#117A#1182#1187#1195#11A4#11E5#1209#1218#1229#1230#1235
+;~F#12B9#12EF#136C#1378#13B9#13C4#13D5#13DA#13E9#1400#1481#148A#1569#1586#158D#1593#15A1#15C5#15E5#1618
+;~F#1724#175D#1772#1834#18C9#18CE#18DE#1BAD#1BC4#1BE3#1BEA#1C37#1C88#1CA7#1CBE#1CE6#1CED#1D21#1D28#1D54
+;~F#1DA2#1DB0#1DB7#1DBD#1DC7#1DCD#1DE4
+;~B#1228
 ;~C#Blitz3D
