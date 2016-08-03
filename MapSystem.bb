@@ -4683,7 +4683,7 @@ Function FillRoom(r.Rooms)
 			
 			;PathPoint 1 for SCP-049
 			r\Objects[7] = CreatePivot()
-			PositionEntity r\Objects[7],r\x,r\y+100.0*RoomScale,r\z-640.0*RoomScale,True
+			PositionEntity r\Objects[7],r\x,r\y+100.0*RoomScale,r\z-800.0*RoomScale,True
 			EntityParent r\Objects[7],r\obj
 			
 			;PathPoints for SCP-049

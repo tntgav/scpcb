@@ -8534,6 +8534,8 @@ Function UpdateEvents()
 						PointEntity e\room\NPC[0]\Collider,e\room\obj
 						MoveEntity e\room\NPC[0]\Collider,0,0,-2
 						ResetEntity e\room\NPC[0]\Collider
+						e\room\NPC[0]\PathX = EntityX(e\room\NPC[0]\Collider)
+						e\room\NPC[0]\PathZ = EntityZ(e\room\NPC[0]\Collider)
 						e\room\NPC[0]\State = 5
 						DebugLog "aaaaaaaaa"
 						e\EventState2 = 1
@@ -8604,7 +8606,8 @@ Function UpdateEvents()
 									DebugLog "Path2"
 								Case 3
 									;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
-									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\obj,True),EntityY(e\room\Objects[7],True),EntityZ(e\room\obj,True))
+									;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\obj,True),EntityY(e\room\Objects[7],True),EntityZ(e\room\obj,True))
+									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],e\room\NPC[0]\PathX,0.1,e\room\NPC[0]\PathZ)
 									e\room\NPC[0]\PrevState = 1
 									DebugLog "Path3"
 								Case 4
@@ -8650,7 +8653,7 @@ Function UpdateEvents()
 						;Still playing the Music for SCP-049 (in the real, SCP-049's State will be set to 2, causing it to stop playing the chasing track)
 						If Music(20) = 0 Then Music(20) = LoadSound_Strict("SFX\Music\SCP-049 Chase.ogg")
 						ShouldPlay = 20
-						If e\room\NPC[0]\PathStatus <> 1
+						If e\room\NPC[0]\PathStatus<>1
 							e\room\NPC[0]\Idle = 70*60 ;(Making SCP-049 idle for one minute (twice as fast for aggressive NPCs = True))
 							PositionEntity e\room\NPC[0]\Collider,0,500,0
 							ResetEntity e\room\NPC[0]\Collider
@@ -8817,6 +8820,6 @@ End Function
 ;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
 ;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
 ;~F#14FD#1595#174B#1831#1885#1936#19E6#1A9E#1AB6#1B77#1BA4#1BC1#1BE8#1C18#1C3C#1C64#1CBE#1CFE#1D2F#1D42
-;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD2#2045#204B#2126#21D4#21D8
-;~B#1498#215E
+;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD6#204F#21DF#21E3
+;~B#1498#2160
 ;~C#Blitz3D
