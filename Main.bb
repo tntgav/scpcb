@@ -1,21 +1,14 @@
 ;This is the Source Code from SCP:CB Version 1.3.0. This version was created by the "Third Subdivision Team".
 ;Original credit goes to Regalis and all the other contributers to SCP:CB.
 
-Local InitErrorStr$ = ""
-If FileSize("FastExt.dll")=0 Then InitErrorStr=InitErrorStr+ "FastExt.dll"+Chr(13)+Chr(10)
-If FileSize("FastText.dll")=0 Then InitErrorStr=InitErrorStr+ "FastText.dll"+Chr(13)+Chr(10)
-If FileSize("winfix.dll")=0 Then InitErrorStr=InitErrorStr+ "winfix.dll"+Chr(13)+Chr(10)
+;Modified by juanjp600 to remove FastExt and FastText due to stability and compatibility concerns.
+;Removing this code also makes a potential engine conversion marginally easier to do (try parsing the code and converting it to C?),
+;since the strange parts of the extensions are gone.
+;In addition, you won't need FastExt.bb in the first place, making redistribution easier.
 
-If Len(InitErrorStr)>0 Then
-	RuntimeError "The following DLLs were not found in the game directory:"+Chr(13)+Chr(10)+Chr(13)+Chr(10)+InitErrorStr
-EndIf
-
-Include "FastExt.bb"
-Include "FastText_Unicode.bb"
 Include "StrictLoads.bb"
 Include "fullscreen_window_fix.bb"
 
-CompatData%(12, 0) ;hopefully this fixes performance issues on Windows 8
 Global OptionFile$ = "options.ini"
 
 Global Font1%, Font2%, Font3%, Font4%
@@ -26,8 +19,6 @@ AppTitle "SCP - Containment Breach Launcher"
 
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%
-
-BumpPower 0.03
 
 Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
@@ -143,7 +134,7 @@ EndIf
 
 Global MenuScale# = (GraphicHeight / 1024.0)
 
-SetBuffer BackBuffer()
+SetBuffer(BackBuffer())
 
 Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, FPSfactor2#
 Local CheckFPS%, ElapsedLoops%, FPS%, ElapsedTime#
@@ -177,10 +168,10 @@ Global SelectedLoadingScreen.LoadingScreens, LoadingScreenAmount%, LoadingScreen
 Global LoadingBack% = LoadImage_Strict("Loadingscreens\loadingback.jpg")
 InitLoadingScreens("Loadingscreens\loadingscreens.ini")
 
-Font1% = LoadFont_Strict("GFX\cour.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0,0, FT_DEFAULT)
-Font2% = LoadFont_Strict("GFX\courbd.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0,0, FT_DEFAULT)
-Font3% = LoadFont_Strict("GFX\DS-DIGI.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0,0, FT_DEFAULT)
-Font4% = LoadFont_Strict("GFX\DS-DIGI.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0,0, FT_DEFAULT)
+Font1% = LoadFont_Strict("GFX\cour.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
+Font2% = LoadFont_Strict("GFX\courbd.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
+Font3% = LoadFont_Strict("GFX\DS-DIGI.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
+Font4% = LoadFont_Strict("GFX\DS-DIGI.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
 SetFont Font2
 
 Global BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
@@ -5209,18 +5200,7 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
 				
 				AntiAlias Opt_AntiAlias
-				TextureLodBias TextureFloat#
 			EndIf
-			;If OptionsMenu < 4 Then 
-			;	If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
-			;		OptionsMenu = OptionsMenu+1
-			;	EndIf
-			;EndIf
-			;If OptionsMenu > 1 Then
-			;	If DrawButton(x+41*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, "<") Then
-			;		OptionsMenu = OptionsMenu-1
-			;	EndIf
-			;EndIf
 			
 			Color 0,255,0
 			If OptionsMenu = 1
@@ -5625,7 +5605,7 @@ Function LoadEntities()
 		TempSounds[i]=0
 	Next
 	
-	TextureLodBias
+	;TextureLodBias
 	
 	AmbientLightRoomTex% = CreateTexture(2,2,257)
 	TextureBlend AmbientLightRoomTex,5
@@ -5644,10 +5624,8 @@ Function LoadEntities()
 	CameraFogColor (Camera, GetINIInt("options.ini", "options", "fog r"), GetINIInt("options.ini", "options", "fog g"), GetINIInt("options.ini", "options", "fog b"))
 	AmbientLight Brightness, Brightness, Brightness
 	
-	ScreenTexs[0] = CreateTexture(512, 512, 1+256+FE_RENDER+FE_ZRENDER)
-	ScreenTexs[1] = CreateTexture(512, 512, 1+256+FE_RENDER+FE_ZRENDER)
-	
-	;InitFastResize()
+	ScreenTexs[0] = CreateTexture(512, 512, 1+256)
+	ScreenTexs[1] = CreateTexture(512, 512, 1+256)
 	
 	CreateBlurImage()
 	;Listener = CreateListener(Camera)
@@ -5751,31 +5729,6 @@ Function LoadEntities()
 	
 	MTFObj = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d") ;optimized MTFs
 	GuardObj = LoadAnimMesh_Strict("GFX\npcs\guard.b3d") ;optimized Guards
-	;GuardTex = LoadTexture_Strict("GFX\npcs\body.jpg") ;optimized the guards even more
-	
-	If BumpEnabled Then
-		bump1 = LoadTexture_Strict("GFX\npcs\mtf_newnormal01.png")
-		TextureBlend bump1, FE_BUMP
-			
-		For i = 2 To CountSurfaces(MTFObj)
-			sf = GetSurface(MTFObj,i)
-			b = GetSurfaceBrush( sf )
-			t1 = GetBrushTexture(b,0)
-			
-			Select Lower(StripPath(TextureName(t1)))
-				Case "MTF_newdiffuse02.png"
-					
-					BrushTexture b, bump1, 0, 0
-					BrushTexture b, t1, 0, 1
-					PaintSurface sf,b
-			End Select
-			FreeBrush b
-			FreeTexture t1
-		Next
-		FreeTexture bump1	
-	EndIf
-	
-	
 	
 	ClassDObj = LoadAnimMesh_Strict("GFX\npcs\classd.b3d") ;optimized Class-D's and scientists/researchers
 	ApacheObj = LoadAnimMesh_Strict("GFX\apache.b3d") ;optimized Apaches (helicopters)
@@ -5824,24 +5777,6 @@ Function LoadEntities()
 	HideEntity LeverBaseOBJ
 	LeverOBJ = LoadMesh_Strict("GFX\map\leverhandle.x")
 	HideEntity LeverOBJ
-	
-	For i = 0 To 1
-		HideEntity BigDoorOBJ(i)
-		;If BumpEnabled And 0 Then
-		If BumpEnabled
-			
-			Local bumptex = LoadTexture_Strict("GFX\map\containmentdoorsbump.jpg")
-			TextureBlend bumptex, FE_BUMP
-			Local tex = LoadTexture_Strict("GFX\map\containment_doors.jpg")	
-			EntityTexture BigDoorOBJ(i), bumptex, 0, 0
-			EntityTexture BigDoorOBJ(i), tex, 0, 1
-			
-			;FreeEntity tex
-			;FreeEntity bumptex
-			FreeTexture tex
-			FreeTexture bumptex
-		EndIf
-	Next
 	
 	DrawLoading(15)
 	
@@ -5947,7 +5882,7 @@ Function LoadEntities()
 	
 	LoadMaterials("DATA\materials.ini")
 	
-	TextureLodBias TextureFloat#
+	;TextureLodBias TextureFloat#
 	
 	DrawLoading(30)
 	
@@ -6387,11 +6322,12 @@ Function NullGame()
 	
 	IsZombie% = False
 	
-	DeInitExt
+	;DeInitExt
 	
 	ClearWorld
+	InitFastResize()
 	
-	InitExt
+	;InitExt
 	
 	For i=0 To 9
 		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
@@ -8154,19 +8090,29 @@ Function EntityScaleZ#(entity%, globl% = False)
 End Function 
 
 Function Graphics3DExt%(width%,height%,depth%=32,mode%=2)
-	If FE_InitExtFlag = 1 Then DeInitExt() ;prevent FastExt from breaking itself
+	;If FE_InitExtFlag = 1 Then DeInitExt() ;prevent FastExt from breaking itself
 	Graphics3D width,height,depth,mode
-	InitExt()
+	InitFastResize()
+	;InitExt()
 	
 	AntiAlias GetINIInt(OptionFile,"options","antialias")
-	TextureAnisotropy% (GetINIInt(OptionFile,"options","anisotropy"),-1)
+	;TextureAnisotropy% (GetINIInt(OptionFile,"options","anisotropy"),-1)
 End Function
 
 Function ResizeImage2(image%,width%,height%)
-   img% = CreateImage(width,height)
-   CopyRectStretch(0,0,ImageWidth(image),ImageHeight(image),0,0,width,height,ImageBuffer(image),ImageBuffer(img))
-   FreeImage image
-   Return img
+    img% = CreateImage(width,height)
+	
+	oldWidth% = ImageWidth(image)
+	oldHeight% = ImageHeight(image)
+	CopyRect 0,0,oldWidth,oldHeight,1024-oldWidth/2,1024-oldHeight/2,ImageBuffer(image),TextureBuffer(fresize_texture)
+	SetBuffer BackBuffer()
+	ScaleRender(0,0,2048.0 / Float(GraphicWidth) * Float(width) / Float(oldWidth), 2048.0 / Float(GraphicWidth) * Float(height) / Float(oldHeight))
+	;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
+	;everyone uses landscape so it's probably a non-issue
+	CopyRect GraphicWidth/2-width/2,GraphicHeight/2-height/2,width,height,0,0,BackBuffer(),ImageBuffer(img)
+	
+    FreeImage image
+    Return img
 End Function
 
 
@@ -8303,65 +8249,65 @@ Function RenderWorld2()
 End Function
 
 
-;Function ScaleRender(x#,y#,hscale#=1.0,vscale#=1.0)
-;	ShowEntity fresize_image
-;	ScaleEntity fresize_image,hscale,vscale,1.0
-;	PositionEntity fresize_image, x, y, 1.0001
-;	ShowEntity fresize_cam
-;	RenderWorld()
-;	HideEntity fresize_cam
-;	HideEntity fresize_image
-;End Function
-
-;Function InitFastResize()
-;   ;Create Camera
-;	Local cam% = CreateCamera()
-;	CameraProjMode cam, 2
-;	CameraZoom cam, 0.1
-;	CameraClsMode cam, 0, 0
-;	CameraRange cam, 0.1, 1.5
-;	MoveEntity cam, 0, 0, -10000
-;	fresize_cam = cam
-;	
-;   ;ark_sw = GraphicsWidth()
-;   ;ark_sh = GraphicsHeight()
-;	
-;   ;Create sprite
-;	Local spr% = CreateMesh(cam)
-;	Local sf% = CreateSurface(spr)
-;	AddVertex sf, -1, 1, 0, 0, 0
-;	AddVertex sf, 1, 1, 0, 1, 0
-;	AddVertex sf, -1, -1, 0, 0, 1
-;	AddVertex sf, 1, -1, 0, 1, 1
-;	AddTriangle sf, 0, 1, 2
-;	AddTriangle sf, 3, 2, 1
-;	EntityFX spr, 17
-;	ScaleEntity spr, 2048.0 / Float(GraphicWidth), 2048.0 / Float(GraphicHeight), 1
-;	PositionEntity spr, 0, 0, 1.0001
-;	EntityOrder spr, -100001
-;	EntityBlend spr, 1
-;	fresize_image = spr
-;	
-;   ;Create texture
-;	fresize_texture = CreateTexture(2048, 2048, 1+256+FE_RENDER+FE_ZRENDER)
-;	;TextureAnisotropy(fresize_texture)
-;	EntityTexture spr, fresize_texture
-;	
-;	HideEntity fresize_cam
-;End Function
-
-Function RenderWorldToTexture()
-	
-	;EntityAlpha ark_blur_image, 1.0
-	HideEntity fresize_image
-	old_buffer% = GetBuffer()
-	SetBuffer(TextureBuffer(fresize_texture))
+Function ScaleRender(x#,y#,hscale#=1.0,vscale#=1.0)
+	ShowEntity fresize_image
+	ScaleEntity fresize_image,hscale,vscale,1.0
+	PositionEntity fresize_image, x, y, 1.0001
+	ShowEntity fresize_cam
 	RenderWorld()
-	SetBuffer(old_buffer)
-	;CopyRect ark_sw / 2 - 1024, ark_sh / 2 - 1024, 2048, 2048, 0, 0, BackBuffer(), TextureBuffer(ark_blur_texture)
-	;CopyRect 0, 0, GraphicWidth, GraphicHeight, 1024.0 - GraphicWidth/2, 1024.0 - GraphicHeight/2, BackBuffer(), TextureBuffer(ark_blur_texture)
-	
+	HideEntity fresize_cam
+	HideEntity fresize_image
 End Function
+
+Function InitFastResize()
+    ;Create Camera
+	Local cam% = CreateCamera()
+	CameraProjMode cam, 2
+	CameraZoom cam, 0.1
+	CameraClsMode cam, 0, 0
+	CameraRange cam, 0.1, 1.5
+	MoveEntity cam, 0, 0, -10000
+	fresize_cam = cam
+	
+    ;ark_sw = GraphicsWidth()
+    ;ark_sh = GraphicsHeight()
+	
+    ;Create sprite
+	Local spr% = CreateMesh(cam)
+	Local sf% = CreateSurface(spr)
+	AddVertex sf, -1, 1, 0, 0, 0
+	AddVertex sf, 1, 1, 0, 1, 0
+	AddVertex sf, -1, -1, 0, 0, 1
+	AddVertex sf, 1, -1, 0, 1, 1
+	AddTriangle sf, 0, 1, 2
+	AddTriangle sf, 3, 2, 1
+	EntityFX spr, 17
+	ScaleEntity spr, 2048.0 / Float(GraphicWidth), 2048.0 / Float(GraphicHeight), 1
+	PositionEntity spr, 0, 0, 1.0001
+	EntityOrder spr, -100001
+	EntityBlend spr, 1
+	fresize_image = spr
+	
+    ;Create texture
+	fresize_texture = CreateTexture(2048, 2048, 1+256)
+	;TextureAnisotropy(fresize_texture)
+	EntityTexture spr, fresize_texture
+	
+	HideEntity fresize_cam
+End Function
+
+;Function RenderWorldToTexture()
+;	
+;	;EntityAlpha ark_blur_image, 1.0
+;	HideEntity fresize_image
+;	;old_buffer% = BackBuffer();GetBuffer()
+;	;SetBuffer(TextureBuffer(fresize_texture))
+;	RenderWorld()
+;	SetBuffer(old_buffer)
+;	;CopyRect ark_sw / 2 - 1024, ark_sh / 2 - 1024, 2048, 2048, 0, 0, BackBuffer(), TextureBuffer(ark_blur_texture)
+;	;CopyRect 0, 0, GraphicWidth, GraphicHeight, 1024.0 - GraphicWidth/2, 1024.0 - GraphicHeight/2, BackBuffer(), TextureBuffer(ark_blur_texture)
+;	
+;End Function
 
 
 Function UpdateScreenGamma()
@@ -8526,10 +8472,6 @@ Function CheckTriggers$()
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#24#AB#12B#12F#136#3CB#4A7#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7E0#8C4#992#9AA
-;~F#A3D#B63#DF2#FDB#13F0#15E6#15F1#1745#17D5#1806#1904#1916#1932#193C#1949#196B#198A#19A9#19C5#19D9
-;~F#19EE#19F2#1A12#1A1A#1BE7#1C9C#1CC7#1D3E#1D44#1D4E#1D5A#1D65#1D69#1DA4#1DAC#1DB4#1DBB#1DC2#1DCF#1DD5
-;~F#1DE0#1E19#1E28#1E46#1E74#1E7B#1E8E#1EA7#1ED4#1EDF#1EE4#1EFE#1F0A#1F25#1F77#1F85#1F8D#1F99#1FA2#1FCB
-;~F#1FD0#1FD5#1FDA#1FE3#1FEB#20B9#20C7#20D4#20FB#210D#2126#2135#214C
-;~B#118C#13C4#1A37
+;~F#1F63#20D7
+;~B#118C#13C4#1A01
 ;~C#Blitz3D

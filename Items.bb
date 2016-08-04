@@ -24,11 +24,10 @@ Type ItemTemplates
 	Field isAnim%
 	
 	Field scale#
-	Field bumptex%
 	Field tex%, texpath$
 End Type 
 
-Function CreateItemTemplate.ItemTemplates(name$, tempname$, objpath$, invimgpath$, imgpath$, scale#, texturepath$ = "", Bump$="",invimgpath2$="",Anim%=0, texflags%=9)
+Function CreateItemTemplate.ItemTemplates(name$, tempname$, objpath$, invimgpath$, imgpath$, scale#, texturepath$ = "",invimgpath2$="",Anim%=0, texflags%=9)
 	Local it.ItemTemplates = New ItemTemplates, n
 	
 	
@@ -273,10 +272,10 @@ Function InitItemTemplates()
 	
 	;BoH items
 	
-	it = CreateItemTemplate("Clipboard", "clipboard", "GFX\items\clipboard.b3d", "GFX\items\INVclipboard.jpg", "", 0.003, "", "", "GFX\items\INVclipboard2.jpg", 1)
+	it = CreateItemTemplate("Clipboard", "clipboard", "GFX\items\clipboard.b3d", "GFX\items\INVclipboard.jpg", "", 0.003, "", "GFX\items\INVclipboard2.jpg", 1)
 	
 	it = CreateItemTemplate("SCP-1123", "1123", "GFX\items\HGIB_Skull1.b3d", "GFX\items\inv1123.jpg", "", 0.015) : it\sound = 0
-	it = CreateItemTemplate("SCP-178", "scp178", "GFX\items\scp178.b3d", "GFX\items\INV178.jpg", "", 0.02,"","","",1)
+	it = CreateItemTemplate("SCP-178", "scp178", "GFX\items\scp178.b3d", "GFX\items\INV178.jpg", "", 0.02,"","",1)
 	
 	it = CreateItemTemplate("Document SCP-1123", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1123.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Document SCP-1074", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1074.jpg", 0.003) : it\sound = 0
@@ -291,14 +290,14 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("SCP-1499","scp1499","GFX\items\SCP-1499.3ds","GFX\items\INVscp1499.jpg", "", 0.023,"GFX\items\SCP-1499.jpg") : it\sound = 2
 	it = CreateItemTemplate("Document SCP-1162", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1162.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Emily Ross's Badge", "badge", "GFX\items\badge.x", "GFX\items\INVbadge.jpg", "GFX\items\badge1.jpg", 0.0001, "GFX\items\badge1_tex.jpg") : it\sound = 0
-	it = CreateItemTemplate("Lost Key", "key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, "GFX\items\key2.png","","",0,1+2+8) : it\sound = 3
+	it = CreateItemTemplate("Lost Key", "key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, "GFX\items\key2.png","",0,1+2+8) : it\sound = 3
 	it = CreateItemTemplate("Disciplinary Hearing DH-S-4137-17092", "oldpaper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\dh.s", 0.003) : it\sound = 0
 	
-	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","","",0,1+2+8) : it\sound = 3
+	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","",0,1+2+8) : it\sound = 3
 	
-	it = CreateItemTemplate("Movie Ticket", "ticket", "GFX\items\key.b3d", "GFX\items\INVticket.jpg", "GFX\items\ticket.png", 0.002, "GFX\items\tickettexture.png","","",0,1+2+8) : it\sound = 0
+	it = CreateItemTemplate("Movie Ticket", "ticket", "GFX\items\key.b3d", "GFX\items\INVticket.jpg", "GFX\items\ticket.png", 0.002, "GFX\items\tickettexture.png","",0,1+2+8) : it\sound = 0
 	
-	it = CreateItemTemplate("Old Badge", "badge", "GFX\items\badge.x", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, "GFX\items\badge2_tex.png","","",0,1+2+8) : it\sound = 0
+	it = CreateItemTemplate("Old Badge", "badge", "GFX\items\badge.x", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, "GFX\items\badge2_tex.png","",0,1+2+8) : it\sound = 0
 	
 	
 	For it = Each ItemTemplates
@@ -621,5 +620,5 @@ Function DropItem(item.Items)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#B#1E#13D#157#198#1B3#1EF#232
+;~F#1D
 ;~C#Blitz3D

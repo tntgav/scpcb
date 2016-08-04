@@ -3,7 +3,7 @@
 Type Materials
 	Field name$
 	Field Diff
-	Field Bump
+	;Field Bump
 	
 	Field StepSound%
 End Type
@@ -26,14 +26,14 @@ Function LoadMaterials(file$)
 			
 			mat\name = Lower(TemporaryString)
 			
-			If BumpEnabled Then
-				StrTemp = GetINIString(file, TemporaryString, "bump")
-				If StrTemp <> "" Then 
-					mat\Bump =  LoadTexture_Strict(StrTemp)
-					
-					TextureBlend mat\Bump, FE_BUMP				
-				EndIf
-			EndIf
+			;If BumpEnabled Then
+			;	StrTemp = GetINIString(file, TemporaryString, "bump")
+			;	If StrTemp <> "" Then 
+			;		mat\Bump =  LoadTexture_Strict(StrTemp)
+			;		
+			;		TextureBlend mat\Bump, FE_BUMP				
+			;	EndIf
+			;EndIf
 			
 			mat\StepSound = (GetINIInt(file, TemporaryString, "stepsound")+1)
 		EndIf
@@ -202,40 +202,40 @@ Function LoadWorld(file$, rt.RoomTemplates)
 		End Select
 	Next
 	
-	If BumpEnabled Then 
-		
-		For i = 1 To CountSurfaces(renderbrushes)
-			sf = GetSurface(renderbrushes,i)
-			b = GetSurfaceBrush( sf )
-			t = GetBrushTexture(b, 1)
-			texname$ =  StripPath(TextureName(t))
-			
-			For mat.Materials = Each Materials
-				If texname = mat\name Then
-					If mat\Bump <> 0 Then 
-						t1 = GetBrushTexture(b,0)
-						
-						BrushTexture b, t1, 0, 0 ;light map
-						BrushTexture b, mat\Bump, 0, 1 ;bump
-						BrushTexture b, t, 0, 2 ;diff
-						
-						PaintSurface sf,b
-						
-						If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
-						
-						;If t1<>0 Then FreeTexture t1
-						;If t2 <> 0 Then FreeTexture t2						
-					EndIf
-					Exit
-				EndIf 
-			Next
-			
-			FreeTexture t
-			FreeBrush b
-			
-		Next
-		
-	EndIf
+	;If BumpEnabled Then 
+	;	
+	;	For i = 1 To CountSurfaces(renderbrushes)
+	;		sf = GetSurface(renderbrushes,i)
+	;		b = GetSurfaceBrush( sf )
+	;		t = GetBrushTexture(b, 1)
+	;		texname$ =  StripPath(TextureName(t))
+	;		
+	;		For mat.Materials = Each Materials
+	;			If texname = mat\name Then
+	;				If mat\Bump <> 0 Then 
+	;					t1 = GetBrushTexture(b,0)
+	;					
+	;					BrushTexture b, t1, 0, 0 ;light map
+	;					BrushTexture b, mat\Bump, 0, 1 ;bump
+	;					BrushTexture b, t, 0, 2 ;diff
+	;					
+	;					PaintSurface sf,b
+	;					
+	;					If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
+	;					
+	;					;If t1<>0 Then FreeTexture t1
+	;					;If t2 <> 0 Then FreeTexture t2						
+	;				EndIf
+	;				Exit
+	;			EndIf 
+	;		Next
+	;		
+	;		FreeTexture t
+	;		FreeBrush b
+	;		
+	;	Next
+	;	
+	;EndIf
 	
 	EntityFX renderbrushes, 1
 	
@@ -270,12 +270,12 @@ Function GetTextureFromCache%(name$)
 	Return 0
 End Function
 
-Function GetBumpFromCache%(name$)
-	For tc.Materials=Each Materials
-		If tc\name = name Then Return tc\Bump
-	Next
-	Return 0
-End Function
+;Function GetBumpFromCache%(name$)
+;	For tc.Materials=Each Materials
+;		If tc\name = name Then Return tc\Bump
+;	Next
+;	Return 0
+;End Function
 
 Function GetCache.Materials(name$)
 	For tc.Materials=Each Materials
@@ -289,13 +289,13 @@ Function AddTextureToCache(texture%)
 	If tc.Materials=Null Then
 		tc.Materials=New Materials
 		tc\name=StripPath(TextureName(texture))
-		Local temp$=GetINIString("Data\materials.ini",tc\name,"bump")
-		If temp<>"" Then
-			tc\Bump=LoadTexture_Strict(temp)
-			TextureBlend tc\Bump,FE_BUMP
-		Else
-			tc\Bump=0
-		EndIf
+		;Local temp$=GetINIString("Data\materials.ini",tc\name,"bump")
+		;If temp<>"" Then
+		;	tc\Bump=LoadTexture_Strict(temp)
+		;	TextureBlend tc\Bump,FE_BUMP
+		;Else
+		;	tc\Bump=0
+		;EndIf
 		tc\Diff=0
 	EndIf
 	If tc\Diff=0 Then tc\Diff=texture
@@ -304,7 +304,7 @@ End Function
 Function ClearTextureCache()
 	For tc.Materials=Each Materials
 		If tc\Diff<>0 Then FreeTexture tc\Diff
-		If tc\Bump<>0 Then FreeTexture tc\Bump
+		;If tc\Bump<>0 Then FreeTexture tc\Bump
 		Delete tc
 	Next
 End Function
@@ -312,8 +312,8 @@ End Function
 Function FreeTextureCache()
 	For tc.Materials=Each Materials
 		If tc\Diff<>0 Then FreeTexture tc\Diff
-		If tc\Bump<>0 Then FreeTexture tc\Bump
-		tc\Diff = 0 : tc\Bump = 0
+		;If tc\Bump<>0 Then FreeTexture tc\Bump
+		tc\Diff = 0; : tc\Bump = 0
 	Next
 End Function
 
@@ -536,82 +536,82 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		
 	Next
 	
-	If BumpEnabled Then
-		For i = 1 To CountSurfaces(Opaque)
-			surf = GetSurface(Opaque,i)
-			brush = GetSurfaceBrush(surf)
-			tex[0] = GetBrushTexture(brush,1)
-			temp1s$ =  StripPath(TextureName(tex[0]))
-			
-			DebugLog(temp1s)
-			
-			If temp1s$<>"" Then 
-				mat.Materials=GetCache(temp1s)
-				
-				tex[1] = GetBrushTexture(brush,0)
-				If tex[1]<>0 Then TextureBlend tex[1],5
-				
-				If TextureName(tex[0])<>"" Then
-					If TextureName(tex[1])<>""
-						BrushTexture brush, tex[0], 0, 2
-						BrushTexture brush, tex[1], 0, 1
-					Else
-						BrushTexture brush, tex[0], 0, 1
-					EndIf
-					BrushTexture brush, AmbientLightRoomTex,0
-					If mat<>Null Then
-						If mat\Bump<>0 Then
-							If TextureName(tex[1])<>""
-								BrushTexture brush, tex[0], 0, 3
-								BrushTexture brush, tex[1], 0, 2
-							Else
-								BrushTexture brush, tex[0], 0, 2
-							EndIf
-							BrushTexture brush, mat\Bump, 0, 1
-							BrushTexture brush, AmbientLightRoomTex,0
-						EndIf
-					EndIf
-					
-					PaintSurface surf,brush
-				EndIf
-				
-				If tex[0]<>0 Then FreeTexture tex[0] : tex[0]=0
-				If tex[1]<>0 Then FreeTexture tex[1] : tex[1]=0
-			EndIf
-			If brush<>0 Then FreeBrush brush : brush=0
-		Next
-	Else
-		For i = 1 To CountSurfaces(Opaque)
-			surf = GetSurface(Opaque,i)
-			brush = GetSurfaceBrush(surf)
-			tex[0] = GetBrushTexture(brush,1)
-			If tex[0]<>0 Then
-				If TextureName(tex[0])<>"" Then
-					tex[1] = GetBrushTexture(brush,0)
-					
-					If tex[1]<>0 Then
-						If TextureName(tex[1])<>"" Then
-							BrushTexture brush, tex[0], 0, 2
-							BrushTexture brush, tex[1], 0, 1
-							BrushTexture brush, AmbientLightRoomTex,0
-							
-							PaintSurface surf,brush
-							FreeTexture tex[1] : tex[1]=0							
-						EndIf
-						
-					Else
-						BrushTexture brush, tex[0], 0, 1
-						BrushTexture brush, AmbientLightRoomTex,0
-						
-						PaintSurface surf,brush
-					EndIf
-					FreeTexture tex[0] : tex[0]=0					
-				EndIf
-			EndIf
-			
-			If brush<>0 Then FreeBrush brush : brush=0
-		Next
-	EndIf
+	;If BumpEnabled Then
+	;	For i = 1 To CountSurfaces(Opaque)
+	;		surf = GetSurface(Opaque,i)
+	;		brush = GetSurfaceBrush(surf)
+	;		tex[0] = GetBrushTexture(brush,1)
+	;		temp1s$ =  StripPath(TextureName(tex[0]))
+	;		
+	;		DebugLog(temp1s)
+	;		
+	;		If temp1s$<>"" Then 
+	;			mat.Materials=GetCache(temp1s)
+	;			
+	;			tex[1] = GetBrushTexture(brush,0)
+	;			If tex[1]<>0 Then TextureBlend tex[1],5
+	;			
+	;			If TextureName(tex[0])<>"" Then
+	;				If TextureName(tex[1])<>""
+	;					BrushTexture brush, tex[0], 0, 2
+	;					BrushTexture brush, tex[1], 0, 1
+	;				Else
+	;					BrushTexture brush, tex[0], 0, 1
+	;				EndIf
+	;				BrushTexture brush, AmbientLightRoomTex,0
+	;				If mat<>Null Then
+	;					If mat\Bump<>0 Then
+	;						If TextureName(tex[1])<>""
+	;							BrushTexture brush, tex[0], 0, 3
+	;							BrushTexture brush, tex[1], 0, 2
+	;						Else
+	;							BrushTexture brush, tex[0], 0, 2
+	;						EndIf
+	;						BrushTexture brush, mat\Bump, 0, 1
+	;						BrushTexture brush, AmbientLightRoomTex,0
+	;					EndIf
+	;				EndIf
+	;				
+	;				PaintSurface surf,brush
+	;			EndIf
+	;			
+	;			If tex[0]<>0 Then FreeTexture tex[0] : tex[0]=0
+	;			If tex[1]<>0 Then FreeTexture tex[1] : tex[1]=0
+	;		EndIf
+	;		If brush<>0 Then FreeBrush brush : brush=0
+	;	Next
+	;Else
+	;	For i = 1 To CountSurfaces(Opaque)
+	;		surf = GetSurface(Opaque,i)
+	;		brush = GetSurfaceBrush(surf)
+	;		tex[0] = GetBrushTexture(brush,1)
+	;		If tex[0]<>0 Then
+	;			If TextureName(tex[0])<>"" Then
+	;				tex[1] = GetBrushTexture(brush,0)
+	;				
+	;				If tex[1]<>0 Then
+	;					If TextureName(tex[1])<>"" Then
+	;						BrushTexture brush, tex[0], 0, 2
+	;						BrushTexture brush, tex[1], 0, 1
+	;						BrushTexture brush, AmbientLightRoomTex,0
+	;						
+	;						PaintSurface surf,brush
+	;						FreeTexture tex[1] : tex[1]=0							
+	;					EndIf
+	;					
+	;				Else
+	;					BrushTexture brush, tex[0], 0, 1
+	;					BrushTexture brush, AmbientLightRoomTex,0
+	;					
+	;					PaintSurface surf,brush
+	;				EndIf
+	;				FreeTexture tex[0] : tex[0]=0					
+	;			EndIf
+	;		EndIf
+	;		
+	;		If brush<>0 Then FreeBrush brush : brush=0
+	;	Next
+	;EndIf
 	
 	Local hiddenMesh%
 	hiddenMesh=CreateMesh()
@@ -1157,9 +1157,9 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 	
 	Local hmap[ROOM4], mask[ROOM4]
 	Local GroundTexture = LoadTexture_Strict("GFX\map\forest\forestfloor.jpg")
-	TextureBlend GroundTexture, FE_ALPHACURRENT
+	;TextureBlend GroundTexture, FE_ALPHACURRENT
 	Local PathTexture = LoadTexture_Strict("GFX\map\forest\forestpath.jpg")
-	TextureBlend PathTexture, FE_ALPHACURRENT
+	;TextureBlend PathTexture, FE_ALPHACURRENT
 	
 	hmap[ROOM1]=LoadImage_Strict("GFX\map\forest\forest1h.png")
 	mask[ROOM1]=LoadTexture_Strict("GFX\map\forest\forest1h_mask.png",1+2)
@@ -1177,7 +1177,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 	mask[ROOM4]=LoadTexture_Strict("GFX\map\forest\forest4h_mask.png",1+2)
 	
 	For i = ROOM1 To ROOM4
-		TextureBlend mask[i], FE_ALPHAMODULATE
+		;TextureBlend mask[i], FE_ALPHAMODULATE
 		
 		fr\TileMesh[i]=load_terrain(hmap[i],0.03,GroundTexture,PathTexture,mask[i])
 	Next
@@ -1758,7 +1758,7 @@ Function FillRoom(r.Rooms)
 	Local it.Items, i%
 	Local xtemp%, ytemp%, ztemp%
 	
-	Local t1, Bump	
+	Local t1;, Bump	
 	
 	Select r\RoomTemplate\Name
 		Case "room860"
@@ -4009,35 +4009,6 @@ Function FillRoom(r.Rooms)
 			EntityPickMode r\Objects[6], 3
 			PositionEntity(r\Objects[6],r\x+784.0*RoomScale,-980.0*RoomScale,r\z+720.0*RoomScale,True)
 			
-			If BumpEnabled Then 
-				
-				For i = 1 To CountSurfaces(r\Objects[6])
-					sf = GetSurface(r\Objects[6],i)
-					b = GetSurfaceBrush( sf )
-					t = GetBrushTexture(b,1)
-					texname$ =  StripPath(TextureName(t))
-					
-					mat.Materials=GetCache(texname)
-					If mat<>Null Then
-						If mat\Bump<>0 Then
-							t1 = GetBrushTexture(b,0)
-							
-							BrushTexture b, t1, 0, 0	
-							BrushTexture b, mat\Bump, 0, 1
-							BrushTexture b, t, 0, 2					
-							
-							PaintSurface sf,b
-							
-							If t1<>0 Then FreeTexture t1 : t1=0
-						EndIf
-					EndIf
-					
-					If t<>0 Then FreeTexture t : t=0
-					If b<>0 Then FreeBrush b : b=0
-				Next
-				
-			EndIf
-			
 			EntityParent(r\Objects[6], r\obj)
 			
 			For n = 0 To 2 Step 2
@@ -4327,13 +4298,10 @@ Function FillRoom(r.Rooms)
 			
 			r\Objects[11]=LoadMesh_Strict("GFX\map\pocketdimension5.b3d") ;the pillar room
 			
-			
 			terrain = LoadMesh_Strict("GFX\map\pocketdimensionterrain.b3d")
 			ScaleEntity terrain,RoomScale,RoomScale,RoomScale,True
 			;RotateEntity terrain,0,e\room\angle,0,True
 			PositionEntity terrain, 0, 2944, 0, True
-			
-			
 			
 			CreateItem("Burnt Note", "paper", EntityX(r\obj),0.5,EntityZ(r\obj)+3.5)
 			
@@ -4350,36 +4318,7 @@ Function FillRoom(r.Rooms)
 						entity = r\Objects[10]							
 					Case 4
 						entity = r\Objects[11]							
-				End Select 
-				
-				If BumpEnabled Then 
-					
-					For i = 1 To CountSurfaces(entity)
-						sf = GetSurface(entity,i)
-						b = GetSurfaceBrush( sf )
-						t = GetBrushTexture(b,1)
-						texname$ =  StripPath(TextureName(t))
-						mat.Materials=GetCache(texname)
-						If mat<>Null Then
-							If mat\Bump<>0 Then
-								t1 = GetBrushTexture(b,0)
-								
-								BrushTexture b, t1, 0, 0	
-								BrushTexture b, mat\Bump, 0, 1
-								BrushTexture b, t, 0, 2					
-								
-								PaintSurface sf,b
-								
-								If t1<>0 Then FreeTexture t1 : t1=0
-							EndIf
-						EndIf
-						
-						If t<>0 Then FreeTexture t : t=0
-						If b<>0 Then FreeBrush b : b=0
-					Next
-					
-				EndIf
-				
+				End Select
 			Next
 			
 			For i = 8 To 11
@@ -5626,7 +5565,7 @@ Function CreateSecurityCam.SecurityCams(x#, y#, z#, r.Rooms, screen% = False)
 		SpriteViewMode(sc\ScrObj, 2)
 		sc\ScrTexture = 0
 		EntityTexture sc\ScrObj, ScreenTexs[sc\ScrTexture]
-		ScaleSprite(sc\ScrObj, MeshWidth(Monitor) * scale * 0.95* 0.5, MeshHeight(Monitor) * scale * 0.95* 0.5)
+		ScaleSprite(sc\ScrObj, MeshWidth(Monitor) * scale * 0.95 * 0.5, MeshHeight(Monitor) * scale * 0.95 * 0.5)
 		
 		sc\ScrOverlay = CreateSprite(sc\ScrObj)
 		;	scaleSprite(sc\scrOverlay , 0.5, 0.4)
@@ -5772,9 +5711,9 @@ Function UpdateSecurityCams()
 											
 											UpdateRoomLights(sc\Cam)
 											
-											SetBuffer TextureBuffer(ScreenTexs[sc\ScrTexture])
-											RenderWorld
 											SetBuffer BackBuffer()
+											RenderWorld
+											CopyRect 0,0,512,512,0,0,BackBuffer(),TextureBuffer(ScreenTexs[sc\ScrTexture])
 											
 											HideEntity(sc\Cam)
 											ShowEntity(Camera)										
@@ -5787,9 +5726,9 @@ Function UpdateSecurityCams()
 											
 											UpdateRoomLights(CoffinCam\Cam)
 											
-											SetBuffer TextureBuffer(ScreenTexs[sc\ScrTexture])
-											RenderWorld
 											SetBuffer BackBuffer()
+											RenderWorld
+											CopyRect 0,0,512,512,0,0,BackBuffer(),TextureBuffer(ScreenTexs[sc\ScrTexture])
 											
 											HideEntity (CoffinCam\room\obj)
 											HideEntity(CoffinCam\Cam)
@@ -5807,7 +5746,7 @@ Function UpdateSecurityCams()
 										HideEntity(sc\Cam)
 										ShowEntity(Camera)	
 										
-										CopyRect(0,0,GraphicWidth,GraphicHeight,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
+										CopyRect(0,0,512,512,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
 										
 									EndIf
 								Else
@@ -6731,7 +6670,7 @@ Function CreateMap()
 	SetRoom("room012", ROOM2, Floor(0.55*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room1123",ROOM2,Floor(0.7*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2elevator",ROOM2,Floor(0.85*Float(Room2Amount[0])),min_pos,max_pos)
-	If (Rand(0,100)<2) Then SetRoom("room2test1074",ROOM2,Floor(0.95*Float(Room2Amount[0])),min_pos,max_pos)
+	;If (Rand(0,100)<2) Then SetRoom("room2test1074",ROOM2,Floor(0.95*Float(Room2Amount[0])),min_pos,max_pos) ;yeah, no, i'm not giving you any chances
 	SetRoom("room2scps2",ROOM2,Floor(0.6*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2gw_b", ROOM2, Floor(0.4*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2sl", ROOM2, Floor(0.5*Float(Room2Amount[0])),min_pos,max_pos)
@@ -7186,32 +7125,52 @@ Function load_terrain(hmap,yscale#=0.7,t1%,t2%,mask%)
 	Next
 			
 	; position the terrain to center 0,0,0
+	Local mesh2% = CopyMesh(mesh,mesh)
+	Local surf2% = GetSurface(mesh2,1)
 	PositionMesh mesh, -x/2.0,0,-y/2.0
+	PositionMesh mesh2, -x/2.0,0.01,-y/2.0
 	
 	; alter vertice height to match the heightmap red channel
 	LockBuffer ImageBuffer(hmap)
+	LockBuffer TextureBuffer(mask)
 	;SetBuffer 
 	For lx = 0 To x
 		For ly = 0 To y
+			;using vertex alpha and two meshes instead of FE_ALPHAWHATEVER
+			;it doesn't look perfect but it does the job
+			;you might get better results by downscaling the mask to the same size as the heightmap
+			Local maskX# = Min(lx*Float(TextureWidth(mask))/Float(ImageWidth(hmap)),TextureWidth(mask)-1)
+			Local maskY# = TextureHeight(mask)-Min(ly*Float(TextureHeight(mask))/Float(ImageHeight(hmap)),TextureHeight(mask)-1)
 			RGB1=ReadPixelFast(Min(lx,x-1),y-Min(ly,y-1),ImageBuffer(hmap))
 			r=(RGB1 And $FF0000)Shr 16 ;separate out the red
+			Local alpha#=(((ReadPixelFast(Max(maskX-5,5),Max(maskY-5,5),TextureBuffer(mask)) And $FF000000) Shr 24)/$FF)
+			alpha#=alpha+(((ReadPixelFast(Min(maskX+5,TextureWidth(mask)-5),Min(maskY+5,TextureHeight(mask)-5),TextureBuffer(mask)) And $FF000000) Shr 24)/$FF)
+			alpha#=alpha+(((ReadPixelFast(Max(maskX-5,5),Min(maskY+5,TextureHeight(mask)-5),TextureBuffer(mask)) And $FF000000) Shr 24)/$FF)
+			alpha#=alpha+(((ReadPixelFast(Min(maskX+5,TextureWidth(mask)-5),Max(maskY-5,5),TextureBuffer(mask)) And $FF000000) Shr 24)/$FF)
+			alpha#=alpha*0.25
+			alpha#=Sqr(alpha)
 			
 			index = lx + ((x+1)*ly)
 			VertexCoords surf, index , VertexX(surf,index), r*yscale,VertexZ(surf,index)
+			VertexCoords surf2, index , VertexX(surf2,index), r*yscale,VertexZ(surf2,index)
+			VertexColor surf2, index, 255.0,255.0,255.0,alpha
 			; set the terrain texture coordinates
 			VertexTexCoords surf,index,lx,-ly 
-			
+			VertexTexCoords surf2,index,lx,-ly 
 		Next
 	Next
+	UnlockBuffer TextureBuffer(mask)
 	UnlockBuffer ImageBuffer(hmap)
 	
 	UpdateNormals mesh
+	UpdateNormals mesh2
 	
 	EntityTexture mesh,t1,0,0
-	EntityTexture mesh,mask,0,1
-	EntityTexture mesh,t2,0,2
+	;EntityTexture mesh,mask,0,1
+	EntityTexture mesh2,t2,0,0;2
 	
 	EntityFX mesh, 1
+	EntityFX mesh2, 1+2+32
 	
 	Return mesh
 End Function
@@ -7362,7 +7321,7 @@ Function AmbientLightRooms(value%=0)
 	If value=AmbientLightRoomVal Then Return
 	AmbientLightRoomVal = value
 	
-	Local oldbuffer% = GetBuffer()
+	Local oldbuffer% = BackBuffer() ;probably shouldn't make assumptions here but who cares, why wouldn't it use the backbuffer ;GetBuffer()
 	
 	SetBuffer TextureBuffer(AmbientLightRoomTex)
 	
@@ -7670,13 +7629,12 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A
-;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
-;~F#8CF#8F2#910#937#93E#94C#968#97D#99A#9B7#9C4#9D6#A14#A3E#A8F#AE5#AF8#B16#BB9#C1A
-;~F#C29#C65#C6D#C7B#C90#CCC#CEB#CFB#D13#D3E#D51#D73#D9B#DED#E19#E40#E47#E4C#E83#EAA
-;~F#EBF#EF3#F71#F91#1005#105C#1087#10D8#10E1#117A#1182#1187#1195#11A4#11E5#1209#1218#1229#1230#1235
-;~F#12B9#12EF#136C#1378#13B9#13C4#13D5#13DA#13E9#1400#1481#148A#1569#1586#158D#1593#15A1#15C5#15E5#1618
-;~F#1724#175D#1772#1834#18C9#18CE#18DE#1BAD#1BC4#1BE3#1BEA#1C37#1C88#1CA7#1CBE#1CE6#1CED#1D21#1D28#1D54
-;~F#1DA2#1DB0#1DB7#1DBD#1DC7#1DCD#1DE4
-;~B#1228
+;~F#2#A#2D#FA#109#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A#574
+;~F#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7#8CF
+;~F#8F2#910#937#93E#94C#968#97D#99A#9B7#9C4#9D6#A14#A3E#A8F#AE5#AF8#B16#BB9#C1A#C29
+;~F#C65#C6D#C7B#C90#CCC#CEB#CFB#D13#D3E#D51#D73#D9B#DED#E19#E40#E47#E4C#E83#EAA#EBF
+;~F#EF3#F71#103F#106A#10BB#113D#1145#114A#1158#1167#11A8#11CC#11DB#11EC#11F3#11F8#127C#12B2#132F#133B
+;~F#137C#1387#1398#139D#13AC#13C3#1444#144D#152C#1549#1550#1556#1564#1588#15A8#15DB#16E7#1720#1735#17F7
+;~F#188C#1891#18A1#1B70#1B87#1BA6#1BAD
+;~B#11EB
 ;~C#Blitz3D
