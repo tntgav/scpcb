@@ -866,8 +866,12 @@ Function LoadGame(file$)
 				Exit
 			EndIf
 		Next
+	Next
+	
+	For e.Events = Each Events
 		If e\EventName = "dimension1499" Or e\EventName = "room2sl"
 			e\EventState = 0.0
+			DebugLog "Reset Eventstate in "+e\EventName
 		EndIf
 	Next
 	
@@ -1793,5 +1797,5 @@ Function LoadMap(file$)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#1A8#402#639#667#685
+;~F#2#406#63D#66B#689
 ;~C#Blitz3D

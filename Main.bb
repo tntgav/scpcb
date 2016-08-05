@@ -5334,30 +5334,36 @@ Function DrawMenu()
 					
 					y=y+45*MenuScale
 					
-					Color 255,255,255
-					Text(x, y, "Texture quality:")
-					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							TextureDetails = (TextureDetails+1) Mod 4
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
-					Color 255,255,255
-					Select TextureDetails%
-						Case 0
-							Text(x + 300 * MenuScale, y + MenuScale, "LOW")
-							TextureFloat# = 1.5
-						Case 1
-							Text(x + 300 * MenuScale, y + MenuScale, "MEDIUM")
-							TextureFloat# = 0.75
-						Case 2
-							Text(x + 300 * MenuScale, y + MenuScale, "HIGH")
-							TextureFloat# = 0.0
-						Case 3
-							Text(x + 300 * MenuScale, y + MenuScale, "VERY HIGH")
-							TextureFloat# = -0.75
-					End Select
+					Color 100,100,100
+					Text(x + 20 * MenuScale, y, "Texture quality:")
+					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
+					;If MouseHit1
+					;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+					;		If TextureDetails% < 3
+					;			TextureDetails% = TextureDetails% + 1
+					;		Else
+					;			TextureDetails% = 0
+					;		EndIf
+					;		PlaySound_Strict(ButtonSFX)
+					;	EndIf
+					;EndIf
+					;Color 255,255,255
+					;Select TextureDetails%
+					;	Case 0
+					;		Text(x + 340 * MenuScale, y + MenuScale, "LOW")
+					;		TextureFloat# = 1.5
+					;	Case 1
+					;		Text(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
+					;		TextureFloat# = 0.75
+					;	Case 2
+					;		Text(x + 340 * MenuScale, y + MenuScale, "HIGH")
+					;		TextureFloat# = 0.0
+					;	Case 3
+					;		Text(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
+					;		TextureFloat# = -0.75
+					;End Select
+					Color 100,100,100
+					Text(x + 340 * MenuScale, y, "DISABLED")
 					;[End Block]
 				Case 2 ;Audio
 					;Text(x+210*MenuScale,y,"AUDIO",True,True)
@@ -8621,7 +8627,7 @@ Function ScaledMouseY%()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#1B#A3#12A#12E#135#3CA#4A6#500#521#599#5A6#65B#6D3#6EA#6F7#729#7DF#1613#1A30#1DF6
-;~F#1EBD#2111
-;~B#1190#13C8#1A4D
+;~F#1B#A3#12A#12E#135#3CA#4A6#500#521#599#5A6#65B#6D3#6EA#6F7#729#7DF#14AA#14FA#150C
+;~F#154B#1619#1A36#1DFC#1EC3#2117
+;~B#1190#13C8#1A53
 ;~C#Blitz3D

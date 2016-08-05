@@ -610,34 +610,36 @@ Function UpdateMainMenu()
 					
 					y=y+40*MenuScale
 					
-					Color 255,255,255
-					Text(x + 20 * MenuScale, y, "Texture details:")
+					Color 100,100,100
+					Text(x + 20 * MenuScale, y, "Texture quality:")
 					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If TextureDetails% < 3
-								TextureDetails% = TextureDetails% + 1
-							Else
-								TextureDetails% = 0
-							EndIf
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
-					Color 255,255,255
-					Select TextureDetails%
-						Case 0
-							Text(x + 340 * MenuScale, y + MenuScale, "LOW")
-							TextureFloat# = 1.5
-						Case 1
-							Text(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
-							TextureFloat# = 0.75
-						Case 2
-							Text(x + 340 * MenuScale, y + MenuScale, "HIGH")
-							TextureFloat# = 0.0
-						Case 3
-							Text(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
-							TextureFloat# = -0.75
-					End Select
+					;If MouseHit1
+					;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+					;		If TextureDetails% < 3
+					;			TextureDetails% = TextureDetails% + 1
+					;		Else
+					;			TextureDetails% = 0
+					;		EndIf
+					;		PlaySound_Strict(ButtonSFX)
+					;	EndIf
+					;EndIf
+					;Color 255,255,255
+					;Select TextureDetails%
+					;	Case 0
+					;		Text(x + 340 * MenuScale, y + MenuScale, "LOW")
+					;		TextureFloat# = 1.5
+					;	Case 1
+					;		Text(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
+					;		TextureFloat# = 0.75
+					;	Case 2
+					;		Text(x + 340 * MenuScale, y + MenuScale, "HIGH")
+					;		TextureFloat# = 0.0
+					;	Case 3
+					;		Text(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
+					;		TextureFloat# = -0.75
+					;End Select
+					Color 100,100,100
+					Text(x + 340 * MenuScale, y, "DISABLED")
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -1573,5 +1575,6 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#76#1D1#20B#233#2E8#328#356#444#456#460#493#55A#56D#58A#591#5A7#5C8#5E0#60D
+;~F#31#146#1D1#20B#233#284#2EA#32A#358#396#446#458#462#495#55C#56F#58C#593#5A9#5CA
+;~F#5E2#60F
 ;~C#Blitz3D
