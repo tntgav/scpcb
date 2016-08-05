@@ -39,7 +39,7 @@ Global Depth% = 0, Fullscreen% = GetINIInt(OptionFile, "options", "fullscreen")
 Global SelectedGFXMode%
 Global SelectedGFXDriver% = Max(GetINIInt(OptionFile, "options", "gfx driver"), 1)
 
-Global fresize_image%, fresize_texture
+Global fresize_image%, fresize_texture%, fresize_texture2%
 Global fresize_cam%
 
 Global ShowFPS = GetINIInt(OptionFile, "options", "show FPS"), WireframeState
@@ -48,6 +48,7 @@ Global TotalGFXModes% = CountGfxModes3D(), GFXModes%
 Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
 
 Global FakeFullScreen% = GetINIInt(OptionFile, "options", "fakefullscreen")
+Global RealGraphicWidth%,RealGraphicHeight%
 
 Global EnableRoomLights% = GetINIInt(OptionFile, "options", "room lights enabled")
 
@@ -80,8 +81,8 @@ If LauncherEnabled Then
 		api_SetWindowLong( G_app_handle, C_GWL_STYLE, C_WS_POPUP )
 		api_SetWindowPos( G_app_handle, C_HWND_TOP, G_viewport_x, G_viewport_y, G_viewport_width, G_viewport_height, C_SWP_SHOWWINDOW )
 		
-		GraphicWidth = G_viewport_width
-		GraphicHeight = G_viewport_height
+		RealGraphicWidth = G_viewport_width
+		RealGraphicHeight = G_viewport_height
 		
 		Fullscreen = False
 	Else
@@ -118,8 +119,8 @@ Else
 		api_SetWindowLong( G_app_handle, C_GWL_STYLE, C_WS_POPUP )
 		api_SetWindowPos( G_app_handle, C_HWND_TOP, G_viewport_x, G_viewport_y, G_viewport_width, G_viewport_height, C_SWP_SHOWWINDOW )
 		
-		GraphicWidth = G_viewport_width
-		GraphicHeight = G_viewport_height
+		RealGraphicWidth = G_viewport_width
+		RealGraphicHeight = G_viewport_height
 		
 		Fullscreen = False
 	Else
@@ -147,7 +148,7 @@ Global Opt_AntiAlias = GetINIInt(OptionFile, "options", "antialias")
 Global CurrFrameLimit# = Framelimit%
 
 Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
-If Fullscreen Then UpdateScreenGamma()
+;If Fullscreen Then UpdateScreenGamma()
 
 Const HIT_MAP% = 1, HIT_PLAYER% = 2, HIT_ITEM% = 3, HIT_APACHE% = 4, HIT_178% = 5, HIT_DEAD% = 6
 SeedRnd MilliSecs()
@@ -168,10 +169,17 @@ Global SelectedLoadingScreen.LoadingScreens, LoadingScreenAmount%, LoadingScreen
 Global LoadingBack% = LoadImage_Strict("Loadingscreens\loadingback.jpg")
 InitLoadingScreens("Loadingscreens\loadingscreens.ini")
 
-Font1% = LoadFont_Strict("GFX\cour.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
-Font2% = LoadFont_Strict("GFX\courbd.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
-Font3% = LoadFont_Strict("GFX\DS-DIGI.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
-Font4% = LoadFont_Strict("GFX\DS-DIGI.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
+;For some reason, Blitz3D doesn't load fonts that have filenames that
+;don't match their "internal name" (i.e. their display name in applications
+;like Word and such). As a workaround, I moved the files and renamed them so they
+;can load without FastText.
+;An actual fix would require a modified version of Blitz3D, which may happen soon
+;since it's possible to replace the Memory Access Violation message with a much more
+;descriptive one.
+Font1% = LoadFont_Strict("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
+Font2% = LoadFont_Strict("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
+Font3% = LoadFont_Strict("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
+Font4% = LoadFont_Strict("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
 SetFont Font2
 
 Global BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
@@ -2426,6 +2434,47 @@ Repeat
 		
 	End If
 	
+	If FakeFullScreen Then
+		If (RealGraphicWidth<>GraphicWidth) Or (RealGraphicHeight<>GraphicHeight) Then
+			CopyRect 0,0,GraphicWidth,GraphicHeight,1024-GraphicWidth/2,1024-GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+			SetBuffer BackBuffer()
+			ScaleRender(0,0,2050.0 / Float(GraphicWidth), 2050.0 / Float(GraphicWidth))
+			;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
+			;everyone uses landscape so it's probably a non-issue
+		EndIf
+	EndIf
+	
+	;not by any means a perfect solution
+	;Not even proper gamma correction but it's a nice looking alternative that works in windowed mode
+	If ScreenGamma>1.0 Then
+		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+		EntityBlend fresize_image,1
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+		EntityFX fresize_image,1+32
+		EntityBlend fresize_image,3
+		EntityAlpha fresize_image,ScreenGamma-1.0
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+	ElseIf ScreenGamma<1.0 Then ;todo: maybe optimize this if it's too slow, alternatively give players the option to disable gamma
+		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+		EntityBlend fresize_image,1
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+		EntityFX fresize_image,1+32
+		EntityBlend fresize_image,2
+		EntityAlpha fresize_image,1.0
+		SetBuffer TextureBuffer(fresize_texture2)
+		ClsColor 255*ScreenGamma,255*ScreenGamma,255*ScreenGamma
+		Cls
+		SetBuffer BackBuffer()
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+		SetBuffer(TextureBuffer(fresize_texture2))
+		ClsColor 0,0,0
+		Cls
+		SetBuffer(BackBuffer())
+	EndIf
+	EntityFX fresize_image,1
+	EntityBlend fresize_image,1
+	EntityAlpha fresize_image,1.0
+	
 	If Vsync = 0 Then
 		Flip 0
 	Else 
@@ -2603,7 +2652,7 @@ Function DrawEnding()
 		
 	EndIf
 	
-	If Fullscreen Then DrawImage CursorIMG, MouseX(),MouseY()
+	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	SetFont Font1
 End Function
@@ -3514,7 +3563,7 @@ Function DrawGUI()
 				Next
 			Next
 			
-			If Fullscreen Then DrawImage CursorIMG, MouseX(),MouseY()
+			If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 			
 			If MouseHit2 Then
 				SelectedDoor = Null
@@ -3602,8 +3651,8 @@ Function DrawGUI()
 		ItemAmount = 0
 		For  n% = 0 To OtherSize - 1
 			isMouseOn% = False
-			If MouseX() > x And MouseX() < x + width Then
-				If MouseY() > y And MouseY() < y + height Then
+			If ScaledMouseX() > x And ScaledMouseX() < x + width Then
+				If ScaledMouseY() > y And ScaledMouseY() < y + height Then
 					isMouseOn = True
 				EndIf
 			EndIf
@@ -3669,9 +3718,9 @@ Function DrawGUI()
 		If SelectedItem <> Null Then
 			If MouseDown1 Then
 				If MouseSlot = 66 Then
-					DrawImage(SelectedItem\invimg, MouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, MouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				ElseIf SelectedItem <> PrevOtherOpen\SecondInv[MouseSlot]
-					DrawImage(SelectedItem\invimg, MouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, MouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				EndIf
 			Else
 				If MouseSlot = 66 Then
@@ -3747,7 +3796,7 @@ Function DrawGUI()
 			EndIf
 		EndIf
 		
-		If Fullscreen Then DrawImage CursorIMG,MouseX(),MouseY()
+		If Fullscreen Then DrawImage CursorIMG,ScaledMouseX(),ScaledMouseY()
 		If (closedInv) And (Not InvOpen) Then 
 			ResumeSounds() 
 			OtherOpen=Null
@@ -3783,8 +3832,8 @@ Function DrawGUI()
 		ItemAmount = 0
 		For  n% = 0 To MaxItemAmount - 1
 			isMouseOn% = False
-			If MouseX() > x And MouseX() < x + width Then
-				If MouseY() > y And MouseY() < y + height Then
+			If ScaledMouseX() > x And ScaledMouseX() < x + width Then
+				If ScaledMouseY() > y And ScaledMouseY() < y + height Then
 					isMouseOn = True
 				End If
 			EndIf
@@ -3890,9 +3939,9 @@ Function DrawGUI()
 		If SelectedItem <> Null Then
 			If MouseDown1 Then
 				If MouseSlot = 66 Then
-					DrawImage(SelectedItem\invimg, MouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, MouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				ElseIf SelectedItem <> Inventory(MouseSlot)
-					DrawImage(SelectedItem\invimg, MouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, MouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				EndIf
 			Else
 				If MouseSlot = 66 Then
@@ -4036,7 +4085,7 @@ Function DrawGUI()
 			End If
 		End If
 		
-		If Fullscreen Then DrawImage CursorIMG, MouseX(),MouseY()
+		If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 		
 		If InvOpen = False Then 
 			ResumeSounds() 
@@ -4359,7 +4408,7 @@ Function DrawGUI()
 								
 								SetBuffer ImageBuffer(SelectedItem\itemtemplate\img)
 								Color 37,45,137
-								SetFont font
+								SetFont Font1
 								temp = ((Int(AccessCode)*3) Mod 10000)
 								If temp < 1000 Then temp = temp+1000
 								Text 333*MenuScale, 714*MenuScale, temp, True, True
@@ -5200,7 +5249,18 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
 				
 				AntiAlias Opt_AntiAlias
+				;TextureLodBias TextureFloat#
 			EndIf
+			;If OptionsMenu < 4 Then 
+			;	If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
+			;		OptionsMenu = OptionsMenu+1
+			;	EndIf
+			;EndIf
+			;If OptionsMenu > 1 Then
+			;	If DrawButton(x+41*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, "<") Then
+			;		OptionsMenu = OptionsMenu-1
+			;	EndIf
+			;EndIf
 			
 			Color 0,255,0
 			If OptionsMenu = 1
@@ -5258,15 +5318,15 @@ Function DrawMenu()
 					
 					y=y+30+MenuScale
 					
-					Local prevGamma# = ScreenGamma
+					;Local prevGamma# = ScreenGamma
 					ScreenGamma = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, ScreenGamma*50.0)/50.0)
 					Color 255,255,255
 					Text(x, y, "Screen gamma")
-					Text(x+5+MenuScale, y + 15 * MenuScale, "(fullscreen only)")
+					;Text(x+5+MenuScale, y + 15 * MenuScale, "(fullscreen only)")
 					
-					If prevGamma<>ScreenGamma Then
-						UpdateScreenGamma()
-					EndIf
+					;If prevGamma<>ScreenGamma Then
+					;	UpdateScreenGamma()
+					;EndIf
 					
 					y=y+45*MenuScale
 					
@@ -5274,7 +5334,7 @@ Function DrawMenu()
 					Text(x, y, "Texture quality:")
 					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
 					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, MouseX(),MouseY(),0,0)
+						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
 							TextureDetails = (TextureDetails+1) Mod 4
 							PlaySound_Strict(ButtonSFX)
 						EndIf
@@ -5578,7 +5638,7 @@ Function DrawMenu()
 			If KillTimer < 0 Then RowText(DeathMSG$, x, y + 80*MenuScale, 390*MenuScale, 600*MenuScale)
 		EndIf
 		
-		If Fullscreen Then DrawImage CursorIMG, MouseX(),MouseY()
+		If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 		
 	End If
 	
@@ -5586,8 +5646,8 @@ Function DrawMenu()
 End Function
 
 Function MouseOn%(x%, y%, width%, height%)
-	If MouseX() > x And MouseX() < x + width Then
-		If MouseY() > y And MouseY() < y + height Then
+	If ScaledMouseX() > x And ScaledMouseX() < x + width Then
+		If ScaledMouseY() > y And ScaledMouseY() < y + height Then
 			Return True
 		End If
 	End If
@@ -5618,6 +5678,7 @@ Function LoadEntities()
 	SoundEmitter = CreatePivot()
 	
 	Camera = CreateCamera()
+	CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
 	CameraRange(Camera, 0.05, 16)
 	CameraFogMode (Camera, 1)
 	CameraFogRange (Camera, CameraFogNear, CameraFogFar)
@@ -5628,6 +5689,7 @@ Function LoadEntities()
 	ScreenTexs[1] = CreateTexture(512, 512, 1+256)
 	
 	CreateBlurImage()
+	CameraProjMode ark_blur_cam,0
 	;Listener = CreateListener(Camera)
 	
 	FogTexture = LoadTexture_Strict("GFX\fog.jpg", 1)
@@ -5729,6 +5791,31 @@ Function LoadEntities()
 	
 	MTFObj = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d") ;optimized MTFs
 	GuardObj = LoadAnimMesh_Strict("GFX\npcs\guard.b3d") ;optimized Guards
+	;GuardTex = LoadTexture_Strict("GFX\npcs\body.jpg") ;optimized the guards even more
+	
+	;If BumpEnabled Then
+	;	bump1 = LoadTexture_Strict("GFX\npcs\mtf_newnormal01.png")
+	;	;TextureBlend bump1, FE_BUMP ;USE DOT3
+	;		
+	;	For i = 2 To CountSurfaces(MTFObj)
+	;		sf = GetSurface(MTFObj,i)
+	;		b = GetSurfaceBrush( sf )
+	;		t1 = GetBrushTexture(b,0)
+	;		
+	;		Select Lower(StripPath(TextureName(t1)))
+	;			Case "MTF_newdiffuse02.png"
+	;				
+	;				BrushTexture b, bump1, 0, 0
+	;				BrushTexture b, t1, 0, 1
+	;				PaintSurface sf,b
+	;		End Select
+	;		FreeBrush b
+	;		FreeTexture t1
+	;	Next
+	;	FreeTexture bump1	
+	;EndIf
+	
+	
 	
 	ClassDObj = LoadAnimMesh_Strict("GFX\npcs\classd.b3d") ;optimized Class-D's and scientists/researchers
 	ApacheObj = LoadAnimMesh_Strict("GFX\apache.b3d") ;optimized Apaches (helicopters)
@@ -5777,6 +5864,24 @@ Function LoadEntities()
 	HideEntity LeverBaseOBJ
 	LeverOBJ = LoadMesh_Strict("GFX\map\leverhandle.x")
 	HideEntity LeverOBJ
+	
+	;For i = 0 To 1
+	;	HideEntity BigDoorOBJ(i)
+	;	;If BumpEnabled And 0 Then
+	;	If BumpEnabled
+	;		
+	;		Local bumptex = LoadTexture_Strict("GFX\map\containmentdoorsbump.jpg")
+	;		;TextureBlend bumptex, FE_BUMP
+	;		Local tex = LoadTexture_Strict("GFX\map\containment_doors.jpg")	
+	;		EntityTexture BigDoorOBJ(i), bumptex, 0, 0
+	;		EntityTexture BigDoorOBJ(i), tex, 0, 1
+	;		
+	;		;FreeEntity tex
+	;		;FreeEntity bumptex
+	;		FreeTexture tex
+	;		FreeTexture bumptex
+	;	EndIf
+	;Next
 	
 	DrawLoading(15)
 	
@@ -6325,6 +6430,8 @@ Function NullGame()
 	;DeInitExt
 	
 	ClearWorld
+	Camera = 0
+	ark_blur_cam = 0
 	InitFastResize()
 	
 	;InitExt
@@ -7086,7 +7193,7 @@ Function Use294()
 	x = GraphicWidth/2 - (ImageWidth(Panel294)/2)
 	y = GraphicHeight/2 - (ImageHeight(Panel294)/2)
 	DrawImage Panel294, x, y
-	If Fullscreen Then DrawImage CursorIMG, MouseX(),MouseY()
+	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	temp = True
 	If PlayerRoom\SoundCHN<>0 Then temp = False
@@ -7095,8 +7202,8 @@ Function Use294()
 	
 	If temp Then
 		If MouseHit1 Then
-			xtemp = Floor((MouseX()-x-228) / 35.5)
-			ytemp = Floor((MouseY()-y-342) / 36.5)
+			xtemp = Floor((ScaledMouseX()-x-228) / 35.5)
+			ytemp = Floor((ScaledMouseY()-y-342) / 36.5)
 			
 			If ytemp => 0 And ytemp < 5 Then
 				If xtemp => 0 And xtemp < 10 Then PlaySound_Strict ButtonSFX
@@ -8106,10 +8213,10 @@ Function ResizeImage2(image%,width%,height%)
 	oldHeight% = ImageHeight(image)
 	CopyRect 0,0,oldWidth,oldHeight,1024-oldWidth/2,1024-oldHeight/2,ImageBuffer(image),TextureBuffer(fresize_texture)
 	SetBuffer BackBuffer()
-	ScaleRender(0,0,2048.0 / Float(GraphicWidth) * Float(width) / Float(oldWidth), 2048.0 / Float(GraphicWidth) * Float(height) / Float(oldHeight))
+	ScaleRender(0,0,2048.0 / Float(RealGraphicWidth) * Float(width) / Float(oldWidth), 2048.0 / Float(RealGraphicWidth) * Float(height) / Float(oldHeight))
 	;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
 	;everyone uses landscape so it's probably a non-issue
-	CopyRect GraphicWidth/2-width/2,GraphicHeight/2-height/2,width,height,0,0,BackBuffer(),ImageBuffer(img)
+	CopyRect RealGraphicWidth/2-width/2,RealGraphicHeight/2-height/2,width,height,0,0,BackBuffer(),ImageBuffer(img)
 	
     FreeImage image
     Return img
@@ -8250,6 +8357,8 @@ End Function
 
 
 Function ScaleRender(x#,y#,hscale#=1.0,vscale#=1.0)
+	If Camera<>0 Then HideEntity Camera
+	WireFrame 0
 	ShowEntity fresize_image
 	ScaleEntity fresize_image,hscale,vscale,1.0
 	PositionEntity fresize_image, x, y, 1.0001
@@ -8257,6 +8366,8 @@ Function ScaleRender(x#,y#,hscale#=1.0,vscale#=1.0)
 	RenderWorld()
 	HideEntity fresize_cam
 	HideEntity fresize_image
+	WireFrame WireframeState
+	If Camera<>0 Then ShowEntity Camera
 End Function
 
 Function InitFastResize()
@@ -8282,7 +8393,7 @@ Function InitFastResize()
 	AddTriangle sf, 0, 1, 2
 	AddTriangle sf, 3, 2, 1
 	EntityFX spr, 17
-	ScaleEntity spr, 2048.0 / Float(GraphicWidth), 2048.0 / Float(GraphicHeight), 1
+	ScaleEntity spr, 2048.0 / Float(RealGraphicWidth), 2048.0 / Float(RealGraphicHeight), 1
 	PositionEntity spr, 0, 0, 1.0001
 	EntityOrder spr, -100001
 	EntityBlend spr, 1
@@ -8290,8 +8401,15 @@ Function InitFastResize()
 	
     ;Create texture
 	fresize_texture = CreateTexture(2048, 2048, 1+256)
+	fresize_texture2 = CreateTexture(2048, 2048, 1+256)
+	TextureBlend fresize_texture2,3
+	SetBuffer(TextureBuffer(fresize_texture2))
+	ClsColor 0,0,0
+	Cls
+	SetBuffer(BackBuffer())
 	;TextureAnisotropy(fresize_texture)
-	EntityTexture spr, fresize_texture
+	EntityTexture spr, fresize_texture,0,0
+	EntityTexture spr, fresize_texture2,0,1
 	
 	HideEntity fresize_cam
 End Function
@@ -8310,16 +8428,16 @@ End Function
 ;End Function
 
 
-Function UpdateScreenGamma()
-	Local n# = 1.0/ScreenGamma
-	Local k%
-	
-	For k=0 To 255
-		Local c# = Min(Max(0, ((k/255.0)^n)*255), 255)
-		SetGamma k,k,k,c,c,c
-	Next
-	UpdateGamma
-End Function
+;Function UpdateScreenGamma()
+;	Local n# = 1.0/ScreenGamma
+;	Local k%
+;	
+;	For k=0 To 255
+;		Local c# = Min(Max(0, ((k/255.0)^n)*255), 255)
+;		SetGamma k,k,k,c,c,c
+;	Next
+;	UpdateGamma
+;End Function
 
 ;--------------------------------------- Some new 1.3 -functions -------------------------------------------------------
 
@@ -8471,7 +8589,20 @@ Function CheckTriggers$()
 	EndIf
 	
 End Function
+
+Function ScaledMouseX%()
+	Return MouseX()*GraphicWidth/RealGraphicWidth
+End Function
+
+Function ScaledMouseY%()
+	Return MouseY()*GraphicHeight/RealGraphicHeight
+End Function
+
 ;~IDEal Editor Parameters:
-;~F#1F63#20D7
-;~B#118C#13C4#1A01
+;~F#24#AB#12B#12F#136#3CB#4A7#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7E0#8C4#992#9AA
+;~F#A3D#B63#DF2#FDB#13F0#15E6#15F1#1745#17D5#1806#1904#1916#1932#193C#1949#196B#198A#19A9#19C5#19D9
+;~F#19EE#19F2#1A12#1A1A#1BE7#1C9C#1CC7#1D3E#1D44#1D4E#1D5A#1D65#1D69#1DA4#1DAC#1DB4#1DBB#1DC2#1DCF#1DD5
+;~F#1DE0#1E19#1E28#1E46#1E74#1E7B#1E8E#1EA7#1ED4#1EDF#1EE4#1EFE#1F0A#1F25#1F77#1F85#1F8D#1F99#1FA2#1FCB
+;~F#1FD0#1FD5#1FDA#1FE3#1FEB#20B9#20C7#20D4#20FB#210D#2126#2135#214C
+;~B#118C#13C4#1A37
 ;~C#Blitz3D

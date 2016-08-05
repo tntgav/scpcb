@@ -401,7 +401,7 @@ Function UpdateMainMenu()
 					Color 255,255,255
 					DrawImage ArrowIMG(1),x + 155 * MenuScale, y+251*MenuScale
 					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 155 * MenuScale, y+251*MenuScale, MouseX(),MouseY(),0,0)
+						If ImageRectOverlap(ArrowIMG(1),x + 155 * MenuScale, y+251*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
 							If SelectedDifficulty\otherFactors < HARD
 								SelectedDifficulty\otherFactors = SelectedDifficulty\otherFactors + 1
 							Else
@@ -598,15 +598,15 @@ Function UpdateMainMenu()
 					
 					y=y+30+MenuScale
 					
-					Local prevGamma# = ScreenGamma
+					;Local prevGamma# = ScreenGamma
 					ScreenGamma = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, ScreenGamma*50.0)/50.0)
 					Color 255,255,255
 					Text(x + 20 * MenuScale, y, "Screen gamma")
-					Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					;Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
 					
-					If prevGamma<>ScreenGamma Then
-						UpdateScreenGamma()
-					EndIf
+					;If prevGamma<>ScreenGamma Then
+					;	UpdateScreenGamma()
+					;EndIf
 					
 					y=y+40*MenuScale
 					
@@ -614,7 +614,7 @@ Function UpdateMainMenu()
 					Text(x + 20 * MenuScale, y, "Texture details:")
 					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
 					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, MouseX(),MouseY(),0,0)
+						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
 							If TextureDetails% < 3
 								TextureDetails% = TextureDetails% + 1
 							Else
@@ -909,7 +909,7 @@ Function UpdateMainMenu()
 	
 	;DrawTiledImageRect(MenuBack, 985 * MenuScale, 860 * MenuScale, 200 * MenuScale, 20 * MenuScale, 1200 * MenuScale, 866 * MenuScale, 300, 20 * MenuScale)
 	
-	If Fullscreen Then DrawImage CursorIMG, MouseX(),MouseY()
+	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	SetFont Font1
 End Function
@@ -919,11 +919,15 @@ Function UpdateLauncher()
 	MenuScale = 1
 	
 	Graphics3DExt(LauncherWidth, LauncherHeight, 0, 2)
+
 	;InitExt
 	
 	SetBuffer BackBuffer()
 	
-	Font1 = LoadFont_Strict("GFX\cour.ttf", 18, 0,0,0)
+	RealGraphicWidth = GraphicWidth
+	RealGraphicHeight = GraphicHeight
+	
+	Font1 = LoadFont_Strict("GFX\font\cour\Courier New.ttf", 18, 0,0,0)
 	MenuWhite = LoadImage_Strict("GFX\menu\menuwhite.jpg")
 	MenuBlack = LoadImage_Strict("GFX\menu\menublack.jpg")	
 	MaskImage MenuBlack, 255,255,0
@@ -1032,15 +1036,22 @@ Function UpdateLauncher()
 			If Fullscreen
 				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + (16+(16*(Not Bit16Mode)))))
 			Else
-				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + 32))
+				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + ",32"))
 			EndIf
 		Else
-			Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(G_viewport_width + "x" + G_viewport_height + "," + 32))
+			Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
+			If GfxModeWidths(SelectedGFXMode)<G_viewport_width Then
+				Text(40+ 260 + 65, 262 - 55 + 160, "(upscaled to "+G_viewport_width + "x" + G_viewport_height + ")")
+			ElseIf GfxModeWidths(SelectedGFXMode)>G_viewport_width Then
+				Text(40+ 260 + 65, 262 - 55 + 160, "(downscaled to "+G_viewport_width + "x" + G_viewport_height + ")")
+			EndIf
 		EndIf
 		
 		If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 55, 100, 30, "LAUNCH", False) Then
 			GraphicWidth = GfxModeWidths(SelectedGFXMode)
 			GraphicHeight = GfxModeHeights(SelectedGFXMode)
+			RealGraphicWidth = GraphicWidth
+			RealGraphicHeight = GraphicHeight
 			Exit
 		EndIf
 		
@@ -1302,6 +1313,47 @@ Function DrawLoading(percent%, shortloading=False)
 			FlushMouse()
 		EndIf
 		
+		If FakeFullScreen Then
+			If (RealGraphicWidth<>GraphicWidth) Or (RealGraphicHeight<>GraphicHeight) Then
+				CopyRect 0,0,GraphicWidth,GraphicHeight,1024-GraphicWidth/2,1024-GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+				SetBuffer BackBuffer()
+				ScaleRender(0,0,2048.0 / Float(GraphicWidth), 2048.0 / Float(GraphicWidth))
+				;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
+				;everyone uses landscape so it's probably a non-issue
+			EndIf
+		EndIf
+		
+		;not by any means a perfect solution
+		;Not even proper gamma correction but it's a nice looking alternative that works in windowed mode
+		If ScreenGamma>1.0 Then
+			CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+			EntityBlend fresize_image,1
+			ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+			EntityFX fresize_image,1+32
+			EntityBlend fresize_image,3
+			EntityAlpha fresize_image,ScreenGamma-1.0
+			ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+		ElseIf ScreenGamma<1.0 Then ;todo: maybe optimize this if it's too slow, alternatively give players the option to disable gamma
+			CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+			EntityBlend fresize_image,1
+			ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+			EntityFX fresize_image,1+32
+			EntityBlend fresize_image,2
+			EntityAlpha fresize_image,1.0
+			SetBuffer TextureBuffer(fresize_texture2)
+			ClsColor 255*ScreenGamma,255*ScreenGamma,255*ScreenGamma
+			Cls
+			SetBuffer BackBuffer()
+			ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+			SetBuffer(TextureBuffer(fresize_texture2))
+			ClsColor 0,0,0
+			Cls
+			SetBuffer(BackBuffer())
+		EndIf
+		EntityFX fresize_image,1
+		EntityBlend fresize_image,1
+		EntityAlpha fresize_image,1.0
+		
 		Flip
 		
 		firstloop = False
@@ -1425,8 +1477,8 @@ End Function
 Function SlideBar#(x%, y%, width%, value#)
 	
 	If MouseDown1 Then
-		If MouseX() >= x And MouseX() <= x + width + 14 And MouseY() >= y And MouseY() <= y + 20 Then
-			value = Min(Max((MouseX() - x) * 100 / width, 0), 100)
+		If ScaledMouseX() >= x And ScaledMouseX() <= x + width + 14 And ScaledMouseY() >= y And ScaledMouseY() <= y + 20 Then
+			value = Min(Max((ScaledMouseX() - x) * 100 / width, 0), 100)
 		EndIf
 	EndIf
 	

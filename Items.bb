@@ -24,6 +24,7 @@ Type ItemTemplates
 	Field isAnim%
 	
 	Field scale#
+	;Field bumptex%
 	Field tex%, texpath$
 End Type 
 
@@ -620,5 +621,5 @@ Function DropItem(item.Items)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#1D
+;~F#B#1E#13D#157#198#1B3#1EF#232
 ;~C#Blitz3D

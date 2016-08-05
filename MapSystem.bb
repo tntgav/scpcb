@@ -4009,6 +4009,35 @@ Function FillRoom(r.Rooms)
 			EntityPickMode r\Objects[6], 3
 			PositionEntity(r\Objects[6],r\x+784.0*RoomScale,-980.0*RoomScale,r\z+720.0*RoomScale,True)
 			
+			;If BumpEnabled Then 
+			;	
+			;	For i = 1 To CountSurfaces(r\Objects[6])
+			;		sf = GetSurface(r\Objects[6],i)
+			;		b = GetSurfaceBrush( sf )
+			;		t = GetBrushTexture(b,1)
+			;		texname$ =  StripPath(TextureName(t))
+			;		
+			;		mat.Materials=GetCache(texname)
+			;		If mat<>Null Then
+			;			If mat\Bump<>0 Then
+			;				t1 = GetBrushTexture(b,0)
+			;				
+			;				BrushTexture b, t1, 0, 0	
+			;				BrushTexture b, mat\Bump, 0, 1
+			;				BrushTexture b, t, 0, 2					
+			;				
+			;				PaintSurface sf,b
+			;				
+			;				If t1<>0 Then FreeTexture t1 : t1=0
+			;			EndIf
+			;		EndIf
+			;		
+			;		If t<>0 Then FreeTexture t : t=0
+			;		If b<>0 Then FreeBrush b : b=0
+			;	Next
+			;	
+			;EndIf
+			
 			EntityParent(r\Objects[6], r\obj)
 			
 			For n = 0 To 2 Step 2
@@ -4298,10 +4327,13 @@ Function FillRoom(r.Rooms)
 			
 			r\Objects[11]=LoadMesh_Strict("GFX\map\pocketdimension5.b3d") ;the pillar room
 			
+			
 			terrain = LoadMesh_Strict("GFX\map\pocketdimensionterrain.b3d")
 			ScaleEntity terrain,RoomScale,RoomScale,RoomScale,True
 			;RotateEntity terrain,0,e\room\angle,0,True
 			PositionEntity terrain, 0, 2944, 0, True
+			
+			
 			
 			CreateItem("Burnt Note", "paper", EntityX(r\obj),0.5,EntityZ(r\obj)+3.5)
 			
@@ -4318,7 +4350,36 @@ Function FillRoom(r.Rooms)
 						entity = r\Objects[10]							
 					Case 4
 						entity = r\Objects[11]							
-				End Select
+				End Select 
+				
+				;If BumpEnabled Then 
+				;	
+				;	For i = 1 To CountSurfaces(entity)
+				;		sf = GetSurface(entity,i)
+				;		b = GetSurfaceBrush( sf )
+				;		t = GetBrushTexture(b,1)
+				;		texname$ =  StripPath(TextureName(t))
+				;		mat.Materials=GetCache(texname)
+				;		If mat<>Null Then
+				;			If mat\Bump<>0 Then
+				;				t1 = GetBrushTexture(b,0)
+				;				
+				;				BrushTexture b, t1, 0, 0	
+				;				BrushTexture b, mat\Bump, 0, 1
+				;				BrushTexture b, t, 0, 2					
+				;				
+				;				PaintSurface sf,b
+				;				
+				;				If t1<>0 Then FreeTexture t1 : t1=0
+				;			EndIf
+				;		EndIf
+				;		
+				;		If t<>0 Then FreeTexture t : t=0
+				;		If b<>0 Then FreeBrush b : b=0
+				;	Next
+				;	
+				;EndIf
+				
 			Next
 			
 			For i = 8 To 11
@@ -7629,12 +7690,13 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A#574
-;~F#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7#8CF
-;~F#8F2#910#937#93E#94C#968#97D#99A#9B7#9C4#9D6#A14#A3E#A8F#AE5#AF8#B16#BB9#C1A#C29
-;~F#C65#C6D#C7B#C90#CCC#CEB#CFB#D13#D3E#D51#D73#D9B#DED#E19#E40#E47#E4C#E83#EAA#EBF
-;~F#EF3#F71#103F#106A#10BB#113D#1145#114A#1158#1167#11A8#11CC#11DB#11EC#11F3#11F8#127C#12B2#132F#133B
-;~F#137C#1387#1398#139D#13AC#13C3#1444#144D#152C#1549#1550#1556#1564#1588#15A8#15DB#16E7#1720#1735#17F7
-;~F#188C#1891#18A1#1B70#1B87#1BA6#1BAD
-;~B#11EB
+;~F#2#A#2D#FA#109#110#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A
+;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
+;~F#8CF#8F2#910#937#93E#94C#968#97D#99A#9B7#9C4#9D6#A14#A3E#A8F#AE5#AF8#B16#BB9#C1A
+;~F#C29#C65#C6D#C7B#C90#CCC#CEB#CFB#D13#D3E#D51#D73#D9B#DED#E19#E40#E47#E4C#E83#EAA
+;~F#EBF#EF3#F71#F91#1005#105C#1087#10D8#10E1#117A#1182#1187#1195#11A4#11E5#1209#1218#1229#1230#1235
+;~F#12B9#12EF#136C#1378#13B9#13C4#13D5#13DA#13E9#1400#1481#148A#1569#1586#158D#1593#15A1#15C5#15E5#1618
+;~F#1724#175D#1772#1834#18C9#18CE#18DE#1BAD#1BC4#1BE3#1BEA#1C37#1C88#1CA7#1CBE#1CE6#1CED#1D21#1D28#1D54
+;~F#1DA2#1DB0#1DB7#1DBD#1DC7#1DCD#1DE4
+;~B#1228
 ;~C#Blitz3D

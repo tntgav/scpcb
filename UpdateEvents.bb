@@ -5107,42 +5107,25 @@ Function UpdateEvents()
 						
 						Select Floor(e\EventState)
 							Case 250.0
-								Msg = "''This work of art is the greatest I've seen in my entire life.''"
+								Msg = "Hey there!"
 								MsgTimer = 70*5
 							Case 500.0
-								Msg = "''But why do I see myself in it?''"
+								Msg = "If you're seeing this, post a bug report."
 								MsgTimer = 70*5
 							Case 700.0
-								Msg = "''What is this supposed to mean?''"
+								Msg = "Seriously, this SCP shouldn't spawn."
 								MsgTimer = 70*5
 							Case 800.0
 								BlinkTimer = -2
 								BlurTimer = 800
 							Case 1200.0
-								Msg = "''Now I understand.''"
+								Msg = "This event sucks."
+								MsgTimer = 70*5
+							Case 1400.0
+								Msg = "Thanks a lot, Juan."
 								MsgTimer = 70*5
 							Case 1500.0
-								Msg = "''I killed them.''"
-								MsgTimer = 70*5
-							Case 1750.0
-								Msg = "''This is my punishment, that is why I'm here.''"
-								MsgTimer = 70*5
-							Case 2000.0
-								Msg = "''Their lives are over, and it's all my fault.''"
-								MsgTimer = 70*5
-							Case 2050.0
-								BlinkTimer = -2
-								BlurTimer = 800
-							Case 2150.0
-								Msg = "''I'm sorry.''"
-								MsgTimer = 70*5
-							Case 2500.0
-								Msg = "You feel weak."
-								MsgTimer = 70*5
-								BlurTimer = 2500
-							Case 2600.0
-								DeathMSG = "Subject D-9341 was found catatonic in Test Room 4-A, where SCP-1074 was being studied before the containment breach occurred."
-								DeathMSG = DeathMSG+" Subject terminated after the breach ended."
+								DeathMSG = "God DAMMIT, Juan. What were you thinking?"
 								Kill()
 						End Select
 						If e\EventState >= 2500.0 Then

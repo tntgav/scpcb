@@ -120,6 +120,18 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\106_2.b3d")
 			
+			;If BumpEnabled Then 		
+			;	diff1 = LoadTexture_Strict("GFX\npcs\106_diffuse.png")
+			;	bump1 = LoadTexture_Strict("GFX\npcs\106_normals.png")
+			;	;TextureBlend bump1, FE_BUMP ;USE DOT3
+			;	;TextureBlend di1, FE_SPECULAR0
+			;	
+			;	;EntityTexture n\obj, bump1, 0, 0
+			;	EntityTexture n\obj, diff1, 0, 1
+			;	FreeTexture diff1
+			;	FreeTexture bump1
+			;EndIf
+			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-106", "scale") / 2.2)		
 			ScaleEntity n\obj, temp, temp, temp
 			
@@ -426,6 +438,34 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			If n\obj = 0 Then 
 				n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-939.b3d")
 				
+				;If BumpEnabled Then
+				;	bump1 = LoadTexture_Strict("GFX\npcs\scp-939_licker_normal.png")
+				;	;TextureBlend bump1, FE_BUMP ;USE DOT3
+				;	
+				;	For i = 2 To CountSurfaces(n\obj)
+				;		sf = GetSurface(n\obj,i)
+				;		b = GetSurfaceBrush( sf )
+				;		If b<>0 Then
+				;			t1 = GetBrushTexture(b,0)
+				;			If t1<>0 Then
+				;				Select Lower(StripPath(TextureName(t1)))
+				;					Case "scp-939-licker_diffusetest01.png"
+				;						
+				;						;BrushTexture b, bump1, 0, 0
+				;						BrushTexture b, t1, 0, 1
+				;						PaintSurface sf,b
+				;						
+				;                  ;If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
+				;                  ;FreeBrush b   
+				;				End Select
+				;				FreeTexture t1
+				;			EndIf
+				;			FreeBrush b
+				;		EndIf
+				;	Next
+				;	FreeTexture bump1
+				;EndIf
+				
 				temp# = GetINIFloat("DATA\NPCs.ini", "SCP-939", "scale")/2.5
 				ScaleEntity n\obj, temp, temp, temp		
 			EndIf
@@ -442,6 +482,16 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-066.b3d")
 			temp# = GetINIFloat("DATA\NPCs.ini", "SCP-066", "scale")/2.5
 			ScaleEntity n\obj, temp, temp, temp		
+			
+			;If BumpEnabled Then 
+			;	diff1 = LoadTexture_Strict("GFX\npcs\scp-066_diffuse01.png")
+			;	bump1 = LoadTexture_Strict("GFX\npcs\scp-066_normal.png")
+			;	;TextureBlend bump1, FE_BUMP ;USE DOT3
+			;	EntityTexture n\obj, bump1, 0, 1
+			;	EntityTexture n\obj, diff1, 0, 2
+			;	FreeTexture diff1
+			;	FreeTexture bump1
+			;EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-066", "speed") / 100.0)
 			;[End Block]
@@ -6337,6 +6387,9 @@ Function RotateToDirection(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#49
-;~B#18B#1245#12DF#1378#152C#1637#17F4#1850
+;~F#0#A#3F#49#6F#95#A5#D5#E5#EE#FC#10B#11E#13D#167#17B#198#1D9#1F1#212
+;~F#235#23E#269#291#38D#478#5E7#5F7#740#748#7C0#85B#97B#980#9B7#A59#A94#B23#B8F#CA4
+;~F#D6F#E26#ED9#FD8#FE1#10A6#10CD#10D8#10FC#110F#1110#116B#12CD#141B#149D#14FD#157D#15AA#15D0#15E9
+;~F#1669#1717#178F#17A0#17BB#17D9#1817#1838#1846#1862#1874#1898#18BB#18C9
+;~B#197#1277#1311#13AA#155E#1669#1826#1882
 ;~C#Blitz3D
