@@ -2268,13 +2268,13 @@ Function FillRoom(r.Rooms)
 			r\Objects[0] = CreatePivot(r\obj)
 			PositionEntity (r\Objects[0], r\x - 720.0*RoomScale, 120.0*RoomScale, r\z+464.0*RoomScale, True)
 			
-			r\Objects[2] = CopyEntity(Monitor2,r\obj)
+			r\Objects[2] = CopyEntity(Monitor3,r\obj)
 			ScaleEntity(r\Objects[2], 2.0, 2.0, 2.0)
 			PositionEntity (r\Objects[2], r\x + 152.0*RoomScale, 384.0*RoomScale, r\z+380.0*RoomScale, True)
 			RotateEntity (r\Objects[2],0,180,0)
 			EntityFX r\Objects[2],1
 			
-			r\Objects[3] = CopyEntity(Monitor2,r\obj)
+			r\Objects[3] = CopyEntity(Monitor3,r\obj)
 			ScaleEntity(r\Objects[3], 2.0, 2.0, 2.0)
 			PositionEntity (r\Objects[3], r\x + 152.0*RoomScale, 384.0*RoomScale, r\z-124.0*RoomScale, True)
 			RotateEntity (r\Objects[3],0,0,0)
@@ -7324,22 +7324,35 @@ End Function
 
 Function UpdateCheckpointMonitors(numb%)
 	Local i,sf,b,t1
+	Local entity%
 	
-	For i = 2 To CountSurfaces(Monitor2)
-		sf = GetSurface(Monitor2,i)
+	If numb% = 0
+		entity% = Monitor2
+		UpdateCheckpoint1 = True
+	Else
+		entity% = Monitor3
+		UpdateCheckpoint2 = True
+	EndIf
+	
+	For i = 2 To CountSurfaces(entity)
+		sf = GetSurface(entity,i)
 		b = GetSurfaceBrush(sf)
 		If b<>0 Then
 			t1 = GetBrushTexture(b,0)
 			If t1<>0 Then
 				name$ = StripPath(TextureName(t1))
 				If Lower(name) <> "monitortexture.jpg"
-					If MonitorTimer# < 50
-						BrushTexture b, MonitorTexture2, 0, 0
-					Else
-						If numb%=0
-							BrushTexture b, MonitorTexture3, 0, 0
+					If numb% = 0
+						If MonitorTimer# < 50
+							BrushTexture b, MonitorTexture2, 0, 0
 						Else
 							BrushTexture b, MonitorTexture4, 0, 0
+						EndIf
+					Else
+						If MonitorTimer2# < 50
+							BrushTexture b, MonitorTexture2, 0, 0
+						Else
+							BrushTexture b, MonitorTexture3, 0, 0
 						EndIf
 					EndIf
 					PaintSurface sf,b
@@ -7349,15 +7362,25 @@ Function UpdateCheckpointMonitors(numb%)
 			FreeBrush b
 		EndIf
 	Next
-	MonitorTimer# = (MonitorTimer# + FPSfactor) Mod 100
 	
 End Function
 
-Function TurnCheckpointMonitorsOff()
+Function TurnCheckpointMonitorsOff(numb%)
 	Local i,sf,b,t1
+	Local entity%
 	
-	For i = 2 To CountSurfaces(Monitor2)
-		sf = GetSurface(Monitor2,i)
+	If numb% = 0
+		entity% = Monitor2
+		UpdateCheckpoint1 = False
+		MonitorTimer# = 0.0
+	Else
+		entity% = Monitor3
+		UpdateCheckpoint2 = False
+		MonitorTimer2# = 0.0
+	EndIf
+	
+	For i = 2 To CountSurfaces(entity)
+		sf = GetSurface(entity,i)
 		b = GetSurfaceBrush(sf)
 		If b<>0 Then
 			t1 = GetBrushTexture(b,0)
@@ -7372,7 +7395,25 @@ Function TurnCheckpointMonitorsOff()
 			FreeBrush b
 		EndIf
 	Next
-	MonitorTimer# = 0.0
+	
+End Function
+
+Function TimeCheckpointMonitors()
+	
+	If UpdateCheckpoint1
+		If MonitorTimer < 100.0
+			MonitorTimer# = Min(MonitorTimer# + FPSfactor,100.0)
+		Else
+			MonitorTimer# = 0.0
+		EndIf
+	EndIf
+	If UpdateCheckpoint2
+		If MonitorTimer2 < 100.0
+			MonitorTimer2# = Min(MonitorTimer2# + FPSfactor,100.0)
+		Else
+			MonitorTimer2# = 0.0
+		EndIf
+	EndIf
 	
 End Function
 
@@ -7690,13 +7731,13 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#110#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A
-;~F#574#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6E4#735#777#799#7F5#807#86E#87D#8A7
+;~F#2#A#2D#FA#109#117#11E#12F#137#13F#34C#35C#36D#395#3A3#3B3#3B8#3C3#46A#574
+;~F#593#5B5#5CA#5D5#60E#61C#644#67A#682#697#6DB#6E4#735#777#799#7F5#807#86E#87D#8A7
 ;~F#8CF#8F2#910#937#93E#94C#968#97D#99A#9B7#9C4#9D6#A14#A3E#A8F#AE5#AF8#B16#BB9#C1A
 ;~F#C29#C65#C6D#C7B#C90#CCC#CEB#CFB#D13#D3E#D51#D73#D9B#DED#E19#E40#E47#E4C#E83#EAA
 ;~F#EBF#EF3#F71#F91#1005#105C#1087#10D8#10E1#117A#1182#1187#1195#11A4#11E5#1209#1218#1229#1230#1235
 ;~F#12B9#12EF#136C#1378#13B9#13C4#13D5#13DA#13E9#1400#1481#148A#1569#1586#158D#1593#15A1#15C5#15E5#1618
-;~F#1724#175D#1772#1834#18C9#18CE#18DE#1BAD#1BC4#1BE3#1BEA#1C37#1C88#1CA7#1CBE#1CE6#1CED#1D21#1D28#1D54
-;~F#1DA2#1DB0#1DB7#1DBD#1DC7#1DCD#1DE4
+;~F#1724#175D#1772#1834#18C9#18CE#18DE#1BAD#1BC4#1BE3#1BEA#1C4B#1CFB#1D23#1D2A#1D5E#1D65#1D91#1DDF#1DED
+;~F#1DF4#1DFA#1E04#1E0A#1E21
 ;~B#1228
 ;~C#Blitz3D

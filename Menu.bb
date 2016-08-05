@@ -1036,14 +1036,18 @@ Function UpdateLauncher()
 			If Fullscreen
 				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + "," + (16+(16*(Not Bit16Mode)))))
 			Else
-				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + ",32"))
+				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode)) + ",32")
 			EndIf
 		Else
-			Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
+			Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + ",32")
 			If GfxModeWidths(SelectedGFXMode)<G_viewport_width Then
-				Text(40+ 260 + 65, 262 - 55 + 160, "(upscaled to "+G_viewport_width + "x" + G_viewport_height + ")")
+				;Text(40+ 260 + 65, 262 - 55 + 160, "(upscaled to "+G_viewport_width + "x" + G_viewport_height + ")")
+				Text(40+ 260 + 65, 262 - 55 + 160, "(upscaled to")
+				Text(40+ 260 + 65, 262 - 55 + 180,G_viewport_width + "x" + G_viewport_height + ",32" + ")")
 			ElseIf GfxModeWidths(SelectedGFXMode)>G_viewport_width Then
-				Text(40+ 260 + 65, 262 - 55 + 160, "(downscaled to "+G_viewport_width + "x" + G_viewport_height + ")")
+				;Text(40+ 260 + 65, 262 - 55 + 160, "(downscaled to "+G_viewport_width + "x" + G_viewport_height + ")")
+				Text(40+ 260 + 65, 262 - 55 + 160, "(downscaled to")
+				Text(40+ 260 + 65, 262 - 55 + 180,G_viewport_width + "x" + G_viewport_height + ",32" + ")")
 			EndIf
 		EndIf
 		
@@ -1569,5 +1573,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#76#1D1#20B#233#2E8#328#356#435#447#451#484#522#535#552#559#56F#590#5A8#5AF
+;~F#31#76#1D1#20B#233#2E8#328#356#444#456#460#493#55A#56D#58A#591#5A7#5C8#5E0#60D
 ;~C#Blitz3D

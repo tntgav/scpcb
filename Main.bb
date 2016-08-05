@@ -1195,8 +1195,8 @@ Global NTF_1499FuckedSFX% = LoadSound_Strict("SFX\1499\fuckedup.ogg")
 
 Global PlayCustomMusic% = False, CustomMusic% = 0
 
-Global Monitor2, MonitorTexture2, MonitorTexture3, MonitorTexture4, MonitorTextureOff
-Global MonitorTimer# = 0.0
+Global Monitor2, Monitor3, MonitorTexture2, MonitorTexture3, MonitorTexture4, MonitorTextureOff
+Global MonitorTimer# = 0.0, MonitorTimer2# = 0.0, UpdateCheckpoint1%, UpdateCheckpoint2%
 
 ;This variable is for when a camera detected the player
 	;False: Player is not seen (will be set after every call of the Main Loop
@@ -2200,6 +2200,9 @@ Repeat
 			EndIf
 		EndIf
 		
+		UpdateCheckpoint1 = False
+		UpdateCheckpoint2 = False
+		
 		If (Not MenuOpen) And (Not InvOpen) And (OtherOpen=Null) And (SelectedDoor = Null) And (ConsoleOpen = False) And (Using294 = False) And (SelectedScreen = Null) And EndingTimer=>0 Then 
 			LightVolume = CurveValue(TempLightVolume, LightVolume, 50.0)
 			CameraFogRange(Camera, CameraFogNear*LightVolume,CameraFogFar*LightVolume)
@@ -2224,6 +2227,7 @@ Repeat
 			UpdateParticles()
 			UpdateScreens()
 			UpdateRoomLights(Camera)
+			TimeCheckpointMonitors()
 			UpdateLeave1499()
 		EndIf
 		
@@ -5924,6 +5928,8 @@ Function LoadEntities()
 	
 	Monitor2 = LoadMesh_Strict("GFX\map\monitor_checkpoint.b3d")
 	HideEntity Monitor2
+	Monitor3 = LoadMesh_Strict("GFX\map\monitor_checkpoint.b3d")
+	HideEntity Monitor3
 	MonitorTexture2 = LoadTexture_Strict("GFX\map\LockdownScreen2.jpg")
 	MonitorTexture3 = LoadTexture_Strict("GFX\map\LockdownScreen.jpg")
 	MonitorTexture4 = LoadTexture_Strict("GFX\map\LockdownScreen3.jpg")
@@ -5935,6 +5941,22 @@ Function LoadEntities()
 	
 	For i = 2 To CountSurfaces(Monitor2)
 		sf = GetSurface(Monitor2,i)
+		b = GetSurfaceBrush(sf)
+		If b<>0 Then
+			t1 = GetBrushTexture(b,0)
+			If t1<>0 Then
+				name$ = StripPath(TextureName(t1))
+				If Lower(name) <> "monitortexture.jpg"
+					BrushTexture b, MonitorTextureOff, 0, 0
+					PaintSurface sf,b
+				EndIf
+				If name<>"" Then FreeTexture t1
+			EndIf
+			FreeBrush b
+		EndIf
+	Next
+	For i = 2 To CountSurfaces(Monitor3)
+		sf = GetSurface(Monitor3,i)
 		b = GetSurfaceBrush(sf)
 		If b<>0 Then
 			t1 = GetBrushTexture(b,0)
@@ -8599,10 +8621,7 @@ Function ScaledMouseY%()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#24#AB#12B#12F#136#3CB#4A7#501#522#59A#5A7#65C#6D4#6EB#6F8#72A#7E0#8C4#992#9AA
-;~F#A3D#B63#DF2#FDB#13F0#15E6#15F1#1745#17D5#1806#1904#1916#1932#193C#1949#196B#198A#19A9#19C5#19D9
-;~F#19EE#19F2#1A12#1A1A#1BE7#1C9C#1CC7#1D3E#1D44#1D4E#1D5A#1D65#1D69#1DA4#1DAC#1DB4#1DBB#1DC2#1DCF#1DD5
-;~F#1DE0#1E19#1E28#1E46#1E74#1E7B#1E8E#1EA7#1ED4#1EDF#1EE4#1EFE#1F0A#1F25#1F77#1F85#1F8D#1F99#1FA2#1FCB
-;~F#1FD0#1FD5#1FDA#1FE3#1FEB#20B9#20C7#20D4#20FB#210D#2126#2135#214C
-;~B#118C#13C4#1A37
+;~F#1B#A3#12A#12E#135#3CA#4A6#500#521#599#5A6#65B#6D3#6EA#6F7#729#7DF#1613#1A30#1DF6
+;~F#1EBD#2111
+;~B#1190#13C8#1A4D
 ;~C#Blitz3D

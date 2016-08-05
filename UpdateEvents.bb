@@ -1342,14 +1342,13 @@ Function UpdateEvents()
 						If e2\EventName = "008"
 							If e2\EventState = 2
 								If e\room\RoomDoors[0]\locked
-									MonitorTimer# = 0.0
-									TurnCheckpointMonitorsOff()
+									TurnCheckpointMonitorsOff(1)
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
 							Else
 								If e\room\dist < 12
-									UpdateCheckpointMonitors(0)
+									UpdateCheckpointMonitors(1)
 									e\room\RoomDoors[0]\locked = True
 									e\room\RoomDoors[1]\locked = True
 								EndIf
@@ -1361,14 +1360,13 @@ Function UpdateEvents()
 						If e2\EventName = "room2sl"
 							If e2\EventState3 = 0
 								If e\room\dist < 12
-									MonitorTimer# = 0.0
-									TurnCheckpointMonitorsOff()
+									TurnCheckpointMonitorsOff(0)
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
 							Else
 								If e\room\dist < 12
-									UpdateCheckpointMonitors(1)
+									UpdateCheckpointMonitors(0)
 									e\room\RoomDoors[0]\locked = True
 									e\room\RoomDoors[1]\locked = True
 								EndIf
@@ -8665,12 +8663,13 @@ Function UpdateEvents()
 				;[End Block]
 				
 				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint got locked again)
-				e\EventState3 = UpdateLever(e\room\Levers[0])
-				If e\EventState3 = 1 Then
-					UpdateCheckpointMonitors(1)
-				Else
-					MonitorTimer# = 0.0
-					TurnCheckpointMonitorsOff()
+				If PlayerRoom = e\room
+					e\EventState3 = UpdateLever(e\room\Levers[0])
+					If e\EventState3 = 1 Then
+						UpdateCheckpointMonitors(0)
+					Else
+						TurnCheckpointMonitorsOff(0)
+					EndIf
 				EndIf
 				
 				;[End Block]
@@ -8823,9 +8822,9 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
-;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
-;~F#14FD#1595#174B#1831#1885#1936#19E6#1A9E#1AB6#1B77#1BA4#1BC1#1BE8#1C18#1C3C#1C64#1CBE#1CFE#1D2F#1D42
-;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD6#204F#212E#21EE#21F2
-;~B#1498#2160
+;~F#13#10F#4F5#571#5E2#641#80F#9F6#A1D#A2B#A35#A42#C2B#C4C#C9B#CE9#CF6#D30#D47#D67
+;~F#D70#D7A#D89#E1D#E3F#10EB#1131#1147#1153#1171#11C2#11D9#12A6#13A7#1427#1440#145F#14C4#14D1#14EA
+;~F#1582#1738#181E#1872#1923#19D3#1A8B#1AA3#1B64#1B91#1BAE#1BD5#1C05#1C29#1C51#1CAB#1CEB#1D1C#1D2F#1DE9
+;~F#1E42#1E55#1E63#1EB8#1ED9#1FC3#203C#211B#21E4#21E8
+;~B#1496#215E
 ;~C#Blitz3D
