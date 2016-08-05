@@ -7899,6 +7899,10 @@ Function UpdateEvents()
 				;e\EventState = A variable to determine the "nostalgia" items
 				;- 0.0 = No nostalgia item
 				;- 1.0 = Lost key
+				;- 2.0 = Disciplinary Hearing DH-S-4137-17092
+				;- 3.0 = Coin
+				;- 4.0 = Movie Ticket
+				;- 5.0 = Old Badge
 				;e\EventState2 = Defining which slot from the Inventory should be picked
 				;e\EventState3 = A check for if a item should be removed
 				;- 0.0 = no item "trade" will happen
@@ -8467,7 +8471,7 @@ Function UpdateEvents()
 						e\room\NPC[0]\PrevState = 2
 						
 						e\EventState = 1
-						e\EventState2 = -(70*5)
+						If e\EventState2 = 0 Then e\EventState2 = -(70*5)
 					EndIf
 				EndIf
 				;[End Block]
@@ -8535,14 +8539,26 @@ Function UpdateEvents()
 						e\room\NPC[0]\PathTimer# = 0.0
 						DebugLog "ccccccccc"
 					Else
-						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 2.0
-							If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 0.6
-								If (Not e\room\RoomDoors[0]\open)
-									e\room\RoomDoors[0]\open = True
-									sound=Rand(0, 2)
-									PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
-								EndIf
+						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 5.0
+							e\room\RoomDoors[0]\locked = True
+							e\room\RoomDoors[1]\locked = True
+							If e\room\NPC[0]\Reload = 0
+								;PlaySound_Strict LoadTempSound("SFX\079_.....")
+								DebugLog "079 - OPEN DOORS IN ROOM2SL"
+								e\room\NPC[0]\Reload = 1
 							EndIf
+							If (Not e\room\RoomDoors[0]\open)
+								e\room\RoomDoors[0]\open = True
+								sound=Rand(0, 2)
+								PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
+							EndIf
+							If (Not e\room\RoomDoors[1]\open)
+								e\room\RoomDoors[1]\open = True
+								sound=Rand(0, 2)
+								PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[1]\obj)
+							EndIf
+						EndIf
+						If e\room\NPC[0]\Reload = 1
 							e\room\NPC[0]\DropSpeed = 0
 						EndIf
 					EndIf
@@ -8605,23 +8621,6 @@ Function UpdateEvents()
 							e\room\NPC[0]\PathTimer# = 0.0
 							e\room\NPC[0]\State3 = e\room\NPC[0]\State3 + 1
 						EndIf
-					Else
-						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[1]\frameobj) < 1.1
-							If (Not e\room\RoomDoors[1]\open)
-								e\room\RoomDoors[1]\open = True
-								sound=Rand(0, 2)
-								PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[1]\obj)
-							EndIf
-						EndIf
-						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 2.0
-							If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 0.6
-								If (Not e\room\RoomDoors[0]\open)
-									e\room\RoomDoors[0]\open = True
-									sound=Rand(0, 2)
-									PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
-								EndIf
-							EndIf
-						EndIf
 					EndIf
 				ElseIf e\EventState2 = 4
 					If e\room\NPC[0]\State <> 5
@@ -8659,10 +8658,14 @@ Function UpdateEvents()
 							e\EventState2 = 7
 						EndIf
 					EndIf
+				ElseIf e\EventState2 = 7
+					e\room\RoomDoors[0]\locked = False
+					e\room\RoomDoors[1]\locked = False
+					e\EventState2 = 8
 				EndIf
 				;[End Block]
 				
-				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint got locked again)
+				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint needs to be locked again)
 				If PlayerRoom = e\room
 					e\EventState3 = UpdateLever(e\room\Levers[0])
 					If e\EventState3 = 1 Then
@@ -8822,9 +8825,9 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#13#10F#4F5#571#5E2#641#80F#9F6#A1D#A2B#A35#A42#C2B#C4C#C9B#CE9#CF6#D30#D47#D67
-;~F#D70#D7A#D89#E1D#E3F#10EB#1131#1147#1153#1171#11C2#11D9#12A6#13A7#1427#1440#145F#14C4#14D1#14EA
-;~F#1582#1738#181E#1872#1923#19D3#1A8B#1AA3#1B64#1B91#1BAE#1BD5#1C05#1C29#1C51#1CAB#1CEB#1D1C#1D2F#1DE9
-;~F#1E42#1E55#1E63#1EB8#1ED9#1FC3#203C#211B#21E4#21E8
-;~B#1496#215E
+;~F#13#10F#4F5#505#571#5E2#641#80F#9F6#A1D#A2B#A35#A42#C2B#C4C#C9B#CE9#CF6#D30#D47
+;~F#D67#D70#D7A#D89#E1D#E3F#10EB#1131#1147#1153#1171#11C2#11D9#12A6#13A7#1427#1440#145F#14C4#14D1
+;~F#14EA#1582#1738#181E#1872#1923#19D3#1A8B#1AA3#1B64#1B91#1BAE#1BD5#1C05#1C29#1C51#1CAB#1CEB#1D1C#1D2F
+;~F#1DE9#1E42#1E55#1E63#1EB8#1ED9#1FC7#2040#21E7#21EB
+;~B#1496#2168
 ;~C#Blitz3D
