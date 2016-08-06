@@ -159,6 +159,8 @@ SeedRnd MilliSecs()
 
 Global GameSaved%
 
+Global CanSave% = True
+
 AppTitle "SCP - Containment Breach v"+VersionNumber
 
 ;---------------------------------------------------------------------------------------------------------------------
@@ -2216,6 +2218,7 @@ Repeat
 			AmbientLight Brightness, Brightness, Brightness	
 			PlayerSoundVolume = CurveValue(0.0, PlayerSoundVolume, 5.0)
 			
+			CanSave% = True
 			UpdateDeafPlayer()
 			UpdateEmitters()
 			MouseLook()			
@@ -2357,8 +2360,12 @@ Repeat
 		
 		If KeyHit(63) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
-				If PlayerRoom\RoomTemplate\Name = "exit1" Or PlayerRoom\RoomTemplate\Name = "173" Or PlayerRoom\RoomTemplate\Name = "gatea" Then
+				RN$ = PlayerRoom\RoomTemplate\Name$
+				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance"
 					Msg = "You can't save in this location"
+					MsgTimer = 70 * 4
+				ElseIf (Not CanSave)
+					Msg = "You can't save at this moment"
 					MsgTimer = 70 * 4
 				Else
 					SaveGame(SavePath + CurrSave + "\")
@@ -5338,8 +5345,8 @@ Function DrawMenu()
 					y=y+45*MenuScale
 					
 					Color 100,100,100
-					AAText(x + 20 * MenuScale, y, "Texture quality:")
-					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
+					AAText(x, y, "Texture quality:")
+					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
 					;If MouseHit1
 					;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
 					;		If TextureDetails% < 3
@@ -5365,7 +5372,7 @@ Function DrawMenu()
 					;		AAText(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
 					;		TextureFloat# = -0.75
 					;End Select
-					AAText(x + 340 * MenuScale, y + MenuScale, "DISABLED")
+					AAText(x + 300 * MenuScale, y + MenuScale, "DISABLED")
 					;[End Block]
 				Case 2 ;Audio
 					;Text(x+210*MenuScale,y,"AUDIO",True,True)
@@ -5490,7 +5497,11 @@ Function DrawMenu()
 			End Select
 		ElseIf AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG > 0 And KillTimer >= 0
 			If SelectedDifficulty\saveType = SAVEONQUIT Or SelectedDifficulty\saveType = SAVEANYWHERE Then
-				If PlayerRoom\RoomTemplate\Name <> "173" And PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea" Then
+				Local RN$ = PlayerRoom\RoomTemplate\Name$
+				Local AbleToSave% = True
+				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance" Then AbleToSave = False
+				If (Not CanSave) Then AbleToSave = False
+				If AbleToSave
 					If DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "Yes") Then
 						DropSpeed = 0
 						SaveGame(SavePath + CurrSave + "\")
@@ -8632,6 +8643,7 @@ Function ScaledMouseY%()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#14FC#150E#154D#1E2D#1E93#1FDA
-;~B#118C#13C4#1A3C
+;~F#1B#A7#12F#133#13A#3CF#4AB#505#526#59E#5AB#660#6D8#6EF#6FC#72E#7E4#8CD#1503#1515
+;~F#1554#1E38#1E9E#1FE5
+;~B#1193#13CB#1A47
 ;~C#Blitz3D

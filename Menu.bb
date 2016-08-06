@@ -1509,7 +1509,7 @@ End Function
 
 
 
-Function RowText(A$, X, Y, W, H, align% = 0)
+Function RowText(A$, X, Y, W, H, align% = 0, Leading#=5)
 	;Display A$ starting at X,Y - no wider than W And no taller than H (all in pixels).
 	;Leading is optional extra vertical spacing in pixels
 	Local LinesShown = 0
@@ -1596,5 +1596,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#76#146#1D1#283#2E9#329#357#444#456#460#493#55C#56F#58C#593#5AE#5CF#5E7#614
+;~F#31#76#146#1D1#283#2E9#329#357#444#456#460#493#55C#56F#58C#593#5AE#5CF#614
 ;~C#Blitz3D

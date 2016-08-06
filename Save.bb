@@ -423,6 +423,7 @@ Function SaveGame(file$)
 End Function
 
 Function LoadGame(file$)
+	DebugLog "---------------------------------------------------------------------------"
 	
 	DropSpeed=0.0
 	
@@ -1029,8 +1030,12 @@ Function LoadGame(file$)
 End Function
 
 Function LoadGameQuick(file$)
+	DebugLog "---------------------------------------------------------------------------"
+	
 	DebugHUD = False
 	GameSaved = True
+	NoTarget = False
+	InfiniteStamina = False
 	Msg = ""
 	
 	PositionEntity Collider,0,1000.0,0,True
@@ -1289,16 +1294,9 @@ Function LoadGameQuick(file$)
 		
 		For x = 0 To 11
 			id = ReadInt(f)
-			If id>0 Then
+			If id > 0 Then
 				For n.NPCs = Each NPCs
-					If n\ID = id Then
-						;For r.Rooms = Each Rooms
-						;	If r\x = x And r\z = z Then
-						r\NPC[x]=n
-						;		Exit
-						;	EndIf
-						;Next
-					EndIf
+					If n\ID = id Then r\NPC[x]=n : Exit
 				Next
 			EndIf
 		Next
@@ -1797,5 +1795,5 @@ Function LoadMap(file$)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#406#63D#66B#689
+;~F#63B#669#687
 ;~C#Blitz3D
