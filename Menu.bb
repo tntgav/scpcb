@@ -610,34 +610,35 @@ Function UpdateMainMenu()
 					
 					y=y+40*MenuScale
 					
-					Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Texture details:")
+					Color 100,100,100
+					AAText(x + 20 * MenuScale, y, "Texture quality:")
 					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If TextureDetails% < 3
-								TextureDetails% = TextureDetails% + 1
-							Else
-								TextureDetails% = 0
-							EndIf
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
-					Color 255,255,255
-					Select TextureDetails%
-						Case 0
-							AAText(x + 340 * MenuScale, y + MenuScale, "LOW")
-							TextureFloat# = 1.5
-						Case 1
-							AAText(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
-							TextureFloat# = 0.75
-						Case 2
-							AAText(x + 340 * MenuScale, y + MenuScale, "HIGH")
-							TextureFloat# = 0.0
-						Case 3
-							AAText(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
-							TextureFloat# = -0.75
-					End Select
+					;If MouseHit1
+					;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+					;		If TextureDetails% < 3
+					;			TextureDetails% = TextureDetails% + 1
+					;		Else
+					;			TextureDetails% = 0
+					;		EndIf
+					;		PlaySound_Strict(ButtonSFX)
+					;	EndIf
+					;EndIf
+					;Color 255,255,255
+					;Select TextureDetails%
+					;	Case 0
+					;		AAText(x + 340 * MenuScale, y + MenuScale, "LOW")
+					;		TextureFloat# = 1.5
+					;	Case 1
+					;		AAText(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
+					;		TextureFloat# = 0.75
+					;	Case 2
+					;		AAText(x + 340 * MenuScale, y + MenuScale, "HIGH")
+					;		TextureFloat# = 0.0
+					;	Case 3
+					;		AAText(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
+					;		TextureFloat# = -0.75
+					;End Select
+					AAText(x + 340 * MenuScale, y + MenuScale, "DISABLED")
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -1040,11 +1041,13 @@ Function UpdateLauncher()
 				Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+(GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + ",32"))
 			EndIf
 		Else
-			Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
+			Text(40+ 260 + 15, 262 - 55 + 140, "Current Resolution: "+GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + ",32")
 			If GfxModeWidths(SelectedGFXMode)<G_viewport_width Then
-				Text(40+ 260 + 65, 262 - 55 + 160, "(upscaled to "+G_viewport_width + "x" + G_viewport_height + ")")
+				Text(40+ 260 + 65, 262 - 55 + 160, "(upscaled to")
+				Text(40+ 260 + 65, 262 - 55 + 180, G_viewport_width + "x" + G_viewport_height + ",32)")
 			ElseIf GfxModeWidths(SelectedGFXMode)>G_viewport_width Then
-				Text(40+ 260 + 65, 262 - 55 + 160, "(downscaled to "+G_viewport_width + "x" + G_viewport_height + ")")
+				Text(40+ 260 + 65, 262 - 55 + 160, "(downscaled to")
+				Text(40+ 260 + 65, 262 - 55 + 180, G_viewport_width + "x" + G_viewport_height + ",32)")
 			EndIf
 		EndIf
 		
@@ -1593,5 +1596,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#31#76#1D1#20B#233#2E8#328#356#435#447#451#484#522#535#552#559#56F#590#5A8#5AF
+;~F#31#76#146#1D1#283#2E9#329#357#444#456#460#493#55C#56F#58C#593#5AE#5CF#5E7#614
 ;~C#Blitz3D
