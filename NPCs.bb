@@ -1872,7 +1872,7 @@ Function UpdateNPCs()
 						Case 5 ;used for "room2sl"
 							;[Block]
 							n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider)
-							PlayerSeeAble% = MeNPCSeesPlayer(n)
+							PlayerSeeAble% = MeNPCSeesPlayer(n,True)
 							If PlayerSeeAble% = True
 								n\State = 2
 								n\PathStatus = 0
@@ -4306,7 +4306,7 @@ Function OtherNPCSeesMeNPC%(me.NPCs,other.NPCs)
 	Return False
 End Function
 
-Function MeNPCSeesPlayer%(me.NPCs)
+Function MeNPCSeesPlayer%(me.NPCs,disablesoundoncrouch%=False)
 	;Return values:
 		;False (=0): Player is not detected anyhow
 		;True (=1): Player is detected by vision
@@ -4325,7 +4325,11 @@ Function MeNPCSeesPlayer%(me.NPCs)
 			If (Abs(DeltaYaw(me\Collider,Collider))>60.0) And EntityVisible(me\Collider,Collider)
 				Return 1
 			ElseIf (Not EntityVisible(me\Collider,Collider))
-				Return 2
+				If disablesoundoncrouch% And Crouch%
+					Return False
+				Else
+					Return 2
+				EndIf
 			EndIf
 		Else
 			If (Abs(DeltaYaw(me\Collider,Collider))>60.0) Then Return False
@@ -6387,9 +6391,8 @@ Function RotateToDirection(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#3F#49#265#280#28D#389#474#5C9#5E3#5F3#73C#744#750#7BC#857#977#97C#9B3
-;~F#A55#A90#B1F#B8B#CA0#D6B#E22#ED5#FD4#FDD#10A2#10C9#10D4#10F8#110B#110C#1167#12C9#1417#1499
-;~F#14F9#1579#15A6#15CC#15E5#1665#1713#178B#179C#17B6#17C7#17D1#17EF#182D#184E#185C#1878#188A#18AE#18D1
-;~F#18DF
-;~B#197#1277#1311#13AA#155E#1669#1826#1882
+;~F#0#A#3F#49#265#28D#389#474#5E3#5F3#73C#744#7BC#857#977#97C#9B3#A55#A90#B1F
+;~F#B8B#CA0#D6B#E22#ED5#FD4#FDD#10A2#10C9#10FC#110F#1110#116B#12CD#141B#149D#14FD#157D#15AA#15D0
+;~F#15E9#1669#1717#178F#17A0#17BA#17CB#17D5#17F3#1831#1852#1860#187C#188E#18B2#18D5#18E3
+;~B#197#127B#1315#13AE#1562#166D#182A#1886
 ;~C#Blitz3D

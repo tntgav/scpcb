@@ -8517,7 +8517,7 @@ Function UpdateEvents()
 							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\AdjDoor[Adj2]\frameobj),EntityY(e\room\Objects[7],True),EntityZ(e\room\AdjDoor[Adj2]\frameobj)
 						EndIf
 						PointEntity e\room\NPC[0]\Collider,e\room\obj
-						MoveEntity e\room\NPC[0]\Collider,0,0,-2
+						MoveEntity e\room\NPC[0]\Collider,0,0,-1
 						ResetEntity e\room\NPC[0]\Collider
 						e\room\NPC[0]\PathX = EntityX(e\room\NPC[0]\Collider)
 						e\room\NPC[0]\PathZ = EntityZ(e\room\NPC[0]\Collider)
@@ -8543,7 +8543,7 @@ Function UpdateEvents()
 							e\room\RoomDoors[0]\locked = True
 							e\room\RoomDoors[1]\locked = True
 							If e\room\NPC[0]\Reload = 0
-								;PlaySound_Strict LoadTempSound("SFX\079_.....")
+								PlaySound_Strict LoadTempSound("SFX\Doors\DoorOpen079.ogg")
 								DebugLog "079 - OPEN DOORS IN ROOM2SL"
 								e\room\NPC[0]\Reload = 1
 							EndIf
@@ -8573,7 +8573,7 @@ Function UpdateEvents()
 						DebugLog "fffffffff"
 					EndIf
 					
-					If MeNPCSeesPlayer(e\room\NPC[0])=2
+					If MeNPCSeesPlayer(e\room\NPC[0],True)=2
 						e\EventState2 = 4
 						DebugLog "ddddddddd"
 					EndIf
@@ -8583,14 +8583,11 @@ Function UpdateEvents()
 						If e\room\NPC[0]\PathTimer# = 0.0
 							;e\room\NPC[0]\PathTimer# = e\room\NPC[0]\PathTimer# + FPSfactor
 							If e\room\NPC[0]\PrevState = 1 Then
-								If (e\SoundCHN2 = 0) Then
-									e\Sound2 = LoadSound_Strict("SFX\049\room2slplaceholder.ogg")
-									e\SoundCHN2 = PlaySound2(e\Sound2, Camera, e\room\NPC[0]\Collider)
+								If (e\room\NPC[0]\SoundChn2 = 0) Then
+									e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\049\room2slplaceholder.ogg")
+									e\room\NPC[0]\SoundChn2 = PlaySound2(e\room\NPC[0]\Sound2, Camera, e\room\NPC[0]\Collider)
 								Else
-									If (ChannelPlaying(e\SoundCHN2)) Then
-										UpdateSoundOrigin2(e\SoundCHN2, Camera, e\room\NPC[0]\Collider)
-										
-									Else
+									If (Not ChannelPlaying(e\room\NPC[0]\SoundChn2))
 										e\room\NPC[0]\PathTimer# = 1.0
 									EndIf
 								EndIf
@@ -8643,7 +8640,7 @@ Function UpdateEvents()
 						EndIf
 					Next
 				ElseIf e\EventState2 = 6
-					If MeNPCSeesPlayer(e\room\NPC[0]) Or e\room\NPC[0]\State2 > 0 Or e\room\NPC[0]\LastSeen > 0
+					If MeNPCSeesPlayer(e\room\NPC[0],True) Or e\room\NPC[0]\State2 > 0 Or e\room\NPC[0]\LastSeen > 0
 						DebugLog "fffffffff"
 						e\EventState2 = 7
 					Else
@@ -8658,10 +8655,45 @@ Function UpdateEvents()
 							e\EventState2 = 7
 						EndIf
 					EndIf
-				ElseIf e\EventState2 = 7
-					e\room\RoomDoors[0]\locked = False
-					e\room\RoomDoors[1]\locked = False
-					e\EventState2 = 8
+				;ElseIf e\EventState2 = 7
+				;	e\room\RoomDoors[0]\locked = False
+				;	e\room\RoomDoors[1]\locked = False
+				;	e\EventState2 = 8
+				EndIf
+				
+				If e\room\NPC[0]<>Null
+					If e\EventState2 < 7
+						If e\EventState2 > 2
+							If Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(e\room\NPC[0]\Collider))>1.0
+								If Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(Collider))<1.0
+									If e\room\RoomDoors[0]\open
+										e\room\RoomDoors[0]\open = False
+										e\room\RoomDoors[0]\fastopen = 1
+										PlaySound_Strict LoadTempSound("SFX\Doors\DoorClose079.ogg")
+										DebugLog "079 - CLOSE DOOR AT HALLWAY IN ROOM2SL"
+									EndIf
+								EndIf
+							Else
+								If e\room\RoomDoors[0]\open = False
+									e\room\RoomDoors[0]\fastopen = 0
+									e\room\RoomDoors[0]\open = True
+									sound=Rand(0, 2)
+									PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
+									PlaySound_Strict LoadTempSound("SFX\Doors\DoorOpen079.ogg")
+									DebugLog "079 - OPEN DOOR AT HALLWAY IN ROOM2SL"
+								EndIf
+							EndIf
+						EndIf
+					Else
+						If e\room\RoomDoors[0]\open = False
+							e\room\RoomDoors[0]\fastopen = 0
+							e\room\RoomDoors[0]\open = True
+							sound=Rand(0, 2)
+							PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
+							PlaySound_Strict LoadTempSound("SFX\Doors\DoorOpen079.ogg")
+							DebugLog "079 - OPEN DOOR AT HALLWAY IN ROOM2SL"
+						EndIf
+					EndIf
 				EndIf
 				;[End Block]
 				
@@ -8828,6 +8860,6 @@ End Function
 ;~F#13#10F#4F5#505#571#5E2#641#80F#9F6#A1D#A2B#A35#A42#C2B#C4C#C9B#CE9#CF6#D30#D47
 ;~F#D67#D70#D7A#D89#E1D#E3F#10EB#1131#1147#1153#1171#11C2#11D9#12A6#13A7#1427#1440#145F#14C4#14D1
 ;~F#14EA#1582#1738#181E#1872#1923#19D3#1A8B#1AA3#1B64#1B91#1BAE#1BD5#1C05#1C29#1C51#1CAB#1CEB#1D1C#1D2F
-;~F#1DE9#1E42#1E55#1E63#1EB8#1ED9#1FC7#2040#21E7#21EB
+;~F#1DE9#1E42#1E55#1E63#1EB8#1ED9#1FC7#2040#2207#220B
 ;~B#1496#2168
 ;~C#Blitz3D
