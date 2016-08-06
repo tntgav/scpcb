@@ -53,10 +53,10 @@ Function AchievementTooltip(achvno%)
 	Rect(ScaledMouseX()+20,ScaledMouseY()+20,width,38*scale,True)
 	Color 150,150,150
 	Rect(ScaledMouseX()+20,ScaledMouseY()+20,width,38*scale,False)
-	SetFont Font3
-	Text(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(40*MenuScale), AchievementStrings(achvno), True, True)
-	SetFont Font1
-	Text(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(60*MenuScale), AchievementDescs(achvno), True, True)
+	AASetFont Font3
+	AAText(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(40*MenuScale), AchievementStrings(achvno), True, True)
+	AASetFont Font1
+	AAText(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(60*MenuScale), AchievementDescs(achvno), True, True)
 End Function
 
 Function DrawAchvIMG(x%, y%, achvno%)
