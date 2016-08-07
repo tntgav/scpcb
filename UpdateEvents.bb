@@ -7728,14 +7728,16 @@ Function UpdateEvents()
 							EndIf
 					End Select 
 					
-					If PlayerRoom <> e\room Then
-						If e\EventState3>0 Then
-							e\EventState3 = e\EventState3+FPSfactor
-							
-							If e\EventState3>70*25 Then
-								FreeEntity(e\room\Objects[0])
-								e\room\Objects[0]=0
-								RemoveEvent(e)
+					If (e <> Null) Then
+						If PlayerRoom <> e\room Then
+							If e\EventState3>0 Then
+								e\EventState3 = e\EventState3+FPSfactor
+								
+								If e\EventState3>70*25 Then
+									FreeEntity(e\room\Objects[0])
+									e\room\Objects[0]=0
+									RemoveEvent(e)
+								EndIf
 							EndIf
 						EndIf
 					EndIf
