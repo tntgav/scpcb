@@ -602,6 +602,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 	
 	ResetEntity(n\Collider)
 	
+	n\ID = 0
 	n\ID = FindFreeNPCID()
 	
 	DebugLog ("Created NPC "+n\NVName+" (ID: "+n\ID+")")
@@ -6093,9 +6094,8 @@ Function ForceSetNPCID(n.NPCs, newID%)
 	n\ID = newID
 	
 	For n2.NPCs = Each NPCs
-		If n2 <> n And n\ID = newID Then
+		If n2 <> n And n2\ID = newID Then
 			n2\id = FindFreeNPCID()
-			DebugLog "NPC "+n2\NVName+" got forced to ID "+n2\id
 		EndIf
 	Next
 End Function

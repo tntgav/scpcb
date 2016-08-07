@@ -47,7 +47,7 @@ End Function
 Function AchievementTooltip(achvno%)
 	Local scale# = GraphicHeight/768.0
 	
-	Local width = (StringWidth(AchievementStrings(achvno)))*MenuScale
+	Local width = (AAStringWidth(AchievementStrings(achvno)))*MenuScale
 	
 	Color 25,25,25
 	Rect(ScaledMouseX()+20,ScaledMouseY()+20,width,38*scale,True)

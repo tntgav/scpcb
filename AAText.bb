@@ -3,6 +3,9 @@
 Global AATextEnable% = GetINIInt(OptionFile, "options", "antialiased text")
 Global AASelectedFont%
 Global AATextCam%,AATextSprite%[150]
+Global AACharW%,AACharH%
+
+Global AACamViewW%,AACamViewH%
 
 Type AAFont
 	Field texture%
@@ -15,7 +18,7 @@ Type AAFont
 	
 	Field lowResFont% ;for use on other buffers
 	
-	;Field mW%
+	Field mW%
 	Field mH%
 	Field texH%
 End Type
@@ -24,7 +27,7 @@ Function InitAAFont()
 	If AATextEnable Then
 		;Create Camera
 		Local cam% = CreateCamera()
-		CameraViewport cam,0,0,GraphicWidth,GraphicHeight
+		CameraViewport cam,0,0,10,10;GraphicWidth,GraphicHeight
 		;CameraProjMode cam, 2
 		CameraZoom cam, 0.1
 		CameraClsMode cam, 0, 0
@@ -60,18 +63,19 @@ End Function
 
 Function AASpritePosition(ind%,x%,y%)
 	;THE HORROR
-	Local nx# = (((Float(x)/Float(GraphicWidth))*2)-1.0)
-	Local ny# = -(((Float(y)/Float(GraphicWidth))*2)-(1.0*Float(GraphicHeight)/Float(GraphicWidth)))
+	Local nx# = (((Float(x-(AACamViewW/2))/Float(AACamViewW))*2))
+	Local ny# = -(((Float(y-(AACamViewH/2))/Float(AACamViewW))*2))
 	
-	;TODO: figure out how to do the half-pixel shifting right so characters don't occasionally get blurred
-	;particularly non-monospace fonts need a fix
-	nx = nx-(1.0/Float(GraphicWidth))
+	;how does this work pls help
+	nx = nx-((1.0/Float(AACamViewW))*(((AACharW-2) Mod 2)))+(1.0/Float(AACamViewW))
+	ny = ny-((1.0/Float(AACamViewW))*(((AACharH-2) Mod 2)))+(1.0/Float(AACamViewW))
 	
-	PositionEntity AATextSprite[ind],nx,ny,1.0001
+	PositionEntity AATextSprite[ind],nx,ny,1.0
 End Function
 
 Function AASpriteScale(ind%,w%,h%)
-	ScaleEntity AATextSprite[ind],1.0/Float(GraphicWidth)*Float(w), 1/Float(GraphicWidth)*Float(h), 1
+	ScaleEntity AATextSprite[ind],1.0/Float(AACamViewW)*Float(w), 1/Float(AACamViewW)*Float(h), 1
+	AACharW = w : AACharH = h
 End Function
 
 Function ReloadAAFont() ;CALL ONLY AFTER CLEARWORLD
@@ -122,7 +126,12 @@ End Function
 
 Function AAStringHeight%(txt$)
 	Local font.AAFont = Object.AAFont(AASelectedFont)
-	Return font\mH
+	If (AATextEnable) Then
+		Return font\mH
+	Else
+		SetFont font\lowResFont
+		Return StringHeight(txt)
+	EndIf
 End Function
 
 Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
@@ -150,14 +159,30 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 	
 	Local tX% = 0
 	CameraProjMode AATextCam,2
+	
+	Local char%
+	
+	Local tw%=0
+	For i=1 To Len(txt)
+		char = Asc(Mid(txt,i,1))
+		If char>=0 And char<=127 Then
+			tw=tw+font\w[char]
+		EndIf
+	Next
+	
+	AACamViewW = tw
+	AACamViewW = AACamViewW+(AACamViewW Mod 2)
+	AACamViewH = AAStringHeight(txt)
+	AACamViewH = AACamViewH+(AACamViewH Mod 2)
+	CameraViewport AATextCam,x,y,AACamViewW,AACamViewH
 	For i=1 To Len(txt)
 		EntityAlpha AATextSprite[i-1],a
 		EntityColor AATextSprite[i-1],ColorRed(),ColorGreen(),ColorBlue()
 		ShowEntity AATextSprite[i-1]
-		Local char% = Asc(Mid(txt,i,1))
+		char% = Asc(Mid(txt,i,1))
 		If char>=0 And char<=127 Then
-			AASpritePosition(i-1,x+tX+(font\w[char]/2),y+(font\h[char]/2))
 			AASpriteScale(i-1,font\w[char],font\h[char])
+			AASpritePosition(i-1,tX+(font\w[char]/2),(font\h[char]/2))
 			VertexTexCoords GetSurface(AATextSprite[i-1],1),0,Float(font\x[char])/1024.0,Float(font\y[char])/1024.0
 			VertexTexCoords GetSurface(AATextSprite[i-1],1),1,Float(font\x[char]+font\w[char])/1024.0,Float(font\y[char])/1024.0
 			VertexTexCoords GetSurface(AATextSprite[i-1],1),2,Float(font\x[char])/1024.0,Float(font\y[char]+font\h[char])/1024.0
@@ -179,26 +204,28 @@ End Function
 Function AALoadFont%(file$="Tahoma", height=13, bold=0, italic=0, underline=0, AATextScaleFactor%=2)
 	Local newFont.AAFont = New AAFont
 	
-	newFont\lowResFont = LoadFont_Strict(file,height,bold,italic,underline)
+	newFont\lowResFont = LoadFont(file,height,bold,italic,underline)
 	
-	Local mW% = (FontWidth()/AATextScaleFactor)+3
+	newFont\mW = (FontWidth()/AATextScaleFactor)+3
 	newFont\mH = (FontHeight()/AATextScaleFactor)+3
 	
 	If AATextEnable Then
-		Local hResFont% = LoadFont_Strict(file,height*AATextScaleFactor,bold,italic,underline)
+		Local hResFont% = LoadFont(file,height*AATextScaleFactor,bold,italic,underline)
 		Local tImage% = CreateTexture(1024,1024,3)
-		Local tX% = 0 : Local tY% = 0
+		Local tX% = 0 : Local tY% = 1
 		SetFont hResFont
 		
-		mW% = (FontWidth()/AATextScaleFactor)+3
+		newFont\mW = (FontWidth()/AATextScaleFactor)+3
 		newFont\mH = (FontHeight()/AATextScaleFactor)+3
 		
 		Local tCharImage% = CreateImage(FontWidth()+2*AATextScaleFactor,FontHeight()+2*AATextScaleFactor)
 		ClsColor 0,0,0
 		LockBuffer TextureBuffer(tImage)
 		
-		Local miy% = newFont\mH*((mW*95/1024)+2)
+		Local miy% = newFont\mH*((newFont\mW*95/1024)+2)
 		DebugLog miy
+		
+		newFont\mW = 0
 		
 		For ix%=0 To 1023
 			For iy%=0 To miy
@@ -245,6 +272,9 @@ Function AALoadFont%(file$="Tahoma", height=13, bold=0, italic=0, underline=0, A
 			newFont\x[i]=tX
 			newFont\y[i]=tY
 			newFont\w[i]=(StringWidth(Chr(i))/AATextScaleFactor)+3
+			
+			If newFont\mW<newFont\w[i]-3 Then newFont\mW=newFont\w[i]-3
+			
 			newFont\h[i]=(FontHeight()/AATextScaleFactor)+3
 			tX=tX+newFont\w[i]+2
 			If (tX>1024-(FontWidth()/AATextScaleFactor)-4) Then
@@ -277,19 +307,3 @@ Function AALoadFont%(file$="Tahoma", height=13, bold=0, italic=0, underline=0, A
 	EndIf
 	Return Handle(newFont)
 End Function
-
-;InitAAFont()
-;AASetFont(AALoadFont("Arial",58,0,0,0,2))
-;SetFont(LoadFont("Courier New",16,0,0,0))
-;While Not KeyHit(1)
-;	If KeyHit(30) Then AAShiftX=AAShiftX-0.05
-;	If KeyHit(32) Then AAShiftX=AAShiftX+0.05
-;	
-;	If KeyHit(17) Then AAShiftY=AAShiftY-0.05
-;	If KeyHit(31) Then AAShiftY=AAShiftY+0.05
-;	Cls
-;	AAText MouseX(),MouseY(),"Testing...",False,False,0.5
-;	Text 0,0,"ShiftX: "+AAShiftX
-;	Text 0,30,"ShiftY: "+AAShiftY
-;	Flip False
-;Wend
