@@ -46,5 +46,5 @@ Function UpdateBlur(power#)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#3#25
+;~F#3#26
 ;~C#Blitz3D

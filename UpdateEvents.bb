@@ -247,13 +247,13 @@ Function UpdateEvents()
 						
 						If i = 0 Then PlaySound_Strict(LoadTempSound("SFX\Intro\PA\scripted\scripted6.ogg"))
 						
-						If (i>0 And i<22) Then
+						If (i>0 And i<23) Then
 							PlaySound_Strict(LoadTempSound("SFX\Intro\Commotion\Commotion"+i+".ogg"))
 						EndIf
 						
 							;If i = 21 Then DebugLog "Commotion21"
 						
-						If (i>23) Then
+						If (i>24) Then
 							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
 							If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
 							If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
@@ -8864,6 +8864,6 @@ End Function
 ;~F#13#10F#4F5#505#571#5E2#641#80F#9F6#A1D#A2B#A35#A42#C2B#C4C#C9B#CE9#CF6#D30#D47
 ;~F#D67#D70#D7A#D89#E1D#E3F#10EB#1131#1147#1153#1171#11C2#11D9#12A6#13A7#1427#1440#145F#14C4#14D1
 ;~F#14EA#1582#1738#181E#1872#1923#19D3#1A8B#1AA3#1B64#1B91#1BAE#1BD5#1C05#1C29#1C51#1CAB#1CEB#1D1C#1D2F
-;~F#1DE9#1E42#1E55#1E63#1E6C#1EB8#1ED9#1FC7#2040#2209#220D
+;~F#1DE9#1E44#1E57#1E65#1EBA#1EDB#1FC9#203C#2042#2121#220B#220F
 ;~B#1498#2160
 ;~C#Blitz3D
