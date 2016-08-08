@@ -5965,20 +5965,39 @@ Function UpdateEvents()
 							;n\State = 2
 							;SetNPCFrame(n, 659)
 							;e\room\NPC[0]=n
+							
+							;For n.NPCs = Each NPCs
+							;	If n\NPCtype = NPCtype049
+							;		e\room\NPC[0]=n
+							;		e\room\NPC[0]\State = 0
+							;		SetNPCFrame(e\room\NPC[0],659)
+							;		PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True)
+							;		ResetEntity e\room\NPC[0]\Collider
+							;		Exit
+							;	EndIf
+							;Next
+							;If e\room\NPC[0]=Null
+							;	n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True), EntityZ(e\room\Objects[4],True))
+							;	PointEntity n\Collider, e\room\obj
+							;	SetNPCFrame(n, 659)
+							;	e\room\NPC[0]=n
+							;EndIf
+							
 							For n.NPCs = Each NPCs
 								If n\NPCtype = NPCtype049
 									e\room\NPC[0]=n
-									e\room\NPC[0]\State = 0
-									SetNPCFrame(e\room\NPC[0],659)
-									PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True)
+									e\room\NPC[0]\State = 2
+									e\room\NPC[0]\Idle = 1
+									PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+3,EntityZ(e\room\Objects[4],True)
 									ResetEntity e\room\NPC[0]\Collider
 									Exit
 								EndIf
 							Next
 							If e\room\NPC[0]=Null
-								n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True), EntityZ(e\room\Objects[4],True))
+								n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True)+3, EntityZ(e\room\Objects[4],True))
 								PointEntity n\Collider, e\room\obj
-								SetNPCFrame(n, 659)
+								n\State = 2
+								n\Idle = 1
 								e\room\NPC[0]=n
 							EndIf
 							
@@ -6002,7 +6021,32 @@ Function UpdateEvents()
 									
 									If e\Sound2=0 Then LoadEventSound(e,"SFX\generator.ogg",1)
 									e\SoundCHN2=LoopSound2(e\Sound2, e\SoundCHN2, Camera, e\room\Objects[8], 6.0, e\EventState3)
-								EndIf							
+									
+									If e\room\NPC[0]\Idle > 0
+										i = 0
+										If EntityDistance(Collider,e\room\RoomDoors[1]\frameobj)<3.0
+											i = 1
+										ElseIf EntityDistance(Collider,e\room\RoomDoors[3]\frameobj)<3.0
+											i = 3
+										EndIf
+										If i > 0
+											;If EntityVisible(Collider,e\room\RoomDoors[i]\frameobj)
+												PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[i],True),EntityY(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)
+												ResetEntity e\room\NPC[0]\Collider
+												PlaySound2(ElevatorBeepSFX, Camera, e\room\Objects[i], 4.0)
+												UseDoor(e\room\RoomDoors[i],False)
+												e\room\RoomDoors[i-1]\open = False
+												e\room\RoomDoors[i]\open = True
+												e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
+												PlaySound2(LoadTempSound("SFX\049\049_"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
+												e\room\NPC[0]\Idle = 0
+											;EndIf
+										EndIf
+									EndIf
+									If EntityVisible(Collider,e\room\NPC[0]\Collider)
+										GiveAchievement(Achv049)
+									EndIf
+								EndIf
 							EndIf
 							
 							If e\EventState < 70*190 Then 
@@ -6010,45 +6054,58 @@ Function UpdateEvents()
 								;049 spawns after 3 minutes
 								If e\EventState > 70*180 Then
 									
-									If e\room\NPC[0]=Null Then
-										For n.NPCs = Each NPCs
-											If n\NPCtype=NPCtype049 Then e\room\NPC[0]=n : Exit
-										Next
-									EndIf
-									e\room\NPC[0]\State = 1
+									;If e\room\NPC[0]=Null Then
+									;	For n.NPCs = Each NPCs
+									;		If n\NPCtype=NPCtype049 Then e\room\NPC[0]=n : Exit
+									;	Next
+									;EndIf
+									;e\room\NPC[0]\State = 1
 									
 									e\room\RoomDoors[4]\open = True
 									PlaySound_Strict TeslaPowerUpSFX
 									PlaySound2(OpenDoorSFX(0,Rand(0,2)),Camera, e\room\RoomDoors[4]\obj, 6.0)
 									
+									e\room\RoomDoors[1]\open = False
+									e\room\RoomDoors[3]\open = False
+									e\room\RoomDoors[0]\open = True
+									e\room\RoomDoors[2]\open = True
+									
 									e\EventState= 70*190
 								EndIf
 							ElseIf e\EventState < 70*240
-								GiveAchievement(Achv049)
+								;GiveAchievement(Achv049)
 								
-								If e\room\NPC[0]=Null Then
-									For n.NPCs = Each NPCs
-										If n\NPCtype=NPCtype049 Then e\room\NPC[0]=n : Exit
-									Next
-								Else
-									If EntityDistance(e\room\NPC[0]\Collider,Collider)<4.0 Then
-										e\EventState=e\EventState+FPSfactor
-										If e\EventState > 70*195 And e\EventState-FPSfactor =< 70*195 Then
-											For n.NPCs = Each NPCs ;awake the zombies
-												If n\NPCtype = NPCtypeZombie And n\State = 0 Then
-													n\State = 1
-													SetNPCFrame(n, 155)
-												EndIf
-											Next
-											PlaySound2(LoadTempSound("SFX\049\049_"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
-										ElseIf e\EventState > 70*214 And e\EventState-FPSfactor =< 70*214
-											PlaySound2(LoadTempSound("SFX\049\049_"+Rand(3,5)+".ogg"),Camera, e\room\NPC[0]\Collider)
-										ElseIf e\EventState > 70*227 And e\EventState-FPSfactor =< 70*227
-											PlaySound2(LoadTempSound("SFX\049\049_"+Rand(6,7)+".ogg"),Camera, e\room\NPC[0]\Collider)
-											e\EventState=70*241
-										EndIf
+								;If e\room\NPC[0]=Null Then
+								;	For n.NPCs = Each NPCs
+								;		If n\NPCtype=NPCtype049 Then e\room\NPC[0]=n : Exit
+								;	Next
+								;Else
+									;If EntityDistance(e\room\NPC[0]\Collider,Collider)<4.0 Then
+									;	e\EventState=e\EventState+FPSfactor
+									;	If e\EventState > 70*195 And e\EventState-FPSfactor =< 70*195 Then
+									;		For n.NPCs = Each NPCs ;awake the zombies
+									;			If n\NPCtype = NPCtypeZombie And n\State = 0 Then
+									;				n\State = 1
+									;				SetNPCFrame(n, 155)
+									;			EndIf
+									;		Next
+									;		;PlaySound2(LoadTempSound("SFX\049\049_"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
+									;	ElseIf e\EventState > 70*214 And e\EventState-FPSfactor =< 70*214
+									;		;PlaySound2(LoadTempSound("SFX\049\049_"+Rand(3,5)+".ogg"),Camera, e\room\NPC[0]\Collider)
+									;	ElseIf e\EventState > 70*227 And e\EventState-FPSfactor =< 70*227
+									;		;PlaySound2(LoadTempSound("SFX\049\049_"+Rand(6,7)+".ogg"),Camera, e\room\NPC[0]\Collider)
+									;		e\EventState=70*241
+									;	EndIf
+									;EndIf
+								;EndIf
+								
+								For n.NPCs = Each NPCs ;awake the zombies
+									If n\NPCtype = NPCtypeZombie And n\State = 0 Then
+										n\State = 1
+										SetNPCFrame(n, 155)
 									EndIf
-								EndIf
+								Next
+								e\EventState=70*241
 							EndIf
 						EndIf
 					EndIf
@@ -8863,7 +8920,7 @@ End Function
 ;~IDEal Editor Parameters:
 ;~F#13#10F#4F5#505#571#5E2#641#80F#9F6#A1D#A2B#A35#A42#C2B#C4C#C9B#CE9#CF6#D30#D47
 ;~F#D67#D70#D7A#D89#E1D#E3F#10EB#1131#1147#1153#1171#11C2#11D9#12A6#13A7#1427#1440#145F#14C4#14D1
-;~F#14EA#1582#1738#181E#1872#1923#19D3#1A8B#1AA3#1B64#1B91#1BAE#1BD5#1C05#1C29#1C51#1CAB#1CEB#1D1C#1D2F
-;~F#1DE9#1E44#1E57#1E65#1EBA#1EDB#1FC9#203C#2042#2121#220B#220F
-;~B#1498#2160
+;~F#14EA#1582#1857#18AB#195C#1A0C#1AC4#1ADC#1B9D#1BCA#1BE7#1C0E#1C3E#1C62#1C8A#1CE4#1D24#1D55#1D68#1E22
+;~F#1E7D#1E90#1E9E#1EF3#1F14#2002#2075#207B#215A#2244#2248
+;~B#1498#2199
 ;~C#Blitz3D
