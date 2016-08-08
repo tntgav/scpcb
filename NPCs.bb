@@ -4186,8 +4186,9 @@ Function UpdateNPCs()
 							
 							dist = EntityDistance(n\Collider,Collider)
 							
-							If dist < 0.75 Then n\State2 = 1.0
 							If n\State2 = 0.0
+								If dist < 0.75 Then n\State2 = Rand(1,2)
+								
 								n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
 								
 								If (n\ID Mod 2 = 0) Then
@@ -4197,22 +4198,42 @@ Function UpdateNPCs()
 								EndIf
 							Else
 								n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
-								AnimateNPC(n,63,100,0.6,False)
-								If prevFrame < 89 And n\Frame=>89
-									If dist > 1.0 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
-										;Miss
-									Else
-										Injuries = Injuries + Rnd(0.75,1.5)
-										PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
-										If Injuries > 10.0
-											Kill()
-											DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
-											DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
-											DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+								If n\State2 = 1
+									AnimateNPC(n,63,100,0.6,False)
+									If prevFrame < 89 And n\Frame=>89
+										If dist > 0.75 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
+											;Miss
+										Else
+											Injuries = Injuries + Rnd(0.75,1.5)
+											PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
+											If Injuries > 10.0
+												Kill()
+												DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
+												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
+												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+											EndIf
 										EndIf
+									ElseIf n\Frame => 99
+										n\State2 = 0.0
 									EndIf
-								ElseIf n\Frame => 99
-									n\State2 = 0.0
+								Else
+									AnimateNPC(n,168,202,0.6,False)
+									If prevFrame < 189 And n\Frame=>189
+										If dist > 1.0 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
+											;Miss
+										Else
+											Injuries = Injuries + Rnd(0.75,1.5)
+											PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
+											If Injuries > 10.0
+												Kill()
+												DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
+												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
+												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+											EndIf
+										EndIf
+									ElseIf n\Frame => 201
+										n\State2 = 0.0
+									EndIf
 								EndIf
 							EndIf
 						Case 2 ;play the "screaming animation" and switch to n\state2 after it's finished
@@ -6408,8 +6429,8 @@ Function RotateToDirection(n.NPCs)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#0#A#3F#49#71#97#A7#D7#E7#F0#FE#10D#120#13F#169#17D#19A#1DB#1F2#213
-;~F#236#23F#266#281#28E#38A#481#5D6#5F2#602#74B#753#75F#7CB#866#986#98B#9C2#A64#AA0
-;~F#B2F#B9B#CB0#D7B#E32#EE5#FE4#FED#10B2#10D9#10E4#110C#111F#1727#179F#17B0#17CA#17DB#17E5#1803
-;~F#1841#1862#1870#188C#189E#18C2#18E5#18F3
-;~B#197#1286#1320#13B9#156D#1678#1836#1892
+;~F#236#23F#266#28E#38A#481#5D6#5F2#602#74B#753#75F#7CB#866#986#98B#9C2#A64#AA0#B2F
+;~F#B9B#CB0#D7B#E32#EE5#FE4#10C7#10EE#10F9#1121#1134#173C#17B4#17C5#17DF#17F0#17FA#1818#1856#1877
+;~F#1885#18A1#18B3#18D7#18FA#1908
+;~B#197#129B#1335#13CE#1582#168D#184B#18A7
 ;~C#Blitz3D
