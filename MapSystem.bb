@@ -4667,6 +4667,8 @@ Function FillRoom(r.Rooms)
 			;Doors for room
 			r\RoomDoors[0] = CreateDoor(r\zone,r\x+480.0*RoomScale,r\y,r\z-640.0*RoomScale,90,r,False,False,3)
 			r\RoomDoors[0]\AutoClose = False
+			PositionEntity r\RoomDoors[0]\buttons[0],r\x+576.0*RoomScale,EntityY(r\RoomDoors[0]\buttons[0],True),r\z-480*RoomScale,True
+			RotateEntity r\RoomDoors[0]\buttons[0],0,270,0
 			r\RoomDoors[1] = CreateDoor(r\zone,r\x+544.0*RoomScale,r\y+480.0*RoomScale,r\z+256.0*RoomScale,270,r,False,False,3)
 			r\RoomDoors[1]\AutoClose = False
 			FreeEntity r\RoomDoors[1]\obj2 : r\RoomDoors[1]\obj2 = 0
