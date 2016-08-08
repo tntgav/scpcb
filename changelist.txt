@@ -1,3 +1,26 @@
+
+----------------------------------------------------------------------------------
+
+v1.3.1
+Juanjpro saves the day again:
+	- removed FastExtension and FastText libraries - this should improve stability 
+	(at the cost of removing bump mapping)
+	- ditching the libraries allowed switching to a newer version of Blitz3D, which
+	has some bugfixes for newer versions of windows
+	- brightness can be changed in fake fullscreen mode and windowed mode
+	- hopefully fixed room2sl's event (with saving)
+
+- new textures and icons for documents and notes
+- fixed checkpoint monitors
+- fixed collision bugS in room2sl and room3offices
+- SCP-1499-1 AI improvements
+- SCP-106 and SCP-372 will no longer spawn in the SCP-1499 dimension
+- changes to the way SCP-049 spawns in room049
+- Emily Ross' badge and some items from SCP-1162 can now be put in the clipboard
+- more things are now affected by the ''Other Difficulty Factors'' setting
+- fixed MAVs in the 1048a event
+- other minor fixes and improvements
+
 ----------------------------------------------------------------------------------
 
 v1.3
