@@ -6833,6 +6833,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("Gas Mask", "supergasmask", x, y, z)
 					RemoveItem(item)
 			End Select
+		Case "SCP-1499"
+				Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
+					RemoveItem(item)
+				Case "1:1"
+					it2 = CreateItem("Gas Mask", "gasmask", x, y, z)
+					RemoveItem(item)
+				Case "fine", "very fine"
+					PositionEntity(item\obj, x, y, z)
+					ResetEntity(item\obj)
+			End Select
 		Case "Ballistic Vest"
 			Select setting
 				Case "rough", "coarse"
@@ -6988,16 +7001,117 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					Else
 						Select item\itemtemplate\name
 							Case "Level 1 Key Card"
-								it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-							Case "Level 2 Key Card"
-								it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-							Case "Level 3 Key Card"
+							Select SelectedDifficulty\otherFactors
+				    Case EASY
+							If Rand(3)=1 Then
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							Else
+								it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+							EndIf
+				    Case NORMAL
+							If Rand(2)=1 Then
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							Else
+								it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+				     		EndIf
+			         Case HARD
+							If Rand(3)=1 Then
+							     it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+							End Select
+							
+							Case "Level 2 Key Card"
+				 	     	Select SelectedDifficulty\otherFactors
+				    Case EASY
+							If Rand(3)=1 Then
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							Else
+								it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+							EndIf
+				    Case NORMAL
+							If Rand(2)=1 Then
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							Else
+								it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+							EndIf
+			         Case HARD
+							If Rand(3)=1 Then
+								it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+							End Select
+			     
+			     			Case "Level 3 Key Card"
+				 	     	Select SelectedDifficulty\otherFactors
+				    Case EASY
+							If Rand(20)=1 Then
+								it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+				    Case NORMAL
+							If Rand(40)=1 Then
+								it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+			         Case HARD
+							If Rand(60)=1 Then
+								it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+							End Select
+						
 							Case "Level 4 Key Card"
+				 	     	Select SelectedDifficulty\otherFactors
+				    Case EASY
+							If Rand(3)=1 Then
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							Else
 								it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+							EndIf
+				    Case NORMAL
+							If Rand(2)=1 Then
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							Else
+								it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+							EndIf
+			         Case HARD
+							If Rand(4)=1 Then
+								it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+							End Select
+							
+
 							Case "Level 5 Key Card"	
+							Select SelectedDifficulty\otherFactors
+						Case EASY
+							If Rand(5)=1 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-						End Select						
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+						Case NORMAL
+							If Rand(7)=1 Then
+								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+							EndIf
+						Case HARD
+							If Rand(10)=1 Then
+								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+							Else
+								it2 = CreateItem("Mastercard", "misc", x, y, z)
+								EndIf
+							End Select
+								End Select
+					
 					EndIf
 				Case "very fine"
 					;If Rand(3)=1 Then
@@ -7050,7 +7164,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1", "fine", "very fine"
-					If Rand(2)=1 Then
+					If Rand(4)=1 Then
 						it2 = CreateItem("Mastercard", "misc", x, y, z)				
 					Else
 						it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)	
