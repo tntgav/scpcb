@@ -6040,8 +6040,6 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 				door2\NPCCalledElevator = False
 				State = 0
 				
-				UseDoor(door2,False)							
-				
 				If inside Then
 					x# = Max(Min((EntityX(Collider)-EntityX(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
 					z# = Max(Min((EntityZ(Collider)-EntityZ(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
@@ -6067,6 +6065,8 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 					EndIf
 					NPC_inside\CurrElevator = Null
 				EndIf
+				
+				UseDoor(door2,False)
 				
 				PlaySound2(ElevatorBeepSFX, Camera, room1, 4.0)
 			EndIf
@@ -6114,8 +6114,6 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 				door2\NPCCalledElevator = False
 				State = 0
 				
-				UseDoor(door1,False)
-				
 				;pelaaja hissin sis‰ll‰, siirret‰‰n
 				If inside Then	
 					x# = Max(Min((EntityX(Collider)-EntityX(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
@@ -6142,6 +6140,8 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 					EndIf
 					NPC_inside\CurrElevator = Null
 				EndIf
+				
+				UseDoor(door1,False)
 				
 				PlaySound2(ElevatorBeepSFX, Camera, room2, 4.0)				
 			EndIf	
@@ -7691,12 +7691,12 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 End Function
 ;~IDEal Editor Parameters:
 ;~F#2#A#2D#FA#109#117#11E#12F#137#13F#323#333#344#36C#37A#38A#38F#39A#441#54B
-;~F#56A#58C#5A1#5AC#5E5#5F3#61B#651#659#66E#6B2#6BB#70C#74E#770#7CC#7DE#845#854#87E
-;~F#8A6#8C9#8E7#90E#915#923#93F#954#971#98E#99B#9AD#9EB#A15#A66#ABC#ACF#AED#B90#BF1
-;~F#C00#C3C#C44#C52#C67#CA3#CC2#CD2#CEA#D15#D28#D4A#D72#DC4#DF0#E17#E1E#E23#E5A#E81
-;~F#E96#ECA#F48#F68#FDC#1033#105E#10AF#10B8#1151#1159#115E#116C#117B#11BC#11E0#11EF#1200#1207#120C
-;~F#1290#12C6#1343#134F#1390#139B#13AC#13B1#13C0#13D7#1458#1461#1540#155D#1564#156A#1578#159C#15BC#15EF
-;~F#16FB#1734#1749#180B#18A0#18A5#18B5#1B84#1B9B#1BBA#1BC1#1C22#1C73#1C9E#1CBF#1CD2#1CFA#1D01#1D35#1D3C
-;~F#1D68#1DB6#1DC4#1DCB#1DD1#1DDB#1DE1#1DF8
+;~F#56A#58C#5A1#5AC#5E5#5F3#61B#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#87E#8A6
+;~F#8C9#8E7#90E#915#923#93F#954#971#98E#99B#9AD#9EB#A15#A66#ABC#ACF#AED#BF1#C00#C3C
+;~F#C44#C52#C67#CA3#CC2#CD2#CEA#D15#D28#D4A#D72#DC4#DF0#E17#E1E#E23#E5A#E81#E96#ECA
+;~F#F48#F68#FDC#1033#105E#10AF#10B8#1151#1159#115E#116C#117B#11BC#11E0#11EF#1200#1207#120C#1290#12C6
+;~F#1343#134F#1390#139B#13AC#13B1#13C0#13D7#1458#1461#1540#155D#1564#156A#1578#159C#15BC#15EF#16FB#1734
+;~F#180B#18A0#18A5#18B5#1B84#1B9B#1BBA#1BC1#1C22#1C73#1C9E#1CBF#1CD2#1CFA#1D01#1D35#1D3C#1D68#1DB6#1DC4
+;~F#1DCB#1DD1#1DDB#1DE1#1DF8
 ;~B#1228
 ;~C#Blitz3D

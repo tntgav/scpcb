@@ -1504,7 +1504,9 @@ Function UpdateNPCs()
 				n\BlinkTimer# = 1.0
 				
 				If n\Idle > 0.1
-					n\Idle = Max(n\Idle-(1+SelectedDifficulty\aggressiveNPCs)*FPSfactor,0.1)
+					If PlayerRoom\RoomTemplate\Name$ <> "room049"
+						n\Idle = Max(n\Idle-(1+SelectedDifficulty\aggressiveNPCs)*FPSfactor,0.1)
+					EndIf
 					n\DropSpeed = 0
 					If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
 					If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
@@ -6405,8 +6407,9 @@ Function RotateToDirection(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#3F#49#266#28E#38A#481#5D6#5F0#600#749#751#75D#7C9#864#984#989#9C0#A62
-;~F#A9E#B2D#B99#CAE#D79#E30#EE3#FE2#FEB#10B0#10D7#10E2#110A#111D#1725#179D#17AE#17C8#17D9#17E3
-;~F#1801#183F#1860#186E#188A#189C#18C0#18E3#18F1
-;~B#197#1284#131E#13B7#156B#1676#1834#1890
+;~F#0#A#3F#49#71#97#A7#D7#E7#F0#FE#10D#120#13F#169#17D#19A#1DB#1F2#213
+;~F#236#23F#266#281#28E#38A#481#5D6#5F2#602#74B#753#75F#7CB#866#986#98B#9C2#A64#AA0
+;~F#B2F#B9B#CB0#D7B#E32#EE5#FE4#FED#10B2#10D9#10E4#110C#111F#1727#179F#17B0#17CA#17DB#17E5#1803
+;~F#1841#1862#1870#188C#189E#18C2#18E5#18F3
+;~B#197#1286#1320#13B9#156D#1678#1836#1892
 ;~C#Blitz3D
