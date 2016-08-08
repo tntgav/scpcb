@@ -4602,7 +4602,7 @@ Function FillRoom(r.Rooms)
 			RotateEntity it\obj, 0, r\angle, 0
 			EntityParent(it\obj, r\obj)
 			
-			it = CreateItem("Emily Ross's Badge", "badge", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
+			it = CreateItem("Emily Ross' Badge", "badge", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
 			EntityParent(it\obj, r\obj)
 			;[End Block]
 		Case "room3offices"

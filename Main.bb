@@ -1,4 +1,4 @@
-;This is the Source Code from SCP:CB Version 1.3.0. This version was created by the "Third Subdivision Team".
+;This is the Source Code from SCP:CB Version 1.3.0 and onwards. This version was created by the "Third Subdivision Team".
 ;Original credit goes to Regalis and all the other contributers to SCP:CB.
 
 ;Modified by juanjp600 to remove FastExt and FastText due to stability and compatibility concerns.
@@ -13,7 +13,8 @@ Global OptionFile$ = "options.ini"
 
 Global Font1%, Font2%, Font3%, Font4%
 
-Global VersionNumber$ = "1.3.0"
+Global VersionNumber$ = "1.3.1"
+Global CompatibleNumber$ = "1.3.1"
 
 AppTitle "SCP - Containment Breach Launcher"
 
@@ -3980,7 +3981,7 @@ Function DrawGUI()
 						SelectedItem = Null
 					ElseIf Inventory(MouseSlot) <> SelectedItem
 						Select SelectedItem\itemtemplate\tempname
-							Case "paper","key1","key2","key3","key4","key5","key6","misc" ;BoH stuff
+							Case "paper","key1","key2","key3","key4","key5","key6","misc","oldpaper","badge","ticket" ;BoH stuff
 								If Inventory(MouseSlot)\itemtemplate\tempname = "clipboard" Then
 									;Add an item to clipboard
 									Local added.Items = Null
@@ -4007,8 +4008,10 @@ Function DrawGUI()
 										If SelectedItem <> Null Then
 											Msg = "This clipboard can't hold more items"
 										Else
-											If added\itemtemplate\tempname = "paper" Then
+											If added\itemtemplate\tempname = "paper" Or added\itemtemplate\tempname = "oldpaper" Then
 												Msg = "You've added this document to the clipboard"
+											ElseIf added\itemtemplate\tempname = "badge"
+												Msg = "You've added "+added\itemtemplate\name+" to the clipboard"
 											Else
 												Msg = "You've added this "+added\itemtemplate\name+" to the clipboard"
 											EndIf
@@ -8643,7 +8646,10 @@ Function ScaledMouseY%()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#1B#A7#12F#133#13A#3CF#4AB#505#526#59E#5AB#660#6D8#6EF#6FC#72E#7E4#8CD#1503#1515
-;~F#1554#1E38#1E9E#1FE5
-;~B#1193#13CB#1A47
+;~F#1C#A8#130#134#13B#3D0#4AC#506#527#59F#5AC#661#6D9#6F0#6FD#72F#7E5#8CE#9C9#9E1
+;~F#A74#B9A#CB9#E29#142A#14B7#1506#1518#1557#1629#1634#179A#182C#185D#195F#1971#198D#1997#19A4#19C6
+;~F#19E5#1A04#1A20#1A34#1A49#1A4D#1A6D#1A75#1AA0#1C42#1CF7#1D22#1D99#1D9F#1DA9#1DB5#1DC0#1DC4#1DFF#1E07
+;~F#1E0F#1E16#1E1D#1E2A#1E30#1E3B#1E74#1E83#1EA1#1ECF#1ED6#1EE9#1F02#1F2F#1F3A#1F3F#1F59#1F65#1F80#1FD2
+;~F#1FE0#1FE8#1FF4#1FFD#2026#202B#2030#2035#203F#2050#20D5#20E3#212A#2151#2163#217C#218B#21A2#21BF#21C3
+;~B#1196#13CE#1A4A
 ;~C#Blitz3D

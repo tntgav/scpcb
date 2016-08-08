@@ -641,7 +641,7 @@ End Function
 
 Function UpdateNPCs()
 	Local n.NPCs, n2.NPCs, d.Doors, de.Decals, r.Rooms, eo.ElevatorObj, eo2.ElevatorObj
-	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%
+	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%, RN$
 	
 	Local target
 	
@@ -914,7 +914,19 @@ Function UpdateNPCs()
 					
 					dist = EntityDistance(n\Collider, Collider)
 					
-					If (Not n\Idle) Then
+					Local spawn106% = True
+					If PlayerRoom\RoomTemplate\Name$ = "dimension1499" Then spawn106% = False
+					For e.Events = Each Events
+						If e\EventName = "room860"
+							If e\EventState = 1
+								spawn106% = False
+							EndIf
+							Exit
+						EndIf
+					Next
+					If (Not spawn106%) And n\State <= 0 Then n\State = Rand(22000, 27000)
+					
+					If (Not n\Idle) And spawn106%
 						If n\State <= 0 Then	;attacking	
 							If EntityY(n\Collider) < EntityY(Collider) - 20.0 - 0.55 Then
 								If Not PlayerRoom\RoomTemplate\DisableDecals Then
@@ -2645,7 +2657,8 @@ Function UpdateNPCs()
 				;[End Block]
 			Case NPCtype372 ;------------------------------------------------------------------------------------------------------------------
 				;[Block]
-				If PlayerRoom\RoomTemplate\Name <> "pocketdimension" Then 
+				RN$ = PlayerRoom\RoomTemplate\Name
+				If RN$ <> "pocketdimension" And RN$ <> "dimension1499" Then 
 					If n\Idle Then
 						HideEntity(n\obj)
 						If Rand(50) = 1 And (BlinkTimer < -5 And BlinkTimer > -15) Then
@@ -6392,8 +6405,8 @@ Function RotateToDirection(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#3F#49#266#281#28E#38A#475#5CA#5E4#5F4#73D#745#751#7BD#858#978#97D#9B4
-;~F#A56#A91#B20#B8C#CA1#D6C#E23#ED6#FD5#FDE#10A3#10CA#10D5#10FD#1110#1718#1790#17A1#17BB#17CC
-;~F#17D6#17F4#1832#1853#1861#187D#188F#18B3#18D6#18E4
-;~B#197#1277#1311#13AA#155E#1669#1827#1883
+;~F#0#A#3F#49#266#28E#38A#481#5D6#5F0#600#749#751#75D#7C9#864#984#989#9C0#A62
+;~F#A9E#B2D#B99#CAE#D79#E30#EE3#FE2#FEB#10B0#10D7#10E2#110A#111D#1725#179D#17AE#17C8#17D9#17E3
+;~F#1801#183F#1860#186E#188A#189C#18C0#18E3#18F1
+;~B#197#1284#131E#13B7#156B#1676#1834#1890
 ;~C#Blitz3D
