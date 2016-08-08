@@ -565,6 +565,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[End Block]
 		Case NPCtype1048a
 			;[Block]
+			n\NVName = "SCP-1048-A"
 			n\obj =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
 			ScaleEntity n\obj, 0.05,0.05,0.05
 			SetAnimTime(n\obj, 2)
@@ -574,6 +575,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[End Block]
 		Case NPCtype1499
 			;[Block]
+			n\NVName = "Unidentified"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
@@ -4090,15 +4092,17 @@ Function UpdateNPCs()
 				prevFrame# = n\Frame
 				
 				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*2
-					For n2.NPCs = Each NPCs
-						If n2\NPCtype = n\NPCtype And n2 <> n
-							If n2\State = 1
-								n\State = 1
-								n\State2 = 0
-								Exit
+					If n\State = 0 Or n\State = 2
+						For n2.NPCs = Each NPCs
+							If n2\NPCtype = n\NPCtype And n2 <> n
+								If n2\State <> 0 And n2\State <> 2
+									n\State = 1
+									n\State2 = 0
+									Exit
+								EndIf
 							EndIf
-						EndIf
-					Next
+						Next
+					EndIf
 					
 					Select n\State
 						Case 0
@@ -4170,7 +4174,8 @@ Function UpdateNPCs()
 											;PlaySound_Strict NTF_1499FuckedSFX
 											
 											For n2.NPCs = Each NPCs
-												If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
+												;If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
+												If n2\NPCtype = n\NPCtype And n2 <> n
 													n2\State = 1
 													n2\State2 = 0
 												EndIf
@@ -4186,8 +4191,10 @@ Function UpdateNPCs()
 						Case 1 ;attacking the player
 							If NoTarget Then n\State = 0
 							
-							If Music(19)=0 Then Music(19) = LoadSound_Strict("SFX\Music\s_gasmask_comb.ogg")
-							ShouldPlay = 19
+							If PlayerRoom\RoomTemplate\Name = "dimension1499"
+								If Music(19)=0 Then Music(19) = LoadSound_Strict("SFX\Music\s_gasmask_comb.ogg")
+								ShouldPlay = 19
+							EndIf
 							
 							PointEntity n\obj,Collider
 							RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
@@ -4195,8 +4202,6 @@ Function UpdateNPCs()
 							dist = EntityDistance(n\Collider,Collider)
 							
 							If n\State2 = 0.0
-								If dist < 0.75 Then n\State2 = Rand(1,2)
-								
 								n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
 								
 								If (n\ID Mod 2 = 0) Then
@@ -4204,44 +4209,19 @@ Function UpdateNPCs()
 								Else
 									AnimateNPC(n,100,167,(n\CurrSpeed*28))
 								EndIf
-							Else
-								n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
-								If n\State2 = 1
-									AnimateNPC(n,63,100,0.6,False)
-									If prevFrame < 89 And n\Frame=>89
-										If dist > 0.75 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
-											;Miss
-										Else
-											Injuries = Injuries + Rnd(0.75,1.5)
-											PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
-											If Injuries > 10.0
-												Kill()
-												DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
-												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
-												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
-											EndIf
-										EndIf
-									ElseIf n\Frame => 99
-										n\State2 = 0.0
+							EndIf
+							
+							If dist < 0.75
+								If (n\ID Mod 2 = 0) Or n\State3 = 1
+									n\State2 = Rand(1,2)
+									n\State = 3
+									If n\State2 = 1
+										SetNPCFrame(n,63)
+									Else
+										SetNPCFrame(n,168)
 									EndIf
 								Else
-									AnimateNPC(n,168,202,0.6,False)
-									If prevFrame < 189 And n\Frame=>189
-										If dist > 1.0 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
-											;Miss
-										Else
-											Injuries = Injuries + Rnd(0.75,1.5)
-											PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
-											If Injuries > 10.0
-												Kill()
-												DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
-												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
-												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
-											EndIf
-										EndIf
-									ElseIf n\Frame => 201
-										n\State2 = 0.0
-									EndIf
+									n\State = 4
 								EndIf
 							EndIf
 						Case 2 ;play the "screaming animation" and switch to n\state2 after it's finished
@@ -4250,6 +4230,71 @@ Function UpdateNPCs()
 							
 							If n\Frame > 294.0 Then
 								n\State = n\State2
+							EndIf
+						Case 3 ;slashing at the player
+							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
+							dist = EntityDistance(n\Collider,Collider)
+							If n\State2 = 1
+								AnimateNPC(n,63,100,0.6,False)
+								If prevFrame < 89 And n\Frame=>89
+									If dist > 0.85 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
+										;Miss
+									Else
+										Injuries = Injuries + Rnd(0.75,1.5)
+										PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
+										If Injuries > 10.0
+											Kill()
+											If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
+												DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
+												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
+												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+											Else
+												DeathMSG = "A Class-D has been found heavily mutilated next to an unidentified creature in [REDACTED]. The creature was terminated by "
+												DeathMSG = DeathMSG + "the Nine Tailed Fox. It was identified to be an SCP-1499-1 instance. It is yet unknown how "
+												DeathMSG = DeathMSG + "the creature appeared in the facility, altough it seems to be a product of SCP-914."
+											EndIf
+										EndIf
+									EndIf
+								ElseIf n\Frame => 99
+									n\State2 = 0.0
+									n\State = 1
+								EndIf
+							Else
+								AnimateNPC(n,168,202,0.6,False)
+								If prevFrame < 189 And n\Frame=>189
+									If dist > 0.85 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
+										;Miss
+									Else
+										Injuries = Injuries + Rnd(0.75,1.5)
+										PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
+										If Injuries > 10.0
+											Kill()
+											If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
+												DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
+												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
+												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+											Else
+												DeathMSG = "A Class-D has been found heavily mutilated next to an unidentified creature in [REDACTED]. The creature was terminated by "
+												DeathMSG = DeathMSG + "the Nine Tailed Fox. It was identified to be an SCP-1499-1 instance. It is yet unknown how "
+												DeathMSG = DeathMSG + "the creature appeared in the facility, altough it seems to be a product of SCP-914."
+											EndIf
+										EndIf
+									EndIf
+								ElseIf n\Frame => 201
+									n\State2 = 0.0
+									n\State = 1
+								EndIf
+							EndIf
+						Case 4 ;standing in front of the player
+							dist = EntityDistance(n\Collider,Collider)
+							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
+							AnimateNPC(n,296,317,0.2)
+							
+							PointEntity n\obj,Collider
+							RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
+							
+							If dist > 0.85
+								n\State = 1
 							EndIf
 					End Select
 					

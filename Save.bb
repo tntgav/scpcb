@@ -1050,6 +1050,7 @@ Function LoadGameQuick(file$)
 	IsZombie% = False
 	DeafPlayer% = False
 	DeafTimer# = 0.0
+	UnableToMove% = False
 	Msg = ""
 	
 	PositionEntity Collider,0,1000.0,0,True

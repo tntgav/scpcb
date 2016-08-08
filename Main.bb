@@ -3094,6 +3094,7 @@ Function MouseLook()
 	
 	If WearingGasMask Or WearingHazmat Or Wearing1499 Then
 		If WearingGasMask = 2 Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
+		If Wearing1499 = 2 Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		If WearingHazmat = 2 Then 
 			Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		ElseIf WearingHazmat=1
@@ -3890,6 +3891,8 @@ Function DrawGUI()
 						If WearingNightVision=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "scp1499"
 						If Wearing1499=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
+					Case "super1499"
+						If Wearing1499=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
 				End Select
 			EndIf
 			
@@ -5025,7 +5028,7 @@ Function DrawGUI()
 						
 					EndIf
 				;new Items in SCP:CB 1.3
-				Case "scp1499"
+				Case "scp1499","super1499"
 					If (Not Wearing1499%) Then
 						GiveAchievement(Achv1499)
 						
@@ -5062,7 +5065,11 @@ Function DrawGUI()
 							EndIf
 						Next
 					EndIf
-					Wearing1499% = (Not Wearing1499%)
+					If SelectedItem\itemtemplate\tempname="super1499"
+						If Wearing1499%=0 Then Wearing1499% = 2 Else Wearing1499%=0
+					Else
+						Wearing1499% = (Not Wearing1499%)
+					EndIf
 					SelectedItem = Null
 				Case "badge"
 					If SelectedItem\itemtemplate\img=0 Then
@@ -6863,7 +6870,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "Gas Mask", "Heavy Gas Mask"
 			Select setting
 				Case "rough", "coarse"
-					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
@@ -6876,20 +6883,27 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "SCP-1499"
 				Select setting
 				Case "rough", "coarse"
-					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
 					it2 = CreateItem("Gas Mask", "gasmask", x, y, z)
 					RemoveItem(item)
-				Case "fine", "very fine"
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+				Case "fine"
+					it2 = CreateItem("SCP-1499", "super1499", x, y, z)
+					RemoveItem(item)
+				Case "very fine"
+					n.NPCs = CreateNPC(NPCtype1499,x,y,z)
+					n\State = 1
+					n\Sound = LoadSound_Strict("SFX\1499\1499_alarm.ogg")
+					n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
+					n\State3 = 1
+					RemoveItem(item)
 			End Select
 		Case "Ballistic Vest"
 			Select setting
 				Case "rough", "coarse"
-					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
@@ -6950,7 +6964,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "Night Vision Goggles"
 			Select setting
 				Case "rough", "coarse"
-					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
@@ -7018,7 +7032,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "First Aid Kit"
 			Select setting
 				Case "rough", "coarse"
-					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
 					it2 = CreateItem("Blue First Aid Kit", "firstaid2", x, y, z)
@@ -7031,7 +7045,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "Level 1 Key Card", "Level 2 Key Card", "Level 3 Key Card", "Level 4 Key Card", "Level 5 Key Card", "Key Card"
 			Select setting
 				Case "rough", "coarse"
-					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
 					it2 = CreateItem("Playing Card", "misc", x, y, z)
@@ -7185,7 +7199,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "Key Card Omni"
 			Select setting
 				Case "rough", "coarse"
-					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
 					If Rand(2)=1 Then
@@ -7201,7 +7215,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "Playing Card", "Mastercard", "Coin"
 			Select setting
 				Case "rough", "coarse"
-					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1", "fine", "very fine"
 					If Rand(4)=1 Then
@@ -8660,7 +8674,7 @@ Function UpdateLeave1499()
 				UpdateRooms()
 				For it.Items = Each Items
 					it\disttimer = 0
-					If it\itemtemplate\tempname = "scp1499"
+					If it\itemtemplate\tempname = "scp1499" Or it\itemtemplate\tempname = "super1499"
 						If EntityY(it\obj) >= EntityY(PlayerRoom\obj)-5
 							PositionEntity it\obj,NTF_1499PrevX#,NTF_1499PrevY#+(EntityY(it\obj)-EntityY(PlayerRoom\obj)),NTF_1499PrevZ#
 							ResetEntity it\obj

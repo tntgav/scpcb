@@ -1515,7 +1515,7 @@ End Function
 
 
 
-Function RowText(A$, X, Y, W, H, align% = 0, Leading#=5)
+Function RowText(A$, X, Y, W, H, align% = 0, Leading#=1)
 	;Display A$ starting at X,Y - no wider than W And no taller than H (all in pixels).
 	;Leading is optional extra vertical spacing in pixels
 	Local LinesShown = 0
