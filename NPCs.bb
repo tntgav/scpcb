@@ -629,6 +629,14 @@ Function RemoveNPC(n.NPCs)
 		n\obj4 = 0
 	EndIf
 	
+	If (n\SoundChn <> 0 And ChannelPlaying(n\SoundChn)) Then
+		StopChannel(n\SoundChn)
+	EndIf
+	
+	If n\SoundChn2 <> 0 And ChannelPlaying(n\SoundChn2) Then
+		StopChannel(n\SoundChn2)
+	EndIf
+	
 	If n\Sound<>0 Then FreeSound_Strict n\Sound
 	If n\Sound2<>0 Then FreeSound_Strict n\Sound2
 	
