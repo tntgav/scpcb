@@ -575,7 +575,10 @@ Function UpdateMainMenu()
 					
 					Color 100,100,100				
 					AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
-					DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)	
+					DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)
+					If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
+						DrawTooltip("Not available in this version")
+					EndIf
 					
 					y=y+30*MenuScale
 					
@@ -639,6 +642,9 @@ Function UpdateMainMenu()
 					;		TextureFloat# = -0.75
 					;End Select
 					AAText(x + 340 * MenuScale, y + MenuScale, "DISABLED")
+					If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+						DrawTooltip("Not available in this version")
+					EndIf
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -1583,7 +1589,18 @@ Function LimitText%(txt$, x%, y%, width%, usingAA%=True)
 	EndIf
 End Function
 
-
+Function DrawTooltip(message$)
+	Local scale# = GraphicHeight/768.0
+	
+	Local width = (AAStringWidth(message$))+20*MenuScale
+	
+	Color 25,25,25
+	Rect(ScaledMouseX()+20,ScaledMouseY(),width,19*scale,True)
+	Color 150,150,150
+	Rect(ScaledMouseX()+20,ScaledMouseY(),width,19*scale,False)
+	AASetFont Font1
+	AAText(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(12*MenuScale), message$, True, True)
+End Function
 
 
 

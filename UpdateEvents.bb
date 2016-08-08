@@ -129,6 +129,7 @@ Function UpdateEvents()
 						e\EventState=e\EventState+FPSfactor
 						
 						If e\EventState2 = 0 Then
+							CanSave = False
 							If e\EventState > 900 And e\room\RoomDoors[5]\open Then
 								If e\EventState - FPSfactor <= 900 Then 
 									e\room\NPC[1]\Sound = LoadSound_Strict("SFX\intro\173scene1.ogg")

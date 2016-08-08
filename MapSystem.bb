@@ -4611,6 +4611,11 @@ Function FillRoom(r.Rooms)
 			PositionEntity(d\buttons[0], r\x + 892.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 224.0 * RoomScale, True)
 			PositionEntity(d\buttons[1], r\x + 892.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 255.0 * RoomScale, True)
 			FreeEntity d\obj2 : d\obj2 = 0
+			
+			r\Objects[0] = LoadMesh_Strict("GFX\map\room3offices_hb.b3d",r\obj)
+			EntityPickMode r\Objects[0],2
+			EntityType r\Objects[0],HIT_MAP
+			EntityAlpha r\Objects[0],0.0
 			;[End Block]
 		Case "room2offices4"
 			;[Block]
@@ -4748,6 +4753,11 @@ Function FillRoom(r.Rooms)
 			;w2\connected[1] = w3 : w2\dist[1] = w3\dist[0]
 			
 			;r\MaxWayPointY# = 400.0*RoomScale
+			
+			r\Objects[22] = LoadMesh_Strict("GFX\map\room2sl_hb.b3d",r\obj)
+			EntityPickMode r\Objects[22],2
+			EntityType r\Objects[22],HIT_MAP
+			EntityAlpha r\Objects[22],0.0
 			;[End Block]
 		Case "room2_4"
 			;[Block]

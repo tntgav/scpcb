@@ -4538,6 +4538,7 @@ Function DrawGUI()
 						Msg = "Use keys 1-5 to change the channel"
 						MsgTimer = 70 * 5
 						RadioState(5) = 1
+						RadioState(0) = -1
 					EndIf
 					
 					strtemp$ = ""
@@ -4557,17 +4558,14 @@ Function DrawGUI()
 									ResumeChannel(RadioCHN(0))
 									;strtemp = "        USER TRACK PLAYER          "
 									strtemp = "        USER TRACK PLAYER - "
-									If (Not EnableUserTracks) Or UserTrackMusicAmount<1
+									If (Not EnableUserTracks)
 										If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
-										strtemp = strtemp + "NOT ENABLED          "
+										strtemp = strtemp + "NOT ENABLED     "
+									ElseIf UserTrackMusicAmount<1
+										If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
+										strtemp = strtemp + "NO TRACKS FOUND     "
 									Else
 										If (Not ChannelPlaying(RadioCHN(0)))
-											If (Not UserTrackMode)
-												RadioState(0) = Rand(0,UserTrackMusicAmount-1)
-											EndIf
-											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
-											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
-											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
 											If (Not UserTrackFlag%)
 												If UserTrackMode
 													If RadioState(0)<(UserTrackMusicAmount-1)
@@ -4576,9 +4574,15 @@ Function DrawGUI()
 														RadioState(0) = 0
 													EndIf
 													UserTrackFlag = True
+												Else
+													RadioState(0) = Rand(0,UserTrackMusicAmount-1)
 												EndIf
 											EndIf
+											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
+											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
+											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
 											DebugLog "CurrTrack: "+RadioState(0)
+											DebugLog UserTrackName$(RadioState(0))
 										Else
 											strtemp = strtemp + Upper(UserTrackName$(RadioState(0))) + "          "
 											UserTrackFlag = False
@@ -4586,12 +4590,6 @@ Function DrawGUI()
 										
 										If KeyHit(2) Then
 											PlaySound_Strict RadioSquelch
-											If (Not UserTrackMode)
-												RadioState(0) = Rand(0,UserTrackMusicAmount-1)
-											EndIf
-											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
-											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
-											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
 											If (Not UserTrackFlag%)
 												If UserTrackMode
 													If RadioState(0)<(UserTrackMusicAmount-1)
@@ -4600,9 +4598,15 @@ Function DrawGUI()
 														RadioState(0) = 0
 													EndIf
 													UserTrackFlag = True
+												Else
+													RadioState(0) = Rand(0,UserTrackMusicAmount-1)
 												EndIf
 											EndIf
+											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
+											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
+											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
 											DebugLog "CurrTrack: "+RadioState(0)
+											DebugLog UserTrackName$(RadioState(0))
 										EndIf
 									EndIf
 								Case 1 ;hälytyskanava
@@ -5310,11 +5314,14 @@ Function DrawMenu()
 					
 					y=y+30*MenuScale
 					
-					;Color 255,255,255				
-					;Text(x + 20 * MenuScale, y, "Enable bump mapping:")	
-					;BumpEnabled = DrawTick(x + 310 * MenuScale, y + MenuScale, BumpEnabled)	
-					;
-					;y=y+30*MenuScale
+					Color 100,100,100				
+					AAText(x, y, "Enable bump mapping:")	
+					DrawTick(x + 270 * MenuScale, y + MenuScale, False, True)
+					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
+						DrawTooltip("Not available in this version")
+					EndIf
+					
+					y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "VSync:")
@@ -5333,7 +5340,7 @@ Function DrawMenu()
 					AAText(x, y, "Enable room lights:")
 					EnableRoomLights = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableRoomLights)
 					
-					y=y+30+MenuScale
+					y=y+30*MenuScale
 					
 					;Local prevGamma# = ScreenGamma
 					ScreenGamma = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, ScreenGamma*50.0)/50.0)
@@ -5345,7 +5352,7 @@ Function DrawMenu()
 					;	UpdateScreenGamma()
 					;EndIf
 					
-					y=y+45*MenuScale
+					y=y+40*MenuScale
 					
 					Color 100,100,100
 					AAText(x, y, "Texture quality:")
@@ -5376,6 +5383,9 @@ Function DrawMenu()
 					;		TextureFloat# = -0.75
 					;End Select
 					AAText(x + 300 * MenuScale, y + MenuScale, "DISABLED")
+					If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+						DrawTooltip("Not available in this version")
+					EndIf
 					;[End Block]
 				Case 2 ;Audio
 					;Text(x+210*MenuScale,y,"AUDIO",True,True)
@@ -5394,6 +5404,36 @@ Function DrawMenu()
 					If (Not DeafPlayer) Then SFXVolume# = PrevSFXVolume#
 					Color 255,255,255
 					AAText(x, y, "Sound volume:")
+					
+					y = y + 30*MenuScale
+					
+					Color 100,100,100
+					AAText x, y, "Sound auto-release:"
+					EnableSFXRelease = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableSFXRelease,True)
+					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
+						DrawTooltip("Not available in-game")
+					EndIf
+					
+					y = y + 30*MenuScale
+					
+					Color 100,100,100
+					AAText x, y, "Enable user tracks:"
+					EnableUserTracks = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableUserTracks,True)
+					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
+						DrawTooltip("Not available in-game")
+					EndIf
+					
+					If EnableUserTracks
+						y = y + 30 * MenuScale
+						Color 255,255,255
+						AAText x, y, "User track mode:"
+						UserTrackMode = DrawTick(x + 270 * MenuScale, y + MenuScale, UserTrackMode)
+						If UserTrackMode
+							AAText x, y + 20 * MenuScale, "Repeat"
+						Else
+							AAText x, y + 20 * MenuScale, "Random"
+						EndIf
+					EndIf
 					;[End Block]
 				Case 3 ;Controls
 					;Text(x+210*MenuScale,y,"CONTROLS",True,True)
