@@ -33,7 +33,7 @@ Global SelectedInputBox%
 
 Global SavePath$ = "Saves\"
 
-;nykyisen tallennuksen nimi ja samalla miss‰ kansiossa tallennustiedosto sijaitsee saves-kansiossa
+;nykyisen tallennuksen nimi ja samalla miss√§ kansiossa tallennustiedosto sijaitsee saves-kansiossa
 Global CurrSave$
 
 Global SaveGameAmount%
@@ -867,6 +867,12 @@ Function UpdateMainMenu()
 							EndIf
 							Delete font
 						Next
+						If (Not AATextEnable) Then
+							FreeEntity AATextCam
+							For i%=0 To 149
+								FreeEntity AATextSprite[i]
+							Next
+						EndIf
 						InitAAFont()
 						Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
 						Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
