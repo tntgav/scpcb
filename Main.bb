@@ -5149,23 +5149,25 @@ Function DrawGUI()
 					
 			End Select
 			
-			If SelectedItem\itemtemplate\img <> 0
-				Local IN$ = SelectedItem\itemtemplate\tempname
-				If IN$ = "paper" Or IN$ = "badge" Or IN$ = "oldpaper" Or IN$ = "ticket" Then
-					For a_it.Items = Each Items
-						If a_it <> SelectedItem
-							Local IN2$ = a_it\itemtemplate\tempname
-							If IN2$ = "paper" Or IN2$ = "badge" Or IN2$ = "oldpaper" Or IN2$ = "ticket" Then
-								If a_it\itemtemplate\img<>0
-									If a_it\itemtemplate\img <> SelectedItem\itemtemplate\img
-										FreeImage(a_it\itemtemplate\img)
-										a_it\itemtemplate\img = 0
+			If SelectedItem <> Null Then
+				If SelectedItem\itemtemplate\img <> 0
+					Local IN$ = SelectedItem\itemtemplate\tempname
+					If IN$ = "paper" Or IN$ = "badge" Or IN$ = "oldpaper" Or IN$ = "ticket" Then
+						For a_it.Items = Each Items
+							If a_it <> SelectedItem
+								Local IN2$ = a_it\itemtemplate\tempname
+								If IN2$ = "paper" Or IN2$ = "badge" Or IN2$ = "oldpaper" Or IN2$ = "ticket" Then
+									If a_it\itemtemplate\img<>0
+										If a_it\itemtemplate\img <> SelectedItem\itemtemplate\img
+											FreeImage(a_it\itemtemplate\img)
+											a_it\itemtemplate\img = 0
+										EndIf
 									EndIf
 								EndIf
 							EndIf
-						EndIf
-					Next
-				EndIf
+						Next
+					EndIf
+				EndIf			
 			EndIf
 			
 			If MouseHit2 Then
