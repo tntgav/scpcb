@@ -1547,7 +1547,7 @@ Function UpdateNPCs()
 							;[End Block]
 						Case 2 ;being active
 							;[Block]
-							If dist < HideDistance*2.5 And (Not n\Idle) ;Checking if the player is in range
+							If (dist < HideDistance*2 Or n\InFacility<>1) And (Not n\Idle) ;Checking if the player is in range/if 049 is in facility/if 049 is not idle
 								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider)
 								PlayerSeeAble% = MeNPCSeesPlayer(n)
 								If PlayerSeeAble%=True Or n\State2>0 ;Player is visible for 049's sight - attacking
@@ -1853,18 +1853,20 @@ Function UpdateNPCs()
 									If Rand(50-(20*SelectedDifficulty\aggressiveNPCs))=1
 										For w.waypoints = Each WayPoints
 											If w\door=Null And w\room\dist < HideDistance And Rand(3)=1 Then
-												x = Abs(EntityX(n\Collider)-EntityX(w\obj,True))
-												If x < 12.0 And x > 4.0 Then
-													z = Abs(EntityZ(n\Collider)-EntityZ(w\obj,True))
-													If z < 12 And z > 4.0 Then
-														If w\room\dist > 4
-															DebugLog "MOVING 049 TO "+w\room\roomtemplate\name
-															PositionEntity n\Collider, EntityX(w\obj,True), EntityY(w\obj,True)+0.25,EntityZ(w\obj,True)
-															ResetEntity n\Collider
-															n\PathStatus = 0
-															n\PathTimer# = 0.0
-															n\PathLocation = 0
-															Exit
+												If EntityDistance(w\room\obj,n\Collider)<EntityDistance(Collider,n\Collider)
+													x = Abs(EntityX(n\Collider)-EntityX(w\obj,True))
+													If x < 12.0 And x > 4.0 Then
+														z = Abs(EntityZ(n\Collider)-EntityZ(w\obj,True))
+														If z < 12 And z > 4.0 Then
+															If w\room\dist > 4
+																DebugLog "MOVING 049 TO "+w\room\roomtemplate\name
+																PositionEntity n\Collider, EntityX(w\obj,True), EntityY(w\obj,True)+0.25,EntityZ(w\obj,True)
+																ResetEntity n\Collider
+																n\PathStatus = 0
+																n\PathTimer# = 0.0
+																n\PathLocation = 0
+																Exit
+															EndIf
 														EndIf
 													EndIf
 												EndIf

@@ -536,7 +536,12 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		
 	Next
 	
-	If rt\Name <> "173"
+	Local isavailRT% = True
+	If rt <> Null
+		If rt\Name = "173" Then isavailRT% = False
+	EndIf
+	
+	If isavailRT%
 		For i = 1 To CountSurfaces(Opaque)
 			surf = GetSurface(Opaque,i)
 			brush = GetSurfaceBrush(surf)

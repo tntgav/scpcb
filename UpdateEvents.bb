@@ -8800,6 +8800,12 @@ Function UpdateEvents()
 								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 								DebugLog "- SCP-096 enraged"
 							EndIf
+							
+							If EntityDistance(Curr096\Collider,e\room\obj)>EntityDistance(Curr096\Collider,Collider)
+								e\EventState = 2
+								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
+								DebugLog "- Room is too far away"
+							EndIf
 						EndIf
 						For e2.Events = Each Events
 							If e2\EventName = "room2servers"
