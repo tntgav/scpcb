@@ -12,12 +12,13 @@ Juanjpro saves the day again:
 - hopefully fixed room2sl's event (with saving)
 - new textures and icons for documents and notes
 - fixed checkpoint monitors
-- fixed collision bugS in room2sl and room3offices
+- fixed collision bugs in room2sl and room3offices
 - SCP-1499-1 AI improvements
 - SCP-106 and SCP-372 will no longer spawn in the SCP-1499 dimension
 - changes to the way SCP-049 spawns in room049
 - Emily Ross' badge and some items from SCP-1162 can now be put in the clipboard
-- more things are now affected by the ''Other Difficulty Factors'' setting
+- more things are now affected by the ''Other Difficulty Factors'' setting (including
+the speeds of some additional NPCs)
 - fixed MAVs in the 1048a event
 - sound volume setting is saved
 - loading/freeing documents is now handled better
