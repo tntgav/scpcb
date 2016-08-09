@@ -7104,124 +7104,113 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					Else
 						Select item\itemtemplate\name
 							Case "Level 1 Key Card"
-							Select SelectedDifficulty\otherFactors
-				    Case EASY
-							If Rand(3)=1 Then
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							Else
-								it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-							EndIf
-				    Case NORMAL
-							If Rand(2)=1 Then
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							Else
-								it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-				     		EndIf
-			         Case HARD
-							If Rand(3)=1 Then
-							     it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							EndIf
-							End Select
-							
-							Case "Level 2 Key Card"
-				 	     	Select SelectedDifficulty\otherFactors
-				    Case EASY
-							If Rand(3)=1 Then
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							Else
-								it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-							EndIf
-				    Case NORMAL
-							If Rand(2)=1 Then
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							Else
-								it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-							EndIf
-			         Case HARD
-							If Rand(3)=1 Then
-								it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							EndIf
-							End Select
-			     
-			     			Case "Level 3 Key Card"
-				 	     	Select SelectedDifficulty\otherFactors
-				    Case EASY
-							If Rand(20)=1 Then
-								it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							EndIf
-				    Case NORMAL
-							If Rand(40)=1 Then
-								it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							EndIf
-			         Case HARD
-							If Rand(60)=1 Then
-								it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							EndIf
-							End Select
-						
-							Case "Level 4 Key Card"
-				 	     	Select SelectedDifficulty\otherFactors
-				    Case EASY
-							If Rand(3)=1 Then
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							Else
-								it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-							EndIf
-				    Case NORMAL
-							If Rand(2)=1 Then
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							Else
-								it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-							EndIf
-			         Case HARD
-							If Rand(4)=1 Then
-								it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							EndIf
-							End Select
-							
-
-							Case "Level 5 Key Card"	
-							Select SelectedDifficulty\otherFactors
-						Case EASY
-							If Rand(5)=1 Then
-								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							EndIf
-						Case NORMAL
-							If Rand(7)=1 Then
-								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-							EndIf
-						Case HARD
-							If Rand(10)=1 Then
-								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-							Else
-								it2 = CreateItem("Mastercard", "misc", x, y, z)
-								EndIf
-							End Select
+								Select SelectedDifficulty\otherFactors
+									Case EASY
+										If Rand(3)=1 Then
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+										EndIf
+									Case NORMAL
+										If Rand(2)=1 Then
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+										EndIf
+									 Case HARD
+										If Rand(3)=1 Then
+											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
 								End Select
-					
+							Case "Level 2 Key Card"
+								Select SelectedDifficulty\otherFactors
+									Case EASY
+										If Rand(3)=1 Then
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+										EndIf
+									Case NORMAL
+										If Rand(2)=1 Then
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+										EndIf
+									 Case HARD
+										If Rand(3)=1 Then
+											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+								End Select
+			     			Case "Level 3 Key Card"
+								Select SelectedDifficulty\otherFactors
+									Case EASY
+										If Rand(20)=1 Then
+											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+									Case NORMAL
+										If Rand(40)=1 Then
+											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+									 Case HARD
+										If Rand(60)=1 Then
+											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+								End Select
+							Case "Level 4 Key Card"
+								Select SelectedDifficulty\otherFactors
+									Case EASY
+										If Rand(3)=1 Then
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+										EndIf
+									Case NORMAL
+										If Rand(2)=1 Then
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+										EndIf
+									 Case HARD
+										If Rand(4)=1 Then
+											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+								End Select
+							Case "Level 5 Key Card"	
+								Select SelectedDifficulty\otherFactors
+									Case EASY
+										If Rand(5)=1 Then
+											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+									Case NORMAL
+										If Rand(7)=1 Then
+											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+									Case HARD
+										If Rand(10)=1 Then
+											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+								End Select
+						End Select
 					EndIf
 				Case "very fine"
-					;If Rand(3)=1 Then
-					;	it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-					;Else	
-					;	it2 = CreateItem("Mastercard", "misc", x, y, z)
-					;EndIf
 					Select SelectedDifficulty\otherFactors
 						Case EASY
 							If Rand(5)=5 Then
