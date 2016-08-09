@@ -5720,6 +5720,8 @@ Function UpdateSecurityCams()
 						Else If SelectedMonitor = sc
 							SelectedMonitor = Null
 						EndIf
+					Else
+						SelectedMonitor = Null
 					EndIf
 					
 					If sc\State >= sc\RenderInterval Then

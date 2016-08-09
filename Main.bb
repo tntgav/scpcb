@@ -2209,7 +2209,7 @@ Repeat
 		UpdateCheckpoint1 = False
 		UpdateCheckpoint2 = False
 		
-		If (Not MenuOpen) And (Not InvOpen) And (OtherOpen=Null) And (SelectedDoor = Null) And (ConsoleOpen = False) And (Using294 = False) And (SelectedScreen = Null) And EndingTimer=>0 Then 
+		If (Not MenuOpen) And (Not InvOpen) And (OtherOpen=Null) And (SelectedDoor = Null) And (ConsoleOpen = False) And (Using294 = False) And (SelectedScreen = Null) And EndingTimer=>0 Then
 			LightVolume = CurveValue(TempLightVolume, LightVolume, 50.0)
 			CameraFogRange(Camera, CameraFogNear*LightVolume,CameraFogFar*LightVolume)
 			CameraFogColor(Camera, 0,0,0)
@@ -2376,8 +2376,12 @@ Repeat
 					Msg = "Find a lit up computer screen to save"
 					MsgTimer = 70 * 4						
 				Else
-					If PlayerRoom\RoomTemplate\Name = "exit1" Or PlayerRoom\RoomTemplate\Name = "173" Or PlayerRoom\RoomTemplate\Name = "gatea" Then
+					RN$ = PlayerRoom\RoomTemplate\Name$
+					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance"
 						Msg = "You can't save in this location"
+						MsgTimer = 70 * 4
+					ElseIf (Not CanSave)
+						Msg = "You can't save at this moment"
 						MsgTimer = 70 * 4
 					Else
 						SaveGame(SavePath + CurrSave + "\")
@@ -2388,7 +2392,7 @@ Repeat
 				MsgTimer = 70 * 4
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
-			If Msg<>"Game saved" Or MsgTimer<=0 Then
+			If (Msg<>"Game saved" And Msg<>"You can't save in this location" And Msg<>"You can't save at this moment") Or MsgTimer<=0 Then
 				Msg = "Press F5 to save"
 				MsgTimer = 70*5
 			EndIf
