@@ -3000,7 +3000,7 @@ Function MouseLook()
 		Local up# = (Sin(Shake) / (20.0+CrouchState*20.0))*0.6;, side# = Cos(Shake / 2.0) / 35.0		
 		Local roll# = Max(Min(Sin(Shake/2)*2.5*Min(Injuries+0.25,3.0),8.0),-8.0)
 		
-		;k‰‰nnet‰‰n kameraa sivulle jos pelaaja on vammautunut
+		;k√§√§nnet√§√§n kameraa sivulle jos pelaaja on vammautunut
 		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), Max(Min(up*30*Injuries,50),-50)
 		PositionEntity Camera, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
 		RotateEntity Camera, 0, EntityYaw(Collider), roll*0.5
@@ -3071,7 +3071,7 @@ Function MouseLook()
 		
 	EndIf
 	
-	;pˆlyhiukkasia
+	;p√∂lyhiukkasia
 	If Rand(35) = 1 Then
 		Local pvt% = CreatePivot()
 		PositionEntity(pvt, EntityX(Camera, True), EntityY(Camera, True), EntityZ(Camera, True))
@@ -4616,7 +4616,7 @@ Function DrawGUI()
 											DebugLog UserTrackName$(RadioState(0))
 										EndIf
 									EndIf
-								Case 1 ;h‰lytyskanava
+								Case 1 ;h√§lytyskanava
 									DebugLog RadioState(1) 
 									
 									ResumeChannel(RadioCHN(1))
@@ -4772,7 +4772,7 @@ Function DrawGUI()
 											If RadioCHN(Int(SelectedItem\state2)) <> 0 Then PauseChannel(RadioCHN(Int(SelectedItem\state2)))
 										EndIf
 										SelectedItem\state2 = i-2
-										;jos nykyist‰ kanavaa ollaan soitettu, laitetaan jatketaan toistoa samasta kohdasta
+										;jos nykyist√§ kanavaa ollaan soitettu, laitetaan jatketaan toistoa samasta kohdasta
 										If RadioCHN(SelectedItem\state2)<>0 Then ResumeChannel(RadioCHN(SelectedItem\state2))
 									EndIf
 								Next
@@ -5586,6 +5586,12 @@ Function DrawMenu()
 							EndIf
 							Delete font
 						Next
+						If (Not AATextEnable) Then
+							FreeEntity AATextCam
+							For i%=0 To 149
+								FreeEntity AATextSprite[i]
+							Next
+						EndIf
 						InitAAFont()
 						Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
 						Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
@@ -7627,7 +7633,7 @@ Function UpdateMTF%()
 	Local r.Rooms, n.NPCs
 	Local dist#, i%
 	
-	;mtf ei viel‰ spawnannut, spawnataan jos pelaaja menee tarpeeksi l‰helle gate b:t‰
+	;mtf ei viel√§ spawnannut, spawnataan jos pelaaja menee tarpeeksi l√§helle gate b:t√§
 	If MTFtimer = 0 Then
 		If Rand(30)=1 And PlayerRoom\RoomTemplate\Name$ <> "dimension1499" Then
 			
@@ -7830,11 +7836,11 @@ Function CircleToLineSegIsect% (cx#, cy#, r#, l1x#, l1y#, l2x#, l2y#)
 	
 	;Palauttaa:
 	;  True (1) kun:
-	;      Ympyr‰ [keskipiste = (cx, cy): s‰de = r]
+	;      Ympyr√§ [keskipiste = (cx, cy): s√§de = r]
 	;      leikkaa janan, joka kulkee pisteiden (l1x, l1y) & (l2x, l2y) kaitta
 	;  False (0) muulloin
 	
-	;Ympyr‰n keskipisteen ja (ainakin toisen) janan p‰‰tepisteen et‰isyys < r
+	;Ympyr√§n keskipisteen ja (ainakin toisen) janan p√§√§tepisteen et√§isyys < r
 	;-> leikkaus
 	If Distance(cx, cy, l1x, l1y) <= r Then
 		Return True
@@ -7844,7 +7850,7 @@ Function CircleToLineSegIsect% (cx#, cy#, r#, l1x#, l1y#, l2x#, l2y#)
 		Return True
 	EndIf	
 	
-	;Vektorit (janan vektori ja vektorit janan p‰‰tepisteist‰ ympyr‰n keskipisteeseen)
+	;Vektorit (janan vektori ja vektorit janan p√§√§tepisteist√§ ympyr√§n keskipisteeseen)
 	Local SegVecX# = l2x - l1x
 	Local SegVecY# = l2y - l1y
 	
@@ -7867,21 +7873,21 @@ Function CircleToLineSegIsect% (cx#, cy#, r#, l1x#, l1y#, l2x#, l2y#)
 		Return False
 	EndIf
 	
-	;Janan p‰‰tepisteiden kautta kulkevan suoran ;yht‰lˆ; (ax + by + c = 0)
+	;Janan p√§√§tepisteiden kautta kulkevan suoran ;yht√§l√∂; (ax + by + c = 0)
 	Local a# = (l2y - l1y) / (l2x - l1x)
 	Local b# = -1
 	Local c# = -(l2y - l1y) / (l2x - l1x) * l1x + l1y
 	
-	;Ympyr‰n keskipisteen et‰isyys suorasta
+	;Ympyr√§n keskipisteen et√§isyys suorasta
 	Local d# = Abs(a * cx + b * cy + c) / Sqr(a * a + b * b)
 	
-	;Ympyr‰ on liian kaukana
+	;Ympyr√§ on liian kaukana
 	;-> ei leikkausta
 	If d > r Then Return False
 	
 	;Local kateetin_pituus# = Cos(angle) * hyp
 	
-	;Jos p‰‰st‰‰n t‰nne saakka, ympyr‰ ja jana leikkaavat (tai ovat sis‰kk‰in)
+	;Jos p√§√§st√§√§n t√§nne saakka, ympyr√§ ja jana leikkaavat (tai ovat sis√§kk√§in)
 	Return True
 End Function
 
