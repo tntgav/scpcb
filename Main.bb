@@ -5149,11 +5149,31 @@ Function DrawGUI()
 					
 			End Select
 			
+			If SelectedItem\itemtemplate\img <> 0
+				Local IN$ = SelectedItem\itemtemplate\tempname
+				If IN$ = "paper" Or IN$ = "badge" Or IN$ = "oldpaper" Or IN$ = "ticket" Then
+					For a_it.Items = Each Items
+						If a_it <> SelectedItem
+							Local IN2$ = a_it\itemtemplate\tempname
+							If IN2$ = "paper" Or IN2$ = "badge" Or IN2$ = "oldpaper" Or IN2$ = "ticket" Then
+								If a_it\itemtemplate\img<>0
+									If a_it\itemtemplate\img <> SelectedItem\itemtemplate\img
+										FreeImage(a_it\itemtemplate\img)
+										a_it\itemtemplate\img = 0
+									EndIf
+								EndIf
+							EndIf
+						EndIf
+					Next
+				EndIf
+			EndIf
+			
 			If MouseHit2 Then
 				EntityAlpha Dark, 0.0
 				
-				Local IN$ = SelectedItem\itemtemplate\tempname
-				If IN$ = "paper" Or IN$ = "scp1025" Or IN$ = "badge" Or IN$ = "oldpaper" Then
+				IN$ = SelectedItem\itemtemplate\tempname
+				;If IN$ = "paper" Or IN$ = "scp1025" Or IN$ = "badge" Or IN$ = "oldpaper" Then
+				If IN$ = "scp1025" Then
 					If SelectedItem\itemtemplate\img<>0 Then FreeImage(SelectedItem\itemtemplate\img)
 					SelectedItem\itemtemplate\img=0
 				EndIf
@@ -5270,6 +5290,8 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
 				PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
 				PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
+				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
+				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 				
 				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -5546,6 +5568,29 @@ Function DrawMenu()
 					Else
 						CurrFrameLimit# = 0.0
 						Framelimit = 0
+					EndIf
+					
+					y = y + 50*MenuScale
+					
+					Color 255,255,255
+					AAText(x, y, "Antialiased text:")
+					AATextEnable% = DrawTick(x + 270 * MenuScale, y + MenuScale, AATextEnable%)
+					If AATextEnable_Prev% <> AATextEnable
+						For font.AAFont = Each AAFont
+							FreeFont font\lowResFont%
+							If (Not AATextEnable)
+								FreeTexture font\texture
+								FreeImage font\backup
+							EndIf
+							Delete font
+						Next
+						InitAAFont()
+						Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
+						Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
+						Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
+						Font4% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
+						;ReloadAAFont()
+						AATextEnable_Prev% = AATextEnable
 					EndIf
 					;[End Block]
 			End Select
