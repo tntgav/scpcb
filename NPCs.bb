@@ -4251,9 +4251,9 @@ Function UpdateNPCs()
 												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
 												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
 											Else
-												DeathMSG = "A Class-D has been found heavily mutilated next to an unidentified creature in [REDACTED]. The creature was terminated by "
-												DeathMSG = DeathMSG + "the Nine Tailed Fox. It was identified to be an SCP-1499-1 instance. It is yet unknown how "
-												DeathMSG = DeathMSG + "the creature appeared in the facility, altough it seems to be a product of SCP-914."
+												DeathMSG = "An unidentified male and a deceased Class D subject were discovered in [REDACTED] by the Nine Tailed Fox. "
+												DeathMSG = DeathMSG + "The man was described as highly agitated and seemed to only speak Russian. "
+												DeathMSG = DeathMSG + "He's been taken into a temporary holding area at [REDACTED] while waiting for a translator to arrive."
 											EndIf
 										EndIf
 									EndIf
@@ -4276,9 +4276,9 @@ Function UpdateNPCs()
 												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
 												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
 											Else
-												DeathMSG = "A Class-D has been found heavily mutilated next to an unidentified creature in [REDACTED]. The creature was terminated by "
-												DeathMSG = DeathMSG + "the Nine Tailed Fox. It was identified to be an SCP-1499-1 instance. It is yet unknown how "
-												DeathMSG = DeathMSG + "the creature appeared in the facility, altough it seems to be a product of SCP-914."
+												DeathMSG = "An unidentified male and a deceased Class D subject were discovered in [REDACTED] by the Nine Tailed Fox. "
+												DeathMSG = DeathMSG + "The man was described as highly agitated and seemed to only speak Russian. "
+												DeathMSG = DeathMSG + "He's been taken into a temporary holding area at [REDACTED] while waiting for a translator to arrive."
 											EndIf
 										EndIf
 									EndIf
