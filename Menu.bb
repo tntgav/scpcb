@@ -299,6 +299,8 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
 					PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
 					PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
+					PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
+					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 					
 					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -814,7 +816,7 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 7 ;Advanced
 					;[Block]
-					height = 180 * MenuScale
+					height = 200 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
@@ -849,6 +851,29 @@ Function UpdateMainMenu()
 					Else
 						CurrFrameLimit# = 0.0
 						Framelimit = 0
+					EndIf
+					
+					y = y + 50*MenuScale
+					
+					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Antialiased text:")
+					AATextEnable% = DrawTick(x + 310 * MenuScale, y + MenuScale, AATextEnable%)
+					If AATextEnable_Prev% <> AATextEnable
+						For font.AAFont = Each AAFont
+							FreeFont font\lowResFont%
+							If (Not AATextEnable)
+								FreeTexture font\texture
+								FreeImage font\backup
+							EndIf
+							Delete font
+						Next
+						InitAAFont()
+						Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
+						Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
+						Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
+						Font4% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
+						;ReloadAAFont()
+						AATextEnable_Prev% = AATextEnable
 					EndIf
 					
 					;y=y+60*MenuScale

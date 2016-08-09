@@ -429,9 +429,15 @@ Function RemoveItem(i.Items)
 				WearingHazmat = False	
 			Case "scp714"
 				Wearing714 = False
+			Case "scp1499","super1499"
+				Wearing1499 = False
 		End Select
 		
 		SelectedItem = Null
+	EndIf
+	If i\itemtemplate\img <> 0
+		FreeImage i\itemtemplate\img
+		i\itemtemplate\img = 0
 	EndIf
 	Delete i
 End Function

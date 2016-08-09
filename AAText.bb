@@ -4,6 +4,7 @@ Global AATextEnable% = GetINIInt(OptionFile, "options", "antialiased text")
 Global AASelectedFont%
 Global AATextCam%,AATextSprite%[150]
 Global AACharW%,AACharH%
+Global AATextEnable_Prev% = AATextEnable
 
 Global AACamViewW%,AACamViewH%
 
