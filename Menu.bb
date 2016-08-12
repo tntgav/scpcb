@@ -869,9 +869,9 @@ Function UpdateMainMenu()
 						Next
 						If (Not AATextEnable) Then
 							FreeEntity AATextCam
-							For i%=0 To 149
-								FreeEntity AATextSprite[i]
-							Next
+							;For i%=0 To 149
+							;	FreeEntity AATextSprite[i]
+							;Next
 						EndIf
 						InitAAFont()
 						Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
