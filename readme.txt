@@ -8,7 +8,7 @@
 
 				 www.scpcbgame.com
 
-				   VERSION 1.3.1
+				   VERSION 1.3.2
 								
 
 
@@ -22,6 +22,9 @@ http://creativecommons.org/licenses/by-sa/3.0/
 
 
 The source code of the game is available on GitHub: https://github.com/Regalis11/scpcb
+
+After you installed Blitz3D, you have to replace the bin folder with the bin folder that is in the
+"mavless_bin.zip" file. Otherwise you can't run the game properly.
 								
 
 **** HOW TO RUN IT **************************************

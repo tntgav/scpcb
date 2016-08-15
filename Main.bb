@@ -11,6 +11,13 @@ Include "fullscreen_window_fix.bb"
 
 Global OptionFile$ = "options.ini"
 
+Global ErrorFile$ = "error_log_"
+Local ErrorFileInd% = 0
+While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
+	ErrorFileInd = ErrorFileInd+1
+Wend
+ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
+
 Global Font1%, Font2%, Font3%, Font4%
 
 Global VersionNumber$ = "1.3.1"
@@ -2437,11 +2444,17 @@ Repeat
 				Color 0,0,0
 				AAText((GraphicWidth / 2)+1, (GraphicHeight / 2) + 201, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 				Color 255,255,255;Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255)
+				If Left(Msg,14)="Blitz3D Error!" Then
+					Color 255,0,0
+				EndIf
 				AAText((GraphicWidth / 2), (GraphicHeight / 2) + 200, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 			Else
 				Color 0,0,0
 				AAText((GraphicWidth / 2)+1, (GraphicHeight * 0.94) + 1, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 				Color 255,255,255;Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255)
+				If Left(Msg,14)="Blitz3D Error!" Then
+					Color 255,0,0
+				EndIf
 				AAText((GraphicWidth / 2), (GraphicHeight * 0.94), Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 			EndIf
 			MsgTimer=MsgTimer-FPSfactor2 
@@ -2494,12 +2507,32 @@ Repeat
 	EntityBlend fresize_image,1
 	EntityAlpha fresize_image,1.0
 	
+	Local errStr$ = ErrorLog()
+	Local errF%
+	If Len(errStr)>0 Then
+		If FileType(ErrorFile)=0 Then
+			errF = WriteFile(ErrorFile)
+		Else
+			errF = OpenFile(ErrorFile)
+			SeekFile errF,FileSize(ErrorFile)
+		EndIf
+		WriteLine errF,"***************"
+		While Len(errStr)>0
+			WriteLine errF,errStr
+			DebugLog errStr
+			errStr = ErrorLog()
+		Wend
+		
+		Msg = "Blitz3D Error! Details in "+Chr(34)+ErrorFile+Chr(34)
+		MsgTimer = 20*70
+		CloseFile errF
+	EndIf
+	
 	If Vsync = 0 Then
 		Flip 0
 	Else 
 		Flip 1
 	EndIf
-	
 Forever
 
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -5588,9 +5621,9 @@ Function DrawMenu()
 						Next
 						If (Not AATextEnable) Then
 							FreeEntity AATextCam
-							For i%=0 To 149
-								FreeEntity AATextSprite[i]
-							Next
+							;For i%=0 To 149
+							;	FreeEntity AATextSprite[i]
+							;Next
 						EndIf
 						InitAAFont()
 						Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
@@ -8639,6 +8672,7 @@ Function InitFastResize()
 	CameraClsMode cam, 0, 0
 	CameraRange cam, 0.1, 1.5
 	MoveEntity cam, 0, 0, -10000
+	
 	fresize_cam = cam
 	
     ;ark_sw = GraphicsWidth()
