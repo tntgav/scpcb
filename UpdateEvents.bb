@@ -129,6 +129,7 @@ Function UpdateEvents()
 						e\EventState=e\EventState+FPSfactor
 						
 						If e\EventState2 = 0 Then
+							CanSave = False
 							If e\EventState > 900 And e\room\RoomDoors[5]\open Then
 								If e\EventState - FPSfactor <= 900 Then 
 									e\room\NPC[1]\Sound = LoadSound_Strict("SFX\intro\173scene1.ogg")
@@ -247,13 +248,13 @@ Function UpdateEvents()
 						
 						If i = 0 Then PlaySound_Strict(LoadTempSound("SFX\Intro\PA\scripted\scripted6.ogg"))
 						
-						If (i>0 And i<22) Then
+						If (i>0 And i<23) Then
 							PlaySound_Strict(LoadTempSound("SFX\Intro\Commotion\Commotion"+i+".ogg"))
 						EndIf
 						
 							;If i = 21 Then DebugLog "Commotion21"
 						
-						If (i>23) Then
+						If (i>24) Then
 							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
 							If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
 							If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
@@ -1342,14 +1343,13 @@ Function UpdateEvents()
 						If e2\EventName = "008"
 							If e2\EventState = 2
 								If e\room\RoomDoors[0]\locked
-									MonitorTimer# = 0.0
-									TurnCheckpointMonitorsOff()
+									TurnCheckpointMonitorsOff(1)
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
 							Else
 								If e\room\dist < 12
-									UpdateCheckpointMonitors(0)
+									UpdateCheckpointMonitors(1)
 									e\room\RoomDoors[0]\locked = True
 									e\room\RoomDoors[1]\locked = True
 								EndIf
@@ -1361,14 +1361,13 @@ Function UpdateEvents()
 						If e2\EventName = "room2sl"
 							If e2\EventState3 = 0
 								If e\room\dist < 12
-									MonitorTimer# = 0.0
-									TurnCheckpointMonitorsOff()
+									TurnCheckpointMonitorsOff(0)
 									e\room\RoomDoors[0]\locked = False
 									e\room\RoomDoors[1]\locked = False
 								EndIf
 							Else
 								If e\room\dist < 12
-									UpdateCheckpointMonitors(1)
+									UpdateCheckpointMonitors(0)
 									e\room\RoomDoors[0]\locked = True
 									e\room\RoomDoors[1]\locked = True
 								EndIf
@@ -5107,42 +5106,25 @@ Function UpdateEvents()
 						
 						Select Floor(e\EventState)
 							Case 250.0
-								Msg = "''This work of art is the greatest I've seen in my entire life.''"
+								Msg = "Hey there!"
 								MsgTimer = 70*5
 							Case 500.0
-								Msg = "''But why do I see myself in it?''"
+								Msg = "If you're seeing this, post a bug report."
 								MsgTimer = 70*5
 							Case 700.0
-								Msg = "''What is this supposed to mean?''"
+								Msg = "Seriously, this SCP shouldn't spawn."
 								MsgTimer = 70*5
 							Case 800.0
 								BlinkTimer = -2
 								BlurTimer = 800
 							Case 1200.0
-								Msg = "''Now I understand.''"
+								Msg = "This event sucks."
+								MsgTimer = 70*5
+							Case 1400.0
+								Msg = "Thanks a lot, Juan."
 								MsgTimer = 70*5
 							Case 1500.0
-								Msg = "''I killed them.''"
-								MsgTimer = 70*5
-							Case 1750.0
-								Msg = "''This is my punishment, that is why I'm here.''"
-								MsgTimer = 70*5
-							Case 2000.0
-								Msg = "''Their lives are over, and it's all my fault.''"
-								MsgTimer = 70*5
-							Case 2050.0
-								BlinkTimer = -2
-								BlurTimer = 800
-							Case 2150.0
-								Msg = "''I'm sorry.''"
-								MsgTimer = 70*5
-							Case 2500.0
-								Msg = "You feel weak."
-								MsgTimer = 70*5
-								BlurTimer = 2500
-							Case 2600.0
-								DeathMSG = "Subject D-9341 was found catatonic in Test Room 4-A, where SCP-1074 was being studied before the containment breach occurred."
-								DeathMSG = DeathMSG+" Subject terminated after the breach ended."
+								DeathMSG = "God DAMMIT, Juan. What were you thinking?"
 								Kill()
 						End Select
 						If e\EventState >= 2500.0 Then
@@ -5984,20 +5966,39 @@ Function UpdateEvents()
 							;n\State = 2
 							;SetNPCFrame(n, 659)
 							;e\room\NPC[0]=n
+							
+							;For n.NPCs = Each NPCs
+							;	If n\NPCtype = NPCtype049
+							;		e\room\NPC[0]=n
+							;		e\room\NPC[0]\State = 0
+							;		SetNPCFrame(e\room\NPC[0],659)
+							;		PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True)
+							;		ResetEntity e\room\NPC[0]\Collider
+							;		Exit
+							;	EndIf
+							;Next
+							;If e\room\NPC[0]=Null
+							;	n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True), EntityZ(e\room\Objects[4],True))
+							;	PointEntity n\Collider, e\room\obj
+							;	SetNPCFrame(n, 659)
+							;	e\room\NPC[0]=n
+							;EndIf
+							
 							For n.NPCs = Each NPCs
 								If n\NPCtype = NPCtype049
 									e\room\NPC[0]=n
-									e\room\NPC[0]\State = 0
-									SetNPCFrame(e\room\NPC[0],659)
-									PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True)
+									e\room\NPC[0]\State = 2
+									e\room\NPC[0]\Idle = 1
+									PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+3,EntityZ(e\room\Objects[4],True)
 									ResetEntity e\room\NPC[0]\Collider
 									Exit
 								EndIf
 							Next
 							If e\room\NPC[0]=Null
-								n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True), EntityZ(e\room\Objects[4],True))
+								n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True)+3, EntityZ(e\room\Objects[4],True))
 								PointEntity n\Collider, e\room\obj
-								SetNPCFrame(n, 659)
+								n\State = 2
+								n\Idle = 1
 								e\room\NPC[0]=n
 							EndIf
 							
@@ -6021,7 +6022,32 @@ Function UpdateEvents()
 									
 									If e\Sound2=0 Then LoadEventSound(e,"SFX\generator.ogg",1)
 									e\SoundCHN2=LoopSound2(e\Sound2, e\SoundCHN2, Camera, e\room\Objects[8], 6.0, e\EventState3)
-								EndIf							
+									
+									If e\room\NPC[0]\Idle > 0
+										i = 0
+										If EntityDistance(Collider,e\room\RoomDoors[1]\frameobj)<3.0
+											i = 1
+										ElseIf EntityDistance(Collider,e\room\RoomDoors[3]\frameobj)<3.0
+											i = 3
+										EndIf
+										If i > 0
+											;If EntityVisible(Collider,e\room\RoomDoors[i]\frameobj)
+												PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[i],True),EntityY(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)
+												ResetEntity e\room\NPC[0]\Collider
+												PlaySound2(ElevatorBeepSFX, Camera, e\room\Objects[i], 4.0)
+												UseDoor(e\room\RoomDoors[i],False)
+												e\room\RoomDoors[i-1]\open = False
+												e\room\RoomDoors[i]\open = True
+												e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
+												PlaySound2(LoadTempSound("SFX\049\049_"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
+												e\room\NPC[0]\Idle = 0
+											;EndIf
+										EndIf
+									EndIf
+									If EntityVisible(Collider,e\room\NPC[0]\Collider)
+										GiveAchievement(Achv049)
+									EndIf
+								EndIf
 							EndIf
 							
 							If e\EventState < 70*190 Then 
@@ -6029,45 +6055,58 @@ Function UpdateEvents()
 								;049 spawns after 3 minutes
 								If e\EventState > 70*180 Then
 									
-									If e\room\NPC[0]=Null Then
-										For n.NPCs = Each NPCs
-											If n\NPCtype=NPCtype049 Then e\room\NPC[0]=n : Exit
-										Next
-									EndIf
-									e\room\NPC[0]\State = 1
+									;If e\room\NPC[0]=Null Then
+									;	For n.NPCs = Each NPCs
+									;		If n\NPCtype=NPCtype049 Then e\room\NPC[0]=n : Exit
+									;	Next
+									;EndIf
+									;e\room\NPC[0]\State = 1
 									
 									e\room\RoomDoors[4]\open = True
 									PlaySound_Strict TeslaPowerUpSFX
 									PlaySound2(OpenDoorSFX(0,Rand(0,2)),Camera, e\room\RoomDoors[4]\obj, 6.0)
 									
+									e\room\RoomDoors[1]\open = False
+									e\room\RoomDoors[3]\open = False
+									e\room\RoomDoors[0]\open = True
+									e\room\RoomDoors[2]\open = True
+									
 									e\EventState= 70*190
 								EndIf
 							ElseIf e\EventState < 70*240
-								GiveAchievement(Achv049)
+								;GiveAchievement(Achv049)
 								
-								If e\room\NPC[0]=Null Then
-									For n.NPCs = Each NPCs
-										If n\NPCtype=NPCtype049 Then e\room\NPC[0]=n : Exit
-									Next
-								Else
-									If EntityDistance(e\room\NPC[0]\Collider,Collider)<4.0 Then
-										e\EventState=e\EventState+FPSfactor
-										If e\EventState > 70*195 And e\EventState-FPSfactor =< 70*195 Then
-											For n.NPCs = Each NPCs ;awake the zombies
-												If n\NPCtype = NPCtypeZombie And n\State = 0 Then
-													n\State = 1
-													SetNPCFrame(n, 155)
-												EndIf
-											Next
-											PlaySound2(LoadTempSound("SFX\049\049_"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
-										ElseIf e\EventState > 70*214 And e\EventState-FPSfactor =< 70*214
-											PlaySound2(LoadTempSound("SFX\049\049_"+Rand(3,5)+".ogg"),Camera, e\room\NPC[0]\Collider)
-										ElseIf e\EventState > 70*227 And e\EventState-FPSfactor =< 70*227
-											PlaySound2(LoadTempSound("SFX\049\049_"+Rand(6,7)+".ogg"),Camera, e\room\NPC[0]\Collider)
-											e\EventState=70*241
-										EndIf
+								;If e\room\NPC[0]=Null Then
+								;	For n.NPCs = Each NPCs
+								;		If n\NPCtype=NPCtype049 Then e\room\NPC[0]=n : Exit
+								;	Next
+								;Else
+									;If EntityDistance(e\room\NPC[0]\Collider,Collider)<4.0 Then
+									;	e\EventState=e\EventState+FPSfactor
+									;	If e\EventState > 70*195 And e\EventState-FPSfactor =< 70*195 Then
+									;		For n.NPCs = Each NPCs ;awake the zombies
+									;			If n\NPCtype = NPCtypeZombie And n\State = 0 Then
+									;				n\State = 1
+									;				SetNPCFrame(n, 155)
+									;			EndIf
+									;		Next
+									;		;PlaySound2(LoadTempSound("SFX\049\049_"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
+									;	ElseIf e\EventState > 70*214 And e\EventState-FPSfactor =< 70*214
+									;		;PlaySound2(LoadTempSound("SFX\049\049_"+Rand(3,5)+".ogg"),Camera, e\room\NPC[0]\Collider)
+									;	ElseIf e\EventState > 70*227 And e\EventState-FPSfactor =< 70*227
+									;		;PlaySound2(LoadTempSound("SFX\049\049_"+Rand(6,7)+".ogg"),Camera, e\room\NPC[0]\Collider)
+									;		e\EventState=70*241
+									;	EndIf
+									;EndIf
+								;EndIf
+								
+								For n.NPCs = Each NPCs ;awake the zombies
+									If n\NPCtype = NPCtypeZombie And n\State = 0 Then
+										n\State = 1
+										SetNPCFrame(n, 155)
 									EndIf
-								EndIf
+								Next
+								e\EventState=70*241
 							EndIf
 						EndIf
 					EndIf
@@ -7747,14 +7786,16 @@ Function UpdateEvents()
 							EndIf
 					End Select 
 					
-					If PlayerRoom <> e\room Then
-						If e\EventState3>0 Then
-							e\EventState3 = e\EventState3+FPSfactor
-							
-							If e\EventState3>70*25 Then
-								FreeEntity(e\room\Objects[0])
-								e\room\Objects[0]=0
-								RemoveEvent(e)
+					If (e <> Null) Then
+						If PlayerRoom <> e\room Then
+							If e\EventState3>0 Then
+								e\EventState3 = e\EventState3+FPSfactor
+								
+								If e\EventState3>70*25 Then
+									FreeEntity(e\room\Objects[0])
+									e\room\Objects[0]=0
+									RemoveEvent(e)
+								EndIf
 							EndIf
 						EndIf
 					EndIf
@@ -7918,6 +7959,10 @@ Function UpdateEvents()
 				;e\EventState = A variable to determine the "nostalgia" items
 				;- 0.0 = No nostalgia item
 				;- 1.0 = Lost key
+				;- 2.0 = Disciplinary Hearing DH-S-4137-17092
+				;- 3.0 = Coin
+				;- 4.0 = Movie Ticket
+				;- 5.0 = Old Badge
 				;e\EventState2 = Defining which slot from the Inventory should be picked
 				;e\EventState3 = A check for if a item should be removed
 				;- 0.0 = no item "trade" will happen
@@ -8486,7 +8531,7 @@ Function UpdateEvents()
 						e\room\NPC[0]\PrevState = 2
 						
 						e\EventState = 1
-						e\EventState2 = -(70*5)
+						If e\EventState2 = 0 Then e\EventState2 = -(70*5)
 					EndIf
 				EndIf
 				;[End Block]
@@ -8532,7 +8577,7 @@ Function UpdateEvents()
 							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\AdjDoor[Adj2]\frameobj),EntityY(e\room\Objects[7],True),EntityZ(e\room\AdjDoor[Adj2]\frameobj)
 						EndIf
 						PointEntity e\room\NPC[0]\Collider,e\room\obj
-						MoveEntity e\room\NPC[0]\Collider,0,0,-2
+						MoveEntity e\room\NPC[0]\Collider,0,0,-1
 						ResetEntity e\room\NPC[0]\Collider
 						e\room\NPC[0]\PathX = EntityX(e\room\NPC[0]\Collider)
 						e\room\NPC[0]\PathZ = EntityZ(e\room\NPC[0]\Collider)
@@ -8554,14 +8599,26 @@ Function UpdateEvents()
 						e\room\NPC[0]\PathTimer# = 0.0
 						DebugLog "ccccccccc"
 					Else
-						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 2.0
-							If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 0.6
-								If (Not e\room\RoomDoors[0]\open)
-									e\room\RoomDoors[0]\open = True
-									sound=Rand(0, 2)
-									PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
-								EndIf
+						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 5.0
+							e\room\RoomDoors[0]\locked = True
+							e\room\RoomDoors[1]\locked = True
+							If e\room\NPC[0]\Reload = 0
+								PlaySound_Strict LoadTempSound("SFX\Doors\DoorOpen079.ogg")
+								DebugLog "079 - OPEN DOORS IN ROOM2SL"
+								e\room\NPC[0]\Reload = 1
 							EndIf
+							If (Not e\room\RoomDoors[0]\open)
+								e\room\RoomDoors[0]\open = True
+								sound=Rand(0, 2)
+								PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
+							EndIf
+							If (Not e\room\RoomDoors[1]\open)
+								e\room\RoomDoors[1]\open = True
+								sound=Rand(0, 2)
+								PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[1]\obj)
+							EndIf
+						EndIf
+						If e\room\NPC[0]\Reload = 1
 							e\room\NPC[0]\DropSpeed = 0
 						EndIf
 					EndIf
@@ -8576,7 +8633,7 @@ Function UpdateEvents()
 						DebugLog "fffffffff"
 					EndIf
 					
-					If MeNPCSeesPlayer(e\room\NPC[0])=2
+					If MeNPCSeesPlayer(e\room\NPC[0],True)=2
 						e\EventState2 = 4
 						DebugLog "ddddddddd"
 					EndIf
@@ -8586,14 +8643,11 @@ Function UpdateEvents()
 						If e\room\NPC[0]\PathTimer# = 0.0
 							;e\room\NPC[0]\PathTimer# = e\room\NPC[0]\PathTimer# + FPSfactor
 							If e\room\NPC[0]\PrevState = 1 Then
-								If (e\SoundCHN2 = 0) Then
-									e\Sound2 = LoadSound_Strict("SFX\049\room2slplaceholder.ogg")
-									e\SoundCHN2 = PlaySound2(e\Sound2, Camera, e\room\NPC[0]\Collider)
+								If (e\room\NPC[0]\SoundChn2 = 0) Then
+									e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\049\room2slplaceholder.ogg")
+									e\room\NPC[0]\SoundChn2 = PlaySound2(e\room\NPC[0]\Sound2, Camera, e\room\NPC[0]\Collider)
 								Else
-									If (ChannelPlaying(e\SoundCHN2)) Then
-										UpdateSoundOrigin2(e\SoundCHN2, Camera, e\room\NPC[0]\Collider)
-										
-									Else
+									If (Not ChannelPlaying(e\room\NPC[0]\SoundChn2))
 										e\room\NPC[0]\PathTimer# = 1.0
 									EndIf
 								EndIf
@@ -8624,23 +8678,6 @@ Function UpdateEvents()
 							e\room\NPC[0]\PathTimer# = 0.0
 							e\room\NPC[0]\State3 = e\room\NPC[0]\State3 + 1
 						EndIf
-					Else
-						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[1]\frameobj) < 1.1
-							If (Not e\room\RoomDoors[1]\open)
-								e\room\RoomDoors[1]\open = True
-								sound=Rand(0, 2)
-								PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[1]\obj)
-							EndIf
-						EndIf
-						If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 2.0
-							If EntityDistance(e\room\NPC[0]\Collider,e\room\RoomDoors[0]\frameobj) < 0.6
-								If (Not e\room\RoomDoors[0]\open)
-									e\room\RoomDoors[0]\open = True
-									sound=Rand(0, 2)
-									PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
-								EndIf
-							EndIf
-						EndIf
 					EndIf
 				ElseIf e\EventState2 = 4
 					If e\room\NPC[0]\State <> 5
@@ -8663,7 +8700,7 @@ Function UpdateEvents()
 						EndIf
 					Next
 				ElseIf e\EventState2 = 6
-					If MeNPCSeesPlayer(e\room\NPC[0]) Or e\room\NPC[0]\State2 > 0 Or e\room\NPC[0]\LastSeen > 0
+					If MeNPCSeesPlayer(e\room\NPC[0],True) Or e\room\NPC[0]\State2 > 0 Or e\room\NPC[0]\LastSeen > 0
 						DebugLog "fffffffff"
 						e\EventState2 = 7
 					Else
@@ -8678,16 +8715,58 @@ Function UpdateEvents()
 							e\EventState2 = 7
 						EndIf
 					EndIf
+				;ElseIf e\EventState2 = 7
+				;	e\room\RoomDoors[0]\locked = False
+				;	e\room\RoomDoors[1]\locked = False
+				;	e\EventState2 = 8
+				EndIf
+				
+				If e\room\NPC[0]<>Null
+					If e\EventState2 < 7
+						If e\EventState2 > 2
+							If Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(e\room\NPC[0]\Collider))>1.0
+								If Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(Collider))<1.0
+									If e\room\RoomDoors[0]\open
+										e\room\RoomDoors[0]\open = False
+										e\room\RoomDoors[0]\fastopen = 1
+										PlaySound_Strict LoadTempSound("SFX\Doors\DoorClose079.ogg")
+										DebugLog "079 - CLOSE DOOR AT HALLWAY IN ROOM2SL"
+									EndIf
+								EndIf
+							Else
+								If e\room\RoomDoors[0]\open = False
+									e\room\RoomDoors[0]\fastopen = 0
+									e\room\RoomDoors[0]\open = True
+									sound=Rand(0, 2)
+									PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
+									PlaySound_Strict LoadTempSound("SFX\Doors\DoorOpen079.ogg")
+									DebugLog "079 - OPEN DOOR AT HALLWAY IN ROOM2SL"
+								EndIf
+							EndIf
+						EndIf
+						
+						If e\EventState2 > 0 Then CanSave% = False
+					Else
+						If e\room\RoomDoors[0]\open = False
+							e\room\RoomDoors[0]\fastopen = 0
+							e\room\RoomDoors[0]\open = True
+							sound=Rand(0, 2)
+							PlaySound2(OpenDoorSFX(0,sound),Camera,e\room\RoomDoors[0]\obj)
+							PlaySound_Strict LoadTempSound("SFX\Doors\DoorOpen079.ogg")
+							DebugLog "079 - OPEN DOOR AT HALLWAY IN ROOM2SL"
+						EndIf
+					EndIf
 				EndIf
 				;[End Block]
 				
-				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint got locked again)
-				e\EventState3 = UpdateLever(e\room\Levers[0])
-				If e\EventState3 = 1 Then
-					UpdateCheckpointMonitors(1)
-				Else
-					MonitorTimer# = 0.0
-					TurnCheckpointMonitorsOff()
+				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint needs to be locked again)
+				If PlayerRoom = e\room
+					e\EventState3 = UpdateLever(e\room\Levers[0])
+					If e\EventState3 = 1 Then
+						UpdateCheckpointMonitors(0)
+					Else
+						TurnCheckpointMonitorsOff(0)
+					EndIf
 				EndIf
 				
 				;[End Block]
@@ -8720,6 +8799,12 @@ Function UpdateEvents()
 								e\EventState = 2
 								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 								DebugLog "- SCP-096 enraged"
+							EndIf
+							
+							If EntityDistance(Curr096\Collider,e\room\obj)>EntityDistance(Curr096\Collider,Collider)
+								e\EventState = 2
+								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
+								DebugLog "- Room is too far away"
 							EndIf
 						EndIf
 						For e2.Events = Each Events
@@ -8840,9 +8925,9 @@ Function UpdateEvents()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#13#10F#4F5#505#573#5E4#643#811#9F8#A1F#A2D#A37#A44#C2D#C4E#C9D#CEB#CF8#D32#D49
-;~F#D69#D72#D7C#D8B#E1F#E41#10ED#1133#1149#1155#1173#11C4#11DB#12A8#13A9#143A#1453#1472#14D7#14E4
-;~F#14FD#1595#174B#1831#1885#1936#19E6#1A9E#1AB6#1B77#1BA4#1BC1#1BE8#1C18#1C3C#1C64#1CBE#1CFE#1D2F#1D42
-;~F#1DFC#1E55#1E68#1E76#1E7F#1ECB#1EEC#1FD6#204F#212E#21EE#21F2
-;~B#1498#2160
+;~F#13#10F#4F5#505#571#5E2#641#80F#9F6#A1D#A2B#A35#A42#C2B#C4C#C9B#CE9#CF6#D30#D47
+;~F#D67#D70#D7A#D89#E1D#E3F#10EB#1131#1147#1153#1171#11C2#11D9#12A6#13A7#1427#1440#145F#14C4#14D1
+;~F#14EA#1582#1857#18AB#195C#1A0C#1AC4#1ADC#1B9D#1BCA#1BE7#1C0E#1C3E#1C62#1C8A#1CE4#1D24#1D55#1D68#1E22
+;~F#1E7D#1E90#1E9E#1EF3#1F14#2002#2075#207B#215A#2244#2248
+;~B#1498#2199
 ;~C#Blitz3D

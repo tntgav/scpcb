@@ -6,11 +6,7 @@ This game and the source code are licensed under Creative Commons Attribution-Sh
 
 http://creativecommons.org/licenses/by-sa/3.0/
 
-Requirements
-•	Blitz3D v1.106
-•	FastExt.bb (needs to be version 1.17)
-•	FastExt.dll (is included in SCP:CB)
-
-Note: Due to Blitz3D and FastExt.bb (the non-trial version) requiring paid-for licenses, they aren't included in the repository. You have to acquire them yourself.
+Requirements:
+•	Blitz3D v1.108
 
 Beware - the source code is perhaps more horrifying than the game itself!

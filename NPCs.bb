@@ -82,20 +82,22 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "scale") / MeshDepth(n\obj))			
 			ScaleEntity n\obj, temp,temp,temp
 			
-			If BumpEnabled Then 		
-				diff1 = LoadTexture_Strict("GFX\npcs\173texture.png")
-				bump1 = LoadTexture_Strict("GFX\npcs\173_norm.jpg")
-				spec1 = LoadTexture_Strict("GFX\npcs\173_spec.jpg")
-				TextureBlend bump1, FE_BUMP
-				TextureBlend spec1, FE_SPECULAR0
-				
-				EntityTexture n\obj, spec1, 0, 0
-				EntityTexture n\obj, bump1, 0, 1
-				EntityTexture n\obj, diff1, 0, 2
-				FreeTexture diff1
-				FreeTexture bump1
-				FreeTexture spec1
-			EndIf
+			;If BumpEnabled Then 		
+			;	diff1 = LoadTexture_Strict("GFX\npcs\173texture.png") 
+			;	bump1 = LoadTexture_Strict("GFX\npcs\173_norm.jpg")
+			;	;spec1 = LoadTexture_Strict("GFX\npcs\173_spec.jpg")
+			;	TextureBlend bump1, 4
+			;	;TextureBlend spec1, FE_SPECULAR0
+			;	
+			;	;EntityTexture n\obj, spec1, 0, 0
+			;	EntityTexture n\obj, bump1, 0, 0
+			;	EntityTexture n\obj, diff1, 0, 1
+			;	FreeTexture diff1
+			;	FreeTexture bump1
+			;	
+			;	;FreeTexture spec1
+			;EndIf
+			;UpdateNormals n\obj
 			
 			;SetAnimTime n\obj, 68	
 			
@@ -118,17 +120,17 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\106_2.b3d")
 			
-			If BumpEnabled Then 		
-				diff1 = LoadTexture_Strict("GFX\npcs\106_diffuse.png")
-				bump1 = LoadTexture_Strict("GFX\npcs\106_normals.png")
-				TextureBlend bump1, FE_BUMP
-				;TextureBlend di1, FE_SPECULAR0
-				
-				EntityTexture n\obj, bump1, 0, 0
-				EntityTexture n\obj, diff1, 0, 1
-				FreeTexture diff1
-				FreeTexture bump1
-			EndIf
+			;If BumpEnabled Then 		
+			;	diff1 = LoadTexture_Strict("GFX\npcs\106_diffuse.png")
+			;	bump1 = LoadTexture_Strict("GFX\npcs\106_normals.png")
+			;	;TextureBlend bump1, FE_BUMP ;USE DOT3
+			;	;TextureBlend di1, FE_SPECULAR0
+			;	
+			;	;EntityTexture n\obj, bump1, 0, 0
+			;	EntityTexture n\obj, diff1, 0, 1
+			;	FreeTexture diff1
+			;	FreeTexture bump1
+			;EndIf
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-106", "scale") / 2.2)		
 			ScaleEntity n\obj, temp, temp, temp
@@ -436,33 +438,33 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			If n\obj = 0 Then 
 				n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-939.b3d")
 				
-				If BumpEnabled Then
-					bump1 = LoadTexture_Strict("GFX\npcs\scp-939_licker_normal.png")
-					TextureBlend bump1, FE_BUMP
-					
-					For i = 2 To CountSurfaces(n\obj)
-						sf = GetSurface(n\obj,i)
-						b = GetSurfaceBrush( sf )
-						If b<>0 Then
-							t1 = GetBrushTexture(b,0)
-							If t1<>0 Then
-								Select Lower(StripPath(TextureName(t1)))
-									Case "scp-939-licker_diffusetest01.png"
-										
-										BrushTexture b, bump1, 0, 0
-										BrushTexture b, t1, 0, 1
-										PaintSurface sf,b
-										
-				                  ;If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
-				                  ;FreeBrush b   
-								End Select
-								FreeTexture t1
-							EndIf
-							FreeBrush b
-						EndIf
-					Next
-					FreeTexture bump1
-				EndIf
+				;If BumpEnabled Then
+				;	bump1 = LoadTexture_Strict("GFX\npcs\scp-939_licker_normal.png")
+				;	;TextureBlend bump1, FE_BUMP ;USE DOT3
+				;	
+				;	For i = 2 To CountSurfaces(n\obj)
+				;		sf = GetSurface(n\obj,i)
+				;		b = GetSurfaceBrush( sf )
+				;		If b<>0 Then
+				;			t1 = GetBrushTexture(b,0)
+				;			If t1<>0 Then
+				;				Select Lower(StripPath(TextureName(t1)))
+				;					Case "scp-939-licker_diffusetest01.png"
+				;						
+				;						;BrushTexture b, bump1, 0, 0
+				;						BrushTexture b, t1, 0, 1
+				;						PaintSurface sf,b
+				;						
+				;                  ;If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
+				;                  ;FreeBrush b   
+				;				End Select
+				;				FreeTexture t1
+				;			EndIf
+				;			FreeBrush b
+				;		EndIf
+				;	Next
+				;	FreeTexture bump1
+				;EndIf
 				
 				temp# = GetINIFloat("DATA\NPCs.ini", "SCP-939", "scale")/2.5
 				ScaleEntity n\obj, temp, temp, temp		
@@ -481,16 +483,15 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			temp# = GetINIFloat("DATA\NPCs.ini", "SCP-066", "scale")/2.5
 			ScaleEntity n\obj, temp, temp, temp		
 			
-			If BumpEnabled Then 
-				diff1 = LoadTexture_Strict("GFX\npcs\scp-066_diffuse01.png")
-				bump1 = LoadTexture_Strict("GFX\npcs\scp-066_normal.png")
-				TextureBlend bump1, FE_BUMP
-				TextureBlend spec1, FE_SPECULAR0
-				EntityTexture n\obj, bump1, 0, 1
-				EntityTexture n\obj, diff1, 0, 2
-				FreeTexture diff1
-				FreeTexture bump1
-			EndIf
+			;If BumpEnabled Then 
+			;	diff1 = LoadTexture_Strict("GFX\npcs\scp-066_diffuse01.png")
+			;	bump1 = LoadTexture_Strict("GFX\npcs\scp-066_normal.png")
+			;	;TextureBlend bump1, FE_BUMP ;USE DOT3
+			;	EntityTexture n\obj, bump1, 0, 1
+			;	EntityTexture n\obj, diff1, 0, 2
+			;	FreeTexture diff1
+			;	FreeTexture bump1
+			;EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-066", "speed") / 100.0)
 			;[End Block]
@@ -564,6 +565,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[End Block]
 		Case NPCtype1048a
 			;[Block]
+			n\NVName = "SCP-1048-A"
 			n\obj =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
 			ScaleEntity n\obj, 0.05,0.05,0.05
 			SetAnimTime(n\obj, 2)
@@ -573,6 +575,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[End Block]
 		Case NPCtype1499
 			;[Block]
+			n\NVName = "Unidentified"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
@@ -601,6 +604,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 	
 	ResetEntity(n\Collider)
 	
+	n\ID = 0
 	n\ID = FindFreeNPCID()
 	
 	DebugLog ("Created NPC "+n\NVName+" (ID: "+n\ID+")")
@@ -627,6 +631,14 @@ Function RemoveNPC(n.NPCs)
 		n\obj4 = 0
 	EndIf
 	
+	If (n\SoundChn <> 0 And ChannelPlaying(n\SoundChn)) Then
+		StopChannel(n\SoundChn)
+	EndIf
+	
+	If n\SoundChn2 <> 0 And ChannelPlaying(n\SoundChn2) Then
+		StopChannel(n\SoundChn2)
+	EndIf
+	
 	If n\Sound<>0 Then FreeSound_Strict n\Sound
 	If n\Sound2<>0 Then FreeSound_Strict n\Sound2
 	
@@ -639,7 +651,7 @@ End Function
 
 Function UpdateNPCs()
 	Local n.NPCs, n2.NPCs, d.Doors, de.Decals, r.Rooms, eo.ElevatorObj, eo2.ElevatorObj
-	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%
+	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%, RN$
 	
 	Local target
 	
@@ -912,7 +924,19 @@ Function UpdateNPCs()
 					
 					dist = EntityDistance(n\Collider, Collider)
 					
-					If (Not n\Idle) Then
+					Local spawn106% = True
+					If PlayerRoom\RoomTemplate\Name$ = "dimension1499" Then spawn106% = False
+					For e.Events = Each Events
+						If e\EventName = "room860"
+							If e\EventState = 1
+								spawn106% = False
+							EndIf
+							Exit
+						EndIf
+					Next
+					If (Not spawn106%) And n\State <= 0 Then n\State = Rand(22000, 27000)
+					
+					If (Not n\Idle) And spawn106%
 						If n\State <= 0 Then	;attacking	
 							If EntityY(n\Collider) < EntityY(Collider) - 20.0 - 0.55 Then
 								If Not PlayerRoom\RoomTemplate\DisableDecals Then
@@ -1490,7 +1514,9 @@ Function UpdateNPCs()
 				n\BlinkTimer# = 1.0
 				
 				If n\Idle > 0.1
-					n\Idle = Max(n\Idle-(1+SelectedDifficulty\aggressiveNPCs)*FPSfactor,0.1)
+					If PlayerRoom\RoomTemplate\Name$ <> "room049"
+						n\Idle = Max(n\Idle-(1+SelectedDifficulty\aggressiveNPCs)*FPSfactor,0.1)
+					EndIf
 					n\DropSpeed = 0
 					If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
 					If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
@@ -1521,7 +1547,7 @@ Function UpdateNPCs()
 							;[End Block]
 						Case 2 ;being active
 							;[Block]
-							If dist < HideDistance*2.5 And (Not n\Idle) ;Checking if the player is in range
+							If (dist < HideDistance*2 Or n\InFacility<>1) And (Not n\Idle) ;Checking if the player is in range/if 049 is in facility/if 049 is not idle
 								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider)
 								PlayerSeeAble% = MeNPCSeesPlayer(n)
 								If PlayerSeeAble%=True Or n\State2>0 ;Player is visible for 049's sight - attacking
@@ -1827,18 +1853,20 @@ Function UpdateNPCs()
 									If Rand(50-(20*SelectedDifficulty\aggressiveNPCs))=1
 										For w.waypoints = Each WayPoints
 											If w\door=Null And w\room\dist < HideDistance And Rand(3)=1 Then
-												x = Abs(EntityX(n\Collider)-EntityX(w\obj,True))
-												If x < 12.0 And x > 4.0 Then
-													z = Abs(EntityZ(n\Collider)-EntityZ(w\obj,True))
-													If z < 12 And z > 4.0 Then
-														If w\room\dist > 4
-															DebugLog "MOVING 049 TO "+w\room\roomtemplate\name
-															PositionEntity n\Collider, EntityX(w\obj,True), EntityY(w\obj,True)+0.25,EntityZ(w\obj,True)
-															ResetEntity n\Collider
-															n\PathStatus = 0
-															n\PathTimer# = 0.0
-															n\PathLocation = 0
-															Exit
+												If EntityDistance(w\room\obj,n\Collider)<EntityDistance(Collider,n\Collider)
+													x = Abs(EntityX(n\Collider)-EntityX(w\obj,True))
+													If x < 12.0 And x > 4.0 Then
+														z = Abs(EntityZ(n\Collider)-EntityZ(w\obj,True))
+														If z < 12 And z > 4.0 Then
+															If w\room\dist > 4
+																DebugLog "MOVING 049 TO "+w\room\roomtemplate\name
+																PositionEntity n\Collider, EntityX(w\obj,True), EntityY(w\obj,True)+0.25,EntityZ(w\obj,True)
+																ResetEntity n\Collider
+																n\PathStatus = 0
+																n\PathTimer# = 0.0
+																n\PathLocation = 0
+																Exit
+															EndIf
 														EndIf
 													EndIf
 												EndIf
@@ -1871,7 +1899,7 @@ Function UpdateNPCs()
 						Case 5 ;used for "room2sl"
 							;[Block]
 							n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider)
-							PlayerSeeAble% = MeNPCSeesPlayer(n)
+							PlayerSeeAble% = MeNPCSeesPlayer(n,True)
 							If PlayerSeeAble% = True
 								n\State = 2
 								n\PathStatus = 0
@@ -2643,7 +2671,8 @@ Function UpdateNPCs()
 				;[End Block]
 			Case NPCtype372 ;------------------------------------------------------------------------------------------------------------------
 				;[Block]
-				If PlayerRoom\RoomTemplate\Name <> "pocketdimension" Then 
+				RN$ = PlayerRoom\RoomTemplate\Name
+				If RN$ <> "pocketdimension" And RN$ <> "dimension1499" Then 
 					If n\Idle Then
 						HideEntity(n\obj)
 						If Rand(50) = 1 And (BlinkTimer < -5 And BlinkTimer > -15) Then
@@ -4065,15 +4094,17 @@ Function UpdateNPCs()
 				prevFrame# = n\Frame
 				
 				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*2
-					For n2.NPCs = Each NPCs
-						If n2\NPCtype = n\NPCtype And n2 <> n
-							If n2\State = 1
-								n\State = 1
-								n\State2 = 0
-								Exit
+					If n\State = 0 Or n\State = 2
+						For n2.NPCs = Each NPCs
+							If n2\NPCtype = n\NPCtype And n2 <> n
+								If n2\State <> 0 And n2\State <> 2
+									n\State = 1
+									n\State2 = 0
+									Exit
+								EndIf
 							EndIf
-						EndIf
-					Next
+						Next
+					EndIf
 					
 					Select n\State
 						Case 0
@@ -4145,7 +4176,8 @@ Function UpdateNPCs()
 											;PlaySound_Strict NTF_1499FuckedSFX
 											
 											For n2.NPCs = Each NPCs
-												If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
+												;If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
+												If n2\NPCtype = n\NPCtype And n2 <> n
 													n2\State = 1
 													n2\State2 = 0
 												EndIf
@@ -4161,15 +4193,16 @@ Function UpdateNPCs()
 						Case 1 ;attacking the player
 							If NoTarget Then n\State = 0
 							
-							If Music(19)=0 Then Music(19) = LoadSound_Strict("SFX\Music\s_gasmask_comb.ogg")
-							ShouldPlay = 19
+							If PlayerRoom\RoomTemplate\Name = "dimension1499"
+								If Music(19)=0 Then Music(19) = LoadSound_Strict("SFX\Music\s_gasmask_comb.ogg")
+								ShouldPlay = 19
+							EndIf
 							
 							PointEntity n\obj,Collider
 							RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
 							
 							dist = EntityDistance(n\Collider,Collider)
 							
-							If dist < 0.75 Then n\State2 = 1.0
 							If n\State2 = 0.0
 								n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
 								
@@ -4178,24 +4211,19 @@ Function UpdateNPCs()
 								Else
 									AnimateNPC(n,100,167,(n\CurrSpeed*28))
 								EndIf
-							Else
-								n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
-								AnimateNPC(n,63,100,0.6,False)
-								If prevFrame < 89 And n\Frame=>89
-									If dist > 1.0 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
-										;Miss
+							EndIf
+							
+							If dist < 0.75
+								If (n\ID Mod 2 = 0) Or n\State3 = 1
+									n\State2 = Rand(1,2)
+									n\State = 3
+									If n\State2 = 1
+										SetNPCFrame(n,63)
 									Else
-										Injuries = Injuries + Rnd(0.75,1.5)
-										PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
-										If Injuries > 10.0
-											Kill()
-											DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
-											DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
-											DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
-										EndIf
+										SetNPCFrame(n,168)
 									EndIf
-								ElseIf n\Frame => 99
-									n\State2 = 0.0
+								Else
+									n\State = 4
 								EndIf
 							EndIf
 						Case 2 ;play the "screaming animation" and switch to n\state2 after it's finished
@@ -4204,6 +4232,71 @@ Function UpdateNPCs()
 							
 							If n\Frame > 294.0 Then
 								n\State = n\State2
+							EndIf
+						Case 3 ;slashing at the player
+							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
+							dist = EntityDistance(n\Collider,Collider)
+							If n\State2 = 1
+								AnimateNPC(n,63,100,0.6,False)
+								If prevFrame < 89 And n\Frame=>89
+									If dist > 0.85 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
+										;Miss
+									Else
+										Injuries = Injuries + Rnd(0.75,1.5)
+										PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
+										If Injuries > 10.0
+											Kill()
+											If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
+												DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
+												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
+												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+											Else
+												DeathMSG = "An unidentified male and a deceased Class D subject were discovered in [REDACTED] by the Nine Tailed Fox. "
+												DeathMSG = DeathMSG + "The man was described as highly agitated and seemed to only speak Russian. "
+												DeathMSG = DeathMSG + "He's been taken into a temporary holding area at [REDACTED] while waiting for a translator to arrive."
+											EndIf
+										EndIf
+									EndIf
+								ElseIf n\Frame => 99
+									n\State2 = 0.0
+									n\State = 1
+								EndIf
+							Else
+								AnimateNPC(n,168,202,0.6,False)
+								If prevFrame < 189 And n\Frame=>189
+									If dist > 0.85 Or Abs(DeltaYaw(n\Collider,Collider))>60.0
+										;Miss
+									Else
+										Injuries = Injuries + Rnd(0.75,1.5)
+										PlaySound2(LoadTempSound("SFX\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
+										If Injuries > 10.0
+											Kill()
+											If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
+												DeathMSG = "All personnel situated within Evacuation Shelter LC-2 during the breach have been administered "
+												DeathMSG = DeathMSG + "Class-B amnestics due to Incident 1499-E. The Class D subject involved in the event "
+												DeathMSG = DeathMSG + "died shortly after being shot by Agent [REDACTED]."
+											Else
+												DeathMSG = "An unidentified male and a deceased Class D subject were discovered in [REDACTED] by the Nine Tailed Fox. "
+												DeathMSG = DeathMSG + "The man was described as highly agitated and seemed to only speak Russian. "
+												DeathMSG = DeathMSG + "He's been taken into a temporary holding area at [REDACTED] while waiting for a translator to arrive."
+											EndIf
+										EndIf
+									EndIf
+								ElseIf n\Frame => 201
+									n\State2 = 0.0
+									n\State = 1
+								EndIf
+							EndIf
+						Case 4 ;standing in front of the player
+							dist = EntityDistance(n\Collider,Collider)
+							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
+							AnimateNPC(n,296,317,0.2)
+							
+							PointEntity n\obj,Collider
+							RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
+							
+							If dist > 0.85
+								n\State = 1
 							EndIf
 					End Select
 					
@@ -4305,7 +4398,7 @@ Function OtherNPCSeesMeNPC%(me.NPCs,other.NPCs)
 	Return False
 End Function
 
-Function MeNPCSeesPlayer%(me.NPCs)
+Function MeNPCSeesPlayer%(me.NPCs,disablesoundoncrouch%=False)
 	;Return values:
 		;False (=0): Player is not detected anyhow
 		;True (=1): Player is detected by vision
@@ -4324,7 +4417,11 @@ Function MeNPCSeesPlayer%(me.NPCs)
 			If (Abs(DeltaYaw(me\Collider,Collider))>60.0) And EntityVisible(me\Collider,Collider)
 				Return 1
 			ElseIf (Not EntityVisible(me\Collider,Collider))
-				Return 2
+				If disablesoundoncrouch% And Crouch%
+					Return False
+				Else
+					Return 2
+				EndIf
 			EndIf
 		Else
 			If (Abs(DeltaYaw(me\Collider,Collider))>60.0) Then Return False
@@ -6088,7 +6185,7 @@ Function ForceSetNPCID(n.NPCs, newID%)
 	n\ID = newID
 	
 	For n2.NPCs = Each NPCs
-		If n2 <> n And n\ID = newID Then
+		If n2 <> n And n2\ID = newID Then
 			n2\id = FindFreeNPCID()
 		EndIf
 	Next
@@ -6222,7 +6319,7 @@ End Function
 Function NPCSpeedChange(n.NPCs)
 	
 	Select n\NPCtype
-		Case NPCtype173,NPCtypeOldMan,NPCtype096,NPCtype049
+		Case NPCtype173,NPCtypeOldMan,NPCtype096,NPCtype049,NPCtype939,NPCtypeMTF
 			Select SelectedDifficulty\otherFactors
 				Case NORMAL
 					n\Speed = n\Speed * 1.1
@@ -6386,9 +6483,9 @@ Function RotateToDirection(n.NPCs)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#0#A#3F#49#6F#95#A5#D5#E5#EE#FC#10B#11E#13D#167#17B#198#1D9#1F1#212
-;~F#235#23E#269#291#38D#478#5E7#5F7#740#748#7C0#85B#97B#980#9B7#A59#A94#B23#B8F#CA4
-;~F#D6F#E26#ED9#FD8#FE1#10A6#10CD#10D8#10FC#110F#1110#116B#12CD#141B#149D#14FD#157D#15AA#15D0#15E9
-;~F#1669#1717#178F#17A0#17BB#17D9#1817#1838#1846#1862#1874#1898#18BB#18C9
-;~B#197#1277#1311#13AA#155E#1669#1826#1882
+;~F#0#A#3F#49#71#97#A7#D7#E7#F0#FE#10D#120#13F#169#17D#19A#1DB#1F2#213
+;~F#236#23F#266#28E#38A#481#5D6#5F2#602#74B#753#75F#7CB#866#986#98B#9C2#A64#AA0#B2F
+;~F#B9B#CB0#D7B#E32#EE5#FE4#10C7#10EE#10F9#1121#1134#173C#17B4#17C5#17DF#17F0#17FA#1818#1856#1877
+;~F#1885#18A1#18B3#18D7#18FA#1908
+;~B#197#129B#1335#13CE#1582#168D#184B#18A7
 ;~C#Blitz3D

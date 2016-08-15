@@ -11,8 +11,9 @@ Function CreateBlurImage()
 	MoveEntity cam, 0, 0, 10000
 	ark_blur_cam = cam
 	
-	ark_sw = GraphicsWidth()
-	ark_sh = GraphicsHeight()
+	ark_sw = GraphicWidth;GraphicsWidth()
+	ark_sh = GraphicHeight;GraphicsHeight()
+	CameraViewport cam,0,0,ark_sw,ark_sh
 	
 	;Create sprite
 	Local spr% = CreateMesh(cam)
@@ -45,5 +46,5 @@ Function UpdateBlur(power#)
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#3#25
+;~F#3#26
 ;~C#Blitz3D

@@ -189,13 +189,12 @@ Function LoadBrush_Strict(file$,flags,u#=1.0,v#=1.0)
 	Return tmp 
 End Function 
 
-;Modified for Fasttext
-Function LoadFont_Strict(file$="Tahoma", height=13, bold=0, italic=0, underline=0, angle#=0, smooth=FT_ANTIALIASED, encoding=FT_ASCII)
+Function LoadFont_Strict(file$="Tahoma", height=13, bold=0, italic=0, underline=0)
 	If FileType(file$)<>1 Then RuntimeError "Font " + file$ + " not found."
-	tmp = LoadFont(file, height, bold, italic, underline, angle, smooth, encoding)  
+	tmp = LoadFont(file, height, bold, italic, underline)  
 	If tmp = 0 Then RuntimeError "Failed to load Font: " + file$ 
 	Return tmp
 End Function
 ;~IDEal Editor Parameters:
-;~F#F#27#2E#46#7F#89#94#9B#A4#AB#B3
+;~F#F#34#3B#53#8C#96#A1#A8#B1#B8#BF
 ;~C#Blitz3D

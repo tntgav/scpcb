@@ -47,16 +47,16 @@ End Function
 Function AchievementTooltip(achvno%)
 	Local scale# = GraphicHeight/768.0
 	
-	Local width = (StringWidth(AchievementStrings(achvno)))*MenuScale
+	Local width = (AAStringWidth(AchievementStrings(achvno)))*MenuScale
 	
 	Color 25,25,25
-	Rect(MouseX()+20,MouseY()+20,width,38*scale,True)
+	Rect(ScaledMouseX()+20,ScaledMouseY()+20,width,38*scale,True)
 	Color 150,150,150
-	Rect(MouseX()+20,MouseY()+20,width,38*scale,False)
-	SetFont Font3
-	Text(MouseX()+(20*MenuScale)+(width/2),MouseY()+(40*MenuScale), AchievementStrings(achvno), True, True)
-	SetFont Font1
-	Text(MouseX()+(20*MenuScale)+(width/2),MouseY()+(60*MenuScale), AchievementDescs(achvno), True, True)
+	Rect(ScaledMouseX()+20,ScaledMouseY()+20,width,38*scale,False)
+	AASetFont Font3
+	AAText(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(40*MenuScale), AchievementStrings(achvno), True, True)
+	AASetFont Font1
+	AAText(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(60*MenuScale), AchievementDescs(achvno), True, True)
 End Function
 
 Function DrawAchvIMG(x%, y%, achvno%)

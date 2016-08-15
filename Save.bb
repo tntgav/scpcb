@@ -31,7 +31,8 @@ Function SaveGame(file$)
 	WriteFloat f, EntityPitch(Collider)
 	WriteFloat f, EntityYaw(Collider)
 	
-	WriteString f, VersionNumber
+	;WriteString f, VersionNumber
+	WriteString f, CompatibleNumber
 	
 	WriteFloat f, BlinkTimer
 	WriteFloat f, BlinkEffect
@@ -177,6 +178,11 @@ Function SaveGame(file$)
 		WriteString f, n\texture
 		
 		WriteFloat f, AnimTime(n\obj)
+		
+		WriteInt f, n\IsDead
+		WriteFloat f, n\PathX
+		WriteFloat f, n\PathZ
+		WriteInt f, n\HP
 	Next
 	
 	WriteFloat f, MTFtimer
@@ -423,6 +429,7 @@ Function SaveGame(file$)
 End Function
 
 Function LoadGame(file$)
+	DebugLog "---------------------------------------------------------------------------"
 	
 	DropSpeed=0.0
 	
@@ -457,7 +464,8 @@ Function LoadGame(file$)
 	RotateEntity(Collider, x, y, 0, 0)
 	
 	strtemp = ReadString(f)
-	If (strtemp <> VersionNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+".")
+	;If (strtemp <> VersionNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+".")
+	If (strtemp <> CompatibleNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+" (latest compatible version: "+CompatibleNumber+").")
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	
@@ -601,6 +609,10 @@ Function LoadGame(file$)
 				SetAnimTime(n\obj, frame)
 		End Select
 		
+		n\IsDead = ReadInt(f)
+		n\PathX = ReadFloat(f)
+		n\PathZ = ReadFloat(f)
+		n\HP = ReadInt(f)
 	Next
 	
 	For n.NPCs = Each NPCs
@@ -866,8 +878,12 @@ Function LoadGame(file$)
 				Exit
 			EndIf
 		Next
+	Next
+	
+	For e.Events = Each Events
 		If e\EventName = "dimension1499" Or e\EventName = "room2sl"
 			e\EventState = 0.0
+			DebugLog "Reset Eventstate in "+e\EventName
 		EndIf
 	Next
 	
@@ -1025,8 +1041,16 @@ Function LoadGame(file$)
 End Function
 
 Function LoadGameQuick(file$)
+	DebugLog "---------------------------------------------------------------------------"
+	
 	DebugHUD = False
 	GameSaved = True
+	NoTarget = False
+	InfiniteStamina = False
+	IsZombie% = False
+	DeafPlayer% = False
+	DeafTimer# = 0.0
+	UnableToMove% = False
 	Msg = ""
 	
 	PositionEntity Collider,0,1000.0,0,True
@@ -1084,7 +1108,8 @@ Function LoadGameQuick(file$)
 	RotateEntity(Collider, x, y, 0, 0)
 	
 	strtemp = ReadString(f)
-	If (strtemp <> VersionNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+".")
+	;If (strtemp <> VersionNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+".")
+	If (strtemp <> CompatibleNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+" (latest compatible version: "+CompatibleNumber+").")
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	
@@ -1232,6 +1257,10 @@ Function LoadGameQuick(file$)
 				SetAnimTime(n\obj, frame)
 		End Select		
 		
+		n\IsDead = ReadInt(f)
+		n\PathX = ReadFloat(f)
+		n\PathZ = ReadFloat(f)
+		n\HP = ReadInt(f)
 	Next
 	
 	For n.NPCs = Each NPCs
@@ -1285,16 +1314,9 @@ Function LoadGameQuick(file$)
 		
 		For x = 0 To 11
 			id = ReadInt(f)
-			If id>0 Then
+			If id > 0 Then
 				For n.NPCs = Each NPCs
-					If n\ID = id Then
-						;For r.Rooms = Each Rooms
-						;	If r\x = x And r\z = z Then
-						r\NPC[x]=n
-						;		Exit
-						;	EndIf
-						;Next
-					EndIf
+					If n\ID = id Then r\NPC[x]=n : Exit
 				Next
 			EndIf
 		Next
@@ -1793,5 +1815,5 @@ Function LoadMap(file$)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#1A6#3FE#635#663#681
+;~F#2#1AE#412#64E#67C#69A
 ;~C#Blitz3D
