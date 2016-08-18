@@ -3513,6 +3513,48 @@ Function UpdateEvents()
 								EndIf
 							Next						
 						EndIf
+						
+						Local temp2 = True
+						For e2.Events = Each Events
+							If e2\EventName = e\EventName And e2 <> e
+								If e2\EventStr <> ""
+									temp2 = False
+									e\EventStr = "done"
+									Exit
+								EndIf
+							EndIf
+						Next
+						
+						Local temp3 = 0
+						If temp2
+							If e\EventStr = ""
+								If EntityDistance(e\room\Objects[5],Collider)<EntityDistance(e\room\Objects[6],Collider)
+									temp3 = 6
+								Else
+									temp3 = 5
+								EndIf
+								e\room\NPC[0] = CreateNPC(NPCtypeD,EntityX(e\room\Objects[temp3],True),0.5,EntityZ(e\room\Objects[temp3],True))
+								PointEntity e\room\NPC[0]\Collider,e\room\Objects[2]
+								FreeEntity e\room\NPC[0]\obj
+								e\room\NPC[0]\obj = LoadAnimMesh_Strict("GFX\npcs\clerk.b3d")
+								e\room\NPC[0]\State = 2
+								Local tempscale# = 0.5 / MeshWidth(e\room\NPC[0]\obj)
+								ScaleEntity e\room\NPC[0]\obj, tempscale#, tempscale#, tempscale#
+								e\EventStr = "step1"
+							ElseIf e\EventStr = "step1"
+								For i = 0 To 2
+									If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale
+										If KillTimer => 0 Then 
+											StopChannel(e\SoundCHN)
+											e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
+											HideEntity e\room\Objects[4]
+											e\EventState = 1
+											Exit
+										EndIf
+									EndIf
+								Next
+							EndIf
+						EndIf
 					Else
 						e\EventState = e\EventState+FPSfactor
 						If e\EventState =< 40 Then
@@ -3536,6 +3578,10 @@ Function UpdateEvents()
 											DeathMSG = "Subject D-9341 killed by the Tesla Gate at [REDACTED]."
 										EndIf
 									Next
+								EndIf
+								
+								If e\EventStr = "step1"
+									e\room\NPC[0]\State = 3
 								EndIf
 								
 								If Curr106\State < -10 Then
@@ -3574,6 +3620,33 @@ Function UpdateEvents()
 								
 								If e\EventState > 150 Then e\EventState = 0
 							EndIf
+						EndIf
+					EndIf
+				EndIf
+				
+				If e\room\NPC[0] <> Null
+					If e\EventStr = "step1" And e\room\NPC[0]\State = 3
+						e\room\NPC[0]\CurrSpeed = 0
+						AnimateNPC(e\room\NPC[0],41,60,0.5,False)
+						If e\room\NPC[0]\Frame = 60
+							e\room\NPC[0]\IsDead = True
+							e\EventStr = "step2"
+						EndIf
+					ElseIf e\EventStr = "step2"
+						e\EventStr = "0"
+					ElseIf e\EventStr <> "" And e\EventStr <> "step1" And e\EventStr <> "done"
+						If Int(e\EventStr)<70*10
+							If Rand(10)=1
+								p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),6,0.05,0,60)
+								p\speed = 0.002
+								RotateEntity(p\pvt, 0, EntityYaw(e\room\NPC[0]\Collider), 0)
+								MoveEntity p\pvt,Rnd(-0.1,0.1),0,0.1+Rnd(0,0.5)
+								RotateEntity(p\pvt, -90, EntityYaw(e\room\NPC[0]\Collider), 0)
+								p\Achange = -0.02
+							EndIf
+							e\EventStr = e\EventStr + FPSfactor
+						Else
+							e\EventStr = "done"
 						EndIf
 					EndIf
 				EndIf

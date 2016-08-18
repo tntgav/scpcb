@@ -3694,7 +3694,7 @@ Function FillRoom(r.Rooms)
 			EntityTexture (r\Objects[3], TeslaTexture)
 			SpriteViewMode(r\Objects[3],2) 
 			;ScaleSprite (r\Objects[3],((512.0 * RoomScale)/2.0),((512.0 * RoomScale)/2.0))
-			EntityBlend (r\Objects[3], blend_add) 
+			EntityBlend (r\Objects[3], 3) 
 			EntityFX(r\Objects[3], 1 + 8 + 16)
 			
 			PositionEntity(r\Objects[3], r\x, 0.8, r\z)
@@ -3714,6 +3714,14 @@ Function FillRoom(r.Rooms)
 			EntityBlend (r\Objects[4], 3)
 			EntityParent(r\Objects[4], r\obj)
 			HideEntity r\Objects[4]
+			
+			r\Objects[5] = CreatePivot()
+			PositionEntity(r\Objects[5],r\x,0,r\z-800*RoomScale)
+			EntityParent(r\Objects[5],r\obj)
+			
+			r\Objects[6] = CreatePivot()
+			PositionEntity(r\Objects[6],r\x,0,r\z+800*RoomScale)
+			EntityParent(r\Objects[6],r\obj)
 			;[End Block]
 		Case "room2doors"
 			;[Block]
