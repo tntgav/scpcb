@@ -3631,11 +3631,15 @@ Function UpdateEvents()
 						If e\room\NPC[0]\Frame = 60
 							e\room\NPC[0]\IsDead = True
 							e\EventStr = "step2"
+							SetNPCFrame(e\room\NPC[0],57)
 						EndIf
 					ElseIf e\EventStr = "step2"
-						e\EventStr = "0"
+						AnimateNPC(e\room\NPC[0],57,60,0.5,False)
+						If e\room\NPC[0]\Frame = 60
+							e\EventStr = "0"
+						EndIf
 					ElseIf e\EventStr <> "" And e\EventStr <> "step1" And e\EventStr <> "done"
-						If Int(e\EventStr)<70*10
+						If Float(e\EventStr)<70*10
 							If Rand(10)=1
 								p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),6,0.05,0,60)
 								p\speed = 0.002
@@ -3644,7 +3648,7 @@ Function UpdateEvents()
 								RotateEntity(p\pvt, -90, EntityYaw(e\room\NPC[0]\Collider), 0)
 								p\Achange = -0.02
 							EndIf
-							e\EventStr = e\EventStr + FPSfactor
+							e\EventStr = Float(e\EventStr) + FPSfactor
 						Else
 							e\EventStr = "done"
 						EndIf
