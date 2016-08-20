@@ -1667,7 +1667,11 @@ Function UpdateNPCs()
 												;Playing a sound if he hears the player
 												If n\PrevState = 0 And ChannelPlaying(n\SoundChn2)=False
 													If n\Sound2 <> 0 Then FreeSound_Strict(n\Sound2)
-													n\Sound2 = LoadSound_Strict("SFX\049\049_"+Rand(5,7)+".ogg")
+													If Rand(8)=3
+														n\Sound2 = LoadSound_Strict("SFX\049\049_9.ogg")
+													Else
+														n\Sound2 = LoadSound_Strict("SFX\049\049_"+Rand(5,7)+".ogg")
+													EndIf
 													n\SoundChn2 = LoopSound2(n\Sound2,n\SoundChn2,Camera,n\obj)
 													n\PrevState = 1
 												EndIf
@@ -1773,6 +1777,15 @@ Function UpdateNPCs()
 														n\PathStatus = 0
 														n\PathTimer# = 0.0
 													EndIf
+												EndIf
+												
+												If n\PrevState = 0 And ChannelPlaying(n\SoundChn2)=False
+													If Rand(8)=3
+														If n\Sound2 <> 0 Then FreeSound_Strict(n\Sound2)
+														n\Sound2 = LoadSound_Strict("SFX\049\049_9.ogg")
+														n\SoundChn2 = LoopSound2(n\Sound2,n\SoundChn2,Camera,n\obj)
+													EndIf
+													n\PrevState = 1
 												EndIf
 												
 												AnimateNPC(n, Max(Min(AnimTime(n\obj),358.0),346), 393.0, n\CurrSpeed*38)
@@ -1884,7 +1897,7 @@ Function UpdateNPCs()
 							PositionEntity n\Collider, CurveValue(EntityX(Collider),EntityX(n\Collider),20.0),EntityY(n\Collider),CurveValue(EntityZ(Collider),EntityZ(n\Collider),20.0)
 							RotateEntity n\Collider, 0, CurveAngle(EntityYaw(Collider)-180.0,EntityYaw(n\Collider),40), 0
 							;[End Block]
-						Case 4
+						Case 4 ;Standing on catwalk in room4
 							;[Block]
 							If dist < 8.0 Then
 								AnimateNPC(n, 18, 19, 0.05)
@@ -1892,8 +1905,9 @@ Function UpdateNPCs()
 								;Animate2(n\obj, AnimTime(n\obj), 18, 19, 0.05)
 								PointEntity n\obj, Collider	
 								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 45.0), 0
-							ElseIf dist > 15.0
+							ElseIf dist > HideDistance*0.8
 								n\State = 2
+								TeleportCloser(n)
 							EndIf
 							;[End Block]
 						Case 5 ;used for "room2sl"

@@ -3641,7 +3641,8 @@ Function UpdateEvents()
 					ElseIf e\EventStr <> "" And e\EventStr <> "step1" And e\EventStr <> "done"
 						If Float(e\EventStr)<70*10
 							If Rand(10)=1
-								p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),6,0.05,0,60)
+								;p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),6,0.05,0,60)
+								p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),0,0.05,0,60)
 								p\speed = 0.002
 								RotateEntity(p\pvt, 0, EntityYaw(e\room\NPC[0]\Collider), 0)
 								MoveEntity p\pvt,Rnd(-0.1,0.1),0,0.1+Rnd(0,0.5)

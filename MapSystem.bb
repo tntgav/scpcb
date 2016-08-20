@@ -3056,8 +3056,13 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("Level 4 Key Card", "key4", r\x - 512.0 * RoomScale, r\y - 3412.0 * RoomScale, r\z + 864.0 * RoomScale)
 			EntityParent(it\obj, r\obj)
 			
-			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x +385.0 * RoomScale, r\y - 3412.0 * RoomScale, r\z + 271.0 * RoomScale)
+			it = CreateItem("First Aid Kit", "firstaid", r\x +385.0 * RoomScale, r\y - 3412.0 * RoomScale, r\z + 271.0 * RoomScale)
 			EntityParent(it\obj, r\obj)
+			
+			r\Objects[10] = LoadMesh_Strict("GFX\map\room049_hb.b3d",r\obj)
+			EntityPickMode r\Objects[10],2
+			EntityType r\Objects[10],HIT_MAP
+			EntityAlpha r\Objects[10],0.0
 			;[End Block]
 		Case "room2_2"
 			;[Block]
@@ -4779,6 +4784,19 @@ Function FillRoom(r.Rooms)
 			r\Objects[6] = CreatePivot()
 			PositionEntity(r\Objects[6], r\x + 640.0 * RoomScale, 8.0 * RoomScale, r\z - 896.0 * RoomScale)
 			EntityParent(r\Objects[6], r\obj)
+			;[End Block]
+		Case "room3z2"
+			;[Block]
+			For r2.Rooms = Each Rooms
+				If r2\RoomTemplate\Name = r\RoomTemplate\Name And r2 <> r
+					r\Objects[0] = CopyEntity(r2\Objects[0],r\obj)
+					Exit
+				EndIf
+			Next
+			If r\Objects[0]=0 Then r\Objects[0] = LoadMesh_Strict("GFX\map\room3z2_hb.b3d",r\obj)
+			EntityPickMode r\Objects[0],2
+			EntityType r\Objects[0],HIT_MAP
+			EntityAlpha r\Objects[0],0.0
 			;[End Block]
 	End Select
 	
