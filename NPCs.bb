@@ -1186,16 +1186,18 @@ Function UpdateNPCs()
 									If ProjectedX()>0 And ProjectedX()<GraphicWidth Then
 										If ProjectedY()>0 And ProjectedY()<GraphicHeight Then
 											If EntityVisible(Collider, n\Collider) Then
-												PlaySound_Strict LoadTempSound("SFX\096_5.ogg")
-												
-												CurrCameraZoom = 10
-												
-												n\Frame = 307
-												;SetAnimTime n\obj, 307
-												StopChannel n\SoundChn
-												FreeSound_Strict n\Sound
-												n\Sound = 0
-												n\State = 1
+												If (BlinkTimer < - 16 Or BlinkTimer > - 6)
+													PlaySound_Strict LoadTempSound("SFX\096_5.ogg")
+													
+													CurrCameraZoom = 10
+													
+													n\Frame = 307
+													;SetAnimTime n\obj, 307
+													StopChannel n\SoundChn
+													FreeSound_Strict n\Sound
+													n\Sound = 0
+													n\State = 1
+												EndIf
 											EndIf									
 										EndIf
 									EndIf								
@@ -1475,16 +1477,18 @@ Function UpdateNPCs()
 									If ProjectedX()>0 And ProjectedX()<GraphicWidth Then
 										If ProjectedY()>0 And ProjectedY()<GraphicHeight Then
 											If EntityVisible(Collider, n\Collider) Then
-												PlaySound_Strict LoadTempSound("SFX\096_5.ogg")
-												
-												CurrCameraZoom = 10
-												
-												n\Frame = 833
-												;SetAnimTime n\obj, 833
-												StopChannel n\SoundChn
-												FreeSound_Strict n\Sound
-												n\Sound = 0
-												n\State = 2
+												If (BlinkTimer < - 16 Or BlinkTimer > - 6)
+													PlaySound_Strict LoadTempSound("SFX\096_5.ogg")
+													
+													CurrCameraZoom = 10
+													
+													n\Frame = 833
+													;SetAnimTime n\obj, 833
+													StopChannel n\SoundChn
+													FreeSound_Strict n\Sound
+													n\Sound = 0
+													n\State = 2
+												EndIf
 											EndIf									
 										EndIf
 									EndIf
