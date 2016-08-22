@@ -206,7 +206,7 @@ Function UpdateMainMenu()
 					RandomSeed = ""
 					If temp Then 
 						If Rand(15)=1 Then 
-							Select Rand(10)
+							Select Rand(13)
 								Case 1 
 									RandomSeed = "NIL"
 								Case 2
@@ -227,6 +227,12 @@ Function UpdateMainMenu()
 									RandomSeed = "rustledjim"
 								Case 10
 									RandomSeed = "larry"
+								Case 11
+									RandomSeed = "JORGE"
+								Case 12
+									RandomSeed = "dirtymetal"
+								Case 13
+									RandomSeed = "whatpumpkin"
 							End Select
 						Else
 							n = Rand(4,8)
@@ -1303,26 +1309,28 @@ Function DrawLoading(percent%, shortloading=False)
 			AAText(GraphicWidth / 2, GraphicHeight / 2 + 80, strtemp, True, True)
 			
 			If percent = 0 Then 
-				Select Rand(10)
+				Select Rand(14)
 					Case 1
-						SelectedLoadingScreen\txt[0] ="A very fine radio might prove to be useful"
+						SelectedLoadingScreen\txt[0] = "A very fine radio might prove to be useful."
 					Case 2
-						SelectedLoadingScreen\txt[0] ="ThIS PLaCE WiLL BUrN"
+						SelectedLoadingScreen\txt[0] = "ThIS PLaCE WiLL BUrN"
 					Case 3
-						SelectedLoadingScreen\txt[0] ="You can't control it"
+						SelectedLoadingScreen\txt[0] = "You can not control it."
 					Case 4
-						SelectedLoadingScreen\txt[0] ="eof9nsd3jue4iwe1fgj"
+						SelectedLoadingScreen\txt[0] = "eof9nsd3jue4iwe1fgj"
 					Case 5
 						SelectedLoadingScreen\txt[0] = "YOU NEED TO TRUST IT"
 					Case 6 
 						SelectedLoadingScreen\txt[0] = "Look my friend in the eye when you address him, isn't that the way of the gentleman?"
 					Case 7
 						SelectedLoadingScreen\txt[0] = "???____??_???__????n?"	
-					Case 8
+					Case 8, 9
+						SelectedLoadingScreen\txt[0] = "Jorge has been expecting you."	
+					Case 10
 						SelectedLoadingScreen\txt[0] = "???????????"
-					Case 9,10
-						SelectedLoadingScreen\txt[0] = "It will happen on " +CurrentDate()
 					Case 11,12
+						SelectedLoadingScreen\txt[0] = "It will happen on " +CurrentDate()+"."
+					Case 13,14
 						SelectedLoadingScreen\txt[0] = CurrentTime()
 				End Select
 			EndIf
@@ -1357,7 +1365,7 @@ Function DrawLoading(percent%, shortloading=False)
 		
 		If percent = 100 Then 
 			If firstloop And SelectedLoadingScreen\title <> "CWM" Then PlaySound_Strict HorrorSFX(8)
-			AAText(GraphicWidth / 2, GraphicHeight - 50, "PRESS ANY KEY", True, True)
+			AAText(GraphicWidth / 2, GraphicHeight - 50, "PRESS ANY KEY TO CONTINUE", True, True)
 		Else
 			FlushKeys()
 			FlushMouse()

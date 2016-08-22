@@ -22,7 +22,7 @@ Function LoadImage_Strict(file$)
 	
 	If tmp = 0 Then
 		;if loading failed again, add an error message to the console and return a black image
-		CreateConsoleMsg("Loading image ''"+file+"'' failed")
+		CreateConsoleMsg("Loading image ''"+file+"'' failed.")
 		If ConsoleOpening Then
 			ConsoleOpen = True
 		EndIf
