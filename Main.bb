@@ -617,7 +617,7 @@ Function UpdateConsole()
 						EndIf
 					Next
 					
-					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found. ¯\_(ツ)_/¯")
+					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.")
 				Case "spawnitem"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					temp = False 
@@ -987,7 +987,7 @@ Function UpdateConsole()
 					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
 					ResetEntity Curr173\Collider
 				Default
-					CreateConsoleMsg("Command not found. ¯\_(ツ)_/¯")
+					CreateConsoleMsg("Command not found.")
 			End Select
 			
 			ConsoleInput = ""

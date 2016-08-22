@@ -565,7 +565,7 @@ Function PickItem(item.Items)
 			EndIf
 		Next
 	Else
-		Msg = "You can noy carry any more items."
+		Msg = "You cannot carry any more items."
 		MsgTimer = 70 * 5
 	EndIf
 End Function
