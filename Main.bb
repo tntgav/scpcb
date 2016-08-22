@@ -20,7 +20,7 @@ ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 
 Global Font1%, Font2%, Font3%, Font4%
 
-Global VersionNumber$ = "1.3.1"
+Global VersionNumber$ = "1.3.2"
 Global CompatibleNumber$ = "1.3.1"
 
 AppTitle "SCP - Containment Breach Launcher"
@@ -967,7 +967,8 @@ Global HUDenabled% = GetINIInt("options.ini", "options", "HUD enabled")
 
 Global Camera%, CameraShake#, CurrCameraZoom#
 
-Global Brightness% = 40
+Global Brightness_Slider# = GetINIFloat("options.ini", "options", "brightness")
+Global Brightness% = Brightness_Slider#*127.5
 Global CameraFogNear# = GetINIFloat("options.ini", "options", "camera fog near")
 Global CameraFogFar# = GetINIFloat("options.ini", "options", "camera fog far")
 
@@ -2162,6 +2163,8 @@ Repeat
 			If OtherOpen<>Null Then OtherOpen=Null
 			SelectedItem = Null 
 		EndIf
+		
+		Brightness = Brightness_Slider*127.5
 		
 		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea"  Then 
 			
@@ -4500,7 +4503,7 @@ Function DrawGUI()
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
-					SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])					
+					If (Not Wearing714) Then SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])					
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
@@ -5327,6 +5330,7 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
 				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
+				PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
 				
 				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -5453,6 +5457,34 @@ Function DrawMenu()
 					AAText(x + 300 * MenuScale, y + MenuScale, "DISABLED")
 					If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
 						DrawTooltip("Not available in this version")
+					EndIf
+					
+					y=y+30*MenuScale
+					
+					Local prevBrightness# = Brightness_Slider
+					Brightness_Slider = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, Brightness_Slider*50.0)/50.0)
+					Color 255,255,255
+					AAText(x, y, "Brightness")
+					
+					Brightness = Brightness_Slider#*127.5
+					If prevBrightness# <> Brightness_Slider
+						AmbientLight Brightness, Brightness, Brightness
+						If (Not WearingNightVision=0) Then
+							If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
+							ShowEntity(NVOverlay)
+							If WearingNightVision=2 Then
+								EntityColor(NVOverlay, 0,100,255)
+							Else
+								EntityColor(NVOverlay, 0,255,0)
+							EndIf
+							EntityTexture(Fog, FogNVTexture)
+						Else
+							If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
+							HideEntity(NVOverlay)
+							EntityTexture(Fog, FogTexture)
+						EndIf
+						If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
+						prevBrightness = Brightness_Slider
 					EndIf
 					;[End Block]
 				Case 2 ;Audio
@@ -6596,8 +6628,8 @@ Function NullGame()
 	DeleteElevatorObjects()
 	
 	NoTarget% = False
-	Brightness = 40
-	StoredBrightness% = 40
+	Brightness = Brightness_Slider#*127.5
+	StoredBrightness% = Brightness_Slider#*127.5
 	
 	OptionsMenu% = -1
 	QuitMSG% = -1
@@ -6617,6 +6649,8 @@ Function NullGame()
 	Camera = 0
 	ark_blur_cam = 0
 	InitFastResize()
+	
+	Brightness% = Brightness_Slider#*255
 	
 	;InitExt
 	
@@ -8027,6 +8061,7 @@ Function TakeOffStuff(flag%=0)
 	If Len(numb_flag%)>5
 		If Mid(numb_flag%,Len(numb_flag%)-5,1) = 1
 			WearingNightVision = False
+			CameraFogFar = StoredCameraFogFar
 			DebugLog "NVG Off"
 		EndIf
 	EndIf

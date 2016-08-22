@@ -3056,8 +3056,13 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("Level 4 Key Card", "key4", r\x - 512.0 * RoomScale, r\y - 3412.0 * RoomScale, r\z + 864.0 * RoomScale)
 			EntityParent(it\obj, r\obj)
 			
-			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x +385.0 * RoomScale, r\y - 3412.0 * RoomScale, r\z + 271.0 * RoomScale)
+			it = CreateItem("First Aid Kit", "firstaid", r\x +385.0 * RoomScale, r\y - 3412.0 * RoomScale, r\z + 271.0 * RoomScale)
 			EntityParent(it\obj, r\obj)
+			
+			r\Objects[10] = LoadMesh_Strict("GFX\map\room049_hb.b3d",r\obj)
+			EntityPickMode r\Objects[10],2
+			EntityType r\Objects[10],HIT_MAP
+			EntityAlpha r\Objects[10],0.0
 			;[End Block]
 		Case "room2_2"
 			;[Block]
@@ -4779,6 +4784,55 @@ Function FillRoom(r.Rooms)
 			r\Objects[6] = CreatePivot()
 			PositionEntity(r\Objects[6], r\x + 640.0 * RoomScale, 8.0 * RoomScale, r\z - 896.0 * RoomScale)
 			EntityParent(r\Objects[6], r\obj)
+			;[End Block]
+		Case "room3z2"
+			;[Block]
+			For r2.Rooms = Each Rooms
+				If r2\RoomTemplate\Name = r\RoomTemplate\Name And r2 <> r
+					r\Objects[0] = CopyEntity(r2\Objects[0],r\obj)
+					Exit
+				EndIf
+			Next
+			If r\Objects[0]=0 Then r\Objects[0] = LoadMesh_Strict("GFX\map\room3z2_hb.b3d",r\obj)
+			EntityPickMode r\Objects[0],2
+			EntityType r\Objects[0],HIT_MAP
+			EntityAlpha r\Objects[0],0.0
+			;[End Block]
+		Case "lockroom3"
+			;[Block]
+			d = CreateDoor(r\zone, r\x - 736.0 * RoomScale, 0, r\z - 104.0 * RoomScale, 0, r, True)
+			d\timer = 70 * 5 : d\AutoClose = False : d\open = False : d\locked = True
+			
+			EntityParent(d\buttons[0], 0)
+			PositionEntity(d\buttons[0], r\x - 288.0 * RoomScale, 0.7, r\z - 640.0 * RoomScale)
+			EntityParent(d\buttons[0], r\obj)
+			
+			FreeEntity(d\buttons[1]) : d\buttons[1] = 0
+			
+			d2 = CreateDoor(r\zone, r\x + 104.0 * RoomScale, 0, r\z + 736.0 * RoomScale, 270, r, True)
+			d2\timer = 70 * 5 : d2\AutoClose = False: d2\open = False : d2\locked = True
+			EntityParent(d2\buttons[0], 0)
+			PositionEntity(d2\buttons[0], r\x + 640.0 * RoomScale, 0.7, r\z + 288.0 * RoomScale)
+			RotateEntity (d2\buttons[0], 0, 90, 0)
+			EntityParent(d2\buttons[0], r\obj)
+			
+			FreeEntity(d2\buttons[1]) : d2\buttons[1] = 0
+			
+			d\LinkedDoor = d2
+			d2\LinkedDoor = d
+			
+			scale# = RoomScale * 4.5 * 0.4
+			
+			r\Objects[0] = CopyEntity(Monitor)
+			ScaleEntity r\Objects[0],scale#,scale#,scale#
+			PositionEntity r\Objects[0],r\x+668*RoomScale,1.1,r\z-96.0*RoomScale,True
+			RotateEntity r\Objects[0],0,90,0
+			EntityParent r\Objects[0],r\obj
+			
+			r\Objects[1] = CopyEntity(Monitor)
+			ScaleEntity r\Objects[1],scale#,scale#,scale#
+			PositionEntity r\Objects[1],r\x+96.0*RoomScale,1.1,r\z-668.0*RoomScale,True
+			EntityParent r\Objects[1],r\obj
 			;[End Block]
 	End Select
 	
