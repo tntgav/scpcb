@@ -4453,6 +4453,9 @@ Function UpdateEvents()
 						EndIf
 						ResetEntity(Curr106\Collider)
 						
+						PositionEntity(Curr106\obj, EntityX(Curr106\Collider), EntityY(Curr106\Collider) - 0.15, EntityZ(Curr106\Collider))
+						RotateEntity Curr106\obj, 0, EntityYaw(Curr106\Collider), 0
+						
 						;PositionEntity(Curr106\Collider, EntityX(Curr106\Collider), EntityY(Collider) - 0.20, EntityZ(Curr106\Collider))
 						
 						If (e\EventState / 250.0) > 0.3 And ((e\EventState - FPSfactor*0.7) / 250.0) <= 0.3 Then
