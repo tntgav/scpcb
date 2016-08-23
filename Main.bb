@@ -2375,9 +2375,12 @@ Repeat
 				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance"
 					Msg = "You can't save in this location"
 					MsgTimer = 70 * 4
-				ElseIf (Not CanSave)
+				ElseIf (Not CanSave) Or QuickLoadPercent > -1
 					Msg = "You can't save at this moment"
 					MsgTimer = 70 * 4
+					If QuickLoadPercent > -1
+						Msg = Msg + " (game is loading)"
+					EndIf
 				Else
 					SaveGame(SavePath + CurrSave + "\")
 				EndIf
@@ -2390,9 +2393,12 @@ Repeat
 					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance"
 						Msg = "You can't save in this location"
 						MsgTimer = 70 * 4
-					ElseIf (Not CanSave)
+					ElseIf (Not CanSave) Or QuickLoadPercent > -1
 						Msg = "You can't save at this moment"
 						MsgTimer = 70 * 4
+						If QuickLoadPercent > -1
+							Msg = Msg + " (game is loading)"
+						EndIf
 					Else
 						SaveGame(SavePath + CurrSave + "\")
 					EndIf
@@ -2466,7 +2472,7 @@ Repeat
 		Color 255, 255, 255
 		If ShowFPS Then AAText 20, 20, "FPS: " + FPS
 		
-		
+		DrawQuickLoading()
 	End If
 	
 	If FakeFullScreen Then
@@ -6412,6 +6418,9 @@ Function NullGame()
 	ClearTextureCache
 	
 	UnableToMove% = False
+	
+	QuickLoadPercent = -1
+	QuickLoadPercent_DisplayTimer# = 0
 	
 	DeathMSG$=""
 	
