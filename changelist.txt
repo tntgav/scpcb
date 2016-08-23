@@ -1,3 +1,24 @@
+
+----------------------------------------------------------------------------------
+
+v1.3.2
+
+Saves from v1.3.1 are compatible with this version
+
+- compiled the game using juanjpro's "MavLess Blitz3D" (less MAVs)
+- added new rooms (including remade medibay)
+- new events with new NPCs
+- brightness slider
+- bugfix for disabling antialiased text
+- fixed badge textures (by "Cridone")
+- the player can't fall through the floor in room049 or room3z2 anymore
+- fixed SCP-096 collision
+- fixed SCP-096 attacking if looking at its face with eyes closed
+- fixed a bug with severed hand spawn in room3storage
+- fixed invisible SCP-106 in the room2pipes event
+- rebalanced SCP-914's key card refining
+- some SCP-049 imporovements
+
 ----------------------------------------------------------------------------------
 
 v1.3.1
