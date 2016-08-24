@@ -4086,16 +4086,10 @@ Function FillRoom(r.Rooms)
 			EntityParent(sc\obj, r\obj)
 			sc\ID = 4
 			;[End Block]
-		Case "room1archive","room1archive1074"
+		Case "room1archive"
 			;[Block]
-			If r\RoomTemplate\Name = "room1archive1074"
-				temp% = 3
-				it = CreateItem("SCP-1074 Containment Notice","paper",r\x-700.0*RoomScale,r\y+159.0*RoomScale,r\z+500.0*RoomScale)
-				EntityParent it\obj,r\obj
-			Else
-				temp% = Rand(1,3)
-			EndIf
-		
+			
+			temp = Rand(1,3)
 			For xtemp = 0 To 1
 				For ytemp = 0 To 2
 					For ztemp = 0 To 2
@@ -4117,7 +4111,7 @@ Function FillRoom(r.Rooms)
 									Case 4
 										tempstr=tempstr+"682"
 									Case 5
-										tempstr=tempstr+"1074"
+										tempstr=tempstr+"079"
 									Case 6
 										tempstr=tempstr+"096"
 									Case 6
@@ -6771,7 +6765,7 @@ Function CreateMap()
 	MapRoom(ROOM1, 0) = "start"	
 	SetRoom("roompj", ROOM1, Floor(0.1*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("914", ROOM1, Floor(0.3*Float(Room1Amount[0])),min_pos,max_pos)
-	SetRoom("room1archive1074",ROOM1,Floor(0.5*Float(Room1Amount[0])),min_pos,max_pos)
+	SetRoom("room1archive",ROOM1,Floor(0.5*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("room205", ROOM1, Floor(0.6*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("room178",ROOM1,Floor(0.7*Float(Room1Amount[0])),min_pos,max_pos)
 	
@@ -7752,7 +7746,7 @@ Function ValidRoom2slCamRoom(r.Rooms)
 	Local RN$ = r\RoomTemplate\Name$
 	
 	If RN$ = "room2closets" Then Return True
-	If RN$ = "room1archive1074" Then Return True
+	If RN$ = "room1archive" Then Return True
 	If RN$ = "room3z3" Then Return True
 	If RN$ = "room1lifts" Then Return True
 	If RN$ = "room106" Then Return True
