@@ -2873,6 +2873,7 @@ Function UpdateEvents()
 										BlinkTimer = -10
 										PositionEntity Collider, EntityX(e\room\Objects[8],True)-1344*RoomScale,2944*RoomScale,EntityZ(e\room\Objects[8],True)-1184*RoomScale
 										ResetEntity Collider
+										Crouch = False
 										
 										LoadEventSound(e,"SFX\PDExplosion.ogg")
 										LoadEventSound(e,"SFX\PDplane.ogg",1)
@@ -7009,7 +7010,7 @@ Function UpdateEvents()
 						
 						If e\EventState2 > 1000 Then
 							If e\Sound2=0 Then
-								e\Sound2 = LoadSound_Strict("SFX\Doors\WoodenDoorOpen.ogg")
+								e\Sound2 = LoadSound_Strict("SFX\1123\DoorOpen.ogg")
 								e\SoundCHN2 = PlaySound_Strict(e\Sound2)
 							EndIf
 							RotateEntity e\room\Objects[11], 0, CurveAngle(10, EntityYaw(e\room\Objects[11],0), 40), 0
@@ -7135,6 +7136,7 @@ Function UpdateEvents()
 						BlurTimer = 500	
 						Injuries = PrevInjuries
 						Bloodloss = PrevBloodloss
+						Crouch = False
 						
 						PrevInjuries = 0
 						PrevBloodloss = 0

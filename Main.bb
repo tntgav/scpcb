@@ -58,7 +58,7 @@ Global HalloweenTex
 Global TotalGFXModes% = CountGfxModes3D(), GFXModes%
 Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
 
-Global FakeFullScreen% = GetINIInt(OptionFile, "options", "fakefullscreen")
+Global BorderlessWindowed% = GetINIInt(OptionFile, "options", "borderless windowed")
 Global RealGraphicWidth%,RealGraphicHeight%
 
 Global EnableRoomLights% = GetINIInt(OptionFile, "options", "room lights enabled")
@@ -85,9 +85,9 @@ Include "AAText.bb"
 If LauncherEnabled Then 
 	UpdateLauncher()
 	
-	;New "fake fullscreen" - ENDSHN
-	If FakeFullScreen
-		DebugLog "Using Faked Fullscreen"
+	;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark,
+	If BorderlessWindowed
+		DebugLog "Using Borderless Windowed Mode"
 		Graphics3DExt G_viewport_width, G_viewport_height, 0, 2
 		
 		; -- Change the window style to 'WS_POPUP' and then set the window position to force the style to update.
@@ -123,8 +123,8 @@ Else
 	GraphicWidth = GfxModeWidths(SelectedGFXMode)
 	GraphicHeight = GfxModeHeights(SelectedGFXMode)
 	
-	;New "fake fullscreen" - ENDSHN
-	If FakeFullScreen
+	;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark,
+	If BorderlessWindowed
 		DebugLog "Using Faked Fullscreen"
 		Graphics3DExt G_viewport_width, G_viewport_height, 0, 2
 		
@@ -1809,7 +1809,7 @@ Function UseDoor(d.Doors, showmsg%=True)
 					ElseIf (Msg<>"You called the elevator.") Or (MsgTimer<60*5) Then
 						;people like spamming the elevator buttons for some reason
 						;so make sure they can see the "called the elevator" message
-						Local ElevatorMessage% = Rand(20)
+						Local ElevatorMessage% = Rand(10)
 						If ElevatorMessage=1 And (MsgTimer<70*3) Then
 							Select Rand(3)
 								Case 1
@@ -2087,7 +2087,7 @@ Function InitEvents()
 	CreateEvent("room966","room966", 0)
 	
 	CreateEvent("room1123", "room1123", 0, 0)
-	CreateEvent("room2test1074","room2test1074",0)
+	;CreateEvent("room2test1074","room2test1074",0)
 	;CreateEvent("room038","room038",0,0)
 	;CreateEvent("room009","room009",0,0)
 	;CreateEvent("medibay", "medibay", 0)
@@ -2473,7 +2473,7 @@ Repeat
 					Msg = "Saving now would only yield a "+Chr(34)+"Memory Access Violation"+Chr(34)+"."
 					MsgTimer = 70 * 4
 				ElseIf (Not CanSave)
-					Msg = "You can not save at this moment."
+					Msg = "You cannot save at this moment."
 					MsgTimer = 70 * 4
 				Else
 					SaveGame(SavePath + CurrSave + "\")
@@ -2485,10 +2485,10 @@ Repeat
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
 					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance"
-						Msg = "You can not save in this location."
+						Msg = "You cannot save in this location."
 						MsgTimer = 70 * 4
 					ElseIf (Not CanSave)
-						Msg = "You can not save at this moment."
+						Msg = "You cannot save at this moment."
 						MsgTimer = 70 * 4
 					Else
 						SaveGame(SavePath + CurrSave + "\")
@@ -2499,7 +2499,7 @@ Repeat
 				MsgTimer = 70 * 4
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
-			If (Msg<>"Game saved" And Msg<>"Saving now would only yield a "+Chr(34)+"Memory Access Violation"+Chr(34)+"." And Msg<>"You can not save in this location." And Msg<>"You can not save at this moment.") Or MsgTimer<=0 Then
+			If (Msg<>"Game progress saved." And Msg<>"Saving now would only yield a "+Chr(34)+"Memory Access Violation"+Chr(34)+"." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
 				Msg = "Press F5 to save."
 				MsgTimer = 70*5
 			EndIf
@@ -2566,7 +2566,7 @@ Repeat
 		
 	End If
 	
-	If FakeFullScreen Then
+	If BorderlessWindowed Then
 		If (RealGraphicWidth<>GraphicWidth) Or (RealGraphicHeight<>GraphicHeight) Then
 			CopyRect 0,0,GraphicWidth,GraphicHeight,1024-GraphicWidth/2,1024-GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 			SetBuffer BackBuffer()
@@ -3914,7 +3914,7 @@ Function DrawGUI()
 					ElseIf PrevOtherOpen\SecondInv[MouseSlot] <> SelectedItem
 						Select SelectedItem\itemtemplate\tempname
 							Default
-								Msg = "You can not combine these two items."
+								Msg = "You cannot combine these two items."
 								MsgTimer = 70 * 5
 						End Select					
 					EndIf
@@ -4121,7 +4121,7 @@ Function DrawGUI()
 										EndIf
 										MsgTimer = 70 * 5
 									Else
-										Msg = "You can not combine these two items."
+										Msg = "You cannot combine these two items."
 										MsgTimer = 70 * 5
 									EndIf
 								EndIf
@@ -4145,7 +4145,7 @@ Function DrawGUI()
 												Msg = "There seems to be no place for batteries in this radio."
 												MsgTimer = 70 * 5
 											Case "18vradio"
-												Msg = "The battery does not fit inside this item."
+												Msg = "The battery does not fit inside this radio."
 												MsgTimer = 70 * 5
 											Case "radio"
 												If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
@@ -4165,13 +4165,13 @@ Function DrawGUI()
 											MsgTimer = 70 * 5
 										EndIf
 									Default
-										Msg = "You can not combine these two items."
+										Msg = "You cannot combine these two items."
 										MsgTimer = 70 * 5	
 								End Select
 							Case "18vbat"
 								Select Inventory(MouseSlot)\itemtemplate\name
 									Case "S-NAV Navigator", "S-NAV 300 Navigator", "S-NAV 310 Navigator"
-										Msg = "The battery does not fit inside this item."
+										Msg = "The battery does not fit inside this navigator."
 										MsgTimer = 70 * 5
 									Case "S-NAV Navigator Ultimate"
 										Msg = "There seems to be no place for batteries in this navigator."
@@ -4190,11 +4190,11 @@ Function DrawGUI()
 												MsgTimer = 70 * 5
 										End Select 
 									Default
-										Msg = "You can not combine these two items."
+										Msg = "You cannot combine these two items."
 										MsgTimer = 70 * 5	
 								End Select
 							Default
-								Msg = "You can not combine these two items."
+								Msg = "You cannot combine these two items."
 								MsgTimer = 70 * 5
 						End Select					
 					End If
@@ -4215,7 +4215,6 @@ Function DrawGUI()
 		If SelectedItem <> Null Then
 			Select SelectedItem\itemtemplate\tempname
 					
-					;BoH Items
 					;[Block]
 				Case "nvgoggles", "supernv"
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
@@ -4230,14 +4229,14 @@ Function DrawGUI()
 						StoredCameraFogFar = CameraFogFar
 						CameraFogFar = 30
 					EndIf
-					If SelectedItem\itemtemplate\tempname="nvgoggles" Then
-						If WearingNightVision=0 Then WearingNightVision = 1 Else WearingNightVision=0
-					ElseIf SelectedItem\itemtemplate\tempname="supernv"
-						If WearingNightVision=0 Then WearingNightVision = 2 Else WearingNightVision=0
-					Else
-						WearingNightVision = (Not WearingNightVision)
+					
+					WearingNightVision = (Not WearingNightVision)
+					If SelectedItem\itemtemplate\tempname="supernv"
+						WearingNightVision = WearingNightVision * 2
 					EndIf
+						
 					SelectedItem = Null	
+
 				Case "scp178"
 					If Wearing178=1 Then
 						Msg = "You removed the glasses."
@@ -4279,35 +4278,10 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
-				Case "pill"
-					Local chanceCure% = Rand(100)
-					If chanceCure<30 Then
-						If Injuries > 0 And Infect > 0 And Bloodloss > 0 Then
-							Msg = "Your wounds are healing rapidly and your nausea is fading."
-						ElseIf Injuries > 0 And Bloodloss > 0
-							Msg = "Your wounds are healing rapidly."
-						Else
-							Msg = "Your wounds are healing."	
-						EndIf
-						MsgTimer = 70*7
-						
-						Injuries = 0
-						Bloodloss = 0
-						Infect = 0
-						Stamina = 100
-						For i = 0 To 5
-							SCP1025state[i]=0
-						Next
-						
-					ElseIf chanceCure<90 Then
-						If Infect Then Msg = "Your nausea was partly alleviated." : MsgTimer = 70*7
-					EndIf
-					RemoveItem(SelectedItem)
-					SelectedItem=Null
-					;[End Block]
 					
 				Case "battery"
 					;InvOpen = True
+
 				Case "key1", "key2", "key3", "key4", "key5", "key6", "keyomni", "scp860", "hand", "hand2"
 					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				Case "scp513"
@@ -4327,16 +4301,16 @@ Function DrawGUI()
 				Case "scp500"
 					GiveAchievement(Achv500)
 					
-					If Injuries > 0 And Infect > 0 And Bloodloss > 0 Then
-						Msg = "Your wounds are healing rapidly and your nausea is fading."
-					ElseIf Injuries > 0 And Bloodloss > 0
-						Msg = "Your wounds are healing rapidly."
+					If (Injuries > 0 Or Bloodloss > 0) And Infect > 0 Then
+						Msg = "You swallowed the pill. Your wounds are healing rapidly and your nausea is fading."
+					ElseIf Infect > 0 Then
+						Msg = "You swallowed the pill. Your nausea is fading."
 					Else
-						Msg = "Your wounds are healing."
+						Msg = "You swallowed the pill. Your wounds are healing rapidly."
 					EndIf
 					MsgTimer = 70*7
 					
-					DeathTimer=0
+					DeathTimer = 0
 					Injuries = 0
 					Bloodloss = 0
 					Infect = 0
@@ -4344,11 +4318,6 @@ Function DrawGUI()
 					For i = 0 To 5
 						SCP1025state[i]=0
 					Next
-					
-					For e.Events = Each Events
-						If e\EventName="room009" Then e\EventState=0.0 : e\EventState3=0.0
-					Next
-					
 					
 					RemoveItem(SelectedItem)
 					SelectedItem = Null
@@ -4454,7 +4423,7 @@ Function DrawGUI()
 									Select Rand(6)
 										Case 1
 											SuperMan = True
-											Msg = "You become overwhelmedwithadrenalineholyshitWOOOOOO~!"
+											Msg = "You have becomed overwhelmedwithadrenalineholyshitWOOOOOO~!"
 										Case 2
 											InvertMouse = (Not InvertMouse)
 											Msg = "You suddenly find it very difficult to turn your head."
@@ -4530,7 +4499,7 @@ Function DrawGUI()
 								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 								
 								If (SelectedItem\state = 0) Then
-									Msg = Chr(34)+"Hey, I remember buying this ticket! Wonder if it ever came out..."+Chr(34)
+									Msg = Chr(34)+"Hey, I remember getting this ticket from the kickstarter! Wonder if it ever came out..."+Chr(34)
 									MsgTimer = 70*10
 									PlaySound_Strict LoadTempSound("SFX\1162\bf1_"+Rand(1,5)+".ogg")
 									SelectedItem\state = 1
@@ -4880,28 +4849,34 @@ Function DrawGUI()
 					EndIf
 					
 				Case "cigarette"
-					Select Rand(6)
-						Case 1
-							Msg = Chr(34)+"I don't have anything to light it with. Umm, what about that... Nevermind."+Chr(34)
-						Case 2
-							Msg = "You are unable to get lit."
-						Case 3
-							Msg = Chr(34)+"I quit that a long time ago."+Chr(34)
-						Case 4
-							Msg = Chr(34)+"Even if I wanted one, I have nothing to light it with."+Chr(34)
-						Case 5
-							Msg = Chr(34)+"Could really go for one now... Wish I had a lighter."+Chr(34)
-						Case 6
-							Msg = Chr(34)+"Don't plan on starting, even at a time like this."+Chr(34)
-					End Select
+					If SelectedItem\State = 0 Then
+						Select Rand(6)
+							Case 1
+								Msg = Chr(34)+"I don't have anything to light it with. Umm, what about that... Nevermind."+Chr(34)
+							Case 2
+								Msg = "You are unable to get lit."
+							Case 3
+								Msg = Chr(34)+"I quit that a long time ago."+Chr(34)
+								RemoveItem(SelectedItem)
+							Case 4
+								Msg = Chr(34)+"Even if I wanted one, I have nothing to light it with."+Chr(34)
+							Case 5
+								Msg = Chr(34)+"Could really go for one now... Wish I had a lighter."+Chr(34)
+							Case 6
+								Msg = Chr(34)+"Don't plan on starting, even at a time like this."+Chr(34)
+								RemoveItem(SelectedItem)
+						End Select
+						SelectedItem\State = 1 
+					Else
+						Msg = "You are unable to get lit."
+					EndIf
 
 					MsgTimer = 70 * 5
-					RemoveItem(SelectedItem)
 				Case "420"
 					If Wearing714=1 Then
-						Msg = "DUDE WTF THIS SHIT DOESN'T EVEN WORK"	
+						Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
 					Else
-						Msg = "MAN DATS SUM GOOD ASS SHIT"
+						Msg = Chr(34) + "MAN DATS SUM GOOD ASS SHIT" + Chr(34)
 						Injuries = Max(Injuries-0.5, 0)
 						BlurTimer = 500
 						GiveAchievement(Achv420)
@@ -4911,12 +4886,12 @@ Function DrawGUI()
 					RemoveItem(SelectedItem)
 				Case "420s"
 					If Wearing714=1 Then
-						Msg = "DUDE WTF THIS SHIT DOESN'T EVEN WORK"	
+						Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
 					Else
-						DeathMSG = "Subject D-9341 found in a comatose state in [DATA REDACTED]. The subject was holding what appears to be a cigarette while smileing widely. "
+						DeathMSG = "Subject D-9341 found in a comatose state in [DATA REDACTED]. The subject was holding what appears to be a cigarette while smiling widely. "
 						DeathMSG = DeathMSG+"Chemical analysis of the cigarette has been inconclusive, although it seems to contain a high concentration of an unidentified chemical "
 						DeathMSG = DeathMSG+"whose molecular structure is remarkably similar to that of tetrahydrocannabinol."
-						Msg = "UH WHERE... WHAT WAS I DOING AGAIN... MAN I NEED TO TAKE A NAP..."
+						Msg = Chr(34) + "UH WHERE... WHAT WAS I DOING AGAIN... MAN I NEED TO TAKE A NAP..." + Chr(34)
 						KillTimer = -1						
 					EndIf
 					MsgTimer = 70 * 6

@@ -6060,15 +6060,15 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 						Case 1,2,3,4,5
 							BlurTimer = 500
 							Stamina = 0
-							ShotMessageUpdate = "A bullet penetrates your vest, making you gasp."
+							ShotMessageUpdate = "A bullet penetrated your vest, making you gasp."
 							Injuries = Injuries + Rnd(0.1,0.5)
 						Case 6
 							BlurTimer = 500
-							ShotMessageUpdate = "A bullet hits your left leg."
+							ShotMessageUpdate = "A bullet hit your left leg."
 							Injuries = Injuries + Rnd(0.8,1.2)
 						Case 7
 							BlurTimer = 500
-							ShotMessageUpdate = "A bullet hits your right leg."
+							ShotMessageUpdate = "A bullet hit your right leg."
 							Injuries = Injuries + Rnd(0.8,1.2)
 						Case 8
 							Kill()
@@ -6077,7 +6077,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 					If Rand(10)=1 Then
 						Kill()
 					Else
-						ShotMessageUpdate = "A bullet hits your chest. The vest absorbs most of the damage."
+						ShotMessageUpdate = "A bullet hit your chest. The vest absorbed most of the damage."
 						Injuries = Injuries + Rnd(0.1,0.5)
 					EndIf
 				EndIf
@@ -6087,23 +6087,23 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 						Kill()
 					Case 2
 						BlurTimer = 500
-						ShotMessageUpdate = "A bullet hits your left leg."
+						ShotMessageUpdate = "A bullet hit your left leg."
 						Injuries = Injuries + Rnd(0.8,1.2)
 					Case 3
 						BlurTimer = 500
-						ShotMessageUpdate = "A bullet hits your right leg."
+						ShotMessageUpdate = "A bullet hit your right leg."
 						Injuries = Injuries + Rnd(0.8,1.2)
 					Case 4
 						BlurTimer = 500
-						ShotMessageUpdate = "A bullet hits your right shoulder."
+						ShotMessageUpdate = "A bullet hit your right shoulder."
 						Injuries = Injuries + Rnd(0.8,1.2)	
 					Case 5
 						BlurTimer = 500
-						ShotMessageUpdate = "A bullet hits your left shoulder."
+						ShotMessageUpdate = "A bullet hit your left shoulder."
 						Injuries = Injuries + Rnd(0.8,1.2)	
 					Case 6
 						BlurTimer = 500
-						ShotMessageUpdate = "A bullet hits your right shoulder."
+						ShotMessageUpdate = "A bullet hit your right shoulder."
 						Injuries = Injuries + Rnd(2.5,4.0)
 				End Select
 			EndIf
