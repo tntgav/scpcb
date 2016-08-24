@@ -713,9 +713,9 @@ Function UpdateConsole()
 						FreeTexture tex
 						CreateConsoleMsg("173 JACK-O-LANTERN ON")
 					Else
-						Local tex = LoadTexture_Strict("GFX\npcs\173texture.png", 1)
-						EntityTexture Curr173\obj, tex, 0, 0
-						FreeTexture tex
+						Local tex2 = LoadTexture_Strict("GFX\npcs\173texture.png", 1)
+						EntityTexture Curr173\obj, tex2, 0, 0
+						FreeTexture tex2
 						CreateConsoleMsg("173 JACK-O-LANTERN OFF")
 					EndIf
 				Case "sanic"
@@ -906,7 +906,7 @@ Function UpdateConsole()
 							DeathMSG = "EXCP_ACCESS_VIOLATION"
 						Case 4
 							DeathMSG = "Subject D-9341 found dead in Sector [REDACTED]."
-							DeathMSG = DeathMSG + "The subject appears to have scribbled the letters "+Chr(34)+"kys"+Chr(34)" in his own blood beside him."
+							DeathMSG = DeathMSG + "The subject appears to have scribbled the letters "+Chr(34)+"kys"+Chr(34)+" in his own blood beside him."
 							DeathMSG = DeathMSG + "No other signs of physical trauma or struggle can be observed. Body was sent for autopsy."
 					End Select 
 

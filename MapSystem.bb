@@ -2199,6 +2199,7 @@ Function FillRoom(r.Rooms)
 			sc\angle = 45
 			sc\turn = 0
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			sc\ID = 5
 			
 			r\Objects[2] = CopyEntity(Monitor2,r\obj)
 			ScaleEntity(r\Objects[2], 2.0, 2.0, 2.0)
@@ -2540,6 +2541,7 @@ Function FillRoom(r.Rooms)
 			sc\angle = 90
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			sc\ID = 6
 			;[End Block]
 		Case "room2tunnel"
 			;[Block]
@@ -2663,6 +2665,7 @@ Function FillRoom(r.Rooms)
 			sc\angle = 135
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			sc\ID = 7
 			;[End Block]
 		Case "room035"
 			;[Block]
@@ -2782,6 +2785,7 @@ Function FillRoom(r.Rooms)
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
+			sc\ID = 9
 			
 			r\Objects[0] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[0], r\x, 0.5, r\z + 512.0 * RoomScale, True)
@@ -3354,6 +3358,7 @@ Function FillRoom(r.Rooms)
 			sc\angle = 180
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			sc\ID = 0
 			;sc\FollowPlayer = True
 			;[End Block]
 		Case "room2offices"
@@ -3958,6 +3963,7 @@ Function FillRoom(r.Rooms)
 			sc\angle = 45
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			sc\ID = 10
 			;[End Block]
 		Case "room106"
 			;[Block]
@@ -4074,6 +4080,7 @@ Function FillRoom(r.Rooms)
 			sc\room = r
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			EntityParent(sc\obj, r\obj)
+			sc\ID = 4
 			;[End Block]
 		Case "room1archive","room1archive1074"
 			;[Block]
@@ -4161,6 +4168,7 @@ Function FillRoom(r.Rooms)
 			sc\angle = 180
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			sc\ID = 1
 			;[End Block]
 		Case "room2test1074"
 			;[Block]
@@ -4455,6 +4463,7 @@ Function FillRoom(r.Rooms)
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
+			sc\ID = 2
 			;[End Block]
 		Case "room2_3"
 			;[Block]
@@ -4474,6 +4483,7 @@ Function FillRoom(r.Rooms)
 			sc\room = r
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			EntityParent(sc\obj, r\obj)
+			sc\ID = 3
 			;[End Block]
 		Case "room2servers2"
 			;[Block]
@@ -4605,6 +4615,7 @@ Function FillRoom(r.Rooms)
 			sc\angle = 225
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			sc\ID = 8
 			;[End Block]
 		Case "room2scps2"
 			;[Block]
@@ -5637,6 +5648,7 @@ Type SecurityCams
 	Field IsRoom2slCam% = False
 	Field Room2slTexs%[2]
 	Field SpecialCam% = False
+	Field ID% = -1
 End Type
 
 Global ScreenTexs%[2]
@@ -6756,8 +6768,8 @@ Function CreateMap()
 	SetRoom("roompj", ROOM1, Floor(0.1*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("914", ROOM1, Floor(0.3*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("room1archive1074",ROOM1,Floor(0.5*Float(Room1Amount[0])),min_pos,max_pos)
+	SetRoom("room205", ROOM1, Floor(0.6*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("room178",ROOM1,Floor(0.7*Float(Room1Amount[0])),min_pos,max_pos)
-	SetRoom("room205", ROOM1, Floor(0.9*Float(Room1Amount[0])),min_pos,max_pos)
 	
 	MapRoom(ROOM2C, 0) = "lockroom"
 	

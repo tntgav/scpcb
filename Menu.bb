@@ -1315,8 +1315,7 @@ Function DrawLoading(percent%, shortloading=False)
 			AAText(GraphicWidth / 2, GraphicHeight / 2 + 80, strtemp, True, True)
 			
 			If percent = 0 Then 
-				Local 990Text% = Rand(5)
-				If 990Text = 1
+				If Rand(5)=1 Then
 					Select Rand(2)
 						Case 1
 							SelectedLoadingScreen\txt[0] = "It will happen on " + CurrentDate() + "."
