@@ -10,6 +10,7 @@
 <Folders>
 </Folders>
 <Files>
+ AbsPath="\AAText.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Achievements.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Converter.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Difficulty.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"

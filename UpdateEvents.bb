@@ -362,7 +362,7 @@ Function UpdateEvents()
 								EndIf
 							ElseIf e\EventState3 < 35
 								If Inventory(0)<>Null Then
-									Msg = "Press "+KeyName(Min(KEY_INV,210))+" to open the inventory."
+									Msg = "Press TAB to open the inventory."
 									MsgTimer=70*4
 									e\EventState3 = 40
 									Exit
