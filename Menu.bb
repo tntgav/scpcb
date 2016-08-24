@@ -1348,7 +1348,7 @@ Function DrawLoading(percent%, shortloading=False)
 						Case 12
 							SelectedLoadingScreen\txt[0] = "oncluded that coming here was a mistake. We have to turn back."
 						Case 13
-							SelectedLoadingScreen\txt[0] = "This alloy contains a certain the essence of my life."
+							SelectedLoadingScreen\txt[0] = "This alloy contains the essence of my life."
 					End Select
 				EndIf
 			EndIf
