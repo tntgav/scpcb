@@ -408,6 +408,9 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 					
 					If tex[j]<>0 Then
 						If temp1i=1 Then TextureBlend tex[j],5
+						If Instr(Lower(temp1s),"_lm")<>0 Then
+							TextureBlend tex[j],3
+						EndIf
 						AddTextureToCache(tex[j])
 					EndIf
 					
@@ -472,11 +475,12 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 ;			If isgood Then
 			For j=0 To 1
 				If tex[j]<>0 Then
-					BrushTexture brush,tex[j],0,j
+					BrushTexture brush,tex[j],0,j+1
 				Else
-					BrushTexture brush,blankTexture,0,j
+					BrushTexture brush,blankTexture,0,j+1
 				EndIf
-			Next	
+			Next
+			BrushTexture brush,AmbientLightRoomTex,0
 ;			Else
 ;				BrushTexture brush,pinkTexture,0,0
 ;				BrushTexture brush,pinkTexture,0,1
@@ -536,46 +540,46 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		
 	Next
 	
-	Local isavailRT% = True
-	If rt <> Null
-		If rt\Name = "173" Then isavailRT% = False
-	EndIf
+	;Local isavailRT% = True
+	;If rt <> Null
+	;	If rt\Name = "173" Then isavailRT% = False
+	;EndIf
 	
-	If isavailRT%
-		For i = 1 To CountSurfaces(Opaque)
-			surf = GetSurface(Opaque,i)
-			brush = GetSurfaceBrush(surf)
-			tex[0] = GetBrushTexture(brush,1)
-			If tex[0]<>0 Then
-				If TextureName(tex[0])<>"" Then
-					tex[1] = GetBrushTexture(brush,0)
-					If TextureName(tex[1])<>"" Then
-						If TextureName(tex[1])<>"" Then
-							TextureBlend tex[1],5
-							TextureBlend tex[0],5
-							
-							BrushTexture brush, tex[0], 0, 2
-							BrushTexture brush, tex[1], 0, 1
-							BrushTexture brush, AmbientLightRoomTex,0
-							
-							PaintSurface surf,brush
-							FreeTexture tex[1] : tex[1]=0							
-						EndIf
-							
-					Else
-						TextureBlend tex[0],5
-						
-						BrushTexture brush, tex[0], 0, 1
-						BrushTexture brush, AmbientLightRoomTex,0
-						
-						PaintSurface surf,brush
-					EndIf
-					FreeTexture tex[0] : tex[0]=0					
-				EndIf
-			EndIf
-			If brush<>0 Then FreeBrush brush : brush=0
-		Next
-	EndIf
+	;If isavailRT%
+	;	For i = 1 To CountSurfaces(Opaque)
+	;		surf = GetSurface(Opaque,i)
+	;		brush = GetSurfaceBrush(surf)
+	;		tex[0] = GetBrushTexture(brush,1)
+	;		If tex[0]<>0 Then
+	;			If TextureName(tex[0])<>"" Then
+	;				tex[1] = GetBrushTexture(brush,0)
+	;				If TextureName(tex[1])<>"" Then
+	;					If TextureName(tex[1])<>"" Then
+	;						TextureBlend tex[1],5
+	;						TextureBlend tex[0],5
+	;						
+	;						BrushTexture brush, tex[0], 0, 2
+	;						BrushTexture brush, tex[1], 0, 1
+	;						BrushTexture brush, AmbientLightRoomTex,0
+	;						
+	;						PaintSurface surf,brush
+	;						FreeTexture tex[1] : tex[1]=0							
+	;					EndIf
+	;						
+	;				Else
+	;					TextureBlend tex[0],5
+	;					
+	;					BrushTexture brush, tex[0], 0, 1
+	;					BrushTexture brush, AmbientLightRoomTex,0
+	;					
+	;					PaintSurface surf,brush
+	;				EndIf
+	;				FreeTexture tex[0] : tex[0]=0					
+	;			EndIf
+	;		EndIf
+	;		If brush<>0 Then FreeBrush brush : brush=0
+	;	Next
+	;EndIf
 	
 	Local hiddenMesh%
 	hiddenMesh=CreateMesh()

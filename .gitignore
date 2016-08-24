@@ -4,3 +4,5 @@
 *.DS_Store
 MapSystem.bb.rej
 UpdateEvents.bb.rej
+*.bb_bak*
+Saves/*
