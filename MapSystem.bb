@@ -408,9 +408,6 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 					
 					If tex[j]<>0 Then
 						If temp1i=1 Then TextureBlend tex[j],5
-						If Instr(Lower(temp1s),"_lm")<>0 Then
-							TextureBlend tex[j],3
-						EndIf
 						AddTextureToCache(tex[j])
 					EndIf
 					
@@ -475,12 +472,11 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 ;			If isgood Then
 			For j=0 To 1
 				If tex[j]<>0 Then
-					BrushTexture brush,tex[j],0,j+1
+					BrushTexture brush,tex[j],0,j
 				Else
-					BrushTexture brush,blankTexture,0,j+1
+					BrushTexture brush,blankTexture,0,j
 				EndIf
-			Next
-			BrushTexture brush,AmbientLightRoomTex,0
+			Next	
 ;			Else
 ;				BrushTexture brush,pinkTexture,0,0
 ;				BrushTexture brush,pinkTexture,0,1
@@ -540,46 +536,46 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		
 	Next
 	
-	;Local isavailRT% = True
-	;If rt <> Null
-	;	If rt\Name = "173" Then isavailRT% = False
-	;EndIf
+	Local isavailRT% = True
+	If rt <> Null
+		If rt\Name = "173" Then isavailRT% = False
+	EndIf
 	
-	;If isavailRT%
-	;	For i = 1 To CountSurfaces(Opaque)
-	;		surf = GetSurface(Opaque,i)
-	;		brush = GetSurfaceBrush(surf)
-	;		tex[0] = GetBrushTexture(brush,1)
-	;		If tex[0]<>0 Then
-	;			If TextureName(tex[0])<>"" Then
-	;				tex[1] = GetBrushTexture(brush,0)
-	;				If TextureName(tex[1])<>"" Then
-	;					If TextureName(tex[1])<>"" Then
-	;						TextureBlend tex[1],5
-	;						TextureBlend tex[0],5
-	;						
-	;						BrushTexture brush, tex[0], 0, 2
-	;						BrushTexture brush, tex[1], 0, 1
-	;						BrushTexture brush, AmbientLightRoomTex,0
-	;						
-	;						PaintSurface surf,brush
-	;						FreeTexture tex[1] : tex[1]=0							
-	;					EndIf
-	;						
-	;				Else
-	;					TextureBlend tex[0],5
-	;					
-	;					BrushTexture brush, tex[0], 0, 1
-	;					BrushTexture brush, AmbientLightRoomTex,0
-	;					
-	;					PaintSurface surf,brush
-	;				EndIf
-	;				FreeTexture tex[0] : tex[0]=0					
-	;			EndIf
-	;		EndIf
-	;		If brush<>0 Then FreeBrush brush : brush=0
-	;	Next
-	;EndIf
+	If isavailRT%
+		For i = 1 To CountSurfaces(Opaque)
+			surf = GetSurface(Opaque,i)
+			brush = GetSurfaceBrush(surf)
+			tex[0] = GetBrushTexture(brush,1)
+			If tex[0]<>0 Then
+				If TextureName(tex[0])<>"" Then
+					tex[1] = GetBrushTexture(brush,0)
+					If TextureName(tex[1])<>"" Then
+						If TextureName(tex[1])<>"" Then
+							TextureBlend tex[1],5
+							TextureBlend tex[0],5
+							
+							BrushTexture brush, tex[0], 0, 2
+							BrushTexture brush, tex[1], 0, 1
+							BrushTexture brush, AmbientLightRoomTex,0
+							
+							PaintSurface surf,brush
+							FreeTexture tex[1] : tex[1]=0							
+						EndIf
+							
+					Else
+						TextureBlend tex[0],5
+						
+						BrushTexture brush, tex[0], 0, 1
+						BrushTexture brush, AmbientLightRoomTex,0
+						
+						PaintSurface surf,brush
+					EndIf
+					FreeTexture tex[0] : tex[0]=0					
+				EndIf
+			EndIf
+			If brush<>0 Then FreeBrush brush : brush=0
+		Next
+	EndIf
 	
 	Local hiddenMesh%
 	hiddenMesh=CreateMesh()
@@ -4086,10 +4082,16 @@ Function FillRoom(r.Rooms)
 			EntityParent(sc\obj, r\obj)
 			sc\ID = 4
 			;[End Block]
-		Case "room1archive"
+		Case "room1archive","room1archive1074"
 			;[Block]
-			
-			temp = Rand(1,3)
+			If r\RoomTemplate\Name = "room1archive1074"
+				temp% = 3
+				it = CreateItem("SCP-1074 Containment Notice","paper",r\x-700.0*RoomScale,r\y+159.0*RoomScale,r\z+500.0*RoomScale)
+				EntityParent it\obj,r\obj
+			Else
+				temp% = Rand(1,3)
+			EndIf
+		
 			For xtemp = 0 To 1
 				For ytemp = 0 To 2
 					For ztemp = 0 To 2
