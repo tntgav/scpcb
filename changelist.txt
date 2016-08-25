@@ -2,9 +2,6 @@
 ----------------------------------------------------------------------------------
 
 v1.3.2
-
-Saves from v1.3.1 are compatible with this version
-
 - compiled the game using juanjpro's "MavLess Blitz3D" (less MAVs)
 - added new rooms (including remade medibay)
 - new events with new NPCs
@@ -18,6 +15,25 @@ Saves from v1.3.1 are compatible with this version
 - fixed invisible SCP-106 in the room2pipes event
 - rebalanced SCP-914's key card refining
 - some SCP-049 imporovements
+- other minor imporovements
+
+Improvements by CommanderMark
+   - corrected the spelling and grammar of various pieces of dialogue.
+   - rewrote a majority of the dialogue (no more "THEY LOOK LIKE EARS").
+   - wrapped first person dialogue in proper double quotes.
+   - better clarified certain pieces of text ("The elevator is moving" --> "You already called the elevator.").
+   - added more randomized dialogue in certain situations.
+   - extended the parameters of the "help" console command.
+   - fixed the "halloween" console command.
+   - fixed SCP-173's model so that it no longer uses 2 texture layers. (juan updated the model)
+   - added unique locked door and DNA scanner sound effects.
+   - changed the message "Press TAB to open up the inventory" to display your bound key.
+   - remove some pieces of unused Nine-Tailed Fox and Box of Horrors code.
+   - stopped damage indicator messages from spamming when being shot at (now only updates the message after at least 2 seconds have passed).
+   - added a door budging sound effect to the wooden door in 860's test room and 860-1.
+   - renamed fake fullscreen to its actual name, borderless windowed mode. 
+   - the game now un-crouches you when the 1123 event completes and when you teleport to the trench. (because people kept complaining about it)
+   - changed the door opening sound for 1123's event.
 
 ----------------------------------------------------------------------------------
 
