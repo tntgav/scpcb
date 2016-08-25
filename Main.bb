@@ -8,6 +8,7 @@
 
 Include "StrictLoads.bb"
 Include "fullscreen_window_fix.bb"
+Include "KeyName.bb"
 
 Global OptionFile$ = "options.ini"
 
@@ -60,6 +61,7 @@ Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
 
 Global BorderlessWindowed% = GetINIInt(OptionFile, "options", "borderless windowed")
 Global RealGraphicWidth%,RealGraphicHeight%
+Global AspectRatioRatio#
 
 Global EnableRoomLights% = GetINIInt(OptionFile, "options", "room lights enabled")
 
@@ -83,6 +85,7 @@ Global Bit16Mode = GetINIInt(OptionFile, "options", "16bit")
 Include "AAText.bb"
 
 If LauncherEnabled Then 
+	AspectRatioRatio = 1.0
 	UpdateLauncher()
 	
 	;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark,
@@ -97,8 +100,11 @@ If LauncherEnabled Then
 		RealGraphicWidth = G_viewport_width
 		RealGraphicHeight = G_viewport_height
 		
+		AspectRatioRatio = (Float(GraphicWidth)/Float(GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
+		
 		Fullscreen = False
 	Else
+		AspectRatioRatio = 1.0
 		If Fullscreen Then
 			Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
 		Else
@@ -135,8 +141,11 @@ Else
 		RealGraphicWidth = G_viewport_width
 		RealGraphicHeight = G_viewport_height
 		
+		AspectRatioRatio = (Float(GraphicWidth)/Float(GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
+		
 		Fullscreen = False
 	Else
+		AspectRatioRatio = 1.0
 		If Fullscreen Then
 			Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
 		Else
@@ -1041,8 +1050,11 @@ Global HUDenabled% = GetINIInt("options.ini", "options", "HUD enabled")
 
 Global Camera%, CameraShake#, CurrCameraZoom#
 
-Global Brightness_Slider# = GetINIFloat("options.ini", "options", "brightness")
-Global Brightness% = Brightness_Slider#*127.5
+;Global Brightness_Slider# = GetINIFloat("options.ini", "options", "brightness")
+
+;this slider is just incorrect, gamma should be the only option players have to change brightness
+
+Global Brightness% = GetINIFloat("options.ini", "options", "brightness");Brightness_Slider#*127.5
 Global CameraFogNear# = GetINIFloat("options.ini", "options", "camera fog near")
 Global CameraFogFar# = GetINIFloat("options.ini", "options", "camera fog far")
 
@@ -1323,7 +1335,7 @@ Global NTF_1499Sky%
 Global OptionsMenu% = 0
 Global QuitMSG% = 0
 
-Global StoredBrightness% = 40
+;Global StoredBrightness% = 40
 Global InFacility% = True
 
 Global PrevMusicVolume# = MusicVolume#
@@ -2261,7 +2273,7 @@ Repeat
 			SelectedItem = Null 
 		EndIf
 		
-		Brightness = Brightness_Slider*127.5
+		;Brightness = Brightness_Slider*127.5
 		
 		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea"  Then 
 			
@@ -2574,9 +2586,12 @@ Repeat
 	
 	If BorderlessWindowed Then
 		If (RealGraphicWidth<>GraphicWidth) Or (RealGraphicHeight<>GraphicHeight) Then
+			SetBuffer TextureBuffer(fresize_texture)
+			ClsColor 0,0,0 : Cls
 			CopyRect 0,0,GraphicWidth,GraphicHeight,1024-GraphicWidth/2,1024-GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 			SetBuffer BackBuffer()
-			ScaleRender(0,0,2050.0 / Float(GraphicWidth), 2050.0 / Float(GraphicWidth))
+			ClsColor 0,0,0 : Cls
+			ScaleRender(0,0,2050.0 / Float(GraphicWidth) * AspectRatioRatio, 2050.0 / Float(GraphicWidth) * AspectRatioRatio)
 			;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
 			;everyone uses landscape so it's probably a non-issue
 		EndIf
@@ -2587,6 +2602,7 @@ Repeat
 	If ScreenGamma>1.0 Then
 		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 		EntityBlend fresize_image,1
+		ClsColor 0,0,0 : Cls
 		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
 		EntityFX fresize_image,1+32
 		EntityBlend fresize_image,3
@@ -2595,6 +2611,7 @@ Repeat
 	ElseIf ScreenGamma<1.0 Then ;todo: maybe optimize this if it's too slow, alternatively give players the option to disable gamma
 		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 		EntityBlend fresize_image,1
+		ClsColor 0,0,0 : Cls
 		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
 		EntityFX fresize_image,1+32
 		EntityBlend fresize_image,2
@@ -3250,9 +3267,8 @@ Function MouseLook()
 	End If
 	
 	If (Not WearingNightVision=0) Then
-		;AmbientLightRooms(60)
-		;AmbientLightRooms(255)
-		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
+		AmbientLightRooms(30)
+		;If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
 		ShowEntity(NVOverlay)
 		If WearingNightVision=2 Then
 			EntityColor(NVOverlay, 0,100,255)
@@ -3261,13 +3277,13 @@ Function MouseLook()
 		EndIf
 		EntityTexture(Fog, FogNVTexture)
 	Else
-		;AmbientLightRooms(0)
-		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
+		AmbientLightRooms(0)
+		;If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
 		HideEntity(NVOverlay)
 		EntityTexture(Fog, FogTexture)
 	EndIf
 	
-	If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
+	;If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
 	
 	If Wearing178>0 Then
 		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\178ambient.ogg")
@@ -4081,6 +4097,13 @@ Function DrawGUI()
 				EndIf
 			Else
 				If MouseSlot = 66 Then
+					DropItem(SelectedItem)		
+		
+					SelectedItem = Null		
+					InvOpen = False		
+							
+					MoveMouse viewport_center_x, viewport_center_y
+				Else
 					If Inventory(MouseSlot) = Null Then
 						For z% = 0 To MaxItemAmount - 1
 							If Inventory(z) = SelectedItem Then Inventory(z) = Null
@@ -5375,7 +5398,7 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
 				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-				PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
+				;PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
 				
 				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -5506,31 +5529,31 @@ Function DrawMenu()
 					
 					y=y+30*MenuScale
 					
-					Local prevBrightness# = Brightness_Slider
-					Brightness_Slider = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, Brightness_Slider*50.0)/50.0)
-					Color 255,255,255
-					AAText(x, y, "Brightness")
+					;Local prevBrightness# = Brightness_Slider
+					;Brightness_Slider = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, Brightness_Slider*50.0)/50.0)
+					;Color 255,255,255
+					;AAText(x, y, "Brightness")
 					
-					Brightness = Brightness_Slider#*127.5
-					If prevBrightness# <> Brightness_Slider
-						AmbientLight Brightness, Brightness, Brightness
-						If (Not WearingNightVision=0) Then
-							If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
-							ShowEntity(NVOverlay)
-							If WearingNightVision=2 Then
-								EntityColor(NVOverlay, 0,100,255)
-							Else
-								EntityColor(NVOverlay, 0,255,0)
-							EndIf
-							EntityTexture(Fog, FogNVTexture)
-						Else
-							If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
-							HideEntity(NVOverlay)
-							EntityTexture(Fog, FogTexture)
-						EndIf
-						If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
-						prevBrightness = Brightness_Slider
-					EndIf
+					;Brightness = Brightness_Slider#*127.5
+					;If prevBrightness# <> Brightness_Slider
+					;	AmbientLight Brightness, Brightness, Brightness
+					;	If (Not WearingNightVision=0) Then
+					;		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
+					;		ShowEntity(NVOverlay)
+					;		If WearingNightVision=2 Then
+					;			EntityColor(NVOverlay, 0,100,255)
+					;		Else
+					;			EntityColor(NVOverlay, 0,255,0)
+					;		EndIf
+					;		EntityTexture(Fog, FogNVTexture)
+					;	Else
+					;		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
+					;		HideEntity(NVOverlay)
+					;		EntityTexture(Fog, FogTexture)
+					;	EndIf
+					;	If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
+					;	prevBrightness = Brightness_Slider
+					;EndIf
 					;[End Block]
 				Case 2 ;Audio
 					;Text(x+210*MenuScale,y,"AUDIO",True,True)
@@ -6676,8 +6699,8 @@ Function NullGame()
 	DeleteElevatorObjects()
 	
 	NoTarget% = False
-	Brightness = Brightness_Slider#*127.5
-	StoredBrightness% = Brightness_Slider#*127.5
+	;Brightness = Brightness_Slider#*127.5
+	;StoredBrightness% = Brightness_Slider#*127.5
 	
 	OptionsMenu% = -1
 	QuitMSG% = -1
@@ -6698,7 +6721,7 @@ Function NullGame()
 	ark_blur_cam = 0
 	InitFastResize()
 	
-	Brightness% = Brightness_Slider#*255
+	;Brightness% = Brightness_Slider#*255
 	
 	;InitExt
 	
@@ -8856,7 +8879,7 @@ Function UpdateLeave1499()
 				NTF_1499PrevY# = 0.0
 				NTF_1499PrevZ# = 0.0
 				NTF_1499PrevRoom = Null
-				Brightness = StoredBrightness
+				;Brightness = StoredBrightness
 				Exit
 			EndIf
 		Next
@@ -8977,11 +9000,11 @@ Function CheckTriggers$()
 End Function
 
 Function ScaledMouseX%()
-	Return MouseX()*GraphicWidth/RealGraphicWidth
+	Return Float(MouseX()-(RealGraphicWidth*0.5*(1.0-AspectRatioRatio)))*Float(GraphicWidth)/Float(RealGraphicWidth*AspectRatioRatio)
 End Function
 
 Function ScaledMouseY%()
-	Return MouseY()*GraphicHeight/RealGraphicHeight
+	Return Float(MouseY())*Float(GraphicHeight)/Float(RealGraphicHeight)
 End Function
 
 ;~IDEal Editor Parameters:

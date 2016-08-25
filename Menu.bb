@@ -48,75 +48,6 @@ Global SelectedMap$
 
 LoadSaveGames()
 
-;[Block]
-Dim KeyName$(211)
-KeyName(1)="Esc"
-For i = 2 To 10
-	KeyName(i)=i-1
-Next
-KeyName(11)="0"
-KeyName(12)="-"
-KeyName(13)="="
-KeyName(14)="Backspace"
-KeyName(15)="TAB"
-KeyName(16)="Q"
-KeyName(17)="W"
-KeyName(18)="E"
-KeyName(19)="R"
-KeyName(20)="T"
-KeyName(21)="Y"
-KeyName(22)="U"
-KeyName(23)="I"
-KeyName(24)="O"
-KeyName(25)="P"
-KeyName(26)="["
-KeyName(27)="]"
-KeyName(28)="Enter"
-KeyName(29)="Left Ctrl"
-KeyName(30)="A"
-KeyName(31)="S"
-KeyName(32)="D"
-KeyName(33)="F"
-KeyName(34)="G"
-KeyName(35)="H"
-KeyName(36)="J"
-KeyName(37)="K"
-KeyName(38)="L"
-KeyName(39)=";"
-KeyName(40)="'"
-KeyName(42)="Left Shift"
-KeyName(43)="\"
-KeyName(44)="Z"
-KeyName(45)="X"
-KeyName(46)="C"
-KeyName(47)="V"
-KeyName(48)="B"
-KeyName(49)="N"
-KeyName(50)="M"
-KeyName(51)=","
-KeyName(52)="."
-KeyName(54)="Right Shift"
-KeyName(56)="Left Alt"
-KeyName(57)="Space"
-KeyName(58)="Caps Lock"
-KeyName(59)="F1"
-KeyName(60)="F2"
-KeyName(61)="F3"
-KeyName(62)="F4"
-KeyName(63)="F5"
-KeyName(64)="F6"
-KeyName(65)="F7"
-KeyName(66)="F8"
-KeyName(67)="F9"
-KeyName(68)="F10"
-KeyName(157)="Right Control"
-KeyName(184)="Right Alt"
-KeyName(200)="Up"
-KeyName(203)="Left"
-KeyName(205)="Right"
-KeyName(208)="Down"
-;[End Block]
-
 Function UpdateMainMenu()
 	Local x%, y%, width%, height%, temp%
 	
@@ -308,7 +239,7 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
 					PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-					PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
+					;PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
 					
 					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -658,9 +589,9 @@ Function UpdateMainMenu()
 					
 					y=y+30*MenuScale
 					
-					Brightness_Slider = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, Brightness_Slider*50.0)/50.0)
-					Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Brightness")
+					;Brightness_Slider = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, Brightness_Slider*50.0)/50.0)
+					;Color 255,255,255
+					;AAText(x + 20 * MenuScale, y, "Brightness")
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -1390,9 +1321,12 @@ Function DrawLoading(percent%, shortloading=False)
 		
 		If BorderlessWindowed Then
 			If (RealGraphicWidth<>GraphicWidth) Or (RealGraphicHeight<>GraphicHeight) Then
+				SetBuffer TextureBuffer(fresize_texture)
+				ClsColor 0,0,0 : Cls
 				CopyRect 0,0,GraphicWidth,GraphicHeight,1024-GraphicWidth/2,1024-GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 				SetBuffer BackBuffer()
-				ScaleRender(0,0,2048.0 / Float(GraphicWidth), 2048.0 / Float(GraphicWidth))
+				ClsColor 0,0,0 : Cls
+				ScaleRender(0,0,2050.0 / Float(GraphicWidth) * AspectRatioRatio, 2050.0 / Float(GraphicWidth) * AspectRatioRatio)
 				;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
 				;everyone uses landscape so it's probably a non-issue
 			EndIf
@@ -1403,6 +1337,7 @@ Function DrawLoading(percent%, shortloading=False)
 		If ScreenGamma>1.0 Then
 			CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 			EntityBlend fresize_image,1
+			ClsColor 0,0,0 : Cls
 			ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
 			EntityFX fresize_image,1+32
 			EntityBlend fresize_image,3
@@ -1411,6 +1346,7 @@ Function DrawLoading(percent%, shortloading=False)
 		ElseIf ScreenGamma<1.0 Then ;todo: maybe optimize this if it's too slow, alternatively give players the option to disable gamma
 			CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 			EntityBlend fresize_image,1
+			ClsColor 0,0,0 : Cls
 			ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
 			EntityFX fresize_image,1+32
 			EntityBlend fresize_image,2
