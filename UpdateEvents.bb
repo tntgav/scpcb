@@ -5049,7 +5049,6 @@ Function UpdateEvents()
 								Else
 									Msg = "You feel as though you are seeing this message because you may or not be feeling " + Chr(34) + "festive" + Chr(34) + "."
 								EndIf
-					Else
 						End Select
 						
 						If Rand(10)=1 Then
