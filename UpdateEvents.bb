@@ -5041,10 +5041,15 @@ Function UpdateEvents()
 									e\room\NPC[1]=Null
 								EndIf
 							Case 60
-								Curr173\texture = "GFX\npcs\173h.pt"
-								tex = LoadTexture(Curr173\texture)
-								EntityTexture Curr173\obj, tex, 0, 2
-								FreeTexture tex
+								If (Not HalloweenTex) Then
+									Local tex970 = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
+									EntityTexture Curr173\obj, tex970, 0, 0
+									FreeTexture tex970
+									CreateConsoleMsg("173 JACK-O-LANTERN ON VIA 970")
+								Else
+									Msg = "You feel as though you are seeing this message because you may or not be feeling " + Chr(34) + "festive" + Chr(34) + "."
+								EndIf
+					Else
 						End Select
 						
 						If Rand(10)=1 Then

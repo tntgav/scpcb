@@ -1815,12 +1815,13 @@ Function UseDoor(d.Doors, showmsg%=True)
 					If d\IsElevatorDoor = 1 Then
 						Msg = "You called the elevator."
 						MsgTimer = 70 * 5
-					ElseIf (Msg<>"You called the elevator.") Or (MsgTimer<60*5) Then
-						;people like spamming the elevator buttons for some reason
-						;so make sure they can see the "called the elevator" message
-						Local ElevatorMessage% = Rand(10)
-						If ElevatorMessage=1 And (MsgTimer<70*3) Then
-							Select Rand(3)
+					ElseIf (Msg<>"You called the elevator.")
+						Local calledMsg% = (Msg="You already called the elevator.")
+						If Not calledMsg Then calledMsg = (Msg="Stop spamming the button.")
+           	    		If Not calledMsg Then calledMsg = (Msg="Pressing it harder does not make the elevator come faster.")
+                		If Not calledMsg Then calledMsg = (Msg="If you continue pressing this button I will generate a Memory Access Violation.")
+                		If (calledMsg) Or (MsgTimer<70*3)	
+							Select Rand(10)
 								Case 1
 									Msg = "Stop spamming the button."
 									MsgTimer = 70 * 7
@@ -1830,15 +1831,14 @@ Function UseDoor(d.Doors, showmsg%=True)
 								Case 3
 									Msg = "If you continue pressing this button I will generate a Memory Access Violation."
 									MsgTimer = 70 * 7
+								Default
+									Msg = "You already called the elevator."
+									MsgTimer = 70 * 7
 							End Select
-
-						ElseIf ElevatorMessage=3 Then
-							Msg = Chr(34)+"Hurry up!"+Chr(34)
-							MsgTimer = 70 * 7
-						Else
-							Msg = "You already called the elevator."
-							MsgTimer = 70 * 7
 						EndIf
+					Else
+						Msg = "You already called the elevator."
+						MsgTimer = 70 * 7
 					EndIf
 				EndIf
 				
@@ -4139,8 +4139,6 @@ Function DrawGUI()
 										Else
 											If added\itemtemplate\tempname = "paper" Or added\itemtemplate\tempname = "oldpaper" Then
 												Msg = "This document was added to the clipboard."
-											ElseIf added\itemtemplate\tempname = "badge"
-												Msg = "This "+added\itemtemplate\name+" was added to the clipboard."
 											Else
 												Msg = "This "+added\itemtemplate\name+" was added to the clipboard."
 											EndIf

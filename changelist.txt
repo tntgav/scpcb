@@ -2,38 +2,28 @@
 ----------------------------------------------------------------------------------
 
 v1.3.2
-- compiled the game using juanjpro's "MavLess Blitz3D" (less MAVs)
-- added new rooms (including remade medibay)
-- new events with new NPCs
+- Compiled the game using Juanjpro's "MavLess Blitz3D".
+	-The game now updates an error log rather than immedietaly crashing when an error occurs.
+- Added several new rooms (including a revamped medical bay).
+- Added a [REDACTED] event to the Tesla gates.
 - brightness slider
-- bugfix for disabling antialiased text
-- fixed badge textures (by "Cridone")
-- the player can't fall through the floor in room049 or room3z2 anymore
-- fixed SCP-096 collision
-- fixed SCP-096 attacking if looking at its face with eyes closed
-- fixed a bug with severed hand spawn in room3storage
-- fixed invisible SCP-106 in the room2pipes event
-- rebalanced SCP-914's key card refining
-- some SCP-049 imporovements
-- other minor imporovements
-
-Improvements by CommanderMark
-   - corrected the spelling and grammar of various pieces of dialogue.
-   - rewrote a majority of the dialogue (no more "THEY LOOK LIKE EARS").
-   - wrapped first person dialogue in proper double quotes.
-   - better clarified certain pieces of text ("The elevator is moving" --> "You already called the elevator.").
-   - added more randomized dialogue in certain situations.
-   - extended the parameters of the "help" console command.
-   - fixed the "halloween" console command.
-   - fixed SCP-173's model so that it no longer uses 2 texture layers. (juan updated the model)
-   - added unique locked door and DNA scanner sound effects.
-   - changed the message "Press TAB to open up the inventory" to display your bound key.
-   - remove some pieces of unused Nine-Tailed Fox and Box of Horrors code.
-   - stopped damage indicator messages from spamming when being shot at (now only updates the message after at least 2 seconds have passed).
-   - added a door budging sound effect to the wooden door in 860's test room and 860-1.
-   - renamed fake fullscreen to its actual name, borderless windowed mode. 
-   - the game now un-crouches you when the 1123 event completes and when you teleport to the trench. (because people kept complaining about it)
-   - changed the door opening sound for 1123's event.
+- Fixed a crash involving disabling antialiased text while in-game.
+- Adjusted the aspect ratio of badge textures (by Cridone).
+- Added extra hit boxes to room049 and room3z2, preventing the player from falling through the floor in certain spots of these rooms.
+- Adjusted SCP-096's collision detection.
+- SCP-096 will no longer become triggered if looking at its face while the player's eyes are closed.
+- Fixed a bug involving the severed hand spawn in room3storage.
+- Fixed SCP-106 being invisible during the room2pipes event.
+- Rebalanced SCP-914's key card refining system.
+- Some improvements to SCP-049's AI.
+- Adjusted the spelling and grammar for a majority of in-game text.
+- Extended the parameters of the "help" console command.
+- Fixed the "halloween" console command.
+- Updated SCP-173's model so that it no longer uses 2 texture layers. In laments terms, its texture is no longer applied twice making it appear "darker".
+	-Credits to Juanjpro for the updated the model.
+- Added unique locked door and DNA scanner sound effects.
+- Damage indicator messages now only display once at least two seconds have passed since the previous one displayed. This prevents the messages from constantly updating when being shot at.
+- Renamed fake fullscreen to borderless windowed mode.
 
 ----------------------------------------------------------------------------------
 
