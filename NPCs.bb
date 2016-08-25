@@ -3865,7 +3865,7 @@ Function UpdateNPCs()
 					
 					If (WearingNightVision=0) Then
 						HideEntity n\obj
-						If dist<1 Then
+						If dist<1 And n\Reload <= 0 And MsgTimer <= 0 Then
 							Select Rand(6)
 								Case 1
 									Msg="You feel something breathing right next to you."
@@ -3880,9 +3880,11 @@ Function UpdateNPCs()
 								Case 6
 									Msg="You can feel something near you, but you are unable to see it. Perhaps its time is now."
 							End Select
-
+                            n\Reload = 20*70
 							MsgTimer=5*70
 						EndIf
+						n\Reload = n\Reload - FPSfactor
+						
 					Else
 						ShowEntity n\obj
 					EndIf

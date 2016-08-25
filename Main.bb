@@ -1050,11 +1050,8 @@ Global HUDenabled% = GetINIInt("options.ini", "options", "HUD enabled")
 
 Global Camera%, CameraShake#, CurrCameraZoom#
 
-;Global Brightness_Slider# = GetINIFloat("options.ini", "options", "brightness")
-
-;this slider is just incorrect, gamma should be the only option players have to change brightness
-
-Global Brightness% = GetINIFloat("options.ini", "options", "brightness");Brightness_Slider#*127.5
+Global Brightness_Slider# = GetINIFloat("options.ini", "options", "brightness")
+Global Brightness% = Brightness_Slider#*127.5
 Global CameraFogNear# = GetINIFloat("options.ini", "options", "camera fog near")
 Global CameraFogFar# = GetINIFloat("options.ini", "options", "camera fog far")
 
@@ -1335,7 +1332,7 @@ Global NTF_1499Sky%
 Global OptionsMenu% = 0
 Global QuitMSG% = 0
 
-;Global StoredBrightness% = 40
+Global StoredBrightness% = 40
 Global InFacility% = True
 
 Global PrevMusicVolume# = MusicVolume#
@@ -1818,12 +1815,13 @@ Function UseDoor(d.Doors, showmsg%=True)
 					If d\IsElevatorDoor = 1 Then
 						Msg = "You called the elevator."
 						MsgTimer = 70 * 5
-					ElseIf (Msg<>"You called the elevator.") Or (MsgTimer<60*5) Then
-						;people like spamming the elevator buttons for some reason
-						;so make sure they can see the "called the elevator" message
-						Local ElevatorMessage% = Rand(10)
-						If ElevatorMessage=1 And (MsgTimer<70*3) Then
-							Select Rand(3)
+					ElseIf (Msg<>"You called the elevator.")
+						Local calledMsg% = (Msg="You already called the elevator.")
+						If Not calledMsg Then calledMsg = (Msg="Stop spamming the button.")
+           	    		If Not calledMsg Then calledMsg = (Msg="Pressing it harder does not make the elevator come faster.")
+                		If Not calledMsg Then calledMsg = (Msg="If you continue pressing this button I will generate a Memory Access Violation.")
+                		If (calledMsg) Or (MsgTimer<70*3)	
+							Select Rand(10)
 								Case 1
 									Msg = "Stop spamming the button."
 									MsgTimer = 70 * 7
@@ -1833,15 +1831,14 @@ Function UseDoor(d.Doors, showmsg%=True)
 								Case 3
 									Msg = "If you continue pressing this button I will generate a Memory Access Violation."
 									MsgTimer = 70 * 7
+								Default
+									Msg = "You already called the elevator."
+									MsgTimer = 70 * 7
 							End Select
-
-						ElseIf ElevatorMessage=3 Then
-							Msg = Chr(34)+"Hurry up!"+Chr(34)
-							MsgTimer = 70 * 7
-						Else
-							Msg = "You already called the elevator."
-							MsgTimer = 70 * 7
 						EndIf
+					Else
+						Msg = "You already called the elevator."
+						MsgTimer = 70 * 7
 					EndIf
 				EndIf
 				
@@ -2273,7 +2270,7 @@ Repeat
 			SelectedItem = Null 
 		EndIf
 		
-		;Brightness = Brightness_Slider*127.5
+		Brightness = Brightness_Slider*127.5
 		
 		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea"  Then 
 			
@@ -3267,8 +3264,9 @@ Function MouseLook()
 	End If
 	
 	If (Not WearingNightVision=0) Then
-		AmbientLightRooms(30)
-		;If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
+		;AmbientLightRooms(60)
+		;AmbientLightRooms(255)
+		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
 		ShowEntity(NVOverlay)
 		If WearingNightVision=2 Then
 			EntityColor(NVOverlay, 0,100,255)
@@ -3277,13 +3275,13 @@ Function MouseLook()
 		EndIf
 		EntityTexture(Fog, FogNVTexture)
 	Else
-		AmbientLightRooms(0)
-		;If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
+		;AmbientLightRooms(0)
+		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
 		HideEntity(NVOverlay)
 		EntityTexture(Fog, FogTexture)
 	EndIf
 	
-	;If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
+	If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
 	
 	If Wearing178>0 Then
 		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\178ambient.ogg")
@@ -4141,8 +4139,6 @@ Function DrawGUI()
 										Else
 											If added\itemtemplate\tempname = "paper" Or added\itemtemplate\tempname = "oldpaper" Then
 												Msg = "This document was added to the clipboard."
-											ElseIf added\itemtemplate\tempname = "badge"
-												Msg = "This "+added\itemtemplate\name+" was added to the clipboard."
 											Else
 												Msg = "This "+added\itemtemplate\name+" was added to the clipboard."
 											EndIf
@@ -4878,7 +4874,7 @@ Function DrawGUI()
 					EndIf
 					
 				Case "cigarette"
-					If SelectedItem\State = 0 Then
+					If SelectedItem\state = 0 Then
 						Select Rand(6)
 							Case 1
 								Msg = Chr(34)+"I don't have anything to light it with. Umm, what about that... Nevermind."+Chr(34)
@@ -4895,7 +4891,7 @@ Function DrawGUI()
 								Msg = Chr(34)+"Don't plan on starting, even at a time like this."+Chr(34)
 								RemoveItem(SelectedItem)
 						End Select
-						SelectedItem\State = 1 
+						SelectedItem\state = 1 
 					Else
 						Msg = "You are unable to get lit."
 					EndIf
@@ -5398,7 +5394,7 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
 				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-				;PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
+				PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
 				
 				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -5527,33 +5523,33 @@ Function DrawMenu()
 						DrawTooltip("Not available in this version")
 					EndIf
 					
-					y=y+30*MenuScale
+;					y=y+30*MenuScale
 					
-					;Local prevBrightness# = Brightness_Slider
-					;Brightness_Slider = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, Brightness_Slider*50.0)/50.0)
-					;Color 255,255,255
-					;AAText(x, y, "Brightness")
-					
-					;Brightness = Brightness_Slider#*127.5
-					;If prevBrightness# <> Brightness_Slider
-					;	AmbientLight Brightness, Brightness, Brightness
-					;	If (Not WearingNightVision=0) Then
-					;		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
-					;		ShowEntity(NVOverlay)
-					;		If WearingNightVision=2 Then
-					;			EntityColor(NVOverlay, 0,100,255)
-					;		Else
-					;			EntityColor(NVOverlay, 0,255,0)
-					;		EndIf
-					;		EntityTexture(Fog, FogNVTexture)
-					;	Else
-					;		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
-					;		HideEntity(NVOverlay)
-					;		EntityTexture(Fog, FogTexture)
-					;	EndIf
-					;	If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
-					;	prevBrightness = Brightness_Slider
-					;EndIf
+;					Local prevBrightness# = Brightness_Slider
+;					Brightness_Slider = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, Brightness_Slider*50.0)/50.0)
+;					Color 255,255,255
+;					AAText(x, y, "Brightness")
+;					
+;					Brightness = Brightness_Slider#*127.5
+;					If prevBrightness# <> Brightness_Slider
+;						AmbientLight Brightness, Brightness, Brightness
+;						If (Not WearingNightVision=0) Then
+;							If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
+;							ShowEntity(NVOverlay)
+;							If WearingNightVision=2 Then
+;								EntityColor(NVOverlay, 0,100,255)
+;							Else
+;								EntityColor(NVOverlay, 0,255,0)
+;							EndIf
+;							EntityTexture(Fog, FogNVTexture)
+;						Else
+;							If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
+;							HideEntity(NVOverlay)
+;							EntityTexture(Fog, FogTexture)
+;						EndIf
+;						If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
+;						prevBrightness = Brightness_Slider
+;					EndIf
 					;[End Block]
 				Case 2 ;Audio
 					;Text(x+210*MenuScale,y,"AUDIO",True,True)
@@ -5931,7 +5927,7 @@ Function LoadEntities()
 	;TextureLodBias
 	
 	AmbientLightRoomTex% = CreateTexture(2,2,257)
-	TextureBlend AmbientLightRoomTex,5
+	TextureBlend AmbientLightRoomTex,2
 	SetBuffer(TextureBuffer(AmbientLightRoomTex))
 	ClsColor 0,0,0
 	Cls
@@ -6699,8 +6695,8 @@ Function NullGame()
 	DeleteElevatorObjects()
 	
 	NoTarget% = False
-	;Brightness = Brightness_Slider#*127.5
-	;StoredBrightness% = Brightness_Slider#*127.5
+	Brightness = Brightness_Slider#*127.5
+	StoredBrightness% = Brightness_Slider#*127.5
 	
 	OptionsMenu% = -1
 	QuitMSG% = -1
@@ -6721,7 +6717,7 @@ Function NullGame()
 	ark_blur_cam = 0
 	InitFastResize()
 	
-	;Brightness% = Brightness_Slider#*255
+	Brightness% = Brightness_Slider#*255
 	
 	;InitExt
 	
@@ -8879,7 +8875,7 @@ Function UpdateLeave1499()
 				NTF_1499PrevY# = 0.0
 				NTF_1499PrevZ# = 0.0
 				NTF_1499PrevRoom = Null
-				;Brightness = StoredBrightness
+				Brightness = StoredBrightness
 				Exit
 			EndIf
 		Next
@@ -9008,10 +9004,5 @@ Function ScaledMouseY%()
 End Function
 
 ;~IDEal Editor Parameters:
-;~F#1C#A8#130#134#13B#3D0#4AC#506#527#59F#5AC#661#6D9#6F0#6FD#72F#7E5#8CE#9C9#9E1
-;~F#A74#B9A#CB9#E29#142A#14B7#1506#1518#1557#1629#1634#179A#182C#185D#195F#1971#198D#1997#19A4#19C6
-;~F#19E5#1A04#1A20#1A34#1A49#1A4D#1A6D#1A75#1AA0#1C42#1CF7#1D22#1D99#1D9F#1DA9#1DB5#1DC0#1DC4#1DFF#1E07
-;~F#1E0F#1E16#1E1D#1E2A#1E30#1E3B#1E74#1E83#1EA1#1ECF#1ED6#1EE9#1F02#1F2F#1F3A#1F3F#1F59#1F65#1F80#1FD2
-;~F#1FE0#1FE8#1FF4#1FFD#2026#202B#2030#2035#203F#2050#20D5#20E3#212A#2151#2163#217C#218B#21A2#21BF#21C3
 ;~B#1196#13CE#1A4A
 ;~C#Blitz3D
