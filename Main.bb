@@ -1816,11 +1816,7 @@ Function UseDoor(d.Doors, showmsg%=True)
 						Msg = "You called the elevator."
 						MsgTimer = 70 * 5
 					ElseIf (Msg<>"You called the elevator.")
-						Local calledMsg% = (Msg="You already called the elevator.")
-						If Not calledMsg Then calledMsg = (Msg="Stop spamming the button.")
-						If Not calledMsg Then calledMsg = (Msg="Pressing it harder does not make the elevator come faster.")
-						If Not calledMsg Then calledMsg = (Msg="If you continue pressing this button I will generate a Memory Access Violation.")
-						If (calledMsg) Or (MsgTimer<70*3)	
+						If (Msg="You already called the elevator.) Or (MsgTimer<70*3)	
 							Select Rand(10)
 								Case 1
 									Msg = "Stop spamming the button."
