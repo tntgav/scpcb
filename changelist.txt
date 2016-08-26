@@ -6,7 +6,6 @@ v1.3.2
 	-The game now updates an error log rather than immedietaly crashing when an error occurs.
 - Added several new rooms (including a revamped medical bay).
 - Added a [REDACTED] event to the Tesla gates.
-- brightness slider
 - Fixed a crash involving disabling antialiased text while in-game.
 - Adjusted the aspect ratio of badge textures (by Cridone).
 - Added extra hit boxes to room049 and room3z2, preventing the player from falling through the floor in certain spots of these rooms.
