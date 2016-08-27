@@ -7216,13 +7216,17 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("Severed Hand", "hand2", x, y, z)
 			End Select
 			RemoveItem(item)
-		Case "First Aid Kit"
+		Case "First Aid Kit", "Blue First Aid Kit"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
+				If Rand(2)=1 Then
 					it2 = CreateItem("Blue First Aid Kit", "firstaid2", x, y, z)
+				Else
+				    it2 = CreateItem("First Aid Kit", "firstaid", x, y, z)
+				EndIf
 				Case "fine"
 					it2 = CreateItem("Small First Aid Kit", "finefirstaid", x, y, z)
 				Case "very fine"
@@ -7244,13 +7248,9 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 1 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(3)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
 											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-										EndIf
 									Case NORMAL
-										If Rand(2)=1 Then
+										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										Else
 											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
@@ -7328,19 +7328,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 5 Key Card"	
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(5)=1 Then
+										If Rand(50)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(7)=1 Then
+										If Rand(70)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(10)=1 Then
+										If Rand(100)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -7351,19 +7351,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(5)=5 Then
+							If Rand(50)=5 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case NORMAL
-							If Rand(7)=7 Then
+							If Rand(70)=7 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case HARD
-							If Rand(10)=10 Then
+							If Rand(100)=10 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -7393,12 +7393,10 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1", "fine", "very fine"
-					If Rand(4)=1 Then
-						it2 = CreateItem("Mastercard", "misc", x, y, z)				
-					Else
-						it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)	
-					EndIf
+				Case "1:1"
+						it2 = CreateItem("Level 1 Key Card", "key1", x, y, z)	
+			    Case "fine", "very fine"
+			            it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 			End Select
 			RemoveItem(item)
 		Case "S-NAV 300 Navigator", "S-NAV 310 Navigator", "S-NAV Navigator", "S-NAV Navigator Ultimate"

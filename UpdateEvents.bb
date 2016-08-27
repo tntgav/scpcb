@@ -283,7 +283,7 @@ Function UpdateEvents()
 						ShouldPlay = 13
 						
 						;slow the player down a bit to match his speed to the guards
-						CurrSpeed = CurrSpeed - (CurrSpeed * 0.02 * FPSfactor)
+						CurrSpeed = CurrSpeed - (CurrSpeed * 0.015 * FPSfactor)
 						
 						If e\EventState3 < 170 Then 
 							If e\EventState3 = 1.0 Then
