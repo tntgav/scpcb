@@ -239,7 +239,7 @@ Global Sanity#, ForceMove#, ForceAngle#
 
 Global Playable% = True
 
-Const BLINKFREQ% = 70 * 8
+Global BLINKFREQ#
 Global BlinkTimer#, EyeIrritation#, EyeStuck#, BlinkEffect# = 1.0, BlinkEffectTimer#
 
 Global Stamina#, StaminaEffect#=1.0, StaminaEffectTimer#
@@ -1353,8 +1353,11 @@ Global PauseMenuIMG% = LoadImage_Strict("GFX\menu\pausemenu.jpg")
 MaskImage PauseMenuIMG, 255,255,0
 ScaleImage PauseMenuIMG,MenuScale,MenuScale
 
-Global SprintIcon% = LoadImage_Strict("GFX\sprinticon.png"), BlinkIcon% = LoadImage_Strict("GFX\blinkicon.png"), CrouchIcon% = LoadImage_Strict("GFX\sneakicon.png")
+Global SprintIcon% = LoadImage_Strict("GFX\sprinticon.png")
+Global BlinkIcon% = LoadImage_Strict("GFX\blinkicon.png")
+Global CrouchIcon% = LoadImage_Strict("GFX\sneakicon.png")
 Global HandIcon% = LoadImage_Strict("GFX\handsymbol.png")
+Global HandIcon2% = LoadImage_Strict("GFX\handsymbol2.png")
 
 Global StaminaMeterIMG% = LoadImage_Strict("GFX\staminameter.jpg")
 
@@ -2400,7 +2403,19 @@ Repeat
 					darkA = Max(darkA, Abs(Sin(BlinkTimer * 18.0)))
 				EndIf
 				
-				If BlinkTimer <= - 20 Then BlinkTimer = BLINKFREQ
+				If BlinkTimer <= - 20 Then
+					;Randomizes the frequency of blinking. Scales with difficulty.
+					Select SelectedDifficulty\otherFactors
+						Case EASY
+							BLINKFREQ = Rnd(490,700)
+						Case NORMAL
+							BLINKFREQ = Rnd(455,665)
+						Case HARD
+							BLINKFREQ = Rnd(420,630)
+					End Select 
+					BlinkTimer = BLINKFREQ
+				EndIf
+
 				BlinkTimer = BlinkTimer - FPSfactor
 			Else
 				BlinkTimer = BlinkTimer - FPSfactor * 0.6
@@ -3102,7 +3117,7 @@ Function MovePlayer()
 	
 	If Playable Then
 		If KeyHit(KEY_BLINK) Then BlinkTimer = 0
-		If KeyDown(KEY_BLINK) And BlinkTimer < - 10 Then BlinkTimer = -10		
+		If KeyDown(KEY_BLINK) And BlinkTimer < - 10 Then BlinkTimer = -10
 	EndIf
 	
 	
@@ -3491,7 +3506,7 @@ Function DrawGUI()
 		If pitchvalue > 90 And pitchvalue <= 180 Then pitchvalue = 90
 		If pitchvalue > 180 And pitchvalue < 270 Then pitchvalue = 270
 		
-		DrawImage(HandIcon, GraphicWidth / 2 + Sin(yawvalue) * (GraphicWidth / 3) - 32, GraphicHeight / 2 - Sin(pitchvalue) * (GraphicHeight / 3) - 32)
+		DrawImage(HandIcon2, GraphicWidth / 2 + Sin(yawvalue) * (GraphicWidth / 3) - 32, GraphicHeight / 2 - Sin(pitchvalue) * (GraphicHeight / 3) - 32)
 	EndIf
 	
 	If DrawHandIcon Then DrawImage(HandIcon, GraphicWidth / 2 - 32, GraphicHeight / 2 - 32)
@@ -7206,16 +7221,21 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						EndIf
 					EndIf					
 			End Select
-			
-		Case "Severed Hand"
+
+		Case "Severed Hand", "Black Severed Hand"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(3, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1","fine","very fine"
-					it2 = CreateItem("Severed Hand", "hand2", x, y, z)
+				Case "1:1", "fine", "very fine"
+					If (item\itemtemplate\name = "Severed Hand")
+						it2 = CreateItem("Black Severed Hand", "hand2", x, y, z)
+					Else
+						it2 = CreateItem("Severed Hand", "hand", x, y, z)
+					EndIf
 			End Select
 			RemoveItem(item)
+
 		Case "First Aid Kit"
 			Select setting
 				Case "rough", "coarse"

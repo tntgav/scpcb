@@ -2905,7 +2905,7 @@ Function FillRoom(r.Rooms)
 					z#=2808
 			End Select
 			
-			it.Items = CreateItem("Severed Hand", "hand", r\x + x*RoomScale, -5496.0*RoomScale+1.0, r\z+z*RoomScale)
+			it.Items = CreateItem("Black Severed Hand", "hand2", r\x + x*RoomScale, -5496.0*RoomScale+1.0, r\z+z*RoomScale)
 			EntityParent(it\obj, r\obj)
 			
 			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x + 1936.0 * RoomScale, r\y - 5496.0 * RoomScale, r\z - 944.0 * RoomScale)
