@@ -7235,12 +7235,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					EndIf
 			End Select
 			RemoveItem(item)
-<<<<<<< HEAD
 
-		Case "First Aid Kit"
-=======
 		Case "First Aid Kit", "Blue First Aid Kit"
->>>>>>> 1c6cb72f334a008a8c5b08bad4b76c2a7bbc3d62
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
