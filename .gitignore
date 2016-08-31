@@ -1,7 +1,7 @@
 *FastExt.bb
 *FastText_Unicode.bb
 *FastImage.bb
-.DS_Store
+*.DS_Store
 MapSystem.bb.rej
 UpdateEvents.bb.rej
 *.bb_bak*
