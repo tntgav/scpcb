@@ -3,7 +3,7 @@
 
 v1.3.2
 - Compiled the game using Juanjpro's "MavLess Blitz3D".
-	- The game now updates an error log rather than immedietaly crashing when an error occurs.
+	-The game now updates an error log rather than immedietaly crashing when an error occurs.
 - Added several new rooms (including a revamped medical bay).
 - Added a [REDACTED] event to the Tesla gates.
 - Fixed a crash involving disabling antialiased text while in-game.
