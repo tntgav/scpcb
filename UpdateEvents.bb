@@ -3109,8 +3109,8 @@ Function UpdateEvents()
 									temp = True
 									For it.Items = Each Items
 										If it\Picked=False Then
-											If EntityX(it\obj)-EntityX(e\room\Objects[1],True)=0 Then
-												If EntityZ(it\obj)-EntityZ(e\room\Objects[1],True)=0 Then
+											If EntityX(it\collider)-EntityX(e\room\Objects[1],True)=0 Then
+												If EntityZ(it\collider)-EntityZ(e\room\Objects[1],True)=0 Then
 													temp = False
 													Exit
 												EndIf
@@ -4017,10 +4017,10 @@ Function UpdateEvents()
 										Case 7
 											AddLight%(Null, e\room\x+ix*2.0-(Sin(EntityYaw(tempInt,True))*504.0*RoomScale)+(Cos(EntityYaw(tempInt,True))*16.0*RoomScale), 8.0+(396.0*RoomScale), e\room\z+iy*2.0+(Cos(EntityYaw(tempInt,True))*504.0*RoomScale)+(Sin(EntityYaw(tempInt,True))*16.0*RoomScale), 2, 500.0, 255, 200, 200)
 											it = CreateItem("SCP-500-01","scp500",e\room\x+ix*2.0+(Cos(EntityYaw(tempInt,True))*(-208.0)*RoomScale)-(Sin(EntityYaw(tempInt,True))*1226.0*RoomScale),8.0+(80.0*RoomScale),e\room\z+iy*2.0+(Sin(EntityYaw(tempInt,True))*(-208.0)*RoomScale)+(Cos(EntityYaw(tempInt,True))*1226.0*RoomScale))
-											EntityType (it\obj, HIT_ITEM)
+											EntityType (it\collider, HIT_ITEM)
 											
 											it = CreateItem("Night Vision Goggles", "nvgoggles",e\room\x+ix*2.0-(Sin(EntityYaw(tempInt,True))*504.0*RoomScale)+(Cos(EntityYaw(tempInt,True))*16.0*RoomScale), 8.0+(80.0*RoomScale), e\room\z+iy*2.0+(Cos(EntityYaw(tempInt,True))*504.0*RoomScale)+(Sin(EntityYaw(tempInt,True))*16.0*RoomScale))
-											EntityType (it\obj, HIT_ITEM)
+											EntityType (it\collider, HIT_ITEM)
 									End Select
 									
 									If e\room\grid\grid[ix+(iy*gridsz)]=6 Or e\room\grid\grid[ix+(iy*gridsz)]=5 Then
@@ -4345,20 +4345,20 @@ Function UpdateEvents()
 						Next
 						
 						For it.Items = Each Items
-							If (EntityY(it\obj,True)>=8.0) And (EntityY(it\obj,True)<=12.0) Then
+							If (EntityY(it\collider,True)>=8.0) And (EntityY(it\collider,True)<=12.0) Then
 								DebugLog it\name+" is within Y limits"
-								If (EntityX(it\obj,True)>=e\room\x-6.0) And (EntityX(it\obj,True)<=(e\room\x+(2.0*gridsz)+6.0)) Then
+								If (EntityX(it\collider,True)>=e\room\x-6.0) And (EntityX(it\collider,True)<=(e\room\x+(2.0*gridsz)+6.0)) Then
 									DebugLog "and within X limits"
 								EndIf
-								If (EntityZ(it\obj,True)>=e\room\z-6.0) And (EntityZ(it\obj,True)<=(e\room\z+(2.0*gridsz)+6.0)) Then
+								If (EntityZ(it\collider,True)>=e\room\z-6.0) And (EntityZ(it\collider,True)<=(e\room\z+(2.0*gridsz)+6.0)) Then
 									DebugLog "and within Z limits"
 								EndIf
 							EndIf
 							
-							If (EntityY(it\obj,True)>=8.0) And (EntityY(it\obj,True)<=12.0) And (EntityX(it\obj,True)>=e\room\x-6.0) And (EntityX(it\obj,True)<=(e\room\x+(2.0*gridsz)+6.0)) And (EntityZ(it\obj,True)>=e\room\z-6.0) And (EntityZ(it\obj,True)<=(e\room\z+(2.0*gridsz)+6.0)) Then
+							If (EntityY(it\collider,True)>=8.0) And (EntityY(it\collider,True)<=12.0) And (EntityX(it\collider,True)>=e\room\x-6.0) And (EntityX(it\collider,True)<=(e\room\x+(2.0*gridsz)+6.0)) And (EntityZ(it\collider,True)>=e\room\z-6.0) And (EntityZ(it\collider,True)<=(e\room\z+(2.0*gridsz)+6.0)) Then
 								DebugLog it\name
-								TranslateEntity it\obj,0.0,0.3,0.0,True
-								ResetEntity it\obj
+								TranslateEntity it\collider,0.0,0.3,0.0,True
+								ResetEntity it\collider
 							EndIf
 						Next
 						
@@ -4945,18 +4945,18 @@ Function UpdateEvents()
 						e\EventState=e\EventState+1;Rand(1,2)
 						
 						For it.Items = Each Items
-							If EntityDistance(it\obj,Collider)<5.0 Then
+							If EntityDistance(it\collider,Collider)<5.0 Then
 								
-								TFormPoint EntityX(it\obj),EntityY(it\obj),EntityZ(it\obj),0,e\room\obj
+								TFormPoint EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),0,e\room\obj
 								x = TFormedX() : y = TFormedY() : z = TFormedZ()
 								If TFormedX()>264 Then
 									TFormPoint x-1024,y,z,e\room\obj,0
-									PositionEntity it\obj, TFormedX(), TFormedY(), TFormedZ()
-									ResetEntity it\obj
+									PositionEntity it\collider, TFormedX(), TFormedY(), TFormedZ()
+									ResetEntity it\collider
 								ElseIf TFormedX()<-264
 									TFormPoint x+1024,y,z,e\room\obj,0
-									PositionEntity it\obj, TFormedX(), TFormedY(), TFormedZ()
-									ResetEntity it\obj
+									PositionEntity it\collider, TFormedX(), TFormedY(), TFormedZ()
+									ResetEntity it\collider
 								EndIf
 								
 							EndIf
@@ -4978,7 +4978,7 @@ Function UpdateEvents()
 											For itt.ItemTemplates = Each ItemTemplates
 												If itt\tempname = "paper" And Rand(6)=1 Then
 													Inventory(i) = CreateItem(itt\name, itt\tempname, 1,1,1)
-													HideEntity Inventory(i)\obj
+													HideEntity Inventory(i)\collider
 													Inventory(i)\Picked = True
 													Exit
 												EndIf
@@ -4990,7 +4990,7 @@ Function UpdateEvents()
 							Case 18
 								TFormPoint -344,176, 272, e\room\obj,0
 								it.Items = CreateItem("Strange Note", "paper", TFormedX(), TFormedY(), TFormedZ())
-								EntityType(it\obj, HIT_ITEM)
+								EntityType(it\collider, HIT_ITEM)
 							Case 25
 								e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\obj)+Cos(e\room\angle-90)*760*RoomScale, 0.35, EntityZ(e\room\obj)+Sin(e\room\angle-90)*760*RoomScale)
 								RotateEntity e\room\NPC[0]\Collider, 0, e\room\angle-200, 0, True
@@ -5004,7 +5004,7 @@ Function UpdateEvents()
 								i = Rand(0,MaxItemAmount-1)
 								If Inventory(i)<>Null Then RemoveItem(Inventory(i))
 								Inventory(i) = CreateItem("Strange Note", "paper", 1,1,1)
-								HideEntity Inventory(i)\obj
+								HideEntity Inventory(i)\collider
 								Inventory(i)\Picked = True
 							Case 35
 								For i = 0 To 3
@@ -5052,23 +5052,23 @@ Function UpdateEvents()
 						;If Abs(TFormedX())<264 Then 
 						For it.Items = Each Items
 							If (it\Dropped=1 And Abs(TFormedX())<264) Or it\Dropped=-1 Then
-								DebugLog "dropping/picking: "+it\Dropped+" - "+EntityX(it\obj)+", "+EntityY(it\obj)+", "+EntityZ(it\obj)
+								DebugLog "dropping/picking: "+it\Dropped+" - "+EntityX(it\collider)+", "+EntityY(it\collider)+", "+EntityZ(it\collider)
 								
-								TFormPoint EntityX(it\obj),EntityY(it\obj),EntityZ(it\obj),0,e\room\obj
+								TFormPoint EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),0,e\room\obj
 								x = TFormedX() : y = TFormedY() : z = TFormedZ()
 								
 								If it\Dropped=1 Then
 									For i = - 1 To 1 Step 2
 										TFormPoint x+1024*i,y,z,e\room\obj,0
-										it2.items = CreateItem(it\name, it\itemtemplate\tempname, TFormedX(), EntityY(it\obj), TFormedZ())
-										RotateEntity(it2\obj, EntityPitch(it\obj),EntityYaw(it\obj),0)
-										EntityType(it2\obj, HIT_ITEM)
+										it2.items = CreateItem(it\name, it\itemtemplate\tempname, TFormedX(), EntityY(it\collider), TFormedZ())
+										RotateEntity(it2\collider, EntityPitch(it\collider),EntityYaw(it\collider),0)
+										EntityType(it2\collider, HIT_ITEM)
 									Next
 								Else
 									For it2.items = Each Items
 										If it2<>it And it2\dist < 15.0 Then
 											
-											TFormPoint EntityX(it2\obj),EntityY(it2\obj),EntityZ(it2\obj),0,e\room\obj
+											TFormPoint EntityX(it2\collider),EntityY(it2\collider),EntityZ(it2\collider),0,e\room\obj
 											DebugLog TFormedZ()+" - "+z
 											
 											If TFormedZ()=z Then RemoveItem(it2) : DebugLog "item removed"									
@@ -7702,9 +7702,9 @@ Function UpdateEvents()
 									
 									If angle < 181 And angle > 90 Then
 										For it.Items = Each Items
-											If it\obj <> 0 And it\Picked = False Then
-												If Abs(EntityX(it\obj) - (e\room\x - 712.0 * RoomScale)) < 200.0 Then
-													If Abs(EntityY(it\obj) - (e\room\y + 648.0 * RoomScale)) < 104.0 Then
+											If it\collider <> 0 And it\Picked = False Then
+												If Abs(EntityX(it\collider) - (e\room\x - 712.0 * RoomScale)) < 200.0 Then
+													If Abs(EntityY(it\collider) - (e\room\y + 648.0 * RoomScale)) < 104.0 Then
 														e\EventState = 1
 														e\SoundCHN = PlaySound2(MachineSFX, Camera, e\room\Objects[1])
 														Exit
@@ -7819,8 +7819,8 @@ Function UpdateEvents()
 						
 						If e\EventState > (12 * 70) Then							
 							For it.Items = Each Items
-								If it\obj <> 0 And it\Picked = False Then
-									If Distance(EntityX(it\obj), EntityZ(it\obj), EntityX(e\room\Objects[2], True), EntityZ(e\room\Objects[2], True)) < (180.0 * RoomScale) Then
+								If it\collider <> 0 And it\Picked = False Then
+									If Distance(EntityX(it\collider), EntityZ(it\collider), EntityX(e\room\Objects[2], True), EntityZ(e\room\Objects[2], True)) < (180.0 * RoomScale) Then
 										Use914(it, setting, EntityX(e\room\Objects[3], True), EntityY(e\room\Objects[3], True), EntityZ(e\room\Objects[3], True))
 										
 									End If
@@ -8151,7 +8151,7 @@ Function UpdateEvents()
 					
 					For it.Items = Each Items
 						If (Not it\Picked)
-							If EntityDistance(it\obj,e\room\Objects[0])<0.75
+							If EntityDistance(it\collider,e\room\Objects[0])<0.75
 								Pick1162% = False
 							EndIf
 						EndIf
@@ -8269,7 +8269,7 @@ Function UpdateEvents()
 							If (shouldCreateItem) Then
 								RemoveItem(Inventory(e\EventState2))
 								it=CreateItem(itt\name,itt\tempname,EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-								EntityType(it\obj, HIT_ITEM)
+								EntityType(it\collider, HIT_ITEM)
 								PlaySound_Strict LoadTempSound("SFX\1162\s12_pt_i+"+Rand(0,4)+".ogg")
 								e\EventState3 = 0.0
 								
@@ -8292,7 +8292,7 @@ Function UpdateEvents()
 						For itt.ItemTemplates = Each ItemTemplates
 							If IsItemGoodFor1162(itt) And Rand(6)=1
 								it = CreateItem(itt\name, itt\tempname, EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
-								EntityType(it\obj, HIT_ITEM)
+								EntityType(it\collider, HIT_ITEM)
 								GiveAchievement(Achv1162)
 								MouseHit1 = False
 								e\EventState3 = 0.0
@@ -8353,7 +8353,7 @@ Function UpdateEvents()
 							Case 5
 								it = CreateItem("Old Badge","badge",EntityX(pp,True),EntityY(pp,True),EntityZ(pp,True))
 						End Select
-						EntityType(it\obj, HIT_ITEM)
+						EntityType(it\collider, HIT_ITEM)
 						GiveAchievement(Achv1162)
 						MouseHit1 = False
 						e\EventState3 = 0.0
