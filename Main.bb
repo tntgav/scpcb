@@ -239,7 +239,7 @@ Global Sanity#, ForceMove#, ForceAngle#
 
 Global Playable% = True
 
-Const BLINKFREQ% = 70 * 8
+Global BLINKFREQ#
 Global BlinkTimer#, EyeIrritation#, EyeStuck#, BlinkEffect# = 1.0, BlinkEffectTimer#
 
 Global Stamina#, StaminaEffect#=1.0, StaminaEffectTimer#
@@ -1353,8 +1353,11 @@ Global PauseMenuIMG% = LoadImage_Strict("GFX\menu\pausemenu.jpg")
 MaskImage PauseMenuIMG, 255,255,0
 ScaleImage PauseMenuIMG,MenuScale,MenuScale
 
-Global SprintIcon% = LoadImage_Strict("GFX\sprinticon.png"), BlinkIcon% = LoadImage_Strict("GFX\blinkicon.png"), CrouchIcon% = LoadImage_Strict("GFX\sneakicon.png")
+Global SprintIcon% = LoadImage_Strict("GFX\sprinticon.png")
+Global BlinkIcon% = LoadImage_Strict("GFX\blinkicon.png")
+Global CrouchIcon% = LoadImage_Strict("GFX\sneakicon.png")
 Global HandIcon% = LoadImage_Strict("GFX\handsymbol.png")
+Global HandIcon2% = LoadImage_Strict("GFX\handsymbol2.png")
 
 Global StaminaMeterIMG% = LoadImage_Strict("GFX\staminameter.jpg")
 
@@ -1816,11 +1819,7 @@ Function UseDoor(d.Doors, showmsg%=True)
 						Msg = "You called the elevator."
 						MsgTimer = 70 * 5
 					ElseIf (Msg<>"You called the elevator.")
-						Local calledMsg% = (Msg="You already called the elevator.")
-						If Not calledMsg Then calledMsg = (Msg="Stop spamming the button.")
-           	    		If Not calledMsg Then calledMsg = (Msg="Pressing it harder does not make the elevator come faster.")
-                		If Not calledMsg Then calledMsg = (Msg="If you continue pressing this button I will generate a Memory Access Violation.")
-                		If (calledMsg) Or (MsgTimer<70*3)	
+						If (Msg="You already called the elevator.") Or (MsgTimer<70*3)	
 							Select Rand(10)
 								Case 1
 									Msg = "Stop spamming the button."
@@ -2404,7 +2403,19 @@ Repeat
 					darkA = Max(darkA, Abs(Sin(BlinkTimer * 18.0)))
 				EndIf
 				
-				If BlinkTimer <= - 20 Then BlinkTimer = BLINKFREQ
+				If BlinkTimer <= - 20 Then
+					;Randomizes the frequency of blinking. Scales with difficulty.
+					Select SelectedDifficulty\otherFactors
+						Case EASY
+							BLINKFREQ = Rnd(490,700)
+						Case NORMAL
+							BLINKFREQ = Rnd(455,665)
+						Case HARD
+							BLINKFREQ = Rnd(420,630)
+					End Select 
+					BlinkTimer = BLINKFREQ
+				EndIf
+
 				BlinkTimer = BlinkTimer - FPSfactor
 			Else
 				BlinkTimer = BlinkTimer - FPSfactor * 0.6
@@ -3106,7 +3117,7 @@ Function MovePlayer()
 	
 	If Playable Then
 		If KeyHit(KEY_BLINK) Then BlinkTimer = 0
-		If KeyDown(KEY_BLINK) And BlinkTimer < - 10 Then BlinkTimer = -10		
+		If KeyDown(KEY_BLINK) And BlinkTimer < - 10 Then BlinkTimer = -10
 	EndIf
 	
 	
@@ -3495,7 +3506,7 @@ Function DrawGUI()
 		If pitchvalue > 90 And pitchvalue <= 180 Then pitchvalue = 90
 		If pitchvalue > 180 And pitchvalue < 270 Then pitchvalue = 270
 		
-		DrawImage(HandIcon, GraphicWidth / 2 + Sin(yawvalue) * (GraphicWidth / 3) - 32, GraphicHeight / 2 - Sin(pitchvalue) * (GraphicHeight / 3) - 32)
+		DrawImage(HandIcon2, GraphicWidth / 2 + Sin(yawvalue) * (GraphicWidth / 3) - 32, GraphicHeight / 2 - Sin(pitchvalue) * (GraphicHeight / 3) - 32)
 	EndIf
 	
 	If DrawHandIcon Then DrawImage(HandIcon, GraphicWidth / 2 - 32, GraphicHeight / 2 - 32)
@@ -7210,23 +7221,32 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						EndIf
 					EndIf					
 			End Select
-			
-		Case "Severed Hand"
+
+		Case "Severed Hand", "Black Severed Hand"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(3, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1","fine","very fine"
-					it2 = CreateItem("Severed Hand", "hand2", x, y, z)
+				Case "1:1", "fine", "very fine"
+					If (item\itemtemplate\name = "Severed Hand")
+						it2 = CreateItem("Black Severed Hand", "hand2", x, y, z)
+					Else
+						it2 = CreateItem("Severed Hand", "hand", x, y, z)
+					EndIf
 			End Select
 			RemoveItem(item)
-		Case "First Aid Kit"
+
+		Case "First Aid Kit", "Blue First Aid Kit"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
+				If Rand(2)=1 Then
 					it2 = CreateItem("Blue First Aid Kit", "firstaid2", x, y, z)
+				Else
+				    it2 = CreateItem("First Aid Kit", "firstaid", x, y, z)
+				EndIf
 				Case "fine"
 					it2 = CreateItem("Small First Aid Kit", "finefirstaid", x, y, z)
 				Case "very fine"
@@ -7248,13 +7268,9 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 1 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(3)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
 											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-										EndIf
 									Case NORMAL
-										If Rand(2)=1 Then
+										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										Else
 											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
@@ -7332,19 +7348,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 5 Key Card"	
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(5)=1 Then
+										If Rand(50)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(7)=1 Then
+										If Rand(70)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(10)=1 Then
+										If Rand(100)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -7355,19 +7371,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(5)=5 Then
+							If Rand(50)=5 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case NORMAL
-							If Rand(7)=7 Then
+							If Rand(70)=7 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case HARD
-							If Rand(10)=10 Then
+							If Rand(100)=10 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -7397,12 +7413,10 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1", "fine", "very fine"
-					If Rand(4)=1 Then
-						it2 = CreateItem("Mastercard", "misc", x, y, z)				
-					Else
-						it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)	
-					EndIf
+				Case "1:1"
+						it2 = CreateItem("Level 1 Key Card", "key1", x, y, z)	
+			    Case "fine", "very fine"
+			            it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 			End Select
 			RemoveItem(item)
 		Case "S-NAV 300 Navigator", "S-NAV 310 Navigator", "S-NAV Navigator", "S-NAV Navigator Ultimate"

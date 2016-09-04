@@ -3,10 +3,9 @@
 
 v1.3.2
 - Compiled the game using Juanjpro's "MavLess Blitz3D".
-	-The game now updates an error log rather than immedietaly crashing when an error occurs.
+	- The game now updates an error log rather than immedietaly crashing when an error occurs.
 - Added several new rooms (including a revamped medical bay).
 - Added a [REDACTED] event to the Tesla gates.
-- brightness slider
 - Fixed a crash involving disabling antialiased text while in-game.
 - Adjusted the aspect ratio of badge textures (by Cridone).
 - Added extra hit boxes to room049 and room3z2, preventing the player from falling through the floor in certain spots of these rooms.
@@ -24,6 +23,8 @@ v1.3.2
 - Added unique locked door and DNA scanner sound effects.
 - Damage indicator messages now only display once at least two seconds have passed since the previous one displayed. This prevents the messages from constantly updating when being shot at.
 - Renamed fake fullscreen to borderless windowed mode.
+- The blink meter's timer is now randomized, making blinking appear more realistic.
+- Updated HUD elements (by Brokami).
 
 ----------------------------------------------------------------------------------
 

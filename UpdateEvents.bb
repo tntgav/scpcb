@@ -283,7 +283,7 @@ Function UpdateEvents()
 						ShouldPlay = 13
 						
 						;slow the player down a bit to match his speed to the guards
-						CurrSpeed = CurrSpeed - (CurrSpeed * 0.02 * FPSfactor)
+						CurrSpeed = CurrSpeed - (CurrSpeed * 0.015 * FPSfactor)
 						
 						If e\EventState3 < 170 Then 
 							If e\EventState3 = 1.0 Then
@@ -974,7 +974,7 @@ Function UpdateEvents()
 							PositionEntity(Curr173\Collider, EntityX(e\room\Objects[5], True), EntityY(Curr173\Collider), EntityZ(e\room\Objects[5], True))
 							RotateEntity(Curr173\Collider, 0, 0, 0, True)
 							ResetEntity(Curr173\Collider)
-						ElseIf e\EventState < 14000 ; pelaaja sis�ll� huoneessa
+						ElseIf e\EventState < 14000 ; player is inside the room
 							e\EventState = Min(e\EventState + FPSfactor, 13000)
 							
 							If e\EventState < 10300 Then
@@ -1044,11 +1044,11 @@ Function UpdateEvents()
 							Animate2(e\room\NPC[6]\obj, AnimTime(e\room\NPC[6]\obj),357,381, 0.05)
 							
 							e\EventState = Min(e\EventState + FPSfactor, 19000)
-							If e\EventState < 14100 Then ;valot sammuu ja 173 tappaa ensimm�isen class d:n
+							If e\EventState < 14100 Then ;lights go out and 173 kills the first Class D
 								
 								;14000-14030
 								If e\EventState < 14060 Then
-									BlinkTimer = Max((14000-e\EventState)/2-Rnd(0,1.0),-10);Max(Min(Sin((e\EventState-14000)*9+90)*10-5,10),-10)
+									BlinkTimer = Max((14000-e\EventState)/2-Rnd(0,1.0),-10)
 									;0-60,   90-640
 									If BlinkTimer = -10 Then
 										PointEntity Curr173\Collider, e\room\NPC[1]\obj
@@ -1120,7 +1120,7 @@ Function UpdateEvents()
 							If e\EventState < 20100 Then
 								CameraShake = 2
 							Else
-								If e\EventState < 20200 Then ;valot sammuu ja 173 menee sotilaan viereen
+								If e\EventState < 20200 Then ;lights go out again and 173 teleports next to the guard
 									If e\EventState > 20105 And e\EventState - FPSfactor < 20105 Then 
 										PlaySound_Strict(IntroSFX(9))
 										PositionEntity(e\room\NPC[0]\Collider, EntityX(e\room\obj) - 160.0 * RoomScale, EntityY(e\room\NPC[0]\Collider) + 0.1, EntityZ(e\room\obj) + 1280.0 * RoomScale)
@@ -1136,12 +1136,12 @@ Function UpdateEvents()
 									
 									BlinkTimer = -10 : LightBlink = 1.0
 									CameraShake = 3
-								ElseIf e\EventState < 20300 ;valot syttyy, sotilas alkaa ampua 173:a
+								ElseIf e\EventState < 20300 ;lights on, the guard starts shooting at 173
 									PointEntity(e\room\NPC[0]\Collider, Curr173\Collider)
 									MoveEntity(e\room\NPC[0]\Collider, 0, 0, -0.002)
 									e\room\NPC[0]\State = 2
 									If e\EventState > 20260 And e\EventState - FPSfactor < 20260 Then PlaySound_Strict(IntroSFX(12))
-								Else ;valot sammuu uudestaan, sotilas kuolee
+								Else ;lights out, guard dies
 									
 									If e\EventState - FPSfactor < 20300 Then
 										BlinkTimer = -10 : LightBlink = 1.0
@@ -1748,7 +1748,7 @@ Function UpdateEvents()
 								ElseIf e\EventState > 42.0*70
 									CameraShake = 0.5
 									
-									;helikopterit l�htee pois
+									;helicopters leave
 									e\room\NPC[0]\EnemyX = EntityX(e\room\Objects[19],True)+4.0
 									e\room\NPC[0]\EnemyY = EntityY(e\room\Objects[19],True)+4.0
 									e\room\NPC[0]\EnemyZ = EntityZ(e\room\Objects[19],True)+4.0
@@ -1779,30 +1779,13 @@ Function UpdateEvents()
 												EndIf
 											Next
 											
-											If temp = 1 Then ;nuken kaukolaukaisu p��ll�, r�j�ytet��n
+											If temp = 1 Then ;remote detonation on -> explode
 												ExplosionTimer = Max(ExplosionTimer, 0.1)
 												SelectedEnding = "B2"
 											Else
 												;e\Sound = LoadSound_Strict("SFX\nuke2.ogg")
 												LoadEventSound(e,"SFX\nuke2.ogg")
 												e\SoundCHN = PlaySound_Strict(e\Sound)
-												
-												;n.NPCs = CreateNPC(NPCtypeApache, EntityX(e\room\Objects[9],True),EntityY(e\room\Objects[9],True)+0.5,EntityZ(e\room\Objects[9],True))
-												;n\State = 2
-												
-												;e\room\NPC[2]\State = 2
-												
-												;For i = 14 To 17
-												;	em.Emitters = CreateEmitter(EntityX(e\room\Objects[i],True),EntityY(e\room\Objects[i],True), EntityZ(e\room\Objects[i],True),0)
-												;	TurnEntity(em\Obj, 90, 0, 0, True)
-												;	;EntityParent(em\Obj, e\room\obj)
-												;	em\Room = PlayerRoom
-												;	em\RandAngle = 15
-												;	em\Speed = 0.025
-												;	em\SizeChange = 0.005
-												;	em\Achange = -0.008
-												;	em\Gravity = -0.21
-												;Next
 												
 												For i = 0 To 1
 													n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[18],True)+(i*0.4),EntityY(e\room\Objects[18],True)+0.29,EntityZ(e\room\Objects[18],True)+(i*0.4))
@@ -2231,7 +2214,7 @@ Function UpdateEvents()
 											EndIf
 										Else
 											Curr106\PathTimer = 70*200
-											For i = 2 To 4 ;helikopterit hy�kk�� 106:n kimppuun
+											For i = 2 To 4 ;helicopters start attacking 106
 												e\room\NPC[i]\State = 3 
 												e\room\NPC[i]\EnemyX = EntityX(Curr106\obj,True)
 												e\room\NPC[i]\EnemyY = EntityY(Curr106\obj,True)+5.0
@@ -2253,7 +2236,7 @@ Function UpdateEvents()
 											
 											FreeEntity pvt
 											
-											If FPSfactor > 0 Then ;106:n alle ilmestyy decaleita
+											If FPSfactor > 0 Then ;decals under 106
 												If ((e\EventState-FPSfactor) Mod 100.0)=<50.0 And (e\EventState Mod 100.0)>50.0 Then
 													de.Decals = CreateDecal(0, EntityX(Curr106\Collider,True),EntityY(e\room\Objects[3],True)+0.01,EntityZ(Curr106\Collider,True), 90, Rand(360), 0)
 													de\Size = 0.2 : de\SizeChange = 0.004 : de\timer = 90000 : EntityAlpha(de\obj, 0.8) : UpdateDecals() 											
@@ -2298,7 +2281,7 @@ Function UpdateEvents()
 												For i = 5 To 8
 													e\room\NPC[i]\State = 2
 												Next
-												For i = 2 To 4 ;helikopterit hy�kk�� pelaajan kimppuun
+												For i = 2 To 4 ;helicopters attack the player
 													e\room\NPC[i]\State = 2
 												Next
 												HideEntity Curr106\obj
@@ -2350,7 +2333,7 @@ Function UpdateEvents()
 											Curr106\State = 100000
 											HideEntity Curr106\obj
 											
-											;MTF-ukot tulee tunnelin ovelle
+											;MTF spawns at the tunnel entrance
 											For i = 5 To 8
 												e\room\NPC[i]\State = 3
 												PositionEntity e\room\NPC[i]\Collider, EntityX(e\room\Objects[15],True)+(i-6)*0.3,EntityY(e\room\Objects[15],True),EntityZ(e\room\Objects[15],True)+(i-6)*0.3, True
@@ -2679,7 +2662,7 @@ Function UpdateEvents()
 								Curr106\State = -0.1
 								e\EventState = 601
 							EndIf
-						ElseIf Curr106\State > 0 ;106 kiert�� isointa huonetta
+						ElseIf Curr106\State > 0 ;106 circles around the starting room
 							angle = (e\EventState/10 Mod 360)
 							PositionEntity(Curr106\Collider, EntityX(e\room\obj), 0.2+0.35+Sin(e\EventState/14.0+i*20.0)*0.4, EntityX(e\room\obj))
 							RotateEntity(Curr106\Collider, 0,angle,0)
@@ -2690,12 +2673,12 @@ Function UpdateEvents()
 						EndIf
 					EndIf 
 					
-					If EntityDistance(Collider, Curr106\Collider) < 0.3 Then ;106 hy�kk�� jos on tarpeeksi l�hell� pelaajaa
+					If EntityDistance(Collider, Curr106\Collider) < 0.3 Then ;106 attacks if close enough to player
 						Curr106\Idle = False
 						Curr106\State = -11
 					EndIf
 					
-					If e\EventState2 = 1 Then ;pieness� huoneessa
+					If e\EventState2 = 1 Then ;in the second room
 						
 						PositionEntity(e\room\Objects[9], EntityX(e\room\Objects[8],True)+3384*RoomScale, 0.0, EntityZ(e\room\Objects[8],True))
 						
@@ -2948,7 +2931,7 @@ Function UpdateEvents()
 								UpdateDoorsTimer = 0
 								UpdateDoors()
 								UpdateRooms()
-							Else ;pelaaja on jossain muualla -> pudonnut alas
+							Else ;the player is not at the exit, must've fallen down
 								
 								If KillTimer => 0 Then 
 									PlaySound_Strict HorrorSFX(8)
@@ -3039,7 +3022,7 @@ Function UpdateEvents()
 							UpdateDoors()
 							UpdateRooms()
 						EndIf					
-					Else ;tornihuone
+					Else ;pillar room
 						CameraFogColor Camera, 38*0.5, 55*0.5, 47*0.5
 						CameraClsColor Camera, 38*0.5, 55*0.5, 47*0.5
 						
@@ -3082,7 +3065,7 @@ Function UpdateEvents()
 						EndIf
 						
 						If EntityY(Collider) < -1600*RoomScale Then
-							;pelaaja on "ulosk�ynnill�"
+							;player is at the exit
 							If Distance(EntityX(e\room\Objects[16],True),EntityZ(e\room\Objects[16],True),EntityX(Collider),EntityZ(Collider))<144*RoomScale Then
 								
 								CameraFogColor Camera, 0,0,0
@@ -3096,7 +3079,7 @@ Function UpdateEvents()
 								UpdateDoorsTimer = 0
 								UpdateDoors()
 								UpdateRooms()
-							Else ;pelaaja on jossain muualla -> pudonnut alas
+							Else ;somewhere else -> must've fallen down
 								If KillTimer => 0 Then PlaySound_Strict HorrorSFX(8)
 								KillTimer = Min(-1, KillTimer)	
 								BlurTimer = 3000
@@ -3497,7 +3480,7 @@ Function UpdateEvents()
 							HideEntity e\room\Objects[4]
 						EndIf						
 						
-						If e\SoundCHN = 0 Then ;soitetaan huminaa jos pelaaja ei l�hell�
+						If e\SoundCHN = 0 Then ;humming when the player isn't close
 							e\SoundCHN = PlaySound2(TeslaIdleSFX, Camera, e\room\Objects[3],4.0,0.5)
 						Else
 							If Not ChannelPlaying(e\SoundCHN) Then e\SoundCHN = PlaySound2(TeslaIdleSFX, Camera, e\room\Objects[3],4.0,0.5)
@@ -3505,7 +3488,7 @@ Function UpdateEvents()
 						
 						For i = 0 To 2
 							If Distance(EntityX(Collider),EntityZ(Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
-								;soitetaan laukaisu��ni
+								;play the activation sound
 								If KillTimer => 0 Then 
 									PlayerSoundVolume = Max(8.0,PlayerSoundVolume)
 									StopChannel(e\SoundCHN)
@@ -3519,7 +3502,7 @@ Function UpdateEvents()
 						If Curr106\State < -10 And e\EventState = 0 Then 
 							For i = 0 To 2
 								If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
-									;soitetaan laukaisu��ni
+								;play the activation sound
 									If KillTimer => 0 Then 
 										StopChannel(e\SoundCHN)
 										e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
@@ -4432,11 +4415,9 @@ Function UpdateEvents()
 						If PlayerRoom = e\room Then e\EventState = 1
 					Else
 						e\EventState=(e\EventState+FPSfactor*0.7)
-						;0-50 = menee keskelle
-						;50-200 = katselee ymp�rilleen
-						;200-250 = l�htee pois
-						
-						
+						;0-50 = walk to the middle
+						;50-200 = look around
+						;200-250 = leave
 						If e\EventState < 50 Then
 							Curr106\Idle = True
 							PositionEntity(Curr106\Collider, EntityX(e\room\Objects[0], True), EntityY(Collider) - 0.15, EntityZ(e\room\Objects[0], True))
@@ -5045,9 +5026,6 @@ Function UpdateEvents()
 									Local tex970 = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
 									EntityTexture Curr173\obj, tex970, 0, 0
 									FreeTexture tex970
-									CreateConsoleMsg("173 JACK-O-LANTERN ON VIA 970")
-								Else
-									Msg = "You feel as though you are seeing this message because you may or not be feeling " + Chr(34) + "festive" + Chr(34) + "."
 								EndIf
 						End Select
 						
@@ -6140,15 +6118,15 @@ Function UpdateEvents()
 										EndIf
 										If i > 0
 											;If EntityVisible(Collider,e\room\RoomDoors[i]\frameobj)
-												PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[i],True),EntityY(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)
-												ResetEntity e\room\NPC[0]\Collider
-												PlaySound2(ElevatorBeepSFX, Camera, e\room\Objects[i], 4.0)
-												UseDoor(e\room\RoomDoors[i],False)
-												e\room\RoomDoors[i-1]\open = False
-												e\room\RoomDoors[i]\open = True
-												e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
-												PlaySound2(LoadTempSound("SFX\049\049_"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
-												e\room\NPC[0]\Idle = 0
+											PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[i],True),EntityY(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)
+											ResetEntity e\room\NPC[0]\Collider
+											PlaySound2(ElevatorBeepSFX, Camera, e\room\Objects[i], 4.0)
+											UseDoor(e\room\RoomDoors[i],False)
+											e\room\RoomDoors[i-1]\open = False
+											e\room\RoomDoors[i]\open = True
+											e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
+											PlaySound2(LoadTempSound("SFX\049\049_"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
+											e\room\NPC[0]\Idle = 0
 											;EndIf
 										EndIf
 									EndIf
@@ -6424,7 +6402,7 @@ Function UpdateEvents()
 			Case "room106"
 				;[Block]
 				
-				;eventstate2 = onko magneetit p��ll�
+				;eventstate2 = are the magnets on
 				
 				If SoundTransmission Then 
 					If e\EventState = 1 Then
@@ -6497,8 +6475,8 @@ Function UpdateEvents()
 						
 						UpdateButton(e\room\Objects[4])
 						If ClosestButton = e\room\Objects[4] And MouseHit1 Then
-							e\EventState = 1 ;femur breaker k�yntiin
-							If SoundTransmission = True Then ;soitetaan ��ni jos sound transmission on p��ll�
+							e\EventState = 1 ;start the femur breaker
+							If SoundTransmission = True Then ;only play sounds if transmission is on
 								If e\SoundCHN2 <> 0 Then
 									If ChannelPlaying(e\SoundCHN2) Then StopChannel e\SoundCHN2
 								EndIf 
@@ -6506,7 +6484,7 @@ Function UpdateEvents()
 								e\SoundCHN2 = PlaySound_Strict (FemurBreakerSFX)
 							EndIf
 						EndIf
-					ElseIf e\EventState = 1 ;luu murrettu
+					ElseIf e\EventState = 1 ;bone broken
 						If SoundTransmission And e\EventState3 < 2000 Then 
 							If e\SoundCHN2 = 0 Then 
 								LoadEventSound(e,"SFX\LureSubject1.ogg",1)
@@ -6570,9 +6548,9 @@ Function UpdateEvents()
 								PositionEntity e\room\Objects[8], 0, 1000.0, 0, True 
 								PositionEntity e\room\Objects[7], 0, 1000.0, 0, True 
 								
-								If e\EventState2 = True Then ;magneetit p��ll� -> 106 napattu
+								If e\EventState2 = True Then ;magnets off -> 106 caught
 									Contained106 = True
-								Else ;magneetit pois p��lt� -> 106 tulee ulos ja hy�kk��
+								Else ;magnets off -> 106 comes out and attacks
 									PositionEntity(Curr106\Collider, EntityX(e\room\Objects[6], True), EntityY(e\room\Objects[6], True), EntityZ(e\room\Objects[6], True))
 									
 									Contained106 = False
