@@ -408,6 +408,9 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 					
 					If tex[j]<>0 Then
 						If temp1i=1 Then TextureBlend tex[j],5
+						If Instr(Lower(temp1s),"_lm")<>0 Then
+							TextureBlend tex[j],3
+						EndIf
 						AddTextureToCache(tex[j])
 					EndIf
 					
@@ -430,59 +433,20 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 			EndIf
 		Else
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-;			If BumpEnabled And temp1s<>"" Then
-;				bumptex = GetBumpFromCache(temp1s)	
-;			Else
-;				bumptex = 0
-;			EndIf
-;			
-;			If bumptex<>0 Then 
-;				BrushTexture brush, tex[1], 0, 0	
-;				BrushTexture brush, bumptex, 0, 1
-;				
-;				For j=0 To 1
-;					If tex[j]<>0 Then
-;						BrushTexture brush,tex[j],0,j
-;					Else
-;						BrushTexture brush,blankTexture,0,j
-;					EndIf
-;				Next
-;			Else
-;			Local isgood% = True
-;			For j=0 To 1
-;				If tex[j]<>0 Then
-;					temp1s = TextureName(tex[j])
-;					If Instr(Lower(temp1s),"wood") Or Instr(Lower(temp1s),"1074tex") Or Instr(Lower(temp1s),"cloth") Then
-;						DebugLog StripPath(temp1s)
-;						isgood = True
-;					EndIf
-;				EndIf
-;			Next
-			
-;			If isgood Then
-			For j=0 To 1
-				If tex[j]<>0 Then
-					BrushTexture brush,tex[j],0,j
-				Else
-					BrushTexture brush,blankTexture,0,j
-				EndIf
-			Next	
-;			Else
-;				BrushTexture brush,pinkTexture,0,0
-;				BrushTexture brush,pinkTexture,0,1
-;			EndIf
-;			EndIf
-			
+			If tex[0]<>0 And tex[1]<>0 Then
+				For j=0 To 1
+					BrushTexture brush,tex[j],0,j+1
+				Next
+				BrushTexture brush,AmbientLightRoomTex,0
+			Else
+				For j=0 To 1
+					If tex[j]<>0 Then
+						BrushTexture brush,tex[j],0,j
+					Else
+						BrushTexture brush,blankTexture,0,j
+					EndIf
+				Next
+			EndIf
 		EndIf
 		
 		surf=CreateSurface(childMesh)
@@ -535,47 +499,6 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		
 		
 	Next
-	
-	Local isavailRT% = True
-	If rt <> Null
-		If rt\Name = "173" Then isavailRT% = False
-	EndIf
-	
-	If isavailRT%
-		For i = 1 To CountSurfaces(Opaque)
-			surf = GetSurface(Opaque,i)
-			brush = GetSurfaceBrush(surf)
-			tex[0] = GetBrushTexture(brush,1)
-			If tex[0]<>0 Then
-				If TextureName(tex[0])<>"" Then
-					tex[1] = GetBrushTexture(brush,0)
-					If TextureName(tex[1])<>"" Then
-						If TextureName(tex[1])<>"" Then
-							TextureBlend tex[1],5
-							TextureBlend tex[0],5
-							
-							BrushTexture brush, tex[0], 0, 2
-							BrushTexture brush, tex[1], 0, 1
-							BrushTexture brush, AmbientLightRoomTex,0
-							
-							PaintSurface surf,brush
-							FreeTexture tex[1] : tex[1]=0							
-						EndIf
-							
-					Else
-						TextureBlend tex[0],5
-						
-						BrushTexture brush, tex[0], 0, 1
-						BrushTexture brush, AmbientLightRoomTex,0
-						
-						PaintSurface surf,brush
-					EndIf
-					FreeTexture tex[0] : tex[0]=0					
-				EndIf
-			EndIf
-			If brush<>0 Then FreeBrush brush : brush=0
-		Next
-	EndIf
 	
 	Local hiddenMesh%
 	hiddenMesh=CreateMesh()
@@ -7484,29 +7407,6 @@ Function AmbientLightRooms(value%=0)
 	ClsColor 0,0,0
 	
 	SetBuffer oldbuffer
-	
-	;;For rt.RoomTemplates = Each RoomTemplates
-	;For rt.Rooms = Each Rooms
-	;	If rt\obj <> 0 Then mesh = GetChild(rt\obj,2)
-	;	DebugLog mesh + " for rtemplate"
-	;	If mesh<>0 Then
-	;		For i = 1 To CountSurfaces(mesh)
-	;			surf = GetSurface(mesh,i)
-	;			brush = GetSurfaceBrush(surf)
-	;			tex0 = GetBrushTexture(brush,1)
-	;			If tex0<>0 Then
-	;				If Instr(TextureName(tex0),"_lm")<>0 Then
-	;					BrushTexture brush, AmbientLightRoomTex,0
-	;					
-	;					PaintSurface surf,brush
-	;				EndIf
-	;				
-	;				FreeTexture tex0 : tex0=0
-	;			EndIf
-	;			If brush<>0 Then FreeBrush brush : brush=0
-	;		Next
-	;	EndIf
-	;Next
 End Function
 
 Type ChunkPart
