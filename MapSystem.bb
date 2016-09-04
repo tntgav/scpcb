@@ -1564,7 +1564,7 @@ Global HideDistance# = 15.0
 
 Global SecondaryLightOn# = True
 Global RemoteDoorOn = True
-Global Contained106 = False, Disabled173 = False
+Global Contained106 = False
 
 Type Rooms
 	Field zone%

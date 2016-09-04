@@ -3,17 +3,17 @@
 
 v1.3.2
 - Compiled the game using Juanjpro's "MavLess Blitz3D".
-	- The game now updates an error log rather than immedietaly crashing when an error occurs.
-- Added several new rooms (including a revamped medical bay).
+	-The game now updates an error log rather than immedietaly crashing when an error occurs.
+- Added several new rooms.
 - Added a [REDACTED] event to the Tesla gates.
-- Fixed a crash involving disabling antialiased text while in-game.
+- Fixed a crash involving the disabling of anti-aliased text while in-game.
 - Adjusted the aspect ratio of badge textures (by Cridone).
 - Added extra hit boxes to room049 and room3z2, preventing the player from falling through the floor in certain spots of these rooms.
 - Adjusted SCP-096's collision detection.
-- SCP-096 will no longer become triggered if looking at its face while the player's eyes are closed.
+- SCP-096 will no longer become triggered when looking at its face while the player's eyes are closed.
 - Fixed a bug involving the severed hand spawn in room3storage.
 - Fixed SCP-106 being invisible during the room2pipes event.
-- Rebalanced SCP-914's key card refining system.
+- Improvements to SCP-914's key card refining system.
 - Some improvements to SCP-049's AI.
 - Adjusted the spelling and grammar for a majority of in-game text.
 - Extended the parameters of the "help" console command.
@@ -25,6 +25,10 @@ v1.3.2
 - Renamed fake fullscreen to borderless windowed mode.
 - The blink meter's timer is now randomized, making blinking appear more realistic.
 - Updated HUD elements (by Brokami).
+- The endroom event no longer occurs if SCP-106 is already contained.
+- SCP-079 no longer opens the door to Dr. L.’s office if the remote door control system is turned off.
+- Fixed Security Chief Franklin using the default scientist texture during the office event if the intro sequence was enabled.
+- Disabled camera fog at Gate A and B.
 
 ----------------------------------------------------------------------------------
 

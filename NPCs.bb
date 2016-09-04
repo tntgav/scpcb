@@ -663,7 +663,7 @@ Function UpdateNPCs()
 		Select n\NPCtype
 			Case NPCtype173
 				;[Block]
-				If Disabled173 Then
+				If Curr173\Idle = 3 Then
 					HideEntity n\obj
 					HideEntity n\Collider
 				Else
