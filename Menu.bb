@@ -239,7 +239,6 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
 					PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-					;PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
 					
 					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -589,7 +588,6 @@ Function UpdateMainMenu()
 					
 					y=y+30*MenuScale
 					
-					;Brightness_Slider = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, Brightness_Slider*50.0)/50.0)
 					;Color 255,255,255
 					;AAText(x + 20 * MenuScale, y, "Brightness")
 					;[End Block]
