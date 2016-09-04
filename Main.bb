@@ -698,11 +698,9 @@ Function UpdateConsole()
 						EndIf
 					Next
 				Case "disable173"
-					Curr173\Idle = True
-					Disabled173=True
+					Curr173\Idle = 3 ;This phenominal comment is brought to you by PolyFox. His absolute wisdom in this fatigue of knowledge brought about a new era of 173 state checks.
 				Case "enable173"
 					Curr173\Idle = False
-					Disabled173=False
 					ShowEntity Curr173\obj
 					ShowEntity Curr173\Collider
 				Case "disable106"
@@ -882,8 +880,7 @@ Function UpdateConsole()
 				Case "asd2"
 					GodMode = 1
 					InfiniteStamina = 1
-					Curr173\Idle = True
-					Disabled173=True
+					Curr173\Idle = 3
 					Curr106\Idle = True
 					Curr106\State = 200000
 					Contained106 = True
@@ -6567,7 +6564,7 @@ Function NullGame()
 	Playable = True
 	
 	Contained106 = False
-	Disabled173 = False
+	Curr173\Idle = False
 	
 	MTFtimer = 0
 	For i = 0 To 9
