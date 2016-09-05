@@ -30,6 +30,7 @@ v1.3.2
 - Fixed Security Chief Franklin using the default scientist texture during the office event if the intro sequence was enabled.
 - Disabled camera fog at Gate A and B.
 - Fixed a bug that cause SCP-096 to spawn too frequently.
+- Adjusted the item overlapping detection code, which caused some items to be pushed into walls and fall through the map.
 
 ----------------------------------------------------------------------------------
 
