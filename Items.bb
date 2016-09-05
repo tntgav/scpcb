@@ -105,11 +105,7 @@ Function CreateItemTemplate.ItemTemplates(name$, tempname$, objpath$, invimgpath
 	it\name = name
 	
 	it\sound = 1
-	
-	EntityRadius it\obj, 0.01
-	EntityPickMode it\obj, 1, False
-	;MakeCollBox(it\obj)
-	
+
 	HideEntity it\obj
 	
 	Return it
@@ -321,7 +317,7 @@ End Function
 
 Type Items
 	Field name$
-	Field obj%
+	Field collider%,model%
 	Field itemtemplate.ItemTemplates
 	Field DropSpeed#
 	
@@ -347,7 +343,8 @@ End Type
 
 Function CreateItem.Items(name$, tempname$, x#, y#, z#, r%=0,g%=0,b%=0,a#=1.0,invSlots%=0)
 	
-	Local i.Items = New Items, it.ItemTemplates
+	Local i.Items = New Items
+	Local it.ItemTemplates
 	
 	name = Lower(name)
 	tempname = Lower (tempname)
@@ -356,19 +353,25 @@ Function CreateItem.Items(name$, tempname$, x#, y#, z#, r%=0,g%=0,b%=0,a#=1.0,in
 		If Lower(it\name) = name Then
 			If Lower(it\tempname) = tempname Then
 				i\itemtemplate = it
-				i\obj = CopyEntity(it\obj)
+				i\collider = CreatePivot()			
+				EntityRadius i\collider, 0.01
+				EntityPickMode i\collider, 1, False
+				i\model = CopyEntity(it\obj,i\collider)
 				i\name = it\name
-				ShowEntity i\obj
+				ShowEntity i\collider
+				ShowEntity i\model
 			EndIf
 		EndIf
 	Next 
 	
+	i\WontColl = False
+	
 	If i\itemtemplate = Null Then RuntimeError("Item template not found ("+name+", "+tempname+")")
 	
-	ResetEntity i\obj		
-	PositionEntity(i\obj, x, y, z)
-	RotateEntity (i\obj, 0, Rand(360), 0)
-	i\dist = EntityDistance(Collider, i\obj)
+	ResetEntity i\collider		
+	PositionEntity(i\collider, x, y, z, True)
+	RotateEntity (i\collider, 0, Rand(360), 0)
+	i\dist = EntityDistance(Collider, i\collider)
 	i\DropSpeed = 0.0
 	
 	If tempname = "cup" Then
@@ -379,8 +382,8 @@ Function CreateItem.Items(name$, tempname$, x#, y#, z#, r%=0,g%=0,b%=0,a#=1.0,in
 		
 		Local liquid = CopyEntity(LiquidObj)
 		ScaleEntity liquid, i\itemtemplate\scale,i\itemtemplate\scale,i\itemtemplate\scale,True
-		PositionEntity liquid, EntityX(i\obj,True),EntityY(i\obj,True),EntityZ(i\obj,True)
-		EntityParent liquid, i\obj
+		PositionEntity liquid, EntityX(i\collider,True),EntityY(i\collider,True),EntityZ(i\collider,True)
+		EntityParent liquid, i\model
 		EntityColor liquid, r,g,b
 		
 		If a < 0 Then 
@@ -397,7 +400,7 @@ Function CreateItem.Items(name$, tempname$, x#, y#, z#, r%=0,g%=0,b%=0,a#=1.0,in
 	i\invimg = i\itemtemplate\invimg
 	If (tempname="clipboard") And (invSlots=0) Then
 		invSlots = 10
-		SetAnimTime i\obj,17.0
+		SetAnimTime i\model,17.0
 		i\invimg = i\itemtemplate\invimg2
 	EndIf
 	
@@ -412,7 +415,7 @@ End Function
 
 Function RemoveItem(i.Items)
 	Local n
-	FreeEntity(i\obj) : i\obj = 0
+	FreeEntity(i\model) : FreeEntity(i\collider) : i\collider = 0
 	
 	For n% = 0 To MaxItemAmount - 1
 		If Inventory(n) = i Then Inventory(n) = Null
@@ -456,40 +459,67 @@ Function UpdateItems()
 		
 		If (Not i\Picked) Then
 			If i\disttimer < MilliSecs() Then
-				i\dist = EntityDistance(Collider, i\obj)
+				i\dist = EntityDistance(Collider, i\collider)
 				i\disttimer = MilliSecs() + Rand(600,800)
-				If i\dist < HideDist Then ShowEntity i\obj
+				If i\dist < HideDist Then ShowEntity i\collider
 			EndIf
 			
 			If i\dist < HideDist Then
-				ShowEntity i\obj
+				ShowEntity i\collider
 				
-				If (Not EntityVisible(i\obj,Camera)) Then
+				If (Not EntityVisible(i\collider,Camera)) Then
 					;the player can't grab this
-					If (Not EntityVisible(i\obj,Collider)) Then i\dist = 2.5
+					If (Not EntityVisible(i\collider,Collider)) Then i\dist = 2.5
 				EndIf
 				
 				If i\dist < 1.2 Then
 					If ClosestItem = Null Then
-						If EntityInView(i\obj, Camera) Then ClosestItem = i
-					Else If ClosestItem = i Or i\dist < EntityDistance(Collider, ClosestItem\obj) Then 
-						If EntityInView(i\obj, Camera) Then ClosestItem = i
+						If EntityInView(i\model, Camera) Then ClosestItem = i
+					Else If ClosestItem = i Or i\dist < EntityDistance(Collider, ClosestItem\collider) Then 
+						If EntityInView(i\model, Camera) Then ClosestItem = i
 					End If
 				EndIf					
 				
-				If EntityCollided(i\obj, HIT_MAP) Then
+				If EntityCollided(i\collider, HIT_MAP) Then
 					i\DropSpeed = 0
 					i\xspeed = 0.0
 					i\zspeed = 0.0
 				Else
 					i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
-					TranslateEntity i\obj, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
-					If i\WontColl Then ResetEntity(i\obj)
+					TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
+					If i\WontColl Then ResetEntity(i\collider)
 				EndIf
 				
-				If EntityY(i\obj) < - 35.0 Then DebugLog "remove: " + i\itemtemplate\name:RemoveItem(i)
+				If i\dist<HideDist*0.2 Then
+					For i2.Items = Each Items
+						If i<>i2 And (Not i2\Picked) And i2\dist<HideDist*0.2 Then
+							
+							xtemp# = (EntityX(i2\collider,True)-EntityX(i\collider,True))
+							ytemp# = (EntityY(i2\collider,True)-EntityY(i\collider,True))
+							ztemp# = (EntityZ(i2\collider,True)-EntityZ(i\collider,True))
+							
+							ed# = (xtemp*xtemp+ztemp*ztemp)
+							If ed<0.07 And Abs(ytemp)<0.25 Then
+								;items are too close together, push away
+								
+								xtemp = xtemp*(0.07-ed)
+								ztemp = ztemp*(0.07-ed)
+								
+								While Abs(xtemp)+Abs(ztemp)<0.001
+									xtemp = xtemp+Rnd(-0.002,0.002)
+									ztemp = ztemp+Rnd(-0.002,0.002)
+								Wend
+								
+								TranslateEntity i2\collider,xtemp,0,ztemp
+								TranslateEntity i\collider,-xtemp,0,-ztemp
+							EndIf
+						EndIf
+					Next
+				EndIf
+				
+				If EntityY(i\collider) < - 35.0 Then DebugLog "remove: " + i\itemtemplate\name:RemoveItem(i)
 			Else
-				HideEntity i\obj
+				HideEntity i\collider
 			EndIf
 		EndIf
 		
@@ -511,7 +541,7 @@ Function PickItem(item.Items)
 			If Inventory(n) = Null Then
 				Select item\itemtemplate\tempname
 					Case "scp178"
-						SetAnimTime item\obj,19.0
+						SetAnimTime item\model,19.0
 					Case "1123"
 						If Not (Wearing714=1) Then
 							For e.Events = Each Events
@@ -560,7 +590,7 @@ Function PickItem(item.Items)
 				item\itemtemplate\found=True
 				
 				Inventory(n) = item
-				HideEntity(item\obj)
+				HideEntity(item\collider)
 				Exit
 			EndIf
 		Next
@@ -575,34 +605,34 @@ Function DropItem(item.Items)
 	
 	item\Dropped = 1
 	
-	ShowEntity(item\obj)
-	PositionEntity(item\obj, EntityX(Camera), EntityY(Camera), EntityZ(Camera))
-	RotateEntity(item\obj, EntityPitch(Camera), EntityYaw(Camera)+Rnd(-20,20), 0)
-	MoveEntity(item\obj, 0, -0.1, 0.1)
-	RotateEntity(item\obj, 0, EntityYaw(Camera)+Rnd(-110,110), 0)
+	ShowEntity(item\collider)
+	PositionEntity(item\collider, EntityX(Camera), EntityY(Camera), EntityZ(Camera))
+	RotateEntity(item\collider, EntityPitch(Camera), EntityYaw(Camera)+Rnd(-20,20), 0)
+	MoveEntity(item\collider, 0, -0.1, 0.1)
+	RotateEntity(item\collider, 0, EntityYaw(Camera)+Rnd(-110,110), 0)
 	
-	ResetEntity (item\obj)
+	ResetEntity (item\collider)
 	
 	;move the item so that it doesn't overlap with other items
-	For it.Items = Each Items
-		If it <> item And it\Picked = False Then
-			x = Abs(EntityX(item\obj, True)-EntityX(it\obj, True))
-			;If x < 0.2 Then 
-			If x < 0.01 Then
-				z = Abs(EntityZ(item\obj, True)-EntityZ(it\obj, True))
-				;If z < 0.2 Then
-				If z < 0.01 Then
-					;While (x+z)<0.25
-					While (x+z)<0.05
-						;MoveEntity(item\obj, 0, 0, 0.025)
-						MoveEntity(item\obj, 0, 0, 0.005)
-						x = Abs(EntityX(item\obj, True)-EntityX(it\obj, True))
-						z = Abs(EntityZ(item\obj, True)-EntityZ(it\obj, True))
-					Wend
-				EndIf
-			EndIf
-		EndIf
-	Next
+	;For it.Items = Each Items
+	;	If it <> item And it\Picked = False Then
+	;		x = Abs(EntityX(item\collider, True)-EntityX(it\collider, True))
+	;		;If x < 0.2 Then 
+	;		If x < 0.01 Then
+	;			z = Abs(EntityZ(item\obj, True)-EntityZ(it\collider, True))
+	;			;If z < 0.2 Then
+	;			If z < 0.01 Then
+	;				;While (x+z)<0.25
+	;				While (x+z)<0.05
+	;					;MoveEntity(item\obj, 0, 0, 0.025)
+	;					MoveEntity(item\collider, 0, 0, 0.005)
+	;					x = Abs(EntityX(item\collider, True)-EntityX(it\collider, True))
+	;					z = Abs(EntityZ(item\collider, True)-EntityZ(it\collider, True))
+	;				Wend
+	;			EndIf
+	;		EndIf
+	;	EndIf
+	;Next
 	
 	item\Picked = False
 	For z% = 0 To MaxItemAmount - 1
