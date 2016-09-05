@@ -360,17 +360,17 @@ Function SaveGame(file$)
 		
 		WriteString f, it\name
 		
-		WriteFloat f, EntityX(it\obj, True)
-		WriteFloat f, EntityY(it\obj, True)
-		WriteFloat f, EntityZ(it\obj, True)
+		WriteFloat f, EntityX(it\collider, True)
+		WriteFloat f, EntityY(it\collider, True)
+		WriteFloat f, EntityZ(it\collider, True)
 		
 		WriteByte f, it\r
 		WriteByte f, it\g
 		WriteByte f, it\b
 		WriteFloat f, it\a
 		
-		WriteFloat f, EntityPitch(it\obj)
-		WriteFloat f, EntityYaw(it\obj)
+		WriteFloat f, EntityPitch(it\collider)
+		WriteFloat f, EntityYaw(it\collider)
 		
 		WriteFloat f, it\state
 		WriteByte f, it\Picked
@@ -383,7 +383,7 @@ Function SaveGame(file$)
 		If ItemFound Then WriteByte f, i Else WriteByte f, 66
 		
 		If it\itemtemplate\isAnim<>0 Then
-			WriteFloat f, AnimTime(it\obj)
+			WriteFloat f, AnimTime(it\model)
 		EndIf
 		WriteByte f,it\invSlots
 		WriteInt f,it\ID
@@ -914,15 +914,15 @@ Function LoadGame(file$)
 		it.Items = CreateItem(ittName, tempName, x, y, z, red,green,blue,a)
 		it\name = Name
 		
-		EntityType it\obj, HIT_ITEM
+		EntityType it\collider, HIT_ITEM
 		
 		x = ReadFloat(f)
 		y = ReadFloat(f)
-		RotateEntity(it\obj, x, y, 0)
+		RotateEntity(it\collider, x, y, 0)
 		
 		it\state = ReadFloat(f)
 		it\Picked = ReadByte(f)
-		If it\Picked Then HideEntity(it\obj)
+		If it\Picked Then HideEntity(it\collider)
 		
 		nt = ReadByte(f)
 		If nt = True Then SelectedItem = it
@@ -932,7 +932,7 @@ Function LoadGame(file$)
 		
 		For itt.ItemTemplates = Each ItemTemplates
 			If (itt\tempname = tempName) And (itt\name = ittName) Then
-				If itt\isAnim<>0 Then SetAnimTime it\obj,ReadFloat(f) : Exit
+				If itt\isAnim<>0 Then SetAnimTime it\model,ReadFloat(f) : Exit
 			EndIf
 		Next
 		it\invSlots = ReadByte(f)
@@ -1522,15 +1522,15 @@ Function LoadGameQuick(file$)
 		it.Items = CreateItem(ittName, tempName, x, y, z, red,green,blue,a)
 		it\name = Name
 		
-		EntityType it\obj, HIT_ITEM
+		EntityType it\collider, HIT_ITEM
 		
 		x = ReadFloat(f)
 		y = ReadFloat(f)
-		RotateEntity(it\obj, x, y, 0)
+		RotateEntity(it\collider, x, y, 0)
 		
 		it\state = ReadFloat(f)
 		it\Picked = ReadByte(f)
-		If it\Picked Then HideEntity(it\obj)
+		If it\Picked Then HideEntity(it\collider)
 		
 		nt = ReadByte(f)
 		If nt = True Then SelectedItem = it
@@ -1540,7 +1540,7 @@ Function LoadGameQuick(file$)
 		
 		For itt.ItemTemplates = Each ItemTemplates
 			If itt\tempname = tempName Then
-				If itt\isAnim<>0 Then SetAnimTime it\obj,ReadFloat(f) : Exit
+				If itt\isAnim<>0 Then SetAnimTime it\model,ReadFloat(f) : Exit
 			EndIf
 		Next
 		it\invSlots = ReadByte(f)
@@ -1619,6 +1619,8 @@ End Function
 
 Function LoadSaveGames()
 	SaveGameAmount = 0
+	If FileType(SavePath)=1 Then RuntimeError "Can't create dir "+Chr(34)+SavePath+Chr(34)
+	If FileType(SavePath)=0 Then CreateDir(SavePath)
 	myDir=ReadDir(SavePath) 
 	Repeat 
 		file$=NextFile$(myDir) 

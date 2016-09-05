@@ -635,13 +635,13 @@ Function UpdateConsole()
 							temp = True
 							CreateConsoleMsg(itt\name + " spawned.")
 							it.Items = CreateItem(itt\name, itt\tempname, EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
-							EntityType(it\obj, HIT_ITEM)
+							EntityType(it\collider, HIT_ITEM)
 							Exit
 						Else If (Lower(itt\tempname) = StrTemp) Then
 							temp = True
 							CreateConsoleMsg(itt\name + " spawned.")
 							it.Items = CreateItem(itt\name, itt\tempname, EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
-							EntityType(it\obj, HIT_ITEM)
+							EntityType(it\collider, HIT_ITEM)
 							Exit
 						End If
 					Next
@@ -739,7 +739,7 @@ Function UpdateConsole()
 						Else
 							it.Items = CreateItem("Joint","420s", EntityX(Collider,True)+Cos((360.0/20.0)*i)*Rnd(0.3,0.5), EntityY(Camera,True), EntityZ(Collider,True)+Sin((360.0/20.0)*i)*Rnd(0.3,0.5))
 						EndIf
-						EntityType (it\obj, HIT_ITEM)
+						EntityType (it\collider, HIT_ITEM)
 					Next
 					PlaySound_Strict LoadTempSound("SFX\Mandeville.ogg")
 				Case "godmode"
@@ -977,17 +977,17 @@ Function UpdateConsole()
 
 				Case "spawnradio"
 					it.Items = CreateItem("Radio Transceiver", "fineradio", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
-					EntityType(it\obj, HIT_ITEM)
+					EntityType(it\collider, HIT_ITEM)
 					it\state = 101
 				Case "spawnnvg"
 					it.Items = CreateItem("Night Vision Goggles", "nvgoggles", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
-					EntityType(it\obj, HIT_ITEM)
+					EntityType(it\collider, HIT_ITEM)
 					it\state = 1000
 				Case "spawnpumpkin","pumpkin"
 					CreateConsoleMsg("What pumpkin?")
 				Case "spawnnav"
 					it.Items = CreateItem("S-NAV Navigator Ultimate", "nav", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
-					EntityType(it\obj, HIT_ITEM)
+					EntityType(it\collider, HIT_ITEM)
 					it\state = 101
 				Case "teleport173"
 					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
@@ -1047,8 +1047,7 @@ Global HUDenabled% = GetINIInt("options.ini", "options", "HUD enabled")
 
 Global Camera%, CameraShake#, CurrCameraZoom#
 
-Global Brightness_Slider# = GetINIFloat("options.ini", "options", "brightness")
-Global Brightness% = Brightness_Slider#*127.5
+Global Brightness% = GetINIFloat("options.ini", "options", "brightness")
 Global CameraFogNear# = GetINIFloat("options.ini", "options", "camera fog near")
 Global CameraFogFar# = GetINIFloat("options.ini", "options", "camera fog far")
 
@@ -1329,7 +1328,7 @@ Global NTF_1499Sky%
 Global OptionsMenu% = 0
 Global QuitMSG% = 0
 
-Global StoredBrightness% = 40
+;Global StoredBrightness% = 40
 Global InFacility% = True
 
 Global PrevMusicVolume# = MusicVolume#
@@ -2265,8 +2264,6 @@ Repeat
 			If OtherOpen<>Null Then OtherOpen=Null
 			SelectedItem = Null 
 		EndIf
-		
-		Brightness = Brightness_Slider*127.5
 		
 		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea"  Then 
 			
@@ -3272,9 +3269,8 @@ Function MouseLook()
 	End If
 	
 	If (Not WearingNightVision=0) Then
-		;AmbientLightRooms(60)
-		;AmbientLightRooms(255)
-		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
+		AmbientLightRooms(30)
+		;If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
 		ShowEntity(NVOverlay)
 		If WearingNightVision=2 Then
 			EntityColor(NVOverlay, 0,100,255)
@@ -3283,13 +3279,13 @@ Function MouseLook()
 		EndIf
 		EntityTexture(Fog, FogNVTexture)
 	Else
-		;AmbientLightRooms(0)
-		If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
+		AmbientLightRooms(0)
+		;If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
 		HideEntity(NVOverlay)
 		EntityTexture(Fog, FogTexture)
 	EndIf
 	
-	If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
+	;If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
 	
 	If Wearing178>0 Then
 		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\178ambient.ogg")
@@ -3496,10 +3492,10 @@ Function DrawGUI()
 	EndIf
 	
 	If ClosestItem <> Null Then
-		yawvalue# = -DeltaYaw(Camera, ClosestItem\obj)
+		yawvalue# = -DeltaYaw(Camera, ClosestItem\collider)
 		If yawvalue > 90 And yawvalue <= 180 Then yawvalue = 90
 		If yawvalue > 180 And yawvalue < 270 Then yawvalue = 270
-		pitchvalue# = -DeltaPitch(Camera, ClosestItem\obj)
+		pitchvalue# = -DeltaPitch(Camera, ClosestItem\collider)
 		If pitchvalue > 90 And pitchvalue <= 180 Then pitchvalue = 90
 		If pitchvalue > 180 And pitchvalue < 270 Then pitchvalue = 270
 		
@@ -3882,28 +3878,28 @@ Function DrawGUI()
 				If MouseSlot = 66 Then
 					If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
 					
-					ShowEntity(SelectedItem\obj)
-					PositionEntity(SelectedItem\obj, EntityX(Camera), EntityY(Camera), EntityZ(Camera))
-					RotateEntity(SelectedItem\obj, EntityPitch(Camera), EntityYaw(Camera), 0)
-					MoveEntity(SelectedItem\obj, 0, -0.1, 0.1)
-					RotateEntity(SelectedItem\obj, 0, Rand(360), 0)
-					ResetEntity (SelectedItem\obj)
+					ShowEntity(SelectedItem\collider)
+					PositionEntity(SelectedItem\collider, EntityX(Camera), EntityY(Camera), EntityZ(Camera))
+					RotateEntity(SelectedItem\collider, EntityPitch(Camera), EntityYaw(Camera), 0)
+					MoveEntity(SelectedItem\collider, 0, -0.1, 0.1)
+					RotateEntity(SelectedItem\collider, 0, Rand(360), 0)
+					ResetEntity (SelectedItem\collider)
 					;move the item so that it doesn't overlap with other items
-					For it.Items = Each Items
-						If it <> SelectedItem And it\Picked = False Then
-							x = Abs(EntityX(SelectedItem\obj, True)-EntityX(it\obj, True))
-							If x < 0.2 Then 
-								z = Abs(EntityZ(SelectedItem\obj, True)-EntityZ(it\obj, True))
-								If z < 0.2 Then
-									While (x+z)<0.25
-										MoveEntity(SelectedItem\obj, 0, 0, 0.025)
-										x = Abs(EntityX(SelectedItem\obj, True)-EntityX(it\obj, True))
-										z = Abs(EntityZ(SelectedItem\obj, True)-EntityZ(it\obj, True))
-									Wend
-								EndIf
-							EndIf
-						EndIf
-					Next
+					;For it.Items = Each Items
+					;	If it <> SelectedItem And it\Picked = False Then
+					;		x = Abs(EntityX(SelectedItem\collider, True)-EntityX(it\collider, True))
+					;		If x < 0.2 Then 
+					;			z = Abs(EntityZ(SelectedItem\collider, True)-EntityZ(it\collider, True))
+					;			If z < 0.2 Then
+					;				While (x+z)<0.25
+					;					MoveEntity(SelectedItem\collider, 0, 0, 0.025)
+					;					x = Abs(EntityX(SelectedItem\collider, True)-EntityX(it\collider, True))
+					;					z = Abs(EntityZ(SelectedItem\collider, True)-EntityZ(it\collider, True))
+					;				Wend
+					;			EndIf
+					;		EndIf
+					;	EndIf
+					;Next
 					
 					SelectedItem\DropSpeed = 0.0
 					
@@ -3922,7 +3918,7 @@ Function DrawGUI()
 						Select OtherOpen\itemtemplate\tempname
 							Case "clipboard"
 								OtherOpen\invimg = OtherOpen\itemtemplate\invimg2
-								SetAnimTime OtherOpen\obj,17.0
+								SetAnimTime OtherOpen\model,17.0
 						End Select
 					EndIf
 					
@@ -4128,7 +4124,7 @@ Function DrawGUI()
 												If SelectedItem <> Null Then
 													Inventory(MouseSlot)\SecondInv[c] = SelectedItem
 													Inventory(MouseSlot)\state = 1.0
-													SetAnimTime Inventory(MouseSlot)\obj,0.0
+													SetAnimTime Inventory(MouseSlot)\model,0.0
 													Inventory(MouseSlot)\invimg = Inventory(MouseSlot)\itemtemplate\invimg
 													
 													For ri% = 0 To MaxItemAmount - 1
@@ -4613,7 +4609,7 @@ Function DrawGUI()
 						For i = 0 To MaxItemAmount-1
 							If Inventory(i)=SelectedItem Then Inventory(i) = it : Exit
 						Next					
-						EntityType (it\obj, HIT_ITEM)
+						EntityType (it\collider, HIT_ITEM)
 						
 						RemoveItem(SelectedItem)						
 					EndIf
@@ -4882,7 +4878,7 @@ Function DrawGUI()
 					EndIf
 					
 				Case "cigarette"
-					If SelectedItem\state = 0 Then
+					If SelectedItem\State = 0 Then
 						Select Rand(6)
 							Case 1
 								Msg = Chr(34)+"I don't have anything to light it with. Umm, what about that... Nevermind."+Chr(34)
@@ -4899,7 +4895,7 @@ Function DrawGUI()
 								Msg = Chr(34)+"Don't plan on starting, even at a time like this."+Chr(34)
 								RemoveItem(SelectedItem)
 						End Select
-						SelectedItem\state = 1 
+						SelectedItem\State = 1 
 					Else
 						Msg = "You are unable to get lit."
 					EndIf
@@ -5402,7 +5398,6 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
 				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-				PutINIValue(OptionFile, "options", "brightness", Brightness_Slider)
 				
 				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
@@ -5531,33 +5526,6 @@ Function DrawMenu()
 						DrawTooltip("Not available in this version")
 					EndIf
 					
-;					y=y+30*MenuScale
-					
-;					Local prevBrightness# = Brightness_Slider
-;					Brightness_Slider = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, Brightness_Slider*50.0)/50.0)
-;					Color 255,255,255
-;					AAText(x, y, "Brightness")
-;					
-;					Brightness = Brightness_Slider#*127.5
-;					If prevBrightness# <> Brightness_Slider
-;						AmbientLight Brightness, Brightness, Brightness
-;						If (Not WearingNightVision=0) Then
-;							If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
-;							ShowEntity(NVOverlay)
-;							If WearingNightVision=2 Then
-;								EntityColor(NVOverlay, 0,100,255)
-;							Else
-;								EntityColor(NVOverlay, 0,255,0)
-;							EndIf
-;							EntityTexture(Fog, FogNVTexture)
-;						Else
-;							If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
-;							HideEntity(NVOverlay)
-;							EntityTexture(Fog, FogTexture)
-;						EndIf
-;						If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
-;						prevBrightness = Brightness_Slider
-;					EndIf
 					;[End Block]
 				Case 2 ;Audio
 					;Text(x+210*MenuScale,y,"AUDIO",True,True)
@@ -5935,7 +5903,7 @@ Function LoadEntities()
 	;TextureLodBias
 	
 	AmbientLightRoomTex% = CreateTexture(2,2,257)
-	TextureBlend AmbientLightRoomTex,2
+	TextureBlend AmbientLightRoomTex,5
 	SetBuffer(TextureBuffer(AmbientLightRoomTex))
 	ClsColor 0,0,0
 	Cls
@@ -6323,8 +6291,8 @@ Function InitNewGame()
 	Next
 	
 	For it.Items = Each Items
-		EntityType (it\obj, HIT_ITEM)
-		EntityParent(it\obj, 0)
+		EntityType (it\collider, HIT_ITEM)
+		EntityParent(it\collider, 0)
 	Next
 	
 	DrawLoading(80)
@@ -6703,8 +6671,6 @@ Function NullGame()
 	DeleteElevatorObjects()
 	
 	NoTarget% = False
-	Brightness = Brightness_Slider#*127.5
-	StoredBrightness% = Brightness_Slider#*127.5
 	
 	OptionsMenu% = -1
 	QuitMSG% = -1
@@ -6724,10 +6690,6 @@ Function NullGame()
 	Camera = 0
 	ark_blur_cam = 0
 	InitFastResize()
-	
-	Brightness% = Brightness_Slider#*255
-	
-	;InitExt
 	
 	For i=0 To 9
 		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
@@ -6912,6 +6874,20 @@ Function GetStepSound(entity%)
 	If picker <> 0 Then
 		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
 		If brush<>0 Then
+			texture = GetBrushTexture(brush,2)
+			If texture <> 0 Then
+				name = StripPath(TextureName(texture))
+				If (name<>"") FreeTexture(texture)
+				For mat.Materials = Each Materials
+					If mat\name = name Then
+						If mat\StepSound>0 Then
+							FreeBrush(brush)
+							Return mat\StepSound-1
+						EndIf
+						Exit
+					EndIf
+				Next				
+			EndIf
 			texture = GetBrushTexture(brush,1)
 			If texture <> 0 Then
 				name = StripPath(TextureName(texture))
@@ -7073,8 +7049,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)
 				Case "fine", "very fine"
 					it2 = CreateItem("Gas Mask", "supergasmask", x, y, z)
 					RemoveItem(item)
@@ -7106,8 +7082,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)
 				Case "fine"
 					it2 = CreateItem("Heavy Ballistic Vest", "finevest", x, y, z)
 					RemoveItem(item)
@@ -7125,8 +7101,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						If n\NPCtype = NPCtype178 Then RemoveNPC(n)
 					Next
 				Case "1:1","fine","very fine"
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)
 			End Select
 		Case "Clipboard"
 			Select setting
@@ -7139,16 +7115,16 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					Next
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)
 				Case "fine"
 					item\invSlots = Max(item\state2,15)
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)
 				Case "very fine"
 					item\invSlots = Max(item\state2,20)
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)
 			End Select
 		Case "Cowbell"
 			Select setting
@@ -7157,8 +7133,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1","fine","very fine"
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)
 			End Select
 		Case "Night Vision Goggles"
 			Select setting
@@ -7167,8 +7143,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)
 				Case "fine", "very fine"
 					it2 = CreateItem("Night Vision Goggles", "supernv", x, y, z)
 					RemoveItem(item)
@@ -7181,11 +7157,11 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "1:1", "fine", "very fine"
 					it2 = Null
 					For it.Items = Each Items
-						If it<>item And it\obj <> 0 And it\Picked = False Then
-							If Distance(EntityX(it\obj,True), EntityZ(it\obj,True), EntityX(item\obj, True), EntityZ(item\obj, True)) < (180.0 * RoomScale) Then
+						If it<>item And it\collider <> 0 And it\Picked = False Then
+							If Distance(EntityX(it\collider,True), EntityZ(it\collider,True), EntityX(Item\collider, True), EntityZ(Item\collider, True)) < (180.0 * RoomScale) Then
 								it2 = it
 								Exit
-							ElseIf Distance(EntityX(it\obj,True), EntityZ(it\obj,True), x,z) < (180.0 * RoomScale)
+							ElseIf Distance(EntityX(it\collider,True), EntityZ(it\collider,True), x,z) < (180.0 * RoomScale)
 								it2 = it
 								Exit
 							End If
@@ -7213,8 +7189,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							it2 = CreateItem("Metal Panel", "scp148", x, y, z)
 							RemoveItem(item)
 						Else
-							PositionEntity(item\obj, x, y, z)
-							ResetEntity(item\obj)							
+							PositionEntity(Item\collider, x, y, z)
+							ResetEntity(Item\collider)							
 						EndIf
 					EndIf					
 			End Select
@@ -7582,13 +7558,13 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					
 					RemoveItem(item)
 				Default
-					PositionEntity(item\obj, x, y, z)
-					ResetEntity(item\obj)	
+					PositionEntity(Item\collider, x, y, z)
+					ResetEntity(Item\collider)	
 			End Select
 			
 	End Select
 	
-	If it2 <> Null Then EntityType (it2\obj, HIT_ITEM)
+	If it2 <> Null Then EntityType (it2\collider, HIT_ITEM)
 End Function
 
 Function Use294()
@@ -7737,7 +7713,7 @@ Function Use294()
 					
 					it.items = CreateItem("Cup", "cup", EntityX(PlayerRoom\Objects[1],True),EntityY(PlayerRoom\Objects[1],True),EntityZ(PlayerRoom\Objects[1],True), r,g,b,alpha)
 					it\name = "Cup of "+Input294
-					EntityType (it\obj, HIT_ITEM)
+					EntityType (it\collider, HIT_ITEM)
 					
 				Else
 					;out of range
@@ -8874,9 +8850,9 @@ Function UpdateLeave1499()
 				For it.Items = Each Items
 					it\disttimer = 0
 					If it\itemtemplate\tempname = "scp1499" Or it\itemtemplate\tempname = "super1499"
-						If EntityY(it\obj) >= EntityY(PlayerRoom\obj)-5
-							PositionEntity it\obj,NTF_1499PrevX#,NTF_1499PrevY#+(EntityY(it\obj)-EntityY(PlayerRoom\obj)),NTF_1499PrevZ#
-							ResetEntity it\obj
+						If EntityY(it\collider) >= EntityY(PlayerRoom\obj)-5
+							PositionEntity it\collider,NTF_1499PrevX#,NTF_1499PrevY#+(EntityY(it\collider)-EntityY(PlayerRoom\obj)),NTF_1499PrevZ#
+							ResetEntity it\collider
 						EndIf
 					EndIf
 				Next
@@ -8886,7 +8862,7 @@ Function UpdateLeave1499()
 				NTF_1499PrevY# = 0.0
 				NTF_1499PrevZ# = 0.0
 				NTF_1499PrevRoom = Null
-				Brightness = StoredBrightness
+				;Brightness = StoredBrightness
 				Exit
 			EndIf
 		Next
@@ -9015,5 +8991,10 @@ Function ScaledMouseY%()
 End Function
 
 ;~IDEal Editor Parameters:
+;~F#1C#A8#130#134#13B#3D0#4AC#506#527#59F#5AC#661#6D9#6F0#6FD#72F#7E5#8CE#9C9#9E1
+;~F#A74#B9A#CB9#E29#142A#14B7#1506#1518#1557#1629#1634#179A#182C#185D#195F#1971#198D#1997#19A4#19C6
+;~F#19E5#1A04#1A20#1A34#1A49#1A4D#1A6D#1A75#1AA0#1C42#1CF7#1D22#1D99#1D9F#1DA9#1DB5#1DC0#1DC4#1DFF#1E07
+;~F#1E0F#1E16#1E1D#1E2A#1E30#1E3B#1E74#1E83#1EA1#1ECF#1ED6#1EE9#1F02#1F2F#1F3A#1F3F#1F59#1F65#1F80#1FD2
+;~F#1FE0#1FE8#1FF4#1FFD#2026#202B#2030#2035#203F#2050#20D5#20E3#212A#2151#2163#217C#218B#21A2#21BF#21C3
 ;~B#1196#13CE#1A4A
 ;~C#Blitz3D
