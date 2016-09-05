@@ -8997,7 +8997,7 @@ Function UpdateEvents()
 					;[Block]
 					If e\EventState <> 2
 						If Curr096<>Null
-							If EntityDistance(Curr096\Collider,Collider)<HideDistance
+							If EntityDistance(Curr096\Collider,Collider)<45
 								e\EventState = 2
 								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 								DebugLog "- SCP-096 too close to player"
@@ -9009,6 +9009,17 @@ Function UpdateEvents()
 										e\EventState = 2
 										DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 										DebugLog "- room2servers event still in progress"
+										Exit
+									EndIf
+								EndIf
+							Next
+							
+							For r.Rooms = Each Rooms
+   								If r\RoomTemplate\Name = "checkpoint1"
+									If r\dist < 10
+										e\EventState = 2
+										DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
+										DebugLog "- too close to checkpoint1"
 										Exit
 									EndIf
 								EndIf
@@ -9080,6 +9091,14 @@ Function UpdateEvents()
 						RotateEntity Curr096\Collider,0,EntityYaw(Curr096\Collider)+180,0
 						FreeEntity pvt%
 						Curr096\State = 5
+
+						;Play 096's ambience when spawned.
+						If Curr096\Sound2 = 0 Then
+							Curr096\Sound2 = LoadSound_Strict("SFX\096_1.ogg")
+						Else
+							Curr096\SoundChn2 = LoopSound2(Curr096\Sound2, Curr096\SoundChn2, Camera, Curr096\Collider, 16.0, 1.0)
+						EndIf
+
 						DebugLog "SCP-096 successfully placed in "+Chr(34)+e\room\RoomTemplate\Name+Chr(34)
 						e\EventState = 1
 					ElseIf e\EventState = 1
@@ -9098,7 +9117,7 @@ Function UpdateEvents()
 					EndIf
 				Else
 					If e\EventState = 2
-						If Rand(1,3-(1*SelectedDifficulty\aggressiveNPCs))
+						If Rand(-1,1+(2*SelectedDifficulty\aggressiveNPCs))>0 Then
 							e\EventState = 0
 						Else
 							e\EventState = 3
