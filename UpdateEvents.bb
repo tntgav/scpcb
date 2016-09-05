@@ -3476,7 +3476,7 @@ Function UpdateEvents()
 				temp = True
 				If e\EventState2 > 70*3.5 And e\EventState2 < 70*90 Then temp = False
 				
-				If PlayerRoom = e\room And temp Then
+				If temp Then
 					
 					If e\Sound = 0 Then e\Sound = LoadSound_Strict("SFX\Tesla.ogg")
 					
@@ -3487,6 +3487,7 @@ Function UpdateEvents()
 							HideEntity e\room\Objects[4]
 						EndIf						
 						
+						If e\room\dist < 8
 						If e\SoundCHN = 0 Then ;humming when the player isn't close
 							e\SoundCHN = PlaySound2(TeslaIdleSFX, Camera, e\room\Objects[3],4.0,0.5)
 						Else
@@ -3506,22 +3507,6 @@ Function UpdateEvents()
 							EndIf
 						Next
 						
-						If Curr106\State < -10 And e\EventState = 0 Then 
-							For i = 0 To 2
-								If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
-								;play the activation sound
-									If KillTimer => 0 Then 
-										StopChannel(e\SoundCHN)
-										e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
-										HideEntity e\room\Objects[4]
-										e\EventState = 1
-										GiveAchievement(AchvTesla)
-										Exit
-									EndIf
-								EndIf
-							Next						
-						EndIf
-						
 						Local temp2 = True
 						For e2.Events = Each Events
 							If e2\EventName = e\EventName And e2 <> e
@@ -3535,7 +3520,7 @@ Function UpdateEvents()
 						
 						Local temp3 = 0
 						If temp2
-							If e\EventStr = ""
+								If e\EventStr = "" And PlayerRoom = e\room
 								If EntityDistance(e\room\Objects[5],Collider)<EntityDistance(e\room\Objects[6],Collider)
 									temp3 = 6
 								Else
@@ -3549,20 +3534,25 @@ Function UpdateEvents()
 								Local tempscale# = 0.5 / MeshWidth(e\room\NPC[0]\obj)
 								ScaleEntity e\room\NPC[0]\obj, tempscale#, tempscale#, tempscale#
 								e\EventStr = "step1"
-							ElseIf e\EventStr = "step1"
+								EndIf
+							EndIf
+						EndIf
+						
+						If Curr106\State < -10 And e\EventState = 0 Then 
 								For i = 0 To 2
-									If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale
+								If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
+								;play the activation sound
 										If KillTimer => 0 Then 
 											StopChannel(e\SoundCHN)
 											e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
 											HideEntity e\room\Objects[4]
 											e\EventState = 1
+										GiveAchievement(AchvTesla)
 											Exit
 										EndIf
 									EndIf
 								Next
 							EndIf
-						EndIf
 					Else
 						e\EventState = e\EventState+FPSfactor
 						If e\EventState =< 40 Then
@@ -3572,7 +3562,12 @@ Function UpdateEvents()
 								HideEntity e\room\Objects[4]
 							EndIf
 						Else
+							;If e\EventState-FPSfactor =< 40 Then PlaySound_Strict(e\Sound)
+							If e\room\dist < 2
 							If e\EventState-FPSfactor =< 40 Then PlaySound_Strict(e\Sound)	
+							Else
+								If e\EventState-FPSfactor =< 40 Then PlaySound2(e\Sound,Camera,e\room\Objects[2])
+							EndIf
 							If e\EventState < 70 Then 
 								
 								If KillTimer => 0 Then 
@@ -3633,7 +3628,21 @@ Function UpdateEvents()
 				EndIf
 				
 				If e\room\NPC[0] <> Null
-					If e\EventStr = "step1" And e\room\NPC[0]\State = 3
+					If e\EventStr = "step1" And e\room\NPC[0]\State <> 3
+						If e\EventState = 0
+							For i = 0 To 2
+								If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale
+									If KillTimer => 0 Then 
+										StopChannel(e\SoundCHN)
+										e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
+										HideEntity e\room\Objects[4]
+										e\EventState = 1
+										Exit
+									EndIf
+								EndIf
+							Next
+						EndIf
+					ElseIf e\EventStr = "step1" And e\room\NPC[0]\State = 3
 						e\room\NPC[0]\CurrSpeed = 0
 						AnimateNPC(e\room\NPC[0],41,60,0.5,False)
 						If e\room\NPC[0]\Frame = 60
