@@ -6874,6 +6874,20 @@ Function GetStepSound(entity%)
 	If picker <> 0 Then
 		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
 		If brush<>0 Then
+			texture = GetBrushTexture(brush,2)
+			If texture <> 0 Then
+				name = StripPath(TextureName(texture))
+				If (name<>"") FreeTexture(texture)
+				For mat.Materials = Each Materials
+					If mat\name = name Then
+						If mat\StepSound>0 Then
+							FreeBrush(brush)
+							Return mat\StepSound-1
+						EndIf
+						Exit
+					EndIf
+				Next				
+			EndIf
 			texture = GetBrushTexture(brush,1)
 			If texture <> 0 Then
 				name = StripPath(TextureName(texture))
