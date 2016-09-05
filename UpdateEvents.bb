@@ -201,15 +201,15 @@ Function UpdateEvents()
 						EndIf
 						
 						
-						If e\EventState > 900+3*70 And e\EventState < 900+4*70 Then 
-							CameraShake = 0.2
-						ElseIf e\EventState > 900+32.3*70 And e\EventState < 900+34*70
-							CameraShake = 0.4
-						ElseIf e\EventState > 900+51*70 And e\EventState < 900+53.5*70
-							CameraShake = 1.0
-						ElseIf e\EventState > 900+57.5*70 And e\EventState < 900+58.5*70
-							CameraShake = 0.4
-						EndIf
+					;	If e\EventState > 900+3*70 And e\EventState < 900+4*70 Then 
+					;		CameraShake = 0.2
+					;	ElseIf e\EventState > 900+32.3*70 And e\EventState < 900+34*70
+					;		CameraShake = 0.4
+					;	ElseIf e\EventState > 900+51*70 And e\EventState < 900+53.5*70
+					;		CameraShake = 1.0
+					;	ElseIf e\EventState > 900+57.5*70 And e\EventState < 900+58.5*70
+					;		CameraShake = 0.4
+					;	EndIf
 						
 						PositionEntity e\room\Objects[0], EntityX(e\room\Objects[0],True), -Max(e\EventState-1300,0)/4500, EntityZ(e\room\Objects[0],True), True
 						RotateEntity e\room\Objects[0], -Max(e\EventState-1320,0)/130, 0, -Max(e\EventState-1300,0)/40, True
@@ -241,6 +241,8 @@ Function UpdateEvents()
 							
 							e\Sound2 = LoadSound_Strict("SFX\Alarm\Alarm2_"+Int(e\EventState3)+".ogg")
 							e\SoundCHN2 = PlaySound_Strict(e\Sound2)
+							Else
+							If Int(e\EventState3) = 8 Then CameraShake = 1.0
 						EndIf
 					EndIf
 					
