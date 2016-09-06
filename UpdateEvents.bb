@@ -230,7 +230,7 @@ Function UpdateEvents()
 						End If
 					EndIf
 					
-					If (e\EventState3<9) Then
+					If (e\EventState3<10) Then
 						If (Not ChannelPlaying(e\SoundCHN2)) Then
 							e\EventState3 = e\EventState3+1
 							
@@ -2891,7 +2891,7 @@ Function UpdateEvents()
 										If temp < 130*RoomScale Then
 											
 											For r.Rooms = Each Rooms
-												If r\RoomTemplate\Name = "room2offices" Then
+												If r\RoomTemplate\Name = "room2_3" Then
 													GiveAchievement(AchvPD)
 													e\EventState = 0
 													e\EventState2 = 0

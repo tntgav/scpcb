@@ -22,7 +22,7 @@ ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 Global Font1%, Font2%, Font3%, Font4%
 
 Global VersionNumber$ = "1.3.2"
-Global CompatibleNumber$ = "1.3.1"
+Global CompatibleNumber$ = "1.3.2"
 
 AppTitle "SCP - Containment Breach Launcher"
 
