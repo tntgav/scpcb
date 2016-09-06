@@ -2070,7 +2070,7 @@ Function UpdateEvents()
 						
 						DrawLoading(30)
 						
-						For i = 0 To 19
+						For i = 0 To e\room\MaxLights
 							If e\room\LightSprites[i]<>0 Then 
 								EntityFX e\room\LightSprites[i], 1+8
 							EndIf
@@ -2209,9 +2209,11 @@ Function UpdateEvents()
 											If Curr106\State =< -10 Then
 												dist# = EntityY(Curr106\Collider)
 												PositionEntity Curr106\Collider,EntityX(Curr106\Collider),EntityY(e\room\Objects[3],True),EntityZ(Curr106\Collider),True
-												Curr106\PathStatus = FindPath(Curr106, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
+												;Curr106\PathStatus = FindPath(Curr106, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
+												Curr106\PathStatus = FindPath(Curr106,EntityX(e\room\NPC[5]\Collider,True),EntityY(e\room\NPC[5]\Collider,True),EntityZ(e\room\NPC[5]\Collider,True))
 												Curr106\PathTimer = 70*200
 												PositionEntity Curr106\Collider,EntityX(Curr106\Collider),dist,EntityZ(Curr106\Collider),True
+												ResetEntity Curr106\Collider
 												Curr106\PathLocation = 1
 												;Curr106\Idle = False
 											;Else	
@@ -2485,6 +2487,11 @@ Function UpdateEvents()
 											e\room\NPC[i]\EnemyX = EntityX(Collider)
 											e\room\NPC[i]\EnemyY = EntityY(Collider)
 											e\room\NPC[i]\EnemyZ = EntityZ(Collider)
+										Else
+											If EntityDistance(e\room\NPC[i]\Collider,Collider)<6.0
+												e\room\NPC[i]\State = 5
+												e\room\NPC[i]\CurrSpeed = 0
+											EndIf
 										EndIf
 									Next
 									
