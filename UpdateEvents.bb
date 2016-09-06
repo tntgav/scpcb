@@ -2296,7 +2296,7 @@ Function UpdateEvents()
 												Curr106\State = 100000
 												e\EventState2 = 0
 												For i = 5 To 8
-													e\room\NPC[i]\State = 2
+													e\room\NPC[i]\State = 1
 												Next
 												For i = 2 To 4 ;helicopters attack the player
 													e\room\NPC[i]\State = 2
