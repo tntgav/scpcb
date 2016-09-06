@@ -142,6 +142,8 @@ Function UpdateEvents()
 								
 								
 								If e\EventState > 900+2.5*70 Then
+								If e\room\NPC[2]\State<>1 Then
+
 									e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
 									AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
 									MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
@@ -153,6 +155,7 @@ Function UpdateEvents()
 									Else
 										RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
 									EndIf
+							EndIf
 								EndIf
 								
 								If e\EventState < 900+4*70 Then
@@ -160,11 +163,13 @@ Function UpdateEvents()
 									RotateEntity Curr173\Collider,0,190,0
 									
 									If e\EventState > 900+70 And e\EventState < 900+2.5*70 Then
+									If e\room\NPC[2]\State<>1 Then
 										AnimateNPC(e\room\NPC[2], 1539, 1553, 0.2, False)
 										PointEntity(e\room\NPC[2]\obj, Curr173\Collider)
 										RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj),EntityYaw(e\room\NPC[2]\Collider),15.0), 0
 									EndIf
-									
+									EndIf
+
 								Else
 									If e\EventState-FPSfactor < 900+4*70 Then 
 										PlaySound_Strict(IntroSFX(11)) : LightBlink = 3.0
@@ -221,6 +226,7 @@ Function UpdateEvents()
 							If Rand(300)=2 Then PlaySound2(DecaySFX(Rand(1,3)),Camera,e\room\Objects[0], 3.0)
 						EndIf
 					End If
+					If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1 
 					
 					If (e\EventState < 2000) Then
 						If e\SoundCHN = 0 Then
