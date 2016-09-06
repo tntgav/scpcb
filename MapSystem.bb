@@ -1487,7 +1487,7 @@ Global HideDistance# = 15.0
 
 Global SecondaryLightOn# = True
 Global RemoteDoorOn = True
-Global Contained106 = False, Disabled173 = False
+Global Contained106 = False
 
 Type Rooms
 	Field zone%
@@ -2782,6 +2782,11 @@ Function FillRoom(r.Rooms)
 			
 			r\Objects[16] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[16], r\x - 432.0 * RoomScale, -5550.0 * RoomScale, r\z + 2976.0 * RoomScale, True)
+			
+			r\Objects[20] = LoadMesh_Strict("GFX\map\room3storage_hb.b3d",r\obj)
+			EntityPickMode r\Objects[20],2
+			EntityType r\Objects[20],HIT_MAP
+			EntityAlpha r\Objects[20],0.0
 			
 			;Doors
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x, 0.0, r\z + 448.0 * RoomScale, 0, r, True)
@@ -5521,7 +5526,7 @@ Function UpdateScreens()
 						SelectedScreen=s
 						s\img = LoadImage_Strict("GFX\screens\"+s\imgpath)
 						MaskImage s\img, 255,0,255
-						ResizeImage(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
+						;ResizeImage(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
 						
 						PlaySound_Strict ButtonSFX
 						MouseUp1=False

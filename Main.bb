@@ -22,7 +22,7 @@ ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 Global Font1%, Font2%, Font3%, Font4%
 
 Global VersionNumber$ = "1.3.2"
-Global CompatibleNumber$ = "1.3.1"
+Global CompatibleNumber$ = "1.3.2"
 
 AppTitle "SCP - Containment Breach Launcher"
 
@@ -698,11 +698,9 @@ Function UpdateConsole()
 						EndIf
 					Next
 				Case "disable173"
-					Curr173\Idle = True
-					Disabled173=True
+					Curr173\Idle = 3 ;This phenominal comment is brought to you by PolyFox. His absolute wisdom in this fatigue of knowledge brought about a new era of 173 state checks.
 				Case "enable173"
 					Curr173\Idle = False
-					Disabled173=False
 					ShowEntity Curr173\obj
 					ShowEntity Curr173\Collider
 				Case "disable106"
@@ -882,8 +880,7 @@ Function UpdateConsole()
 				Case "asd2"
 					GodMode = 1
 					InfiniteStamina = 1
-					Curr173\Idle = True
-					Disabled173=True
+					Curr173\Idle = 3
 					Curr106\Idle = True
 					Curr106\State = 200000
 					Contained106 = True
@@ -1188,7 +1185,7 @@ Dim AmbientSFXAmount(6)
 ;0 = light containment, 1 = heavy containment, 2 = entrance
 AmbientSFXAmount(0)=8 : AmbientSFXAmount(1)=11 : AmbientSFXAmount(2)=12
 ;3 = general, 4 = pre-breach
-AmbientSFXAmount(3)=15 : AmbientSFXAmount(4)=3
+AmbientSFXAmount(3)=15 : AmbientSFXAmount(4)=5
 ;5 = forest
 AmbientSFXAmount(5)=10
 
@@ -1237,8 +1234,8 @@ Global HeartBeatSFX = LoadSound_Strict("SFX\heartbeat.ogg")
 Dim BreathSFX(2,5)
 Global BreathCHN%
 For i = 0 To 4
-	BreathSFX(0,i)=LoadSound_Strict("SFX\9431\breath"+i+".ogg")
-	BreathSFX(1,i)=LoadSound_Strict("SFX\9431\breath"+i+"gas.ogg")
+	BreathSFX(0,i)=LoadSound_Strict("SFX\9341\breath"+i+".ogg")
+	BreathSFX(1,i)=LoadSound_Strict("SFX\9341\breath"+i+"gas.ogg")
 Next
 
 
@@ -6535,7 +6532,7 @@ Function NullGame()
 	Playable = True
 	
 	Contained106 = False
-	Disabled173 = False
+	Curr173\Idle = False
 	
 	MTFtimer = 0
 	For i = 0 To 9

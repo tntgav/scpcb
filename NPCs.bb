@@ -663,7 +663,7 @@ Function UpdateNPCs()
 		Select n\NPCtype
 			Case NPCtype173
 				;[Block]
-				If Disabled173 Then
+				If Curr173\Idle = 3 Then
 					HideEntity n\obj
 					HideEntity n\Collider
 				Else
@@ -809,7 +809,7 @@ Function UpdateNPCs()
 														DeathMSG = "Subject D-9341. Cause of death: Fatal cervical fracture. The surveillance tapes confirm that the subject was killed by SCP-173."	
 													Case "173"
 														If Rand(2)=1 Then
-															DeathMSG = Chr(34)+"Yes, we we're just about to start the tests when it started. The Class Ds and the guard died as soon as the lights started flickering, "
+															DeathMSG = Chr(34)+"Yes, we were just about to start the tests when it started. The Class Ds and the guard died as soon as the lights started flickering, "
 															DeathMSG = DeathMSG + "but I managed to get out of the surveillance room before it got me."+Chr(34)
 														Else
 															DeathMSG = "Subject D-9341. Cause of death: Fatal cervical fracture. According to Security Chief Franklin who was present at SCP-173's containment "
@@ -1223,7 +1223,7 @@ Function UpdateNPCs()
 									n\SoundChn2 = PlaySound_Strict (n\Sound2)
 								Else
 									If (Not ChannelPlaying(n\SoundChn2)) Then n\SoundChn2 = PlaySound_Strict(n\Sound2)
-									ChannelVolume(n\SoundChn2, Min(Max(8.0-dist,0.6),1.0))
+									ChannelVolume(n\SoundChn2, Min(Max(8.0-dist,0.6),1.0)*SFXVolume#)
 								EndIf
 							EndIf
 						EndIf
@@ -3881,7 +3881,7 @@ Function UpdateNPCs()
 									Msg="You can feel something near you, but you are unable to see it. Perhaps its time is now."
 							End Select
                             n\Reload = 20*70
-							MsgTimer=5*70
+							MsgTimer=8*70
 						EndIf
 						n\Reload = n\Reload - FPSfactor
 						
@@ -5465,7 +5465,6 @@ Function UpdateMTFUnit(n.NPCs)
 							EndIf
 						EndIf
 						
-						
 					EndIf
 				Else
 					n\CurrSpeed = 0
@@ -5654,20 +5653,23 @@ Function UpdateMTFUnit(n.NPCs)
 					If n\PathStatus = 1 And n\Reload =< 0 Then
 						dist# = Distance(EntityX(target),EntityZ(target),EntityX(n\Collider),EntityZ(n\Collider))
 						
-						If dist<20.0 Then
-							PositionEntity pvt, EntityX(n\obj),EntityY(n\obj), EntityZ(n\obj)
-							RotateEntity pvt, EntityPitch(n\Collider), EntityYaw(n\Collider),0
-							MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
-							
-							If WrapAngle(EntityYaw(pvt)-EntityYaw(n\Collider))<5 Then
-								PlaySound2(GunshotSFX, Camera, n\Collider, 20)
-								p.Particles = CreateParticle(EntityX(n\obj, True), EntityY(n\obj, True), EntityZ(n\obj, True), 1, 0.2, 0.0, 5)
-								PositionEntity(p\pvt, EntityX(pvt), EntityY(pvt), EntityZ(pvt))
-								
-								n\Reload = 10
-							EndIf
-							
-						EndIf
+						;If dist<20.0 Then
+						;	pvt = CreatePivot()
+						;	
+						;	PositionEntity pvt, EntityX(n\obj),EntityY(n\obj), EntityZ(n\obj)
+						;	RotateEntity pvt, EntityPitch(n\Collider), EntityYaw(n\Collider),0
+						;	MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
+						;	
+						;	If WrapAngle(EntityYaw(pvt)-EntityYaw(n\Collider))<5 Then
+						;		PlaySound2(GunshotSFX, Camera, n\Collider, 20)
+						;		p.Particles = CreateParticle(EntityX(n\obj, True), EntityY(n\obj, True), EntityZ(n\obj, True), 1, 0.2, 0.0, 5)
+						;		PositionEntity(p\pvt, EntityX(pvt), EntityY(pvt), EntityZ(pvt))
+						;		
+						;		n\Reload = 7
+						;	EndIf
+						;	
+						;	FreeEntity pvt
+						;EndIf
 					EndIf
 				EndIf		
 				
