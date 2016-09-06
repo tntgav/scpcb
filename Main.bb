@@ -1234,8 +1234,8 @@ Global HeartBeatSFX = LoadSound_Strict("SFX\heartbeat.ogg")
 Dim BreathSFX(2,5)
 Global BreathCHN%
 For i = 0 To 4
-	BreathSFX(0,i)=LoadSound_Strict("SFX\9431\breath"+i+".ogg")
-	BreathSFX(1,i)=LoadSound_Strict("SFX\9431\breath"+i+"gas.ogg")
+	BreathSFX(0,i)=LoadSound_Strict("SFX\9341\breath"+i+".ogg")
+	BreathSFX(1,i)=LoadSound_Strict("SFX\9341\breath"+i+"gas.ogg")
 Next
 
 
