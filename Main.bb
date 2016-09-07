@@ -2483,8 +2483,8 @@ Repeat
 		If KeyHit(63) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance"
-					Msg = "Saving now would only yield a "+Chr(34)+"Memory Access Violation"+Chr(34)+"."
+				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
+					Msg = "You cannot save in this location."
 					MsgTimer = 70 * 4
 				ElseIf (Not CanSave) Or QuickLoadPercent > -1
 					Msg = "You cannot save at this moment."
