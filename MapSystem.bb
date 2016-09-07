@@ -2783,6 +2783,11 @@ Function FillRoom(r.Rooms)
 			r\Objects[16] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[16], r\x - 432.0 * RoomScale, -5550.0 * RoomScale, r\z + 2976.0 * RoomScale, True)
 			
+			r\Objects[20] = LoadMesh_Strict("GFX\map\room3storage_hb.b3d",r\obj)
+			EntityPickMode r\Objects[20],2
+			EntityType r\Objects[20],HIT_MAP
+			EntityAlpha r\Objects[20],0.0
+			
 			;Doors
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x, 0.0, r\z + 448.0 * RoomScale, 0, r, True)
 			r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = True
@@ -2828,7 +2833,7 @@ Function FillRoom(r.Rooms)
 					z#=2808
 			End Select
 			
-			it.Items = CreateItem("Black Severed Hand", "hand2", r\x + x*RoomScale, -5496.0*RoomScale+1.0, r\z+z*RoomScale)
+			it.Items = CreateItem("Black Severed Hand", "hand2", r\x + x*RoomScale, -5596.0*RoomScale+1.0, r\z+z*RoomScale)
 			EntityParent(it\collider, r\obj)
 			
 			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x + 1936.0 * RoomScale, r\y - 5496.0 * RoomScale, r\z - 944.0 * RoomScale)
@@ -5520,9 +5525,8 @@ Function UpdateScreens()
 					If MouseUp1 Then 
 						SelectedScreen=s
 						s\img = LoadImage_Strict("GFX\screens\"+s\imgpath)
+						s\img = ResizeImage2(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
 						MaskImage s\img, 255,0,255
-						ResizeImage(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
-						
 						PlaySound_Strict ButtonSFX
 						MouseUp1=False
 					EndIf

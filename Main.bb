@@ -22,7 +22,7 @@ ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 Global Font1%, Font2%, Font3%, Font4%
 
 Global VersionNumber$ = "1.3.2"
-Global CompatibleNumber$ = "1.3.1"
+Global CompatibleNumber$ = "1.3.2"
 
 AppTitle "SCP - Containment Breach Launcher"
 
@@ -31,6 +31,9 @@ Global ButtonSFX%
 
 Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
+
+;CHANGE IT FROM "True" TO "False" BEFORE COMPILING!!! - ENDSHN
+Global CanOpenConsole% = False
 
 Dim ArrowIMG(4)
 
@@ -333,6 +336,8 @@ Function CreateConsoleMsg(txt$)
 End Function
 
 Function UpdateConsole()
+	
+	If CanOpenConsole = False Then ConsoleOpen = False
 	
 	If ConsoleOpen Then
 		Local x% = 20, y% = 20, width% = 400, height% = 500
@@ -1013,7 +1018,6 @@ Function UpdateConsole()
 	
 End Function
 
-
 CreateConsoleMsg("Console commands: ")
 CreateConsoleMsg("  - teleport [room name]")
 CreateConsoleMsg("  - godmode [on/off]")
@@ -1185,7 +1189,7 @@ Dim AmbientSFXAmount(6)
 ;0 = light containment, 1 = heavy containment, 2 = entrance
 AmbientSFXAmount(0)=8 : AmbientSFXAmount(1)=11 : AmbientSFXAmount(2)=12
 ;3 = general, 4 = pre-breach
-AmbientSFXAmount(3)=15 : AmbientSFXAmount(4)=3
+AmbientSFXAmount(3)=15 : AmbientSFXAmount(4)=5
 ;5 = forest
 AmbientSFXAmount(5)=10
 
@@ -2483,8 +2487,8 @@ Repeat
 		If KeyHit(63) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance"
-					Msg = "Saving now would only yield a "+Chr(34)+"Memory Access Violation"+Chr(34)+"."
+				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
+					Msg = "You cannot save in this location."
 					MsgTimer = 70 * 4
 				ElseIf (Not CanSave) Or QuickLoadPercent > -1
 					Msg = "You cannot save at this moment."
@@ -2528,6 +2532,7 @@ Repeat
 		EndIf
 		
 		If KeyHit(61) Then
+			If CanOpenConsole
 			If ConsoleOpen Then
 				UsedConsole = True
 				ResumeSounds()
@@ -2535,9 +2540,12 @@ Repeat
 			Else
 				PauseSounds()
 			EndIf
-			
 			ConsoleOpen = (Not ConsoleOpen)
 			FlushKeys()
+			Else
+				Msg = "You press F3 but nothing happens."
+				MsgTimer = 70*5
+			EndIf
 		EndIf
 		
 		DrawGUI()

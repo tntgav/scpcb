@@ -142,6 +142,8 @@ Function UpdateEvents()
 								
 								
 								If e\EventState > 900+2.5*70 Then
+								If e\room\NPC[2]\State<>1 Then
+
 									e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
 									AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
 									MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
@@ -153,6 +155,7 @@ Function UpdateEvents()
 									Else
 										RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
 									EndIf
+							EndIf
 								EndIf
 								
 								If e\EventState < 900+4*70 Then
@@ -160,11 +163,13 @@ Function UpdateEvents()
 									RotateEntity Curr173\Collider,0,190,0
 									
 									If e\EventState > 900+70 And e\EventState < 900+2.5*70 Then
+									If e\room\NPC[2]\State<>1 Then
 										AnimateNPC(e\room\NPC[2], 1539, 1553, 0.2, False)
 										PointEntity(e\room\NPC[2]\obj, Curr173\Collider)
 										RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj),EntityYaw(e\room\NPC[2]\Collider),15.0), 0
 									EndIf
-									
+									EndIf
+
 								Else
 									If e\EventState-FPSfactor < 900+4*70 Then 
 										PlaySound_Strict(IntroSFX(11)) : LightBlink = 3.0
@@ -221,6 +226,7 @@ Function UpdateEvents()
 							If Rand(300)=2 Then PlaySound2(DecaySFX(Rand(1,3)),Camera,e\room\Objects[0], 3.0)
 						EndIf
 					End If
+					If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1 
 					
 					If (e\EventState < 2000) Then
 						If e\SoundCHN = 0 Then
@@ -230,7 +236,7 @@ Function UpdateEvents()
 						End If
 					EndIf
 					
-					If (e\EventState3<9) Then
+					If (e\EventState3<10) Then
 						If (Not ChannelPlaying(e\SoundCHN2)) Then
 							e\EventState3 = e\EventState3+1
 							
@@ -2070,7 +2076,7 @@ Function UpdateEvents()
 						
 						DrawLoading(30)
 						
-						For i = 0 To 19
+						For i = 0 To e\room\MaxLights
 							If e\room\LightSprites[i]<>0 Then 
 								EntityFX e\room\LightSprites[i], 1+8
 							EndIf
@@ -2209,9 +2215,11 @@ Function UpdateEvents()
 											If Curr106\State =< -10 Then
 												dist# = EntityY(Curr106\Collider)
 												PositionEntity Curr106\Collider,EntityX(Curr106\Collider),EntityY(e\room\Objects[3],True),EntityZ(Curr106\Collider),True
-												Curr106\PathStatus = FindPath(Curr106, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
+												;Curr106\PathStatus = FindPath(Curr106, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
+												Curr106\PathStatus = FindPath(Curr106,EntityX(e\room\NPC[5]\Collider,True),EntityY(e\room\NPC[5]\Collider,True),EntityZ(e\room\NPC[5]\Collider,True))
 												Curr106\PathTimer = 70*200
 												PositionEntity Curr106\Collider,EntityX(Curr106\Collider),dist,EntityZ(Curr106\Collider),True
+												ResetEntity Curr106\Collider
 												Curr106\PathLocation = 1
 												;Curr106\Idle = False
 											;Else	
@@ -2288,7 +2296,7 @@ Function UpdateEvents()
 												Curr106\State = 100000
 												e\EventState2 = 0
 												For i = 5 To 8
-													e\room\NPC[i]\State = 2
+													e\room\NPC[i]\State = 1
 												Next
 												For i = 2 To 4 ;helicopters attack the player
 													e\room\NPC[i]\State = 2
@@ -2485,6 +2493,11 @@ Function UpdateEvents()
 											e\room\NPC[i]\EnemyX = EntityX(Collider)
 											e\room\NPC[i]\EnemyY = EntityY(Collider)
 											e\room\NPC[i]\EnemyZ = EntityZ(Collider)
+										Else
+											If EntityDistance(e\room\NPC[i]\Collider,Collider)<6.0
+												e\room\NPC[i]\State = 5
+												e\room\NPC[i]\CurrSpeed = 0
+											EndIf
 										EndIf
 									Next
 									
@@ -2884,7 +2897,7 @@ Function UpdateEvents()
 										If temp < 130*RoomScale Then
 											
 											For r.Rooms = Each Rooms
-												If r\RoomTemplate\Name = "room2offices" Then
+												If r\RoomTemplate\Name = "room2_3" Then
 													GiveAchievement(AchvPD)
 													e\EventState = 0
 													e\EventState2 = 0

@@ -5465,7 +5465,6 @@ Function UpdateMTFUnit(n.NPCs)
 							EndIf
 						EndIf
 						
-						
 					EndIf
 				Else
 					n\CurrSpeed = 0
@@ -5654,20 +5653,23 @@ Function UpdateMTFUnit(n.NPCs)
 					If n\PathStatus = 1 And n\Reload =< 0 Then
 						dist# = Distance(EntityX(target),EntityZ(target),EntityX(n\Collider),EntityZ(n\Collider))
 						
-						If dist<20.0 Then
-							PositionEntity pvt, EntityX(n\obj),EntityY(n\obj), EntityZ(n\obj)
-							RotateEntity pvt, EntityPitch(n\Collider), EntityYaw(n\Collider),0
-							MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
-							
-							If WrapAngle(EntityYaw(pvt)-EntityYaw(n\Collider))<5 Then
-								PlaySound2(GunshotSFX, Camera, n\Collider, 20)
-								p.Particles = CreateParticle(EntityX(n\obj, True), EntityY(n\obj, True), EntityZ(n\obj, True), 1, 0.2, 0.0, 5)
-								PositionEntity(p\pvt, EntityX(pvt), EntityY(pvt), EntityZ(pvt))
-								
-								n\Reload = 10
-							EndIf
-							
-						EndIf
+						;If dist<20.0 Then
+						;	pvt = CreatePivot()
+						;	
+						;	PositionEntity pvt, EntityX(n\obj),EntityY(n\obj), EntityZ(n\obj)
+						;	RotateEntity pvt, EntityPitch(n\Collider), EntityYaw(n\Collider),0
+						;	MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
+						;	
+						;	If WrapAngle(EntityYaw(pvt)-EntityYaw(n\Collider))<5 Then
+						;		PlaySound2(GunshotSFX, Camera, n\Collider, 20)
+						;		p.Particles = CreateParticle(EntityX(n\obj, True), EntityY(n\obj, True), EntityZ(n\obj, True), 1, 0.2, 0.0, 5)
+						;		PositionEntity(p\pvt, EntityX(pvt), EntityY(pvt), EntityZ(pvt))
+						;		
+						;		n\Reload = 7
+						;	EndIf
+						;	
+						;	FreeEntity pvt
+						;EndIf
 					EndIf
 				EndIf		
 				
