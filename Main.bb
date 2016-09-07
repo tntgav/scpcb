@@ -32,6 +32,9 @@ Global ButtonSFX%
 Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
+;CHANGE IT FROM "True" TO "False" BEFORE COMPILING!!! - ENDSHN
+Global CanOpenConsole% = False
+
 Dim ArrowIMG(4)
 
 ;[Block]
@@ -333,6 +336,8 @@ Function CreateConsoleMsg(txt$)
 End Function
 
 Function UpdateConsole()
+	
+	If CanOpenConsole = False Then ConsoleOpen = False
 	
 	If ConsoleOpen Then
 		Local x% = 20, y% = 20, width% = 400, height% = 500
@@ -1012,7 +1017,6 @@ Function UpdateConsole()
 	End If
 	
 End Function
-
 
 CreateConsoleMsg("Console commands: ")
 CreateConsoleMsg("  - teleport [room name]")
@@ -2528,6 +2532,7 @@ Repeat
 		EndIf
 		
 		If KeyHit(61) Then
+			If CanOpenConsole
 			If ConsoleOpen Then
 				UsedConsole = True
 				ResumeSounds()
@@ -2535,9 +2540,12 @@ Repeat
 			Else
 				PauseSounds()
 			EndIf
-			
 			ConsoleOpen = (Not ConsoleOpen)
 			FlushKeys()
+			Else
+				Msg = "You press F3 but nothing happens."
+				MsgTimer = 70*5
+			EndIf
 		EndIf
 		
 		DrawGUI()
