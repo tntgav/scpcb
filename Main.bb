@@ -3277,23 +3277,23 @@ Function MouseLook()
 	End If
 	
 	If (Not WearingNightVision=0) Then
-		AmbientLightRooms(30)
-		;If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Min(Brightness*2,255))
 		ShowEntity(NVOverlay)
 		If WearingNightVision=2 Then
 			EntityColor(NVOverlay, 0,100,255)
+			AmbientLightRooms(15)
+		ElseIf WearingNightVision=3 Then
+			EntityColor(NVOverlay, 255,0,0)
+			AmbientLightRooms(40)
 		Else
 			EntityColor(NVOverlay, 0,255,0)
+			AmbientLightRooms(15)
 		EndIf
 		EntityTexture(Fog, FogNVTexture)
 	Else
 		AmbientLightRooms(0)
-		;If PlayerRoom\RoomTemplate\Name <> "173" Then AmbientLightRooms(Brightness)
 		HideEntity(NVOverlay)
 		EntityTexture(Fog, FogTexture)
 	EndIf
-	
-	;If PlayerRoom\RoomTemplate\Name = "173" Then AmbientLightRooms(75)
 	
 	If Wearing178>0 Then
 		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\178ambient.ogg")
@@ -4037,6 +4037,8 @@ Function DrawGUI()
 						If Wearing1499=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "super1499"
 						If Wearing1499=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
+					Case "veryfinenvgoggles"
+						If WearingNightVision=3 Then Rect(x - 3, y - 3, width + 6, height + 6)
 				End Select
 			EndIf
 			
@@ -4193,7 +4195,8 @@ Function DrawGUI()
 												MsgTimer = 70 * 5
 										End Select
 									Case "Night Vision Goggles"
-										If Inventory(MouseSlot)\itemtemplate\tempname="nvgoggles" Then
+										Local nvname$ = Inventory(MouseSlot)\itemtemplate\tempname
+										If nvname$="nvgoggles" Or nvname$="veryfinenvgoggles" Then
 											If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
 											RemoveItem (SelectedItem)
 											SelectedItem = Null
@@ -4253,7 +4256,7 @@ Function DrawGUI()
 			Select SelectedItem\itemtemplate\tempname
 					
 					;[Block]
-				Case "nvgoggles", "supernv"
+				Case "nvgoggles", "supernv", "veryfinenvgoggles"
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
 					If WearingNightVision > 0 Then
 						Msg = "You removed the goggles."
@@ -4270,6 +4273,8 @@ Function DrawGUI()
 					WearingNightVision = (Not WearingNightVision)
 					If SelectedItem\itemtemplate\tempname="supernv"
 						WearingNightVision = WearingNightVision * 2
+					ElseIf SelectedItem\itemtemplate\tempname="veryfinenvgoggles"
+						WearingNightVision = WearingNightVision * 3
 					EndIf
 						
 					SelectedItem = Null	
@@ -4886,7 +4891,7 @@ Function DrawGUI()
 					EndIf
 					
 				Case "cigarette"
-					If SelectedItem\State = 0 Then
+					If SelectedItem\state = 0 Then
 						Select Rand(6)
 							Case 1
 								Msg = Chr(34)+"I don't have anything to light it with. Umm, what about that... Nevermind."+Chr(34)
@@ -4903,7 +4908,7 @@ Function DrawGUI()
 								Msg = Chr(34)+"Don't plan on starting, even at a time like this."+Chr(34)
 								RemoveItem(SelectedItem)
 						End Select
-						SelectedItem\State = 1 
+						SelectedItem\state = 1 
 					Else
 						Msg = "You are unable to get lit."
 					EndIf
@@ -7057,8 +7062,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
 				Case "fine", "very fine"
 					it2 = CreateItem("Gas Mask", "supergasmask", x, y, z)
 					RemoveItem(item)
@@ -7090,8 +7095,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
 				Case "fine"
 					it2 = CreateItem("Heavy Ballistic Vest", "finevest", x, y, z)
 					RemoveItem(item)
@@ -7109,8 +7114,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						If n\NPCtype = NPCtype178 Then RemoveNPC(n)
 					Next
 				Case "1:1","fine","very fine"
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
 			End Select
 		Case "Clipboard"
 			Select setting
@@ -7123,16 +7128,16 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					Next
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
 				Case "fine"
 					item\invSlots = Max(item\state2,15)
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
 				Case "very fine"
 					item\invSlots = Max(item\state2,20)
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
 			End Select
 		Case "Cowbell"
 			Select setting
@@ -7141,8 +7146,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1","fine","very fine"
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
 			End Select
 		Case "Night Vision Goggles"
 			Select setting
@@ -7151,10 +7156,13 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)
-				Case "fine", "very fine"
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
+				Case "fine"
 					it2 = CreateItem("Night Vision Goggles", "supernv", x, y, z)
+					RemoveItem(item)
+				Case "very fine"
+					it2 = CreateItem("Night Vision Goggles", "veryfinenvgoggles", x, y, z)
 					RemoveItem(item)
 			End Select
 		Case "Metal Panel", "SCP-148 Ingot"
@@ -7166,7 +7174,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = Null
 					For it.Items = Each Items
 						If it<>item And it\collider <> 0 And it\Picked = False Then
-							If Distance(EntityX(it\collider,True), EntityZ(it\collider,True), EntityX(Item\collider, True), EntityZ(Item\collider, True)) < (180.0 * RoomScale) Then
+							If Distance(EntityX(it\collider,True), EntityZ(it\collider,True), EntityX(item\collider, True), EntityZ(item\collider, True)) < (180.0 * RoomScale) Then
 								it2 = it
 								Exit
 							ElseIf Distance(EntityX(it\collider,True), EntityZ(it\collider,True), x,z) < (180.0 * RoomScale)
@@ -7198,7 +7206,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							RemoveItem(item)
 						Else
 							PositionEntity(Item\collider, x, y, z)
-							ResetEntity(Item\collider)							
+							ResetEntity(item\collider)							
 						EndIf
 					EndIf					
 			End Select
@@ -7566,8 +7574,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					
 					RemoveItem(item)
 				Default
-					PositionEntity(Item\collider, x, y, z)
-					ResetEntity(Item\collider)	
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)	
 			End Select
 			
 	End Select
@@ -8624,8 +8632,10 @@ Function RenderWorld2()
 	CameraProjMode ark_blur_cam,0
 	CameraProjMode Camera,1
 	
-	If WearingNightVision>0 Then
+	If WearingNightVision>0 And WearingNightVision<3 Then
 		AmbientLight Min(Brightness*2,255), Min(Brightness*2,255), Min(Brightness*2,255)
+	ElseIf WearingNightVision=3
+		AmbientLight 255,255,255
 	ElseIf PlayerRoom<>Null
 		If (PlayerRoom\RoomTemplate\Name<>"173") And (PlayerRoom\RoomTemplate\Name<>"exit1") And (PlayerRoom\RoomTemplate\Name<>"gatea") Then
 			AmbientLight Brightness, Brightness, Brightness
@@ -8634,9 +8644,10 @@ Function RenderWorld2()
 	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision=1)
+	If (WearingNightVision=1) Or (WearingNightVision=3)
 		For i=0 To MaxItemAmount-1
 			If (Inventory(i)<>Null) Then
+				If (WearingNightVision=1)
 				If Inventory(i)\itemtemplate\tempname="nvgoggles" Then
 					Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.02)
 					power%=Int(Inventory(i)\state)
@@ -8649,7 +8660,21 @@ Function RenderWorld2()
 					ElseIf Inventory(i)\state<=100.0 Then
 						hasBattery = 1
 					EndIf
-					
+					EndIf
+				Else
+					If Inventory(i)\itemtemplate\tempname="veryfinenvgoggles" Then
+						Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.04)
+						power%=Int(Inventory(i)\state)
+						If Inventory(i)\state<=0.0 Then ;this nvg can't be used
+							hasBattery = 0
+							Msg = "The batteries in these night vision goggles died."
+							BlinkTimer = -1.0
+							MsgTimer = 350
+							Exit
+						ElseIf Inventory(i)\state<=100.0 Then
+							hasBattery = 1
+						EndIf
+					EndIf
 				EndIf
 			EndIf
 		Next
@@ -8722,16 +8747,16 @@ Function RenderWorld2()
 			FreeEntity (temp) : FreeEntity (temp2)
 			
 			Color 255,255,255
-		ElseIf WearingNightVision=1 And hasBattery<>0
-			Color 0,55,0
+		ElseIf (WearingNightVision=1 Or WearingNightVision=3) And hasBattery<>0
+			Color 55*(WearingNightVision=3),55*(WearingNightVision=1),0
 			For k=0 To 10
 				Rect 45,GraphicHeight*0.5-(k*20),54,10,True
 			Next
-			Color 0,255,0
+			Color 255*(WearingNightVision=3),255*(WearingNightVision=1),0
 			For l=0 To Floor((power%+50)*0.01)
 				Rect 45,GraphicHeight*0.5-(l*20),54,10,True
 			Next
-			DrawImage NVGImages,40,GraphicHeight*0.5+30
+			DrawImage NVGImages,40,GraphicHeight*0.5+30,(WearingNightVision=3)
 		EndIf
 	EndIf
 	
@@ -8742,7 +8767,7 @@ Function RenderWorld2()
 	CameraProjMode ark_blur_cam,0
 	
 	If BlinkTimer < - 16 Or BlinkTimer > - 6
-		If (WearingNightVision=1) And (hasBattery=1) And ((MilliSecs() Mod 800) < 400) Then
+		If (WearingNightVision=1 Or WearingNightVision=3) And (hasBattery=1) And ((MilliSecs() Mod 800) < 400) Then
 			Color 255,0,0
 			AASetFont Font3
 			
