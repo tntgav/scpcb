@@ -7479,7 +7479,7 @@ Type Chunk
 	;Field debugobj%
 End Type
 
-Function CreateChunk.Chunk(obj%,x#,y#,z#)
+Function CreateChunk.Chunk(obj%,x#,y#,z#,spawnNPCs%=True)
 	Local ch.Chunk = New Chunk
 	Local chp.ChunkPart,i,n.NPCs
 	
@@ -7509,11 +7509,13 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#)
 				Exit
 			EndIf
 		Next
+		If spawnNPCs%
 		For i = 0 To Rand(5,10)
 			n.NPCs = CreateNPC(NPCtype1499,x+Rnd(-60.0,60.0),y+0.5,z+Rnd(-60.0,60.0))
 			If Rand(2)=1 Then n\State2 = 500*3
 			n\Angle = Rnd(360)
 		Next
+	EndIf
 	EndIf
 	
 	ch\x = x
@@ -7523,7 +7525,7 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#)
 	Return ch
 End Function
 
-Function UpdateChunks(r.Rooms,ChunkPartAmount%)
+Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 	Local ch.Chunk, ch2.Chunk, chp.ChunkPart, ChunkPartAmount2%
 	Local ChunkHideDistance% = 120
 	Local temp% = False, temp2% = False
@@ -7583,7 +7585,7 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%)
 		If (Not temp2%)
 			;ch2 = CreateChunk(r\Objects[Rand(1,ChunkPartAmount%)],x#,y#,z#)
 			ChunkPartAmount2 = GetINIInt("Data\1499chunks.INI","general","count")
-			ch2 = CreateChunk(Rand(0,ChunkPartAmount2),x#,y#,z#)
+			ch2 = CreateChunk(Rand(0,ChunkPartAmount2),x#,y#,z#,spawnNPCs%)
 		EndIf
 		If x# < (ChunkHideDistance+(CurrChunkX#))
 			x# = x# + 40

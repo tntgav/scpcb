@@ -6407,7 +6407,7 @@ End Function
 
 Function InitLoadGame()
 	
-	Local d.Doors, sc.SecurityCams, rt.RoomTemplates
+	Local d.Doors, sc.SecurityCams, rt.RoomTemplates, e.Events
 	
 	DrawLoading(80)
 	
@@ -6445,6 +6445,49 @@ Function InitLoadGame()
 	Next
 	
 	DropSpeed = 0.0
+	
+	For e.Events = Each Events
+		;Loading the necessary stuff for dimension1499, but this will only be done if the player is in this dimension already
+		If e\EventName = "dimension1499"
+			If e\EventState = 2
+				;[Block]
+				DrawLoading(91)
+				e\room\Objects[0] = CreatePlane()
+				Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
+				EntityTexture e\room\Objects[0],planetex%
+				FreeTexture planetex%
+				PositionEntity e\room\Objects[0],0,EntityY(e\room\obj),0
+				EntityType e\room\Objects[0],HIT_MAP
+				;EntityParent e\room\Objects[0],e\room\obj
+				DrawLoading(92)
+				NTF_1499Sky = sky_CreateSky("GFX\map\sky\1499sky")
+				DrawLoading(93)
+				For i = 1 To 15
+					e\room\Objects[i] = LoadMesh_Strict("GFX\map\dimension1499\1499object"+i+".b3d")
+					HideEntity e\room\Objects[i]
+				Next
+				DrawLoading(96)
+				CreateChunkParts(e\room)
+				DrawLoading(97)
+				x# = EntityX(e\room\obj)
+				z# = EntityZ(e\room\obj)
+				Local ch.Chunk
+				For i = -2 To 2 Step 2
+					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
+				Next
+				If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\s_gasmask_amb.ogg")
+				DrawLoading(98)
+				UpdateChunks(e\room,15,False)
+				;MoveEntity Collider,0,10,0
+				;ResetEntity Collider
+				
+				DebugLog "Loaded dimension1499 successful"
+				
+				Exit
+				;[End Block]
+			EndIf
+		EndIf
+	Next
 	
 	FreeTextureCache
 	
