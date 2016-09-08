@@ -2196,15 +2196,10 @@ Function UpdateNPCs()
 							Local ShootAccuracy# = 0.9
 
 							;If at Gate B increse his distance so he can shoot from the roof.
-							For e.Events = Each Events
-								If e\EventName = "exit1"
-									If PlayerRoom = e\room Then
-										DetectDistance = 20.0
-										ShootAccuracy = 0.4
-									EndIf
-									Exit
-								EndIf
-							Next
+							If PlayerRoom\RoomTemplate\Name = "exit1" Then
+								DetectDistance = 20.0
+								ShootAccuracy = 0.4
+							EndIf
 							
 							If dist < DetectDistance Then
 								pvt% = CreatePivot()
