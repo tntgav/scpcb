@@ -2505,7 +2505,7 @@ Repeat
 					MsgTimer = 70 * 4						
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
-					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance"
+					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
 						Msg = "You cannot save in this location."
 						MsgTimer = 70 * 4
 					ElseIf (Not CanSave) Or QuickLoadPercent > -1
@@ -2523,7 +2523,7 @@ Repeat
 				MsgTimer = 70 * 4
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
-			If (Msg<>"Game progress saved." And Msg<>"Saving now would only yield a "+Chr(34)+"Memory Access Violation"+Chr(34)+"." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
+			If (Msg<>"Game progress saved." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
 				Msg = "Press F5 to save."
 				MsgTimer = 70*5
 			EndIf
@@ -2542,9 +2542,6 @@ Repeat
 			EndIf
 			ConsoleOpen = (Not ConsoleOpen)
 			FlushKeys()
-			Else
-				Msg = "You press F3 but nothing happens."
-				MsgTimer = 70*5
 			EndIf
 		EndIf
 		
