@@ -257,11 +257,9 @@ Function UpdateEvents()
 						
 						If i = 0 Then PlaySound_Strict(LoadTempSound("SFX\Room\Intro\PA\scripted\scripted6.ogg"))
 						
-						If (i>0 And i<23) Then
+						If (i>0 And i<24) Then
 							PlaySound_Strict(LoadTempSound("SFX\Room\Intro\Commotion\Commotion"+i+".ogg"))
 						EndIf
-						
-							;If i = 21 Then DebugLog "Commotion21"
 						
 						If (i>24) Then
 							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
