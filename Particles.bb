@@ -79,7 +79,7 @@ Function RemoveParticle(p.Particles)
 End Function
 
 Global InSmoke%
-Global HissSFX% = LoadSound_Strict("SFX\hiss.ogg")
+Global HissSFX% = LoadSound_Strict("SFX\General\Hiss.ogg")
 
 Type Emitters
 	Field Obj%

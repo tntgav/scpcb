@@ -550,7 +550,7 @@ Function PickItem(item.Items)
 									If e\eventstate = 0 Then
 										ShowEntity Light
 										LightFlash = 3
-										PlaySound_Strict(LoadTempSound("SFX\mindwipe.ogg"))											
+										PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))											
 									EndIf
 									e\eventstate = Max(1, e\eventstate)
 									Exit

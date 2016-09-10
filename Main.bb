@@ -32,8 +32,8 @@ Global ButtonSFX%
 Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
-;CHANGE IT FROM "True" TO "False" BEFORE COMPILING!!! - ENDSHN
-Global CanOpenConsole% = False
+;CHANGE IT FROM "1" TO "0" BEFORE COMPILING!!! - ENDSHN
+Global CanOpenConsole% = GetINIInt(OptionFile, "options", "console")
 
 Dim ArrowIMG(4)
 
@@ -746,7 +746,7 @@ Function UpdateConsole()
 						EndIf
 						EntityType (it\collider, HIT_ITEM)
 					Next
-					PlaySound_Strict LoadTempSound("SFX\Mandeville.ogg")
+					PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
 				Case "godmode"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
@@ -1075,22 +1075,22 @@ Global TempSoundIndex% = 0
 
 Dim Music%(40)
 Music(0) = LoadSound_Strict("SFX\Music\The Dread.ogg")
-Music(1) = LoadSound_Strict("SFX\Music\HCZ Background.ogg") 
-Music(2) = LoadSound_Strict("SFX\Music\Anxiety.ogg") 
-;Music(3) = LoadSound_Strict("SFX\Ambient\PocketDimension.ogg")
-;Music(4) = LoadSound_Strict("SFX\Music\AI.ogg")
-;Music(5) = LoadSound_Strict("SFX\Music\Satiate Strings.ogg")
-;Music(6) = LoadSound_Strict("SFX\Music\Medusa.ogg")
-;Music(7) = LoadSound_Strict("SFX\Music\Groaning Ambience.ogg") 
-;Music(8) = LoadSound_Strict("SFX\Music\SCP-049 Tension.ogg") 
-;Music(9) = LoadSound_Strict("SFX\Music\Forest.ogg") 
-Music(10) = LoadSound_Strict("SFX\Music\Bump in the Night.ogg")
-Music(11) = LoadSound_Strict("SFX\Music\MenuAmbience.ogg")
-;Music(12) = LoadSound_strict("SFX\Music\Forest2.ogg")
-;Music(13) = LoadSound_strict("SFX\Music\Blue Feather.ogg")
-;Music(14) = LoadSound("SFX\178ambient.ogg")
-;Music(15) = LoadSound("SFX\Music\PDTrenchAmbience.ogg")
-;Music(15) = LoadSound("SFX\Music\205_music.ogg")
+Music(1) = LoadSound_Strict("SFX\Music\HeavyContainment.ogg") 
+Music(2) = LoadSound_Strict("SFX\Music\EntranceZone.ogg") 
+;Music(3) = LoadSound_Strict("SFX\Music\PD.ogg")
+;Music(4) = LoadSound_Strict("SFX\Music\079.ogg")
+;Music(5) = LoadSound_Strict("SFX\Music\GateB1.ogg")
+;Music(6) = LoadSound_Strict("SFX\Music\GateB2.ogg")
+;Music(7) = LoadSound_Strict("SFX\Music\Room3Storage.ogg") 
+;Music(8) = LoadSound_Strict("SFX\Music\Room049.ogg") 
+;Music(9) = LoadSound_Strict("SFX\Music\8601.ogg") 
+Music(10) = LoadSound_Strict("SFX\Music\106.ogg")
+Music(11) = LoadSound_Strict("SFX\Music\Menu.ogg")
+;Music(12) = LoadSound_strict("SFX\Music\8601Cancer.ogg")
+;Music(13) = LoadSound_strict("SFX\Music\Intro.ogg")
+;Music(14) = LoadSound("SFX\178.ogg")
+;Music(15) = LoadSound("SFX\Music\PDTrench.ogg")
+;Music(15) = LoadSound("SFX\Music\205.ogg")
 ;
 ;Music(18): Dimension1499 normal theme
 ;Music(19): Dimension1499 aggressive theme
@@ -1106,66 +1106,64 @@ DrawLoading(10, True)
 
 Dim OpenDoorSFX%(3,3), CloseDoorSFX%(3,3)
 For i = 0 To 2
-	OpenDoorSFX(0,i) = LoadSound_Strict("SFX\Doors\DoorOpen" + (i + 1) + ".ogg")
-	CloseDoorSFX(0,i) = LoadSound_Strict("SFX\Doors\DoorClose" + (i + 1) + ".ogg")
-	OpenDoorSFX(2,i) = LoadSound_Strict("SFX\Doors\Door2Open" + (i + 1) + ".ogg")
-	CloseDoorSFX(2,i) = LoadSound_Strict("SFX\Doors\Door2Close" + (i + 1) + ".ogg")
+	OpenDoorSFX(0,i) = LoadSound_Strict("SFX\Door\DoorOpen" + (i + 1) + ".ogg")
+	CloseDoorSFX(0,i) = LoadSound_Strict("SFX\Door\DoorClose" + (i + 1) + ".ogg")
+	OpenDoorSFX(2,i) = LoadSound_Strict("SFX\Door\Door2Open" + (i + 1) + ".ogg")
+	CloseDoorSFX(2,i) = LoadSound_Strict("SFX\Door\Door2Close" + (i + 1) + ".ogg")
 Next
 For i = 0 To 1
-	OpenDoorSFX(1,i) = LoadSound_Strict("SFX\Doors\BigDoorOpen" + (i + 1) + ".ogg")
-	CloseDoorSFX(1,i) = LoadSound_Strict("SFX\Doors\BigDoorClose" + (i + 1) + ".ogg")
+	OpenDoorSFX(1,i) = LoadSound_Strict("SFX\Door\BigDoorOpen" + (i + 1) + ".ogg")
+	CloseDoorSFX(1,i) = LoadSound_Strict("SFX\Door\BigDoorClose" + (i + 1) + ".ogg")
 Next
 
-Global KeyCardSFX1 = LoadSound_Strict("SFX\Doors\KeyCardUse1.ogg")
-Global KeyCardSFX2 = LoadSound_Strict("SFX\Doors\KeyCardUse2.ogg")
-Global ButtonSFX2 = LoadSound_Strict("SFX\Button2.ogg")
-Global ScannerSFX1 = LoadSound_Strict("SFX\Doors\ScannerUse1.ogg")
-Global ScannerSFX2 = LoadSound_Strict("SFX\Doors\ScannerUse2.ogg")
+Global KeyCardSFX1 = LoadSound_Strict("SFX\Interact\KeyCardUse1.ogg")
+Global KeyCardSFX2 = LoadSound_Strict("SFX\Interact\KeyCardUse2.ogg")
+Global ButtonSFX2 = LoadSound_Strict("SFX\Interact\Button2.ogg")
+Global ScannerSFX1 = LoadSound_Strict("SFX\Interact\ScannerUse1.ogg")
+Global ScannerSFX2 = LoadSound_Strict("SFX\Interact\ScannerUse2.ogg")
 
-Global OpenDoorFastSFX=LoadSound_Strict("SFX\Doors\DoorOpenFast.ogg")
-Global CautionSFX% = LoadSound_Strict("SFX\caution.ogg")
+Global OpenDoorFastSFX=LoadSound_Strict("SFX\Door\DoorOpenFast.ogg")
+Global CautionSFX% = LoadSound_Strict("SFX\Room\LockroomCaution.ogg")
 
 Global NuclearSirenSFX%
 
-Global CameraSFX = LoadSound_Strict("SFX\camera.ogg") 
+Global CameraSFX = LoadSound_Strict("SFX\General\Camera.ogg") 
 
-Global StoneDragSFX% = LoadSound_Strict("SFX\StoneDrag.ogg")
+Global StoneDragSFX% = LoadSound_Strict("SFX\SCP\173\StoneDrag.ogg")
 
-Global GunshotSFX% = LoadSound_Strict("SFX\gunshot.ogg"),Gunshot2SFX% = LoadSound_Strict("SFX\gunshot2.ogg"),Gunshot3SFX% = LoadSound_Strict("SFX\bulletmiss.ogg")
-Global BullethitSFX% = LoadSound_Strict("SFX\bullethit.ogg")
+Global GunshotSFX% = LoadSound_Strict("SFX\General\Gunshot.ogg"),Gunshot2SFX% = LoadSound_Strict("SFX\General\Gunshot2.ogg"),Gunshot3SFX% = LoadSound_Strict("SFX\bulletmiss.ogg")
+Global BullethitSFX% = LoadSound_Strict("SFX\General\BulletHit.ogg")
 
-Global TeslaIdleSFX = LoadSound_Strict("SFX\teslaidle.ogg"), TeslaActivateSFX = LoadSound_Strict("SFX\teslaactivate.ogg")
-Global TeslaPowerUpSFX = LoadSound_Strict("SFX\teslapowerup.ogg")
+Global TeslaIdleSFX = LoadSound_Strict("SFX\Room\Tesla\Idle.ogg"), TeslaActivateSFX = LoadSound_Strict("SFX\Room\Tesla\WindUp.ogg")
+Global TeslaPowerUpSFX = LoadSound_Strict("SFX\Room\Tesla\PowerUp.ogg")
 
-Global MagnetUpSFX% = LoadSound_Strict("SFX\MagnetUp.ogg"), MagnetDownSFX = LoadSound_Strict("SFX\MagnetDown.ogg")
+Global MagnetUpSFX% = LoadSound_Strict("SFX\Room\106Chamber\MagnetUp.ogg"), MagnetDownSFX = LoadSound_Strict("SFX\Room\106Chamber\MagnetDown.ogg")
 Global FemurBreakerSFX%
 
 Dim DecaySFX%(5)
 For i = 0 To 3
-	DecaySFX(i) = LoadSound_Strict("SFX\decay" + i + ".ogg")
+	DecaySFX(i) = LoadSound_Strict("SFX\SCP\106\Decay" + i + ".ogg")
 Next
 
-Global BurstSFX = LoadSound_Strict("SFX\burst.ogg")
+Global BurstSFX = LoadSound_Strict("SFX\Room\TunnelBurst.ogg")
 
 DrawLoading(20, True)
 
 Dim RustleSFX%(3)
 For i = 0 To 2
-	RustleSFX(i) = LoadSound_Strict("SFX\rustle" + i + ".ogg")
+	RustleSFX(i) = LoadSound_Strict("SFX\SCP\372\Rustle" + i + ".ogg")
 Next
 
-Global Death914SFX% = LoadSound_Strict("SFX\914death.ogg"), Use914SFX% = LoadSound_Strict("SFX\914use.ogg")
+Global Death914SFX% = LoadSound_Strict("SFX\SCP\914\PlayerDeath.ogg"), Use914SFX% = LoadSound_Strict("SFX\SCP\914\PlayerUse.ogg")
 
 Dim DripSFX%(4)
 For i = 0 To 3
-	DripSFX(i) = LoadSound_Strict("SFX\drip" + i + ".ogg")
+	DripSFX(i) = LoadSound_Strict("SFX\Character\D9341\BloodDrip" + i + ".ogg")
 Next
 
-Global LeverSFX% = LoadSound_Strict("SFX\lever.ogg"), LightSFX% = LoadSound_Strict("SFX\lightswitch.ogg")
+Global LeverSFX% = LoadSound_Strict("SFX\Interact\LeverFlip.ogg"), LightSFX% = LoadSound_Strict("SFX\General\LightSwitch.ogg")
 
-;Global GasmaskBreathCHN%, GasmaskBreath% = LoadSound_Strict("SFX\GasmaskBreath.ogg")
-
-Global ButtGhostSFX% = LoadSound_Strict("SFX\BuGh.ogg")
+Global ButtGhostSFX% = LoadSound_Strict("SFX\SCP\Joke\789J.ogg")
 
 Dim RadioSFX(5,10)
 RadioSFX(1,0) = LoadSound_Strict("SFX\Radio\RadioAlarm.ogg")
@@ -1177,11 +1175,11 @@ Global RadioSquelch = LoadSound_Strict("SFX\Radio\squelch.ogg")
 Global RadioStatic = LoadSound_Strict("SFX\Radio\static.ogg")
 Global RadioBuzz = LoadSound_Strict("SFX\Radio\buzz.ogg")
 
-Global ElevatorBeepSFX = LoadSound_Strict("SFX\ElevatorBeep.ogg"), ElevatorMoveSFX = LoadSound_Strict("SFX\ElevatorMove.ogg") 
+Global ElevatorBeepSFX = LoadSound_Strict("SFX\General\Elevator\Beep.ogg"), ElevatorMoveSFX = LoadSound_Strict("SFX\General\Elevator\Moving.ogg") 
 
 Dim PickSFX%(10)
 For i = 0 To 3
-	PickSFX(i) = LoadSound_Strict("SFX\PickItem" + i + ".ogg")
+	PickSFX(i) = LoadSound_Strict("SFX\Interact\PickItem" + i + ".ogg")
 Next
 
 Global AmbientSFXCHN%, CurrAmbientSFX%
@@ -1196,22 +1194,24 @@ AmbientSFXAmount(5)=10
 Dim AmbientSFX%(6, 15)
 
 Dim OldManSFX%(6)
-For i = 0 To 4
-	OldManSFX(i) = LoadSound_Strict("SFX\oldman" + (i + 1) + ".ogg")
+For i = 0 To 2
+	OldManSFX(i) = LoadSound_Strict("SFX\SCP\106\Corrosion" + (i + 1) + ".ogg")
 Next
-OldManSFX(5) = LoadSound_Strict("SFX\oldmandrag.ogg")
+OldManSFX(3) = LoadSound_Strict("SFX\SCP\106\Laugh.ogg")
+OldManSFX(4) = LoadSound_Strict("SFX\SCP\106\Breathing.ogg")
+OldManSFX(5) = LoadSound_Strict("SFX\Room\PocketDimension\Enter.ogg")
 
 Dim Scp173SFX%(3)
 For i = 0 To 2
-	Scp173SFX(i) = LoadSound_Strict("SFX\173sound" + (i + 1) + ".ogg")
+	Scp173SFX(i) = LoadSound_Strict("SFX\SCP\173\Rattle" + (i + 1) + ".ogg")
 Next
 
 Dim HorrorSFX%(20)
 For i = 0 To 10
-	HorrorSFX(i) = LoadSound_Strict("SFX\horror" + i + ".ogg")
+	HorrorSFX(i) = LoadSound_Strict("SFX\Horror\Horror" + i + ".ogg")
 Next
 For i = 14 To 15
-	HorrorSFX(i) = LoadSound_Strict("SFX\horror" + i + ".ogg")
+	HorrorSFX(i) = LoadSound_Strict("SFX\Horror\Horror" + i + ".ogg")
 Next
 
 DrawLoading(25, True)
@@ -1219,38 +1219,38 @@ DrawLoading(25, True)
 Dim IntroSFX%(20)
 
 For i = 7 To 9
-	IntroSFX(i) = LoadSound_Strict("SFX\intro\bang" + (i - 6) + ".ogg")
+	IntroSFX(i) = LoadSound_Strict("SFX\Room\Intro\Bang" + (i - 6) + ".ogg")
 Next
 For i = 10 To 12
-	IntroSFX(i) = LoadSound_Strict("SFX\intro\light" + (i - 9) + ".ogg")
+	IntroSFX(i) = LoadSound_Strict("SFX\Room\Intro\Light" + (i - 9) + ".ogg")
 Next
 ;IntroSFX(13) = LoadSound_Strict("SFX\intro\shoot1.ogg")
 ;IntroSFX(14) = LoadSound_Strict("SFX\intro\shoot2.ogg")
-IntroSFX(15) = LoadSound_Strict("SFX\intro\metal173.ogg")
+IntroSFX(15) = LoadSound_Strict("SFX\Room\Intro\173Vent.ogg")
 
 Dim AlarmSFX%(5)
-AlarmSFX(0) = LoadSound_Strict("SFX\alarm.ogg")
-;AlarmSFX(1) = LoadSound_Strict("SFX\alarm2.ogg")
-AlarmSFX(2) = LoadSound_Strict("SFX\alarm3.ogg")
+AlarmSFX(0) = LoadSound_Strict("SFX\Alarm\Alarm.ogg")
+;AlarmSFX(1) = LoadSound_Strict("SFX\Alarm\Alarm2.ogg")
+AlarmSFX(2) = LoadSound_Strict("SFX\Alarm\Alarm3.ogg")
 
-Global HeartBeatSFX = LoadSound_Strict("SFX\heartbeat.ogg")
+Global HeartBeatSFX = LoadSound_Strict("SFX\Character\D9341\Heartbeat.ogg")
 
 Dim BreathSFX(2,5)
 Global BreathCHN%
 For i = 0 To 4
-	BreathSFX(0,i)=LoadSound_Strict("SFX\9341\breath"+i+".ogg")
-	BreathSFX(1,i)=LoadSound_Strict("SFX\9341\breath"+i+"gas.ogg")
+	BreathSFX(0,i)=LoadSound_Strict("SFX\Character\D9341\breath"+i+".ogg")
+	BreathSFX(1,i)=LoadSound_Strict("SFX\Character\D9341\breath"+i+"gas.ogg")
 Next
 
 
 Dim NeckSnapSFX(3)
 For i = 0 To 2
-	NeckSnapSFX(i) =  LoadSound_Strict("SFX\necksnap"+(i+1)+".ogg")
+	NeckSnapSFX(i) =  LoadSound_Strict("SFX\SCP\173\NeckSnap"+(i+1)+".ogg")
 Next
 
 Dim DamageSFX%(9)
 For i = 0 To 8
-	DamageSFX(i) = LoadSound_Strict("SFX\Damage"+(i+1)+".ogg")
+	DamageSFX(i) = LoadSound_Strict("SFX\Character\D9341\Damage"+(i+1)+".ogg")
 Next
 
 Dim MTFSFX%(8)
@@ -1258,30 +1258,30 @@ Dim MTFSFX%(8)
 Dim CoughSFX%(3)
 Global CoughCHN%
 For i = 0 To 2
-	CoughSFX(i) = LoadSound_Strict("SFX\cough" + (i + 1) + ".ogg")
+	CoughSFX(i) = LoadSound_Strict("SFX\Character\D9341\Cough" + (i + 1) + ".ogg")
 Next
 
-Global MachineSFX% = LoadSound_Strict("SFX\Machine.ogg")
+Global MachineSFX% = LoadSound_Strict("SFX\SCP\914\Refining.ogg")
 
-Global ApacheSFX = LoadSound_Strict("SFX\apache.ogg")
+Global ApacheSFX = LoadSound_Strict("SFX\Character\Apache\Propell.ogg")
 
 Global CurrStepSFX
 Dim StepSFX%(4, 2, 8) ;(normal/metal, walk/run, id)
 For i = 0 To 7
-	StepSFX(0, 0, i) = LoadSound_Strict("SFX\step" + (i + 1) + ".ogg")
-	StepSFX(1, 0, i) = LoadSound_Strict("SFX\stepmetal" + (i + 1) + ".ogg")
-	StepSFX(0, 1, i)= LoadSound_Strict("SFX\run" + (i + 1) + ".ogg")
-	StepSFX(1, 1, i) = LoadSound_Strict("SFX\runmetal" + (i + 1) + ".ogg")
+	StepSFX(0, 0, i) = LoadSound_Strict("SFX\Step\Step" + (i + 1) + ".ogg")
+	StepSFX(1, 0, i) = LoadSound_Strict("SFX\Step\StepMetal" + (i + 1) + ".ogg")
+	StepSFX(0, 1, i)= LoadSound_Strict("SFX\Step\Run" + (i + 1) + ".ogg")
+	StepSFX(1, 1, i) = LoadSound_Strict("SFX\Step\RunMetal" + (i + 1) + ".ogg")
 	If i < 3
-		StepSFX(2, 0, i) = LoadSound_Strict("SFX\MTF\StepMTF" + (i + 1) + ".ogg")
-		StepSFX(3, 0, i) = LoadSound_Strict("SFX\StepBoot"+ (i + 1) + ".ogg")
+		StepSFX(2, 0, i) = LoadSound_Strict("SFX\Character\MTF\Step" + (i + 1) + ".ogg")
+		StepSFX(3, 0, i) = LoadSound_Strict("SFX\SCP\049\Step"+ (i + 1) + ".ogg")
 	EndIf
 Next
 
 Dim Step2SFX(6)
 For i = 0 To 2
-	Step2SFX(i) = LoadSound_Strict("SFX\stepPD" + (i + 1) + ".ogg")
-	Step2SFX(i+3) = LoadSound_Strict("SFX\stepForest" + (i + 1) + ".ogg")
+	Step2SFX(i) = LoadSound_Strict("SFX\Step\StepPD" + (i + 1) + ".ogg")
+	Step2SFX(i+3) = LoadSound_Strict("SFX\Step\StepForest" + (i + 1) + ".ogg")
 Next 
 
 DrawLoading(30, True)
@@ -1290,9 +1290,8 @@ DrawLoading(30, True)
 
 ;New Sounds and Meshes/Other things in SCP:CB 1.3 - ENDSHN
 ;[Block]
-Global NTF_1499EnterSFX% = LoadSound_Strict("SFX\1499\1499_mfe_vhd_00.ogg")
-Global NTF_1499LeaveSFX% = LoadSound_Strict("SFX\1499\1499_mfe_lve_10.ogg")
-Global NTF_1499FuckedSFX% = LoadSound_Strict("SFX\1499\fuckedup.ogg")
+Global NTF_1499EnterSFX% = LoadSound_Strict("SFX\SCP\1499\Enter.ogg")
+Global NTF_1499LeaveSFX% = LoadSound_Strict("SFX\SCP\1499\Exit.ogg")
 
 Global PlayCustomMusic% = False, CustomMusic% = 0
 
@@ -2299,13 +2298,13 @@ Repeat
 				
 				Select PlayerZone
 					Case 0,1,2
-						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\ambient\zone"+(PlayerZone+1)+"\ambient"+(CurrAmbientSFX+1)+".ogg")
+						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Zone"+(PlayerZone+1)+"\ambient"+(CurrAmbientSFX+1)+".ogg")
 					Case 3
-						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\ambient\general\ambient"+(CurrAmbientSFX+1)+".ogg")
+						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\General\ambient"+(CurrAmbientSFX+1)+".ogg")
 					Case 4
-						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\ambient\pre-breach\ambient"+(CurrAmbientSFX+1)+".ogg")
+						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Pre-breach\ambient"+(CurrAmbientSFX+1)+".ogg")
 					Case 5
-						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\ambient\forest\ambient"+(CurrAmbientSFX+1)+".ogg")
+						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Forest\ambient"+(CurrAmbientSFX+1)+".ogg")
 				End Select
 				
 				AmbientSFXCHN = PlaySound2(AmbientSFX(PlayerZone,CurrAmbientSFX), Camera, SoundEmitter)
@@ -2314,7 +2313,7 @@ Repeat
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
 				If RN$ <> "pocketdimension" And RN$ <> "room860" And RN$ <> "173" And RN$ <> "dimension1499" Then
 					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
-					PlaySound_Strict  LoadTempSound("SFX\079_"+Rand(7,10)+".ogg")
+					PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
 				EndIf 
 			EndIf
 		EndIf
@@ -2725,14 +2724,14 @@ Function DrawEnding()
 		EndIf
 		
 		If EndingTimer <-400 Then 
-			If Music(5)=0 Then Music(5) = LoadSound_Strict("SFX\Music\Blue Feather.ogg")
+			If Music(5)=0 Then Music(5) = LoadSound_Strict("SFX\Music\Intro.ogg")
 			ShouldPlay = 5
 		EndIf
 		
 		If EndingScreen = 0 Then 
 			EndingScreen = LoadImage_Strict("GFX\endingscreen.pt")
 			
-			temp = LoadSound_Strict ("SFX\Ending.ogg")
+			temp = LoadSound_Strict ("SFX\Music\Ending.ogg")
 			PlaySound_Strict temp
 			
 			PlaySound_Strict LightSFX
@@ -2751,7 +2750,12 @@ Function DrawEnding()
 			EndIf
 			
 			If EndingTimer+FPSfactor2 > -450 And EndingTimer <= -450 Then
-				PlaySound_Strict LoadTempSound("SFX\Ending"+SelectedEnding+".ogg")
+				Select Lower(SelectedEnding)
+					Case "a1", "a2"
+						PlaySound_Strict LoadTempSound("SFX\Ending\GateA\Ending"+SelectedEnding+".ogg")
+					Case "b1", "b2", "b3"
+						PlaySound_Strict LoadTempSound("SFX\Ending\GateB\Ending"+SelectedEnding+".ogg")
+				End Select
 			EndIf			
 			
 		Else
@@ -2816,7 +2820,7 @@ Function DrawEnding()
 					EndIf
 					
 					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
-						PlaySound_Strict LoadTempSound("SFX\breath.ogg")
+						PlaySound_Strict LoadTempSound("SFX\Ending\MenuBreath.ogg")
 						NullGame()
 						MenuOpen = False
 						MainMenuOpen = True
@@ -3293,7 +3297,7 @@ Function MouseLook()
 	EndIf
 	
 	If Wearing178>0 Then
-		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\178ambient.ogg")
+		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\Music\178.ogg")
 		ShouldPlay = 14
 		ShowEntity(GlassesOverlay)
 	Else
@@ -4324,7 +4328,7 @@ Function DrawGUI()
 				Case "key1", "key2", "key3", "key4", "key5", "key6", "keyomni", "scp860", "hand", "hand2"
 					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				Case "scp513"
-					PlaySound_Strict LoadTempSound("SFX\Bell1.ogg")
+					PlaySound_Strict LoadTempSound("SFX\SCP\513\Bell"+Rand(1,3)+".ogg")
 					
 					temp = True
 					For np.NPCs = Each NPCs
@@ -4540,7 +4544,7 @@ Function DrawGUI()
 								If (SelectedItem\state = 0) Then
 									Msg = Chr(34)+"Hey, I remember getting this ticket from the kickstarter! Wonder if it ever came out..."+Chr(34)
 									MsgTimer = 70*10
-									PlaySound_Strict LoadTempSound("SFX\1162\bf1_"+Rand(1,5)+".ogg")
+									PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
 									SelectedItem\state = 1
 								EndIf
 							Default 
@@ -4748,16 +4752,16 @@ Function DrawGUI()
 										RadioState(3)=RadioState(3)+Max(Rand(-10,1),0)
 										Select RadioState(3)
 											Case 40
-												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\MTF\Random1.ogg"))
+												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random1.ogg"))
 												RadioState(3)=RadioState(3)+1													
 											Case 400
-												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\MTF\Random2.ogg"))
+												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random2.ogg"))
 												RadioState(3)=RadioState(3)+1	
 											Case 800
-												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\MTF\Random3.ogg"))
+												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random3.ogg"))
 												RadioState(3)=RadioState(3)+1															
 											Case 1200
-												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\MTF\Random4.ogg"))	
+												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random4.ogg"))	
 												RadioState(3)=RadioState(3)+1		
 										End Select
 									EndIf
@@ -4789,16 +4793,16 @@ Function DrawGUI()
 													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter4.ogg"))
 													RadioState(4)=RadioState(4)+1
 												Case 260
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\035\radio1.ogg"))
+													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp1.ogg"))
 													RadioState(4)=RadioState(4)+1
 												Case 300
 													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter1.ogg"))	
 													RadioState(4)=RadioState(4)+1	
 												Case 350
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\035\franklin2.ogg"))
+													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin2.ogg"))
 													RadioState(4)=RadioState(4)+1
 												Case 400
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\035\radio2.ogg"))
+													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp2.ogg"))
 													RadioState(4)=RadioState(4)+1
 												Case 450
 													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin3.ogg"))	
@@ -4919,7 +4923,7 @@ Function DrawGUI()
 						Injuries = Max(Injuries-0.5, 0)
 						BlurTimer = 500
 						GiveAchievement(Achv420)
-						PlaySound_Strict LoadTempSound("SFX\Mandeville.ogg")
+						PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
 					EndIf
 					MsgTimer = 70 * 5
 					RemoveItem(SelectedItem)
@@ -5200,7 +5204,7 @@ Function DrawGUI()
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
 					If SelectedItem\state = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
 						Select SelectedItem\itemtemplate\name
 							Case "Old Badge"
 								Msg = Chr(34)+"Huh? This guy looks just like me!"+Chr(34)
@@ -5211,7 +5215,7 @@ Function DrawGUI()
 					EndIf
 				Case "key"
 					If SelectedItem\state = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
 						
 						Msg = "Isn't this the key to that old shack? The one where I... No, it can't be."
 						MsgTimer = 70*10						
@@ -5236,13 +5240,13 @@ Function DrawGUI()
 								
 								Msg = Chr(34)+"Why does this seem so familiar?"+Chr(34)
 								MsgTimer = 70*10
-								PlaySound_Strict LoadTempSound("SFX\1162\bf2_"+Rand(1,5)+".ogg")
+								PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
 								SelectedItem\state = 1
 						End Select
 					EndIf
 				Case "coin"
 					If SelectedItem\state = 0
-						PlaySound_Strict LoadTempSound("SFX\1162\bf1_"+Rand(1,5)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
 					EndIf
 					
 					Msg = ""
@@ -5401,6 +5405,7 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "framelimit", Framelimit%)
 				PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 				PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
+				PutINIValue(OptionFile, "options", "console", CanOpenConsole%)
 				PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
 				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 				PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
@@ -6475,7 +6480,7 @@ Function InitLoadGame()
 				For i = -2 To 2 Step 2
 					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
 				Next
-				If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\s_gasmask_amb.ogg")
+				If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\1499.ogg")
 				DrawLoading(98)
 				UpdateChunks(e\room,15,False)
 				;MoveEntity Collider,0,10,0
@@ -7123,7 +7128,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					n.NPCs = CreateNPC(NPCtype1499,x,y,z)
 					n\State = 1
-					n\Sound = LoadSound_Strict("SFX\1499\1499_alarm.ogg")
+					n\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
 					n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
 					n\State3 = 1
 					RemoveItem(item)
@@ -7483,7 +7488,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "SCP-513"
 			Select setting
 				Case "rough", "coarse"
-					PlaySound_Strict LoadTempSound("SFX\Bell4.ogg")
+					PlaySound_Strict LoadTempSound("SFX\SCP\513\914Refine.ogg")
 					For n.npcs = Each NPCs
 						If n\npctype = NPCtype5131 Then RemoveNPC(n)
 					Next
@@ -7744,7 +7749,7 @@ Function Use294()
 				If loc > 0 Then
 					strtemp$ = GetINIString2("DATA\SCP-294.ini", loc, "dispensesound")
 					If strtemp="" Then
-						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\294\dispense1.ogg"))
+						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\SCP\294\dispense1.ogg"))
 					Else
 						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound(strtemp))
 					EndIf
@@ -7774,7 +7779,7 @@ Function Use294()
 				Else
 					;out of range
 					Input294 = "OUT OF RANGE"
-					PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\294\outofrange.ogg"))
+					PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\SCP\294\outofrange.ogg"))
 				EndIf
 				
 			EndIf
@@ -7823,7 +7828,7 @@ Function UpdateMTF%()
 				If Abs(EntityZ(entrance\obj)-EntityZ(Collider))<30.0 Then
 					;If PlayerRoom\RoomTemplate\Name<>"room860" And PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then
 					If PlayerInReachableRoom()
-						PlaySound_Strict LoadTempSound("SFX\MTF\Announc.ogg")
+						PlaySound_Strict LoadTempSound("SFX\Character\MTF\Announc.ogg")
 					EndIf
 					
 					MTFtimer = 1
@@ -7864,9 +7869,9 @@ Function UpdateInfect()
 			
 			EntityAlpha InfectOverlay, Min(((Infect*0.2)^2)/1000.0,0.5) * (Sin(MilliSecs()/8.0)+2.0)
 			
-			For i = 0 To 5
+			For i = 0 To 6
 				If Infect>i*15+10 And temp =< i*15+10 Then
-					PlaySound_Strict LoadTempSound("SFX\008voices"+i+".ogg")
+					PlaySound_Strict LoadTempSound("SFX\SCP\008\Voices"+i+".ogg")
 				EndIf
 			Next
 			
@@ -7890,7 +7895,7 @@ Function UpdateInfect()
 							PositionEntity Collider, EntityX(r\Objects[7],True),EntityY(r\Objects[7],True),EntityZ(r\Objects[7],True),True
 							ResetEntity Collider
 							r\NPC[0] = CreateNPC(NPCtypeD, EntityX(r\Objects[6],True),EntityY(r\Objects[6],True)+0.2,EntityZ(r\Objects[6],True))
-							r\NPC[0]\Sound = LoadSound_Strict("SFX\008death1.ogg")
+							r\NPC[0]\Sound = LoadSound_Strict("SFX\SCP\008\KillScientist1.ogg")
 							r\NPC[0]\SoundChn = PlaySound_Strict(r\NPC[0]\Sound)
 							tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
 							EntityTexture r\NPC[0]\obj, tex
@@ -7924,7 +7929,7 @@ Function UpdateInfect()
 				BlurTimer = 950
 				
 				If temp < 94.7 Then 
-					PlayerRoom\NPC[0]\Sound = LoadSound_Strict("SFX\008death2.ogg")
+					PlayerRoom\NPC[0]\Sound = LoadSound_Strict("SFX\SCP\008\KillScientist2.ogg")
 					PlayerRoom\NPC[0]\SoundChn = PlaySound_Strict(PlayerRoom\NPC[0]\Sound)
 					
 					DeathMSG = "Subject D-9341 found ingesting Dr. [REDACTED] at Sector [REDACTED]. Subject was immediately terminated by Nine-Tailed Fox and sent for autopsy. "

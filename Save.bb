@@ -422,9 +422,9 @@ Function SaveGame(file$)
 	CloseFile f
 	
 	If SelectedDifficulty\saveType = SAVEONSCREENS Then
-		PlaySound_Strict(LoadTempSound("SFX/save2.ogg"))
+		PlaySound_Strict(LoadTempSound("SFX\Save2.ogg"))
 	Else
-		PlaySound_Strict(LoadTempSound("SFX/save.ogg"))
+		PlaySound_Strict(LoadTempSound("SFX\Save1.ogg"))
 	EndIf
 	
 	Msg = "Game progress saved."

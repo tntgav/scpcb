@@ -916,7 +916,7 @@ Function UpdateLauncher()
 	MenuBlack = LoadImage_Strict("GFX\menu\menublack.jpg")	
 	MaskImage MenuBlack, 255,255,0
 	LauncherIMG = LoadImage_Strict("GFX\menu\launcher.jpg")
-	ButtonSFX% = LoadSound_Strict("SFX\Button.ogg")
+	ButtonSFX% = LoadSound_Strict("SFX\Interact\Button.ogg")
 	Local i%	
 	
 	For i = 0 To 3
@@ -1230,9 +1230,9 @@ Function DrawLoading(percent%, shortloading=False)
 			If Not shortloading Then 
 				If firstloop Then 
 					If percent = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\cwm1.cwm")
+						PlaySound_Strict LoadTempSound("SFX\SCP\990\cwm1.cwm")
 					ElseIf percent = 100
-						PlaySound_Strict LoadTempSound("SFX\cwm2.cwm")
+						PlaySound_Strict LoadTempSound("SFX\SCP\990\cwm2.cwm")
 					EndIf
 				EndIf
 			EndIf
