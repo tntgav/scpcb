@@ -1233,6 +1233,11 @@ AlarmSFX(0) = LoadSound_Strict("SFX\Alarm\Alarm.ogg")
 ;AlarmSFX(1) = LoadSound_Strict("SFX\Alarm\Alarm2.ogg")
 AlarmSFX(2) = LoadSound_Strict("SFX\Alarm\Alarm3.ogg")
 
+Dim CommotionSFX%(23)
+For i = 1 To 23
+	CommotionSFX(i) = True
+Next
+
 Global HeartBeatSFX = LoadSound_Strict("SFX\Character\D9341\Heartbeat.ogg")
 
 Dim BreathSFX(2,5)
