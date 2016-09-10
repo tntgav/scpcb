@@ -107,7 +107,7 @@ Function UpdateMainMenu()
 				Case 21
 					MenuStr = "The spiral is growing"
 				Case 22
-					MenuStr = "''Some kind of gestalt effect due to massive reality damage''"
+					MenuStr = Chr(34)+"Some kind of gestalt effect due to massive reality damage."+Chr(34)
 			End Select
 		EndIf
 	EndIf
@@ -233,6 +233,7 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 					PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
 					PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
+					PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 					PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
 					PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
@@ -429,7 +430,7 @@ Function UpdateMainMenu()
 				AASetFont Font1	
 				
 				If SaveGameAmount = 0 Then
-					AAText (x + 20 * MenuScale, y + 20 * MenuScale, "No saved games")
+					AAText (x + 20 * MenuScale, y + 20 * MenuScale, "No saved games.")
 				Else
 					x = x + 20 * MenuScale
 					y = y + 20 * MenuScale

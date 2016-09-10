@@ -33,7 +33,7 @@ Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
 ;CHANGE IT FROM "1" TO "0" BEFORE COMPILING!!! - ENDSHN
-Global CanOpenConsole% = GetINIInt(OptionFile, "options", "console")
+Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
 
 Dim ArrowIMG(4)
 
@@ -5405,7 +5405,7 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "framelimit", Framelimit%)
 				PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 				PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
-				PutINIValue(OptionFile, "options", "console", CanOpenConsole%)
+				PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 				PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
 				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 				PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
