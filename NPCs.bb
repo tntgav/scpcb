@@ -2192,8 +2192,16 @@ Function UpdateNPCs()
 						
 						If KillTimer => 0 Then
 							dist = EntityDistance(n\Collider,Collider)
+							Local DetectDistance# = 11.0
+							Local ShootAccuracy# = 0.9
+
+							;If at Gate B increse his distance so he can shoot from the roof.
+							If PlayerRoom\RoomTemplate\Name = "exit1" Then
+								DetectDistance = 20.0
+								ShootAccuracy = 0.4
+							EndIf
 							
-							If dist<11.0 Then
+							If dist < DetectDistance Then
 								pvt% = CreatePivot()
 								PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider))
 								PointEntity(pvt, Collider)
@@ -2219,7 +2227,7 @@ Function UpdateNPCs()
 										MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
 										
 										PointEntity pvt, Collider
-										Shoot(EntityX(pvt),EntityY(pvt),EntityZ(pvt),0.9, False)
+										Shoot(EntityX(pvt),EntityY(pvt),EntityZ(pvt),ShootAccuracy, False)
 										n\Reload = 7
 									Else
 										n\CurrSpeed = n\Speed

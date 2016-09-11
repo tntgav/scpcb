@@ -102,7 +102,7 @@ End Type
 Function UpdateEmitters()
 	InSmoke = False
 	For e.emitters = Each Emitters
-		If FPSfactor > 0 And PlayerRoom = e\Room Then
+		If FPSfactor > 0 And (PlayerRoom = e\room Or e\room\dist < 8) Then
 			;If EntityDistance(Camera, e\Obj) < 6.0 Then
 				Local p.Particles = CreateParticle(EntityX(e\obj, True), EntityY(e\obj, True), EntityZ(e\obj, True), Rand(e\minimage, e\maximage), e\size, e\gravity, e\lifetime)
 				p\speed = e\speed
