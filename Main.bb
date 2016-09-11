@@ -309,6 +309,8 @@ Include "Difficulty.bb"
 Global MTFtimer#, MTFrooms.Rooms[10], MTFroomState%[10]
 
 Dim RadioState#(10)
+Dim RadioState3%(3)
+Dim RadioState4%(9)
 Dim RadioCHN%(8)
 
 Dim OldAiPics%(5)
@@ -490,6 +492,11 @@ Function UpdateConsole()
 							CreateConsoleMsg("of the specified room. Any room that appears")
 							CreateConsoleMsg("in rooms.ini is a valid parameter.")
 							CreateConsoleMsg("******************************")
+						Case "stopsound", "stfu"
+							CreateConsoleMsg("HELP - stopsound")
+							CreateConsoleMsg("******************************")
+							CreateConsoleMsg("Stops all currently playing sounds.")
+							CreateConsoleMsg("******************************")
 						Case "camerapick"
 							CreateConsoleMsg("HELP - camerapick")
 							CreateConsoleMsg("******************************")
@@ -524,18 +531,7 @@ Function UpdateConsole()
 					NoClip = 1
 					CameraFogNear = 15
 					CameraFogFar = 20
-				Case "mute"
-					For e.events = Each Events
-						If e\eventname = "alarm" Then 
-							StopChannel e\soundchn
-							e\SoundCHN = 0
-							StopChannel e\soundchn2
-							e\SoundCHN2 = 0
-							e\eventstate = 4000
-							e\EventState3 = 9
-							Exit
-						EndIf
-					Next
+
 				Case "status"
 					CreateConsoleMsg("******************************")
 					CreateConsoleMsg("Status: ")
@@ -565,6 +561,7 @@ Function UpdateConsole()
 					CreateConsoleMsg("Injuries: "+Injuries)
 					CreateConsoleMsg("Bloodloss: "+Bloodloss)
 					CreateConsoleMsg("******************************")
+
 				Case "camerapick"
 					c = CameraPick(Camera,GraphicWidth/2, GraphicHeight/2)
 					If c = 0 Then
@@ -582,28 +579,35 @@ Function UpdateConsole()
 						CreateConsoleMsg("Coordinates: "+EntityX(c)+", "+EntityY(c)+", "+EntityZ(c))
 						CreateConsoleMsg("******************************")							
 					EndIf
+
 				Case "hidedistance"
 					HideDistance = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					CreateConsoleMsg("Hidedistance set to "+HideDistance)					
+					CreateConsoleMsg("Hidedistance set to "+HideDistance)		
+
 				Case "ending"
 					SelectedEnding = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					KillTimer = -0.1
 					;EndingTimer = -0.1
+
 				Case "noclipspeed"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					NoClipSpeed = Float(StrTemp)
+
 				Case "injure"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Injuries = Float(StrTemp)
+
 				Case "infect"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Infect = Float(StrTemp)
+
 				Case "heal"
 					Injuries = 0
 					Bloodloss = 0
+
 				Case "teleport"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
@@ -632,6 +636,7 @@ Function UpdateConsole()
 					Next
 					
 					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.")
+
 				Case "spawnitem"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					temp = False 
@@ -652,6 +657,7 @@ Function UpdateConsole()
 					Next
 					
 					If temp = False Then CreateConsoleMsg("Item not found.")
+
 				Case "wireframe"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
@@ -671,29 +677,36 @@ Function UpdateConsole()
 					EndIf
 					
 					WireFrame WireframeState
+
 				Case "173speed"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Curr173\Speed = Float(StrTemp)
 					CreateConsoleMsg("173's speed set to " + StrTemp)
+
 				Case "106speed"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Curr106\Speed = Float(StrTemp)
 					CreateConsoleMsg("106's speed set to " + StrTemp)
+
 				Case "173state"
 					CreateConsoleMsg("SCP-173")
 					CreateConsoleMsg("Position: " + EntityX(Curr173\obj) + ", " + EntityY(Curr173\obj) + ", " + EntityZ(Curr173\obj))
 					CreateConsoleMsg("Idle: " + Curr173\Idle)
 					CreateConsoleMsg("State: " + Curr173\State)
+
 				Case "106state"
 					CreateConsoleMsg("SCP-106")
 					CreateConsoleMsg("Position: " + EntityX(Curr106\obj) + ", " + EntityY(Curr106\obj) + ", " + EntityZ(Curr106\obj))
 					CreateConsoleMsg("Idle: " + Curr106\Idle)
 					CreateConsoleMsg("State: " + Curr106\State)
+
 				Case "spawn513-1"
 					CreateNPC(NPCtype5131, 0,0,0)
+
 				Case "spawn106"
 					Curr106\State = -1
 					PositionEntity Curr106\Collider, EntityX(Collider), EntityY(Curr106\Collider), EntityZ(Collider)
+
 				Case "reset096"
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
@@ -702,21 +715,26 @@ Function UpdateConsole()
 							Exit
 						EndIf
 					Next
+
 				Case "disable173"
 					Curr173\Idle = 3 ;This phenominal comment is brought to you by PolyFox. His absolute wisdom in this fatigue of knowledge brought about a new era of 173 state checks.
+
 				Case "enable173"
 					Curr173\Idle = False
 					ShowEntity Curr173\obj
 					ShowEntity Curr173\Collider
+
 				Case "disable106"
 					Curr106\Idle = True
 					Curr106\State = 200000
 					Contained106 = True
+
 				Case "enable106"
 					Curr106\Idle = False
 					Contained106 = False
 					ShowEntity Curr106\Collider
 					ShowEntity Curr106\obj
+
 				Case "halloween"
 					HalloweenTex = Not HalloweenTex
 					If HalloweenTex Then
@@ -730,6 +748,7 @@ Function UpdateConsole()
 						FreeTexture tex2
 						CreateConsoleMsg("173 JACK-O-LANTERN OFF")
 					EndIf
+
 				Case "sanic"
 					SuperMan = Not SuperMan
 					If SuperMan = True Then
@@ -737,6 +756,7 @@ Function UpdateConsole()
 					Else
 						CreateConsoleMsg("WHOA SLOW DOWN")
 					EndIf
+
 				Case "scp-420-j","420","weed"
 					For i = 1 To 20
 						If Rand(2)=1 Then
@@ -747,6 +767,7 @@ Function UpdateConsole()
 						EntityType (it\collider, HIT_ITEM)
 					Next
 					PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
+
 				Case "godmode"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
@@ -847,6 +868,25 @@ Function UpdateConsole()
 					Else
 						CreateConsoleMsg("Debug Mode Off")
 					EndIf
+
+				Case "stopsound", "stfu"
+					For snd.Sound = Each Sound
+						For i = 0 To 31
+							If snd\channels[i]<>0 Then
+								StopChannel snd\channels[i]
+							EndIf
+						Next
+					Next
+
+					For e.events = Each Events
+						If e\eventname = "alarm" Then 
+							e\eventstate = 4000
+							e\EventState3 = 9
+							Exit
+						EndIf
+					Next
+					CreateConsoleMsg("Stopped all sounds.")
+
 					
 				Case "camerafog"
 					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -1233,10 +1273,7 @@ AlarmSFX(0) = LoadSound_Strict("SFX\Alarm\Alarm.ogg")
 ;AlarmSFX(1) = LoadSound_Strict("SFX\Alarm\Alarm2.ogg")
 AlarmSFX(2) = LoadSound_Strict("SFX\Alarm\Alarm3.ogg")
 
-Dim CommotionSFX%(23)
-For i = 1 To 23
-	CommotionSFX(i) = True
-Next
+Dim CommotionState%(23)
 
 Global HeartBeatSFX = LoadSound_Strict("SFX\Character\D9341\Heartbeat.ogg")
 
@@ -4757,17 +4794,29 @@ Function DrawGUI()
 										RadioState(3)=RadioState(3)+Max(Rand(-10,1),0)
 										Select RadioState(3)
 											Case 40
-												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random1.ogg"))
-												RadioState(3)=RadioState(3)+1													
+												If Not RadioState3(0) Then
+													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random1.ogg"))
+													RadioState(3) = RadioState(3)+1	
+													RadioState3(0) = True	
+												EndIf											
 											Case 400
-												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random2.ogg"))
-												RadioState(3)=RadioState(3)+1	
+												If Not RadioState3(1) Then
+													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random2.ogg"))
+													RadioState(3) = RadioState(3)+1	
+													RadioState3(1) = True	
+												EndIf	
 											Case 800
-												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random3.ogg"))
-												RadioState(3)=RadioState(3)+1															
+												If Not RadioState3(2) Then
+													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random3.ogg"))
+													RadioState(3) = RadioState(3)+1	
+													RadioState3(2) = True
+												EndIf													
 											Case 1200
-												RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random4.ogg"))	
-												RadioState(3)=RadioState(3)+1		
+												If Not RadioState3(3) Then
+													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random4.ogg"))	
+													RadioState(3) = RadioState(3)+1	
+													RadioState3(3) = True
+												EndIf		
 										End Select
 									EndIf
 								Case 4
@@ -4784,37 +4833,65 @@ Function DrawGUI()
 											
 											Select RadioState(4)
 												Case 10
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\OhGod.ogg"))
-													RadioState(4)=RadioState(4)+1													
+													If Not RadioState4(0) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\OhGod.ogg"))
+														RadioState(4) = RadioState(4)+1
+														RadioState4(0) = True
+													EndIf													
 												Case 100
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter2.ogg"))
-													RadioState(4)=RadioState(4)+1	
+													If Not RadioState4(1) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter2.ogg"))
+														RadioState(4) = RadioState(4)+1
+														RadioState4(1) = True
+													EndIf		
 												Case 158
-													If MTFtimer = 0 Then 
+													If MTFtimer = 0 And (Not RadioState4(2)) Then 
 														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin1.ogg"))
-														RadioState(4)=RadioState(4)+1
+														RadioState(4) = RadioState(4)+1
+														RadioState(2) = True
 													EndIf
 												Case 200
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter4.ogg"))
-													RadioState(4)=RadioState(4)+1
+													If Not RadioState4(3) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter4.ogg"))
+														RadioState(4) = RadioState(4)+1
+														RadioState4(3) = True
+													EndIf		
 												Case 260
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp1.ogg"))
-													RadioState(4)=RadioState(4)+1
+													If Not RadioState4(4) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp1.ogg"))
+														RadioState(4) = RadioState(4)+1
+														RadioState4(4) = True
+													EndIf		
 												Case 300
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter1.ogg"))	
-													RadioState(4)=RadioState(4)+1	
+													If Not RadioState4(5) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter1.ogg"))	
+														RadioState(4) = RadioState(4)+1	
+														RadioState4(5) = True
+													EndIf		
 												Case 350
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin2.ogg"))
-													RadioState(4)=RadioState(4)+1
+													If Not RadioState4(6) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin2.ogg"))
+														RadioState(4) = RadioState(4)+1
+														RadioState4(6) = True
+													EndIf		
 												Case 400
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp2.ogg"))
-													RadioState(4)=RadioState(4)+1
+													If Not RadioState4(7) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp2.ogg"))
+														RadioState(4) = RadioState(4)+1
+														RadioState4(7) = True
+													EndIf		
 												Case 450
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin3.ogg"))	
-													RadioState(4)=RadioState(4)+1		
+													If Not RadioState4(8) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin3.ogg"))	
+														RadioState(4) = RadioState(4)+1		
+														RadioState4(8) = True
+													EndIf		
 												Case 600
-													RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin4.ogg"))	
-													RadioState(4)=RadioState(4)+1	
+													If Not RadioState4(9) Then
+														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin4.ogg"))	
+														RadioState(4) = RadioState(4)+1	
+														RadioState4(9) = True
+													EndIf		
 											End Select
 										EndIf
 									EndIf
@@ -5222,7 +5299,7 @@ Function DrawGUI()
 					If SelectedItem\state = 0 Then
 						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
 						
-						Msg = "Isn't this the key to that old shack? The one where I... No, it can't be."
+						Msg = Chr(34)+"Isn't this the key to that old shack? The one where I... No, it can't be."+Chr(34)
 						MsgTimer = 70*10						
 					EndIf
 					
@@ -5410,8 +5487,8 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "framelimit", Framelimit%)
 				PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 				PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
-				PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 				PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
+				PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 				PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
 				PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)

@@ -258,9 +258,9 @@ Function UpdateEvents()
 						If i = 0 Then PlaySound_Strict(LoadTempSound("SFX\Room\Intro\PA\scripted\scripted6.ogg"))
 						
 						If (i>0 And i<24) Then
-							If CommotionSFX(i) Then ;Prevents the same commotion file from playing more then once.
+							If Not CommotionState(i) Then ;Prevents the same commotion file from playing more then once.
 								PlaySound_Strict(LoadTempSound("SFX\Room\Intro\Commotion\Commotion"+i+".ogg"))
-								CommotionSFX(i) = False
+								CommotionState(i) = True
 							EndIf
 						EndIf
 						
