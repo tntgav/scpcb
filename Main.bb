@@ -880,8 +880,8 @@ Function UpdateConsole()
 
 					For e.events = Each Events
 						If e\eventname = "alarm" Then 
-							e\eventstate = 4000
-							e\EventState3 = 9
+							e\eventstate = 19400
+							e\EventState3 = 10
 							Exit
 						EndIf
 					Next
