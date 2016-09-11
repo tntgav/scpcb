@@ -888,9 +888,16 @@ Function LoadGame(file$)
 	Next
 	
 	For e.Events = Each Events
-		If e\EventName = "dimension1499" Or e\EventName = "room2sl"
+		;Reset for the monitor loading and stuff for room2sl
+		If e\EventName = "room2sl"
 			e\EventState = 0.0
 			DebugLog "Reset Eventstate in "+e\EventName
+		;Only reset if the dimension has already been generated and the player wasn't saving in it
+		ElseIf e\EventName = "dimension1499"
+			If e\EventState = 1.0
+				e\EventState = 0.0
+				DebugLog "Reset Eventstate in "+e\EventName
+			EndIf
 		EndIf
 	Next
 	

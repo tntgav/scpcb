@@ -2297,7 +2297,7 @@ Function UpdateEvents()
 												Curr106\State = 100000
 												e\EventState2 = 0
 												For i = 5 To 8
-													e\room\NPC[i]\State = 2
+													e\room\NPC[i]\State = 1
 												Next
 												For i = 2 To 4 ;helicopters attack the player
 													e\room\NPC[i]\State = 2
@@ -8035,7 +8035,6 @@ Function UpdateEvents()
 					;0: The player never entered SCP-1499
 					;1: The player had already entered the dimension at least once
 					;2: The player is in dimension
-				;e\EventState2: A timer for the brightness change (stores Brightness value for a "blending" effect)
 				If PlayerRoom = e\room Then
 					If e\EventState < 2.0
 						;1499 random generator
@@ -8081,6 +8080,8 @@ Function UpdateEvents()
 									e\EventStr = 18
 								EndIf
 							EndIf
+						Else
+							e\EventState = 2.0
 						EndIf
 						;[End Block]
 						For n.NPCs = Each NPCs
@@ -8094,6 +8095,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 					EndIf
+					PositionEntity e\room\Objects[0],0,800,0
 					CameraFogRange Camera,40,80
 					CameraFogColor Camera,96,97,104
 					CameraClsColor Camera,96,97,104
