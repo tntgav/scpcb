@@ -9067,13 +9067,6 @@ Function UpdateEvents()
 						FreeEntity pvt%
 						Curr096\State = 5
 
-						;Play 096's ambience when spawned.
-						If Curr096\Sound2 = 0 Then
-							Curr096\Sound2 = LoadSound_Strict("SFX\Music\096.ogg")
-						Else
-							Curr096\SoundChn2 = LoopSound2(Curr096\Sound2, Curr096\SoundChn2, Camera, Curr096\Collider, 16.0, 1.0)
-						EndIf
-
 						DebugLog "SCP-096 successfully placed in "+Chr(34)+e\room\RoomTemplate\Name+Chr(34)
 						e\EventState = 1
 					ElseIf e\EventState = 1
