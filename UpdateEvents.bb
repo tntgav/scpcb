@@ -9143,7 +9143,11 @@ Function UpdateEvents()
 				;[End Block]
 		End Select
 		
-		CatchErrors(Chr(34)+e\EventName+Chr(34)+" event")
+		If e<>Null Then
+			CatchErrors(Chr(34)+e\EventName+Chr(34)+" event")
+		Else
+			CatchErrors("Deleted event")
+		EndIf
 		
 	Next
 	
