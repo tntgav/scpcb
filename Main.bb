@@ -2637,26 +2637,7 @@ Repeat
 	EntityBlend fresize_image,1
 	EntityAlpha fresize_image,1.0
 	
-	Local errStr$ = ErrorLog()
-	Local errF%
-	If Len(errStr)>0 Then
-		If FileType(ErrorFile)=0 Then
-			errF = WriteFile(ErrorFile)
-		Else
-			errF = OpenFile(ErrorFile)
-			SeekFile errF,FileSize(ErrorFile)
-		EndIf
-		WriteLine errF,"***************"
-		While Len(errStr)>0
-			WriteLine errF,errStr
-			DebugLog errStr
-			errStr = ErrorLog()
-		Wend
-		
-		Msg = "Blitz3D Error! Details in "+Chr(34)+ErrorFile+Chr(34)
-		MsgTimer = 20*70
-		CloseFile errF
-	EndIf
+	CatchErrors("Main loop / uncaught")
 	
 	If Vsync = 0 Then
 		Flip 0
@@ -2842,6 +2823,7 @@ End Function
 ;--------------------------------------- player controls -------------------------------------------
 
 Function MovePlayer()
+	CatchErrors("Uncaught (MovePlayer)")
 	Local Sprint# = 1.0, Speed# = 0.018, i%, angle#
 	
 	If SuperMan Then
@@ -3133,6 +3115,7 @@ Function MovePlayer()
 		HeartBeatVolume = Max(HeartBeatVolume - FPSfactor*0.05, 0)
 	EndIf
 	
+	CatchErrors("MovePlayer")
 End Function
 
 Function MouseLook()
@@ -3423,6 +3406,7 @@ End Function
 ;--------------------------------------- GUI, menu etc ------------------------------------------------
 
 Function DrawGUI()
+	CatchErrors("Uncaught (DrawGUI)")
 	
 	Local temp%, x%, y%, z%, i%, yawvalue#, pitchvalue#
 	Local x2#,y2#,z2#
@@ -5309,9 +5293,13 @@ Function DrawGUI()
 	EndIf 
 	
 	If PrevInvOpen And (Not InvOpen) Then MoveMouse viewport_center_x, viewport_center_y
+	
+	CatchErrors("DrawGUI")
 End Function
 
 Function DrawMenu()
+	CatchErrors("Uncaught (DrawMenu)")
+	
 	Local x%, y%, width%, height%
 	
 	If MenuOpen Then
@@ -5888,6 +5876,8 @@ Function DrawMenu()
 	End If
 	
 	AASetFont Font1
+	
+	CatchErrors("DrawMenu")
 End Function
 
 Function MouseOn%(x%, y%, width%, height%)
@@ -5902,6 +5892,7 @@ End Function
 ;----------------------------------------------------------------------------------------------
 
 Function LoadEntities()
+	CatchErrors("Uncaught (LoadEntities)")
 	DrawLoading(0)
 	
 	Local i%
@@ -6256,11 +6247,11 @@ Function LoadEntities()
 	
 	;LoadRoomMeshes()
 	
-	
+	CatchErrors("LoadEntities")
 End Function
 
 Function InitNewGame()
-	
+	CatchErrors("Uncaught (InitNewGame)")
 	Local i%, de.Decals, d.Doors, it.Items, r.Rooms, sc.SecurityCams, e.Events
 	
 	DrawLoading(45)
@@ -6403,10 +6394,11 @@ Function InitNewGame()
 	DropSpeed = 0
 	
 	PrevTime = MilliSecs()
+	CatchErrors("InitNewGame")
 End Function
 
 Function InitLoadGame()
-	
+	CatchErrors("Uncaught (InitLoadGame)")
 	Local d.Doors, sc.SecurityCams, rt.RoomTemplates, e.Events
 	
 	DrawLoading(80)
@@ -6491,6 +6483,7 @@ Function InitLoadGame()
 	
 	FreeTextureCache
 	
+	CatchErrors("InitLoadGame")
 	DrawLoading(100)
 	
 	PrevTime = MilliSecs()
@@ -6498,6 +6491,7 @@ Function InitLoadGame()
 End Function
 
 Function NullGame()
+	CatchErrors("Uncaught (NullGame)")
 	Local i%, x%, y%, lvl
 	Local itt.ItemTemplates, s.Screens, lt.LightTemplates, d.Doors, m.Materials
 	Local wp.WayPoints, twp.TempWayPoints, r.Rooms, it.Items
@@ -6748,6 +6742,7 @@ Function NullGame()
 		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
 	Next
 	
+	CatchErrors("NullGame")
 End Function
 
 Include "save.bb"
@@ -9061,6 +9056,29 @@ End Function
 
 Function ScaledMouseY%()
 	Return Float(MouseY())*Float(GraphicHeight)/Float(RealGraphicHeight)
+End Function
+
+Function CatchErrors(location$)
+	Local errStr$ = ErrorLog()
+	Local errF%
+	If Len(errStr)>0 Then
+		If FileType(ErrorFile)=0 Then
+			errF = WriteFile(ErrorFile)
+		Else
+			errF = OpenFile(ErrorFile)
+			SeekFile errF,FileSize(ErrorFile)
+		EndIf
+		WriteLine errF,location+" ***************"
+		While Len(errStr)>0
+			WriteLine errF,errStr
+			DebugLog errStr
+			errStr = ErrorLog()
+		Wend
+		
+		Msg = "Blitz3D Error! Details in "+Chr(34)+ErrorFile+Chr(34)
+		MsgTimer = 20*70
+		CloseFile errF
+	EndIf
 End Function
 
 ;~IDEal Editor Parameters:

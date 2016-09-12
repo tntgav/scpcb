@@ -759,7 +759,7 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 7 ;Advanced
 					;[Block]
-					height = 220 * MenuScale
+					height = 200 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
@@ -826,11 +826,9 @@ Function UpdateMainMenu()
 					EndIf
 					
 					;y=y+60*MenuScale
-					y=y+30*MenuScale
+					;
+					;Color 255,255,255
 					
-					Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Enable console:")
-					CanOpenConsole = DrawTick(x + 310 * MenuScale, y + MenuScale, CanOpenConsole)
 					;[End Block]
 				EndIf
 				;[End Block]

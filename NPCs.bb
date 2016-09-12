@@ -650,13 +650,13 @@ End Function
 
 
 Function UpdateNPCs()
+	CatchErrors("Uncaught (UpdateNPCs)")
 	Local n.NPCs, n2.NPCs, d.Doors, de.Decals, r.Rooms, eo.ElevatorObj, eo2.ElevatorObj
 	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%, RN$
 	
 	Local target
 	
 	For n.NPCs = Each NPCs
-		
 		;A variable to determine if the NPC is in the facility or not
 		n\InFacility = CheckForNPCInFacility(n)
 		
@@ -4391,6 +4391,8 @@ Function UpdateNPCs()
 		Else
 			n\DropSpeed = 0
 		EndIf
+		
+		CatchErrors(Chr(34)+n\NVName+Chr(34)+" NPC")
 		
 	Next
 	
