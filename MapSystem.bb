@@ -5913,7 +5913,15 @@ Function UpdateSecurityCams()
 				If SelectedMonitor=sc Then SelectedMonitor=Null
 			EndIf
 			
-			CatchErrors("UpdateSecurityCameras ("+sc\room\RoomTemplate\Name+")")
+			If sc<>Null Then
+				If sc\room<>Null Then
+					CatchErrors("UpdateSecurityCameras ("+sc\room\RoomTemplate\Name+")")
+				Else
+					CatchErrors("UpdateSecurityCameras (screen has no room)")
+				EndIf
+			Else
+				CatchErrors("UpdateSecurityCameras (screen doesn't exist anymore)")
+			EndIf
 		EndIf
 	Next
 	
