@@ -7860,7 +7860,7 @@ Function UpdateEvents()
 							
 							RotateEntity(e\room\Objects[0], -90.0, Rnd(0.0, 360.0), 0.0)
 							
-							e\Sound = LoadSound_Strict("SFX\SCP\1048A\Shirek.ogg")
+							e\Sound = LoadSound_Strict("SFX\SCP\1048A\Shriek.ogg")
 							e\Sound2 = LoadSound_Strict("SFX\SCP\1048A\Growth.ogg")
 							
 							e\EventState = 1
