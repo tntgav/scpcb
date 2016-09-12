@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Global MenuBack% = LoadImage_Strict("GFX\menu\back.jpg")
 Global MenuText% = LoadImage_Strict("GFX\menu\scptext.jpg")
 Global Menu173% = LoadImage_Strict("GFX\menu\173back.jpg")
@@ -1638,5 +1639,5 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#31#76#146#1D1#283#2E9#329#357#395#444#456#460#493#55C#56F#58C#593#5AE#5CF#5E7
-;~F#614
+;~F#614a69eb09fac237b36c3cbfa91ea377eac0353f645
 ;~C#Blitz3D
