@@ -634,6 +634,7 @@ Function LoadGame(file$)
 			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
 			FreeEntity n\obj
 			n\obj = model
+			SetAnimTime n\obj,n\Frame
 		EndIf
 	Next
 	
@@ -1302,6 +1303,7 @@ Function LoadGameQuick(file$)
 			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
 			FreeEntity n\obj
 			n\obj = model
+			SetAnimTime n\obj,n\Frame
 		EndIf
 	Next
 	
