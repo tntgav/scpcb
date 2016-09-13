@@ -59,6 +59,8 @@ Type NPCs
 	Field CurrElevator.ElevatorObj
 	Field HP%
 	Field PathX#,PathZ#
+	Field Model$
+	Field ModelScaleX#,ModelScaleY#,ModelScaleZ#
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)

@@ -3548,6 +3548,10 @@ Function UpdateEvents()
 								e\room\NPC[0]\State = 2
 								Local tempscale# = 0.5 / MeshWidth(e\room\NPC[0]\obj)
 								ScaleEntity e\room\NPC[0]\obj, tempscale#, tempscale#, tempscale#
+								e\room\NPC[0]\Model$ = "GFX\npcs\clerk.b3d"
+								e\room\NPC[0]\ModelScaleX = tempscale#
+								e\room\NPC[0]\ModelScaleY = tempscale#
+								e\room\NPC[0]\ModelScaleZ = tempscale#
 								e\EventStr = "step1"
 								EndIf
 							EndIf
