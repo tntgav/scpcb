@@ -3716,7 +3716,7 @@ Function DrawGUI()
 									KeypadInput=KeypadInput + ((n+1)+(i*4)-1)
 								Case 8 ;enter
 									If KeypadInput = SelectedDoor\Code Then
-										PlaySound_Strict KeyCardSFX1
+										PlaySound_Strict ScannerSFX1
 										
 										If SelectedDoor\Code = Str(AccessCode) Then
 											GiveAchievement(AchvMaynard)
@@ -3729,7 +3729,7 @@ Function DrawGUI()
 										SelectedDoor = Null
 										MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 									Else
-										PlaySound_Strict KeyCardSFX2
+										PlaySound_Strict ScannerSFX2
 										KeypadMSG = "ACCESS DENIED"
 										KeypadTimer = 210
 										KeypadInput = ""	

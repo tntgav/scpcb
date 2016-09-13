@@ -1420,8 +1420,7 @@ Function UpdateNPCs()
 					Case 5
 						If dist < 16.0 Then 
 						
-							
-							If dist<4.0 Then
+							If dist < 4.0 Then
 								GiveAchievement(Achv096)
 							EndIf
 								
@@ -1430,7 +1429,6 @@ Function UpdateNPCs()
 							Else
 								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 20.0, 1.0)
 							EndIf
-
 							
 							n\State2=n\State2+FPSfactor
 							If n\State2>1000 Then ;walking around
