@@ -107,7 +107,7 @@ Function UpdateMainMenu()
 				Case 21
 					MenuStr = "The spiral is growing"
 				Case 22
-					MenuStr = "''Some kind of gestalt effect due to massive reality damage''"
+					MenuStr = Chr(34)+"Some kind of gestalt effect due to massive reality damage."+Chr(34)
 			End Select
 		EndIf
 	EndIf
@@ -233,6 +233,7 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 					PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
 					PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
+					PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 					PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
 					PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
@@ -429,7 +430,7 @@ Function UpdateMainMenu()
 				AASetFont Font1	
 				
 				If SaveGameAmount = 0 Then
-					AAText (x + 20 * MenuScale, y + 20 * MenuScale, "No saved games")
+					AAText (x + 20 * MenuScale, y + 20 * MenuScale, "No saved games.")
 				Else
 					x = x + 20 * MenuScale
 					y = y + 20 * MenuScale
@@ -916,7 +917,7 @@ Function UpdateLauncher()
 	MenuBlack = LoadImage_Strict("GFX\menu\menublack.jpg")	
 	MaskImage MenuBlack, 255,255,0
 	LauncherIMG = LoadImage_Strict("GFX\menu\launcher.jpg")
-	ButtonSFX% = LoadSound_Strict("SFX\Button.ogg")
+	ButtonSFX% = LoadSound_Strict("SFX\Interact\Button.ogg")
 	Local i%	
 	
 	For i = 0 To 3
@@ -1230,9 +1231,9 @@ Function DrawLoading(percent%, shortloading=False)
 			If Not shortloading Then 
 				If firstloop Then 
 					If percent = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\cwm1.cwm")
+						PlaySound_Strict LoadTempSound("SFX\SCP\990\cwm1.cwm")
 					ElseIf percent = 100
-						PlaySound_Strict LoadTempSound("SFX\cwm2.cwm")
+						PlaySound_Strict LoadTempSound("SFX\SCP\990\cwm2.cwm")
 					EndIf
 				EndIf
 			EndIf
@@ -1637,5 +1638,5 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#31#76#146#1D1#283#2E9#329#357#395#444#456#460#493#55C#56F#58C#593#5AE#5CF#5E7
-;~F#614
+;~F#614a69eb09fac237b36c3cbfa91ea377eac0353f645
 ;~C#Blitz3D

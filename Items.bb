@@ -343,6 +343,7 @@ Type Items
 End Type 
 
 Function CreateItem.Items(name$, tempname$, x#, y#, z#, r%=0,g%=0,b%=0,a#=1.0,invSlots%=0)
+	CatchErrors("Uncaught (CreateItem)")
 	
 	Local i.Items = New Items
 	Local it.ItemTemplates
@@ -410,11 +411,12 @@ Function CreateItem.Items(name$, tempname$, x#, y#, z#, r%=0,g%=0,b%=0,a#=1.0,in
 	i\ID=LastItemID+1
 	LastItemID=i\ID
 	
+	CatchErrors("CreateItem")
 	Return i
-	
 End Function
 
 Function RemoveItem(i.Items)
+	CatchErrors("Uncaught (RemoveItem)")
 	Local n
 	FreeEntity(i\model) : FreeEntity(i\collider) : i\collider = 0
 	
@@ -444,10 +446,13 @@ Function RemoveItem(i.Items)
 		i\itemtemplate\img = 0
 	EndIf
 	Delete i
+	
+	CatchErrors("RemoveItem")
 End Function
 
 
 Function UpdateItems()
+	CatchErrors("Uncaught (UpdateItems)")
 	Local n, i.Items
 	Local xtemp#, ytemp#, ztemp#
 	Local temp%, np.NPCs
@@ -524,6 +529,7 @@ Function UpdateItems()
 			EndIf
 		EndIf
 		
+		CatchErrors(Chr(34)+i\itemtemplate\name+Chr(34)+" item")
 	Next
 	
 	If ClosestItem <> Null Then
@@ -537,6 +543,7 @@ End Function
 Function PickItem(item.Items)
 	Local n% = 0
 	
+	CatchErrors("Uncaught (PickItem)")
 	If ItemAmount < MaxItemAmount Then
 		For n% = 0 To MaxItemAmount - 1
 			If Inventory(n) = Null Then
@@ -550,7 +557,7 @@ Function PickItem(item.Items)
 									If e\eventstate = 0 Then
 										ShowEntity Light
 										LightFlash = 3
-										PlaySound_Strict(LoadTempSound("SFX\mindwipe.ogg"))											
+										PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))											
 									EndIf
 									e\eventstate = Max(1, e\eventstate)
 									Exit
@@ -599,9 +606,11 @@ Function PickItem(item.Items)
 		Msg = "You cannot carry any more items."
 		MsgTimer = 70 * 5
 	EndIf
+	CatchErrors("PickItem")
 End Function
 
 Function DropItem(item.Items)
+	CatchErrors("Uncaught (DropItem)")
 	If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
 	
 	item\Dropped = 1
@@ -656,6 +665,8 @@ Function DropItem(item.Items)
 		Case "scp1499","super1499"
 			Wearing1499 = False
 	End Select
+	
+	CatchErrors("DropItem")
 End Function
 
 ;~IDEal Editor Parameters:

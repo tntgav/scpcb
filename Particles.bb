@@ -79,7 +79,7 @@ Function RemoveParticle(p.Particles)
 End Function
 
 Global InSmoke%
-Global HissSFX% = LoadSound_Strict("SFX\hiss.ogg")
+Global HissSFX% = LoadSound_Strict("SFX\General\Hiss.ogg")
 
 Type Emitters
 	Field Obj%
@@ -132,7 +132,7 @@ Function UpdateEmitters()
 	If InSmoke Then
 		If EyeIrritation > (70 * 6) Then BlurVolume = Max(BlurVolume, (EyeIrritation - (70 * 6)) / (70.0 * 24.0))
 		If EyeIrritation > (70 * 24) Then 
-			DeathMSG = "Subject D-9341 found dead in [DATA REDACTED]. Cause of death: suffocation due to decontamination gas."
+			DeathMSG = "Subject D-9341 found dead in [DATA REDACTED]. Cause of death: Suffocation due to decontamination gas."
 			Kill()
 		EndIf
 		
