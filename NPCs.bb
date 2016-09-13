@@ -570,7 +570,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, 0.05,0.05,0.05
 			SetAnimTime(n\obj, 2)
 			
-			n\Sound = LoadSound_Strict("SFX\SCP\1048A\Shirek.ogg")
+			n\Sound = LoadSound_Strict("SFX\SCP\1048A\Shriek.ogg")
 			n\Sound2 = LoadSound_Strict("SFX\SCP\1048A\Growth.ogg")
 			;[End Block]
 		Case NPCtype1499
@@ -1936,7 +1936,7 @@ Function UpdateNPCs()
 								n\State3 = 0
 								n\State2 = 70*2
 								n\PrevState = 0
-								PlaySound_Strict LoadTempSound("SFX\Room\Room2SL\049Spawn.ogg")
+								PlaySound_Strict LoadTempSound("SFX\Room\Room2SL049Spawn.ogg")
 							ElseIf PlayerSeeAble% = 2 And n\State3 > 0.0
 								n\PathStatus = FindPath(n,EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 							Else

@@ -1163,7 +1163,7 @@ Global ScannerSFX1 = LoadSound_Strict("SFX\Interact\ScannerUse1.ogg")
 Global ScannerSFX2 = LoadSound_Strict("SFX\Interact\ScannerUse2.ogg")
 
 Global OpenDoorFastSFX=LoadSound_Strict("SFX\Door\DoorOpenFast.ogg")
-Global CautionSFX% = LoadSound_Strict("SFX\Room\LockroomCaution.ogg")
+Global CautionSFX% = LoadSound_Strict("SFX\Room\LockroomSiren.ogg")
 
 Global NuclearSirenSFX%
 
@@ -1171,10 +1171,13 @@ Global CameraSFX = LoadSound_Strict("SFX\General\Camera.ogg")
 
 Global StoneDragSFX% = LoadSound_Strict("SFX\SCP\173\StoneDrag.ogg")
 
-Global GunshotSFX% = LoadSound_Strict("SFX\General\Gunshot.ogg"),Gunshot2SFX% = LoadSound_Strict("SFX\General\Gunshot2.ogg"),Gunshot3SFX% = LoadSound_Strict("SFX\bulletmiss.ogg")
+Global GunshotSFX% = LoadSound_Strict("SFX\General\Gunshot.ogg")
+Global Gunshot2SFX% = LoadSound_Strict("SFX\General\Gunshot2.ogg")
+Global Gunshot3SFX% = LoadSound_Strict("SFX\General\BulletMiss.ogg")
 Global BullethitSFX% = LoadSound_Strict("SFX\General\BulletHit.ogg")
 
-Global TeslaIdleSFX = LoadSound_Strict("SFX\Room\Tesla\Idle.ogg"), TeslaActivateSFX = LoadSound_Strict("SFX\Room\Tesla\WindUp.ogg")
+Global TeslaIdleSFX = LoadSound_Strict("SFX\Room\Tesla\Idle.ogg")
+Global TeslaActivateSFX = LoadSound_Strict("SFX\Room\Tesla\WindUp.ogg")
 Global TeslaPowerUpSFX = LoadSound_Strict("SFX\Room\Tesla\PowerUp.ogg")
 
 Global MagnetUpSFX% = LoadSound_Strict("SFX\Room\106Chamber\MagnetUp.ogg"), MagnetDownSFX = LoadSound_Strict("SFX\Room\106Chamber\MagnetDown.ogg")
