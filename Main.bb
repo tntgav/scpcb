@@ -1308,7 +1308,7 @@ Next
 
 Global MachineSFX% = LoadSound_Strict("SFX\SCP\914\Refining.ogg")
 
-Global ApacheSFX = LoadSound_Strict("SFX\Character\Apache\Propell.ogg")
+Global ApacheSFX = LoadSound_Strict("SFX\Character\Apache\Propeller.ogg")
 
 Global CurrStepSFX
 Dim StepSFX%(4, 2, 8) ;(normal/metal, walk/run, id)

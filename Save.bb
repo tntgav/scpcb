@@ -184,6 +184,10 @@ Function SaveGame(file$)
 		WriteFloat f, n\PathX
 		WriteFloat f, n\PathZ
 		WriteInt f, n\HP
+		WriteString f, n\Model
+		WriteFloat f, n\ModelScaleX#
+		WriteFloat f, n\ModelScaleY#
+		WriteFloat f, n\ModelScaleZ#
 	Next
 	
 	WriteFloat f, MTFtimer
@@ -348,6 +352,7 @@ Function SaveGame(file$)
 		WriteFloat f, e\EventState3	
 		WriteFloat f, EntityX(e\room\obj)
 		WriteFloat f, EntityZ(e\room\obj)
+		WriteString f, e\EventStr
 	Next
 	
 	temp = 0
@@ -620,6 +625,17 @@ Function LoadGame(file$)
 		n\PathX = ReadFloat(f)
 		n\PathZ = ReadFloat(f)
 		n\HP = ReadInt(f)
+		n\Model = ReadString(f)
+		n\ModelScaleX# = ReadFloat(f)
+		n\ModelScaleY# = ReadFloat(f)
+		n\ModelScaleZ# = ReadFloat(f)
+		If n\Model <> ""
+			model = LoadAnimMesh_Strict(n\Model)
+			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+			FreeEntity n\obj
+			n\obj = model
+			SetAnimTime n\obj,n\Frame
+		EndIf
 	Next
 	
 	For n.NPCs = Each NPCs
@@ -885,6 +901,7 @@ Function LoadGame(file$)
 				Exit
 			EndIf
 		Next
+		e\EventStr = ReadString(f)
 	Next
 	
 	For e.Events = Each Events
@@ -1277,6 +1294,17 @@ Function LoadGameQuick(file$)
 		n\PathX = ReadFloat(f)
 		n\PathZ = ReadFloat(f)
 		n\HP = ReadInt(f)
+		n\Model = ReadString(f)
+		n\ModelScaleX# = ReadFloat(f)
+		n\ModelScaleY# = ReadFloat(f)
+		n\ModelScaleZ# = ReadFloat(f)
+		If n\Model <> ""
+			model = LoadAnimMesh_Strict(n\Model)
+			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+			FreeEntity n\obj
+			n\obj = model
+			SetAnimTime n\obj,n\Frame
+		EndIf
 	Next
 	
 	For n.NPCs = Each NPCs
@@ -1509,6 +1537,7 @@ Function LoadGameQuick(file$)
 				Exit
 			EndIf
 		Next	
+		e\EventStr = ReadString(f)
 	Next
 	
 	Local it.Items
