@@ -1868,7 +1868,7 @@ Function FillRoom(r.Rooms)
 				If r2\RoomTemplate\Name = "exit1" Then
 					r\Objects[1]=r2\Objects[1]
 					r\Objects[2]=r2\Objects[2]	
-				ElseIf r2\roomtemplate\name = "gateaentrance"
+				ElseIf r2\RoomTemplate\Name = "gateaentrance"
 					;ylempi hissi
 					r\RoomDoors[1] = CreateDoor(0, r\x+1544.0*RoomScale,12000.0*RoomScale, r\z-64.0*RoomScale, 90, r, False)
 					r\RoomDoors[1]\AutoClose = False : r\RoomDoors[1]\open = False
@@ -1972,7 +1972,7 @@ Function FillRoom(r.Rooms)
 			
 			;oikean puolen watchpoint 1
 			r\Objects[4] = CreatePivot()
-			PositionEntity(r\Objects[4], r\x+1088.0*RoomScale, 12192.0*RoomScale, r\z-4672.0*RoomScale, True)
+			PositionEntity(r\Objects[4], r\x+5167.34*RoomScale, 12128.0*RoomScale, r\z-2752.5*RoomScale, True)
 			EntityParent r\Objects[4], r\obj
 			;oikean puolen watchpoint 2
 			r\Objects[5] = CreatePivot()
@@ -5891,7 +5891,7 @@ Function UpdateSecurityCams()
 							EntityTexture(sc\ScrOverlay, OldAiPics(0))
 						End If
 						
-						If (MilliSecs() Mod sc\PlayerState) >= Rand(500) Then
+						If (MilliSecs2() Mod sc\PlayerState) >= Rand(600) Then
 							EntityTexture(sc\ScrOverlay, MonitorTexture)
 						Else
 							If sc\soundCHN = 0 Then
@@ -7719,13 +7719,6 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	
 End Function
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#117#11E#12F#137#13F#323#333#344#36C#37A#38A#38F#39A#441#54B
-;~F#56A#58C#5A1#5AC#5E5#5F3#61B#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#87E#8A6
-;~F#8C9#8E7#90E#915#923#93F#954#971#98E#99B#9AD#9EB#A15#A66#ABC#ACF#AED#BF1#C00#C3C
-;~F#C44#C52#C67#CA3#CC2#CD2#CEA#D15#D28#D4A#D72#DC4#DF0#E17#E1E#E23#E5A#E81#E96#ECA
-;~F#F48#F68#FDC#1033#105E#10AF#10B8#1151#1159#115E#116C#117B#11BC#11E0#11EF#1200#1207#120C#1290#12C6
-;~F#1343#134F#1390#139B#13AC#13B1#13C0#13D7#1458#1461#1540#155D#1564#156A#1578#159C#15BC#15EF#16FB#1734
-;~F#180B#18A0#18A5#18B5#1B84#1B9B#1BBA#1BC1#1C22#1C73#1C9E#1CBF#1CD2#1CFA#1D01#1D35#1D3C#1D68#1DB6#1DC4
-;~F#1DCB#1DD1#1DDB#1DE1#1DF8
+;~F#2#A#CEA#11EF#13C0#1DE1#1DF8
 ;~B#1228
 ;~C#Blitz3D

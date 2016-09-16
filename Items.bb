@@ -458,15 +458,16 @@ Function UpdateItems()
 	Local temp%, np.NPCs
 	
 	Local HideDist = HideDistance*0.5
+	Local deletedItem% = False
 	
 	ClosestItem = Null
 	For i.Items = Each Items
 		i\Dropped = 0
 		
 		If (Not i\Picked) Then
-			If i\disttimer < MilliSecs() Then
+			If i\disttimer < MilliSecs2() Then
 				i\dist = EntityDistance(Collider, i\collider)
-				i\disttimer = MilliSecs() + Rand(600,800)
+				i\disttimer = MilliSecs2() + Rand(600,800)
 				If i\dist < HideDist Then ShowEntity i\collider
 			EndIf
 			
@@ -523,13 +524,16 @@ Function UpdateItems()
 					Next
 				EndIf
 				
-				If EntityY(i\collider) < - 35.0 Then DebugLog "remove: " + i\itemtemplate\name:RemoveItem(i)
+				If EntityY(i\collider) < - 35.0 Then DebugLog "remove: " + i\itemtemplate\name:RemoveItem(i):deletedItem=True
 			Else
 				HideEntity i\collider
 			EndIf
 		EndIf
 		
-		CatchErrors(Chr(34)+i\itemtemplate\name+Chr(34)+" item")
+		If Not deletedItem Then
+			CatchErrors(Chr(34)+i\itemtemplate\name+Chr(34)+" item")
+		EndIf
+		deletedItem = False
 	Next
 	
 	If ClosestItem <> Null Then
@@ -667,8 +671,14 @@ Function DropItem(item.Items)
 	End Select
 	
 	CatchErrors("DropItem")
+	
 End Function
 
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#B#1E#76#140#15A#19B#1B6#1F2#235
+;~F#B#1E
 ;~C#Blitz3D

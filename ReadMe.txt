@@ -13,7 +13,7 @@
 
 
 The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
-See "credits.txt" for further details.
+See "Credits.txt" for further details.
 
 
 This game is licensed under Creative Commons Attribution-ShareAlike 3.0 License.
@@ -23,9 +23,7 @@ http://creativecommons.org/licenses/by-sa/3.0/
 
 The source code of the game is available on GitHub: https://github.com/Regalis11/scpcb
 
-After you installed Blitz3D, you have to replace the bin folder with the bin folder that is in the
-"mavless_bin.zip" file. Otherwise you can't run the game properly.
-								
+
 
 **** HOW TO RUN IT **************************************
 
@@ -46,21 +44,21 @@ After you installed Blitz3D, you have to replace the bin folder with the bin fol
 
 **** DEFAULT CONTROLS ***********************************
 
-	WASD				-	moving
-	Space				-	manual blinking
-	Left Shift			-	sprint
-	Left Control			-	crouch
-	Tab				-	inventory
-	F5				-	save
-	F3				-	console
+	WASD				-	Move.
+	Space				-	Manual blink.
+	Left Shift			-	Sprint.
+	Left Control			-	Crouch.
+	Tab				-	Toggle inventory.
+	F5				-	Save.
+	F3				-	[DATA EXPUNGED]
 
-	Pick up items and use levers and buttons by clicking on them.
+	Pick up items and use levers/buttons by left-clicking on them.
 
-	Use items by double clicking them in the inventory.
+	Use items by double left-clicking them in the inventory.
 
-	You can drop items by dragging them out of the inventory.
+	You can drop items by clicking and dragging them out of their inventory slot.
 
-	You can combine certain items by dragging them into the same inventory slot.
+	You can combine certain items by dragging an item into the another inventory slot.
 
 
 

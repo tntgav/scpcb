@@ -427,14 +427,16 @@ Function SaveGame(file$)
 	
 	CloseFile f
 	
-	If SelectedDifficulty\saveType = SAVEONSCREENS Then
-		PlaySound_Strict(LoadTempSound("SFX\General\Save2.ogg"))
-	Else
-		PlaySound_Strict(LoadTempSound("SFX\General\Save1.ogg"))
+	If Not MenuOpen Then
+		If SelectedDifficulty\saveType = SAVEONSCREENS Then
+			PlaySound_Strict(LoadTempSound("SFX\General\Save2.ogg"))
+		Else
+			PlaySound_Strict(LoadTempSound("SFX\General\Save1.ogg"))
+		EndIf
+		
+		Msg = "Game progress saved."
+		MsgTimer = 70 * 4
 	EndIf
-	
-	Msg = "Game progress saved."
-	MsgTimer = 70 * 4
 	
 	CatchErrors("SaveGame")
 End Function
@@ -1867,6 +1869,14 @@ Function LoadMap(file$)
 	
 	CatchErrors("LoadMap")
 End Function
+
+
+
+
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#2#1AE#412#64E#67C#69A
 ;~C#Blitz3D

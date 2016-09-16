@@ -880,8 +880,13 @@ Function UpdateConsole()
 
 					For e.events = Each Events
 						If e\eventname = "alarm" Then 
-							e\eventstate = 19400
-							e\EventState3 = 10
+							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
+							If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
+							If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
+							
+							FreeEntity e\room\Objects[0]
+							FreeEntity e\room\Objects[1]
+							RemoveEvent(e)
 							Exit
 						EndIf
 					Next
@@ -950,14 +955,14 @@ Function UpdateConsole()
 						Case 1
 							DeathMSG = "[REDACTED]"
 						Case 2
-							DeathMSG = "Subject D-9341 found dead in Sector [REDACTED]."
-							DeathMSG = DeathMSG + "The subject appears to have attained no physical damage, and there is no visible indication as to what killed him."
+							DeathMSG = "Subject D-9341 found dead in Sector [REDACTED]. "
+							DeathMSG = DeathMSG + "The subject appears to have attained no physical damage, and there is no visible indication as to what killed him. "
 							DeathMSG = DeathMSG + "Body was sent for autopsy."
 						Case 3
 							DeathMSG = "EXCP_ACCESS_VIOLATION"
 						Case 4
-							DeathMSG = "Subject D-9341 found dead in Sector [REDACTED]."
-							DeathMSG = DeathMSG + "The subject appears to have scribbled the letters "+Chr(34)+"kys"+Chr(34)+" in his own blood beside him."
+							DeathMSG = "Subject D-9341 found dead in Sector [REDACTED]. "
+							DeathMSG = DeathMSG + "The subject appears to have scribbled the letters "+Chr(34)+"kys"+Chr(34)+" in his own blood beside him. "
 							DeathMSG = DeathMSG + "No other signs of physical trauma or struggle can be observed. Body was sent for autopsy."
 					End Select 
 
@@ -2191,6 +2196,12 @@ Collisions HIT_178, HIT_MAP, 2, 2
 Collisions HIT_178, HIT_178, 1, 3
 Collisions HIT_DEAD, HIT_MAP, 2, 2
 
+Function MilliSecs2()
+	Local retVal% = MilliSecs()
+	If retVal<0 Then retVal=retVal+2147483648
+	Return retVal
+End Function
+
 DrawLoading(90, True)
 
 ;----------------------------------- meshes and textures ----------------------------------------------------------------
@@ -2266,10 +2277,10 @@ Repeat
 	EndIf
 	
 	;Counting the fps
-	If CheckFPS < MilliSecs() Then
+	If CheckFPS < MilliSecs2() Then
 		FPS = ElapsedLoops
 		ElapsedLoops = 0
-		CheckFPS = MilliSecs()+1000
+		CheckFPS = MilliSecs2()+1000
 	EndIf
 	ElapsedLoops = ElapsedLoops + 1
 	
@@ -5733,16 +5744,22 @@ Function DrawMenu()
 					y = y + 50*MenuScale
 					
 					Color 255,255,255
-					AAText(x, y, "Open console on error:")
-					ConsoleOpening = DrawTick(x + 270 * MenuScale, y, ConsoleOpening)
+					AAText(x, y, "Enable console:")
+					CanOpenConsole = DrawTick(x +270 * MenuScale, y + MenuScale, CanOpenConsole)
 					
 					y = y + 30*MenuScale
+					
+					Color 255,255,255
+					AAText(x, y, "Open console on error:")
+					ConsoleOpening = DrawTick(x + 270 * MenuScale, y + MenuScale, ConsoleOpening)
+					
+					y = y + 50*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Achievement popups:")
 					AchvMSGenabled% = DrawTick(x + 270 * MenuScale, y, AchvMSGenabled%)
 					
-					y = y + 30*MenuScale
+					y = y + 50*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Show FPS:")
@@ -5755,7 +5772,7 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					If DrawTick(x + 270 * MenuScale, y, CurrFrameLimit > 0.0) Then
-						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+23*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
+						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+30*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
 						CurrFrameLimit = Max(CurrFrameLimit, 0.1)
 						Framelimit% = CurrFrameLimit#*100.0
 						Color 255,255,0
@@ -5765,7 +5782,7 @@ Function DrawMenu()
 						Framelimit = 0
 					EndIf
 					
-					y = y + 50*MenuScale
+					y = y + 80*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Antialiased text:")
@@ -5799,7 +5816,7 @@ Function DrawMenu()
 			If SelectedDifficulty\saveType = SAVEONQUIT Or SelectedDifficulty\saveType = SAVEANYWHERE Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
 				Local AbleToSave% = True
-				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Or RN$ = "gateaentrance" Then AbleToSave = False
+				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Then AbleToSave = False
 				If (Not CanSave) Then AbleToSave = False
 				If AbleToSave
 					If DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "Yes") Then
@@ -9170,12 +9187,7 @@ Function CatchErrors(location$)
 		CloseFile errF
 	EndIf
 End Function
-
 ;~IDEal Editor Parameters:
-;~F#1C#A8#130#134#13B#3D0#4AC#506#527#59F#5AC#661#6D9#6F0#6FD#72F#7E5#8CE#9C9#9E1
-;~F#A74#B9A#CB9#E29#142A#14B7#1506#1518#1557#1629#1634#179A#182C#185D#195F#1971#198D#1997#19A4#19C6
-;~F#19E5#1A04#1A20#1A34#1A49#1A4D#1A6D#1A75#1AA0#1C42#1CF7#1D22#1D99#1D9F#1DA9#1DB5#1DC0#1DC4#1DFF#1E07
-;~F#1E0F#1E16#1E1D#1E2A#1E30#1E3B#1E74#1E83#1EA1#1ECF#1ED6#1EE9#1F02#1F2F#1F3A#1F3F#1F59#1F65#1F80#1FD2
-;~F#1FE0#1FE8#1FF4#1FFD#2026#202B#2030#2035#203F#2050#20D5#20E3#212A#2151#2163#217C#218B#21A2#21BF#21C3
-;~B#1196#13CE#1A4A
+;~F#2174#21D4
+;~B#11A1#13D9#1A5B
 ;~C#Blitz3D
