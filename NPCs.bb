@@ -1429,7 +1429,7 @@ Function UpdateNPCs()
 							If n\Sound = 0 Then
 								n\Sound = LoadSound_Strict("SFX\Music\096.ogg")
 							Else
-								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 20.0, 1.0)
+								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 14.0, 1.0)
 							EndIf
 							
 							n\State2=n\State2+FPSfactor
@@ -6551,10 +6551,14 @@ Function RotateToDirection(n.NPCs)
 	ShowEntity n\Collider
 	
 End Function
+
+
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#0#A#3F#49#71#97#A7#D7#E7#F0#FE#10D#120#13F#169#17D#19A#1DB#1F2#213
-;~F#236#23F#266#28E#38A#481#5D6#5F2#602#74B#753#75F#7CB#866#986#98B#9C2#A64#AA0#B2F
-;~F#B9B#CB0#D7B#E32#EE5#FE4#10C7#10EE#10F9#1121#1134#173C#17B4#17C5#17DF#17F0#17FA#1818#1856#1877
-;~F#1885#18A1#18B3#18D7#18FA#1908
+;~F#0
 ;~B#197#129B#1335#13CE#1582#168D#184B#18A7
 ;~C#Blitz3D

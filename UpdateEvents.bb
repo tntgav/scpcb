@@ -41,11 +41,9 @@ Function UpdateEvents()
 						If SelectedDifficulty\saveType = SAVEANYWHERE Then
 							Msg = "Press F5 to save."
 							MsgTimer = 70*4
-						Else
-							If SelectedDifficulty\saveType = SAVEONSCREENS Then
-								Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
-								MsgTimer = 70 * 4	
-							EndIf 
+						ElseIf SelectedDifficulty\saveType = SAVEONSCREENS Then
+							Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
+							MsgTimer = 70 * 8
 						EndIf
 						
 						Curr173\Idle=False
@@ -1371,7 +1369,7 @@ Function UpdateEvents()
 			Case "coffin", "coffin106"
 				;[Block]
 				
-				If e\EventState < MilliSecs() Then
+				If e\EventState < MilliSecs2() Then
 					;SCP-079 starts broadcasting 895 camera feed on monitors after leaving the first zone
 					If PlayerZone > 0 Then 
 						If EntityPitch(e\room\Levers[0],True) > 0 Then ;camera feed on
@@ -1391,7 +1389,7 @@ Function UpdateEvents()
 						EndIf						
 					EndIf
 					
-					e\EventState = MilliSecs()+3000
+					e\EventState = MilliSecs2()+3000
 				EndIf
 				
 				If PlayerRoom = e\room Then
@@ -1609,7 +1607,7 @@ Function UpdateEvents()
 							e\room\NPC[0] = CreateNPC(NPCtypeApache, e\room\x, 100.0, e\room\z)
 							e\room\NPC[0]\State = 1
 							
-							e\room\NPC[1] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+0.5,EntityZ(e\room\Objects[4],True))
+							e\room\NPC[1] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+0.3,EntityZ(e\room\Objects[4],True))
 							e\room\NPC[1]\State = 1
 							
 							
@@ -1976,19 +1974,6 @@ Function UpdateEvents()
 							
 							p\SizeChange = -0.00001
 						End If
-						
-						If Rand(250)=1 And e\room\NPC[1]\State <> 1 Then 
-							If e\room\NPC[1]\PathStatus = 0 Then
-								If EntityDistance(e\room\NPC[1]\Collider, e\room\Objects[4])<EntityDistance(e\room\NPC[1]\Collider, e\room\Objects[5]) Then
-									e\room\NPC[1]\PathStatus = FindPath(e\room\NPC[1], EntityX(e\room\Objects[5],True),EntityY(e\room\Objects[5],True),EntityZ(e\room\Objects[5],True))
-									e\room\NPC[1]\State = 3
-								Else
-									e\room\NPC[1]\PathStatus = FindPath(e\room\NPC[1], EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
-									e\room\NPC[1]\State = 3
-								EndIf
-							EndIf
-						EndIf	
-						
 						
 						;helikopteri huomaa pelaajan -> ilmoittaa vartijoille
 						If EntityVisible(e\room\NPC[0]\Collider,Collider) Then
@@ -3458,7 +3443,7 @@ Function UpdateEvents()
 					If e\Sound = 0 Then e\Sound = LoadSound_Strict("SFX\Room\Tesla\Shock.ogg")
 					
 					If e\EventState = 0 Then
-						If (MilliSecs() Mod 1500) < 800 Then
+						If (MilliSecs2() Mod 1500) < 800 Then
 							ShowEntity e\room\Objects[4]
 						Else
 							HideEntity e\room\Objects[4]
@@ -3537,7 +3522,7 @@ Function UpdateEvents()
 					Else
 						e\EventState = e\EventState+FPSfactor
 						If e\EventState =< 40 Then
-							If (MilliSecs() Mod 100) < 50 Then
+							If (MilliSecs2() Mod 100) < 50 Then
 								ShowEntity e\room\Objects[4]
 							Else
 								HideEntity e\room\Objects[4]
@@ -5426,7 +5411,7 @@ Function UpdateEvents()
 				;[End Block]
 			Case "room4"
 				;[Block]
-				If e\EventState < MilliSecs() Then
+				If e\EventState < MilliSecs2() Then
 					If PlayerRoom <> e\room Then
 						If Distance(EntityX(Collider),EntityZ(Collider),EntityX(e\room\obj),EntityZ(e\room\obj))<16.0 Then
 							For n.NPCs = Each NPCs
@@ -5446,7 +5431,7 @@ Function UpdateEvents()
 							Next
 						EndIf
 					EndIf
-					If e<>Null Then e\EventState = MilliSecs()+5000
+					If e<>Null Then e\EventState = MilliSecs2()+5000
 				EndIf
 				;[End Block]
 			Case "room012"
@@ -7458,7 +7443,7 @@ Function UpdateEvents()
 						ElseIf e\EventState = 1
 							e\SoundCHN = LoopSound2(AlarmSFX(0), e\SoundCHN, Camera, e\room\Objects[0], 5.0)
 							
-							If (MilliSecs() Mod 1000)<500 Then
+							If (MilliSecs2() Mod 1000)<500 Then
 								ShowEntity e\room\Objects[5] 
 							Else
 								HideEntity e\room\Objects[5]
@@ -9139,11 +9124,7 @@ Function UpdateEvents()
 	EndIf
 	
 End Function
-
 ;~IDEal Editor Parameters:
-;~F#13#10F#4F5#505#571#5E2#641#80F#9F6#A1D#A2B#A35#A42#C2B#C4C#C9B#CE9#CF6#D30#D47
-;~F#D67#D70#D7A#D89#E1D#E3F#10EB#1131#1147#1153#1171#11C2#11D9#12A6#13A7#1427#1440#145F#14C4#14D1
-;~F#14EA#1582#1857#18AB#195C#1A0C#1AC4#1ADC#1B9D#1BCA#1BE7#1C0E#1C3E#1C62#1C8A#1CE4#1D24#1D55#1D68#1E22
-;~F#1E7D#1E90#1E9E#1EF3#1F14#2002#2075#207B#215A#2244#2248
-;~B#1498#2199
+;~F#189C
+;~B#1489#218A
 ;~C#Blitz3D
