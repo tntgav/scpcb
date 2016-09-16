@@ -33,7 +33,8 @@ Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
 ;CHANGE IT FROM "1" TO "0" BEFORE COMPILING!!! - ENDSHN
-Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
+;PS @Mark: This was intentional that this option won't be saved (idea approved by Reg) - ENDSHN
+Global CanOpenConsole% = 0
 
 Dim ArrowIMG(4)
 
