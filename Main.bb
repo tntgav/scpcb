@@ -9186,7 +9186,10 @@ Function CatchErrors(location$)
 		MsgTimer = 20*70
 		CloseFile errF
 	EndIf
-End Functio
+End Function
+
+
+
 ;~IDEal Editor Parameters:
 ;~F#2174#21D4
 ;~B#11A1#13D9#1A5B
