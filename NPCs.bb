@@ -2205,11 +2205,11 @@ Function UpdateNPCs()
 						If KillTimer => 0 Then
 							dist = EntityDistance(n\Collider,Collider)
 							Local ShootAccuracy# = 0.9
-							Local DetectDistance = 11.0
+							Local DetectDistance# = 11.0
 
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
-								ShootAccuracy = 0.3
+								ShootAccuracy = 0.25
 								DetectDistance = 21.0
 							EndIf
 							
@@ -2227,6 +2227,7 @@ Function UpdateNPCs()
 								
 								If n\Reload = 0 And n\Frame>1550 Then
 									DebugLog "entitypick"
+									DebugLog ShootAccuracy
 									EntityPick(pvt, dist)
 									If PickedEntity() = Collider Or n\State3=1 Then
 										
@@ -6095,11 +6096,17 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 							ShotMessageUpdate = "A bullet hit your right leg."
 							Injuries = Injuries + Rnd(0.8,1.2)
 						Case 8
-							Kill()
+							BlurTimer = 500
+							Stamina = 0
+							ShotMessageUpdate = "A bullet struck your neck, making you gasp."
+							Injuries = Injuries + Rnd(1.2,1.6)
 					End Select	
 				Else
 					If Rand(10)=1 Then
-						Kill()
+						BlurTimer = 500
+						Stamina = Stamina - 1
+						ShotMessageUpdate = "A bullet hit your chest. The vest absorbed some of the damage."
+						Injuries = Injuries + Rnd(0.8,1.1)
 					Else
 						ShotMessageUpdate = "A bullet hit your chest. The vest absorbed most of the damage."
 						Injuries = Injuries + Rnd(0.1,0.5)
