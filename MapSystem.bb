@@ -5238,7 +5238,7 @@ Function InitWayPoints(loadingstart=45)
 		Next
 	Next
 	
-	DebugLog "InitWaypoints() - "+(MilliSecs()-temper)
+	DebugLog "InitWaypoints() - "+(MilliSecs2()-temper)
 	
 End Function
 
