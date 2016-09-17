@@ -2209,7 +2209,7 @@ Function UpdateNPCs()
 
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
-								ShootAccuracy = 0.4
+								ShootAccuracy = 0.25
 								DetectDistance = 21.0
 							EndIf
 							
@@ -2860,7 +2860,7 @@ Function UpdateNPCs()
 													
 													DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate B."+Chr(34)
 													
-													Shoot( EntityX(pvt),EntityY(pvt), EntityZ(pvt),(15/dist)*(n\State=2),(n\State=2))
+													Shoot( EntityX(pvt),EntityY(pvt), EntityZ(pvt),(10/dist)*(n\State=2),(n\State=2))
 													
 													n\Reload = 5
 												EndIf
@@ -6162,8 +6162,6 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 			
 			EntityPick(pvt, 2.5)
 			
-			FreeEntity pvt
-			
 			If PickedEntity() <> 0 Then 
 				PlaySound2(Gunshot3SFX, Camera, pvt, 0.4, Rnd(0.8,1.0))
 				
@@ -6195,6 +6193,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 					ScaleSprite de\obj, de\Size, de\Size
 				EndIf				
 			EndIf
+			FreeEntity pvt
 			
 		EndIf
 		
@@ -6573,5 +6572,5 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#0
-;~B#197#129F#1339#13D2#1586#1691#1853#18AF
+;~B#197#129F#1339#13D2#1586#1691#1852#18AE
 ;~C#Blitz3D

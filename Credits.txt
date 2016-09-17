@@ -59,18 +59,25 @@
 			Main developer.
 
 		MonocleBios
+			Bug fixes and optimizations.
 
 		Juanjpro
+			Blitz3D modifications, countless bug fixes and optimizations, SCP-178, anti-aliased text, maintenance tunnel generation algorithm.
 
 		Ryan Stillings
 			Bug fixes and SCP-860-1's generation algorithm.
 
 		ENDSHN
 			GFX, SFX, animations.
+			
+		Vane Brain 
+			Room modeling, GFX, music, ideas.
 
 		InnocentSam
 			SCP-008, SCP-500, skybox code.
-
+			
+		CommanderMark
+			Bug fixes and grammar.
 
 	3D Modellers
 
@@ -113,9 +120,6 @@
 
 		Brandon Smith
 			Various 3D props.
-
-		Vane Brain 
-			Room modeling, GFX, music, ideas.
 
 		Tom Malinowski
 
