@@ -2230,7 +2230,9 @@ Function UpdateNPCs()
 									EntityPick(pvt, dist)
 									If PickedEntity() = Collider Or n\State3=1 Then
 										
-										DeathMSG = ""
+										If PlayerRoom\RoomTemplate\Name = "exit1" Then
+											DeathMSG = Chr(34)+"Agent G. to control. Shot down a runaway Class D at Gate B."+Chr(34)
+										EndIf
 										
 										PlaySound2(GunshotSFX, Camera, n\Collider, 35)
 										
@@ -6066,7 +6068,7 @@ End Function
 Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 	
 	;muzzle flash
-	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
+	Local p.particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
 	TurnEntity p\obj, 0,0,Rnd(360)
 	p\Achange = -0.15
 	
@@ -6163,7 +6165,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 				
 				If particles Then 
 					;dust/smoke particles
-					p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
+					p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
 					p\speed = 0.001
 					p\SizeChange = 0.003
 					p\A = 0.8
@@ -6171,7 +6173,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 					RotateEntity p\pvt, EntityPitch(pvt)-180, EntityYaw(pvt),0
 					
 					For i = 0 To Rand(2,3)
-						p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
+						p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
 						p\speed = 0.02
 						p\A = 0.8
 						p\Achange = -0.01
@@ -6565,8 +6567,7 @@ End Function
 
 
 
-
 ;~IDEal Editor Parameters:
 ;~F#0
-;~B#197#129D#1337#13D0#1584#168F#184D#18A9
+;~B#197#129F#1339#13D2#1586#1691#184F#18AB
 ;~C#Blitz3D

@@ -1975,7 +1975,7 @@ Function FillRoom(r.Rooms)
 			EntityParent r\Objects[4], r\obj
 			;oikean puolen watchpoint 2
 			r\Objects[5] = CreatePivot()
-			PositionEntity(r\Objects[5], r\x+5257.09*RoomScale, 12128.0*RoomScale, r\z-869.914*RoomScale, True)
+			PositionEntity(r\Objects[5], r\x+4363.02*RoomScale, 10536.0*RoomScale, r\z+2766.16*RoomScale, True)
 			EntityParent r\Objects[5], r\obj	
 			;vasemman puolen watchpoint 1
 			r\Objects[6] = CreatePivot()
@@ -7716,6 +7716,9 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	Next
 	
 End Function
+
+
+
 
 
 

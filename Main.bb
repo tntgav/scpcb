@@ -2365,9 +2365,9 @@ Repeat
 				
 				AmbientSFXCHN = PlaySound2(AmbientSFX(PlayerZone,CurrAmbientSFX), Camera, SoundEmitter)
 			EndIf
-			If Rand(40000) = 3 Then
+			If Rand(50000) = 3 Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ <> "pocketdimension" And RN$ <> "room860" And RN$ <> "173" And RN$ <> "dimension1499" Then
+				If RN$ <> "pocketdimension" And RN$ <> "room860" And RN$ <> "173" And RN$ <> "dimension1499" And RN$ <> "exit1" And RN$ <> "gatea" And (Not MenuOpen) Then
 					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
 					PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
 				EndIf 
@@ -3530,16 +3530,6 @@ Function DrawGUI()
 		EndIf
 	EndIf
 	
-	If SelectedScreen <> Null Then
-		DrawImage SelectedScreen\img, GraphicWidth/2-ImageWidth(SelectedScreen\img)/2,GraphicHeight/2-ImageHeight(SelectedScreen\img)/2
-		
-		If MouseUp1 Or MouseHit2 Then
-			FreeImage SelectedScreen\img : SelectedScreen\img = 0
-			SelectedScreen = Null
-			MouseUp1 = False
-		EndIf
-	EndIf
-	
 	If ClosestItem <> Null Then
 		yawvalue# = -DeltaYaw(Camera, ClosestItem\collider)
 		If yawvalue > 90 And yawvalue <= 180 Then yawvalue = 90
@@ -3667,6 +3657,16 @@ Function DrawGUI()
 			
 		EndIf
 		
+	EndIf
+	
+	If SelectedScreen <> Null Then
+		DrawImage SelectedScreen\img, GraphicWidth/2-ImageWidth(SelectedScreen\img)/2,GraphicHeight/2-ImageHeight(SelectedScreen\img)/2
+		
+		If MouseUp1 Or MouseHit2 Then
+			FreeImage SelectedScreen\img : SelectedScreen\img = 0
+			SelectedScreen = Null
+			MouseUp1 = False
+		EndIf
 	EndIf
 	
 	Local PrevInvOpen% = InvOpen, MouseSlot% = 66
@@ -9187,6 +9187,9 @@ Function CatchErrors(location$)
 		CloseFile errF
 	EndIf
 End Function
+
+
+
 
 
 

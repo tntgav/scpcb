@@ -1969,27 +1969,15 @@ Function UpdateEvents()
 							
 							p\SizeChange = -0.00001
 						End If
-						
-						If Rand(250) = 1 And e\room\NPC[1]\State <> 1 Then 
-							If e\room\NPC[1]\PathStatus = 0 Then
-								If EntityDistance(e\room\NPC[1]\Collider, e\room\Objects[4]) < EntityDistance(e\room\NPC[1]\Collider, e\room\Objects[5]) Then
-									e\room\NPC[1]\PathStatus = FindPath(e\room\NPC[1], EntityX(e\room\Objects[5],True),EntityY(e\room\Objects[5],True),EntityZ(e\room\Objects[5],True))
-									e\room\NPC[1]\State = 3
-								Else
-									e\room\NPC[1]\PathStatus = FindPath(e\room\NPC[1], EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
-									e\room\NPC[1]\State = 3
-								EndIf
-							EndIf
-						EndIf	
 
-						;Helicopter spots or player is with range. --> Start shooting.
-						If ((EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) And e\room\NPC[1]\State <> 1) Or EntityVisible(e\room\NPC[0]\Collider,Collider)
+						;Helicopter spots or player is within range. --> Start shooting.
+						If ((EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) Or EntityVisible(e\room\NPC[0]\Collider,Collider)) And e\room\NPC[1]\State <> 1
 							e\room\NPC[1]\State = 1
 							e\room\NPC[1]\State3 = 1
 						EndIf
 						
 						;Below roof or inside catwalk. --> Stop shooting.
-						If (EntityDistance(e\room\NPC[1]\Collider,Collider) < 8.9) Or ((EntityX(e\room\NPC[0]\Collider)+1.48) < EntityX(Collider)) Then
+						If (EntityDistance(e\room\NPC[1]\Collider,Collider) < 8.9) Or (EntityDistance(e\room\Objects[5],Collider) < 16.9) Then
 							e\room\NPC[1]\State3 = 0
 						Else
 							e\room\NPC[1]\State3 = 1
@@ -9175,8 +9163,7 @@ End Function
 
 
 
-
 ;~IDEal Editor Parameters:
 ;~F#309
-;~B#1492#2193
+;~B#1486#2187
 ;~C#Blitz3D
