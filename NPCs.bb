@@ -2227,7 +2227,6 @@ Function UpdateNPCs()
 								
 								If n\Reload = 0 And n\Frame>1550 Then
 									DebugLog "entitypick"
-									DebugLog ShootAccuracy
 									EntityPick(pvt, dist)
 									If PickedEntity() = Collider Or n\State3=1 Then
 										

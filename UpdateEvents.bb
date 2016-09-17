@@ -1981,17 +1981,17 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 						EndIf	
-						
-						If (EntityDistance(e\room\NPC[1]\Collider,Collider) > 8.9) And (EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) And ((EntityX(e\room\NPC[0]\Collider)+1.48) > EntityX(Collider)) Then
+
+						;Helicopter spots or player is with range. --> Start shooting.
+						If ((EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) And e\room\NPC[1]\State <> 1) Or EntityVisible(e\room\NPC[0]\Collider,Collider)
 							e\room\NPC[1]\State = 1
 							e\room\NPC[1]\State3 = 1
-						ElseIf EntityDistance(e\room\NPC[1]\Collider,Collider) < 8.9
-							e\room\NPC[1]\State3 = 0
 						EndIf
-
-						;helikopteri huomaa pelaajan -> ilmoittaa vartijoille
-						If EntityVisible(e\room\NPC[0]\Collider,Collider) And (EntityDistance(e\room\NPC[1]\Collider,Collider) > 8.9) And ((EntityX(e\room\NPC[0]\Collider)+1.48) > EntityX(Collider)) Then
-							e\room\NPC[1]\State = 1
+						
+						;Below roof or inside catwalk. --> Stop shooting.
+						If (EntityDistance(e\room\NPC[1]\Collider,Collider) < 8.9) Or ((EntityX(e\room\NPC[0]\Collider)+1.48) < EntityX(Collider)) Then
+							e\room\NPC[1]\State3 = 0
+						Else
 							e\room\NPC[1]\State3 = 1
 						EndIf
 						
