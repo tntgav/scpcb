@@ -22,6 +22,7 @@ v1.3.2
 - SCP-079 no longer opens the door to Dr. L.’s office if the remote door control system is turned off.
 - Adjusted particle emitters so that they now update even when the player is not in the same room. This fixes some visual bugs such as the gas on catwalks only activating once the player steps inside the room.
 - Disabled camera fog at Gate A and B.
+- Re-positioned the Gate B guard so it will now properly shoot the player when they are within range.
 - Added an option to disable console functionality while in-game.
 - The player can now save at the entrance to Gate A.
 - Refactored the SFX folder.
@@ -36,10 +37,10 @@ Bug Fixes:
 - Fixed the "halloween" console command.
 - Fixed Security Chief Franklin using the default scientist texture during the office event if the intro sequence was enabled.
 - Fixed a bug that caused SCP-096 to spawn too frequently.
-- The guard on the roof at Gate B now properly shoots the player when they are within range.
 - Adjusted the item overlapping detection code, which caused some items to be pushed into walls and fall through the map.
 - Fixed a bug that caused the Tesla gate’s event to constantly loop if the player exits the area fast enough.
-- Fixed lag spikes involving monitors.
+- Fixed lag spikes involving monitors and a bug that caused the HUD to draw over screens.
+- Fixed 079's broadcasts playing during Gate A, Gate B and when the game is paused.
 - Fixed some issues relating to Windows 10. This includes a fatal bug that caused no items to spawn in the map.
 - Fixed several issues with both Gate A endings.
 
