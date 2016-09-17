@@ -1975,10 +1975,14 @@ Function UpdateEvents()
 							p\SizeChange = -0.00001
 						End If
 						
-						;helikopteri huomaa pelaajan -> ilmoittaa vartijoille
-						If EntityVisible(e\room\NPC[0]\Collider,Collider) Then
-							e\room\NPC[1]\State = 1
+						If EntityDistance(e\room\NPC[1]\Collider,Collider) < 8.0 Then
+							e\room\NPC[1]\State3 = 1
 						EndIf
+
+						;helikopteri huomaa pelaajan -> ilmoittaa vartijoille
+						;If EntityVisible(e\room\NPC[0]\Collider,Collider) Then
+						;	e\room\NPC[1]\State = 1
+						;EndIf
 						
 					Else
 						

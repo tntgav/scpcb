@@ -2204,16 +2204,14 @@ Function UpdateNPCs()
 						
 						If KillTimer => 0 Then
 							dist = EntityDistance(n\Collider,Collider)
-							Local DetectDistance# = 11.0
 							Local ShootAccuracy# = 0.9
 
 							;If at Gate B increse his distance so he can shoot from the roof.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
-								DetectDistance = 20.0
 								ShootAccuracy = 0.4
 							EndIf
 							
-							If dist < DetectDistance Then
+							If dist < 11.0 Then
 								pvt% = CreatePivot()
 								PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider))
 								PointEntity(pvt, Collider)

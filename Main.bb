@@ -2198,7 +2198,7 @@ Collisions HIT_DEAD, HIT_MAP, 2, 2
 
 Function MilliSecs2()
 	Local retVal% = MilliSecs()
-	If retVal<0 Then retVal=retVal+2147483648
+	If retVal < 0 Then retVal = -retVal
 	Return retVal
 End Function
 
