@@ -29,11 +29,11 @@ AppTitle "SCP - Containment Breach Launcher"
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%
 
+;If you're gonna revert this then let Regalis do it.
+Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
+
 Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
-
-;CHANGE IT FROM "1" TO "0" BEFORE COMPILING!!! - ENDSHN
-Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
 
 Dim ArrowIMG(4)
 
@@ -9186,7 +9186,7 @@ Function CatchErrors(location$)
 		MsgTimer = 20*70
 		CloseFile errF
 	EndIf
-End Function
+End Functio
 ;~IDEal Editor Parameters:
 ;~F#2174#21D4
 ;~B#11A1#13D9#1A5B

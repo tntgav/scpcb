@@ -141,8 +141,6 @@ Function UpdateEvents()
 								
 								
 								If e\EventState > 900+2.5*70 Then
-								If e\room\NPC[2]\State<>1 Then
-
 									e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
 									AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
 									MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
@@ -154,7 +152,6 @@ Function UpdateEvents()
 									Else
 										RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
 									EndIf
-							EndIf
 								EndIf
 								
 								If e\EventState < 900+4*70 Then
@@ -162,11 +159,9 @@ Function UpdateEvents()
 									RotateEntity Curr173\Collider,0,190,0
 									
 									If e\EventState > 900+70 And e\EventState < 900+2.5*70 Then
-									If e\room\NPC[2]\State<>1 Then
 										AnimateNPC(e\room\NPC[2], 1539, 1553, 0.2, False)
 										PointEntity(e\room\NPC[2]\obj, Curr173\Collider)
 										RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj),EntityYaw(e\room\NPC[2]\Collider),15.0), 0
-									EndIf
 									EndIf
 
 								Else
@@ -224,8 +219,7 @@ Function UpdateEvents()
 						If EntityDistance(e\room\Objects[0],Collider)<2.5 Then
 							If Rand(300)=2 Then PlaySound2(DecaySFX(Rand(1,3)),Camera,e\room\Objects[0], 3.0)
 						EndIf
-					End If
-					If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1 
+					EndIf
 					
 					If (e\EventState < 2000) Then
 						If e\SoundCHN = 0 Then
@@ -1607,8 +1601,8 @@ Function UpdateEvents()
 							e\room\NPC[0] = CreateNPC(NPCtypeApache, e\room\x, 100.0, e\room\z)
 							e\room\NPC[0]\State = 1
 							
-							e\room\NPC[1] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+0.3,EntityZ(e\room\Objects[4],True))
-							e\room\NPC[1]\State = 1
+							e\room\NPC[1] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+0.2,EntityZ(e\room\Objects[4],True))
+							e\room\NPC[1]\State = 0
 							
 							
 							pvt = CreatePivot()
@@ -1975,14 +1969,29 @@ Function UpdateEvents()
 							p\SizeChange = -0.00001
 						End If
 						
-						If EntityDistance(e\room\NPC[1]\Collider,Collider) < 8.0 Then
+						If Rand(250) = 1 And e\room\NPC[1]\State <> 1 Then 
+							If e\room\NPC[1]\PathStatus = 0 Then
+								If EntityDistance(e\room\NPC[1]\Collider, e\room\Objects[4]) < EntityDistance(e\room\NPC[1]\Collider, e\room\Objects[5]) Then
+									e\room\NPC[1]\PathStatus = FindPath(e\room\NPC[1], EntityX(e\room\Objects[5],True),EntityY(e\room\Objects[5],True),EntityZ(e\room\Objects[5],True))
+									e\room\NPC[1]\State = 3
+								Else
+									e\room\NPC[1]\PathStatus = FindPath(e\room\NPC[1], EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
+									e\room\NPC[1]\State = 3
+								EndIf
+							EndIf
+						EndIf	
+						
+						If (EntityDistance(e\room\NPC[1]\Collider,Collider) > 8.9) And (EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) Then
+							e\room\NPC[1]\State = 1
 							e\room\NPC[1]\State3 = 1
+						ElseIf EntityDistance(e\room\NPC[1]\Collider,Collider) < 8.9
+							e\room\NPC[1]\State3 = 0
 						EndIf
 
 						;helikopteri huomaa pelaajan -> ilmoittaa vartijoille
-						;If EntityVisible(e\room\NPC[0]\Collider,Collider) Then
-						;	e\room\NPC[1]\State = 1
-						;EndIf
+						If EntityVisible(e\room\NPC[0]\Collider,Collider) Then
+							e\room\NPC[1]\State3 = 1
+						EndIf
 						
 					Else
 						
@@ -9128,7 +9137,44 @@ Function UpdateEvents()
 	EndIf
 	
 End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#189C
-;~B#1489#218A
+;~F#309
+;~B#1492#2193
 ;~C#Blitz3D
