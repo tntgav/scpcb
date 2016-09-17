@@ -2209,7 +2209,7 @@ Function UpdateNPCs()
 
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
-								ShootAccuracy = 0.25
+								ShootAccuracy = 0.3
 								DetectDistance = 21.0
 							EndIf
 							
