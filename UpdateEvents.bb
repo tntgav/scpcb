@@ -1990,7 +1990,7 @@ Function UpdateEvents()
 						EndIf
 
 						;helikopteri huomaa pelaajan -> ilmoittaa vartijoille
-						If EntityVisible(e\room\NPC[0]\Collider,Collider) Then
+						If EntityVisible(e\room\NPC[0]\Collider,Collider) And (EntityDistance(e\room\NPC[1]\Collider,Collider) > 8.9) And ((EntityX(e\room\NPC[0]\Collider)+1.48) > EntityX(Collider)) Then
 							e\room\NPC[1]\State = 1
 							e\room\NPC[1]\State3 = 1
 						EndIf
