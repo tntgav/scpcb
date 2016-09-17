@@ -2209,7 +2209,7 @@ Function UpdateNPCs()
 
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
-								ShootAccuracy = 0.25
+								ShootAccuracy = 0.4
 								DetectDistance = 21.0
 							EndIf
 							
@@ -6113,6 +6113,10 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 						Injuries = Injuries + Rnd(0.1,0.5)
 					EndIf
 				EndIf
+				
+				If Injuries >= 3
+					If Rand(3) = 1 Then Kill()
+				EndIf
 			Else
 				Select Rand(6)
 					Case 1
@@ -6569,5 +6573,5 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#0
-;~B#197#129F#1339#13D2#1586#1691#184F#18AB
+;~B#197#129F#1339#13D2#1586#1691#1853#18AF
 ;~C#Blitz3D
