@@ -1822,6 +1822,7 @@ Function UpdateEvents()
 												If n\NPCtype = NPCtypeMTF
 													If n\State = 5 And EntityDistance(n\Collider,Collider)<3.0
 														If e\EventState3 = 0.0
+															PlaySound_Strict LoadTempSound("SFX\Ending\GateB\PlayerDetect.ogg")
 															e\EventState3 = e\EventState3 + FPSfactor
 															For n2.NPCs = Each NPCs
 																If n2\NPCtype = n\NPCtype
@@ -1853,11 +1854,6 @@ Function UpdateEvents()
 													EndIf
 												Next
 											ElseIf e\EventState3 > 500.0
-												For n.NPCs = Each NPCs
-													If n\NPCtype = NPCtypeMTF
-														RemoveNPC(n)
-													EndIf
-												Next
 												ent% = LoadSprite("GFX\blooddrop1.png",1+2)
 												EntityFX ent%,1+2+8
 												ScaleSprite ent%,1.5,1.5
@@ -1870,6 +1866,11 @@ Function UpdateEvents()
 												DeathMSG = ""
 												Kill()
 												BlinkTimer = -10
+												For n.NPCs = Each NPCs
+													If n\NPCtype = NPCtypeMTF
+														RemoveNPC(n)
+													EndIf
+												Next
 												RemoveEvent(e)
 												Exit
 											EndIf

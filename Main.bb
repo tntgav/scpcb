@@ -29,11 +29,11 @@ AppTitle "SCP - Containment Breach Launcher"
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%
 
-;If you're gonna revert this then let Regalis do it.
-Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
-
 Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
+
+;If you're gonna revert this then let Regalis do it.
+Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
 
 Dim ArrowIMG(4)
 
