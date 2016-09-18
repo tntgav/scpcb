@@ -39,9 +39,11 @@ Bug Fixes:
 - Fixed a bug that caused SCP-096 to spawn too frequently.
 - Adjusted the item overlapping detection code, which caused some items to be pushed into walls and fall through the map.
 - Fixed a bug that caused the Tesla gate’s event to constantly loop if the player exits the area fast enough.
+- Adjusted the maintenance tunnel code so that its ambient light no longer leaks into other rooms.
 - Fixed lag spikes involving monitors and a bug that caused the HUD to draw over screens.
 - Fixed 079's broadcasts playing during Gate A, Gate B and when the game is paused.
 - Fixed some issues relating to Windows 10. This includes a fatal bug that caused no items to spawn in the map.
+- Fixed the achievement descriptions leaking outside of their tooltips.
 - Fixed several issues with both Gate A endings.
 
 ----------------------------------------------------------------------------------
