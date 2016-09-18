@@ -6564,7 +6564,6 @@ Function UpdateEvents()
 			Case "room205"
 				;[Block]
 				If PlayerRoom = e\room Then
-					DebugLog e\EventState
 					ShouldPlay = 15
 					If e\EventState=0 Or e\room\Objects[0]=0 Then
 						If e\EventStr = ""
@@ -6751,15 +6750,13 @@ Function UpdateEvents()
 									e\EventState3=0
 								EndIf
 						End Select
+						
 					EndIf
 				Else If (e\room\Objects[3]<>0)
 					HideEntity(e\room\Objects[3])
 					HideEntity(e\room\Objects[4])
 					HideEntity(e\room\Objects[5])
 					HideEntity(e\room\Objects[6])
-				Else
-					e\EventState = 0
-					e\EventStr = ""
 				EndIf
 				;[End block]
 			Case "room860"
@@ -9165,7 +9162,8 @@ End Function
 
 
 
+
 ;~IDEal Editor Parameters:
 ;~F#309
-;~B#1486#218A
+;~B#1486#2187
 ;~C#Blitz3D
