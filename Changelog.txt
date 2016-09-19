@@ -25,10 +25,11 @@ v1.3.2
 - Re-positioned the Gate B guard so it will now properly shoot the player when they are within range.
 - Added an option to disable console functionality while in-game.
 - The player can now save at the entrance to Gate A.
-- Refactored the SFX folder.
+- Refactored the SFX folder whilst removing duplicate/unused sounds. 
 
 Bug Fixes:
 - Fixed a crash involving the disabling of anti-aliased text while in-game.
+- Fixed a runtime error caused by saving and reloading inside SCP-205's chamber. 
 - Added extra hitboxes to room049, room3storage and room3z2, preventing the player from falling through the floor in certain spots of these rooms.
 - Adjusted SCP-096's collision detection.
 - SCP-096 will no longer become triggered when looking at its face while the player's eyes are closed.
