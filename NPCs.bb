@@ -2204,13 +2204,13 @@ Function UpdateNPCs()
 						
 						If KillTimer => 0 Then
 							dist = EntityDistance(n\Collider,Collider)
-							Local DetectDistance# = 11.0
 							Local ShootAccuracy# = 0.9
+							Local DetectDistance# = 11.0
 
-							;If at Gate B increse his distance so he can shoot from the roof.
+							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
-								DetectDistance = 20.0
-								ShootAccuracy = 0.4
+								ShootAccuracy = 0.3
+								DetectDistance = 21.0
 							EndIf
 							
 							If dist < DetectDistance Then
@@ -2230,7 +2230,9 @@ Function UpdateNPCs()
 									EntityPick(pvt, dist)
 									If PickedEntity() = Collider Or n\State3=1 Then
 										
-										DeathMSG = ""
+										If PlayerRoom\RoomTemplate\Name = "exit1" Then
+											DeathMSG = Chr(34)+"Agent G. to control. Shot down a runaway Class D at Gate B."+Chr(34)
+										EndIf
 										
 										PlaySound2(GunshotSFX, Camera, n\Collider, 35)
 										
@@ -2858,7 +2860,7 @@ Function UpdateNPCs()
 													
 													DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate B."+Chr(34)
 													
-													Shoot( EntityX(pvt),EntityY(pvt), EntityZ(pvt),(15/dist)*(n\State=2),(n\State=2))
+													Shoot( EntityX(pvt),EntityY(pvt), EntityZ(pvt),(10/dist)*(n\State=2),(n\State=2))
 													
 													n\Reload = 5
 												EndIf
@@ -6066,7 +6068,7 @@ End Function
 Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 	
 	;muzzle flash
-	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
+	Local p.particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
 	TurnEntity p\obj, 0,0,Rnd(360)
 	p\Achange = -0.15
 	
@@ -6095,15 +6097,25 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 							ShotMessageUpdate = "A bullet hit your right leg."
 							Injuries = Injuries + Rnd(0.8,1.2)
 						Case 8
-							Kill()
+							BlurTimer = 500
+							Stamina = 0
+							ShotMessageUpdate = "A bullet struck your neck, making you gasp."
+							Injuries = Injuries + Rnd(1.2,1.6)
 					End Select	
 				Else
 					If Rand(10)=1 Then
-						Kill()
+						BlurTimer = 500
+						Stamina = Stamina - 1
+						ShotMessageUpdate = "A bullet hit your chest. The vest absorbed some of the damage."
+						Injuries = Injuries + Rnd(0.8,1.1)
 					Else
 						ShotMessageUpdate = "A bullet hit your chest. The vest absorbed most of the damage."
 						Injuries = Injuries + Rnd(0.1,0.5)
 					EndIf
+				EndIf
+				
+				If Injuries >= 3
+					If Rand(3) = 1 Then Kill()
 				EndIf
 			Else
 				Select Rand(6)
@@ -6150,14 +6162,12 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 			
 			EntityPick(pvt, 2.5)
 			
-			FreeEntity pvt
-			
 			If PickedEntity() <> 0 Then 
 				PlaySound2(Gunshot3SFX, Camera, pvt, 0.4, Rnd(0.8,1.0))
 				
 				If particles Then 
 					;dust/smoke particles
-					p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
+					p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
 					p\speed = 0.001
 					p\SizeChange = 0.003
 					p\A = 0.8
@@ -6165,7 +6175,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 					RotateEntity p\pvt, EntityPitch(pvt)-180, EntityYaw(pvt),0
 					
 					For i = 0 To Rand(2,3)
-						p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
+						p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
 						p\speed = 0.02
 						p\A = 0.8
 						p\Achange = -0.01
@@ -6183,6 +6193,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 					ScaleSprite de\obj, de\Size, de\Size
 				EndIf				
 			EndIf
+			FreeEntity pvt
 			
 		EndIf
 		
@@ -6558,7 +6569,8 @@ End Function
 
 
 
+
 ;~IDEal Editor Parameters:
 ;~F#0
-;~B#197#129B#1335#13CE#1582#168D#184B#18A7
+;~B#197#129F#1339#13D2#1586#1691#1852#18AE
 ;~C#Blitz3D

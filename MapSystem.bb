@@ -1962,8 +1962,7 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[4]\dir = 1 : r\RoomDoors[4]\AutoClose = False : r\RoomDoors[4]\open = False
 			PositionEntity(r\RoomDoors[4]\buttons[1], r\x+352*RoomScale, 0.7, r\z-528*RoomScale, True)
 			RotateEntity r\RoomDoors[4]\buttons[1],0,r\angle-90,0,True
-			PositionEntity(r\RoomDoors[4]\buttons[0], r\x, 7.0, r\z, True)
-			
+			PositionEntity(r\RoomDoors[4]\buttons[0], r\x, 7.0, r\z, True)		
 			
 			;k�yt�v�n takaosa
 			r\Objects[3] = CreatePivot()
@@ -1972,11 +1971,11 @@ Function FillRoom(r.Rooms)
 			
 			;oikean puolen watchpoint 1
 			r\Objects[4] = CreatePivot()
-			PositionEntity(r\Objects[4], r\x+5167.34*RoomScale, 12128.0*RoomScale, r\z-2752.5*RoomScale, True)
+			PositionEntity(r\Objects[4], r\x+5203.36*RoomScale, 12128.0*RoomScale, r\z-1739.19*RoomScale, True)
 			EntityParent r\Objects[4], r\obj
 			;oikean puolen watchpoint 2
 			r\Objects[5] = CreatePivot()
-			PositionEntity(r\Objects[5], r\x+3264.0*RoomScale, 12192.0*RoomScale, r\z-4480.0*RoomScale, True)
+			PositionEntity(r\Objects[5], r\x+4363.02*RoomScale, 10536.0*RoomScale, r\z+2766.16*RoomScale, True)
 			EntityParent r\Objects[5], r\obj	
 			;vasemman puolen watchpoint 1
 			r\Objects[6] = CreatePivot()
@@ -5239,7 +5238,7 @@ Function InitWayPoints(loadingstart=45)
 		Next
 	Next
 	
-	DebugLog "InitWaypoints() - "+(MilliSecs()-temper)
+	DebugLog "InitWaypoints() - "+(MilliSecs2()-temper)
 	
 End Function
 
@@ -5546,7 +5545,6 @@ Function UpdateScreens()
 						s\img = LoadImage_Strict("GFX\screens\"+s\imgpath)
 						s\img = ResizeImage2(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
 						MaskImage s\img, 255,0,255
-						s\img = ResizeImage2(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
 						PlaySound_Strict ButtonSFX
 						MouseUp1=False
 					EndIf
@@ -7718,7 +7716,14 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	Next
 	
 End Function
+
+
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#2#A#CEA#11EF#13C0#1DE1#1DF8
-;~B#1228
+;~F#2#A#CE9#11EE#13BF#1DDF#1DF6
+;~B#1227
 ;~C#Blitz3D
