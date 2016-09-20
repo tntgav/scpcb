@@ -141,6 +141,7 @@ Function UpdateEvents()
 								
 								
 								If e\EventState > 900+2.5*70 Then
+									If e\room\NPC[2]\State<>1
 									e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
 									AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
 									MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
@@ -152,6 +153,7 @@ Function UpdateEvents()
 									Else
 										RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
 									EndIf
+								EndIf
 								EndIf
 								
 								If e\EventState < 900+4*70 Then
@@ -184,8 +186,11 @@ Function UpdateEvents()
 										ResetEntity Curr173\Collider
 									EndIf
 								EndIf
+								
+								If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1
 							Else
 								CanSave = True
+								If e\room\NPC[2]\State<>1
 								If EntityX(Collider)<(e\room\x+1384*RoomScale) Then e\EventState = Max(e\EventState,900)
 								
 								If e\room\RoomDoors[5]\openstate=0 Then 
@@ -196,6 +201,7 @@ Function UpdateEvents()
 									HideEntity e\room\NPC[2]\Collider
 									e\EventState2=1
 								EndIf
+								endif
 							EndIf
 						EndIf
 						
