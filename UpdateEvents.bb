@@ -176,6 +176,7 @@ Function UpdateEvents()
 									
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
 									
+									If e\room\NPC[2]\State <> 1
 									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
 										e\room\RoomDoors[5]\open = False
 										LightBlink = 3.0
@@ -186,8 +187,10 @@ Function UpdateEvents()
 										ResetEntity Curr173\Collider
 									EndIf
 								EndIf
+								EndIf
 								
 								If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1
+								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = true
 							Else
 								CanSave = True
 								If e\room\NPC[2]\State<>1
@@ -201,7 +204,7 @@ Function UpdateEvents()
 									HideEntity e\room\NPC[2]\Collider
 									e\EventState2=1
 								EndIf
-								endif
+								EndIf
 							EndIf
 						EndIf
 						
