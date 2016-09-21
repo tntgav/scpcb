@@ -718,6 +718,8 @@ Function UpdateConsole()
 
 				Case "disable173"
 					Curr173\Idle = 3 ;This phenominal comment is brought to you by PolyFox. His absolute wisdom in this fatigue of knowledge brought about a new era of 173 state checks.
+					HideEntity Curr173\obj
+					HideEntity Cur173\Collider
 
 				Case "enable173"
 					Curr173\Idle = False
