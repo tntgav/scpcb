@@ -190,7 +190,7 @@ Function UpdateEvents()
 								EndIf
 								
 								If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1
-								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = true
+								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = True
 							Else
 								CanSave = True
 								If e\room\NPC[2]\State<>1
@@ -7367,12 +7367,14 @@ Function UpdateEvents()
 				
 			Case "testroom173"
 				;[Block]
-				If PlayerRoom = e\room Then	
+				If PlayerRoom = e\room	
 					If Curr173\Idle = 0 Then 
 						If e\EventState = 0 Then
+							If e\room\RoomDoors[0]\open = True
 							PositionEntity(Curr173\Collider, EntityX(e\room\Objects[0], True), 0.5, EntityZ(e\room\Objects[0], True))
 							ResetEntity(Curr173\Collider)
 							e\EventState = 1
+							EndIf
 						Else
 							ShowEntity (e\room\Objects[2])
 							;start a timer for 173 breaking through the window
@@ -8057,7 +8059,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 					EndIf
-					PositionEntity e\room\Objects[0],0,800,0
+					;PositionEntity e\room\Objects[0],0,800,0
 					CameraFogRange Camera,40,80
 					CameraFogColor Camera,96,97,104
 					CameraClsColor Camera,96,97,104
@@ -8072,6 +8074,10 @@ Function UpdateEvents()
 						ShowEntity NTF_1499Sky
 						Update1499Sky()
 						ShouldPlay = 18
+						If EntityY(Collider)<800.0 Then PositionEntity Collider,EntityX(Collider),800.1,EntityZ(Collider),True
+						ResetEntity Collider
+					Else
+						DropSpeed = 0
 					EndIf
 					CurrStepSFX=3
 				Else

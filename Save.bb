@@ -910,11 +910,20 @@ Function LoadGame(file$)
 		;Reset for the monitor loading and stuff for room2sl
 		If e\EventName = "room2sl"
 			e\EventState = 0.0
+			e\EventStr = ""
 			DebugLog "Reset Eventstate in "+e\EventName
 		;Only reset if the dimension has already been generated and the player wasn't saving in it
 		ElseIf e\EventName = "dimension1499"
 			If e\EventState = 1.0
 				e\EventState = 0.0
+				e\EventStr = ""
+				For n.NPCs = Each NPCs
+					If n\NPCtype = NPCtype1499
+						If n\InFacility = 0
+							RemoveNPC(n)
+						EndIf
+					EndIf
+				Next
 				DebugLog "Reset Eventstate in "+e\EventName
 			EndIf
 		EndIf
