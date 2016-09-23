@@ -25,6 +25,7 @@ v1.3.2
 - Re-positioned the Gate B guard so it will now properly shoot the player when they are within range.
 - Added an option to disable console functionality while in-game.
 - The player can now save at the entrance to Gate A.
+- The keys for quick saving and toggling the console can now be rebound in the controls menu.
 - Refactored the SFX folder whilst removing duplicate/unused sounds. 
 
 Bug Fixes:

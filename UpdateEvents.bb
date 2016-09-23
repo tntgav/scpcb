@@ -39,7 +39,7 @@ Function UpdateEvents()
 						CameraFogRange(Camera, CameraFogNear, CameraFogFar)
 						CameraFogMode(Camera, 1)
 						If SelectedDifficulty\saveType = SAVEANYWHERE Then
-							Msg = "Press F5 to save."
+							Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 							MsgTimer = 70*4
 						ElseIf SelectedDifficulty\saveType = SAVEONSCREENS Then
 							Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
@@ -365,7 +365,7 @@ Function UpdateEvents()
 								EndIf
 							ElseIf e\EventState3 < 35
 								If Inventory(0)<>Null Then
-									Msg = "Press "+KeyName(Min(KEY_INV,210))+" to open the inventory."
+									Msg = "Press "+KeyName(KEY_INV)+" to open the inventory."
 									MsgTimer=70*4
 									e\EventState3 = 40
 									Exit
@@ -1126,7 +1126,7 @@ Function UpdateEvents()
 										For r.Rooms = Each Rooms
 											If r\RoomTemplate\Name = "start" Then
 												DebugLog "tostart"
-												;Msg = "Press F5 to save."
+												;Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 												;MsgTimer = 70*8
 												
 												PlayerRoom = r

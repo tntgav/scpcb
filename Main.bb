@@ -201,9 +201,6 @@ InitAAFont()
 ;don't match their "internal name" (i.e. their display name in applications
 ;like Word and such). As a workaround, I moved the files and renamed them so they
 ;can load without FastText.
-;An actual fix would require a modified version of Blitz3D, which may happen soon
-;since it's possible to replace the Memory Access Violation message with a much more
-;descriptive one.
 Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
 Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
@@ -225,10 +222,17 @@ Global mouse_left_limit% = 250, mouse_right_limit% = GraphicsWidth () - 250
 Global mouse_top_limit% = 150, mouse_bottom_limit% = GraphicsHeight () - 150 ; As above.
 Global mouse_x_speed_1#, mouse_y_speed_1#
 
-Global KEY_RIGHT=GetINIInt(OptionFile, "options", "Right key"), KEY_LEFT=GetINIInt(OptionFile, "options", "Left key")
-Global KEY_UP=GetINIInt(OptionFile, "options", "Up key"), KEY_DOWN=GetINIInt(OptionFile, "options", "Down key")
-Global KEY_BLINK=GetINIInt(OptionFile, "options", "Blink key"), KEY_SPRINT=GetINIInt(OptionFile, "options", "Sprint key")
-Global KEY_INV=GetINIInt(OptionFile, "options", "Inventory key"), KEY_CROUCH=GetINIInt(OptionFile, "options", "Crouch key")
+Global KEY_RIGHT = GetINIInt(OptionFile, "binds", "Right key")
+Global KEY_LEFT = GetINIInt(OptionFile, "binds", "Left key")
+Global KEY_UP = GetINIInt(OptionFile, "binds", "Up key")
+Global KEY_DOWN = GetINIInt(OptionFile, "binds", "Down key")
+
+Global KEY_BLINK = GetINIInt(OptionFile, "binds", "Blink key")
+Global KEY_SPRINT = GetINIInt(OptionFile, "binds", "Sprint key")
+Global KEY_INV = GetINIInt(OptionFile, "binds", "Inventory key")
+Global KEY_CROUCH = GetINIInt(OptionFile, "binds", "Crouch key")
+Global KEY_SAVE = GetINIInt(OptionFile, "binds", "Save key")
+Global KEY_CONSOLE = GetINIInt(OptionFile, "binds", "Console key")
 
 Const INFINITY# = (999.0) ^ (99999.0), NAN# = (-1.0) ^ (0.5)
 
@@ -316,6 +320,7 @@ Dim RadioCHN%(8)
 Dim OldAiPics%(5)
 
 Global PlayTime%
+Global ConsoleFlush%
 
 Global InfiniteStamina% = False
 
@@ -1044,6 +1049,8 @@ Function UpdateConsole()
 				Case "teleport173"
 					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
 					ResetEntity Curr173\Collider
+				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
+					ConsoleFlush = True
 				Default
 					CreateConsoleMsg("Command not found.")
 			End Select
@@ -2541,7 +2548,7 @@ Repeat
 		
 		;[End block]
 		
-		If KeyHit(63) Then
+		If KeyHit(KEY_SAVE) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
 				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
@@ -2581,24 +2588,24 @@ Repeat
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
 			If (Msg<>"Game progress saved." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
-				Msg = "Press F5 to save."
+				Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 				MsgTimer = 70*5
 			EndIf
 			
 			If MouseHit2 Then SelectedMonitor = Null
 		EndIf
 		
-		If KeyHit(61) Then
+		If KeyHit(KEY_CONSOLE) Then
 			If CanOpenConsole
-			If ConsoleOpen Then
-				UsedConsole = True
-				ResumeSounds()
-				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
-			Else
-				PauseSounds()
-			EndIf
-			ConsoleOpen = (Not ConsoleOpen)
-			FlushKeys()
+				If ConsoleOpen Then
+					UsedConsole = True
+					ResumeSounds()
+					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+				Else
+					PauseSounds()
+				EndIf
+				ConsoleOpen = (Not ConsoleOpen)
+				FlushKeys()
 			EndIf
 		EndIf
 		
@@ -5500,14 +5507,16 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 				
-				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
-				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
-				PutINIValue(OptionFile, "options", "Up key", KEY_UP)
-				PutINIValue(OptionFile, "options", "Down key", KEY_DOWN)
-				PutINIValue(OptionFile, "options", "Blink key", KEY_BLINK)
-				PutINIValue(OptionFile, "options", "Sprint key", KEY_SPRINT)
-				PutINIValue(OptionFile, "options", "Inventory key", KEY_INV)
-				PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
+				PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
+				PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
+				PutINIValue(OptionFile, "binds", "Up key", KEY_UP)
+				PutINIValue(OptionFile, "binds", "Down key", KEY_DOWN)
+				PutINIValue(OptionFile, "binds", "Blink key", KEY_BLINK)
+				PutINIValue(OptionFile, "binds", "Sprint key", KEY_SPRINT)
+				PutINIValue(OptionFile, "binds", "Inventory key", KEY_INV)
+				PutINIValue(OptionFile, "binds", "Crouch key", KEY_CROUCH)
+				PutINIValue(OptionFile, "binds", "Save key", KEY_SAVE)
+				PutINIValue(OptionFile, "binds", "Console key", KEY_CONSOLE)
 				
 				AntiAlias Opt_AntiAlias
 				;TextureLodBias TextureFloat#
@@ -5696,23 +5705,27 @@ Function DrawMenu()
 					AAText(x, y, "Control configuration:")
 					y = y + 10*MenuScale
 					
-					AAText(x, y + 20 * MenuScale, "Up")
+					AAText(x, y + 20 * MenuScale, "Move Forward")
 					InputBox(x + 60 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
-					AAText(x, y + 40 * MenuScale, "Left")
+					AAText(x, y + 40 * MenuScale, "Strafe Left")
 					InputBox(x + 60 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
-					AAText(x, y + 60 * MenuScale, "Down")
+					AAText(x, y + 60 * MenuScale, "Move Backward")
 					InputBox(x + 60 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
-					AAText(x, y + 80 * MenuScale, "Right")
-					InputBox(x + 60 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
+					AAText(x, y + 80 * MenuScale, "Strafe Right")
+					InputBox(x + 60 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)
+					AAText(x, y + 100 * MenuScale, "Quick Save")
+					InputBox(x + 60 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)	
 					
-					AAText(x + 220 * MenuScale, y + 20 * MenuScale, "Blink")
+					AAText(x + 220 * MenuScale, y + 20 * MenuScale, "Manual Blink")
 					InputBox(x + 320 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
 					AAText(x + 220 * MenuScale, y + 40 * MenuScale, "Sprint")
 					InputBox(x + 320 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
-					AAText(x + 220 * MenuScale, y + 60 * MenuScale, "Inventory")
+					AAText(x + 220 * MenuScale, y + 60 * MenuScale, "Open/Close Inventory")
 					InputBox(x + 320 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
 					AAText(x + 220 * MenuScale, y + 80 * MenuScale, "Crouch")
 					InputBox(x + 320 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					AAText(x + 220 * MenuScale, y + 100 * MenuScale, "Open/Close Console")
+					InputBox(x + 330 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
 					
 					For i = 0 To 227
 						If KeyHit(i) Then key = i : Exit
@@ -5735,6 +5748,10 @@ Function DrawMenu()
 								KEY_INV = key
 							Case 10
 								KEY_CROUCH = key
+							Case 11
+								KEY_SAVE = key
+							Case 12
+								KEY_CONSOLE = key
 						End Select
 						SelectedInputBox = 0
 					EndIf

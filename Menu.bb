@@ -241,14 +241,16 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 					
-					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
-					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
-					PutINIValue(OptionFile, "options", "Up key", KEY_UP)
-					PutINIValue(OptionFile, "options", "Down key", KEY_DOWN)
-					PutINIValue(OptionFile, "options", "Blink key", KEY_BLINK)
-					PutINIValue(OptionFile, "options", "Sprint key", KEY_SPRINT)
-					PutINIValue(OptionFile, "options", "Inventory key", KEY_INV)
-					PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
+					PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
+					PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
+					PutINIValue(OptionFile, "binds", "Up key", KEY_UP)
+					PutINIValue(OptionFile, "binds", "Down key", KEY_DOWN)
+					PutINIValue(OptionFile, "binds", "Blink key", KEY_BLINK)
+					PutINIValue(OptionFile, "binds", "Sprint key", KEY_SPRINT)
+					PutINIValue(OptionFile, "binds", "Inventory key", KEY_INV)
+					PutINIValue(OptionFile, "binds", "Crouch key", KEY_CROUCH)
+					PutINIValue(OptionFile, "binds", "Save key", KEY_SAVE)
+					PutINIValue(OptionFile, "binds", "Console key", KEY_CONSOLE)
 					
 					UserTrackCheck% = 0
 					UserTrackCheck2% = 0
@@ -715,23 +717,27 @@ Function UpdateMainMenu()
 					AAText(x + 20 * MenuScale, y, "Control configuration:")
 					y = y + 10*MenuScale
 					
-					AAText(x + 20 * MenuScale, y + 20 * MenuScale, "Up")
+					AAText(x + 20 * MenuScale, y + 20 * MenuScale, "Move Forward")
 					InputBox(x + 170 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
-					AAText(x + 20 * MenuScale, y + 40 * MenuScale, "Left")
+					AAText(x + 20 * MenuScale, y + 40 * MenuScale, "Strafe Left")
 					InputBox(x + 170 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
-					AAText(x + 20 * MenuScale, y + 60 * MenuScale, "Down")
+					AAText(x + 20 * MenuScale, y + 60 * MenuScale, "Move Backward")
 					InputBox(x + 170 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
-					AAText(x + 20 * MenuScale, y + 80 * MenuScale, "Right")
+					AAText(x + 20 * MenuScale, y + 80 * MenuScale, "Strafe Right")
 					InputBox(x + 170 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
+					AAText(x + 20 * MenuScale, y + 100 * MenuScale, "Quick Save")
+					InputBox(x = 170 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)
 					
-					AAText(x + 300 * MenuScale, y + 20 * MenuScale, "Blink")
+					AAText(x + 300 * MenuScale, y + 20 * MenuScale, "Manual Blink")
 					InputBox(x + 450 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
 					AAText(x + 300 * MenuScale, y + 40 * MenuScale, "Sprint")
 					InputBox(x + 450 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
-					AAText(x + 300 * MenuScale, y + 60 * MenuScale, "Inventory")
+					AAText(x + 300 * MenuScale, y + 60 * MenuScale, "Open/Close Inventory")
 					InputBox(x + 450 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
 					AAText(x + 300 * MenuScale, y + 80 * MenuScale, "Crouch")
-					InputBox(x + 450 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					InputBox(x + 450 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)	
+					AAText(x + 300 * MenuScale, y + 100 * MenuScale, "Open/Close Console")
+					InputBox(x = 450 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
 					
 					For i = 0 To 227
 						If KeyHit(i) Then key = i : Exit
@@ -754,6 +760,10 @@ Function UpdateMainMenu()
 								KEY_INV = key
 							Case 10
 								KEY_CROUCH = key
+							Case 11
+								KEY_SAVE = key
+							Case 12
+								KEY_CONSOLE = key
 						End Select
 						SelectedInputBox = 0
 					EndIf
