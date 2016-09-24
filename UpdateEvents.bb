@@ -285,7 +285,7 @@ Function UpdateEvents()
 						ShouldPlay = 13
 						
 						;slow the player down a bit to match his speed to the guards
-						CurrSpeed = CurrSpeed - (CurrSpeed * 0.015 * FPSfactor)
+						CurrSpeed = CurrSpeed - (CurrSpeed * 0.01 * FPSfactor)
 						
 						If e\EventState3 < 170 Then 
 							If e\EventState3 = 1.0 Then
@@ -3509,14 +3509,15 @@ Function UpdateEvents()
 						
 						If Curr106\State < -10 And e\EventState = 0 Then 
 								For i = 0 To 2
-								If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
-								;play the activation sound
+									If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
+										;play the activation sound
 										If KillTimer => 0 Then 
 											StopChannel(e\SoundCHN)
 											e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
 											HideEntity e\room\Objects[4]
 											e\EventState = 1
-										GiveAchievement(AchvTesla)
+											Curr106\State = 70 * 60 * Rand(10,13)
+											GiveAchievement(AchvTesla)
 											Exit
 										EndIf
 									EndIf

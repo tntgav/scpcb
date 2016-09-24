@@ -3477,18 +3477,22 @@ Function UpdateNPCs()
 							
 							n\State = 3
 						ElseIf PlayerSoundVolume*1.6>dist
-							If n\State<>1 Then
+							If n\State<>1 And n\Reload <= 0 Then
 								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 								n\Sound = LoadSound_Strict("SFX\SCP\939\"+(n\ID Mod 3)+"Alert"+Rand(1,3)+".ogg")
 								n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider)	
 								
 								n\Frame = 175
+								n\Reload = 70 * 3
 								;SetAnimTime(n\obj, 175)	
 							EndIf
 							
 							n\State = 1
 							
 						EndIf
+						
+						n\Reload = n\Reload - FPSfactor
+						
 					EndIf				
 					
 					RotateEntity n\Collider, 0, EntityYaw(n\Collider), 0, True	

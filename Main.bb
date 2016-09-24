@@ -5323,8 +5323,8 @@ Function DrawGUI()
 					SelectedItem\state = 1
 					SelectedItem = Null
 				Case "oldpaper"
-					If SelectedItem\itemtemplate\img=0 Then
-						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+					If SelectedItem\itemtemplate\img = 0 Then
+						SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
 						
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
@@ -5349,7 +5349,6 @@ Function DrawGUI()
 					EndIf
 					
 					Msg = ""
-					MsgTimer = 70*10
 					
 					SelectedItem\state = 1
 					SelectedItem = Null
@@ -6652,8 +6651,6 @@ Function NullGame()
 	
 	HideDistance# = 15.0
 	
-	CameraZoom Camera, 1.0
-	
 	For lvl = 0 To 0
 		For x = 0 To MapWidth - 1
 			For y = 0 To MapHeight - 1
@@ -6685,7 +6682,7 @@ Function NullGame()
 	Infect = 0
 	
 	For i = 0 To 5
-		SCP1025state[i]=0
+		SCP1025state[i] = 0
 	Next
 	
 	SelectedEnding = ""
