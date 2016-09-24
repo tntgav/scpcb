@@ -2250,7 +2250,7 @@ Function UpdateNPCs()
 								
 								FreeEntity(pvt)									
 							EndIf
-							n\BoneToManipulate = "spine"
+							n\BoneToManipulate = "chest"
 							n\ManipulateBone = True
 							n\ManipulationType = 1
 						Else
@@ -2396,7 +2396,7 @@ Function UpdateNPCs()
 									SetNPCFrame(n, 1553)
 								EndIf
 								
-								n\BoneToManipulate = "spine"
+								n\BoneToManipulate = "chest"
 								n\ManipulateBone = True
 								n\ManipulationType = 1
 							Else
@@ -6068,7 +6068,7 @@ End Function
 Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 	
 	;muzzle flash
-	Local p.particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
+	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
 	TurnEntity p\obj, 0,0,Rnd(360)
 	p\Achange = -0.15
 	
@@ -6383,8 +6383,8 @@ Function ManipulateNPCBones()
 					;PointEntity bone%,Collider
 					;RotateEntity bone%,0,EntityYaw(bone%),0
 					PointEntity pvt%,Camera
-					n\BoneYaw# = CurveAngle(EntityPitch(pvt%),n\BoneYaw#,10.0)
-					RotateEntity bone%,0,-n\BoneYaw#,0
+					n\BonePitch# = CurveAngle(EntityPitch(pvt%),n\BonePitch#,10.0)
+					RotateEntity bone%,0,-n\BonePitch#-10,0
 				Case 2 ;<--- looking away from SCP-096
 					PointEntity bone%,Curr096\obj
 					n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)

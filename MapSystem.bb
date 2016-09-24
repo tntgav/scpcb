@@ -4949,7 +4949,9 @@ Function UpdateRooms()
 				z = Abs(EntityZ(Collider,True)-EntityZ(PlayerRoom\AdjDoor[i]\frameobj,True))
 				If PlayerRoom\AdjDoor[i]\openstate = 0 Then
 					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-				ElseIf Abs(DeltaYaw(Camera,PlayerRoom\Adjacent[i]\obj))>90+(((8.0-Max(x,z))/8.0)*90.0) Then
+				;ElseIf Abs(DeltaYaw(Camera,PlayerRoom\Adjacent[i]\obj))>90+(((8.0-Max(x,z))/8.0)*90.0) Then
+				;	EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
+				ElseIf (Not EntityInView(PlayerRoom\AdjDoor[i]\frameobj,Camera))
 					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
 				Else
 					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),1)
