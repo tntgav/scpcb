@@ -1886,12 +1886,12 @@ Function UseDoor(d.Doors, showmsg%=True)
 		If temp <> 0 Then
 			PlaySound_Strict ScannerSFX1
 			Msg = "You place the palm of the hand onto the scanner. The scanner reads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
-			MsgTimer = 70 * 5
+			MsgTimer = 70 * 10
 		Else
 			If showmsg = True Then 
 				PlaySound_Strict ScannerSFX2
 				Msg = "You placed your palm onto the scanner. The scanner reads: "+Chr(34)+"DNA does not match known sample. Access denied."+Chr(34)
-				MsgTimer = 70 * 5
+				MsgTimer = 70 * 10
 			EndIf
 			Return			
 		EndIf
