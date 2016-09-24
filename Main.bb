@@ -1053,7 +1053,7 @@ Function UpdateConsole()
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
 					ConsoleFlush = True 
 					
-					If ConsoleFlush Then
+					If ConsoleFlushSnd = 0 Then
 						ConsoleFlushSnd = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(83)+Chr(67)+Chr(80)+Chr(92)+Chr(57)+Chr(55)+Chr(48)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
 						If MusicCHN <> 0 Then StopChannel MusicCHN
 						ConsoleMusFlush% = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(77)+Chr(117)+Chr(115)+Chr(105)+Chr(99)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
@@ -2533,7 +2533,7 @@ Repeat
 				SelectedScreen = Null
 				SelectedMonitor = Null
 				BlurTimer = Abs(FallTimer*10)
-				FallTimer=FallTimer-FPSfactor
+				FallTimer = FallTimer-FPSfactor
 				darkA = Max(darkA, Min(Abs(FallTimer / 400.0), 1.0))				
 			EndIf
 			
@@ -6956,10 +6956,8 @@ End Function
 
 Function UpdateMusic()
 	
-	If ConsoleFlush And (Not ConsoleOpen) Then
-		If Not ChannelPlaying(MusicCHN) Then
-			MusicCHN = PlaySound(ConsoleMusFlush)
-		EndIf
+	If ConsoleFlush Then
+		If Not ChannelPlaying(MusicCHN) Then MusicCHN = PlaySound(ConsoleMusFlush)
 	ElseIf (Not PlayCustomMusic)
 		If FPSfactor > 0 Or OptionsMenu = 2 Then 
 			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
@@ -9220,7 +9218,6 @@ Function CatchErrors(location$)
 		CloseFile errF
 	EndIf
 End Function
-
 
 
 
