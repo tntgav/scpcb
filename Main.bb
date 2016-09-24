@@ -956,6 +956,26 @@ Function UpdateConsole()
 							Exit
 						EndIf
 					Next
+					
+				Case "toggle_079_deal"
+					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					
+					Select StrTemp
+						Case "a"
+							For e.Events = Each Events
+								If e\EventName="gateaentrance" Then
+									e\EventState3 = (Not e\EventState3)
+									Exit
+								EndIf
+							Next
+						Case "b"
+							For e.Events = Each Events
+								If e\EventName="exit1" Then
+									e\EventState3 = (Not e\EventState3)
+									Exit
+								EndIf
+							Next	
+					End Select
 
 				Case "kill","suicide"
 					KillTimer = -1
