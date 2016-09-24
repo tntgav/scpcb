@@ -104,7 +104,11 @@ Function PlaySound_Strict%(sndHandle%)
 							EndIf
 						EndIf
 					EndIf
-					snd\channels[i] = PlaySound(snd\internalHandle)
+					If ConsoleFlush Then
+						snd\channels[i] = PlaySound(ConsoleFlushSnd)
+					Else
+						snd\channels[i] = PlaySound(snd\internalHandle)
+					EndIf
 					ChannelVolume snd\channels[i],SFXVolume#
 					snd\releaseTime = MilliSecs2()+5000 ;release after 5 seconds
 					Return snd\channels[i]
@@ -127,7 +131,11 @@ Function PlaySound_Strict%(sndHandle%)
 						EndIf
 					EndIf
 				EndIf
-				snd\channels[i] = PlaySound(snd\internalHandle)
+				If ConsoleFlushSnd Then
+					snd\channels[i] = PlaySound(ConsoleFlushSnd)
+				Else
+					snd\channels[i] = PlaySound(snd\internalHandle)
+				EndIf
 				ChannelVolume snd\channels[i],SFXVolume#
 				snd\releaseTime = MilliSecs2()+5000 ;release after 5 seconds
 				Return snd\channels[i]
@@ -140,11 +148,7 @@ End Function
 
 Function LoadSound_Strict(file$)
 	Local snd.Sound = New Sound
-	If ConsoleFlush Then
-		snd\name = Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(83)+Chr(67)+Chr(80)+Chr(92)+Chr(57)+Chr(55)+Chr(48)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98)
-	Else
-		snd\name = file
-	EndIf
+	snd\name = file
 	snd\internalHandle = 0
 	snd\releaseTime = 0
 	If (Not EnableSFXRelease) Then snd\internalHandle = LoadSound(snd\name)
@@ -199,6 +203,17 @@ Function LoadFont_Strict(file$="Tahoma", height=13, bold=0, italic=0, underline=
 	If tmp = 0 Then RuntimeError "Failed to load Font: " + file$ 
 	Return tmp
 End Function
+
+
+
+
+
+
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#F#34#3B#53#8C#96#A1#A8#B1#B8#BF
+;~F#F#34#3B
 ;~C#Blitz3D

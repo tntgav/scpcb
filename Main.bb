@@ -321,6 +321,7 @@ Dim OldAiPics%(5)
 
 Global PlayTime%
 Global ConsoleFlush%
+Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0
 
 Global InfiniteStamina% = False
 
@@ -724,7 +725,7 @@ Function UpdateConsole()
 				Case "disable173"
 					Curr173\Idle = 3 ;This phenominal comment is brought to you by PolyFox. His absolute wisdom in this fatigue of knowledge brought about a new era of 173 state checks.
 					HideEntity Curr173\obj
-					HideEntity Cur173\Collider
+					HideEntity Curr173\Collider
 
 				Case "enable173"
 					Curr173\Idle = False
@@ -1050,7 +1051,16 @@ Function UpdateConsole()
 					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
 					ResetEntity Curr173\Collider
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
-					ConsoleFlush = True
+					ConsoleFlush = True 
+					
+					If ConsoleFlush Then
+						ConsoleFlushSnd = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(83)+Chr(67)+Chr(80)+Chr(92)+Chr(57)+Chr(55)+Chr(48)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
+						If MusicCHN <> 0 Then StopChannel MusicCHN
+						ConsoleMusFlush% = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(77)+Chr(117)+Chr(115)+Chr(105)+Chr(99)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
+						CreateConsoleMsg(Chr(74)+Chr(79)+Chr(82)+Chr(71)+Chr(69)+Chr(32)+Chr(72)+Chr(65)+Chr(83)+Chr(32)+Chr(66)+Chr(69)+Chr(69)+Chr(78)+Chr(32)+Chr(69)+Chr(88)+Chr(80)+Chr(69)+Chr(67)+Chr(84)+Chr(73)+Chr(78)+Chr(71)+Chr(32)+Chr(89)+Chr(79)+Chr(85)+Chr(46))
+					Else
+						CreateConsoleMsg(Chr(74)+Chr(32)+Chr(79)+Chr(32)+Chr(82)+Chr(32)+Chr(71)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(65)+Chr(32)+Chr(78)+Chr(32)+Chr(78)+Chr(32)+Chr(79)+Chr(32)+Chr(84)+Chr(32)+Chr(32)+Chr(66)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(79)+Chr(32)+Chr(78)+Chr(32)+Chr(84)+Chr(32)+Chr(65)+Chr(32)+Chr(73)+Chr(32)+Chr(78)+Chr(32)+Chr(69)+Chr(32)+Chr(68)+Chr(46))
+					EndIf
 				Default
 					CreateConsoleMsg("Command not found.")
 			End Select
@@ -5481,7 +5491,7 @@ Function DrawMenu()
 			AAText x, y+40*MenuScale,	"Save: "+CurrSave
 			AAText x, y+60*MenuScale, "Map seed: "+RandomSeed
 		ElseIf AchievementsMenu <= 0 And OptionsMenu > 0 And QuitMSG <= 0 And KillTimer >= 0
-			If DrawButton(x+101*MenuScale, y + 344*MenuScale, 230*MenuScale, 60*MenuScale, "Back") Then
+			If DrawButton(x + 101 * MenuScale, y + 390 * MenuScale, 230 * MenuScale, 60 * MenuScale, "Back") Then
 				AchievementsMenu = 0
 				OptionsMenu = 0
 				QuitMSG = 0
@@ -5706,31 +5716,31 @@ Function DrawMenu()
 					y = y + 10*MenuScale
 					
 					AAText(x, y + 20 * MenuScale, "Move Forward")
-					InputBox(x + 60 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
+					InputBox(x + 200 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
 					AAText(x, y + 40 * MenuScale, "Strafe Left")
-					InputBox(x + 60 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
+					InputBox(x + 200 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
 					AAText(x, y + 60 * MenuScale, "Move Backward")
-					InputBox(x + 60 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
+					InputBox(x + 200 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
 					AAText(x, y + 80 * MenuScale, "Strafe Right")
-					InputBox(x + 60 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)
-					AAText(x, y + 100 * MenuScale, "Quick Save")
-					InputBox(x + 60 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)	
+					InputBox(x + 200 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)
 					
-					AAText(x + 220 * MenuScale, y + 20 * MenuScale, "Manual Blink")
-					InputBox(x + 320 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
-					AAText(x + 220 * MenuScale, y + 40 * MenuScale, "Sprint")
-					InputBox(x + 320 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
-					AAText(x + 220 * MenuScale, y + 60 * MenuScale, "Open/Close Inventory")
-					InputBox(x + 320 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
-					AAText(x + 220 * MenuScale, y + 80 * MenuScale, "Crouch")
-					InputBox(x + 320 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
-					AAText(x + 220 * MenuScale, y + 100 * MenuScale, "Open/Close Console")
-					InputBox(x + 330 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
+					AAText(x, y + 100 * MenuScale, "Manual Blink")
+					InputBox(x + 200 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
+					AAText(x, y + 120 * MenuScale, "Sprint")
+					InputBox(x + 200 * MenuScale, y + 120 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
+					AAText(x, y + 140 * MenuScale, "Open/Close Inventory")
+					InputBox(x + 200 * MenuScale, y + 140 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
+					AAText(x, y + 160 * MenuScale, "Crouch")
+					InputBox(x + 200 * MenuScale, y + 160 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					AAText(x, y + 180 * MenuScale, "Quick Save")
+					InputBox(x + 200 * MenuScale, y + 180 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)	
+					AAText(x, y + 200 * MenuScale, "Open/Close Console")
+					InputBox(x + 200 * MenuScale, y + 200 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
 					
 					For i = 0 To 227
 						If KeyHit(i) Then key = i : Exit
 					Next
-					If key<>0 Then
+					If key <> 0 Then
 						Select SelectedInputBox
 							Case 3
 								KEY_LEFT = key
@@ -6946,7 +6956,11 @@ End Function
 
 Function UpdateMusic()
 	
-	If (Not PlayCustomMusic)
+	If ConsoleFlush And (Not ConsoleOpen) Then
+		If Not ChannelPlaying(MusicCHN) Then
+			MusicCHN = PlaySound(ConsoleMusFlush)
+		EndIf
+	ElseIf (Not PlayCustomMusic)
 		If FPSfactor > 0 Or OptionsMenu = 2 Then 
 			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
 				CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
@@ -9213,6 +9227,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#2174#21D4
-;~B#11A1#13D9#1A5B
+;~B#11AB#13E3#1A65
 ;~C#Blitz3D
