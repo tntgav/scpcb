@@ -2228,7 +2228,7 @@ Function UpdateNPCs()
 									If PickedEntity() = Collider Or n\State3=1 Then
 										
 										If PlayerRoom\RoomTemplate\Name = "exit1" Then
-											DeathMSG = Chr(34)+"Agent G. to control. Eliminated a class D escapee in Gate B's courtyard."+Chr(34)
+											DeathMSG = Chr(34)+"Agent G. to control. Eliminated a Class D escapee in Gate B's courtyard."+Chr(34)
 										EndIf
 										
 										PlaySound2(GunshotSFX, Camera, n\Collider, 35)
