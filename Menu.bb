@@ -107,7 +107,7 @@ Function UpdateMainMenu()
 				Case 21
 					MenuStr = "The spiral is growing"
 				Case 22
-					MenuStr = "''Some kind of gestalt effect due to massive reality damage''"
+					MenuStr = Chr(34)+"Some kind of gestalt effect due to massive reality damage."+Chr(34)
 			End Select
 		EndIf
 	EndIf
@@ -233,6 +233,7 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 					PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
 					PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
+					PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 					PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
 					PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
@@ -429,7 +430,7 @@ Function UpdateMainMenu()
 				AASetFont Font1	
 				
 				If SaveGameAmount = 0 Then
-					AAText (x + 20 * MenuScale, y + 20 * MenuScale, "No saved games")
+					AAText (x + 20 * MenuScale, y + 20 * MenuScale, "No saved games.")
 				Else
 					x = x + 20 * MenuScale
 					y = y + 20 * MenuScale
@@ -551,7 +552,7 @@ Function UpdateMainMenu()
 					;	UpdateScreenGamma()
 					;EndIf
 					
-					y=y+40*MenuScale
+					y = y + 50*MenuScale
 					
 					Color 100,100,100
 					AAText(x + 20 * MenuScale, y, "Texture quality:")
@@ -593,7 +594,7 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
-					height = 190 * MenuScale
+					height = 220 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
@@ -602,7 +603,7 @@ Function UpdateMainMenu()
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Music volume:")
 					
-					y = y + 30*MenuScale
+					y = y + 40*MenuScale
 					
 					;SFXVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, SFXVolume*100.0)/100.0)
 					PrevSFXVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, SFXVolume*100.0)/100.0)
@@ -659,11 +660,11 @@ Function UpdateMainMenu()
 						AAText x + 20 * MenuScale, y, "User track mode:"
 						UserTrackMode = DrawTick(x + 310 * MenuScale, y + MenuScale, UserTrackMode)
 						If UserTrackMode
-							AAText x + 20 * MenuScale, y + 20 * MenuScale, "Repeat"
+							AAText x + 350 * MenuScale, y + 5 * MenuScale, "Repeat"
 						Else
-							AAText x + 20 * MenuScale, y + 20 * MenuScale, "Random"
+							AAText x + 350 * MenuScale, y + 5 * MenuScale, "Random"
 						EndIf
-						If DrawButton(x + 340 * MenuScale, y, 175 * MenuScale, 25 * MenuScale, "Check user tracks",False)
+						If DrawButton(x + 20 * MenuScale, y + 30 * MenuScale, 190 * MenuScale, 25 * MenuScale, "Scan for User Tracks",False)
 							DebugLog "User Tracks Check Started"
 							
 							UserTrackCheck% = 0
@@ -704,7 +705,7 @@ Function UpdateMainMenu()
 					Color(255, 255, 255)
 					AAText(x + 20 * MenuScale, y, "Mouse sensitivity:")
 					
-					y = y + 30*MenuScale
+					y = y + 40*MenuScale
 					
 					Color(255, 255, 255)
 					AAText(x + 20 * MenuScale, y, "Invert mouse Y-axis:")
@@ -759,22 +760,28 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 7 ;Advanced
 					;[Block]
-					height = 200 * MenuScale
+					height = 310 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
 					
 					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Enable console:")
+					CanOpenConsole = DrawTick(x + 310 * MenuScale, y + MenuScale, CanOpenConsole)
+					
+					y = y + 30*MenuScale
+					
+					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Open console on error:")
 					ConsoleOpening = DrawTick(x + 310 * MenuScale, y + MenuScale, ConsoleOpening)
 					
-					y = y + 30*MenuScale
+					y = y + 50*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Achievement popups:")
 					AchvMSGenabled% = DrawTick(x + 310 * MenuScale, y + MenuScale, AchvMSGenabled%)
 					
-					y = y + 30*MenuScale
+					y = y + 50*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Show FPS:")
@@ -786,7 +793,7 @@ Function UpdateMainMenu()
 					AAText(x + 20 * MenuScale, y, "Framelimit:")
 					Color 255,255,255
 					If DrawTick(x + 310 * MenuScale, y, CurrFrameLimit > 0.0) Then
-						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+23*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
+						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+30*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
 						CurrFrameLimit = Max(CurrFrameLimit, 0.1)
 						Framelimit% = CurrFrameLimit#*100.0
 						Color 255,255,0
@@ -796,7 +803,7 @@ Function UpdateMainMenu()
 						Framelimit = 0
 					EndIf
 					
-					y = y + 50*MenuScale
+					y = y + 80*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Antialiased text:")
@@ -824,11 +831,6 @@ Function UpdateMainMenu()
 						;ReloadAAFont()
 						AATextEnable_Prev% = AATextEnable
 					EndIf
-					
-					;y=y+60*MenuScale
-					;
-					;Color 255,255,255
-					
 					;[End Block]
 				EndIf
 				;[End Block]
@@ -914,7 +916,7 @@ Function UpdateLauncher()
 	MenuBlack = LoadImage_Strict("GFX\menu\menublack.jpg")	
 	MaskImage MenuBlack, 255,255,0
 	LauncherIMG = LoadImage_Strict("GFX\menu\launcher.jpg")
-	ButtonSFX% = LoadSound_Strict("SFX\Button.ogg")
+	ButtonSFX% = LoadSound_Strict("SFX\Interact\Button.ogg")
 	Local i%	
 	
 	For i = 0 To 3
@@ -1228,9 +1230,9 @@ Function DrawLoading(percent%, shortloading=False)
 			If Not shortloading Then 
 				If firstloop Then 
 					If percent = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\cwm1.cwm")
+						PlaySound_Strict LoadTempSound("SFX\SCP\990\cwm1.cwm")
 					ElseIf percent = 100
-						PlaySound_Strict LoadTempSound("SFX\cwm2.cwm")
+						PlaySound_Strict LoadTempSound("SFX\SCP\990\cwm2.cwm")
 					EndIf
 				EndIf
 			EndIf
@@ -1632,8 +1634,5 @@ End Function
 
 
 
-
 ;~IDEal Editor Parameters:
-;~F#31#76#146#1D1#283#2E9#329#357#395#444#456#460#493#55C#56F#58C#593#5AE#5CF#5E7
-;~F#614
 ;~C#Blitz3D

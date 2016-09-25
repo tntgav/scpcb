@@ -1868,7 +1868,7 @@ Function FillRoom(r.Rooms)
 				If r2\RoomTemplate\Name = "exit1" Then
 					r\Objects[1]=r2\Objects[1]
 					r\Objects[2]=r2\Objects[2]	
-				ElseIf r2\roomtemplate\name = "gateaentrance"
+				ElseIf r2\RoomTemplate\Name = "gateaentrance"
 					;ylempi hissi
 					r\RoomDoors[1] = CreateDoor(0, r\x+1544.0*RoomScale,12000.0*RoomScale, r\z-64.0*RoomScale, 90, r, False)
 					r\RoomDoors[1]\AutoClose = False : r\RoomDoors[1]\open = False
@@ -1962,8 +1962,7 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[4]\dir = 1 : r\RoomDoors[4]\AutoClose = False : r\RoomDoors[4]\open = False
 			PositionEntity(r\RoomDoors[4]\buttons[1], r\x+352*RoomScale, 0.7, r\z-528*RoomScale, True)
 			RotateEntity r\RoomDoors[4]\buttons[1],0,r\angle-90,0,True
-			PositionEntity(r\RoomDoors[4]\buttons[0], r\x, 7.0, r\z, True)
-			
+			PositionEntity(r\RoomDoors[4]\buttons[0], r\x, 7.0, r\z, True)		
 			
 			;k�yt�v�n takaosa
 			r\Objects[3] = CreatePivot()
@@ -1972,11 +1971,11 @@ Function FillRoom(r.Rooms)
 			
 			;oikean puolen watchpoint 1
 			r\Objects[4] = CreatePivot()
-			PositionEntity(r\Objects[4], r\x+1088.0*RoomScale, 12192.0*RoomScale, r\z-4672.0*RoomScale, True)
+			PositionEntity(r\Objects[4], r\x+5203.36*RoomScale, 12128.0*RoomScale, r\z-1739.19*RoomScale, True)
 			EntityParent r\Objects[4], r\obj
 			;oikean puolen watchpoint 2
 			r\Objects[5] = CreatePivot()
-			PositionEntity(r\Objects[5], r\x+3264.0*RoomScale, 12192.0*RoomScale, r\z-4480.0*RoomScale, True)
+			PositionEntity(r\Objects[5], r\x+4363.02*RoomScale, 10536.0*RoomScale, r\z+2766.16*RoomScale, True)
 			EntityParent r\Objects[5], r\obj	
 			;vasemman puolen watchpoint 1
 			r\Objects[6] = CreatePivot()
@@ -2241,8 +2240,10 @@ Function FillRoom(r.Rooms)
 			
 			FreeTexture Glasstex
 			
-			d = CreateDoor(r\zone, r\x - 240.0 * RoomScale, 0.0, r\z + 640.0 * RoomScale, 90, r, False, False, 1)
-			d\AutoClose = False : d\open = False
+			;d = CreateDoor(r\zone, r\x - 240.0 * RoomScale, 0.0, r\z + 640.0 * RoomScale, 90, r, False, False, 1)
+			;d\AutoClose = False : d\open = False
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 240.0 * RoomScale, 0.0, r\z + 640.0 * RoomScale, 90, r, False, False, 1)
+			r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = False
 			
 			d = CreateDoor(r\zone, r\x - 512.0 * RoomScale, 0.0, r\z + 384.0 * RoomScale, 0, r, False, False)
 			d\AutoClose = False : d\open = False					
@@ -4948,7 +4949,9 @@ Function UpdateRooms()
 				z = Abs(EntityZ(Collider,True)-EntityZ(PlayerRoom\AdjDoor[i]\frameobj,True))
 				If PlayerRoom\AdjDoor[i]\openstate = 0 Then
 					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-				ElseIf Abs(DeltaYaw(Camera,PlayerRoom\Adjacent[i]\obj))>90+(((8.0-Max(x,z))/8.0)*90.0) Then
+				;ElseIf Abs(DeltaYaw(Camera,PlayerRoom\Adjacent[i]\obj))>90+(((8.0-Max(x,z))/8.0)*90.0) Then
+				;	EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
+				ElseIf (Not EntityInView(PlayerRoom\AdjDoor[i]\frameobj,Camera))
 					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
 				Else
 					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),1)
@@ -5239,7 +5242,7 @@ Function InitWayPoints(loadingstart=45)
 		Next
 	Next
 	
-	DebugLog "InitWaypoints() - "+(MilliSecs()-temper)
+	DebugLog "InitWaypoints() - "+(MilliSecs2()-temper)
 	
 End Function
 
@@ -5546,7 +5549,6 @@ Function UpdateScreens()
 						s\img = LoadImage_Strict("GFX\screens\"+s\imgpath)
 						s\img = ResizeImage2(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
 						MaskImage s\img, 255,0,255
-						s\img = ResizeImage2(s\img, ImageWidth(s\img) * MenuScale, ImageHeight(s\img) * MenuScale)
 						PlaySound_Strict ButtonSFX
 						MouseUp1=False
 					EndIf
@@ -5891,14 +5893,14 @@ Function UpdateSecurityCams()
 							EntityTexture(sc\ScrOverlay, OldAiPics(0))
 						End If
 						
-						If (MilliSecs() Mod sc\PlayerState) >= Rand(500) Then
+						If (MilliSecs2() Mod sc\PlayerState) >= Rand(600) Then
 							EntityTexture(sc\ScrOverlay, MonitorTexture)
 						Else
 							If sc\soundCHN = 0 Then
-								sc\soundCHN = PlaySound_Strict(LoadTempSound("SFX\079_"+Rand(4,6)+".ogg"))
+								sc\soundCHN = PlaySound_Strict(LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,3)+".ogg"))
 								If sc\CoffinEffect=2 Then sc\CoffinEffect=3 : sc\PlayerState = 0
 							ElseIf (Not ChannelPlaying(sc\soundCHN))
-								sc\soundCHN = PlaySound_Strict(LoadTempSound("SFX\079_"+Rand(4,6)+".ogg"))
+								sc\soundCHN = PlaySound_Strict(LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,3)+".ogg"))
 								If sc\CoffinEffect=2 Then sc\CoffinEffect=3 : sc\PlayerState = 0
 							EndIf
 							EntityTexture(sc\ScrOverlay, OldAiPics(0))
@@ -7718,14 +7720,14 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	Next
 	
 End Function
+
+
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#2#A#2D#FA#109#117#11E#12F#137#13F#323#333#344#36C#37A#38A#38F#39A#441#54B
-;~F#56A#58C#5A1#5AC#5E5#5F3#61B#651#659#66E#6BB#70C#74E#770#7CC#7DE#845#854#87E#8A6
-;~F#8C9#8E7#90E#915#923#93F#954#971#98E#99B#9AD#9EB#A15#A66#ABC#ACF#AED#BF1#C00#C3C
-;~F#C44#C52#C67#CA3#CC2#CD2#CEA#D15#D28#D4A#D72#DC4#DF0#E17#E1E#E23#E5A#E81#E96#ECA
-;~F#F48#F68#FDC#1033#105E#10AF#10B8#1151#1159#115E#116C#117B#11BC#11E0#11EF#1200#1207#120C#1290#12C6
-;~F#1343#134F#1390#139B#13AC#13B1#13C0#13D7#1458#1461#1540#155D#1564#156A#1578#159C#15BC#15EF#16FB#1734
-;~F#180B#18A0#18A5#18B5#1B84#1B9B#1BBA#1BC1#1C22#1C73#1C9E#1CBF#1CD2#1CFA#1D01#1D35#1D3C#1D68#1DB6#1DC4
-;~F#1DCB#1DD1#1DDB#1DE1#1DF8
-;~B#1228
+;~F#2#A#CE9#11EE#13BF#1DDF#1DF6
+;~B#1227
 ;~C#Blitz3D

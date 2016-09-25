@@ -184,6 +184,10 @@ Function SaveGame(file$)
 		WriteFloat f, n\PathX
 		WriteFloat f, n\PathZ
 		WriteInt f, n\HP
+		WriteString f, n\Model
+		WriteFloat f, n\ModelScaleX#
+		WriteFloat f, n\ModelScaleY#
+		WriteFloat f, n\ModelScaleZ#
 	Next
 	
 	WriteFloat f, MTFtimer
@@ -348,6 +352,7 @@ Function SaveGame(file$)
 		WriteFloat f, e\EventState3	
 		WriteFloat f, EntityX(e\room\obj)
 		WriteFloat f, EntityZ(e\room\obj)
+		WriteString f, e\EventStr
 	Next
 	
 	temp = 0
@@ -422,14 +427,16 @@ Function SaveGame(file$)
 	
 	CloseFile f
 	
-	If SelectedDifficulty\saveType = SAVEONSCREENS Then
-		PlaySound_Strict(LoadTempSound("SFX/save2.ogg"))
-	Else
-		PlaySound_Strict(LoadTempSound("SFX/save.ogg"))
+	If Not MenuOpen Then
+		If SelectedDifficulty\saveType = SAVEONSCREENS Then
+			PlaySound_Strict(LoadTempSound("SFX\General\Save2.ogg"))
+		Else
+			PlaySound_Strict(LoadTempSound("SFX\General\Save1.ogg"))
+		EndIf
+		
+		Msg = "Game progress saved."
+		MsgTimer = 70 * 4
 	EndIf
-	
-	Msg = "Game progress saved."
-	MsgTimer = 70 * 4
 	
 	CatchErrors("SaveGame")
 End Function
@@ -620,6 +627,17 @@ Function LoadGame(file$)
 		n\PathX = ReadFloat(f)
 		n\PathZ = ReadFloat(f)
 		n\HP = ReadInt(f)
+		n\Model = ReadString(f)
+		n\ModelScaleX# = ReadFloat(f)
+		n\ModelScaleY# = ReadFloat(f)
+		n\ModelScaleZ# = ReadFloat(f)
+		If n\Model <> ""
+			model = LoadAnimMesh_Strict(n\Model)
+			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+			FreeEntity n\obj
+			n\obj = model
+			SetAnimTime n\obj,n\Frame
+		EndIf
 	Next
 	
 	For n.NPCs = Each NPCs
@@ -885,17 +903,27 @@ Function LoadGame(file$)
 				Exit
 			EndIf
 		Next
+		e\EventStr = ReadString(f)
 	Next
 	
 	For e.Events = Each Events
 		;Reset for the monitor loading and stuff for room2sl
 		If e\EventName = "room2sl"
 			e\EventState = 0.0
+			e\EventStr = ""
 			DebugLog "Reset Eventstate in "+e\EventName
 		;Only reset if the dimension has already been generated and the player wasn't saving in it
 		ElseIf e\EventName = "dimension1499"
 			If e\EventState = 1.0
 				e\EventState = 0.0
+				e\EventStr = ""
+				For n.NPCs = Each NPCs
+					If n\NPCtype = NPCtype1499
+						If n\InFacility = 0
+							RemoveNPC(n)
+						EndIf
+					EndIf
+				Next
 				DebugLog "Reset Eventstate in "+e\EventName
 			EndIf
 		EndIf
@@ -1277,6 +1305,17 @@ Function LoadGameQuick(file$)
 		n\PathX = ReadFloat(f)
 		n\PathZ = ReadFloat(f)
 		n\HP = ReadInt(f)
+		n\Model = ReadString(f)
+		n\ModelScaleX# = ReadFloat(f)
+		n\ModelScaleY# = ReadFloat(f)
+		n\ModelScaleZ# = ReadFloat(f)
+		If n\Model <> ""
+			model = LoadAnimMesh_Strict(n\Model)
+			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+			FreeEntity n\obj
+			n\obj = model
+			SetAnimTime n\obj,n\Frame
+		EndIf
 	Next
 	
 	For n.NPCs = Each NPCs
@@ -1509,6 +1548,7 @@ Function LoadGameQuick(file$)
 				Exit
 			EndIf
 		Next	
+		e\EventStr = ReadString(f)
 	Next
 	
 	Local it.Items
@@ -1838,6 +1878,14 @@ Function LoadMap(file$)
 	
 	CatchErrors("LoadMap")
 End Function
+
+
+
+
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#2#1AE#412#64E#67C#69A
 ;~C#Blitz3D
