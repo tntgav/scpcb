@@ -5031,20 +5031,10 @@ Function DrawGUI()
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
-					If WearingHazmat Then
-						Msg = "You removed the hazmat suit."
-					Else
-						Msg = "You put on the hazmat suit."
-						TakeOffStuff(16)
-					EndIf
+					Msg = "You removed the hazmat suit."
+					WearingHazmat=0
 					MsgTimer = 70 * 5
-					If SelectedItem\itemtemplate\tempname="hazmatsuit3" Then
-						If WearingHazmat=0 Then WearingHazmat = 3 Else WearingHazmat=0
-					ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2"
-						If WearingHazmat=0 Then WearingHazmat = 2 Else WearingHazmat=0
-					Else
-						WearingHazmat = (Not WearingHazmat)
-					EndIf
+					DropItem(SelectedItem)
 					SelectedItem = Null	
 				Case "vest"
 					If WearingVest Then
