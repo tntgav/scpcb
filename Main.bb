@@ -4233,8 +4233,10 @@ Function DrawGUI()
 										Else
 											If added\itemtemplate\tempname = "paper" Or added\itemtemplate\tempname = "oldpaper" Then
 												Msg = "This document was added to the clipboard."
+											ElseIf added\itemtemplate\tempname = "badge"
+												Msg = added\itemtemplate\name + " was added to the clipboard."
 											Else
-												Msg = "This "+added\itemtemplate\name+" was added to the clipboard."
+												Msg = "The " + added\itemtemplate\name + " was added to the clipboard."
 											EndIf
 											
 										EndIf
