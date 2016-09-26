@@ -1,4 +1,4 @@
-
+﻿
 ----------------------------------------------------------------------------------
 
 v1.3.2
@@ -15,6 +15,7 @@ v1.3.2
 	-Credits to Juanjpro for the updated model.
 - Added unique locked door and DNA scanner sound effects.
 - Damage indicator messages now only display once at least two seconds have passed since the previous one displayed. This prevents the messages from constantly updating when being shot at.
+	- Same thing for 939's alert sound effects, only with a delay of three seconds.
 - Renamed fake fullscreen to borderless windowed mode.
 - The blink meter's timer is now randomized, making blinking appear more realistic.
 - Updated HUD elements (by Brokami).
@@ -25,6 +26,7 @@ v1.3.2
 - Re-positioned the Gate B guard so it will now properly shoot the player when they are within range.
 - Added an option to disable console functionality while in-game.
 - The player can now save at the entrance to Gate A.
+- The keys for quick saving and toggling the console can now be rebound in the controls menu.
 - Refactored the SFX folder whilst removing duplicate/unused sounds. 
 
 Bug Fixes:
@@ -35,6 +37,7 @@ Bug Fixes:
 - SCP-096 will no longer become triggered when looking at its face while the player's eyes are closed.
 - Fixed a bug involving the severed hand spawn in room3storage.
 - Fixed SCP-106 being invisible during the room2pipes event.
+- Fixed SCP-106 instantly respawning after going through a Tesla gate.
 - Fixed the "halloween" console command.
 - Fixed Security Chief Franklin using the default scientist texture during the office event if the intro sequence was enabled.
 - Fixed a bug that caused SCP-096 to spawn too frequently.
@@ -45,6 +48,7 @@ Bug Fixes:
 - Fixed 079's broadcasts playing during Gate A, Gate B and when the game is paused.
 - Fixed some issues relating to Windows 10. This includes a fatal bug that caused no items to spawn in the map.
 - Fixed the achievement descriptions leaking outside of their tooltips.
+- Fixed a framerate dip when viewing the coin from SCP-1162.
 - Fixed several issues with both Gate A endings.
 
 ----------------------------------------------------------------------------------

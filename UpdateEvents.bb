@@ -39,7 +39,7 @@ Function UpdateEvents()
 						CameraFogRange(Camera, CameraFogNear, CameraFogFar)
 						CameraFogMode(Camera, 1)
 						If SelectedDifficulty\saveType = SAVEANYWHERE Then
-							Msg = "Press F5 to save."
+							Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 							MsgTimer = 70*4
 						ElseIf SelectedDifficulty\saveType = SAVEONSCREENS Then
 							Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
@@ -294,7 +294,7 @@ Function UpdateEvents()
 						ShouldPlay = 13
 						
 						;slow the player down a bit to match his speed to the guards
-						CurrSpeed = CurrSpeed - (CurrSpeed * 0.015 * FPSfactor)
+						CurrSpeed = CurrSpeed - (CurrSpeed * 0.01 * FPSfactor)
 						
 						If e\EventState3 < 170 Then 
 							If e\EventState3 = 1.0 Then
@@ -374,7 +374,7 @@ Function UpdateEvents()
 								EndIf
 							ElseIf e\EventState3 < 35
 								If Inventory(0)<>Null Then
-									Msg = "Press "+KeyName(Min(KEY_INV,210))+" to open the inventory."
+									Msg = "Press "+KeyName(KEY_INV)+" to open the inventory."
 									MsgTimer=70*4
 									e\EventState3 = 40
 									Exit
@@ -1135,7 +1135,7 @@ Function UpdateEvents()
 										For r.Rooms = Each Rooms
 											If r\RoomTemplate\Name = "start" Then
 												DebugLog "tostart"
-												;Msg = "Press F5 to save."
+												;Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 												;MsgTimer = 70*8
 												
 												PlayerRoom = r
@@ -3518,14 +3518,15 @@ Function UpdateEvents()
 						
 						If Curr106\State < -10 And e\EventState = 0 Then 
 								For i = 0 To 2
-								If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
-								;play the activation sound
+									If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
+										;play the activation sound
 										If KillTimer => 0 Then 
 											StopChannel(e\SoundCHN)
 											e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
 											HideEntity e\room\Objects[4]
 											e\EventState = 1
-										GiveAchievement(AchvTesla)
+											Curr106\State = 70 * 60 * Rand(10,13)
+											GiveAchievement(AchvTesla)
 											Exit
 										EndIf
 									EndIf

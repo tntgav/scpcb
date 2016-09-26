@@ -241,14 +241,16 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 					
-					PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
-					PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
-					PutINIValue(OptionFile, "options", "Up key", KEY_UP)
-					PutINIValue(OptionFile, "options", "Down key", KEY_DOWN)
-					PutINIValue(OptionFile, "options", "Blink key", KEY_BLINK)
-					PutINIValue(OptionFile, "options", "Sprint key", KEY_SPRINT)
-					PutINIValue(OptionFile, "options", "Inventory key", KEY_INV)
-					PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
+					PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
+					PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
+					PutINIValue(OptionFile, "binds", "Up key", KEY_UP)
+					PutINIValue(OptionFile, "binds", "Down key", KEY_DOWN)
+					PutINIValue(OptionFile, "binds", "Blink key", KEY_BLINK)
+					PutINIValue(OptionFile, "binds", "Sprint key", KEY_SPRINT)
+					PutINIValue(OptionFile, "binds", "Inventory key", KEY_INV)
+					PutINIValue(OptionFile, "binds", "Crouch key", KEY_CROUCH)
+					PutINIValue(OptionFile, "binds", "Save key", KEY_SAVE)
+					PutINIValue(OptionFile, "binds", "Console key", KEY_CONSOLE)
 					
 					UserTrackCheck% = 0
 					UserTrackCheck2% = 0
@@ -696,7 +698,7 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 6 ;Controls
 					;[Block]
-					height = 210 * MenuScale
+					height = 230 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
@@ -715,23 +717,27 @@ Function UpdateMainMenu()
 					AAText(x + 20 * MenuScale, y, "Control configuration:")
 					y = y + 10*MenuScale
 					
-					AAText(x + 20 * MenuScale, y + 20 * MenuScale, "Up")
-					InputBox(x + 170 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
-					AAText(x + 20 * MenuScale, y + 40 * MenuScale, "Left")
-					InputBox(x + 170 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
-					AAText(x + 20 * MenuScale, y + 60 * MenuScale, "Down")
-					InputBox(x + 170 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
-					AAText(x + 20 * MenuScale, y + 80 * MenuScale, "Right")
-					InputBox(x + 170 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
+					AAText(x + 20 * MenuScale, y + 20 * MenuScale, "Move Forward")
+					InputBox(x + 160 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
+					AAText(x + 20 * MenuScale, y + 40 * MenuScale, "Strafe Left")
+					InputBox(x + 160 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
+					AAText(x + 20 * MenuScale, y + 60 * MenuScale, "Move Backward")
+					InputBox(x + 160 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
+					AAText(x + 20 * MenuScale, y + 80 * MenuScale, "Strafe Right")
+					InputBox(x + 160 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
+					AAText(x + 20 * MenuScale, y + 100 * MenuScale, "Quick Save")
+					InputBox(x + 160 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)
 					
-					AAText(x + 300 * MenuScale, y + 20 * MenuScale, "Blink")
-					InputBox(x + 450 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
-					AAText(x + 300 * MenuScale, y + 40 * MenuScale, "Sprint")
-					InputBox(x + 450 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
-					AAText(x + 300 * MenuScale, y + 60 * MenuScale, "Inventory")
-					InputBox(x + 450 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
-					AAText(x + 300 * MenuScale, y + 80 * MenuScale, "Crouch")
-					InputBox(x + 450 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					AAText(x + 280 * MenuScale, y + 20 * MenuScale, "Manual Blink")
+					InputBox(x + 470 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
+					AAText(x + 280 * MenuScale, y + 40 * MenuScale, "Sprint")
+					InputBox(x + 470 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
+					AAText(x + 280 * MenuScale, y + 60 * MenuScale, "Open/Close Inventory")
+					InputBox(x + 470 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
+					AAText(x + 280 * MenuScale, y + 80 * MenuScale, "Crouch")
+					InputBox(x + 470 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)	
+					AAText(x + 280 * MenuScale, y + 100 * MenuScale, "Open/Close Console")
+					InputBox(x + 470 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
 					
 					For i = 0 To 227
 						If KeyHit(i) Then key = i : Exit
@@ -754,6 +760,10 @@ Function UpdateMainMenu()
 								KEY_INV = key
 							Case 10
 								KEY_CROUCH = key
+							Case 11
+								KEY_SAVE = key
+							Case 12
+								KEY_CONSOLE = key
 						End Select
 						SelectedInputBox = 0
 					EndIf
@@ -1517,6 +1527,9 @@ End Function
 Function RowText(A$, X, Y, W, H, align% = 0, Leading#=1)
 	;Display A$ starting at X,Y - no wider than W And no taller than H (all in pixels).
 	;Leading is optional extra vertical spacing in pixels
+	
+	If H<1 Then H=2048
+	
 	Local LinesShown = 0
 	Local Height = AAStringHeight(A$) + Leading
 	Local b$
@@ -1625,7 +1638,6 @@ Function DrawQuickLoading()
 	EndIf
 	
 End Function
-
 
 
 
