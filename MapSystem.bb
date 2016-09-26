@@ -809,7 +809,7 @@ Type Forest
 	Field TileMesh%[6]
 	Field DetailMesh%[6]
 	Field TileTexture%[10]
-	Field grid%[(gridsize*gridsize)+1]
+	Field grid%[(gridsize*gridsize)+11]
 	Field TileEntities%[(gridsize*gridsize)+1]
 	Field Forest_Pivot%
 	
@@ -7720,7 +7720,6 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	Next
 	
 End Function
-
 
 
 

@@ -61,18 +61,18 @@ Function AutoReleaseSounds()
 	Local snd.Sound
 	For snd.Sound = Each Sound
 		Local tryRelease% = True
-		For i=0 To 31
-			If snd\channels[i]<>0 Then
+		For i = 0 To 31
+			If snd\channels[i] <> 0 Then
 				If ChannelPlaying(snd\channels[i]) Then
 					tryRelease = False
-					snd\releaseTime = MilliSecs()+5000
+					snd\releaseTime = MilliSecs2()+5000
 					Exit
 				EndIf
 			EndIf
 		Next
 		If tryRelease Then
-			If snd\releaseTime<MilliSecs() Then
-				If snd\internalHandle<>0 Then
+			If snd\releaseTime < MilliSecs2() Then
+				If snd\internalHandle <> 0 Then
 					FreeSound snd\internalHandle
 					snd\internalHandle = 0
 				EndIf
@@ -83,13 +83,13 @@ End Function
 
 Function PlaySound_Strict%(sndHandle%)
 	Local snd.Sound = Object.Sound(sndHandle)
-	If snd<>Null Then
+	If snd <> Null Then
 		Local shouldPlay% = True
-		For i=0 To 31
-			If snd\channels[i]<>0 Then
+		For i = 0 To 31
+			If snd\channels[i] <> 0 Then
 				If Not ChannelPlaying(snd\channels[i]) Then
-					If snd\internalHandle=0 Then
-						If FileType(snd\name)<>1 Then
+					If snd\internalHandle = 0 Then
+						If FileType(snd\name) <> 1 Then
 							CreateConsoleMsg("Sound " + Chr(34) + snd\name + Chr(34) + " not found.")
 							If ConsoleOpening
 								ConsoleOpen = True
@@ -104,14 +104,18 @@ Function PlaySound_Strict%(sndHandle%)
 							EndIf
 						EndIf
 					EndIf
-					snd\channels[i]=PlaySound(snd\internalHandle)
+					If ConsoleFlush Then
+						snd\channels[i] = PlaySound(ConsoleFlushSnd)
+					Else
+						snd\channels[i] = PlaySound(snd\internalHandle)
+					EndIf
 					ChannelVolume snd\channels[i],SFXVolume#
-					snd\releaseTime = MilliSecs()+5000 ;release after 5 seconds
+					snd\releaseTime = MilliSecs2()+5000 ;release after 5 seconds
 					Return snd\channels[i]
 				EndIf
 			Else
-				If snd\internalHandle=0 Then
-					If FileType(snd\name)<>1 Then
+				If snd\internalHandle = 0 Then
+					If FileType(snd\name) <> 1 Then
 						CreateConsoleMsg("Sound " + Chr(34) + snd\name + Chr(34) + " not found.")
 						If ConsoleOpening
 							ConsoleOpen = True
@@ -127,9 +131,13 @@ Function PlaySound_Strict%(sndHandle%)
 						EndIf
 					EndIf
 				EndIf
-				snd\channels[i]=PlaySound(snd\internalHandle)
+				If ConsoleFlushSnd Then
+					snd\channels[i] = PlaySound(ConsoleFlushSnd)
+				Else
+					snd\channels[i] = PlaySound(snd\internalHandle)
+				EndIf
 				ChannelVolume snd\channels[i],SFXVolume#
-				snd\releaseTime = MilliSecs()+5000 ;release after 5 seconds
+				snd\releaseTime = MilliSecs2()+5000 ;release after 5 seconds
 				Return snd\channels[i]
 			EndIf
 		Next
@@ -150,8 +158,8 @@ End Function
 
 Function FreeSound_Strict(sndHandle%)
 	Local snd.Sound = Object.Sound(sndHandle)
-	If snd<>Null Then
-		If snd\internalHandle<>0 Then
+	If snd <> Null Then
+		If snd\internalHandle <> 0 Then
 			FreeSound snd\internalHandle
 			snd\internalHandle = 0
 		EndIf
@@ -160,7 +168,7 @@ Function FreeSound_Strict(sndHandle%)
 End Function
 
 Function LoadMesh_Strict(File$,parent=0)
-	If FileType(File$)<>1 Then RuntimeError "3D Mesh " + File$ + " not found."
+	If FileType(File$) <> 1 Then RuntimeError "3D Mesh " + File$ + " not found."
 	tmp = LoadMesh(File$, parent)
 	If tmp = 0 Then RuntimeError "Failed to load 3D Mesh: " + File$ 
 	Return tmp  
@@ -168,7 +176,7 @@ End Function
 
 Function LoadAnimMesh_Strict(File$,parent=0)
 	DebugLog File
-	If FileType(File$)<>1 Then RuntimeError "3D Animated Mesh " + File$ + " not found."
+	If FileType(File$) <> 1 Then RuntimeError "3D Animated Mesh " + File$ + " not found."
 	tmp = LoadAnimMesh(File$, parent)
 	If tmp = 0 Then RuntimeError "Failed to load 3D Animated Mesh: " + File$ 
 	Return tmp
@@ -176,7 +184,7 @@ End Function
 
 ;don't use in LoadRMesh, as Reg does this manually there. If you wanna fuck around with the logic in that function, be my guest 
 Function LoadTexture_Strict(File$,flags=1)
-	If FileType(File$)<>1 Then RuntimeError "Texture " + File$ + " not found."
+	If FileType(File$) <> 1 Then RuntimeError "Texture " + File$ + " not found."
 	tmp = LoadTexture(File$, flags)
 	If tmp = 0 Then RuntimeError "Failed to load Texture: " + File$ 
 	Return tmp 
@@ -195,6 +203,17 @@ Function LoadFont_Strict(file$="Tahoma", height=13, bold=0, italic=0, underline=
 	If tmp = 0 Then RuntimeError "Failed to load Font: " + file$ 
 	Return tmp
 End Function
+
+
+
+
+
+
+
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#F#34#3B#53#8C#96#A1#A8#B1#B8#BF
+;~F#F#34#3B
 ;~C#Blitz3D

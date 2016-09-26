@@ -201,9 +201,6 @@ InitAAFont()
 ;don't match their "internal name" (i.e. their display name in applications
 ;like Word and such). As a workaround, I moved the files and renamed them so they
 ;can load without FastText.
-;An actual fix would require a modified version of Blitz3D, which may happen soon
-;since it's possible to replace the Memory Access Violation message with a much more
-;descriptive one.
 Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1024.0)), 0,0,0)
 Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
@@ -225,10 +222,17 @@ Global mouse_left_limit% = 250, mouse_right_limit% = GraphicsWidth () - 250
 Global mouse_top_limit% = 150, mouse_bottom_limit% = GraphicsHeight () - 150 ; As above.
 Global mouse_x_speed_1#, mouse_y_speed_1#
 
-Global KEY_RIGHT=GetINIInt(OptionFile, "options", "Right key"), KEY_LEFT=GetINIInt(OptionFile, "options", "Left key")
-Global KEY_UP=GetINIInt(OptionFile, "options", "Up key"), KEY_DOWN=GetINIInt(OptionFile, "options", "Down key")
-Global KEY_BLINK=GetINIInt(OptionFile, "options", "Blink key"), KEY_SPRINT=GetINIInt(OptionFile, "options", "Sprint key")
-Global KEY_INV=GetINIInt(OptionFile, "options", "Inventory key"), KEY_CROUCH=GetINIInt(OptionFile, "options", "Crouch key")
+Global KEY_RIGHT = GetINIInt(OptionFile, "binds", "Right key")
+Global KEY_LEFT = GetINIInt(OptionFile, "binds", "Left key")
+Global KEY_UP = GetINIInt(OptionFile, "binds", "Up key")
+Global KEY_DOWN = GetINIInt(OptionFile, "binds", "Down key")
+
+Global KEY_BLINK = GetINIInt(OptionFile, "binds", "Blink key")
+Global KEY_SPRINT = GetINIInt(OptionFile, "binds", "Sprint key")
+Global KEY_INV = GetINIInt(OptionFile, "binds", "Inventory key")
+Global KEY_CROUCH = GetINIInt(OptionFile, "binds", "Crouch key")
+Global KEY_SAVE = GetINIInt(OptionFile, "binds", "Save key")
+Global KEY_CONSOLE = GetINIInt(OptionFile, "binds", "Console key")
 
 Const INFINITY# = (999.0) ^ (99999.0), NAN# = (-1.0) ^ (0.5)
 
@@ -316,6 +320,8 @@ Dim RadioCHN%(8)
 Dim OldAiPics%(5)
 
 Global PlayTime%
+Global ConsoleFlush%
+Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0
 
 Global InfiniteStamina% = False
 
@@ -718,6 +724,8 @@ Function UpdateConsole()
 
 				Case "disable173"
 					Curr173\Idle = 3 ;This phenominal comment is brought to you by PolyFox. His absolute wisdom in this fatigue of knowledge brought about a new era of 173 state checks.
+					HideEntity Curr173\obj
+					HideEntity Curr173\Collider
 
 				Case "enable173"
 					Curr173\Idle = False
@@ -948,6 +956,26 @@ Function UpdateConsole()
 							Exit
 						EndIf
 					Next
+					
+				Case "toggle_079_deal"
+					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					
+					Select StrTemp
+						Case "a"
+							For e.Events = Each Events
+								If e\EventName="gateaentrance" Then
+									e\EventState3 = (Not e\EventState3)
+									Exit
+								EndIf
+							Next
+						Case "b"
+							For e.Events = Each Events
+								If e\EventName="exit1" Then
+									e\EventState3 = (Not e\EventState3)
+									Exit
+								EndIf
+							Next	
+					End Select
 
 				Case "kill","suicide"
 					KillTimer = -1
@@ -1042,6 +1070,17 @@ Function UpdateConsole()
 				Case "teleport173"
 					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
 					ResetEntity Curr173\Collider
+				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
+					ConsoleFlush = True 
+					
+					If ConsoleFlushSnd = 0 Then
+						ConsoleFlushSnd = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(83)+Chr(67)+Chr(80)+Chr(92)+Chr(57)+Chr(55)+Chr(48)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
+						If MusicCHN <> 0 Then StopChannel MusicCHN
+						ConsoleMusFlush% = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(77)+Chr(117)+Chr(115)+Chr(105)+Chr(99)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
+						CreateConsoleMsg(Chr(74)+Chr(79)+Chr(82)+Chr(71)+Chr(69)+Chr(32)+Chr(72)+Chr(65)+Chr(83)+Chr(32)+Chr(66)+Chr(69)+Chr(69)+Chr(78)+Chr(32)+Chr(69)+Chr(88)+Chr(80)+Chr(69)+Chr(67)+Chr(84)+Chr(73)+Chr(78)+Chr(71)+Chr(32)+Chr(89)+Chr(79)+Chr(85)+Chr(46))
+					Else
+						CreateConsoleMsg(Chr(74)+Chr(32)+Chr(79)+Chr(32)+Chr(82)+Chr(32)+Chr(71)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(65)+Chr(32)+Chr(78)+Chr(32)+Chr(78)+Chr(32)+Chr(79)+Chr(32)+Chr(84)+Chr(32)+Chr(32)+Chr(66)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(79)+Chr(32)+Chr(78)+Chr(32)+Chr(84)+Chr(32)+Chr(65)+Chr(32)+Chr(73)+Chr(32)+Chr(78)+Chr(32)+Chr(69)+Chr(32)+Chr(68)+Chr(46))
+					EndIf
 				Default
 					CreateConsoleMsg("Command not found.")
 			End Select
@@ -1847,12 +1886,12 @@ Function UseDoor(d.Doors, showmsg%=True)
 		If temp <> 0 Then
 			PlaySound_Strict ScannerSFX1
 			Msg = "You place the palm of the hand onto the scanner. The scanner reads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
-			MsgTimer = 70 * 5
+			MsgTimer = 70 * 10
 		Else
 			If showmsg = True Then 
 				PlaySound_Strict ScannerSFX2
 				Msg = "You placed your palm onto the scanner. The scanner reads: "+Chr(34)+"DNA does not match known sample. Access denied."+Chr(34)
-				MsgTimer = 70 * 5
+				MsgTimer = 70 * 10
 			EndIf
 			Return			
 		EndIf
@@ -2514,7 +2553,7 @@ Repeat
 				SelectedScreen = Null
 				SelectedMonitor = Null
 				BlurTimer = Abs(FallTimer*10)
-				FallTimer=FallTimer-FPSfactor
+				FallTimer = FallTimer-FPSfactor
 				darkA = Max(darkA, Min(Abs(FallTimer / 400.0), 1.0))				
 			EndIf
 			
@@ -2539,7 +2578,7 @@ Repeat
 		
 		;[End block]
 		
-		If KeyHit(63) Then
+		If KeyHit(KEY_SAVE) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
 				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
@@ -2579,24 +2618,24 @@ Repeat
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
 			If (Msg<>"Game progress saved." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
-				Msg = "Press F5 to save."
+				Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 				MsgTimer = 70*5
 			EndIf
 			
 			If MouseHit2 Then SelectedMonitor = Null
 		EndIf
 		
-		If KeyHit(61) Then
+		If KeyHit(KEY_CONSOLE) Then
 			If CanOpenConsole
-			If ConsoleOpen Then
-				UsedConsole = True
-				ResumeSounds()
-				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
-			Else
-				PauseSounds()
-			EndIf
-			ConsoleOpen = (Not ConsoleOpen)
-			FlushKeys()
+				If ConsoleOpen Then
+					UsedConsole = True
+					ResumeSounds()
+					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+				Else
+					PauseSounds()
+				EndIf
+				ConsoleOpen = (Not ConsoleOpen)
+				FlushKeys()
 			EndIf
 		EndIf
 		
@@ -4194,8 +4233,10 @@ Function DrawGUI()
 										Else
 											If added\itemtemplate\tempname = "paper" Or added\itemtemplate\tempname = "oldpaper" Then
 												Msg = "This document was added to the clipboard."
+											ElseIf added\itemtemplate\tempname = "badge"
+												Msg = added\itemtemplate\name + " was added to the clipboard."
 											Else
-												Msg = "This "+added\itemtemplate\name+" was added to the clipboard."
+												Msg = "The " + added\itemtemplate\name + " was added to the clipboard."
 											EndIf
 											
 										EndIf
@@ -5294,8 +5335,8 @@ Function DrawGUI()
 					SelectedItem\state = 1
 					SelectedItem = Null
 				Case "oldpaper"
-					If SelectedItem\itemtemplate\img=0 Then
-						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+					If SelectedItem\itemtemplate\img = 0 Then
+						SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
 						
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
@@ -5320,7 +5361,6 @@ Function DrawGUI()
 					EndIf
 					
 					Msg = ""
-					MsgTimer = 70*10
 					
 					SelectedItem\state = 1
 					SelectedItem = Null
@@ -5462,7 +5502,7 @@ Function DrawMenu()
 			AAText x, y+40*MenuScale,	"Save: "+CurrSave
 			AAText x, y+60*MenuScale, "Map seed: "+RandomSeed
 		ElseIf AchievementsMenu <= 0 And OptionsMenu > 0 And QuitMSG <= 0 And KillTimer >= 0
-			If DrawButton(x+101*MenuScale, y + 344*MenuScale, 230*MenuScale, 60*MenuScale, "Back") Then
+			If DrawButton(x + 101 * MenuScale, y + 390 * MenuScale, 230 * MenuScale, 60 * MenuScale, "Back") Then
 				AchievementsMenu = 0
 				OptionsMenu = 0
 				QuitMSG = 0
@@ -5488,14 +5528,16 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 				
-				PutINIValue(OptionFile, "options", "Right key", KEY_RIGHT)
-				PutINIValue(OptionFile, "options", "Left key", KEY_LEFT)
-				PutINIValue(OptionFile, "options", "Up key", KEY_UP)
-				PutINIValue(OptionFile, "options", "Down key", KEY_DOWN)
-				PutINIValue(OptionFile, "options", "Blink key", KEY_BLINK)
-				PutINIValue(OptionFile, "options", "Sprint key", KEY_SPRINT)
-				PutINIValue(OptionFile, "options", "Inventory key", KEY_INV)
-				PutINIValue(OptionFile, "options", "Crouch key", KEY_CROUCH)
+				PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
+				PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
+				PutINIValue(OptionFile, "binds", "Up key", KEY_UP)
+				PutINIValue(OptionFile, "binds", "Down key", KEY_DOWN)
+				PutINIValue(OptionFile, "binds", "Blink key", KEY_BLINK)
+				PutINIValue(OptionFile, "binds", "Sprint key", KEY_SPRINT)
+				PutINIValue(OptionFile, "binds", "Inventory key", KEY_INV)
+				PutINIValue(OptionFile, "binds", "Crouch key", KEY_CROUCH)
+				PutINIValue(OptionFile, "binds", "Save key", KEY_SAVE)
+				PutINIValue(OptionFile, "binds", "Console key", KEY_CONSOLE)
 				
 				AntiAlias Opt_AntiAlias
 				;TextureLodBias TextureFloat#
@@ -5684,28 +5726,32 @@ Function DrawMenu()
 					AAText(x, y, "Control configuration:")
 					y = y + 10*MenuScale
 					
-					AAText(x, y + 20 * MenuScale, "Up")
-					InputBox(x + 60 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
-					AAText(x, y + 40 * MenuScale, "Left")
-					InputBox(x + 60 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
-					AAText(x, y + 60 * MenuScale, "Down")
-					InputBox(x + 60 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
-					AAText(x, y + 80 * MenuScale, "Right")
-					InputBox(x + 60 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)	
+					AAText(x, y + 20 * MenuScale, "Move Forward")
+					InputBox(x + 200 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
+					AAText(x, y + 40 * MenuScale, "Strafe Left")
+					InputBox(x + 200 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
+					AAText(x, y + 60 * MenuScale, "Move Backward")
+					InputBox(x + 200 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
+					AAText(x, y + 80 * MenuScale, "Strafe Right")
+					InputBox(x + 200 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)
 					
-					AAText(x + 220 * MenuScale, y + 20 * MenuScale, "Blink")
-					InputBox(x + 320 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
-					AAText(x + 220 * MenuScale, y + 40 * MenuScale, "Sprint")
-					InputBox(x + 320 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
-					AAText(x + 220 * MenuScale, y + 60 * MenuScale, "Inventory")
-					InputBox(x + 320 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
-					AAText(x + 220 * MenuScale, y + 80 * MenuScale, "Crouch")
-					InputBox(x + 320 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					AAText(x, y + 100 * MenuScale, "Manual Blink")
+					InputBox(x + 200 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
+					AAText(x, y + 120 * MenuScale, "Sprint")
+					InputBox(x + 200 * MenuScale, y + 120 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
+					AAText(x, y + 140 * MenuScale, "Open/Close Inventory")
+					InputBox(x + 200 * MenuScale, y + 140 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
+					AAText(x, y + 160 * MenuScale, "Crouch")
+					InputBox(x + 200 * MenuScale, y + 160 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					AAText(x, y + 180 * MenuScale, "Quick Save")
+					InputBox(x + 200 * MenuScale, y + 180 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)	
+					AAText(x, y + 200 * MenuScale, "Open/Close Console")
+					InputBox(x + 200 * MenuScale, y + 200 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
 					
 					For i = 0 To 227
 						If KeyHit(i) Then key = i : Exit
 					Next
-					If key<>0 Then
+					If key <> 0 Then
 						Select SelectedInputBox
 							Case 3
 								KEY_LEFT = key
@@ -5723,6 +5769,10 @@ Function DrawMenu()
 								KEY_INV = key
 							Case 10
 								KEY_CROUCH = key
+							Case 11
+								KEY_SAVE = key
+							Case 12
+								KEY_CONSOLE = key
 						End Select
 						SelectedInputBox = 0
 					EndIf
@@ -6613,8 +6663,6 @@ Function NullGame()
 	
 	HideDistance# = 15.0
 	
-	CameraZoom Camera, 1.0
-	
 	For lvl = 0 To 0
 		For x = 0 To MapWidth - 1
 			For y = 0 To MapHeight - 1
@@ -6646,7 +6694,7 @@ Function NullGame()
 	Infect = 0
 	
 	For i = 0 To 5
-		SCP1025state[i]=0
+		SCP1025state[i] = 0
 	Next
 	
 	SelectedEnding = ""
@@ -6917,7 +6965,9 @@ End Function
 
 Function UpdateMusic()
 	
-	If (Not PlayCustomMusic)
+	If ConsoleFlush Then
+		If Not ChannelPlaying(MusicCHN) Then MusicCHN = PlaySound(ConsoleMusFlush)
+	ElseIf (Not PlayCustomMusic)
 		If FPSfactor > 0 Or OptionsMenu = 2 Then 
 			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
 				CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
@@ -9182,8 +9232,6 @@ End Function
 
 
 
-
 ;~IDEal Editor Parameters:
-;~F#2174#21D4
-;~B#11A1#13D9#1A5B
+;~B#11AB#13E3#1A65
 ;~C#Blitz3D
