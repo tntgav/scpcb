@@ -51,6 +51,7 @@ Type NPCs
 	
 	Field ManipulateBone%
 	Field BoneToManipulate$
+	Field BoneToManipulate2$
 	Field ManipulationType%
 	Field BoneX#,BoneY#,BoneZ#
 	Field BonePitch#,BoneYaw#,BoneRoll#
@@ -696,7 +697,7 @@ Function UpdateNPCs()
 								n\PrevX = EntityX(n\Collider)
 								n\PrevZ = EntityZ(n\Collider)				
 								
-								If (BlinkTimer < - 16 Or BlinkTimer > - 6) Then
+								If (BlinkTimer < - 16 Or BlinkTimer > - 6) And (IsNVGBlinking=False) Then
 									If EntityInView(n\obj, Camera) Then move = False
 								EndIf
 							EndIf
@@ -2194,6 +2195,7 @@ Function UpdateNPCs()
 				prevFrame# = n\Frame
 				
 				n\BoneToManipulate = ""
+				n\BoneToManipulate2 = ""
 				n\ManipulateBone = False
 				n\ManipulationType = 0
 				
@@ -2251,6 +2253,7 @@ Function UpdateNPCs()
 								FreeEntity(pvt)									
 							EndIf
 							n\BoneToManipulate = "chest"
+							n\BoneToManipulate2 = "head"
 							n\ManipulateBone = True
 							n\ManipulationType = 1
 						Else
@@ -6364,13 +6367,17 @@ Function Console_SpawnNPC(c_input$,state%=-9999)
 End Function
 
 Function ManipulateNPCBones()
-	Local n.NPCs,bone%,pvt%,pitch#,yaw#,roll#
+	Local n.NPCs,bone%,bone2%,pvt%,pitch#,yaw#,roll#
 	
 	For n = Each NPCs
 		If n\ManipulateBone
 			pvt% = CreatePivot()
 			bone% = FindChild(n\obj,n\BoneToManipulate$)
 			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate+Chr(34)+" is not existing!"
+			If n\BoneToManipulate2<>""
+				bone2% = FindChild(n\obj,n\BoneToManipulate2$)
+				If bone2% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate2+Chr(34)+" is not existing!"
+			EndIf
 			PositionEntity pvt%,EntityX(bone%,True),EntityY(bone%,True),EntityZ(bone%,True)
 			Select n\ManipulationType
 				Case 0 ;<--- looking at player
@@ -6380,11 +6387,11 @@ Function ManipulateNPCBones()
 					n\BonePitch# = CurveAngle(EntityPitch(pvt%),n\BonePitch#,10.0)
 					RotateEntity bone%,n\BoneYaw#,-n\BonePitch#+20,0
 				Case 1 ;<--- looking at player #2
-					;PointEntity bone%,Collider
-					;RotateEntity bone%,0,EntityYaw(bone%),0
-					PointEntity pvt%,Camera
-					n\BonePitch# = CurveAngle(EntityPitch(pvt%),n\BonePitch#,10.0)
-					RotateEntity bone%,0,-n\BonePitch#-10,0
+					;PointEntity pvt%,Camera
+					;n\BonePitch# = CurveAngle(EntityPitch(pvt%),n\BonePitch#,10.0)
+					;RotateEntity bone%,0,-n\BonePitch#-10,0
+					n\BonePitch# = CurveAngle(DeltaPitch(bone2%,Camera),n\BonePitch#,10.0)
+					RotateEntity bone%,0,-n\BonePitch#-20,0
 				Case 2 ;<--- looking away from SCP-096
 					PointEntity bone%,Curr096\obj
 					n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
