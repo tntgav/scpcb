@@ -623,6 +623,8 @@ Function LoadGame(file$)
 				SetAnimTime(n\obj, frame)
 		End Select
 		
+		n\Frame = frame
+		
 		n\IsDead = ReadInt(f)
 		n\PathX = ReadFloat(f)
 		n\PathZ = ReadFloat(f)
@@ -632,11 +634,10 @@ Function LoadGame(file$)
 		n\ModelScaleY# = ReadFloat(f)
 		n\ModelScaleZ# = ReadFloat(f)
 		If n\Model <> ""
-			model = LoadAnimMesh_Strict(n\Model)
-			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
 			FreeEntity n\obj
-			n\obj = model
-			SetAnimTime n\obj,n\Frame
+			n\obj = LoadAnimMesh_Strict(n\Model)
+			ScaleEntity n\obj,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+			SetAnimTime n\obj,frame
 		EndIf
 	Next
 	
@@ -910,11 +911,20 @@ Function LoadGame(file$)
 		;Reset for the monitor loading and stuff for room2sl
 		If e\EventName = "room2sl"
 			e\EventState = 0.0
+			e\EventStr = ""
 			DebugLog "Reset Eventstate in "+e\EventName
 		;Only reset if the dimension has already been generated and the player wasn't saving in it
 		ElseIf e\EventName = "dimension1499"
 			If e\EventState = 1.0
 				e\EventState = 0.0
+				e\EventStr = ""
+				For n.NPCs = Each NPCs
+					If n\NPCtype = NPCtype1499
+						If n\InFacility = 0
+							RemoveNPC(n)
+						EndIf
+					EndIf
+				Next
 				DebugLog "Reset Eventstate in "+e\EventName
 			EndIf
 		EndIf
@@ -1292,6 +1302,8 @@ Function LoadGameQuick(file$)
 				SetAnimTime(n\obj, frame)
 		End Select		
 		
+		n\Frame = frame
+		
 		n\IsDead = ReadInt(f)
 		n\PathX = ReadFloat(f)
 		n\PathZ = ReadFloat(f)
@@ -1301,11 +1313,10 @@ Function LoadGameQuick(file$)
 		n\ModelScaleY# = ReadFloat(f)
 		n\ModelScaleZ# = ReadFloat(f)
 		If n\Model <> ""
-			model = LoadAnimMesh_Strict(n\Model)
-			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
 			FreeEntity n\obj
-			n\obj = model
-			SetAnimTime n\obj,n\Frame
+			n\obj = LoadAnimMesh_Strict(n\Model)
+			ScaleEntity n\obj,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+			SetAnimTime n\obj,frame
 		EndIf
 	Next
 	

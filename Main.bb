@@ -324,6 +324,8 @@ Global ConsoleFlush%
 Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0
 
 Global InfiniteStamina% = False
+Global NVBlink%
+Global IsNVGBlinking% = False
 
 ;[End block]
 
@@ -3362,7 +3364,7 @@ Function MouseLook()
 			AmbientLightRooms(15)
 		ElseIf WearingNightVision=3 Then
 			EntityColor(NVOverlay, 255,0,0)
-			AmbientLightRooms(40)
+			AmbientLightRooms(15)
 		Else
 			EntityColor(NVOverlay, 0,255,0)
 			AmbientLightRooms(15)
@@ -4278,12 +4280,15 @@ Function DrawGUI()
 										End Select
 									Case "Night Vision Goggles"
 										Local nvname$ = Inventory(MouseSlot)\itemtemplate\tempname
-										If nvname$="nvgoggles" Or nvname$="veryfinenvgoggles" Then
+										If nvname$="nvgoggles" Or nvname$="supernv" Then
 											If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
 											RemoveItem (SelectedItem)
 											SelectedItem = Null
 											Inventory(MouseSlot)\state = 1000.0
 											Msg = "You replaced the goggles' battery."
+											MsgTimer = 70 * 5
+										Else
+											Msg = "There seems to be no place for batteries in these night vision goggles."
 											MsgTimer = 70 * 5
 										EndIf
 									Default
@@ -5072,20 +5077,10 @@ Function DrawGUI()
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
-					If WearingHazmat Then
-						Msg = "You removed the hazmat suit."
-					Else
-						Msg = "You put on the hazmat suit."
-						TakeOffStuff(16)
-					EndIf
+					Msg = "You removed the hazmat suit."
+					WearingHazmat=0
 					MsgTimer = 70 * 5
-					If SelectedItem\itemtemplate\tempname="hazmatsuit3" Then
-						If WearingHazmat=0 Then WearingHazmat = 3 Else WearingHazmat=0
-					ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2"
-						If WearingHazmat=0 Then WearingHazmat = 2 Else WearingHazmat=0
-					Else
-						WearingHazmat = (Not WearingHazmat)
-					EndIf
+					DropItem(SelectedItem)
 					SelectedItem = Null	
 				Case "vest"
 					If WearingVest Then
@@ -6124,6 +6119,13 @@ Function LoadEntities()
 	EntityOrder NVOverlay, -1003
 	MoveEntity(NVOverlay, 0, 0, 1.0)
 	HideEntity(NVOverlay)
+	NVBlink = CreateSprite(ark_blur_cam)
+	ScaleSprite(NVBlink, Max(GraphicWidth / 1024.0, 1.0), Max(GraphicHeight / 1024.0 * 0.8, 0.8))
+	EntityColor(NVBlink,0,0,0)
+	EntityFX(NVBlink, 1)
+	EntityOrder NVBlink, -1005
+	MoveEntity(NVBlink, 0, 0, 1.0)
+	HideEntity(NVBlink)
 	
 	GlassesTexture = LoadTexture_Strict("GFX\GlassesOverlay.jpg",1)
 	GlassesOverlay = CreateSprite(ark_blur_cam)
@@ -7397,7 +7399,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							it2 = CreateItem("Metal Panel", "scp148", x, y, z)
 							RemoveItem(item)
 						Else
-							PositionEntity(Item\collider, x, y, z)
+							PositionEntity(item\collider, x, y, z)
 							ResetEntity(item\collider)							
 						EndIf
 					EndIf					
@@ -8834,9 +8836,12 @@ Function RenderWorld2()
 		EndIf
 	EndIf
 	
+	IsNVGBlinking% = False
+	HideEntity NVBlink
+	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision=1) Or (WearingNightVision=3)
+	If (WearingNightVision=1) Or (WearingNightVision=2)
 		For i=0 To MaxItemAmount-1
 			If (Inventory(i)<>Null) Then
 				If (WearingNightVision=1)
@@ -8854,7 +8859,7 @@ Function RenderWorld2()
 					EndIf
 					EndIf
 				Else
-					If Inventory(i)\itemtemplate\tempname="veryfinenvgoggles" Then
+					If Inventory(i)\itemtemplate\tempname="supernv" Then
 						Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.04)
 						power%=Int(Inventory(i)\state)
 						If Inventory(i)\state<=0.0 Then ;this nvg can't be used
@@ -8878,8 +8883,13 @@ Function RenderWorld2()
 		RenderWorld()
 	EndIf
 	
+	If hasBattery=0 And WearingNightVision<>3
+		IsNVGBlinking% = True
+		ShowEntity NVBlink%
+	EndIf
+	
 	If BlinkTimer < - 16 Or BlinkTimer > - 6
-		If WearingNightVision=2 Then ;show a HUD
+		If WearingNightVision=2 And hasBattery<>0 Then ;show a HUD
 			NVTimer=NVTimer-FPSfactor
 			
 			If NVTimer<=0.0 Then
@@ -8888,7 +8898,11 @@ Function RenderWorld2()
 					np\NVY = EntityY(np\Collider,True)
 					np\NVZ = EntityZ(np\Collider,True)
 				Next
+				IsNVGBlinking% = True
+				ShowEntity NVBlink%
+				If NVTimer<=-10
 				NVTimer = 600.0
+			EndIf
 			EndIf
 			
 			Color 255,255,255
@@ -8897,7 +8911,7 @@ Function RenderWorld2()
 			
 			AAText GraphicWidth/2,20*MenuScale,"REFRESHING DATA IN",True,False
 			
-			AAText GraphicWidth/2,60*MenuScale,f2s(NVTimer/60.0,1),True,False
+			AAText GraphicWidth/2,60*MenuScale,Max(f2s(NVTimer/60.0,1),0.0),True,False
 			AAText GraphicWidth/2,100*MenuScale,"SECONDS",True,False
 			
 			temp% = CreatePivot() : temp2% = CreatePivot()
@@ -8930,25 +8944,37 @@ Function RenderWorld2()
 							yvalue# = Sin(pitchvalue)
 						EndIf
 						
+						If (Not IsNVGBlinking%)
 						AAText GraphicWidth / 2 + xvalue * (GraphicWidth / 2),GraphicHeight / 2 - yvalue * (GraphicHeight / 2),np\NVName,True,True
 						AAText GraphicWidth / 2 + xvalue * (GraphicWidth / 2),GraphicHeight / 2 - yvalue * (GraphicHeight / 2) + 30.0 * MenuScale,f2s(dist,1)+" m",True,True
 					EndIf
+				EndIf
 				EndIf
 			Next
 			
 			FreeEntity (temp) : FreeEntity (temp2)
 			
-			Color 255,255,255
-		ElseIf (WearingNightVision=1 Or WearingNightVision=3) And hasBattery<>0
-			Color 55*(WearingNightVision=3),55*(WearingNightVision=1),0
+			Color 0,0,55
 			For k=0 To 10
 				Rect 45,GraphicHeight*0.5-(k*20),54,10,True
 			Next
-			Color 255*(WearingNightVision=3),255*(WearingNightVision=1),0
+			Color 0,0,255
 			For l=0 To Floor((power%+50)*0.01)
 				Rect 45,GraphicHeight*0.5-(l*20),54,10,True
 			Next
-			DrawImage NVGImages,40,GraphicHeight*0.5+30,(WearingNightVision=3)
+			DrawImage NVGImages,40,GraphicHeight*0.5+30,1
+			
+			Color 255,255,255
+		ElseIf WearingNightVision=1 And hasBattery<>0
+			Color 0,55,0
+			For k=0 To 10
+				Rect 45,GraphicHeight*0.5-(k*20),54,10,True
+			Next
+			Color 0,255,0
+			For l=0 To Floor((power%+50)*0.01)
+				Rect 45,GraphicHeight*0.5-(l*20),54,10,True
+			Next
+			DrawImage NVGImages,40,GraphicHeight*0.5+30,0
 		EndIf
 	EndIf
 	
@@ -8959,7 +8985,7 @@ Function RenderWorld2()
 	CameraProjMode ark_blur_cam,0
 	
 	If BlinkTimer < - 16 Or BlinkTimer > - 6
-		If (WearingNightVision=1 Or WearingNightVision=3) And (hasBattery=1) And ((MilliSecs2() Mod 800) < 400) Then
+		If (WearingNightVision=1 Or WearingNightVision=2) And (hasBattery=1) And ((MilliSecs2() Mod 800) < 400) Then
 			Color 255,0,0
 			AASetFont Font3
 			

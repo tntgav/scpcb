@@ -593,6 +593,26 @@ Function PickItem(item.Items)
 						item\state = 0
 					Case "navigator", "nav"
 						If item\itemtemplate\name = "S-NAV Navigator Ultimate" Then GiveAchievement(AchvSNAV)
+					Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
+						Msg = "You put on the hazmat suit."
+						TakeOffStuff(16)
+						MsgTimer = 70 * 5
+						If SelectedItem\itemtemplate\tempname="hazmatsuit3" Then
+							WearingHazmat = 3
+						ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2"
+							WearingHazmat = 2
+						Else
+							WearingHazmat = 1
+						EndIf
+						
+						For z% = 0 To MaxItemAmount - 1
+							If Inventory(z) <> Null Then
+								If Inventory(z)\itemtemplate\tempname="hazmatsuit" Or Inventory(z)\itemtemplate\tempname="hazmatsuit2" Or Inventory(z)\itemtemplate\tempname="hazmatsuit3" Then
+									DropItem(Inventory(z))
+								EndIf
+							EndIf
+						Next
+						
 				End Select
 				
 				If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))

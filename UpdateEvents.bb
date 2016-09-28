@@ -141,6 +141,7 @@ Function UpdateEvents()
 								
 								
 								If e\EventState > 900+2.5*70 Then
+									If e\room\NPC[2]\State<>1
 									e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
 									AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
 									MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
@@ -152,6 +153,7 @@ Function UpdateEvents()
 									Else
 										RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
 									EndIf
+								EndIf
 								EndIf
 								
 								If e\EventState < 900+4*70 Then
@@ -174,6 +176,7 @@ Function UpdateEvents()
 									
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
 									
+									If e\room\NPC[2]\State <> 1
 									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
 										e\room\RoomDoors[5]\open = False
 										LightBlink = 3.0
@@ -184,8 +187,13 @@ Function UpdateEvents()
 										ResetEntity Curr173\Collider
 									EndIf
 								EndIf
+								EndIf
+								
+								If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1
+								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = True
 							Else
 								CanSave = True
+								If e\room\NPC[2]\State<>1
 								If EntityX(Collider)<(e\room\x+1384*RoomScale) Then e\EventState = Max(e\EventState,900)
 								
 								If e\room\RoomDoors[5]\openstate=0 Then 
@@ -195,6 +203,7 @@ Function UpdateEvents()
 									HideEntity e\room\NPC[2]\obj
 									HideEntity e\room\NPC[2]\Collider
 									e\EventState2=1
+								EndIf
 								EndIf
 							EndIf
 						EndIf
@@ -7359,12 +7368,14 @@ Function UpdateEvents()
 				
 			Case "testroom173"
 				;[Block]
-				If PlayerRoom = e\room Then	
+				If PlayerRoom = e\room	
 					If Curr173\Idle = 0 Then 
 						If e\EventState = 0 Then
+							If e\room\RoomDoors[0]\open = True
 							PositionEntity(Curr173\Collider, EntityX(e\room\Objects[0], True), 0.5, EntityZ(e\room\Objects[0], True))
 							ResetEntity(Curr173\Collider)
 							e\EventState = 1
+							EndIf
 						Else
 							ShowEntity (e\room\Objects[2])
 							;start a timer for 173 breaking through the window
@@ -8049,7 +8060,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 					EndIf
-					PositionEntity e\room\Objects[0],0,800,0
+					;PositionEntity e\room\Objects[0],0,800,0
 					CameraFogRange Camera,40,80
 					CameraFogColor Camera,96,97,104
 					CameraClsColor Camera,96,97,104
@@ -8064,6 +8075,10 @@ Function UpdateEvents()
 						ShowEntity NTF_1499Sky
 						Update1499Sky()
 						ShouldPlay = 18
+						If EntityY(Collider)<800.0 Then PositionEntity Collider,EntityX(Collider),800.1,EntityZ(Collider),True
+						ResetEntity Collider
+					Else
+						DropSpeed = 0
 					EndIf
 					CurrStepSFX=3
 				Else
