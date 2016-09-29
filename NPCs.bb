@@ -2397,6 +2397,7 @@ Function UpdateNPCs()
 								EndIf
 								
 								n\BoneToManipulate = "chest"
+								n\BoneToManipulate2 = "head"
 								n\ManipulateBone = True
 								n\ManipulationType = 1
 							Else
@@ -3934,6 +3935,10 @@ Function UpdateNPCs()
 						n\State3=Max(n\State3-FPSfactor*0.2,0.0)
 					EndIf
 					
+					If n\State <> 10
+						n\LastSeen = 0
+					EndIf
+					
 					Select n\State
 						Case 0 ;idle, standing
 							If n\Frame>2300.0 Then
@@ -4098,6 +4103,11 @@ Function UpdateNPCs()
 								MoveEntity n\Collider,0,0,n\CurrSpeed
 							EndIf
 						Case 10 ;attack
+							If n\LastSeen=0
+								PlaySound2(LoadTempSound("SFX\SCP\966\Echo"+Rand(1,3)+".ogg"), Camera, n\Collider)
+								n\LastSeen = 1
+							EndIf
+							
 							If n\Frame>2300.0 Then
 								AnimateNPC(n, 2391, 2416, 1.0, False)	
 								If n\Frame>2415.0 Then 
