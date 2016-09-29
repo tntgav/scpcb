@@ -3024,7 +3024,7 @@ Function MovePlayer()
 			
 			Local temp# = (Shake Mod 360), tempchn%
 			If (Not UnableToMove%) Then Shake# = (Shake + FPSfactor * Min(Sprint, 1.5) * 7) Mod 720
-			If temp < 180 And (Shake Mod 360) >= 180 Then
+			If temp < 180 And (Shake Mod 360) >= 180 And KillTimer>=0 Then
 				If CurrStepSFX=0 Then
 					temp = GetStepSound(Collider)
 					
