@@ -119,6 +119,8 @@ Function UpdateEvents()
 					
 					If (CurrTrigger = "173scene_timer") Then
 						e\EventState=e\EventState+FPSfactor
+						Msg = "Hold "+KeyName(KEY_SPRINT)+" to run."
+						MsgTimer = 70*4
 					Else If (CurrTrigger = "173scene_activated")
 						e\EventState = Max(e\EventState, 500)
 					EndIf
@@ -189,7 +191,10 @@ Function UpdateEvents()
 								EndIf
 								EndIf
 								
-								If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1
+								If (CurrTrigger = "173scene_end")
+									e\room\NPC[2]\State = 1
+									e\room\NPC[2]\State3 = 1
+								EndIf
 								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = True
 							Else
 								CanSave = True
@@ -294,7 +299,7 @@ Function UpdateEvents()
 						ShouldPlay = 13
 						
 						;slow the player down a bit to match his speed to the guards
-						CurrSpeed = CurrSpeed - (CurrSpeed * 0.01 * FPSfactor)
+						CurrSpeed = CurrSpeed - (CurrSpeed * 0.015 * FPSfactor)
 						
 						If e\EventState3 < 170 Then 
 							If e\EventState3 = 1.0 Then
@@ -622,12 +627,16 @@ Function UpdateEvents()
 										e\room\NPC[3]\State = 11
 										e\room\NPC[4]\State = 11
 										e\room\NPC[5]\State = 11
+										e\room\NPC[3]\State3 = 1
+										e\room\NPC[4]\State3 = 1
+										e\room\NPC[5]\State3 = 1
 									EndIf
 								EndIf
 								If e\room\NPC[5]\State <> 11
 									If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0
 										If EntityDistance(e\room\NPC[5]\Collider,Collider)<3.5
 											e\room\NPC[5]\State = 11
+											e\room\NPC[5]\State3 = 1
 											e\room\NPC[5]\SoundChn2 = PlaySound2(e\room\NPC[5]\Sound2,Camera,e\room\NPC[5]\Collider)
 											e\room\NPC[5]\Reload = 70*3
 										EndIf
@@ -886,6 +895,8 @@ Function UpdateEvents()
 							If IntroSFX(17)<>0 Then
 								If EntityVisible(Curr173\Collider, Collider) Then
 									If EntityInView(Curr173\obj, Camera) Then
+									    Msg = "Press "+KeyName(KEY_BLINK)+" to blink."
+							            MsgTimer = 70*4
 										PlaySound_Strict IntroSFX(17)
 										IntroSFX(17)=0
 									EndIf
