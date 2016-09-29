@@ -622,12 +622,16 @@ Function UpdateEvents()
 										e\room\NPC[3]\State = 11
 										e\room\NPC[4]\State = 11
 										e\room\NPC[5]\State = 11
+										e\room\NPC[3]\State3 = 1
+										e\room\NPC[4]\State3 = 1
+										e\room\NPC[5]\State3 = 1
 									EndIf
 								EndIf
 								If e\room\NPC[5]\State <> 11
 									If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0
 										If EntityDistance(e\room\NPC[5]\Collider,Collider)<3.5
 											e\room\NPC[5]\State = 11
+											e\room\NPC[5]\State3 = 1
 											e\room\NPC[5]\SoundChn2 = PlaySound2(e\room\NPC[5]\Sound2,Camera,e\room\NPC[5]\Collider)
 											e\room\NPC[5]\Reload = 70*3
 										EndIf
