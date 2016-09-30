@@ -255,7 +255,7 @@ Function UpdateEvents()
 							e\Sound2 = LoadSound_Strict("SFX\Alarm\Alarm2_"+Int(e\EventState3)+".ogg")
 							e\SoundCHN2 = PlaySound_Strict(e\Sound2)
 							Else
-							If Int(e\EventState3) = 8 Then CameraShake = 1.0
+								If Int(e\EventState3) = 8 Then CameraShake = 1.0
 						EndIf
 					EndIf
 					
@@ -298,8 +298,8 @@ Function UpdateEvents()
 						If Music(13)=0 Then Music(13) = LoadSound_Strict("SFX\Music\Intro.ogg")
 						ShouldPlay = 13
 						
-						;slow the player down a bit to match his speed to the guards
-						CurrSpeed = CurrSpeed - (CurrSpeed * 0.015 * FPSfactor)
+						;slow the player down to match his speed to the guards
+						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.007/EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
 						
 						If e\EventState3 < 170 Then 
 							If e\EventState3 = 1.0 Then
@@ -895,8 +895,8 @@ Function UpdateEvents()
 							If IntroSFX(17)<>0 Then
 								If EntityVisible(Curr173\Collider, Collider) Then
 									If EntityInView(Curr173\obj, Camera) Then
-									    Msg = "Press "+KeyName(KEY_BLINK)+" to blink."
-							            MsgTimer = 70*4
+										Msg = "Press "+KeyName(KEY_BLINK)+" to blink."
+										MsgTimer = 70*4
 										PlaySound_Strict IntroSFX(17)
 										IntroSFX(17)=0
 									EndIf
