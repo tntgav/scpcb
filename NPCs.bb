@@ -2205,7 +2205,7 @@ Function UpdateNPCs()
 							dist = EntityDistance(n\Collider,Collider)
 							Local ShootAccuracy# = 0.9
 							Local DetectDistance# = 11.0
-
+							
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
 								ShootAccuracy = 0.3
@@ -2249,10 +2249,17 @@ Function UpdateNPCs()
 								
 								FreeEntity(pvt)									
 							EndIf
-							n\BoneToManipulate = "chest"
-							n\BoneToManipulate2 = "head"
+							
 							n\ManipulateBone = True
-							n\ManipulationType = 1
+							
+							If n\State2 = 10 Then ;Hacky way of applying spine pitch to specific guards.
+								n\BoneToManipulate = "spine"
+								n\ManipulationType = 3
+							Else
+								n\BoneToManipulate = "chest"
+								n\BoneToManipulate2 = "head"
+								n\ManipulationType = 1
+							EndIf
 						Else
 							n\State = 0
 						EndIf
@@ -6384,10 +6391,10 @@ Function ManipulateNPCBones()
 		If n\ManipulateBone
 			pvt% = CreatePivot()
 			bone% = FindChild(n\obj,n\BoneToManipulate$)
-			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate+Chr(34)+" is not existing!"
+			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate+Chr(34)+" does not exist."
 			If n\BoneToManipulate2<>""
 				bone2% = FindChild(n\obj,n\BoneToManipulate2$)
-				If bone2% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate2+Chr(34)+" is not existing!"
+				If bone2% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate2+Chr(34)+" does not exist."
 			EndIf
 			PositionEntity pvt%,EntityX(bone%,True),EntityY(bone%,True),EntityZ(bone%,True)
 			Select n\ManipulationType
@@ -6407,6 +6414,10 @@ Function ManipulateNPCBones()
 					PointEntity bone%,Curr096\obj
 					n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
 					RotateEntity bone%,-n\BoneYaw#,20,0
+				Case 3 ;<-- looking and pitching towards the player
+					PointEntity pvt%,Camera
+					n\BoneYaw# = CurveAngle(EntityPitch(pvt%),n\BoneYaw#,10.0)
+					RotateEntity bone%,0,-n\BoneYaw#,00
 			End Select
 			FreeEntity pvt%
 		EndIf

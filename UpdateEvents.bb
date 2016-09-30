@@ -936,6 +936,7 @@ Function UpdateEvents()
 										e\room\NPC[6]\SoundChn = PlaySound_Strict(IntroSFX(6))
 									ElseIf e\EventState > 1000
 										e\room\NPC[0]\State = 1
+										e\room\NPC[0]\State2= 10
 										e\room\NPC[0]\State3= 1
 										e\room\NPC[3]\State = 11
 										e\room\RoomDoors[2]\locked = False
@@ -1623,6 +1624,7 @@ Function UpdateEvents()
 							
 							e\room\NPC[1] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+0.2,EntityZ(e\room\Objects[4],True))
 							e\room\NPC[1]\State = 0
+							e\room\NPC[1]\State2 = 10
 							
 							
 							pvt = CreatePivot()
