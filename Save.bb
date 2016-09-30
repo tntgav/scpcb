@@ -623,6 +623,8 @@ Function LoadGame(file$)
 				SetAnimTime(n\obj, frame)
 		End Select
 		
+		n\Frame = frame
+		
 		n\IsDead = ReadInt(f)
 		n\PathX = ReadFloat(f)
 		n\PathZ = ReadFloat(f)
@@ -632,11 +634,10 @@ Function LoadGame(file$)
 		n\ModelScaleY# = ReadFloat(f)
 		n\ModelScaleZ# = ReadFloat(f)
 		If n\Model <> ""
-			model = LoadAnimMesh_Strict(n\Model)
-			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
 			FreeEntity n\obj
-			n\obj = model
-			SetAnimTime n\obj,n\Frame
+			n\obj = LoadAnimMesh_Strict(n\Model)
+			ScaleEntity n\obj,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+			SetAnimTime n\obj,frame
 		EndIf
 	Next
 	
@@ -1301,6 +1302,8 @@ Function LoadGameQuick(file$)
 				SetAnimTime(n\obj, frame)
 		End Select		
 		
+		n\Frame = frame
+		
 		n\IsDead = ReadInt(f)
 		n\PathX = ReadFloat(f)
 		n\PathZ = ReadFloat(f)
@@ -1310,11 +1313,10 @@ Function LoadGameQuick(file$)
 		n\ModelScaleY# = ReadFloat(f)
 		n\ModelScaleZ# = ReadFloat(f)
 		If n\Model <> ""
-			model = LoadAnimMesh_Strict(n\Model)
-			ScaleEntity model,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
 			FreeEntity n\obj
-			n\obj = model
-			SetAnimTime n\obj,n\Frame
+			n\obj = LoadAnimMesh_Strict(n\Model)
+			ScaleEntity n\obj,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+			SetAnimTime n\obj,frame
 		EndIf
 	Next
 	

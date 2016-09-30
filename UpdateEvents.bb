@@ -39,7 +39,7 @@ Function UpdateEvents()
 						CameraFogRange(Camera, CameraFogNear, CameraFogFar)
 						CameraFogMode(Camera, 1)
 						If SelectedDifficulty\saveType = SAVEANYWHERE Then
-							Msg = "Press F5 to save."
+							Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 							MsgTimer = 70*4
 						ElseIf SelectedDifficulty\saveType = SAVEONSCREENS Then
 							Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
@@ -119,6 +119,8 @@ Function UpdateEvents()
 					
 					If (CurrTrigger = "173scene_timer") Then
 						e\EventState=e\EventState+FPSfactor
+						Msg = "Hold "+KeyName(KEY_SPRINT)+" to run."
+						MsgTimer = 70*4
 					Else If (CurrTrigger = "173scene_activated")
 						e\EventState = Max(e\EventState, 500)
 					EndIf
@@ -189,7 +191,10 @@ Function UpdateEvents()
 								EndIf
 								EndIf
 								
-								If (CurrTrigger = "173scene_end") Then e\room\NPC[2]\State = 1
+								If (CurrTrigger = "173scene_end")
+									e\room\NPC[2]\State = 1
+									e\room\NPC[2]\State3 = 1
+								EndIf
 								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = True
 							Else
 								CanSave = True
@@ -374,7 +379,7 @@ Function UpdateEvents()
 								EndIf
 							ElseIf e\EventState3 < 35
 								If Inventory(0)<>Null Then
-									Msg = "Press "+KeyName(Min(KEY_INV,210))+" to open the inventory."
+									Msg = "Press "+KeyName(KEY_INV)+" to open the inventory."
 									MsgTimer=70*4
 									e\EventState3 = 40
 									Exit
@@ -622,12 +627,16 @@ Function UpdateEvents()
 										e\room\NPC[3]\State = 11
 										e\room\NPC[4]\State = 11
 										e\room\NPC[5]\State = 11
+										e\room\NPC[3]\State3 = 1
+										e\room\NPC[4]\State3 = 1
+										e\room\NPC[5]\State3 = 1
 									EndIf
 								EndIf
 								If e\room\NPC[5]\State <> 11
 									If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0
 										If EntityDistance(e\room\NPC[5]\Collider,Collider)<3.5
 											e\room\NPC[5]\State = 11
+											e\room\NPC[5]\State3 = 1
 											e\room\NPC[5]\SoundChn2 = PlaySound2(e\room\NPC[5]\Sound2,Camera,e\room\NPC[5]\Collider)
 											e\room\NPC[5]\Reload = 70*3
 										EndIf
@@ -886,6 +895,8 @@ Function UpdateEvents()
 							If IntroSFX(17)<>0 Then
 								If EntityVisible(Curr173\Collider, Collider) Then
 									If EntityInView(Curr173\obj, Camera) Then
+									    Msg = "Press "+KeyName(KEY_BLINK)+" to blink."
+							            MsgTimer = 70*4
 										PlaySound_Strict IntroSFX(17)
 										IntroSFX(17)=0
 									EndIf
@@ -1135,7 +1146,7 @@ Function UpdateEvents()
 										For r.Rooms = Each Rooms
 											If r\RoomTemplate\Name = "start" Then
 												DebugLog "tostart"
-												;Msg = "Press F5 to save."
+												;Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 												;MsgTimer = 70*8
 												
 												PlayerRoom = r
@@ -3518,14 +3529,15 @@ Function UpdateEvents()
 						
 						If Curr106\State < -10 And e\EventState = 0 Then 
 								For i = 0 To 2
-								If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
-								;play the activation sound
+									If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
+										;play the activation sound
 										If KillTimer => 0 Then 
 											StopChannel(e\SoundCHN)
 											e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
 											HideEntity e\room\Objects[4]
 											e\EventState = 1
-										GiveAchievement(AchvTesla)
+											Curr106\State = 70 * 60 * Rand(10,13)
+											GiveAchievement(AchvTesla)
 											Exit
 										EndIf
 									EndIf

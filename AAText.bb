@@ -134,6 +134,7 @@ Function AAStringHeight%(txt$)
 End Function
 
 Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
+	If Len(txt)=0 Then Return
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	
 	If (GraphicsBuffer()<>BackBuffer()) Or (Not AATextEnable) Then
