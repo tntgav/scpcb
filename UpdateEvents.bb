@@ -8996,7 +8996,7 @@ Function UpdateEvents()
 					;[Block]
 					If e\EventState <> 2
 						If Curr096<>Null
-							If EntityDistance(Curr096\Collider,Collider)<45
+							If EntityDistance(Curr096\Collider,Collider)<40
 								e\EventState = 2
 								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 								DebugLog "- SCP-096 too close to player"
