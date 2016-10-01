@@ -920,7 +920,7 @@ Function UpdateConsole()
 					Console_SpawnNPC(StrTemp$)
 
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
-				Case "infinitestamina"
+				Case "infinitestamina","infstam"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp

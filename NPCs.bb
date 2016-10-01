@@ -6405,7 +6405,7 @@ Function ManipulateNPCBones()
 			pvt% = CreatePivot()
 			bonename$ = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"bonename",0)
 			bone% = FindChild(n\obj,bonename$)
-			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+bonename$+Chr(34)+" does not existing."
+			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+bonename$+Chr(34)+" does not exist."
 			If n\BoneToManipulate2<>""
 				bonename2$ = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"navbone",0)
 				bone2% = FindChild(n\obj,n\BoneToManipulate2$)
@@ -6470,7 +6470,7 @@ Function ManipulateNPCBones()
 					PointEntity bone%,Curr096\obj
 					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yaw")
 						Case 0
-					n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
+							n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
 							pitchvalue# = -n\BoneYaw#
 						Case 1
 							n\BoneYaw# = CurveAngle(EntityYaw(bone%),n\BoneYaw#,10.0)
@@ -6478,6 +6478,27 @@ Function ManipulateNPCBones()
 						Case 2
 							n\BoneYaw# = CurveAngle(EntityRoll(bone%),n\BoneYaw#,10.0)
 							rollvalue# = -n\BoneYaw#
+					End Select
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
+						pitchvalue# = -pitchvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
+						yawvalue# = -yawvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
+						rollvalue# = -rollvalue#
+					EndIf
+					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
+				Case 3 ;<-- looking and pitching towards the player
+					PointEntity pvt%,Camera
+					n\BoneYaw# = CurveAngle(EntityPitch(pvt%),n\BoneYaw#,10.0)
+					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yaw")
+						Case 0
+							pitchvalue# = n\BoneYaw#
+						Case 1
+							yawvalue# = n\BoneYaw#
+						Case 2
+							rollvalue# = n\BoneYaw#
 					End Select
 					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
 						pitchvalue# = -pitchvalue#
