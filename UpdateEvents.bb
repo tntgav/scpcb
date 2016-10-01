@@ -3665,7 +3665,7 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				
-				If PlayerRoom\RoomTemplate\Name<>"pocketdimension" And PlayerRoom\RoomTemplate\Name<>"room860" Then
+				If PlayerRoom\RoomTemplate\Name<>"pocketdimension" And (Not isIn8601) Then
 					If e\EventState2 = 0 Then
 						If e\EventState3 <=0 Then 
 							temp = False
@@ -6794,6 +6794,7 @@ Function UpdateEvents()
 					;Local dp.DrawPortal
 					
 					If e\EventState=1.0 Then ;the player is in the forest
+						isIn8601 = True
 						
 						CurrStepSFX = 2
 						
@@ -6828,8 +6829,6 @@ Function UpdateEvents()
 								ShouldPlay = 9
 							EndIf
 						EndIf
-						
-						PlayerZone = 5
 						
 						;the player fell	
 						If EntityY(Collider)<=28.5 Then 
@@ -6892,6 +6891,8 @@ Function UpdateEvents()
 											UpdateDoors()
 											
 											e\EventState = 0.0
+											
+											isIn8601 = False
 											
 										Else
 											PlaySound_Strict(LoadTempSound("SFX\Door\WoodenDoorBudge.ogg"))

@@ -272,6 +272,7 @@ Global user_camera_pitch#, side#
 Global Crouch%, CrouchState#
 
 Global PlayerZone%, PlayerRoom.Rooms
+Global isIn8601%
 
 Global GrabbedEntity%
 
@@ -2393,20 +2394,14 @@ Repeat
 				
 				If Rand(3)=1 Then PlayerZone = 3
 				
-				If PlayerRoom\RoomTemplate\Name = "173"
+				If PlayerRoom\RoomTemplate\Name = "173" Then 
 					PlayerZone = 4
-				ElseIf PlayerRoom\RoomTemplate\Name = "room860"
-					For e.Events = Each Events
-						If e\EventName = "room860"
-							If e\EventState = 1.0
-								PlayerZone = 5
-								Exit
-							EndIf
-						EndIf
-					Next
+				ElseIf isIn8601
+					PlayerZone = 5
 				EndIf
 				
 				CurrAmbientSFX = Rand(0,AmbientSFXAmount(PlayerZone)-1)
+				DebugLog PlayerZone
 				
 				Select PlayerZone
 					Case 0,1,2
@@ -2423,7 +2418,7 @@ Repeat
 			EndIf
 			If Rand(50000) = 3 Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ <> "pocketdimension" And RN$ <> "room860" And RN$ <> "173" And RN$ <> "dimension1499" And RN$ <> "exit1" And RN$ <> "gatea" And (Not MenuOpen) Then
+				If RN$ <> "pocketdimension" And (Not isIn8601) And RN$ <> "173" And RN$ <> "dimension1499" And RN$ <> "exit1" And RN$ <> "gatea" And (Not MenuOpen) Then
 					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
 					PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
 				EndIf 

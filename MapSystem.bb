@@ -5884,7 +5884,7 @@ Function UpdateSecurityCams()
 						EndIf
 					EndIf 
 					
-					If sc\InSight And sc\CoffinEffect=0 Or sc\CoffinEffect=2 Then
+					If sc\InSight And (Not isIn8601) And sc\CoffinEffect=0 Or sc\CoffinEffect=2 Then
 						If sc\PlayerState = 0 Then
 							sc\PlayerState = Rand(60000, 65000)
 						EndIf
