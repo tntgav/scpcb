@@ -119,8 +119,6 @@ Function UpdateEvents()
 					
 					If (CurrTrigger = "173scene_timer") Then
 						e\EventState=e\EventState+FPSfactor
-						Msg = "Hold "+KeyName(KEY_SPRINT)+" to run."
-						MsgTimer = 70*4
 					Else If (CurrTrigger = "173scene_activated")
 						e\EventState = Max(e\EventState, 500)
 					EndIf
@@ -179,16 +177,18 @@ Function UpdateEvents()
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
 									
 									If e\room\NPC[2]\State <> 1
-									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
-										e\room\RoomDoors[5]\open = False
-										LightBlink = 3.0
-										PlaySound_Strict(IntroSFX(11))
-										BlinkTimer = -10
-										PlaySound2 (StoneDragSFX, Camera, Curr173\Collider)
-										PositionEntity Curr173\Collider, 0,0,0
-										ResetEntity Curr173\Collider
+										If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
+											e\room\RoomDoors[5]\open = False
+											LightBlink = 3.0
+											PlaySound_Strict(IntroSFX(11))
+											BlinkTimer = -10
+											PlaySound2 (StoneDragSFX, Camera, Curr173\Collider)
+											PositionEntity Curr173\Collider, 0,0,0
+											ResetEntity Curr173\Collider
+											Msg = "Hold "+KeyName(KEY_SPRINT)+" to run."
+											MsgTimer = 70*8
+										EndIf
 									EndIf
-								EndIf
 								EndIf
 								
 								If (CurrTrigger = "173scene_end")
