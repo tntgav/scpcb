@@ -8318,6 +8318,14 @@ Function TakeOffStuff(flag%=0)
 	If Len(numb_flag%)>1
 		If Mid(numb_flag%,Len(numb_flag%)-1,1) = 1
 			WearingHazmat = False
+			For i = 0 To MaxItemAmount-1
+				If Inventory(i) <> Null Then
+					If Inventory(i)\itemtemplate\name = "Hazmat Suit" Or Inventory(i)\itemtemplate\tempname = "hazmatsuit3"
+						RemoveItem(Inventory(e\EventState2))
+						Exit
+					EndIf
+				EndIf
+			Next
 			DebugLog "Hazmat Off"
 		EndIf
 	EndIf
