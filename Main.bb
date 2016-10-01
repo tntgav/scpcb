@@ -5089,7 +5089,7 @@ Function DrawGUI()
 					SelectedItem = Null	
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
 					Msg = "You removed the hazmat suit."
-					WearingHazmat=0
+					WearingHazmat = 0
 					MsgTimer = 70 * 5
 					DropItem(SelectedItem)
 					SelectedItem = Null	
@@ -5126,9 +5126,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					If SelectedItem\itemtemplate\tempname="gasmask3" Then
-						If WearingGasMask=0 Then WearingGasMask = 3 Else WearingGasMask=0
+						If WearingGasMask = 0 Then WearingGasMask = 3 Else WearingGasMask=0
 					ElseIf SelectedItem\itemtemplate\tempname="supergasmask"
-						If WearingGasMask=0 Then WearingGasMask = 2 Else WearingGasMask=0
+						If WearingGasMask = 0 Then WearingGasMask = 2 Else WearingGasMask=0
 					Else
 						WearingGasMask = (Not WearingGasMask)
 					EndIf
@@ -8321,7 +8321,7 @@ Function TakeOffStuff(flag%=0)
 			For i = 0 To MaxItemAmount-1
 				If Inventory(i) <> Null Then
 					If Inventory(i)\itemtemplate\name = "Hazmat Suit" Or Inventory(i)\itemtemplate\tempname = "hazmatsuit3"
-						RemoveItem(Inventory(e\EventState2))
+						DropItem(Inventory(i))
 						Exit
 					EndIf
 				EndIf
