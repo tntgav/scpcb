@@ -7085,45 +7085,46 @@ Function ResumeSounds()
 End Function
 
 Function GetStepSound(entity%)
-	Local picker%,brush%,texture%,name$
-	Local mat.Materials
-	
-	picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
-	If picker <> 0 Then
-		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
-		If brush<>0 Then
-			texture = GetBrushTexture(brush,2)
-			If texture <> 0 Then
-				name = StripPath(TextureName(texture))
-				If (name<>"") FreeTexture(texture)
-				For mat.Materials = Each Materials
-					If mat\name = name Then
-						If mat\StepSound>0 Then
-							FreeBrush(brush)
-							Return mat\StepSound-1
-						EndIf
-						Exit
-					EndIf
-				Next				
-			EndIf
-			texture = GetBrushTexture(brush,1)
-			If texture <> 0 Then
-				name = StripPath(TextureName(texture))
-				If (name<>"") FreeTexture(texture)
-				FreeBrush(brush)
-				For mat.Materials = Each Materials
-					If mat\name = name Then
-						If mat\StepSound>0 Then
-							Return mat\StepSound-1
-						EndIf
-						Exit
-					EndIf
-				Next				
-			EndIf
-		EndIf
-	EndIf
-	
-	Return 0
+    Local picker%,brush%,texture%,name$
+    Local mat.Materials
+    
+    picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
+    If picker <> 0 Then
+        If EntityType(picker) <> HIT_MAP Return 0
+        brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
+        If brush <> 0 Then
+            texture = GetBrushTexture(brush,2)
+            If texture <> 0 Then
+                name = StripPath(TextureName(texture))
+                If (name <> "") FreeTexture(texture)
+                For mat.Materials = Each Materials
+                    If mat\name = name Then
+                        If mat\StepSound > 0 Then
+                            FreeBrush(brush)
+                            Return mat\StepSound-1
+                        EndIf
+                        Exit
+                    EndIf
+                Next                
+            EndIf
+            texture = GetBrushTexture(brush,1)
+            If texture <> 0 Then
+                name = StripPath(TextureName(texture))
+                If (name <> "") FreeTexture(texture)
+                FreeBrush(brush)
+                For mat.Materials = Each Materials
+                    If mat\name = name Then
+                        If mat\StepSound > 0 Then
+                            Return mat\StepSound-1
+                        EndIf
+                        Exit
+                    EndIf
+                Next                
+            EndIf
+        EndIf
+    EndIf
+    
+    Return 0
 End Function
 
 Function UpdateSoundOrigin2(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
