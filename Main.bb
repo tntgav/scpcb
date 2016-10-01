@@ -1181,6 +1181,7 @@ Music(11) = LoadSound_Strict("SFX\Music\Menu.ogg")
 ;Music(18): Dimension1499 normal theme
 ;Music(19): Dimension1499 aggressive theme
 ;Music(20): SCP-049 tension theme (for "room2sl")
+;Music(21): Breath theme after beating the game
 
 
 Global MusicVolume# = GetINIFloat(OptionFile, "options", "music volume")
@@ -2344,7 +2345,21 @@ Repeat
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
 	If MainMenuOpen Then
-		ShouldPlay = 11
+		If ShouldPlay = 21 Then
+			If TempSoundCHN = 0 Then
+				For snd.Sound = Each Sound
+					For i = 0 To 31
+						If snd\channels[i]<>0 Then
+							StopChannel snd\channels[i]
+						EndIf
+					Next
+				Next
+				TempSoundCHN = PlaySound_Strict(Music(21))
+			EndIf
+			If (Not ChannelPlaying(TempSoundCHN)) Then FreeSound_Strict Music(21) : ShouldPlay = 11
+		Else
+			ShouldPlay = 11
+		EndIf
 		UpdateMainMenu()
 	Else
 		ShouldPlay = Min(PlayerZone,2)
@@ -2898,8 +2913,9 @@ Function DrawEnding()
 					EndIf
 					
 					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
-						PlaySound_Strict LoadTempSound("SFX\Ending\MenuBreath.ogg")
 						NullGame()
+						Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
+						ShouldPlay = 21
 						MenuOpen = False
 						MainMenuOpen = True
 						MainMenuTab = 0
@@ -6997,7 +7013,7 @@ Function UpdateMusic()
 				MusicCHN = PlaySound_Strict(Music(NowPlaying))
 			Else
 				If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
-			End If
+			EndIf
 		EndIf
 		
 		ChannelVolume MusicCHN, CurrMusicVolume
