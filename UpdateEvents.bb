@@ -119,8 +119,6 @@ Function UpdateEvents()
 					
 					If (CurrTrigger = "173scene_timer") Then
 						e\EventState=e\EventState+FPSfactor
-						Msg = "Hold "+KeyName(KEY_SPRINT)+" to run."
-						MsgTimer = 70*4
 					Else If (CurrTrigger = "173scene_activated")
 						e\EventState = Max(e\EventState, 500)
 					EndIf
@@ -179,16 +177,18 @@ Function UpdateEvents()
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
 									
 									If e\room\NPC[2]\State <> 1
-									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
-										e\room\RoomDoors[5]\open = False
-										LightBlink = 3.0
-										PlaySound_Strict(IntroSFX(11))
-										BlinkTimer = -10
-										PlaySound2 (StoneDragSFX, Camera, Curr173\Collider)
-										PositionEntity Curr173\Collider, 0,0,0
-										ResetEntity Curr173\Collider
+										If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
+											e\room\RoomDoors[5]\open = False
+											LightBlink = 3.0
+											PlaySound_Strict(IntroSFX(11))
+											BlinkTimer = -10
+											PlaySound2 (StoneDragSFX, Camera, Curr173\Collider)
+											PositionEntity Curr173\Collider, 0,0,0
+											ResetEntity Curr173\Collider
+											Msg = "Hold "+KeyName(KEY_SPRINT)+" to run."
+											MsgTimer = 70*8
+										EndIf
 									EndIf
-								EndIf
 								EndIf
 								
 								If (CurrTrigger = "173scene_end")
@@ -936,6 +936,7 @@ Function UpdateEvents()
 										e\room\NPC[6]\SoundChn = PlaySound_Strict(IntroSFX(6))
 									ElseIf e\EventState > 1000
 										e\room\NPC[0]\State = 1
+										e\room\NPC[0]\State2= 10
 										e\room\NPC[0]\State3= 1
 										e\room\NPC[3]\State = 11
 										e\room\RoomDoors[2]\locked = False
@@ -1623,6 +1624,7 @@ Function UpdateEvents()
 							
 							e\room\NPC[1] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+0.2,EntityZ(e\room\Objects[4],True))
 							e\room\NPC[1]\State = 0
+							e\room\NPC[1]\State2 = 10
 							
 							
 							pvt = CreatePivot()
@@ -3663,7 +3665,7 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				
-				If PlayerRoom\RoomTemplate\Name<>"pocketdimension" And PlayerRoom\RoomTemplate\Name<>"room860" Then
+				If PlayerRoom\RoomTemplate\Name<>"pocketdimension" And (Not isIn8601) Then
 					If e\EventState2 = 0 Then
 						If e\EventState3 <=0 Then 
 							temp = False
@@ -6792,6 +6794,7 @@ Function UpdateEvents()
 					;Local dp.DrawPortal
 					
 					If e\EventState=1.0 Then ;the player is in the forest
+						isIn8601 = True
 						
 						CurrStepSFX = 2
 						
@@ -6826,8 +6829,6 @@ Function UpdateEvents()
 								ShouldPlay = 9
 							EndIf
 						EndIf
-						
-						PlayerZone = 5
 						
 						;the player fell	
 						If EntityY(Collider)<=28.5 Then 
@@ -6890,6 +6891,8 @@ Function UpdateEvents()
 											UpdateDoors()
 											
 											e\EventState = 0.0
+											
+											isIn8601 = False
 											
 										Else
 											PlaySound_Strict(LoadTempSound("SFX\Door\WoodenDoorBudge.ogg"))
@@ -8993,7 +8996,7 @@ Function UpdateEvents()
 					;[Block]
 					If e\EventState <> 2
 						If Curr096<>Null
-							If EntityDistance(Curr096\Collider,Collider)<45
+							If EntityDistance(Curr096\Collider,Collider)<40
 								e\EventState = 2
 								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 								DebugLog "- SCP-096 too close to player"

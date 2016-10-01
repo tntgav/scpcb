@@ -272,6 +272,7 @@ Global user_camera_pitch#, side#
 Global Crouch%, CrouchState#
 
 Global PlayerZone%, PlayerRoom.Rooms
+Global isIn8601%
 
 Global GrabbedEntity%
 
@@ -919,7 +920,7 @@ Function UpdateConsole()
 					Console_SpawnNPC(StrTemp$)
 
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
-				Case "infinitestamina"
+				Case "infinitestamina","infstam"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
@@ -1181,6 +1182,7 @@ Music(11) = LoadSound_Strict("SFX\Music\Menu.ogg")
 ;Music(18): Dimension1499 normal theme
 ;Music(19): Dimension1499 aggressive theme
 ;Music(20): SCP-049 tension theme (for "room2sl")
+;Music(21): Breath theme after beating the game
 
 
 Global MusicVolume# = GetINIFloat(OptionFile, "options", "music volume")
@@ -2344,7 +2346,21 @@ Repeat
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
 	If MainMenuOpen Then
-		ShouldPlay = 11
+		If ShouldPlay = 21 Then
+			If TempSoundCHN = 0 Then
+				For snd.Sound = Each Sound
+					For i = 0 To 31
+						If snd\channels[i]<>0 Then
+							StopChannel snd\channels[i]
+						EndIf
+					Next
+				Next
+				TempSoundCHN = PlaySound_Strict(Music(21))
+			EndIf
+			If (Not ChannelPlaying(TempSoundCHN)) Then FreeSound_Strict Music(21) : ShouldPlay = 11
+		Else
+			ShouldPlay = 11
+		EndIf
 		UpdateMainMenu()
 	Else
 		ShouldPlay = Min(PlayerZone,2)
@@ -2378,20 +2394,14 @@ Repeat
 				
 				If Rand(3)=1 Then PlayerZone = 3
 				
-				If PlayerRoom\RoomTemplate\Name = "173"
+				If PlayerRoom\RoomTemplate\Name = "173" Then 
 					PlayerZone = 4
-				ElseIf PlayerRoom\RoomTemplate\Name = "room860"
-					For e.Events = Each Events
-						If e\EventName = "room860"
-							If e\EventState = 1.0
-								PlayerZone = 5
-								Exit
-							EndIf
-						EndIf
-					Next
+				ElseIf isIn8601
+					PlayerZone = 5
 				EndIf
 				
 				CurrAmbientSFX = Rand(0,AmbientSFXAmount(PlayerZone)-1)
+				DebugLog PlayerZone
 				
 				Select PlayerZone
 					Case 0,1,2
@@ -2408,7 +2418,7 @@ Repeat
 			EndIf
 			If Rand(50000) = 3 Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ <> "pocketdimension" And RN$ <> "room860" And RN$ <> "173" And RN$ <> "dimension1499" And RN$ <> "exit1" And RN$ <> "gatea" And (Not MenuOpen) Then
+				If RN$ <> "pocketdimension" And (Not isIn8601) And RN$ <> "173" And RN$ <> "dimension1499" And RN$ <> "exit1" And RN$ <> "gatea" And (Not MenuOpen) Then
 					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
 					PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
 				EndIf 
@@ -2898,8 +2908,9 @@ Function DrawEnding()
 					EndIf
 					
 					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
-						PlaySound_Strict LoadTempSound("SFX\Ending\MenuBreath.ogg")
 						NullGame()
+						Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
+						ShouldPlay = 21
 						MenuOpen = False
 						MainMenuOpen = True
 						MainMenuTab = 0
@@ -5078,7 +5089,7 @@ Function DrawGUI()
 					SelectedItem = Null	
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
 					Msg = "You removed the hazmat suit."
-					WearingHazmat=0
+					WearingHazmat = 0
 					MsgTimer = 70 * 5
 					DropItem(SelectedItem)
 					SelectedItem = Null	
@@ -5115,9 +5126,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					If SelectedItem\itemtemplate\tempname="gasmask3" Then
-						If WearingGasMask=0 Then WearingGasMask = 3 Else WearingGasMask=0
+						If WearingGasMask = 0 Then WearingGasMask = 3 Else WearingGasMask=0
 					ElseIf SelectedItem\itemtemplate\tempname="supergasmask"
-						If WearingGasMask=0 Then WearingGasMask = 2 Else WearingGasMask=0
+						If WearingGasMask = 0 Then WearingGasMask = 2 Else WearingGasMask=0
 					Else
 						WearingGasMask = (Not WearingGasMask)
 					EndIf
@@ -6997,7 +7008,7 @@ Function UpdateMusic()
 				MusicCHN = PlaySound_Strict(Music(NowPlaying))
 			Else
 				If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
-			End If
+			EndIf
 		EndIf
 		
 		ChannelVolume MusicCHN, CurrMusicVolume
@@ -7074,45 +7085,46 @@ Function ResumeSounds()
 End Function
 
 Function GetStepSound(entity%)
-	Local picker%,brush%,texture%,name$
-	Local mat.Materials
-	
-	picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
-	If picker <> 0 Then
-		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
-		If brush<>0 Then
-			texture = GetBrushTexture(brush,2)
-			If texture <> 0 Then
-				name = StripPath(TextureName(texture))
-				If (name<>"") FreeTexture(texture)
-				For mat.Materials = Each Materials
-					If mat\name = name Then
-						If mat\StepSound>0 Then
-							FreeBrush(brush)
-							Return mat\StepSound-1
-						EndIf
-						Exit
-					EndIf
-				Next				
-			EndIf
-			texture = GetBrushTexture(brush,1)
-			If texture <> 0 Then
-				name = StripPath(TextureName(texture))
-				If (name<>"") FreeTexture(texture)
-				FreeBrush(brush)
-				For mat.Materials = Each Materials
-					If mat\name = name Then
-						If mat\StepSound>0 Then
-							Return mat\StepSound-1
-						EndIf
-						Exit
-					EndIf
-				Next				
-			EndIf
-		EndIf
-	EndIf
-	
-	Return 0
+    Local picker%,brush%,texture%,name$
+    Local mat.Materials
+    
+    picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
+    If picker <> 0 Then
+        If EntityType(picker) <> HIT_MAP Return 0
+        brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
+        If brush <> 0 Then
+            texture = GetBrushTexture(brush,2)
+            If texture <> 0 Then
+                name = StripPath(TextureName(texture))
+                If (name <> "") FreeTexture(texture)
+                For mat.Materials = Each Materials
+                    If mat\name = name Then
+                        If mat\StepSound > 0 Then
+                            FreeBrush(brush)
+                            Return mat\StepSound-1
+                        EndIf
+                        Exit
+                    EndIf
+                Next                
+            EndIf
+            texture = GetBrushTexture(brush,1)
+            If texture <> 0 Then
+                name = StripPath(TextureName(texture))
+                If (name <> "") FreeTexture(texture)
+                FreeBrush(brush)
+                For mat.Materials = Each Materials
+                    If mat\name = name Then
+                        If mat\StepSound > 0 Then
+                            Return mat\StepSound-1
+                        EndIf
+                        Exit
+                    EndIf
+                Next                
+            EndIf
+        EndIf
+    EndIf
+    
+    Return 0
 End Function
 
 Function UpdateSoundOrigin2(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
@@ -8307,6 +8319,14 @@ Function TakeOffStuff(flag%=0)
 	If Len(numb_flag%)>1
 		If Mid(numb_flag%,Len(numb_flag%)-1,1) = 1
 			WearingHazmat = False
+			For i = 0 To MaxItemAmount-1
+				If Inventory(i) <> Null Then
+					If Inventory(i)\itemtemplate\name = "Hazmat Suit" Or Inventory(i)\itemtemplate\tempname = "hazmatsuit3"
+						DropItem(Inventory(i))
+						Exit
+					EndIf
+				EndIf
+			Next
 			DebugLog "Hazmat Off"
 		EndIf
 	EndIf
