@@ -4,6 +4,10 @@
 v1.3.2
 - Compiled the game using Juanjpro's "MavLess Blitz3D".
 	-The game now updates an error log rather than immediately crashing when an error occurs.
+- Redesigned console by Juanjpro.
+	- Added color coding.
+	- Added the ability to scroll through previously displayed console messages.
+	- Pressing up or down now cycles previous commands into the input field, without having to retype the command.
 - Added several new rooms.
 - Added a [REDACTED] event to the Tesla gates.
 - Adjusted the aspect ratio of badge textures (by Cridone).
@@ -29,6 +33,8 @@ v1.3.2
 - Added an option to disable console functionality while in-game.
 - The player can now save at the entrance to Gate A.
 - The keys for quick saving and toggling the console can now be rebound in the controls menu.
+- Added the ability to quick load from the pause menu.
+- Renamed some buttons on the quit menu to better explain their functions.
 - Refactored the SFX folder whilst removing duplicate/unused sounds. 
 
 Bug Fixes:
@@ -40,6 +46,7 @@ Bug Fixes:
 - Fixed the severed hand in room3storage falling through the map.
 - Fixed SCP-106 being invisible during the room2pipes event.
 - Fixed SCP-106 instantly respawning after going through a Tesla gate.
+- Fixed the 939 instances not being able to kill the player.
 - Fixed the "halloween" console command.
 - Fixed Security Chief Franklin using the default scientist texture during the office event if the intro sequence was enabled.
 - Fixed a bug that caused SCP-096 to spawn too frequently.
