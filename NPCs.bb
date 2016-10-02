@@ -3414,6 +3414,7 @@ Function UpdateNPCs()
 										If Distance(n\EnemyX, n\EnemyZ, EntityX(n\Collider), EntityZ(n\Collider))<1.5 Then
 											PlaySound_Strict n\Sound2
 											Injuries = Injuries + Rnd(1.5, 2.5)-WearingVest*0.5
+											Bloodloss = Bloodloss + Rnd(0.8, 1.8)-WearingVest*0.2
 											BlurTimer = 500		
 										Else
 											n\Frame	 = 449

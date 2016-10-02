@@ -19,7 +19,8 @@ While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
 Wend
 ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 
-Global Font1%, Font2%, Font3%, Font4%
+Global Font1%, Font2%, Font3%, Font4%, Font5%
+Global ConsoleFont%
 
 Global VersionNumber$ = "1.3.2"
 Global CompatibleNumber$ = "1.3.2"
@@ -205,6 +206,10 @@ Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1
 Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
 Font4% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
+Font5% = AALoadFont("GFX\font\Journal\Journal.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
+
+ConsoleFont% = AALoadFont("Blitz", Int(22 * (GraphicHeight / 1024.0)), 0,0,0,1)
+
 AASetFont Font2
 
 Global BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
@@ -334,36 +339,204 @@ Global IsNVGBlinking% = False
 ;----------------------------------------------  Console -----------------------------------------------------
 
 Global ConsoleOpen%, ConsoleInput$
+Global ConsoleScroll#,ConsoleScrollDragging%
+Global ConsoleMouseMem%
+Global ConsoleReissue.ConsoleMsg = Null
+Global ConsoleR% = 255,ConsoleG% = 255,ConsoleB% = 255
 
 Type ConsoleMsg
 	Field txt$
+	Field isCommand%
+	Field r%,g%,b%
 End Type
 
-Function CreateConsoleMsg(txt$)
+Function CreateConsoleMsg(txt$,r%=-1,g%=-1,b%=-1,isCommand%=False)
 	Local c.ConsoleMsg = New ConsoleMsg
 	Insert c Before First ConsoleMsg
 	
 	c\txt = txt
+	c\isCommand = isCommand
+	
+	c\r = r
+	c\g = g
+	c\b = b
+	
+	If (c\r<0) Then c\r = ConsoleR
+	If (c\g<0) Then c\g = ConsoleG
+	If (c\b<0) Then c\b = ConsoleB
 End Function
 
 Function UpdateConsole()
 	
-	If CanOpenConsole = False Then ConsoleOpen = False
+	If CanOpenConsole = False Then
+		ConsoleOpen = False
+		Return
+	EndIf
 	
 	If ConsoleOpen Then
-		Local x% = 20, y% = 20, width% = 400, height% = 500
+		Local cm.ConsoleMsg
+	
+		AASetFont ConsoleFont
+		
+		ConsoleR = 255 : ConsoleG = 255 : ConsoleB = 255
+	
+		Local x% = 0, y% = GraphicHeight-300*MenuScale, width% = GraphicWidth, height% = 300*MenuScale-30*MenuScale
 		Local StrTemp$, temp%,  i%
 		Local ev.Events, r.Rooms, it.Items
 		
-		DrawFrame x,y,width,height
+		DrawFrame x,y,width,height+30*MenuScale
+		
+		Local consoleHeight% = 0
+		Local scrollbarHeight% = 0
+		For cm.ConsoleMsg = Each ConsoleMsg
+			consoleHeight = consoleHeight + 15*MenuScale
+		Next
+		scrollbarHeight = (Float(height)/Float(consoleHeight))*height
+		If scrollbarHeight>height Then scrollbarHeight = height
+		If consoleHeight<height Then consoleHeight = height
+		
+		Color 50,50,50
+		inBar% = MouseOn(x+width-26*MenuScale,y,26*MenuScale,height)
+		If inBar Then Color 70,70,70
+		Rect x+width-26*MenuScale,y,26*MenuScale,height,True
+		
+		
+		Color 120,120,120
+		inBox% = MouseOn(x+width-23*MenuScale,y+height-scrollBarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight)
+		If inBox Then Color 200,200,200
+		If ConsoleScrollDragging Then Color 255,255,255
+		Rect x+width-23*MenuScale,y+height-scrollBarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight,True
+		
+		If Not MouseDown(1) Then
+			ConsoleScrollDragging=False
+		ElseIf ConsoleScrollDragging Then
+			ConsoleScroll = ConsoleScroll+((ScaledMouseY()-ConsoleMouseMem)*height/scrollbarHeight)
+			ConsoleMouseMem = ScaledMouseY()
+		EndIf
+		
+		If (Not ConsoleScrollDragging) Then
+			If MouseHit1 Then
+				If inBox Then
+					ConsoleScrollDragging=True
+					ConsoleMouseMem = ScaledMouseY()
+				ElseIf inBar Then
+					ConsoleScroll = ConsoleScroll+((ScaledMouseY()-(y+height))*consoleHeight/height+(height/2))
+					ConsoleScroll = ConsoleScroll/2
+				EndIf
+			EndIf
+		EndIf
+		
+		mouseScroll = MouseZSpeed()
+		If mouseScroll=1 Then
+			ConsoleScroll = ConsoleScroll - 15*MenuScale
+		ElseIf mouseScroll=-1 Then
+			ConsoleScroll = ConsoleScroll + 15*MenuScale
+		EndIf
+		
+		Local reissuePos%
+		If KeyHit(200) Then
+			reissuePos% = 0
+			If (ConsoleReissue=Null) Then
+				ConsoleReissue=First ConsoleMsg
+				
+				While (ConsoleReissue<>Null)
+					If (ConsoleReissue\isCommand) Then
+						Exit
+					EndIf
+					reissuePos = reissuePos - 15*MenuScale
+					ConsoleReissue = After ConsoleReissue
+				Wend
+				
+			Else
+				cm.ConsoleMsg = First ConsoleMsg
+				While cm<>Null
+					If cm=ConsoleReissue Then Exit
+					reissuePos = reissuePos-15*MenuScale
+					cm = After cm
+				Wend
+				ConsoleReissue = After ConsoleReissue
+				reissuePos = reissuePos-15*MenuScale
+				
+				While True
+					If (ConsoleReissue=Null) Then
+						ConsoleReissue=First ConsoleMsg
+						reissuePos = 0
+					EndIf
+				
+					If (ConsoleReissue\isCommand) Then
+						Exit
+					EndIf
+					reissuePos = reissuePos - 15*MenuScale
+					ConsoleReissue = After ConsoleReissue
+				Wend
+			EndIf
+			
+			If ConsoleReissue<>Null Then
+				ConsoleInput = ConsoleReissue\txt
+				ConsoleScroll = reissuePos+(height/2)
+			EndIf
+		EndIf
+		
+		If KeyHit(208) Then
+			reissuePos% = -consoleHeight+15*MenuScale
+			If (ConsoleReissue=Null) Then
+				ConsoleReissue=Last ConsoleMsg
+				
+				While (ConsoleReissue<>Null)
+					If (ConsoleReissue\isCommand) Then
+						Exit
+					EndIf
+					reissuePos = reissuePos + 15*MenuScale
+					ConsoleReissue = Before ConsoleReissue
+				Wend
+				
+			Else
+				cm.ConsoleMsg = Last ConsoleMsg
+				While cm<>Null
+					If cm=ConsoleReissue Then Exit
+					reissuePos = reissuePos+15*MenuScale
+					cm = Before cm
+				Wend
+				ConsoleReissue = Before ConsoleReissue
+				reissuePos = reissuePos+15*MenuScale
+				
+				While True
+					If (ConsoleReissue=Null) Then
+						ConsoleReissue=Last ConsoleMsg
+						reissuePos=-consoleHeight+15*MenuScale
+					EndIf
+				
+					If (ConsoleReissue\isCommand) Then
+						Exit
+					EndIf
+					reissuePos = reissuePos + 15*MenuScale
+					ConsoleReissue = Before ConsoleReissue
+				Wend
+			EndIf
+			
+			If ConsoleReissue<>Null Then
+				ConsoleInput = ConsoleReissue\txt
+				ConsoleScroll = reissuePos+(height/2)
+			EndIf
+		EndIf
+		
+		If ConsoleScroll<-consoleHeight+height Then ConsoleScroll = -consoleHeight+height
+		If ConsoleScroll>0 Then ConsoleScroll = 0
 		
 		Color 255, 255, 255
 		
 		SelectedInputBox = 2
-		ConsoleInput = InputBox(x, y + height - 30, width, 30, ConsoleInput, 2)
-		ConsoleInput = Left(ConsoleInput, 50)
+		Local oldConsoleInput$ = ConsoleInput
+		ConsoleInput = InputBox(x, y + height, width, 30*MenuScale, ConsoleInput, 2)
+		If oldConsoleInput<>ConsoleInput Then
+			ConsoleReissue = Null
+		EndIf
+		ConsoleInput = Left(ConsoleInput, 100)
 		
 		If KeyHit(28) And ConsoleInput <> "" Then
+			ConsoleReissue = Null
+			ConsoleScroll = 0
+			CreateConsoleMsg(ConsoleInput,255,255,0,True)
 			If Instr(ConsoleInput, " ") > 0 Then
 				StrTemp$ = Lower(Left(ConsoleInput, Instr(ConsoleInput, " ") - 1))
 			Else
@@ -377,6 +550,7 @@ Function UpdateConsole()
 					Else
 						StrTemp$ = ""
 					EndIf
+					ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 255
 					
 					Select Lower(StrTemp)
 						Case "1",""
@@ -530,7 +704,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("******************************")
 							
 						Default
-							CreateConsoleMsg("There is no help available for that command.")
+							CreateConsoleMsg("There is no help available for that command.",255,150,0)
 					End Select
 					
 				Case "asd"
@@ -542,6 +716,7 @@ Function UpdateConsole()
 					CameraFogFar = 20
 
 				Case "status"
+					ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 0
 					CreateConsoleMsg("******************************")
 					CreateConsoleMsg("Status: ")
 					CreateConsoleMsg("Coordinates: ")
@@ -572,6 +747,7 @@ Function UpdateConsole()
 					CreateConsoleMsg("******************************")
 
 				Case "camerapick"
+					ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 0
 					c = CameraPick(Camera,GraphicWidth/2, GraphicHeight/2)
 					If c = 0 Then
 						CreateConsoleMsg("******************************")
@@ -644,7 +820,7 @@ Function UpdateConsole()
 						EndIf
 					Next
 					
-					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.")
+					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.",255,150,0)
 
 				Case "spawnitem"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -665,7 +841,7 @@ Function UpdateConsole()
 						End If
 					Next
 					
-					If temp = False Then CreateConsoleMsg("Item not found.")
+					If temp = False Then CreateConsoleMsg("Item not found.",255,150,0)
 
 				Case "wireframe"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -897,6 +1073,8 @@ Function UpdateConsole()
 							
 							FreeEntity e\room\Objects[0]
 							FreeEntity e\room\Objects[1]
+							PositionEntity Curr173\Collider, 0,0,0
+							ResetEntity Curr173\Collider
 							RemoveEvent(e)
 							Exit
 						EndIf
@@ -1085,26 +1263,44 @@ Function UpdateConsole()
 						CreateConsoleMsg(Chr(74)+Chr(32)+Chr(79)+Chr(32)+Chr(82)+Chr(32)+Chr(71)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(65)+Chr(32)+Chr(78)+Chr(32)+Chr(78)+Chr(32)+Chr(79)+Chr(32)+Chr(84)+Chr(32)+Chr(32)+Chr(66)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(79)+Chr(32)+Chr(78)+Chr(32)+Chr(84)+Chr(32)+Chr(65)+Chr(32)+Chr(73)+Chr(32)+Chr(78)+Chr(32)+Chr(69)+Chr(32)+Chr(68)+Chr(46))
 					EndIf
 				Default
-					CreateConsoleMsg("Command not found.")
+					CreateConsoleMsg("Command not found.",255,0,0)
 			End Select
 			
 			ConsoleInput = ""
 		End If
 		
-		Local TempY% = y + height - 70
-		Local cm.ConsoleMsg
+		Local TempY% = y + height - 25*MenuScale - ConsoleScroll
+		Local count% = 0
 		For cm.ConsoleMsg = Each ConsoleMsg
-			If TempY < y + 20 Then
+			count = count+1
+			If count>1000 Then
 				Delete cm
 			Else
-				AAText(x + 20, TempY, cm\txt)
-				TempY = TempY - 15
+				If TempY >= y And TempY < y + height - 20*MenuScale Then
+					If cm=ConsoleReissue Then
+						Color cm\r/4,cm\g/4,cm\b/4
+						Rect x,TempY-2*MenuScale,width-30*MenuScale,24*MenuScale,True
+					EndIf
+					Color cm\r,cm\g,cm\b
+					If cm\isCommand Then
+						AAText(x + 20*MenuScale, TempY, "> "+cm\txt)
+					Else
+						AAText(x + 20*MenuScale, TempY, cm\txt)
+					EndIf
+				EndIf
+				TempY = TempY - 15*MenuScale
 			EndIf
+			
 		Next
+		
+		Color 255,255,255
+		
+		If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	End If
 	
 End Function
 
+ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 255
 CreateConsoleMsg("Console commands: ")
 CreateConsoleMsg("  - teleport [room name]")
 CreateConsoleMsg("  - godmode [on/off]")
@@ -2631,7 +2827,7 @@ Repeat
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
 			If (Msg<>"Game progress saved." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
 				Msg = "Press "+KeyName(KEY_SAVE)+" to save."
-				MsgTimer = 70*5
+				MsgTimer = 70*4
 			EndIf
 			
 			If MouseHit2 Then SelectedMonitor = Null
@@ -3526,7 +3722,7 @@ Function DrawGUI()
 	
 	Local e.Events, it.Items
 	
-	If MenuOpen Or SelectedDoor <> Null Or InvOpen Or OtherOpen<>Null Or EndingTimer < 0 Then
+	If MenuOpen Or ConsoleOpen Or SelectedDoor <> Null Or InvOpen Or OtherOpen<>Null Or EndingTimer < 0 Then
 		ShowPointer()
 	Else
 		HidePointer()
@@ -4605,7 +4801,7 @@ Function DrawGUI()
 					EndIf
 					RemoveItem(SelectedItem)
 				Case "supereyedrops"
-					If (Not (Wearing714=1)) Then
+					If (Not (Wearing714 = 1)) Then
 						BlinkEffect = 0.0
 						BlinkEffectTimer = 60
 						EyeStuck = 10000
@@ -4613,7 +4809,7 @@ Function DrawGUI()
 					BlurTimer = 1000
 					RemoveItem(SelectedItem)					
 				Case "paper", "ticket"
-					If SelectedItem\itemtemplate\img=0 Then
+					If SelectedItem\itemtemplate\img = 0 Then
 						Select SelectedItem\itemtemplate\name
 							Case "Burnt Note" 
 								SelectedItem\itemtemplate\img = LoadImage_Strict("GFX\items\bn.it")
@@ -4623,15 +4819,15 @@ Function DrawGUI()
 								Color 255,255,255
 								SetBuffer BackBuffer()
 							Case "Document SCP-372"
-								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+								SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 								SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
 								
 								SetBuffer ImageBuffer(SelectedItem\itemtemplate\img)
 								Color 37,45,137
-								AASetFont Font1
+								AASetFont Font5
 								temp = ((Int(AccessCode)*3) Mod 10000)
 								If temp < 1000 Then temp = temp+1000
-								AAText 333*MenuScale, 714*MenuScale, temp, True, True
+								AAText 383*MenuScale, 734*MenuScale, temp, True, True
 								Color 255,255,255
 								SetBuffer BackBuffer()
 							Case "Movie Ticket"
@@ -5494,7 +5690,7 @@ Function DrawMenu()
 			AASetFont Font1
 		ElseIf QuitMSG > 0 Then
 			AASetFont Font2
-			AAText(x, y-(122-45)*MenuScale, "SAVE & QUIT?",False,True)
+			AAText(x, y-(122-45)*MenuScale, "QUIT?",False,True)
 			AASetFont Font1
 		ElseIf KillTimer >= 0 Then
 			AASetFont Font2
@@ -5863,19 +6059,23 @@ Function DrawMenu()
 						Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 						Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
 						Font4% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
+						Font5% = AALoadFont("GFX\font\Journal\Journal.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
+						ConsoleFont% = AALoadFont("Blitz", Int(22 * (GraphicHeight / 1024.0)), 0,0,0,1)
 						;ReloadAAFont()
 						AATextEnable_Prev% = AATextEnable
 					EndIf
 					;[End Block]
 			End Select
 		ElseIf AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG > 0 And KillTimer >= 0
+			Local QuitButton% = 60 
 			If SelectedDifficulty\saveType = SAVEONQUIT Or SelectedDifficulty\saveType = SAVEANYWHERE Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
 				Local AbleToSave% = True
 				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Then AbleToSave = False
 				If (Not CanSave) Then AbleToSave = False
 				If AbleToSave
-					If DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "Yes") Then
+					QuitButton = 140
+					If DrawButton(x, y + 60*MenuScale, 390*MenuScale, 60*MenuScale, "Save & Quit") Then
 						DropSpeed = 0
 						SaveGame(SavePath + CurrSave + "\")
 						NullGame()
@@ -5885,17 +6085,10 @@ Function DrawMenu()
 						CurrSave = ""
 						FlushKeys()
 					EndIf
-				Else
-					DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "")
-					Color 50,50,50
-					AAText(x+185*MenuScale, (y + 80*MenuScale)+30*MenuScale, "Yes", True, True)
 				EndIf
-			Else
-				DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "")
-				Color 50,50,50
-				AAText(x+185*MenuScale, (y + 80*MenuScale)+30*MenuScale, "Yes", True, True)
 			EndIf
-			If DrawButton(x, y + 220*MenuScale, 390*MenuScale, 60*MenuScale, "No") Then
+			
+			If DrawButton(x, y + QuitButton*MenuScale, 390*MenuScale, 60*MenuScale, "Quit") Then
 				NullGame()
 				MenuOpen = False
 				MainMenuOpen = True
@@ -5903,6 +6096,49 @@ Function DrawMenu()
 				CurrSave = ""
 				FlushKeys()
 			EndIf
+			
+			If GameSaved And (Not SelectedDifficulty\permaDeath) Then
+				If DrawButton(x, y + (80 + QuitButton)*MenuScale, 390*MenuScale, 60*MenuScale, "Load Game") Then
+					DrawLoading(0)
+					
+					MenuOpen = False
+					QuitMSG% = -1
+					LoadGameQuick(SavePath + CurrSave + "\")
+					
+					MoveMouse viewport_center_x,viewport_center_y
+					AASetFont Font1
+					HidePointer ()
+					
+					FlushKeys()
+					FlushMouse()
+					Playable=True
+					
+					UpdateRooms()
+					
+					For r.Rooms = Each Rooms
+						x = Abs(EntityX(Collider) - EntityX(r\obj))
+						z = Abs(EntityZ(Collider) - EntityZ(r\obj))
+						
+						If x < 12.0 And z < 12.0 Then
+							MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = Max(MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)), 1)
+							If x < 4.0 And z < 4.0 Then
+								If Abs(EntityY(Collider) - EntityY(r\obj)) < 1.5 Then PlayerRoom = r
+								MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = 1
+							EndIf
+						End If
+					Next
+					
+					DrawLoading(100)
+					
+					DropSpeed=0
+					
+					UpdateWorld 0.0
+					
+					PrevTime = MilliSecs()
+					FPSfactor = 0
+				EndIf
+			EndIf
+			
 			If DrawButton(x+101*MenuScale, y + 344*MenuScale, 230*MenuScale, 60*MenuScale, "Back") Then
 				AchievementsMenu = 0
 				OptionsMenu = 0
@@ -7090,7 +7326,7 @@ Function GetStepSound(entity%)
     
     picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
     If picker <> 0 Then
-        If EntityType(picker) <> HIT_MAP Return 0
+        If GetEntityType(picker) <> HIT_MAP Then Return 0
         brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
         If brush <> 0 Then
             texture = GetBrushTexture(brush,2)
