@@ -20,6 +20,8 @@ Type AAFont
 	Field mW%
 	Field mH%
 	Field texH%
+	
+	Field isAA%
 End Type
 
 Function InitAAFont()
@@ -81,17 +83,19 @@ Function ReloadAAFont() ;CALL ONLY AFTER CLEARWORLD
 	If AATextEnable Then
 		InitAAFont()
 		For font.AAFont = Each AAFont
-			font\texture = CreateTexture(1024,1024,3)
-			LockBuffer ImageBuffer(font\backup)
-			LockBuffer TextureBuffer(font\texture)
-			For ix%=0 To 1023
-				For iy%=0 To font\texH
-					px% = ReadPixelFast(ix,iy,ImageBuffer(font\backup)) Shl 24
-					WritePixelFast(ix,iy,$FFFFFF+px,TextureBuffer(font\texture))
+			If font\isAA Then
+				font\texture = CreateTexture(1024,1024,3)
+				LockBuffer ImageBuffer(font\backup)
+				LockBuffer TextureBuffer(font\texture)
+				For ix%=0 To 1023
+					For iy%=0 To font\texH
+						px% = ReadPixelFast(ix,iy,ImageBuffer(font\backup)) Shl 24
+						WritePixelFast(ix,iy,$FFFFFF+px,TextureBuffer(font\texture))
+					Next
 				Next
-			Next
-			UnlockBuffer TextureBuffer(font\texture)
-			UnlockBuffer ImageBuffer(font\backup)
+				UnlockBuffer TextureBuffer(font\texture)
+				UnlockBuffer ImageBuffer(font\backup)
+			EndIf
 		Next
 	EndIf
 End Function
@@ -99,7 +103,7 @@ End Function
 Function AASetFont(fnt%)
 	AASelectedFont = fnt
 	Local font.AAFont = Object.AAFont(AASelectedFont)
-	If AATextEnable Then
+	If AATextEnable And font\isAA Then
 		For i%=0 To 149
 			EntityTexture AATextSprite[i],font\texture
 		Next
@@ -108,7 +112,7 @@ End Function
 
 Function AAStringWidth%(txt$)
 	Local font.AAFont = Object.AAFont(AASelectedFont)
-	If (AATextEnable) Then
+	If (AATextEnable) And (font\isAA) Then
 		Local retVal%=0
 		For i=1 To Len(txt)
 			Local char% = Asc(Mid(txt,i,1))
@@ -125,7 +129,7 @@ End Function
 
 Function AAStringHeight%(txt$)
 	Local font.AAFont = Object.AAFont(AASelectedFont)
-	If (AATextEnable) Then
+	If (AATextEnable) And (font\isAA) Then
 		Return font\mH
 	Else
 		SetFont font\lowResFont
@@ -137,7 +141,7 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 	If Len(txt)=0 Then Return
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	
-	If (GraphicsBuffer()<>BackBuffer()) Or (Not AATextEnable) Then
+	If (GraphicsBuffer()<>BackBuffer()) Or (Not AATextEnable) Or (Not font\isAA) Then
 		SetFont font\lowResFont
 		Local oldr% = ColorRed() : Local oldg% = ColorGreen() : Local oldb% = ColorBlue()
 		Color oldr*a,oldg*a,oldb*a
@@ -210,7 +214,7 @@ Function AALoadFont%(file$="Tahoma", height=13, bold=0, italic=0, underline=0, A
 	newFont\mW = FontWidth()
 	newFont\mH = FontHeight()
 	
-	If AATextEnable Then
+	If AATextEnable And AATextScaleFactor>1 Then
 		Local hResFont% = LoadFont(file,height*AATextScaleFactor,bold,italic,underline)
 		Local tImage% = CreateTexture(1024,1024,3)
 		Local tX% = 0 : Local tY% = 1
@@ -310,6 +314,9 @@ Function AALoadFont%(file$="Tahoma", height=13, bold=0, italic=0, underline=0, A
 		FreeImage tCharImage
 		FreeFont hResFont
 		newFont\texture = tImage
+		newFont\isAA = True
+	Else
+		newFont\isAA = False
 	EndIf
 	Return Handle(newFont)
 End Function
