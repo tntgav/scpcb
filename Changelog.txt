@@ -7,6 +7,7 @@ v1.3.2
 - Added several new rooms.
 - Added a [REDACTED] event to the Tesla gates.
 - Adjusted the aspect ratio of badge textures (by Cridone).
+- Updated battery model (by Cridone).
 - Improvements to SCP-914's key card refining system.
 - Some improvements to SCP-049's AI.
 - Adjusted the spelling and grammar for a majority of in-game text.

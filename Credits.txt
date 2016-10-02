@@ -120,6 +120,9 @@
 
 		Brandon Smith
 			Various 3D props.
+			
+		Wilbur Frisk ("Cridone")
+			Battery and dared question Regalis' font choices.
 
 		Tom Malinowski
 

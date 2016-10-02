@@ -19,7 +19,7 @@ While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
 Wend
 ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 
-Global Font1%, Font2%, Font3%, Font4%
+Global Font1%, Font2%, Font3%, Font4%, Font5%
 
 Global VersionNumber$ = "1.3.2"
 Global CompatibleNumber$ = "1.3.2"
@@ -205,6 +205,8 @@ Font1% = AALoadFont("GFX\font\cour\Courier New.ttf", Int(18 * (GraphicHeight / 1
 Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
 Font4% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
+Font5% = AALoadFont("GFX\font\Journal\Journal.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
+
 AASetFont Font2
 
 Global BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
@@ -4605,7 +4607,7 @@ Function DrawGUI()
 					EndIf
 					RemoveItem(SelectedItem)
 				Case "supereyedrops"
-					If (Not (Wearing714=1)) Then
+					If (Not (Wearing714 = 1)) Then
 						BlinkEffect = 0.0
 						BlinkEffectTimer = 60
 						EyeStuck = 10000
@@ -4613,7 +4615,7 @@ Function DrawGUI()
 					BlurTimer = 1000
 					RemoveItem(SelectedItem)					
 				Case "paper", "ticket"
-					If SelectedItem\itemtemplate\img=0 Then
+					If SelectedItem\itemtemplate\img = 0 Then
 						Select SelectedItem\itemtemplate\name
 							Case "Burnt Note" 
 								SelectedItem\itemtemplate\img = LoadImage_Strict("GFX\items\bn.it")
@@ -4623,15 +4625,15 @@ Function DrawGUI()
 								Color 255,255,255
 								SetBuffer BackBuffer()
 							Case "Document SCP-372"
-								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+								SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 								SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
 								
 								SetBuffer ImageBuffer(SelectedItem\itemtemplate\img)
 								Color 37,45,137
-								AASetFont Font1
+								AASetFont Font5
 								temp = ((Int(AccessCode)*3) Mod 10000)
 								If temp < 1000 Then temp = temp+1000
-								AAText 333*MenuScale, 714*MenuScale, temp, True, True
+								AAText 383*MenuScale, 734*MenuScale, temp, True, True
 								Color 255,255,255
 								SetBuffer BackBuffer()
 							Case "Movie Ticket"
@@ -7090,7 +7092,7 @@ Function GetStepSound(entity%)
     
     picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
     If picker <> 0 Then
-        If EntityType(picker) <> HIT_MAP Return 0
+        If GetEntityType(picker) <> HIT_MAP Then Return 0
         brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
         If brush <> 0 Then
             texture = GetBrushTexture(brush,2)
