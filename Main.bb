@@ -426,10 +426,11 @@ Function UpdateConsole()
 			EndIf
 		EndIf
 		
-		If MouseZSpeed()=1 Then
-			ConsoleScroll = ConsoleScroll + 15*MenuScale
-		ElseIf MouseZSpeed()=-1 Then
+		mouseScroll = MouseZSpeed()
+		If mouseScroll=1 Then
 			ConsoleScroll = ConsoleScroll - 15*MenuScale
+		ElseIf mouseScroll=-1 Then
+			ConsoleScroll = ConsoleScroll + 15*MenuScale
 		EndIf
 		
 		Local reissuePos%
