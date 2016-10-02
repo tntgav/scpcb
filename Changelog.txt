@@ -7,6 +7,7 @@ v1.3.2
 - Added several new rooms.
 - Added a [REDACTED] event to the Tesla gates.
 - Adjusted the aspect ratio of badge textures (by Cridone).
+- Updated battery model (by Cridone).
 - Improvements to SCP-914's key card refining system.
 - Some improvements to SCP-049's AI.
 - Adjusted the spelling and grammar for a majority of in-game text.
@@ -43,6 +44,7 @@ Bug Fixes:
 - Fixed Security Chief Franklin using the default scientist texture during the office event if the intro sequence was enabled.
 - Fixed a bug that caused SCP-096 to spawn too frequently.
 - Fixed a bug that caused the guard's model to tilt incorrectly when aiming at the player.
+- Fixed an arbitraty runtime error that occurred when dropping an item.
 - Adjusted the item overlapping detection code, which caused some items to be pushed into walls and fall through the map.
 - Fixed a bug that caused the Tesla gate’s event to constantly loop if the player exits the area fast enough.
 - Adjusted the maintenance tunnel code so that its ambient light no longer leaks into other rooms.
