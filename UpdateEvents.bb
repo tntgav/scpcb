@@ -299,7 +299,7 @@ Function UpdateEvents()
 						ShouldPlay = 13
 						
 						;slow the player down to match his speed to the guards
-						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.007/EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
+						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.008/EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
 						
 						If e\EventState3 < 170 Then 
 							If e\EventState3 = 1.0 Then

@@ -899,6 +899,8 @@ Function UpdateConsole()
 							
 							FreeEntity e\room\Objects[0]
 							FreeEntity e\room\Objects[1]
+							PositionEntity Curr173\Collider, 0,0,0
+							ResetEntity Curr173\Collider
 							RemoveEvent(e)
 							Exit
 						EndIf
@@ -2633,7 +2635,7 @@ Repeat
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
 			If (Msg<>"Game progress saved." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
 				Msg = "Press "+KeyName(KEY_SAVE)+" to save."
-				MsgTimer = 70*5
+				MsgTimer = 70*4
 			EndIf
 			
 			If MouseHit2 Then SelectedMonitor = Null
@@ -5496,7 +5498,7 @@ Function DrawMenu()
 			AASetFont Font1
 		ElseIf QuitMSG > 0 Then
 			AASetFont Font2
-			AAText(x, y-(122-45)*MenuScale, "SAVE & QUIT?",False,True)
+			AAText(x, y-(122-45)*MenuScale, "QUIT?",False,True)
 			AASetFont Font1
 		ElseIf KillTimer >= 0 Then
 			AASetFont Font2
@@ -5865,19 +5867,22 @@ Function DrawMenu()
 						Font2% = AALoadFont("GFX\font\courbd\Courier New.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 						Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight / 1024.0)), 0,0,0)
 						Font4% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
+						Font5% = AALoadFont("GFX\font\Journal\Journal.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 						;ReloadAAFont()
 						AATextEnable_Prev% = AATextEnable
 					EndIf
 					;[End Block]
 			End Select
 		ElseIf AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG > 0 And KillTimer >= 0
+			Local QuitButton% = 60 
 			If SelectedDifficulty\saveType = SAVEONQUIT Or SelectedDifficulty\saveType = SAVEANYWHERE Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
 				Local AbleToSave% = True
 				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea" Then AbleToSave = False
 				If (Not CanSave) Then AbleToSave = False
 				If AbleToSave
-					If DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "Yes") Then
+					QuitButton = 140
+					If DrawButton(x, y + 60*MenuScale, 390*MenuScale, 60*MenuScale, "Save & Quit") Then
 						DropSpeed = 0
 						SaveGame(SavePath + CurrSave + "\")
 						NullGame()
@@ -5887,17 +5892,10 @@ Function DrawMenu()
 						CurrSave = ""
 						FlushKeys()
 					EndIf
-				Else
-					DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "")
-					Color 50,50,50
-					AAText(x+185*MenuScale, (y + 80*MenuScale)+30*MenuScale, "Yes", True, True)
 				EndIf
-			Else
-				DrawButton(x, y + 80*MenuScale, 390*MenuScale, 60*MenuScale, "")
-				Color 50,50,50
-				AAText(x+185*MenuScale, (y + 80*MenuScale)+30*MenuScale, "Yes", True, True)
 			EndIf
-			If DrawButton(x, y + 220*MenuScale, 390*MenuScale, 60*MenuScale, "No") Then
+			
+			If DrawButton(x, y + QuitButton*MenuScale, 390*MenuScale, 60*MenuScale, "Quit") Then
 				NullGame()
 				MenuOpen = False
 				MainMenuOpen = True
@@ -5905,6 +5903,49 @@ Function DrawMenu()
 				CurrSave = ""
 				FlushKeys()
 			EndIf
+			
+			If GameSaved And (Not SelectedDifficulty\permaDeath) Then
+				If DrawButton(x, y + (80 + QuitButton)*MenuScale, 390*MenuScale, 60*MenuScale, "Load Game") Then
+					DrawLoading(0)
+					
+					MenuOpen = False
+					QuitMSG% = -1
+					LoadGameQuick(SavePath + CurrSave + "\")
+					
+					MoveMouse viewport_center_x,viewport_center_y
+					AASetFont Font1
+					HidePointer ()
+					
+					FlushKeys()
+					FlushMouse()
+					Playable=True
+					
+					UpdateRooms()
+					
+					For r.Rooms = Each Rooms
+						x = Abs(EntityX(Collider) - EntityX(r\obj))
+						z = Abs(EntityZ(Collider) - EntityZ(r\obj))
+						
+						If x < 12.0 And z < 12.0 Then
+							MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = Max(MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)), 1)
+							If x < 4.0 And z < 4.0 Then
+								If Abs(EntityY(Collider) - EntityY(r\obj)) < 1.5 Then PlayerRoom = r
+								MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = 1
+							EndIf
+						End If
+					Next
+					
+					DrawLoading(100)
+					
+					DropSpeed=0
+					
+					UpdateWorld 0.0
+					
+					PrevTime = MilliSecs()
+					FPSfactor = 0
+				EndIf
+			EndIf
+			
 			If DrawButton(x+101*MenuScale, y + 344*MenuScale, 230*MenuScale, 60*MenuScale, "Back") Then
 				AchievementsMenu = 0
 				OptionsMenu = 0
