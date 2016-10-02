@@ -16,6 +16,7 @@ v1.3.2
 - Added unique locked door and DNA scanner sound effects.
 - Damage indicator messages now only display once at least two seconds have passed since the previous one displayed. This prevents the messages from constantly updating when being shot at.
 	- Same thing for 939's alert sound effects, only with a delay of three seconds.
+- The hazmat suit now automatically equips when the player picks it up.
 - Renamed fake fullscreen to borderless windowed mode.
 - The blink meter's timer is now randomized, making blinking appear more realistic.
 - Updated HUD elements (by Brokami).
@@ -35,12 +36,13 @@ Bug Fixes:
 - Added extra hitboxes to room049, room3storage and room3z2, preventing the player from falling through the floor in certain spots of these rooms.
 - Adjusted SCP-096's collision detection.
 - SCP-096 will no longer become triggered when looking at its face while the player's eyes are closed.
-- Fixed a bug involving the severed hand spawn in room3storage.
+- Fixed the severed hand in room3storage falling through the map.
 - Fixed SCP-106 being invisible during the room2pipes event.
 - Fixed SCP-106 instantly respawning after going through a Tesla gate.
 - Fixed the "halloween" console command.
 - Fixed Security Chief Franklin using the default scientist texture during the office event if the intro sequence was enabled.
 - Fixed a bug that caused SCP-096 to spawn too frequently.
+- Fixed a bug that caused the guard's model to tilt incorrectly when aiming at the player.
 - Adjusted the item overlapping detection code, which caused some items to be pushed into walls and fall through the map.
 - Fixed a bug that caused the Tesla gate’s event to constantly loop if the player exits the area fast enough.
 - Adjusted the maintenance tunnel code so that its ambient light no longer leaks into other rooms.

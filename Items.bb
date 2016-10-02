@@ -595,11 +595,11 @@ Function PickItem(item.Items)
 						If item\itemtemplate\name = "S-NAV Navigator Ultimate" Then GiveAchievement(AchvSNAV)
 					Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
 						Msg = "You put on the hazmat suit."
-						TakeOffStuff(16)
+						TakeOffStuff(1+16)
 						MsgTimer = 70 * 5
-						If SelectedItem\itemtemplate\tempname="hazmatsuit3" Then
+						If item\itemtemplate\tempname="hazmatsuit3" Then
 							WearingHazmat = 3
-						ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2"
+						ElseIf item\itemtemplate\tempname="hazmatsuit2"
 							WearingHazmat = 2
 						Else
 							WearingHazmat = 1

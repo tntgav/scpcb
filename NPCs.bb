@@ -55,6 +55,7 @@ Type NPCs
 	Field ManipulationType%
 	Field BoneX#,BoneY#,BoneZ#
 	Field BonePitch#,BoneYaw#,BoneRoll#
+	Field NPCNameInSection$
 	Field InFacility% = True
 	Field CanUseElevator% = False
 	Field CurrElevator.ElevatorObj
@@ -2195,6 +2196,7 @@ Function UpdateNPCs()
 				n\BoneToManipulate2 = ""
 				n\ManipulateBone = False
 				n\ManipulationType = 0
+				n\NPCNameInSection = "Guard"
 				
 				Select n\State
 					Case 1 ;aims and shoots at the player
@@ -2205,7 +2207,7 @@ Function UpdateNPCs()
 							dist = EntityDistance(n\Collider,Collider)
 							Local ShootAccuracy# = 0.9
 							Local DetectDistance# = 11.0
-
+							
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
 								ShootAccuracy = 0.3
@@ -2249,10 +2251,17 @@ Function UpdateNPCs()
 								
 								FreeEntity(pvt)									
 							EndIf
-							n\BoneToManipulate = "chest"
-							n\BoneToManipulate2 = "head"
+							
 							n\ManipulateBone = True
-							n\ManipulationType = 1
+							
+							If n\State2 = 10 Then ;Hacky way of applying spine pitch to specific guards.
+								n\BoneToManipulate = "spine"
+								n\ManipulationType = 3
+							Else
+								n\BoneToManipulate = "chest"
+								n\BoneToManipulate2 = "head"
+								n\ManipulationType = 1
+							EndIf
 						Else
 							n\State = 0
 						EndIf
@@ -4613,8 +4622,10 @@ Function UpdateMTFUnit(n.NPCs)
 	Local prevFrame# = n\Frame
 	
 	n\BoneToManipulate = ""
+	n\BoneToManipulate2 = ""
 	n\ManipulateBone = False
 	n\ManipulationType = 0
+	n\NPCNameInSection = "MTF"
 	
 	If Int(n\State) <> 1 Then n\PrevState = 0
 	
@@ -6379,38 +6390,180 @@ End Function
 
 Function ManipulateNPCBones()
 	Local n.NPCs,bone%,bone2%,pvt%,pitch#,yaw#,roll#
+	Local bonename$,bonename2$
+	Local pitchvalue#,yawvalue#,rollvalue#
+	Local pitchoffset#,yawoffset#,rolloffset#
 	
 	For n = Each NPCs
 		If n\ManipulateBone
+			pitchvalue# = 0
+			yawvalue# = 0
+			rollvalue# = 0
+			pitchoffset# = TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"pitchoffset")
+			yawoffset# = TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yawoffset")
+			rolloffset# = TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"rolloffset")
 			pvt% = CreatePivot()
-			bone% = FindChild(n\obj,n\BoneToManipulate$)
-			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate+Chr(34)+" is not existing!"
+			bonename$ = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"bonename",0)
+			bone% = FindChild(n\obj,bonename$)
+			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+bonename$+Chr(34)+" does not exist."
 			If n\BoneToManipulate2<>""
+				bonename2$ = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"navbone",0)
 				bone2% = FindChild(n\obj,n\BoneToManipulate2$)
-				If bone2% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+n\BoneToManipulate2+Chr(34)+" is not existing!"
+				If bone2% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+bonename2$+Chr(34)+" does not exist."
 			EndIf
 			PositionEntity pvt%,EntityX(bone%,True),EntityY(bone%,True),EntityZ(bone%,True)
 			Select n\ManipulationType
 				Case 0 ;<--- looking at player
 					PointEntity bone%,Camera
 					PointEntity pvt%,Camera
-					n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
 					n\BonePitch# = CurveAngle(EntityPitch(pvt%),n\BonePitch#,10.0)
-					RotateEntity bone%,n\BoneYaw#,-n\BonePitch#+20,0
+					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yaw")
+						Case 0
+							n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
+							pitchvalue# = n\BoneYaw#
+						Case 1
+							n\BoneYaw# = CurveAngle(EntityYaw(bone%),n\BoneYaw#,10.0)
+							yawvalue# = n\BoneYaw#
+						Case 2
+							n\BoneYaw# = CurveAngle(EntityRoll(bone%),n\BoneYaw#,10.0)
+							rollvalue# = n\BoneYaw#
+					End Select
+					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"pitch")
+						Case 0
+							pitchvalue# = n\BonePitch#
+						Case 1
+							yawvalue# = n\BonePitch#
+						Case 2
+							rollvalue# = n\BonePitch#
+					End Select
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
+						pitchvalue# = -pitchvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
+						yawvalue# = -yawvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
+						rollvalue# = -rollvalue#
+					EndIf
+					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
 				Case 1 ;<--- looking at player #2
-					;PointEntity pvt%,Camera
-					;n\BonePitch# = CurveAngle(EntityPitch(pvt%),n\BonePitch#,10.0)
-					;RotateEntity bone%,0,-n\BonePitch#-10,0
 					n\BonePitch# = CurveAngle(DeltaPitch(bone2%,Camera),n\BonePitch#,10.0)
-					RotateEntity bone%,0,-n\BonePitch#-20,0
+					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"pitch")
+						Case 0
+							pitchvalue# = n\BonePitch#
+						Case 1
+							yawvalue# = n\BonePitch#
+						Case 2
+							rollvalue# = n\BonePitch#
+					End Select
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
+						pitchvalue# = -pitchvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
+						yawvalue# = -yawvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
+						rollvalue# = -rollvalue#
+					EndIf
+					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
 				Case 2 ;<--- looking away from SCP-096
 					PointEntity bone%,Curr096\obj
-					n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
-					RotateEntity bone%,-n\BoneYaw#,20,0
+					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yaw")
+						Case 0
+							n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
+							pitchvalue# = -n\BoneYaw#
+						Case 1
+							n\BoneYaw# = CurveAngle(EntityYaw(bone%),n\BoneYaw#,10.0)
+							yawvalue# = -n\BoneYaw#
+						Case 2
+							n\BoneYaw# = CurveAngle(EntityRoll(bone%),n\BoneYaw#,10.0)
+							rollvalue# = -n\BoneYaw#
+					End Select
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
+						pitchvalue# = -pitchvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
+						yawvalue# = -yawvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
+						rollvalue# = -rollvalue#
+					EndIf
+					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
+				Case 3 ;<-- looking and pitching towards the player
+					PointEntity pvt%,Camera
+					n\BoneYaw# = CurveAngle(EntityPitch(pvt%),n\BoneYaw#,10.0)
+					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yaw")
+						Case 0
+							pitchvalue# = n\BoneYaw#
+						Case 1
+							yawvalue# = n\BoneYaw#
+						Case 2
+							rollvalue# = n\BoneYaw#
+					End Select
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
+						pitchvalue# = -pitchvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
+						yawvalue# = -yawvalue#
+					EndIf
+					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
+						rollvalue# = -rollvalue#
+					EndIf
+					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
 			End Select
 			FreeEntity pvt%
 		EndIf
 	Next
+	
+End Function
+
+Function GetNPCManipulationValue$(NPC$,bone$,section$,valuetype%=0)
+	;valuetype determines what type of variable should the Output be returned
+	;0 - String
+	;1 - Int
+	;2 - Float
+	;3 - Boolean
+	
+	Local value$ = GetINIString("Data\NPCBones.ini",NPC$,bone$+"_"+section$)
+	Select valuetype%
+		Case 0
+			Return value$
+		Case 1
+			Return Int(value$)
+		Case 2
+			Return Float(value$)
+		Case 3
+			If value$ = "true" Or value$ = "1"
+				Return True
+			Else
+				Return False
+			EndIf
+	End Select
+	
+End Function
+
+Function TransformNPCManipulationData(NPC$,bone$,section$)
+	;If "section$" = "pitch","yaw" or "roll":
+	;	- 0 means "realpitch" value has detected
+	;	- 1 means "realyaw" value has detected
+	;	- 2 means "realroll" value has detected
+	;If "section$" = "pitchoffset","yawoffset","rolloffset":
+	;	- simply return the offset degree value using a "return Float"
+	
+	Local value$ = GetNPCManipulationValue(NPC$,bone$,section$)
+	Select section$
+		Case "pitch","yaw","roll"
+			Select value$
+				Case "realpitch"
+					Return 0
+				Case "realyaw"
+					Return 1
+				Case "realroll"
+					Return 2
+			End Select
+		Case "pitchoffset","yawoffset","rolloffset"
+			Return Float(value$)
+	End Select
 	
 End Function
 
