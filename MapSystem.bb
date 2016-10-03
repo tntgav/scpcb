@@ -4167,6 +4167,9 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("Leaflet", "paper", r\x - 816.0 * RoomScale, r\y + 704.0 * RoomScale, r\z+ 888.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			
+			it = CreateItem("Gas Mask", "gasmask", r\x + 457.0 * RoomScale, r\y + 150.0 * RoomScale, r\z + 960.0 * RoomScale)
+			EntityParent(it\collider, r\obj)
+			
 			d.Doors = CreateDoor(r\zone, r\x + 832.0 * RoomScale, 0.0, r\z + 367.0 * RoomScale, 0, r, False, False, 3)
 			PositionEntity(d\buttons[0], r\x + 956.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 352.0 * RoomScale, True)
 			PositionEntity(d\buttons[1], r\x + 713.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 384.0 * RoomScale, True)
@@ -7727,6 +7730,6 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#2#A#CE9#11EE#13BF#1DDF#1DF6
-;~B#1227
+;~F#2#A
+;~B#122A
 ;~C#Blitz3D
