@@ -208,7 +208,7 @@ Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight /
 Font4% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
 Font5% = AALoadFont("GFX\font\Journal\Journal.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 
-ConsoleFont% = AALoadFont("Blitz", Int(22 * (GraphicHeight / 1024.0)), 0,0,0,1)
+ConsoleFont% = AALoadFont("Blitz", Int(20 * (GraphicHeight / 1024.0)), 0,0,0,1)
 
 AASetFont Font2
 
@@ -7722,13 +7722,13 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(2)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
+										If Rand(4)=1 Then
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									 Case HARD
-										If Rand(3)=1 Then
+										If Rand(5)=1 Then
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -7764,10 +7764,10 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(2)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
+										If Rand(3)=1 Then
 											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									 Case HARD
 										If Rand(4)=1 Then
@@ -7779,19 +7779,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 5 Key Card"	
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(50)=1 Then
+										If Rand(500)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(70)=1 Then
+										If Rand(700)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(100)=1 Then
+										If Rand(1000)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -7802,19 +7802,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(50)=5 Then
+							If Rand(500)=5 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case NORMAL
-							If Rand(70)=7 Then
+							If Rand(700)=7 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case HARD
-							If Rand(100)=10 Then
+							If Rand(1000)=10 Then
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -7891,11 +7891,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					Next
 					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1"
-					
-				Case "fine"
-					
-				Case "very fine"
+				Case "1:1", "fine", "very fine"
+					it2 = CreateItem("SCP-513", "scp513", x, y, z)
 					
 			End Select
 			
