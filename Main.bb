@@ -606,6 +606,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("- playmusic [clip + .wav/.ogg]")
 							CreateConsoleMsg("- notarget")
 							CreateConsoleMsg("- spawnnpcstate [npc type] [state]")
+							CreateConsoleMsg("- unlockexits")
 						Case "asd"
 							CreateConsoleMsg("HELP - asd")
 							CreateConsoleMsg("******************************")
@@ -822,6 +823,14 @@ Function UpdateConsole()
 					
 					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.",255,150,0)
 
+				Case "unlockexits"
+					
+					RemoteDoorOn=True
+					For e.Events = Each Events
+						If e\EventName="exit1" Or e\EventName="gatea" Then e\EventState3=1
+					Next
+					PlaySound_Strict (LoadTempSound("SFX\SCP\079\GateB.ogg"))
+					
 				Case "spawnitem"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					temp = False 

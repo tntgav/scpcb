@@ -2205,12 +2205,13 @@ Function UpdateNPCs()
 						
 						If KillTimer => 0 Then
 							dist = EntityDistance(n\Collider,Collider)
-							Local ShootAccuracy# = 0.9
+							Local ShootAccuracy# = 0.4+0.5*SelectedDifficulty\aggressiveNPCs
 							Local DetectDistance# = 11.0
 							
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
-								ShootAccuracy = 0.3
+								ShootAccuracy = 0.0
+								If Rand(1,8-SelectedDifficulty\aggressiveNPCs*4)<2 Then ShootAccuracy = 0.03
 								DetectDistance = 21.0
 							EndIf
 							
@@ -2870,7 +2871,7 @@ Function UpdateNPCs()
 													
 													DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate B."+Chr(34)
 													
-													Shoot( EntityX(pvt),EntityY(pvt), EntityZ(pvt),(10/dist)*(n\State=2),(n\State=2))
+													Shoot( EntityX(pvt),EntityY(pvt), EntityZ(pvt),((10/dist)*(1/dist))*(n\State=2),(n\State=2))
 													
 													n\Reload = 5
 												EndIf
