@@ -2212,6 +2212,10 @@ Function UpdateNPCs()
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
 								ShootAccuracy = 0.0
 								If Rand(1,8-SelectedDifficulty\aggressiveNPCs*4)<2 Then ShootAccuracy = 0.03
+								
+								;increase accuracy if the player is going slow
+								ShootAccuracy = ShootAccuracy + (0.5 - CurrSpeed*20)
+								
 								DetectDistance = 21.0
 							EndIf
 							
