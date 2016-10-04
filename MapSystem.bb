@@ -1852,13 +1852,19 @@ Function FillRoom(r.Rooms)
 			d2\AutoClose = False : d2\open = False : d2\locked = True
 			
 			d2 = CreateDoor(r\zone, r\x-1440*RoomScale, (12000.0-480.0)*RoomScale, r\z + 2328.0 * RoomScale, 0, r, False, False, 2)
-			d2\AutoClose = False : d2\open = False	
+			If SelectedEnding = "A2" Then 
+				d2\AutoClose = False : d2\open = True : d2\locked = True	
+			Else
+				d2\AutoClose = False : d2\open = False : d2\locked = False	
 			PositionEntity d2\buttons[0], r\x-1320.0*RoomScale, EntityY(d2\buttons[0],True), r\z + 2288.0*RoomScale, True
 			PositionEntity d2\buttons[1], r\x-1584*RoomScale, EntityY(d2\buttons[0],True), r\z + 2488.0*RoomScale, True	
 			RotateEntity d2\buttons[1], 0, 90, 0, True
 			
 			d2 = CreateDoor(r\zone, r\x-1440*RoomScale, (12000.0-480.0)*RoomScale, r\z + 4352.0 * RoomScale, 0, r, False, False, 2)
-			d2\AutoClose = False : d2\open = False	
+			If SelectedEnding = "A2" Then 
+				d2\AutoClose = False : d2\open = True : d2\locked = True	
+			Else
+				d2\AutoClose = False : d2\open = False : d2\locked = False
 			PositionEntity d2\buttons[0], r\x-1320.0*RoomScale, EntityY(d2\buttons[0],True), r\z + 4384.0*RoomScale, True
 			RotateEntity d2\buttons[0], 0, 180, 0, True	
 			PositionEntity d2\buttons[1], r\x-1584.0*RoomScale, EntityY(d2\buttons[0],True), r\z + 4232.0*RoomScale, True	
@@ -7731,5 +7737,5 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#2#A
-;~B#122A
+;~B#1230
 ;~C#Blitz3D
