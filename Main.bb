@@ -33,7 +33,6 @@ Global ButtonSFX%
 Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
-;If you're gonna revert this then let Regalis do it.
 Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
 
 Dim ArrowIMG(4)
@@ -5718,10 +5717,9 @@ Function DrawMenu()
 		
 		If AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG <= 0
 			AASetFont Font1
-			AAText x, y, "Designation: D-9341"
-			AAText x, y+20*MenuScale, "Difficulty: "+SelectedDifficulty\name
-			AAText x, y+40*MenuScale,	"Save: "+CurrSave
-			AAText x, y+60*MenuScale, "Map seed: "+RandomSeed
+			AAText x, y, "Difficulty: "+SelectedDifficulty\name
+			AAText x, y+20*MenuScale, "Save: "+CurrSave
+			AAText x, y+40*MenuScale, "Map seed: "+RandomSeed
 		ElseIf AchievementsMenu <= 0 And OptionsMenu > 0 And QuitMSG <= 0 And KillTimer >= 0
 			If DrawButton(x + 101 * MenuScale, y + 390 * MenuScale, 230 * MenuScale, 60 * MenuScale, "Back") Then
 				AchievementsMenu = 0
@@ -5763,16 +5761,6 @@ Function DrawMenu()
 				AntiAlias Opt_AntiAlias
 				;TextureLodBias TextureFloat#
 			EndIf
-			;If OptionsMenu < 4 Then 
-			;	If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
-			;		OptionsMenu = OptionsMenu+1
-			;	EndIf
-			;EndIf
-			;If OptionsMenu > 1 Then
-			;	If DrawButton(x+41*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, "<") Then
-			;		OptionsMenu = OptionsMenu-1
-			;	EndIf
-			;EndIf
 			
 			Color 0,255,0
 			If OptionsMenu = 1
@@ -5794,7 +5782,6 @@ Function DrawMenu()
 			Color 255,255,255
 			Select OptionsMenu
 				Case 1 ;Graphics
-					;Text(x+210*MenuScale,y,"GRAPHICS",True,True)
 					AASetFont Font1
 					;[Block]
 					y=y+50*MenuScale
@@ -5848,31 +5835,7 @@ Function DrawMenu()
 					Color 100,100,100
 					AAText(x, y, "Texture quality:")
 					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
-					;If MouseHit1
-					;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-					;		If TextureDetails% < 3
-					;			TextureDetails% = TextureDetails% + 1
-					;		Else
-					;			TextureDetails% = 0
-					;		EndIf
-					;		PlaySound_Strict(ButtonSFX)
-					;	EndIf
-					;EndIf
-					;Color 255,255,255
-					;Select TextureDetails%
-					;	Case 0
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "LOW")
-					;		TextureFloat# = 1.5
-					;	Case 1
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
-					;		TextureFloat# = 0.75
-					;	Case 2
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "HIGH")
-					;		TextureFloat# = 0.0
-					;	Case 3
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
-					;		TextureFloat# = -0.75
-					;End Select
+					
 					AAText(x + 300 * MenuScale, y + MenuScale, "DISABLED")
 					If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
 						DrawTooltip("Not available in this version")
@@ -5880,7 +5843,6 @@ Function DrawMenu()
 					
 					;[End Block]
 				Case 2 ;Audio
-					;Text(x+210*MenuScale,y,"AUDIO",True,True)
 					AASetFont Font1
 					;[Block]
 					y = y + 50*MenuScale
@@ -5891,7 +5853,6 @@ Function DrawMenu()
 					
 					y = y + 30*MenuScale
 					
-					;SFXVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, SFXVolume*100.0)/100.0)
 					PrevSFXVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, SFXVolume*100.0)/100.0)
 					If (Not DeafPlayer) Then SFXVolume# = PrevSFXVolume#
 					Color 255,255,255
@@ -6106,48 +6067,6 @@ Function DrawMenu()
 				FlushKeys()
 			EndIf
 			
-			If GameSaved And (Not SelectedDifficulty\permaDeath) Then
-				If DrawButton(x, y + (80 + QuitButton)*MenuScale, 390*MenuScale, 60*MenuScale, "Load Game") Then
-					DrawLoading(0)
-					
-					MenuOpen = False
-					QuitMSG% = -1
-					LoadGameQuick(SavePath + CurrSave + "\")
-					
-					MoveMouse viewport_center_x,viewport_center_y
-					AASetFont Font1
-					HidePointer ()
-					
-					FlushKeys()
-					FlushMouse()
-					Playable=True
-					
-					UpdateRooms()
-					
-					For r.Rooms = Each Rooms
-						x = Abs(EntityX(Collider) - EntityX(r\obj))
-						z = Abs(EntityZ(Collider) - EntityZ(r\obj))
-						
-						If x < 12.0 And z < 12.0 Then
-							MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = Max(MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)), 1)
-							If x < 4.0 And z < 4.0 Then
-								If Abs(EntityY(Collider) - EntityY(r\obj)) < 1.5 Then PlayerRoom = r
-								MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = 1
-							EndIf
-						End If
-					Next
-					
-					DrawLoading(100)
-					
-					DropSpeed=0
-					
-					UpdateWorld 0.0
-					
-					PrevTime = MilliSecs()
-					FPSfactor = 0
-				EndIf
-			EndIf
-			
 			If DrawButton(x+101*MenuScale, y + 344*MenuScale, 230*MenuScale, 60*MenuScale, "Back") Then
 				AchievementsMenu = 0
 				OptionsMenu = 0
@@ -6201,17 +6120,71 @@ Function DrawMenu()
 		
 		If AchievementsMenu<=0 And OptionsMenu<=0 And QuitMSG<=0 Then
 			If KillTimer >= 0 Then	
-				y = y+ 104*MenuScale
+				
+				y = y+ 72*MenuScale
+				
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Resume", True, True) Then
 					MenuOpen = False
 					ResumeSounds()
 					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 				EndIf
-				y = y + 80*MenuScale
+				
+				y = y + 75*MenuScale
+				If (Not SelectedDifficulty\permaDeath) Then
+					If GameSaved Then
+						If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Load Game") Then
+							DrawLoading(0)
+							
+							MenuOpen = False
+							QuitMSG% = -1
+							LoadGameQuick(SavePath + CurrSave + "\")
+							
+							MoveMouse viewport_center_x,viewport_center_y
+							AASetFont Font1
+							HidePointer ()
+							
+							FlushKeys()
+							FlushMouse()
+							Playable=True
+							
+							UpdateRooms()
+							
+							For r.Rooms = Each Rooms
+								x = Abs(EntityX(Collider) - EntityX(r\obj))
+								z = Abs(EntityZ(Collider) - EntityZ(r\obj))
+								
+								If x < 12.0 And z < 12.0 Then
+									MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = Max(MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)), 1)
+									If x < 4.0 And z < 4.0 Then
+										If Abs(EntityY(Collider) - EntityY(r\obj)) < 1.5 Then PlayerRoom = r
+										MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = 1
+									EndIf
+								End If
+							Next
+							
+							DrawLoading(100)
+							
+							DropSpeed=0
+							
+							UpdateWorld 0.0
+							
+							PrevTime = MilliSecs()
+							FPSfactor = 0
+						EndIf
+					Else
+						DrawFrame(x,y,390*MenuScale, 60*MenuScale)
+						Color (100, 100, 100)
+						AASetFont Font2
+						AAText(x + (390*MenuScale) / 2, y + (60*MenuScale) / 2, "Load Game", True, True)
+					EndIf
+					
+				EndIf
+				y = y + 75*MenuScale
+				
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Achievements") Then AchievementsMenu = 1
-				y = y + 80*MenuScale
+				y = y + 75*MenuScale
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Options") Then OptionsMenu = 1
-				y = y + 80*MenuScale
+				y = y + 75*MenuScale
 			Else
 				y = y+104*MenuScale
 				If GameSaved And (Not SelectedDifficulty\permaDeath) Then

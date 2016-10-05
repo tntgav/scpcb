@@ -1856,6 +1856,7 @@ Function FillRoom(r.Rooms)
 				d2\AutoClose = False : d2\open = True : d2\locked = True	
 			Else
 				d2\AutoClose = False : d2\open = False : d2\locked = False	
+			EndIf	
 			PositionEntity d2\buttons[0], r\x-1320.0*RoomScale, EntityY(d2\buttons[0],True), r\z + 2288.0*RoomScale, True
 			PositionEntity d2\buttons[1], r\x-1584*RoomScale, EntityY(d2\buttons[0],True), r\z + 2488.0*RoomScale, True	
 			RotateEntity d2\buttons[1], 0, 90, 0, True
@@ -1865,6 +1866,7 @@ Function FillRoom(r.Rooms)
 				d2\AutoClose = False : d2\open = True : d2\locked = True	
 			Else
 				d2\AutoClose = False : d2\open = False : d2\locked = False
+			EndIf
 			PositionEntity d2\buttons[0], r\x-1320.0*RoomScale, EntityY(d2\buttons[0],True), r\z + 4384.0*RoomScale, True
 			RotateEntity d2\buttons[0], 0, 180, 0, True	
 			PositionEntity d2\buttons[1], r\x-1584.0*RoomScale, EntityY(d2\buttons[0],True), r\z + 4232.0*RoomScale, True	
