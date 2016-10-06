@@ -992,6 +992,18 @@ Function UpdateEvents()
 								PlaySound2(e\room\NPC[2]\Sound, Camera, e\room\NPC[1]\Collider)
 							End If
 							
+							;Guard Alert
+							If e\EventState => 10440 And e\EventState - FPSfactor < 11561
+								If EntityX(Collider) < (EntityX(e\room\obj)) + 408.0 * RoomScale
+									If e\room\NPC[0]\State <> 12
+										e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\Alert"+Rand(1,2)+".ogg")
+										e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,20)
+										e\room\NPC[0]\State = 12
+										e\room\NPC[0]\State2 = 1
+									EndIf
+								EndIf
+							EndIf
+							
 							If e\EventState > 10300 Then 
 								
 								If e\EventState > 10560 Then
@@ -1054,7 +1066,7 @@ Function UpdateEvents()
 									BlinkTimer = -10
 									If e\room\NPC[1]\State = 0 Then PlaySound2(NeckSnapSFX(Rand(0, 2)),Camera,Curr173\Collider)
 									
-									e\room\NPC[0]\State=8
+									;e\room\NPC[0]\State=8
 									SetAnimTime e\room\NPC[1]\obj, 0
 									e\room\NPC[1]\State = 6
 									PositionEntity(Curr173\Collider, EntityX(e\room\NPC[1]\obj), EntityY(Curr173\Collider), EntityZ(e\room\NPC[1]\obj))
@@ -1065,6 +1077,18 @@ Function UpdateEvents()
 									RotateEntity e\room\NPC[2]\Collider, 0, EntityYaw(e\room\NPC[2]\Collider), 0
 									Animate2(e\room\NPC[2]\obj, AnimTime(e\room\NPC[2]\obj),406,382,-0.01*15)
 									MoveEntity e\room\NPC[2]\Collider, 0,0,-0.01*FPSfactor
+									
+									;Guard WTF
+									e\room\NPC[0]\State = 12
+									If e\room\NPC[0]\Sound<>0
+										StopChannel(e\room\NPC[0]\SoundChn)
+										FreeSound_Strict(e\room\NPC[0]\Sound)
+										e\room\NPC[0]\Sound = 0
+									EndIf
+									e\room\NPC[0]\Angle = 180
+									e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\WTF"+Rand(1,2)+".ogg")
+									e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,20)
+									e\room\NPC[0]\State2 = 0
 								Else
 									Animate2(e\room\NPC[1]\obj, AnimTime(e\room\NPC[1]\obj), 0, 19, 0.2, False)
 									If e\room\NPC[2]\Sound=0 Then 
@@ -1113,6 +1137,15 @@ Function UpdateEvents()
 										PlaySound_Strict(IntroSFX(9))
 										PositionEntity(e\room\NPC[0]\Collider, EntityX(e\room\obj) - 160.0 * RoomScale, EntityY(e\room\NPC[0]\Collider) + 0.1, EntityZ(e\room\obj) + 1280.0 * RoomScale)
 										ResetEntity(e\room\NPC[0]\Collider)										
+										
+										;Guard OhShit
+										If e\room\NPC[0]\Sound<>0
+											StopChannel(e\room\NPC[0]\SoundChn)
+											FreeSound_Strict(e\room\NPC[0]\Sound)
+											e\room\NPC[0]\Sound = 0
+										EndIf
+										e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\OhSh.ogg")
+										e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,20)
 									EndIf
 									If e\EventState > 20105 Then
 										Curr173\Idle = True 
@@ -1128,6 +1161,7 @@ Function UpdateEvents()
 									PointEntity(e\room\NPC[0]\Collider, Curr173\Collider)
 									MoveEntity(e\room\NPC[0]\Collider, 0, 0, -0.002)
 									e\room\NPC[0]\State = 2
+									UpdateSoundOrigin(e\room\NPC[0]\SoundChn,Camera,e\room\NPC[0]\Collider,20)
 									If e\EventState > 20260 And e\EventState - FPSfactor < 20260 Then PlaySound_Strict(IntroSFX(12))
 								Else ;lights out, guard dies
 									

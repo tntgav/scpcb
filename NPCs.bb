@@ -2477,6 +2477,36 @@ Function UpdateNPCs()
 						Else
 							n\State = 0
 						EndIf
+					Case 12
+						AnimateNPC(n, 1539, 1553, 0.2, False)
+						
+						pvt% = CreatePivot()
+						PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider))
+						If n\State2 = 1.0
+							PointEntity(pvt, Collider)
+						Else
+							RotateEntity pvt,0,n\Angle,0
+						EndIf
+						RotateEntity(pvt, Min(EntityPitch(pvt), 20), EntityYaw(pvt), 0)
+						
+						RotateEntity(n\Collider, CurveAngle(EntityPitch(pvt), EntityPitch(n\Collider), 10), CurveAngle(EntityYaw(pvt), EntityYaw(n\Collider), 10), 0, True)
+						
+						PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider)+0.8, EntityZ(n\Collider))
+						If n\State2 = 1.0
+							PointEntity(pvt, Collider)
+						Else
+							RotateEntity pvt,0,n\Angle,0
+						EndIf
+						RotateEntity(pvt, Min(EntityPitch(pvt), 40), EntityYaw(n\Collider), 0)
+						
+						FreeEntity(pvt)
+						
+						n\ManipulateBone = True
+						n\BoneToManipulate = "chest"
+						n\BoneToManipulate2 = "head"
+						n\ManipulationType = 1
+						
+						UpdateSoundOrigin(n\SoundChn,Camera,n\Collider,20)
 					Default
 						If Rand(400) = 1 Then n\PrevState = Rnd(-30, 30)
 						n\PathStatus = 0
