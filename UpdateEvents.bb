@@ -994,7 +994,7 @@ Function UpdateEvents()
 							
 							;Guard Alert
 							If e\EventState => 10440 And e\EventState - FPSfactor < 11561
-								If EntityX(Collider) < (EntityX(e\room\obj)) + 408.0 * RoomScale
+								If EntityX(Collider) < EntityX(e\room\RoomDoors[1]\frameobj, True)
 									If e\room\NPC[0]\State <> 12
 										e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\Alert"+Rand(1,2)+".ogg")
 										e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,20)

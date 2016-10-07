@@ -810,18 +810,13 @@ Function UpdateNPCs()
 													Case "lockroom", "room2closets", "coffin"
 														DeathMSG = "Subject D-9341. Cause of death: Fatal cervical fracture. The surveillance tapes confirm that the subject was killed by SCP-173."	
 													Case "173"
-														If Rand(2)=1 Then
-															DeathMSG = Chr(34)+"Yes, we were just about to start the tests when it started. The Class Ds and the guard died as soon as the lights started flickering, "
-															DeathMSG = DeathMSG + "but I managed to get out of the surveillance room before it got me."+Chr(34)
-														Else
-															DeathMSG = "Subject D-9341. Cause of death: Fatal cervical fracture. According to Security Chief Franklin who was present at SCP-173's containment "
-															DeathMSG = DeathMSG + "chamber during the breach, the subject was killed by SCP-173 as soon as the disruptions in the electrical network started."
-														EndIf
+														DeathMSG = "Subject D-9341. Cause of death: Fatal cervical fracture. According to Security Chief Franklin who was present at SCP-173's containment "
+														DeathMSG = DeathMSG + "chamber during the breach, the subject was killed by SCP-173 as soon as the disruptions in the electrical network started."
 													Case "room2doors"
 														DeathMSG = Chr(34)+"If I'm not mistaken, one of the main purposes of these rooms was to stop SCP-173 from moving further in the event of a containment breach. "
-														DeathMSG = DeathMSG + "So, who's brilliant idea was it to put A GODDAMN MAN-SIZED VENTILATION DUCT in it?"+Chr(34)
+														DeathMSG = DeathMSG + "So, who's brilliant idea was it to put A GODDAMN MAN-SIZED VENTILATION DUCT in there?"+Chr(34)
 													Default 
-														DeathMSG = "Subject D-9341. Cause of death: Fatal cervical fracture. Assumed to be attacked by SCP-173."	
+														DeathMSG = "Subject D-9341. Cause of death: Fatal cervical fracture. Assumed to be attacked by SCP-173."
 												End Select
 												
 												If (Not GodMode) Then n\Idle = True
