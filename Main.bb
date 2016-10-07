@@ -6177,9 +6177,8 @@ Function DrawMenu()
 						AASetFont Font2
 						AAText(x + (390*MenuScale) / 2, y + (60*MenuScale) / 2, "Load Game", True, True)
 					EndIf
-					
-				EndIf
-				y = y + 75*MenuScale
+					y = y + 75*MenuScale
+			EndIf
 				
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, "Achievements") Then AchievementsMenu = 1
 				y = y + 75*MenuScale
