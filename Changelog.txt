@@ -1,4 +1,4 @@
-
+﻿
 ----------------------------------------------------------------------------------
 
 v1.3.2
@@ -10,16 +10,17 @@ v1.3.2
 	- Pressing up or down now cycles previous commands into the input field, without having to retype the command.
 - Added several new rooms.
 - Added a [REDACTED] event to the Tesla gates.
+
 - Added a new variant of the night vision goggles.
 - Adjusted the aspect ratio of badge textures (by Cridone).
 - Updated battery model (by Cridone).
 - Improvements to SCP-914's key card refining system.
-- Some improvements to SCP-049's AI.
+
 - Optimized the rendering of adjacent rooms.
 - Adjusted the spelling and grammar for a majority of in-game text.
 - Extended the parameters of the "help" console command.
 - Updated SCP-173's model so that it no longer uses 2 texture layers. In layman's terms, its texture is no longer applied twice and therefore it no longer appears "darker".
-	-Credits to Juanjpro for the updated model.
+	- Credits to Juanjpro for the updated model.
 - Added unique locked door and DNA scanner sound effects.
 - Damage indicator messages now only display once at least two seconds have passed since the previous one displayed. This prevents the messages from constantly updating when being shot at.
 	- Same thing for 939's alert sound effects, only with a delay of three seconds.

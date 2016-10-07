@@ -3497,7 +3497,7 @@ Function UpdateEvents()
 				temp = True
 				If e\EventState2 > 70*3.5 And e\EventState2 < 70*90 Then temp = False
 				
-				If temp Then
+				If temp And EntityY(Collider, True)>EntityY(e\room\obj,True) Then
 					
 					If e\Sound = 0 Then e\Sound = LoadSound_Strict("SFX\Room\Tesla\Shock.ogg")
 					
@@ -3564,21 +3564,21 @@ Function UpdateEvents()
 						EndIf
 						
 						If Curr106\State < -10 And e\EventState = 0 Then 
-								For i = 0 To 2
-									If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
-										;play the activation sound
-										If KillTimer => 0 Then 
-											StopChannel(e\SoundCHN)
-											e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
-											HideEntity e\room\Objects[4]
-											e\EventState = 1
-											Curr106\State = 70 * 60 * Rand(10,13)
-											GiveAchievement(AchvTesla)
-											Exit
-										EndIf
+							For i = 0 To 2
+								If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
+									;play the activation sound
+									If KillTimer => 0 Then 
+										StopChannel(e\SoundCHN)
+										e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
+										HideEntity e\room\Objects[4]
+										e\EventState = 1
+										Curr106\State = 70 * 60 * Rand(10,13)
+										GiveAchievement(AchvTesla)
+										Exit
 									EndIf
-								Next
-							EndIf
+								EndIf
+							Next
+						EndIf
 					Else
 						e\EventState = e\EventState+FPSfactor
 						If e\EventState =< 40 Then
@@ -9227,8 +9227,6 @@ End Function
 
 
 
-
 ;~IDEal Editor Parameters:
-;~F#309
 ;~B#1486#2189
 ;~C#Blitz3D
