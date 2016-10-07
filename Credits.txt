@@ -1,4 +1,4 @@
-
+﻿
 *********************************************************
 
 	A big thank you to everyone who's supported the project during these years 
@@ -205,6 +205,10 @@
 
 		Christian Rieß
 			Version 1.3 quality assurance.
+
+		Polyfox Digital
+			
+			Post-1.3.0 quality assurance
 
 		Caleb Yu ("Omniary")
 			Some of the documents and SCP-513-1's texture.
