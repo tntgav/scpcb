@@ -1462,7 +1462,7 @@ Function UpdateEvents()
 						;If EntityVisible(Camera,e\room\Objects[1])
 							If CoffinDistance<4.0
 								
-								Sanity=Sanity-FPSfactor*1.1
+								Sanity=Sanity-(FPSfactor*1.1/WearingNightVision)
 								BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
 								
 								tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
@@ -3497,7 +3497,7 @@ Function UpdateEvents()
 				temp = True
 				If e\EventState2 > 70*3.5 And e\EventState2 < 70*90 Then temp = False
 				
-				If temp And EntityY(Collider, True)>EntityY(e\room\obj,True) Then
+				If temp And EntityY(Collider, True) > EntityY(e\room\obj,True) And EntityY(Collider, True) < 4.0 Then
 					
 					If e\Sound = 0 Then e\Sound = LoadSound_Strict("SFX\Room\Tesla\Shock.ogg")
 					
@@ -3602,7 +3602,6 @@ Function UpdateEvents()
 											ShowEntity Light
 											LightFlash = 0.4
 											CameraShake = 1.0
-											DeathMSG = ""
 											Kill()
 											DeathMSG = "Subject D-9341 killed by the Tesla gate at [REDACTED]."
 										EndIf
@@ -3657,7 +3656,7 @@ Function UpdateEvents()
 					If e\EventStr = "step1" And e\room\NPC[0]\State <> 3
 						If e\EventState = 0
 							For i = 0 To 2
-								If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale
+								If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 400.0*RoomScale
 									If KillTimer => 0 Then 
 										StopChannel(e\SoundCHN)
 										e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
@@ -3699,7 +3698,7 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				
-				If PlayerRoom\RoomTemplate\Name<>"pocketdimension" And (Not isIn8601) Then
+				If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "room860" Then
 					If e\EventState2 = 0 Then
 						If e\EventState3 <=0 Then 
 							temp = False
@@ -6828,8 +6827,6 @@ Function UpdateEvents()
 					;Local dp.DrawPortal
 					
 					If e\EventState=1.0 Then ;the player is in the forest
-						isIn8601 = True
-						
 						CurrStepSFX = 2
 						
 						Curr106\Idle = True
@@ -6925,8 +6922,6 @@ Function UpdateEvents()
 											UpdateDoors()
 											
 											e\EventState = 0.0
-											
-											isIn8601 = False
 											
 										Else
 											PlaySound_Strict(LoadTempSound("SFX\Door\WoodenDoorBudge.ogg"))
@@ -8609,13 +8604,13 @@ Function UpdateEvents()
 														TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
 														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 														DebugLog "Created Monitor for "+Chr(34)+"room2closets"+Chr(34)
-													Case "room1archive1074" ;ID=1 q
+													Case "room1archive" ;ID=1 q
 														PositionEntity pvt%,-231.489,872.0,95.7443,False
 														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 														EntityParent(sc\ScrObj, e\room\obj)
 														TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
 														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room1archive1074"+Chr(34)
+														DebugLog "Created Monitor for "+Chr(34)+"room1archive"+Chr(34)
 													Case "room3z3" ;ID=2 q
 														PositionEntity pvt%,-231.489,872.0,255.744,False
 														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))

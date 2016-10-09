@@ -3729,7 +3729,7 @@ Function FillRoom(r.Rooms)
 			EntityParent(r\Objects[0], r\obj)
 			EntityParent(r\Objects[1], r\obj)
 			
-			d = CreateDoor(r\zone, r\x - 624.0 * RoomScale, 0.0,r\z + 528.0 * RoomScale, 180, r, True)
+			d = CreateDoor(r\zone, r\x - 624.0 * RoomScale, 0.0, r\z + 528.0 * RoomScale, 180, r, True)
 			FreeEntity (d\obj2) : d\obj2 = 0
 			FreeEntity (d\buttons[0]) : d\buttons[0] = 0
 			FreeEntity (d\buttons[1]) : d\buttons[1] = 0
@@ -4033,15 +4033,9 @@ Function FillRoom(r.Rooms)
 			EntityParent(sc\obj, r\obj)
 			sc\ID = 4
 			;[End Block]
-		Case "room1archive","room1archive1074"
+		Case "room1archive"
 			;[Block]
-			If r\RoomTemplate\Name = "room1archive1074"
-				temp% = 3
-				it = CreateItem("SCP-1074 Containment Notice","paper",r\x-700.0*RoomScale,r\y+159.0*RoomScale,r\z+500.0*RoomScale)
-				EntityParent it\collider,r\obj
-			Else
-				temp% = Rand(1,3)
-			EndIf
+			temp% = Rand(1,3)
 		
 			For xtemp = 0 To 1
 				For ytemp = 0 To 2

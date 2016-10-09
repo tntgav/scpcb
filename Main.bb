@@ -30,7 +30,7 @@ AppTitle "SCP - Containment Breach Launcher"
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%
 
-Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
+Global EnableSFXRelease% = GetINIInt(OptionFile, "audio", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
 Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
@@ -81,7 +81,7 @@ Select TextureDetails%
 		TextureFloat# = -0.75
 End Select
 Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
-Global SFXVolume# = GetINIFloat(OptionFile, "options", "sound volume")
+Global SFXVolume# = GetINIFloat(OptionFile, "audio", "sound volume")
 
 Global Bit16Mode = GetINIInt(OptionFile, "options", "16bit")
 
@@ -276,7 +276,6 @@ Global user_camera_pitch#, side#
 Global Crouch%, CrouchState#
 
 Global PlayerZone%, PlayerRoom.Rooms
-Global isIn8601%
 
 Global GrabbedEntity%
 
@@ -401,10 +400,10 @@ Function UpdateConsole()
 		
 		
 		Color 120,120,120
-		inBox% = MouseOn(x+width-23*MenuScale,y+height-scrollBarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight)
+		inBox% = MouseOn(x+width-23*MenuScale,y+height-scrollbarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight)
 		If inBox Then Color 200,200,200
 		If ConsoleScrollDragging Then Color 255,255,255
-		Rect x+width-23*MenuScale,y+height-scrollBarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight,True
+		Rect x+width-23*MenuScale,y+height-scrollbarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight,True
 		
 		If Not MouseDown(1) Then
 			ConsoleScrollDragging=False
@@ -903,8 +902,7 @@ Function UpdateConsole()
 				Case "reset096"
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
-							RemoveNPC(n)
-							CreateEvent("lockroom096", "lockroom2", 0)   
+							n\State = 0
 							Exit
 						EndIf
 					Next
@@ -1306,6 +1304,8 @@ Function UpdateConsole()
 		If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	End If
 	
+	AASetFont Font1
+	
 End Function
 
 ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 255
@@ -1389,7 +1389,7 @@ Music(11) = LoadSound_Strict("SFX\Music\Menu.ogg")
 ;Music(21): Breath theme after beating the game
 
 
-Global MusicVolume# = GetINIFloat(OptionFile, "options", "music volume")
+Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 Global MusicCHN% = PlaySound_Strict(Music(2))
 ChannelVolume(MusicCHN, MusicVolume)
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
@@ -1610,8 +1610,8 @@ Global AmbientLightRoomTex%, AmbientLightRoomVal%
 
 ;Global NVGImage% = CreateImage(GraphicWidth,GraphicHeight),NVGCam%
 
-Global EnableUserTracks% = GetINIInt(OptionFile,"options","enable user tracks")
-Global UserTrackMode% = GetINIInt(OptionFile,"options","user track setting")
+Global EnableUserTracks% = GetINIInt(OptionFile, "audio", "enable user tracks")
+Global UserTrackMode% = GetINIInt(OptionFile, "audio", "user track setting")
 Global UserTrackCheck% = 0, UserTrackCheck2% = 0
 Global UserTrackMusicAmount% = 0, CurrUserTrack%, UserTrackFlag% = False
 Dim UserTrackName$(256)
@@ -2600,12 +2600,19 @@ Repeat
 				
 				If PlayerRoom\RoomTemplate\Name = "173" Then 
 					PlayerZone = 4
-				ElseIf isIn8601
-					PlayerZone = 5
+				ElseIf PlayerRoom\RoomTemplate\Name = "room860"
+					For e.Events = Each Events
+						If e\EventName = "room860"
+							If e\EventState = 1.0
+								PlayerZone = 5
+								PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 30.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
+								Exit
+							EndIf
+						EndIf
+					Next
 				EndIf
 				
 				CurrAmbientSFX = Rand(0,AmbientSFXAmount(PlayerZone)-1)
-				DebugLog PlayerZone
 				
 				Select PlayerZone
 					Case 0,1,2
@@ -2622,7 +2629,7 @@ Repeat
 			EndIf
 			If Rand(50000) = 3 Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ <> "pocketdimension" And (Not isIn8601) And RN$ <> "173" And RN$ <> "dimension1499" And RN$ <> "exit1" And RN$ <> "gatea" And (Not MenuOpen) Then
+				If RN$ <> "pocketdimension" And RN$ <> "room860" And RN$ <> "173" And RN$ <> "dimension1499" And RN$ <> "exit1" And RN$ <> "gatea" And (Not MenuOpen) Then
 					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
 					PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
 				EndIf 
@@ -2745,7 +2752,7 @@ Repeat
 			
 			If Using294 Then darkA=1.0
 			
-			darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
+			If (Not WearingNightVision) Then darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
 			
 			If KillTimer >= 0 Then
 				
@@ -2896,7 +2903,7 @@ Repeat
 		End If
 		
 		Color 255, 255, 255
-		If ShowFPS Then AAText 20, 20, "FPS: " + FPS
+		If ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
 		
 		DrawQuickLoading()
 	End If
@@ -3866,6 +3873,7 @@ Function DrawGUI()
 		
 		If DebugHUD Then
 			Color 255, 255, 255
+			AASetFont ConsoleFont
 			
 			;Text x + 250, 50, "Zone: " + (EntityZ(Collider)/8.0)
 			AAText x - 50, 50, "Player Position: (" + f2s(EntityX(Collider), 3) + ", " + f2s(EntityY(Collider), 3) + ", " + f2s(EntityZ(Collider), 3) + ")"
@@ -3911,6 +3919,7 @@ Function DrawGUI()
 				EndIf
 			Next
 			
+			AASetFont Font1
 		EndIf
 		
 	EndIf
@@ -4558,27 +4567,55 @@ Function DrawGUI()
 			Select SelectedItem\itemtemplate\tempname
 					
 					;[Block]
-				Case "nvgoggles", "supernv", "veryfinenvgoggles"
+				Case "nvgoggles"
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
-					If WearingNightVision > 0 Then
+					If WearingNightVision = 1 Then
 						Msg = "You removed the goggles."
 						CameraFogFar = StoredCameraFogFar
 					Else
 						Msg = "You put on the goggles."
 						;WearingGasMask = 0
 						;Wearing178 = False
-						TakeOffStuff(1+2+8+64)
+						TakeOffStuff(1+2+8+32+64)
 						StoredCameraFogFar = CameraFogFar
 						CameraFogFar = 30
 					EndIf
 					
 					WearingNightVision = (Not WearingNightVision)
-					If SelectedItem\itemtemplate\tempname="supernv"
-						WearingNightVision = WearingNightVision * 2
-					ElseIf SelectedItem\itemtemplate\tempname="veryfinenvgoggles"
-						WearingNightVision = WearingNightVision * 3
+					SelectedItem = Null	
+					
+				Case "supernv"
+					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
+					If WearingNightVision = 2 Then
+						Msg = "You removed the goggles."
+						CameraFogFar = StoredCameraFogFar
+					Else
+						Msg = "You put on the goggles."
+						;WearingGasMask = 0
+						;Wearing178 = False
+						TakeOffStuff(1+2+8+32+64)
+						StoredCameraFogFar = CameraFogFar
+						CameraFogFar = 30
 					EndIf
-						
+					
+					WearingNightVision = (Not WearingNightVision) * 2
+					SelectedItem = Null	
+					
+				Case "veryfinenvgoggles"
+					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
+					If WearingNightVision = 3 Then
+						Msg = "You removed the goggles."
+						CameraFogFar = StoredCameraFogFar
+					Else
+						Msg = "You put on the goggles."
+						;WearingGasMask = 0
+						;Wearing178 = False
+						TakeOffStuff(1+2+8+32+64)
+						StoredCameraFogFar = CameraFogFar
+						CameraFogFar = 30
+					EndIf
+					
+					WearingNightVision = (Not WearingNightVision) * 3
 					SelectedItem = Null	
 
 				Case "scp178"
@@ -5726,7 +5763,6 @@ Function DrawMenu()
 				OptionsMenu = 0
 				QuitMSG = 0
 				MouseHit1 = False
-				PutINIValue(OptionFile, "options", "music volume", MusicVolume)
 				PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
 				PutINIValue(OptionFile, "options", "invert mouse y", InvertMouse)
 				PutINIValue(OptionFile, "options", "bump mapping enabled", BumpEnabled)			
@@ -5741,11 +5777,13 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
 				PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
-				PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
-				PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
-				PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
-				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
+				
+				PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
+				PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
+				PutINIValue(OptionFile, "audio", "sfx release", EnableSFXRelease)
+				PutINIValue(OptionFile, "audio", "enable user tracks", EnableUserTracks%)
+				PutINIValue(OptionFile, "audio", "user track setting", UserTrackMode%)
 				
 				PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
@@ -6136,7 +6174,6 @@ Function DrawMenu()
 							DrawLoading(0)
 							
 							MenuOpen = False
-							QuitMSG% = -1
 							LoadGameQuick(SavePath + CurrSave + "\")
 							
 							MoveMouse viewport_center_x,viewport_center_y
@@ -6238,7 +6275,7 @@ Function DrawMenu()
 					CurrSave = ""
 					FlushKeys()
 				EndIf
-				y= y + 80*MenuScale
+				y = y + 80*MenuScale
 			EndIf
 			
 			If KillTimer >= 0 And (Not MainMenuOpen)
