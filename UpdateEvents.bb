@@ -1483,7 +1483,7 @@ Function UpdateEvents()
 									EntityColor(NVOverlay, 255,255,255)
 								EndIf
 								If Sanity < (-1000) Then 
-									If WearingNightVision=2
+									If WearingNightVision > 1
 										DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
 										DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
 									Else
