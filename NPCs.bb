@@ -3453,7 +3453,7 @@ Function UpdateNPCs()
 									EndIf
 									
 									If Injuries>4.0 Then 
-										DeathMSG=Chr(34)+"All four escaped SCP-939 specimens have been captured and recontained successfully. "
+										DeathMSG=Chr(34)+"All four (4) escaped SCP-939 specimens have been captured and recontained successfully. "
 										DeathMSG=DeathMSG+"Three (3) of them made quite a mess at Storage Area 6. A cleaning team has been dispatched."+Chr(34)
 										Kill()
 										If (Not GodMode) Then n\State = 5
