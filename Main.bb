@@ -620,6 +620,12 @@ Function UpdateConsole()
 							CreateConsoleMsg("at 'CameraFogFar' units away from the camera.")
 							CreateConsoleMsg("Example: camerafog 20 40")
 							CreateConsoleMsg("******************************")
+						Case "gamma"
+							CreateConsoleMsg("HELP - gamma")
+							CreateConsoleMsg("******************************")
+							CreateConsoleMsg("Sets the gamma correction.")
+							CreateConsoleMsg("Should be set to a value between 0.0 and 2.0.")
+							CreateConsoleMsg("******************************")
 						Case "noclip","fly"
 							CreateConsoleMsg("HELP - noclip")
 							CreateConsoleMsg("******************************")
@@ -1094,10 +1100,10 @@ Function UpdateConsole()
 					CameraFogFar = Float(Right(args, Len(args) - Instr(args, " ")))
 					CreateConsoleMsg("Near set to: " + CameraFogNear + ", far set to: " + CameraFogFar)
 					
-				Case "brightness"
+				Case "gamma"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					Brightness = Int(StrTemp)
-					CreateConsoleMsg("Brightness set to " + Brightness)
+					ScreenGamma = Int(StrTemp)
+					CreateConsoleMsg("Gamma set to " + ScreenGamma)
 
 				Case "spawn"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
