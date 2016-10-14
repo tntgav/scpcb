@@ -9120,36 +9120,20 @@ Function RenderWorld2()
 	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision=1) Or (WearingNightVision=2)
-		For i=0 To MaxItemAmount-1
-			If (Inventory(i)<>Null) Then
-				If (WearingNightVision=1)
-				If Inventory(i)\itemtemplate\tempname="nvgoggles" Then
-					Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.02)
-					power%=Int(Inventory(i)\state)
-					If Inventory(i)\state<=0.0 Then ;this nvg can't be used
+	If (WearingNightVision = 1) Or (WearingNightVision = 2)
+		For i% = 0 To MaxItemAmount - 1
+			If (Inventory(i) <> Null) Then
+				If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+					Inventory(i)\state = Inventory(i)\state - (FPSfactor * (0.02 * WearingNightVision))
+					power% = Int(Inventory(i)\state)
+					If Inventory(i)\state <= 0.0 Then ;this nvg can't be used
 						hasBattery = 0
 						Msg = "The batteries in these night vision goggles died."
 						BlinkTimer = -1.0
 						MsgTimer = 350
 						Exit
-					ElseIf Inventory(i)\state<=100.0 Then
+					ElseIf Inventory(i)\state <= 100.0 Then
 						hasBattery = 1
-					EndIf
-					EndIf
-				Else
-					If Inventory(i)\itemtemplate\tempname="supernv" Then
-						Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.04)
-						power%=Int(Inventory(i)\state)
-						If Inventory(i)\state<=0.0 Then ;this nvg can't be used
-							hasBattery = 0
-							Msg = "The batteries in these night vision goggles died."
-							BlinkTimer = -1.0
-							MsgTimer = 350
-							Exit
-						ElseIf Inventory(i)\state<=100.0 Then
-							hasBattery = 1
-						EndIf
 					EndIf
 				EndIf
 			EndIf

@@ -1449,20 +1449,31 @@ Function UpdateEvents()
 							de.Decals = CreateDecal(0, EntityX(e\room\Objects[1],True), -1531.0*RoomScale, EntityZ(e\room\Objects[1],True), 90, Rand(360), 0)
 							de\Size = 0.05 : de\SizeChange = 0.001 : EntityAlpha(de\obj, 0.8) : UpdateDecals()
 							
-							PositionEntity Curr106\Collider, EntityX(e\room\Objects[1],True), -2000*RoomScale, EntityZ(e\room\Objects[1],True)
+							PositionEntity Curr106\Collider, EntityX(e\room\Objects[1],True), -1547*RoomScale, EntityZ(e\room\Objects[1],True)
 							Curr106\State = -0.1
 							ShowEntity Curr106\obj
 							e\EventState2 = 1
 						EndIf
 					EndIf
-					
-					If WearingNightVision>0 Then
+
+					If WearingNightVision > 0 Then
+						Local hasBatteryFor895% = 0
+						For i% = 0 To MaxItemAmount - 1
+							If (Inventory(i) <> Null) Then
+								If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+									If Inventory(i)\state > 0.0 Then
+										hasBatteryFor895 = 1
+										Exit
+									EndIf
+								EndIf
+							EndIf
+						Next
 						;If EntityVisible(Camera,e\room\Objects[2]) Then
 							;If EntityInView(e\room\Objects[2], Camera) Then
 						;If EntityVisible(Camera,e\room\Objects[1])
-							If CoffinDistance<4.0
+							If (CoffinDistance < 4.0) And (hasBatteryFor895) Then
 								
-								Sanity=Sanity-(FPSfactor*1.1/WearingNightVision)
+								Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
 								BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
 								
 								tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
