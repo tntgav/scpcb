@@ -943,7 +943,11 @@ Function UpdateNPCs()
 								n\PrevY = EntityY(Collider)
 								
 								SetAnimTime n\obj, 110
-								PositionEntity(n\Collider, EntityX(Collider), EntityY(Collider) - 15, EntityZ(Collider))
+								
+								If PlayerRoom\RoomTemplate\Name <> "coffin"
+									PositionEntity(n\Collider, EntityX(Collider), EntityY(Collider) - 15, EntityZ(Collider))
+								EndIf
+								
 								PlaySound_Strict(DecaySFX(0))
 							End If
 							

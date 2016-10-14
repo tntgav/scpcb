@@ -1449,7 +1449,7 @@ Function UpdateEvents()
 							de.Decals = CreateDecal(0, EntityX(e\room\Objects[1],True), -1531.0*RoomScale, EntityZ(e\room\Objects[1],True), 90, Rand(360), 0)
 							de\Size = 0.05 : de\SizeChange = 0.001 : EntityAlpha(de\obj, 0.8) : UpdateDecals()
 							
-							PositionEntity Curr106\Collider, EntityX(e\room\Objects[1],True), -1547*RoomScale, EntityZ(e\room\Objects[1],True)
+							PositionEntity Curr106\Collider, EntityX(e\room\Objects[1],True), -10240*RoomScale, EntityZ(e\room\Objects[1],True)
 							Curr106\State = -0.1
 							ShowEntity Curr106\obj
 							e\EventState2 = 1
