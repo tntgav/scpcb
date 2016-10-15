@@ -827,14 +827,6 @@ Function UpdateConsole()
 					Next
 					
 					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.",255,150,0)
-
-				Case "unlockexits"
-					
-					RemoteDoorOn=True
-					For e.Events = Each Events
-						If e\EventName="exit1" Or e\EventName="gatea" Then e\EventState3=1
-					Next
-					PlaySound_Strict (LoadTempSound("SFX\SCP\079\GateB.ogg"))
 					
 				Case "spawnitem"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -1151,24 +1143,30 @@ Function UpdateConsole()
 						EndIf
 					Next
 					
-				Case "toggle_079_deal"
+				Case "unlockexits", "toggle_079_deal"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
 						Case "a"
 							For e.Events = Each Events
-								If e\EventName="gateaentrance" Then
+								If e\EventName = "gateaentrance" Then
 									e\EventState3 = (Not e\EventState3)
 									Exit
 								EndIf
 							Next
 						Case "b"
 							For e.Events = Each Events
-								If e\EventName="exit1" Then
+								If e\EventName = "exit1" Then
 									e\EventState3 = (Not e\EventState3)
 									Exit
 								EndIf
-							Next	
+							Next
+						Default
+							For e.Events = Each Events
+								If e\EventName = "exit1" Or e\EventName = "gatea" Then e\EventState3 = (Not e\EventState3)
+							Next
+							
+							RemoteDoorOn = (Not RemoteDoorOn)
 					End Select
 
 				Case "kill","suicide"
@@ -2583,27 +2581,27 @@ Repeat
 		If KeyHit(KEY_INV) Then 
 			If InvOpen Then
 				ResumeSounds()
-				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1# = 0.0 : mouse_y_speed_1# = 0.0
 			Else
 				PauseSounds()
 			EndIf
 			InvOpen = Not InvOpen
-			If OtherOpen<>Null Then OtherOpen=Null
+			If OtherOpen <> Null Then OtherOpen = Null
 			SelectedItem = Null 
 		EndIf
 		
-		If (Not MenuOpen) And (Not ConsoleOpen) And PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "exit1"  Then 
+		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "exit1" And (Not MenuOpen) And (Not ConsoleOpen) Then 
 			
 			If Rand(1500) = 1 Then
 				For i = 0 To 5
-					If AmbientSFX(i,CurrAmbientSFX)<>0 Then
-						If ChannelPlaying(AmbientSFXCHN)=0 Then FreeSound_Strict AmbientSFX(i,CurrAmbientSFX) : AmbientSFX(i,CurrAmbientSFX) = 0
+					If AmbientSFX(i,CurrAmbientSFX) <> 0 Then
+						If ChannelPlaying(AmbientSFXCHN) = 0 Then FreeSound_Strict AmbientSFX(i,CurrAmbientSFX) : AmbientSFX(i,CurrAmbientSFX) = 0
 					EndIf			
 				Next
 				
 				PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 0.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
 				
-				If Rand(3)=1 Then PlayerZone = 3
+				If Rand(3) = 1 Then PlayerZone = 3
 				
 				If PlayerRoom\RoomTemplate\Name = "173" Then 
 					PlayerZone = 4
@@ -2635,7 +2633,7 @@ Repeat
 				
 				AmbientSFXCHN = PlaySound2(AmbientSFX(PlayerZone,CurrAmbientSFX), Camera, SoundEmitter)
 			EndIf
-
+			
 			If Rand(50000) = 3 Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
 				If RN$ <> "room860" And RN$ <> "room1123" And RN$ <> "173" And RN$ <> "dimension1499" Then

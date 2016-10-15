@@ -83,6 +83,15 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Gravity = True
 			
 			n\obj = LoadMesh_Strict("GFX\npcs\173_2.b3d")
+			
+			;On Halloween set jack-o-latern texture.
+			If (Left(CurrentDate(), 7) = "31 Oct ") Then
+				HalloweenTex = True
+				Local texFestive = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
+				EntityTexture n\obj, texFestive, 0, 0
+				FreeTexture texFestive
+			EndIf
+			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "scale") / MeshDepth(n\obj))			
 			ScaleEntity n\obj, temp,temp,temp
 			
@@ -6140,7 +6149,7 @@ Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False
 	
 	If (Not GodMode) Then 
 		
-		If instaKill Then Kill() : DebugLog "WOw cringe" : Return
+		If instaKill Then Kill() : PlaySound_Strict BullethitSFX : Return
 		
 		If Rnd(1.0) =< hitProb Then
 			TurnEntity Camera, Rnd(-3,3), Rnd(-3,3), 0

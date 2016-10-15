@@ -195,6 +195,9 @@ Function UpdateEvents()
 								If (CurrTrigger = "173scene_end") And EntityVisible(e\room\NPC[2]\Collider, Collider) And (Not GodMode) Then
 									e\room\NPC[2]\State = 1
 									e\room\NPC[2]\State3 = 1
+								ElseIf e\room\NPC[2]\State = 1 And (Not EntityVisible(e\room\NPC[2]\Collider, Collider))
+									e\room\NPC[2]\State = 0
+									e\room\NPC[2]\State3 = 0
 								EndIf
 								
 								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = True
