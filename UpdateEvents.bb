@@ -118,14 +118,14 @@ Function UpdateEvents()
 					CurrTrigger = CheckTriggers()
 					
 					If (CurrTrigger = "173scene_timer") Then
-						e\EventState=e\EventState+FPSfactor
+						e\EventState = e\EventState+FPSfactor
 					Else If (CurrTrigger = "173scene_activated")
 						e\EventState = Max(e\EventState, 500)
 					EndIf
 					
 					
 					If e\EventState >= 500 Then
-						e\EventState=e\EventState+FPSfactor
+						e\EventState = e\EventState+FPSfactor
 						
 						If e\EventState2 = 0 Then
 							CanSave = False
@@ -141,19 +141,19 @@ Function UpdateEvents()
 								
 								
 								If e\EventState > 900+2.5*70 Then
-									If e\room\NPC[2]\State<>1
-									e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
-									AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
-									MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
-									e\room\NPC[2]\State=8
-									
-									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-512*RoomScale Then
-										PointEntity(e\room\NPC[2]\obj, e\room\NPC[1]\Collider)
-										RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj)-180,EntityYaw(e\room\NPC[2]\Collider),15.0), 0
-									Else
-										RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
+									If e\room\NPC[2]\State <> 1
+										e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
+										AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
+										MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
+										e\room\NPC[2]\State = 8
+										
+										If EntityZ(e\room\NPC[2]\Collider) < e\room\z-512*RoomScale Then
+											PointEntity(e\room\NPC[2]\obj, e\room\NPC[1]\Collider)
+											RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj)-180,EntityYaw(e\room\NPC[2]\Collider),15.0), 0
+										Else
+											RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
+										EndIf
 									EndIf
-								EndIf
 								EndIf
 								
 								If e\EventState < 900+4*70 Then
@@ -176,8 +176,8 @@ Function UpdateEvents()
 									
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
 									
-									If e\room\NPC[2]\State <> 1
-										If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
+									If e\room\NPC[2]\State <> 1 And KillTimer >= 0
+										If EntityZ(e\room\NPC[2]\Collider) < e\room\z-1150*RoomScale Then
 											e\room\RoomDoors[5]\open = False
 											LightBlink = 3.0
 											PlaySound_Strict(IntroSFX(11))
@@ -191,24 +191,26 @@ Function UpdateEvents()
 									EndIf
 								EndIf
 								
-								If (CurrTrigger = "173scene_end")
+								;If Ulgrin can see the player then start shooting at them.
+								If (CurrTrigger = "173scene_end") And EntityVisible(e\room\NPC[2]\Collider, Collider) And (Not GodMode) Then
 									e\room\NPC[2]\State = 1
 									e\room\NPC[2]\State3 = 1
 								EndIf
+								
 								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = True
 							Else
 								CanSave = True
-								If e\room\NPC[2]\State<>1
-								If EntityX(Collider)<(e\room\x+1384*RoomScale) Then e\EventState = Max(e\EventState,900)
-								
-								If e\room\RoomDoors[5]\openstate=0 Then 
-									HideEntity e\room\NPC[1]\obj
-									HideEntity e\room\NPC[1]\Collider
+								If e\room\NPC[2]\State <> 1
+									If EntityX(Collider)<(e\room\x+1384*RoomScale) Then e\EventState = Max(e\EventState,900)
 									
-									HideEntity e\room\NPC[2]\obj
-									HideEntity e\room\NPC[2]\Collider
-									e\EventState2=1
-								EndIf
+									If e\room\RoomDoors[5]\openstate = 0 Then 
+										HideEntity e\room\NPC[1]\obj
+										HideEntity e\room\NPC[1]\Collider
+										
+										HideEntity e\room\NPC[2]\obj
+										HideEntity e\room\NPC[2]\Collider
+										e\EventState2=1
+									EndIf
 								EndIf
 							EndIf
 						EndIf
@@ -7181,13 +7183,15 @@ Function UpdateEvents()
 								e\room\NPC[0]\State = 3
 								PointEntity e\room\NPC[0]\Collider, Collider
 								AnimateNPC(e\room\NPC[0], 570, 596, 0.5, False)
-								If e\room\NPC[0]\Frame=>596 Then
-									e\EventState=5
-									e\EventState2=0
+								If e\room\NPC[0]\Frame => 596 Then
+									e\EventState = 5
+									e\EventState2 = 0
 									PositionEntity Collider, EntityX(e\room\obj,True),0.3,EntityZ(e\room\obj,True),True
 									ResetEntity Collider									
 									BlinkTimer = -10
 									BlurTimer = 500	
+									Injuries = 1.5
+									Bloodloss = 70
 								;PlaySound_Strict(LoadTempSound("SFX\Door\WoodenDoorClose.ogg"))							
 								EndIf								
 							EndIf
@@ -7197,9 +7201,9 @@ Function UpdateEvents()
 						;RemoveNPC(e\room\NPC[0])
 						;RemoveNPC(e\room\NPC[1])
 						;RemoveEvent(e)
-					ElseIf e\EventState=5
+					ElseIf e\EventState = 5
 						e\EventState2 = e\EventState2 + FPSfactor
-						If e\EventState2>1000 Then 
+						If e\EventState2 > 500 Then 
 							RotateEntity e\room\Objects[9],0,90,0,False
 							RotateEntity e\room\Objects[13],0,0,0,False
 							
@@ -7227,7 +7231,7 @@ Function UpdateEvents()
 							
 							e\EventState = 6
 						EndIf
-					ElseIf e\EventState=6
+					ElseIf e\EventState = 6
 						PointEntity e\room\NPC[0]\Collider, Collider
 						
 						If e\room\NPC[0]\Sound<>0 Then 
@@ -7253,6 +7257,15 @@ Function UpdateEvents()
 						
 						PrevInjuries = 0
 						PrevBloodloss = 0
+						
+						For i = 0 To MaxItemAmount-1
+							If Inventory(i) <> Null Then
+								If Inventory(i)\itemtemplate\name = "Leaflet"
+									RemoveItem(Inventory(i))
+									Exit
+								EndIf
+							EndIf
+						Next
 						
 						RemoveNPC(e\room\NPC[0])
 						RemoveEvent(e)						

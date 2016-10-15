@@ -2638,7 +2638,7 @@ Repeat
 
 			If Rand(50000) = 3 Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ <> "room860" And RN$ <> "173" And RN$ <> "dimension1499" Then
+				If RN$ <> "room860" And RN$ <> "room1123" And RN$ <> "173" And RN$ <> "dimension1499" Then
 					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
 					PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
 				EndIf 
@@ -8157,7 +8157,7 @@ Function Use294()
 			
 			Input294 = Left(Input294, Min(Len(Input294),15))
 			
-			If temp And Input294<>"" Then ;dispense
+			If temp And Input294 <> "" Then ;dispense
 				Input294 = Trim(Lower(Input294))
 				If Left(Input294, Min(7,Len(Input294))) = "cup of " Then
 					Input294 = Right(Input294, Len(Input294)-7)
@@ -8169,7 +8169,7 @@ Function Use294()
 				
 				If loc > 0 Then
 					strtemp$ = GetINIString2("DATA\SCP-294.ini", loc, "dispensesound")
-					If strtemp="" Then
+					If strtemp = "" Then
 						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\SCP\294\dispense1.ogg"))
 					Else
 						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound(strtemp))
@@ -8196,7 +8196,6 @@ Function Use294()
 					it.items = CreateItem("Cup", "cup", EntityX(PlayerRoom\Objects[1],True),EntityY(PlayerRoom\Objects[1],True),EntityZ(PlayerRoom\Objects[1],True), r,g,b,alpha)
 					it\name = "Cup of "+Input294
 					EntityType (it\collider, HIT_ITEM)
-					
 				Else
 					;out of range
 					Input294 = "OUT OF RANGE"
@@ -8214,7 +8213,7 @@ Function Use294()
 		EndIf
 		
 	Else ;playing a dispensing sound
-		If Input294 <> "OUT OF RANGE" Then Input294 = "DISPENSING..."
+		If Input294 <> "OUT OF RANGE" Then Input294 = "DISPENSING..." : DebugLog "Generated dat dispenser"
 		
 		If Not ChannelPlaying(PlayerRoom\SoundCHN) Then
 			If Input294 <> "OUT OF RANGE" Then

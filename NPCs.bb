@@ -2209,13 +2209,12 @@ Function UpdateNPCs()
 							
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
+								DetectDistance = 21.0
 								ShootAccuracy = 0.0
 								If Rand(1,8-SelectedDifficulty\aggressiveNPCs*4)<2 Then ShootAccuracy = 0.03
 								
 								;increase accuracy if the player is going slow
 								ShootAccuracy = ShootAccuracy + (0.5 - CurrSpeed*20)
-								
-								DetectDistance = 21.0
 							EndIf
 							
 							If dist < DetectDistance Then
@@ -2234,9 +2233,15 @@ Function UpdateNPCs()
 									DebugLog "entitypick"
 									EntityPick(pvt, dist)
 									If PickedEntity() = Collider Or n\State3=1 Then
+										Local instaKillPlayer% = False
 										
-										If PlayerRoom\RoomTemplate\Name = "exit1" Then
+										If PlayerRoom\RoomTemplate\Name = "start" Then 
+											DeathMSG = "Subject D-9341. Cause of death: Gunshot wound to the head. The surveillance tapes confirm that the subject was terminated by Agent Ulgrin shortly after the site lockdown was initiated."
+											instaKillPlayer = True
+										ElseIf PlayerRoom\RoomTemplate\Name = "exit1" Then
 											DeathMSG = Chr(34)+"Agent G. to control. Eliminated a Class D escapee in Gate B's courtyard."+Chr(34)
+										Else
+											DeathMSG = ""
 										EndIf
 										
 										PlaySound2(GunshotSFX, Camera, n\Collider, 35)
@@ -2246,7 +2251,7 @@ Function UpdateNPCs()
 										MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
 										
 										PointEntity pvt, Collider
-										Shoot(EntityX(pvt),EntityY(pvt),EntityZ(pvt),ShootAccuracy, False)
+										Shoot(EntityX(pvt), EntityY(pvt), EntityZ(pvt), ShootAccuracy, False, instaKillPlayer)
 										n\Reload = 7
 									Else
 										n\CurrSpeed = n\Speed
@@ -6124,7 +6129,7 @@ Function UpdateMTFUnit(n.NPCs)
 	EndIf
 End Function
 
-Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
+Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False)
 	
 	;muzzle flash
 	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
@@ -6135,7 +6140,9 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 	
 	If (Not GodMode) Then 
 		
-		If Rnd(1.0)=<hitProb Then
+		If instaKill Then Kill() : DebugLog "WOw cringe" : Return
+		
+		If Rnd(1.0) =< hitProb Then
 			TurnEntity Camera, Rnd(-3,3), Rnd(-3,3), 0
 			
 			Local ShotMessageUpdate$
@@ -6204,7 +6211,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 			EndIf
 			
 			;Only updates the message if it's been more than two seconds.
-			If (MsgTimer<64*4) Then
+			If (MsgTimer < 64*4) Then
 				Msg = ShotMessageUpdate
 				MsgTimer = 70*6
 			EndIf
@@ -6226,7 +6233,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 				
 				If particles Then 
 					;dust/smoke particles
-					p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
+					p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
 					p\speed = 0.001
 					p\SizeChange = 0.003
 					p\A = 0.8
@@ -6234,7 +6241,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 					RotateEntity p\pvt, EntityPitch(pvt)-180, EntityYaw(pvt),0
 					
 					For i = 0 To Rand(2,3)
-						p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
+						p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
 						p\speed = 0.02
 						p\A = 0.8
 						p\Achange = -0.01
