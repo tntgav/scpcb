@@ -3304,6 +3304,9 @@ Function FillRoom(r.Rooms)
 			
 			d.Doors = CreateDoor(0, r\x - 240.0 * RoomScale, 0.0, r\z, 90, r, False)
 			d\open = False : d\AutoClose = False 
+			MoveEntity(d\buttons[0], 0.0, 0.0, 22.0 * RoomScale)
+			DebugLog "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+			MoveEntity(d\buttons[1], 0.0, 0.0, 22.0 * RoomScale)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x, r\y + 704*RoomScale, r\z + 863*RoomScale, r)
 			sc\angle = 180

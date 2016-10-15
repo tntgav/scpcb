@@ -7723,7 +7723,7 @@ Function UpdateEvents()
 				;[Block]
 				If e\EventState = 0 Then
 					If PlayerRoom = e\room Then e\EventState = 70 * Rand(300,1000)
-				ElseIf PlayerRoom\RoomTemplate\Name <> "pocketdimension"
+				ElseIf PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "room860" And PlayerRoom\RoomTemplate\Name <> "room1123" And PlayerRoom\RoomTemplate\Name <> "dimension1499" 
 					e\EventState = e\EventState-FPSfactor
 					
 					If e\EventState < 17*70 Then
