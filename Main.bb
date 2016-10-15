@@ -30,7 +30,7 @@ AppTitle "SCP - Containment Breach Launcher"
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%
 
-Global EnableSFXRelease% = GetINIInt(OptionFile, "options", "sfx release")
+Global EnableSFXRelease% = GetINIInt(OptionFile, "audio", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
 Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
@@ -81,7 +81,7 @@ Select TextureDetails%
 		TextureFloat# = -0.75
 End Select
 Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
-Global SFXVolume# = GetINIFloat(OptionFile, "options", "sound volume")
+Global SFXVolume# = GetINIFloat(OptionFile, "audio", "sound volume")
 
 Global Bit16Mode = GetINIInt(OptionFile, "options", "16bit")
 
@@ -276,7 +276,6 @@ Global user_camera_pitch#, side#
 Global Crouch%, CrouchState#
 
 Global PlayerZone%, PlayerRoom.Rooms
-Global isIn8601%
 
 Global GrabbedEntity%
 
@@ -401,10 +400,10 @@ Function UpdateConsole()
 		
 		
 		Color 120,120,120
-		inBox% = MouseOn(x+width-23*MenuScale,y+height-scrollBarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight)
+		inBox% = MouseOn(x+width-23*MenuScale,y+height-scrollbarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight)
 		If inBox Then Color 200,200,200
 		If ConsoleScrollDragging Then Color 255,255,255
-		Rect x+width-23*MenuScale,y+height-scrollBarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight,True
+		Rect x+width-23*MenuScale,y+height-scrollbarHeight+(ConsoleScroll*scrollbarHeight/height),20*MenuScale,scrollbarHeight,True
 		
 		If Not MouseDown(1) Then
 			ConsoleScrollDragging=False
@@ -595,7 +594,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("- 096state")
 							CreateConsoleMsg("- debughud")
 							CreateConsoleMsg("- camerafog [near] [far]")
-							CreateConsoleMsg("- brightness [value]")
+							CreateConsoleMsg("- gamma [value]")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Use "+Chr(34)+"help [command name]"+Chr(34)+" to get more information about a command.")
 							CreateConsoleMsg("******************************")
@@ -620,6 +619,13 @@ Function UpdateConsole()
 							CreateConsoleMsg("away from the camera and becomes completely opaque")
 							CreateConsoleMsg("at 'CameraFogFar' units away from the camera.")
 							CreateConsoleMsg("Example: camerafog 20 40")
+							CreateConsoleMsg("******************************")
+						Case "gamma"
+							CreateConsoleMsg("HELP - gamma")
+							CreateConsoleMsg("******************************")
+							CreateConsoleMsg("Sets the gamma correction.")
+							CreateConsoleMsg("Should be set to a value between 0.0 and 2.0.")
+							CreateConsoleMsg("Default is 1.0.")
 							CreateConsoleMsg("******************************")
 						Case "noclip","fly"
 							CreateConsoleMsg("HELP - noclip")
@@ -821,14 +827,6 @@ Function UpdateConsole()
 					Next
 					
 					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.",255,150,0)
-
-				Case "unlockexits"
-					
-					RemoteDoorOn=True
-					For e.Events = Each Events
-						If e\EventName="exit1" Or e\EventName="gatea" Then e\EventState3=1
-					Next
-					PlaySound_Strict (LoadTempSound("SFX\SCP\079\GateB.ogg"))
 					
 				Case "spawnitem"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -903,8 +901,7 @@ Function UpdateConsole()
 				Case "reset096"
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
-							RemoveNPC(n)
-							CreateEvent("lockroom096", "lockroom2", 0)   
+							n\State = 0
 							Exit
 						EndIf
 					Next
@@ -1096,10 +1093,10 @@ Function UpdateConsole()
 					CameraFogFar = Float(Right(args, Len(args) - Instr(args, " ")))
 					CreateConsoleMsg("Near set to: " + CameraFogNear + ", far set to: " + CameraFogFar)
 					
-				Case "brightness"
+				Case "gamma"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					Brightness = Int(StrTemp)
-					CreateConsoleMsg("Brightness set to " + Brightness)
+					ScreenGamma = Int(StrTemp)
+					CreateConsoleMsg("Gamma set to " + ScreenGamma)
 
 				Case "spawn"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -1146,25 +1143,31 @@ Function UpdateConsole()
 						EndIf
 					Next
 					
-				Case "toggle_079_deal"
+				Case "unlockexits", "toggle_079_deal"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
 						Case "a"
 							For e.Events = Each Events
-								If e\EventName="gateaentrance" Then
+								If e\EventName = "gateaentrance" Then
 									e\EventState3 = (Not e\EventState3)
 									Exit
 								EndIf
 							Next
 						Case "b"
 							For e.Events = Each Events
-								If e\EventName="exit1" Then
+								If e\EventName = "exit1" Then
 									e\EventState3 = (Not e\EventState3)
 									Exit
 								EndIf
-							Next	
+							Next
+						Default
+							For e.Events = Each Events
+								If e\EventName = "exit1" Or e\EventName = "gateaentrance" Then e\EventState3 = (Not e\EventState3)
+							Next
 					End Select
+
+					RemoteDoorOn = True
 
 				Case "kill","suicide"
 					KillTimer = -1
@@ -1306,6 +1309,8 @@ Function UpdateConsole()
 		If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	End If
 	
+	AASetFont Font1
+	
 End Function
 
 ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 255
@@ -1389,7 +1394,7 @@ Music(11) = LoadSound_Strict("SFX\Music\Menu.ogg")
 ;Music(21): Breath theme after beating the game
 
 
-Global MusicVolume# = GetINIFloat(OptionFile, "options", "music volume")
+Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 Global MusicCHN% = PlaySound_Strict(Music(2))
 ChannelVolume(MusicCHN, MusicVolume)
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
@@ -1610,8 +1615,8 @@ Global AmbientLightRoomTex%, AmbientLightRoomVal%
 
 ;Global NVGImage% = CreateImage(GraphicWidth,GraphicHeight),NVGCam%
 
-Global EnableUserTracks% = GetINIInt(OptionFile,"options","enable user tracks")
-Global UserTrackMode% = GetINIInt(OptionFile,"options","user track setting")
+Global EnableUserTracks% = GetINIInt(OptionFile, "audio", "enable user tracks")
+Global UserTrackMode% = GetINIInt(OptionFile, "audio", "user track setting")
 Global UserTrackCheck% = 0, UserTrackCheck2% = 0
 Global UserTrackMusicAmount% = 0, CurrUserTrack%, UserTrackFlag% = False
 Dim UserTrackName$(256)
@@ -2576,36 +2581,44 @@ Repeat
 		If KeyHit(KEY_INV) Then 
 			If InvOpen Then
 				ResumeSounds()
-				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1# = 0.0 : mouse_y_speed_1# = 0.0
 			Else
 				PauseSounds()
 			EndIf
 			InvOpen = Not InvOpen
-			If OtherOpen<>Null Then OtherOpen=Null
+			If OtherOpen <> Null Then OtherOpen = Null
 			SelectedItem = Null 
 		EndIf
 		
-		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea"  Then 
+		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "exit1" And (Not MenuOpen) And (Not ConsoleOpen) Then 
 			
 			If Rand(1500) = 1 Then
 				For i = 0 To 5
-					If AmbientSFX(i,CurrAmbientSFX)<>0 Then
-						If ChannelPlaying(AmbientSFXCHN)=0 Then FreeSound_Strict AmbientSFX(i,CurrAmbientSFX) : AmbientSFX(i,CurrAmbientSFX) = 0
+					If AmbientSFX(i,CurrAmbientSFX) <> 0 Then
+						If ChannelPlaying(AmbientSFXCHN) = 0 Then FreeSound_Strict AmbientSFX(i,CurrAmbientSFX) : AmbientSFX(i,CurrAmbientSFX) = 0
 					EndIf			
 				Next
 				
 				PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 0.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
 				
-				If Rand(3)=1 Then PlayerZone = 3
+				If Rand(3) = 1 Then PlayerZone = 3
 				
 				If PlayerRoom\RoomTemplate\Name = "173" Then 
 					PlayerZone = 4
-				ElseIf isIn8601
-					PlayerZone = 5
+				ElseIf PlayerRoom\RoomTemplate\Name = "room860"
+					For e.Events = Each Events
+						If e\EventName = "room860"
+							If e\EventState = 1.0
+								PlayerZone = 5
+								PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 30.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
+							EndIf
+							
+							Exit
+						EndIf
+					Next
 				EndIf
 				
 				CurrAmbientSFX = Rand(0,AmbientSFXAmount(PlayerZone)-1)
-				DebugLog PlayerZone
 				
 				Select PlayerZone
 					Case 0,1,2
@@ -2620,9 +2633,10 @@ Repeat
 				
 				AmbientSFXCHN = PlaySound2(AmbientSFX(PlayerZone,CurrAmbientSFX), Camera, SoundEmitter)
 			EndIf
+			
 			If Rand(50000) = 3 Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ <> "pocketdimension" And (Not isIn8601) And RN$ <> "173" And RN$ <> "dimension1499" And RN$ <> "exit1" And RN$ <> "gatea" And (Not MenuOpen) Then
+				If RN$ <> "room860" And RN$ <> "room1123" And RN$ <> "173" And RN$ <> "dimension1499" Then
 					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
 					PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
 				EndIf 
@@ -2745,7 +2759,7 @@ Repeat
 			
 			If Using294 Then darkA=1.0
 			
-			darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
+			If (Not WearingNightVision) Then darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
 			
 			If KillTimer >= 0 Then
 				
@@ -2896,7 +2910,7 @@ Repeat
 		End If
 		
 		Color 255, 255, 255
-		If ShowFPS Then AAText 20, 20, "FPS: " + FPS
+		If ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
 		
 		DrawQuickLoading()
 	End If
@@ -3866,6 +3880,7 @@ Function DrawGUI()
 		
 		If DebugHUD Then
 			Color 255, 255, 255
+			AASetFont ConsoleFont
 			
 			;Text x + 250, 50, "Zone: " + (EntityZ(Collider)/8.0)
 			AAText x - 50, 50, "Player Position: (" + f2s(EntityX(Collider), 3) + ", " + f2s(EntityY(Collider), 3) + ", " + f2s(EntityZ(Collider), 3) + ")"
@@ -3911,6 +3926,7 @@ Function DrawGUI()
 				EndIf
 			Next
 			
+			AASetFont Font1
 		EndIf
 		
 	EndIf
@@ -4558,27 +4574,55 @@ Function DrawGUI()
 			Select SelectedItem\itemtemplate\tempname
 					
 					;[Block]
-				Case "nvgoggles", "supernv", "veryfinenvgoggles"
+				Case "nvgoggles"
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
-					If WearingNightVision > 0 Then
+					If WearingNightVision = 1 Then
 						Msg = "You removed the goggles."
 						CameraFogFar = StoredCameraFogFar
 					Else
 						Msg = "You put on the goggles."
 						;WearingGasMask = 0
 						;Wearing178 = False
-						TakeOffStuff(1+2+8+64)
+						TakeOffStuff(1+2+8+32+64)
 						StoredCameraFogFar = CameraFogFar
 						CameraFogFar = 30
 					EndIf
 					
 					WearingNightVision = (Not WearingNightVision)
-					If SelectedItem\itemtemplate\tempname="supernv"
-						WearingNightVision = WearingNightVision * 2
-					ElseIf SelectedItem\itemtemplate\tempname="veryfinenvgoggles"
-						WearingNightVision = WearingNightVision * 3
+					SelectedItem = Null	
+					
+				Case "supernv"
+					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
+					If WearingNightVision = 2 Then
+						Msg = "You removed the goggles."
+						CameraFogFar = StoredCameraFogFar
+					Else
+						Msg = "You put on the goggles."
+						;WearingGasMask = 0
+						;Wearing178 = False
+						TakeOffStuff(1+2+8+32+64)
+						StoredCameraFogFar = CameraFogFar
+						CameraFogFar = 30
 					EndIf
-						
+					
+					WearingNightVision = (Not WearingNightVision) * 2
+					SelectedItem = Null	
+					
+				Case "veryfinenvgoggles"
+					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
+					If WearingNightVision = 3 Then
+						Msg = "You removed the goggles."
+						CameraFogFar = StoredCameraFogFar
+					Else
+						Msg = "You put on the goggles."
+						;WearingGasMask = 0
+						;Wearing178 = False
+						TakeOffStuff(1+2+8+32+64)
+						StoredCameraFogFar = CameraFogFar
+						CameraFogFar = 30
+					EndIf
+					
+					WearingNightVision = (Not WearingNightVision) * 3
 					SelectedItem = Null	
 
 				Case "scp178"
@@ -5726,7 +5770,6 @@ Function DrawMenu()
 				OptionsMenu = 0
 				QuitMSG = 0
 				MouseHit1 = False
-				PutINIValue(OptionFile, "options", "music volume", MusicVolume)
 				PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
 				PutINIValue(OptionFile, "options", "invert mouse y", InvertMouse)
 				PutINIValue(OptionFile, "options", "bump mapping enabled", BumpEnabled)			
@@ -5741,11 +5784,13 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
 				PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
-				PutINIValue(OptionFile, "options", "enable user tracks", EnableUserTracks%)
-				PutINIValue(OptionFile, "options", "user track setting", UserTrackMode%)
-				PutINIValue(OptionFile, "options", "sfx release", EnableSFXRelease)
-				PutINIValue(OptionFile, "options", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
+				
+				PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
+				PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
+				PutINIValue(OptionFile, "audio", "sfx release", EnableSFXRelease)
+				PutINIValue(OptionFile, "audio", "enable user tracks", EnableUserTracks%)
+				PutINIValue(OptionFile, "audio", "user track setting", UserTrackMode%)
 				
 				PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
@@ -6136,7 +6181,6 @@ Function DrawMenu()
 							DrawLoading(0)
 							
 							MenuOpen = False
-							QuitMSG% = -1
 							LoadGameQuick(SavePath + CurrSave + "\")
 							
 							MoveMouse viewport_center_x,viewport_center_y
@@ -6238,7 +6282,7 @@ Function DrawMenu()
 					CurrSave = ""
 					FlushKeys()
 				EndIf
-				y= y + 80*MenuScale
+				y = y + 80*MenuScale
 			EndIf
 			
 			If KillTimer >= 0 And (Not MainMenuOpen)
@@ -8111,7 +8155,7 @@ Function Use294()
 			
 			Input294 = Left(Input294, Min(Len(Input294),15))
 			
-			If temp And Input294<>"" Then ;dispense
+			If temp And Input294 <> "" Then ;dispense
 				Input294 = Trim(Lower(Input294))
 				If Left(Input294, Min(7,Len(Input294))) = "cup of " Then
 					Input294 = Right(Input294, Len(Input294)-7)
@@ -8123,7 +8167,7 @@ Function Use294()
 				
 				If loc > 0 Then
 					strtemp$ = GetINIString2("DATA\SCP-294.ini", loc, "dispensesound")
-					If strtemp="" Then
+					If strtemp = "" Then
 						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\SCP\294\dispense1.ogg"))
 					Else
 						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound(strtemp))
@@ -8150,7 +8194,6 @@ Function Use294()
 					it.items = CreateItem("Cup", "cup", EntityX(PlayerRoom\Objects[1],True),EntityY(PlayerRoom\Objects[1],True),EntityZ(PlayerRoom\Objects[1],True), r,g,b,alpha)
 					it\name = "Cup of "+Input294
 					EntityType (it\collider, HIT_ITEM)
-					
 				Else
 					;out of range
 					Input294 = "OUT OF RANGE"
@@ -8168,7 +8211,7 @@ Function Use294()
 		EndIf
 		
 	Else ;playing a dispensing sound
-		If Input294 <> "OUT OF RANGE" Then Input294 = "DISPENSING..."
+		If Input294 <> "OUT OF RANGE" Then Input294 = "DISPENSING..." : DebugLog "Generated dat dispenser"
 		
 		If Not ChannelPlaying(PlayerRoom\SoundCHN) Then
 			If Input294 <> "OUT OF RANGE" Then
@@ -9075,36 +9118,20 @@ Function RenderWorld2()
 	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision=1) Or (WearingNightVision=2)
-		For i=0 To MaxItemAmount-1
-			If (Inventory(i)<>Null) Then
-				If (WearingNightVision=1)
-				If Inventory(i)\itemtemplate\tempname="nvgoggles" Then
-					Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.02)
-					power%=Int(Inventory(i)\state)
-					If Inventory(i)\state<=0.0 Then ;this nvg can't be used
+	If (WearingNightVision = 1) Or (WearingNightVision = 2)
+		For i% = 0 To MaxItemAmount - 1
+			If (Inventory(i) <> Null) Then
+				If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+					Inventory(i)\state = Inventory(i)\state - (FPSfactor * (0.02 * WearingNightVision))
+					power% = Int(Inventory(i)\state)
+					If Inventory(i)\state <= 0.0 Then ;this nvg can't be used
 						hasBattery = 0
 						Msg = "The batteries in these night vision goggles died."
 						BlinkTimer = -1.0
 						MsgTimer = 350
 						Exit
-					ElseIf Inventory(i)\state<=100.0 Then
+					ElseIf Inventory(i)\state <= 100.0 Then
 						hasBattery = 1
-					EndIf
-					EndIf
-				Else
-					If Inventory(i)\itemtemplate\tempname="supernv" Then
-						Inventory(i)\state=Inventory(i)\state-(FPSfactor*0.04)
-						power%=Int(Inventory(i)\state)
-						If Inventory(i)\state<=0.0 Then ;this nvg can't be used
-							hasBattery = 0
-							Msg = "The batteries in these night vision goggles died."
-							BlinkTimer = -1.0
-							MsgTimer = 350
-							Exit
-						ElseIf Inventory(i)\state<=100.0 Then
-							hasBattery = 1
-						EndIf
 					EndIf
 				EndIf
 			EndIf
