@@ -1163,11 +1163,11 @@ Function UpdateConsole()
 							Next
 						Default
 							For e.Events = Each Events
-								If e\EventName = "exit1" Or e\EventName = "gatea" Then e\EventState3 = (Not e\EventState3)
+								If e\EventName = "exit1" Or e\EventName = "gateaentrance" Then e\EventState3 = (Not e\EventState3)
 							Next
-							
-							RemoteDoorOn = (Not RemoteDoorOn)
 					End Select
+
+					RemoteDoorOn = True
 
 				Case "kill","suicide"
 					KillTimer = -1
