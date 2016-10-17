@@ -83,6 +83,15 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Gravity = True
 			
 			n\obj = LoadMesh_Strict("GFX\npcs\173_2.b3d")
+			
+			;On Halloween set jack-o-latern texture.
+			If (Left(CurrentDate(), 7) = "31 Oct ") Then
+				HalloweenTex = True
+				Local texFestive = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
+				EntityTexture n\obj, texFestive, 0, 0
+				FreeTexture texFestive
+			EndIf
+			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "scale") / MeshDepth(n\obj))			
 			ScaleEntity n\obj, temp,temp,temp
 			
@@ -943,7 +952,11 @@ Function UpdateNPCs()
 								n\PrevY = EntityY(Collider)
 								
 								SetAnimTime n\obj, 110
-								PositionEntity(n\Collider, EntityX(Collider), EntityY(Collider) - 15, EntityZ(Collider))
+								
+								If PlayerRoom\RoomTemplate\Name <> "coffin"
+									PositionEntity(n\Collider, EntityX(Collider), EntityY(Collider) - 15, EntityZ(Collider))
+								EndIf
+								
 								PlaySound_Strict(DecaySFX(0))
 							End If
 							
@@ -2205,13 +2218,12 @@ Function UpdateNPCs()
 							
 							;If at Gate B increase his distance so that he can shoot the player from a distance after they are spotted.
 							If PlayerRoom\RoomTemplate\Name = "exit1" Then
+								DetectDistance = 21.0
 								ShootAccuracy = 0.0
 								If Rand(1,8-SelectedDifficulty\aggressiveNPCs*4)<2 Then ShootAccuracy = 0.03
 								
 								;increase accuracy if the player is going slow
 								ShootAccuracy = ShootAccuracy + (0.5 - CurrSpeed*20)
-								
-								DetectDistance = 21.0
 							EndIf
 							
 							If dist < DetectDistance Then
@@ -2230,9 +2242,15 @@ Function UpdateNPCs()
 									DebugLog "entitypick"
 									EntityPick(pvt, dist)
 									If PickedEntity() = Collider Or n\State3=1 Then
+										Local instaKillPlayer% = False
 										
-										If PlayerRoom\RoomTemplate\Name = "exit1" Then
+										If PlayerRoom\RoomTemplate\Name = "start" Then 
+											DeathMSG = "Subject D-9341. Cause of death: Gunshot wound to the head. The surveillance tapes confirm that the subject was terminated by Agent Ulgrin shortly after the site lockdown was initiated."
+											instaKillPlayer = True
+										ElseIf PlayerRoom\RoomTemplate\Name = "exit1" Then
 											DeathMSG = Chr(34)+"Agent G. to control. Eliminated a Class D escapee in Gate B's courtyard."+Chr(34)
+										Else
+											DeathMSG = ""
 										EndIf
 										
 										PlaySound2(GunshotSFX, Camera, n\Collider, 35)
@@ -2242,7 +2260,7 @@ Function UpdateNPCs()
 										MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
 										
 										PointEntity pvt, Collider
-										Shoot(EntityX(pvt),EntityY(pvt),EntityZ(pvt),ShootAccuracy, False)
+										Shoot(EntityX(pvt), EntityY(pvt), EntityZ(pvt), ShootAccuracy, False, instaKillPlayer)
 										n\Reload = 7
 									Else
 										n\CurrSpeed = n\Speed
@@ -3444,7 +3462,6 @@ Function UpdateNPCs()
 										If Distance(n\EnemyX, n\EnemyZ, EntityX(n\Collider), EntityZ(n\Collider))<1.5 Then
 											PlaySound_Strict n\Sound2
 											Injuries = Injuries + Rnd(1.5, 2.5)-WearingVest*0.5
-											Bloodloss = Bloodloss + Rnd(0.8, 1.8)-WearingVest*0.2
 											BlurTimer = 500		
 										Else
 											n\Frame	 = 449
@@ -3453,7 +3470,7 @@ Function UpdateNPCs()
 									EndIf
 									
 									If Injuries>4.0 Then 
-										DeathMSG=Chr(34)+"All four escaped SCP-939 specimens have been captured and recontained successfully. "
+										DeathMSG=Chr(34)+"All four (4) escaped SCP-939 specimens have been captured and recontained successfully. "
 										DeathMSG=DeathMSG+"Three (3) of them made quite a mess at Storage Area 6. A cleaning team has been dispatched."+Chr(34)
 										Kill()
 										If (Not GodMode) Then n\State = 5
@@ -6121,7 +6138,7 @@ Function UpdateMTFUnit(n.NPCs)
 	EndIf
 End Function
 
-Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
+Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False)
 	
 	;muzzle flash
 	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
@@ -6132,7 +6149,9 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 	
 	If (Not GodMode) Then 
 		
-		If Rnd(1.0)=<hitProb Then
+		If instaKill Then Kill() : PlaySound_Strict BullethitSFX : Return
+		
+		If Rnd(1.0) =< hitProb Then
 			TurnEntity Camera, Rnd(-3,3), Rnd(-3,3), 0
 			
 			Local ShotMessageUpdate$
@@ -6201,7 +6220,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 			EndIf
 			
 			;Only updates the message if it's been more than two seconds.
-			If (MsgTimer<64*4) Then
+			If (MsgTimer < 64*4) Then
 				Msg = ShotMessageUpdate
 				MsgTimer = 70*6
 			EndIf
@@ -6223,7 +6242,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 				
 				If particles Then 
 					;dust/smoke particles
-					p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
+					p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
 					p\speed = 0.001
 					p\SizeChange = 0.003
 					p\A = 0.8
@@ -6231,7 +6250,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 					RotateEntity p\pvt, EntityPitch(pvt)-180, EntityYaw(pvt),0
 					
 					For i = 0 To Rand(2,3)
-						p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
+						p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
 						p\speed = 0.02
 						p\A = 0.8
 						p\Achange = -0.01

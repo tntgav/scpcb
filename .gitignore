@@ -2,9 +2,12 @@
 *FastText_Unicode.bb
 *FastImage.bb
 *.DS_Store
+*.ipf
+*.iws
 MapSystem.bb.rej
 UpdateEvents.bb.rej
 *.bb_bak*
 Saves/*
 error_log_*
+.vscode
 RMesh_Model_Viewer.bb
