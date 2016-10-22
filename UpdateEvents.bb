@@ -1968,23 +1968,25 @@ Function UpdateEvents()
 											TurnEntity(em\Obj, -80+20*i, 0, 0)
 											EntityParent em\Obj, e\room\NPC[3]\Collider
 											
-											For i = 0 To 7
-												p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, Rnd(0.5,1.0), -0.1, 200)
-												p\speed = 0.01
-												p\SizeChange = 0.01
-												p\A = 1.0
-												p\Achange = -0.005
-												RotateEntity p\pvt, Rnd(360),Rnd(360),0
-												MoveEntity p\pvt, 0,0,0.3
-											Next
-											
-											For i = 0 To 12
-												p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, 0.02, 0.003, 200)
-												p\speed = 0.04
-												p\A = 1.0
-												p\Achange = -0.005
-												RotateEntity p\pvt, Rnd(360),Rnd(360),0
-											Next
+											If ParticleAmount>0
+												For i = 0 To (3+(4*(ParticleAmount-1)))
+													p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, Rnd(0.5,1.0), -0.1, 200)
+													p\speed = 0.01
+													p\SizeChange = 0.01
+													p\A = 1.0
+													p\Achange = -0.005
+													RotateEntity p\pvt, Rnd(360),Rnd(360),0
+													MoveEntity p\pvt, 0,0,0.3
+												Next
+												
+												For i = 0 To (6+(6*(ParticleAmount-1)))
+													p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, 0.02, 0.003, 200)
+													p\speed = 0.04
+													p\A = 1.0
+													p\Achange = -0.005
+													RotateEntity p\pvt, Rnd(360),Rnd(360),0
+												Next
+											EndIf
 										EndIf
 									Else
 										HideEntity e\room\Objects[12]
@@ -2018,13 +2020,15 @@ Function UpdateEvents()
 						
 						AmbientLight (140, 140, 140)
 						
-						If Rand(3) = 1 Then
-							p.Particles = CreateParticle(EntityX(Camera)+Rnd(-2.0,2.0), EntityY(Camera)+Rnd(0.9,2.0), EntityZ(Camera)+Rnd(-2.0,2.0), 2, 0.006, 0, 300)
-							p\speed = Rnd(0.002,0.003)
-							RotateEntity(p\pvt, Rnd(-20, 20), e\room\angle-90+Rnd(-15,15),0, 0)
-							
-							p\SizeChange = -0.00001
-						End If
+						If ParticleAmount>0
+							If Rand(3) = 1 Then
+								p.Particles = CreateParticle(EntityX(Camera)+Rnd(-2.0,2.0), EntityY(Camera)+Rnd(0.9,2.0), EntityZ(Camera)+Rnd(-2.0,2.0), 2, 0.006, 0, 300)
+								p\speed = Rnd(0.002,0.003)
+								RotateEntity(p\pvt, Rnd(-20, 20), e\room\angle-90+Rnd(-15,15),0, 0)
+								
+								p\SizeChange = -0.00001
+							End If
+						EndIf
 
 						;Helicopter spots or player is within range. --> Start shooting.
 						If ((EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) Or EntityVisible(e\room\NPC[0]\Collider,Collider)) And e\room\NPC[1]\State <> 1
@@ -2337,13 +2341,15 @@ Function UpdateEvents()
 													EndIf
 												EndIf
 												
-												For i = 0 To Rand(2,8)-Int(dist)
-													p.Particles = CreateParticle(EntityX(Curr106\obj,True),EntityY(Curr106\obj,True)+Rnd(0.4,0.9), EntityZ(Curr106\obj), 0, 0.006, -0.002, 40)
-													p\speed = 0.005
-													p\A = 0.8
-													p\Achange = -0.01
-													RotateEntity p\pvt, -Rnd(70,110), Rnd(360),0	
-												Next										
+												If ParticleAmount>0
+													For i = 0 To Rand(2,2+(6*(ParticleAmount-1)))-Int(dist)
+														p.Particles = CreateParticle(EntityX(Curr106\obj,True),EntityY(Curr106\obj,True)+Rnd(0.4,0.9), EntityZ(Curr106\obj), 0, 0.006, -0.002, 40)
+														p\speed = 0.005
+														p\A = 0.8
+														p\Achange = -0.01
+														RotateEntity p\pvt, -Rnd(70,110), Rnd(360),0	
+													Next
+												EndIf
 											EndIf
 											
 											
@@ -3054,16 +3060,18 @@ Function UpdateEvents()
 						CameraFogColor Camera, 38*0.5, 55*0.5, 47*0.5
 						CameraClsColor Camera, 38*0.5, 55*0.5, 47*0.5
 						
-						If Rand(800)=1 Then 
-							angle = EntityYaw(Camera,True)+Rnd(150,210)
-							p.Particles = CreateParticle(EntityX(Collider)+Cos(angle)*7.5, 0.0, EntityZ(Collider)+Sin(angle)*7.5, 3, 4.0, 0.0, 2500)
-							EntityBlend(p\obj, 2)
-							;EntityFX(p\obj, 1)
-							p\speed = 0.01
-							p\SizeChange = 0
-							PointEntity(p\pvt, Camera)
-							TurnEntity(p\pvt, 0, 145, 0, True)
-							TurnEntity(p\pvt, Rand(10,20), 0, 0, True)
+						If ParticleAmount>0
+							If Rand(800)=1 Then
+								angle = EntityYaw(Camera,True)+Rnd(150,210)
+								p.Particles = CreateParticle(EntityX(Collider)+Cos(angle)*7.5, 0.0, EntityZ(Collider)+Sin(angle)*7.5, 3, 4.0, 0.0, 2500)
+								EntityBlend(p\obj, 2)
+								;EntityFX(p\obj, 1)
+								p\speed = 0.01
+								p\SizeChange = 0
+								PointEntity(p\pvt, Camera)
+								TurnEntity(p\pvt, 0, 145, 0, True)
+								TurnEntity(p\pvt, Rand(10,20), 0, 0, True)
+							EndIf
 						EndIf
 						
 						If e\EventState2 > 12 Then 
@@ -3618,15 +3626,17 @@ Function UpdateEvents()
 										If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 250.0*RoomScale Then
 											ShowEntity Light
 											LightFlash = 0.3
-											For i = 0 To 10
-												p.Particles = CreateParticle(EntityX(Curr106\Collider, True), EntityY(Curr106\Collider, True), EntityZ(Curr106\Collider, True), 0, 0.015, -0.2, 250)
-												p\size = 0.03
-												p\gravity = -0.2
-												p\lifetime = 200
-												p\SizeChange = 0.005
-												p\speed = 0.001
-												RotateEntity(p\pvt, Rnd(360), Rnd(360), 0, True)
-											Next
+											If ParticleAmount>0
+												For i = 0 To 5+(5*(ParticleAmount-1))
+													p.Particles = CreateParticle(EntityX(Curr106\Collider, True), EntityY(Curr106\Collider, True), EntityZ(Curr106\Collider, True), 0, 0.015, -0.2, 250)
+													p\size = 0.03
+													p\gravity = -0.2
+													p\lifetime = 200
+													p\SizeChange = 0.005
+													p\speed = 0.001
+													RotateEntity(p\pvt, Rnd(360), Rnd(360), 0, True)
+												Next
+											EndIf
 											Curr106\State = -20000
 											TranslateEntity(Curr106\Collider,0,-50.0,0,True)
 										EndIf
@@ -3683,14 +3693,16 @@ Function UpdateEvents()
 						EndIf
 					ElseIf e\EventStr <> "" And e\EventStr <> "step1" And e\EventStr <> "done"
 						If Float(e\EventStr)<70*10
-							If Rand(10)=1
-								;p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),6,0.05,0,60)
-								p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),0,0.05,0,60)
-								p\speed = 0.002
-								RotateEntity(p\pvt, 0, EntityYaw(e\room\NPC[0]\Collider), 0)
-								MoveEntity p\pvt,Rnd(-0.1,0.1),0,0.1+Rnd(0,0.5)
-								RotateEntity(p\pvt, -90, EntityYaw(e\room\NPC[0]\Collider), 0)
-								p\Achange = -0.02
+							If ParticleAmount>0
+								If Rand(20-(10*(ParticleAmount-1)))=1
+									;p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),6,0.05,0,60)
+									p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),0,0.05,0,60)
+									p\speed = 0.002
+									RotateEntity(p\pvt, 0, EntityYaw(e\room\NPC[0]\Collider), 0)
+									MoveEntity p\pvt,Rnd(-0.1,0.1),0,0.1+Rnd(0,0.5)
+									RotateEntity(p\pvt, -90, EntityYaw(e\room\NPC[0]\Collider), 0)
+									p\Achange = -0.02
+								EndIf
 							EndIf
 							e\EventStr = Float(e\EventStr) + FPSfactor
 						Else
@@ -7313,7 +7325,7 @@ Function UpdateEvents()
 							em\SizeChange = 0.007
 							;EntityParent(em\Obj, e\room\obj)
 							
-							For z = 0 To 10
+							For z = 0 To Ceil(3.3333*(ParticleAmount+1))
 								p.Particles = CreateParticle(EntityX(em\Obj, True), 448*RoomScale, EntityZ(em\Obj, True), Rand(em\MinImage, em\MaxImage), em\Size, em\Gravity, em\LifeTime)
 								p\speed = em\Speed
 								RotateEntity(p\pvt, Rnd(360), Rnd(360), 0, True)
@@ -8460,19 +8472,21 @@ Function UpdateEvents()
 									RotateEntity(pvt, 0, EntityYaw(d_ent%,True)+90, 0)
 									MoveEntity pvt,0,0,0.2
 									
-									For i = 0 To 3									
-										p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 7, 0.002, 0, 25)
-										p\speed = Rnd(0.01,0.05)
-										;RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
-										RotateEntity(p\pvt, Rnd(-45,0), EntityYaw(pvt)+Rnd(-10.0,10.0), 0)
-										
-										p\size = 0.0075
-										ScaleSprite p\obj,p\size,p\size
-										
-										;EntityOrder p\obj,-1
-										
-										p\Achange = -0.05
-									Next
+									If ParticleAmount>0
+										For i = 0 To (1+(2*(ParticleAmount-1)))
+											p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 7, 0.002, 0, 25)
+											p\speed = Rnd(0.01,0.05)
+											;RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
+											RotateEntity(p\pvt, Rnd(-45,0), EntityYaw(pvt)+Rnd(-10.0,10.0), 0)
+											
+											p\size = 0.0075
+											ScaleSprite p\obj,p\size,p\size
+											
+											;EntityOrder p\obj,-1
+											
+											p\Achange = -0.05
+										Next
+									EndIf
 									
 									FreeEntity pvt
 								EndIf
@@ -8575,7 +8589,7 @@ Function UpdateEvents()
 												EntityFX sc\ScrObj, 17
 												SpriteViewMode(sc\ScrObj, 2)
 												sc\ScrTexture = 0
-													;EntityTexture sc\ScrObj, ScreenTexs[sc\ScrTexture]
+												;EntityTexture sc\ScrObj, ScreenTexs[sc\ScrTexture]
 												ScaleSprite(sc\ScrObj, MeshWidth(Monitor) * scale * 0.95* 0.5, MeshHeight(Monitor) * scale * 0.95* 0.5)
 												
 												sc\ScrOverlay = CreateSprite(sc\ScrObj)
@@ -8753,7 +8767,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 					ElseIf e\EventStr = "load2"
-							;For SCP-049
+						;For SCP-049
 						If e\room\NPC[0]=Null Then
 							For n.NPCs = Each NPCs
 								If n\NPCtype = NPCtype049
@@ -9178,8 +9192,8 @@ Function UpdateEvents()
 			If ExplosionTimer-FPSfactor < 140.0 Then
 				BlinkTimer = 1.0
 				ExplosionSFX = LoadSound_Strict("SFX\Ending\GateB\Nuke2.ogg")
-				PlaySound_Strict ExplosionSFX				
-				For i = 0 To 40
+				PlaySound_Strict ExplosionSFX
+				For i = 0 To (10+(10*(ParticleAmount+1)))
 					p.Particles = CreateParticle(EntityX(Collider)+Rnd(-0.5,0.5),EntityY(Collider)-Rnd(0.2,1.5),EntityZ(Collider)+Rnd(-0.5,0.5),0, Rnd(0.2,0.6), 0.0, 350)	
 					RotateEntity p\pvt,-90,0,0,True
 					p\speed = Rnd(0.05,0.07)
@@ -9228,5 +9242,9 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~B#1486#2189
+;~F#14#121#50E#51E#58A#5FA#65A#818#A08#A2F#A3D#A47#A54#C40#C61#CB0#D0F#D1C#D56#D6D
+;~F#D8D#D96#DA0#DAF#EA3#EC5#1171#11B8#11CE#11DA#11F7#1248#1261#132E#1430#14B0#14C9#14E8#155F#156C
+;~F#1585#161D#17D2#18E4#1938#19E9#1AB1#1B7E#1BA2#1C64#1C91#1CAE#1CD5#1D05#1D2B#1D53#1DAD#1DED#1E1E#1E31
+;~F#1EEB#1F58#1F6B#1F81#1FDE#1FFF#20ED#2162#2168#2263#234F#2353
+;~B#1492#2197
 ;~C#Blitz3D

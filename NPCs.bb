@@ -6210,7 +6210,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 			
 			;Kill()
 			PlaySound_Strict BullethitSFX
-		ElseIf particles
+		ElseIf particles And ParticleAmount>0
 			pvt = CreatePivot()
 			PositionEntity pvt, EntityX(Collider),(EntityY(Collider)+EntityY(Camera))/2,EntityZ(Collider)
 			PointEntity pvt, p\obj
@@ -6223,7 +6223,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 				
 				If particles Then 
 					;dust/smoke particles
-					p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
+					p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
 					p\speed = 0.001
 					p\SizeChange = 0.003
 					p\A = 0.8
@@ -6231,7 +6231,7 @@ Function Shoot(x#,y#,z#,hitProb#=1.0,particles%=True)
 					RotateEntity p\pvt, EntityPitch(pvt)-180, EntityYaw(pvt),0
 					
 					For i = 0 To Rand(2,3)
-						p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
+						p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
 						p\speed = 0.02
 						p\A = 0.8
 						p\Achange = -0.01
@@ -6764,7 +6764,6 @@ Function RotateToDirection(n.NPCs)
 	ShowEntity n\Collider
 	
 End Function
-
 
 
 
