@@ -178,7 +178,18 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 	AACamViewW = AACamViewW+(AACamViewW Mod 2)
 	AACamViewH = AAStringHeight(txt)
 	AACamViewH = AACamViewH+(AACamViewH Mod 2)
-	CameraViewport AATextCam,x,y,AACamViewW,AACamViewH
+	
+	Local vx% = x : If vx<0 Then vx=0
+	Local vy% = y : If vy<0 Then vy=0
+	Local vw% = AACamViewW+(x-vx) : If vw+vx>GraphicWidth Then vw=GraphicWidth-vx
+	Local vh% = AACamViewH+(y-vy) : If vh+vy>GraphicHeight Then vh=GraphicHeight-vy
+	vw = vw-(vw Mod 2)
+	vh = vh-(vh Mod 2)
+	AACamViewH = AACamViewH+(AACamViewH Mod 2)
+	AACamViewW = vw : AACamViewH = vh
+	
+	
+	CameraViewport AATextCam,vx,vy,vw,vh
 	For i=1 To Len(txt)
 		EntityAlpha AATextSprite[i-1],a
 		EntityColor AATextSprite[i-1],ColorRed(),ColorGreen(),ColorBlue()
@@ -186,7 +197,7 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 		char% = Asc(Mid(txt,i,1))
 		If char>=0 And char<=127 Then
 			AASpriteScale(i-1,font\w[char],font\h[char])
-			AASpritePosition(i-1,tX+(font\w[char]/2),(font\h[char]/2))
+			AASpritePosition(i-1,tX+(x-vx)+(font\w[char]/2),(y-vy)+(font\h[char]/2))
 			VertexTexCoords GetSurface(AATextSprite[i-1],1),0,Float(font\x[char])/1024.0,Float(font\y[char])/1024.0
 			VertexTexCoords GetSurface(AATextSprite[i-1],1),1,Float(font\x[char]+font\w[char])/1024.0,Float(font\y[char])/1024.0
 			VertexTexCoords GetSurface(AATextSprite[i-1],1),2,Float(font\x[char])/1024.0,Float(font\y[char]+font\h[char])/1024.0

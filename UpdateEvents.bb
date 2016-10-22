@@ -118,14 +118,14 @@ Function UpdateEvents()
 					CurrTrigger = CheckTriggers()
 					
 					If (CurrTrigger = "173scene_timer") Then
-						e\EventState=e\EventState+FPSfactor
+						e\EventState = e\EventState+FPSfactor
 					Else If (CurrTrigger = "173scene_activated")
 						e\EventState = Max(e\EventState, 500)
 					EndIf
 					
 					
 					If e\EventState >= 500 Then
-						e\EventState=e\EventState+FPSfactor
+						e\EventState = e\EventState+FPSfactor
 						
 						If e\EventState2 = 0 Then
 							CanSave = False
@@ -141,19 +141,19 @@ Function UpdateEvents()
 								
 								
 								If e\EventState > 900+2.5*70 Then
-									If e\room\NPC[2]\State<>1
-									e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
-									AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
-									MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
-									e\room\NPC[2]\State=8
-									
-									If EntityZ(e\room\NPC[2]\Collider)<e\room\z-512*RoomScale Then
-										PointEntity(e\room\NPC[2]\obj, e\room\NPC[1]\Collider)
-										RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj)-180,EntityYaw(e\room\NPC[2]\Collider),15.0), 0
-									Else
-										RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
+									If e\room\NPC[2]\State <> 1
+										e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
+										AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
+										MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
+										e\room\NPC[2]\State = 8
+										
+										If EntityZ(e\room\NPC[2]\Collider) < e\room\z-512*RoomScale Then
+											PointEntity(e\room\NPC[2]\obj, e\room\NPC[1]\Collider)
+											RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj)-180,EntityYaw(e\room\NPC[2]\Collider),15.0), 0
+										Else
+											RotateEntity e\room\NPC[2]\Collider, 0, 0, 0
+										EndIf
 									EndIf
-								EndIf
 								EndIf
 								
 								If e\EventState < 900+4*70 Then
@@ -176,8 +176,8 @@ Function UpdateEvents()
 									
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
 									
-									If e\room\NPC[2]\State <> 1
-										If EntityZ(e\room\NPC[2]\Collider)<e\room\z-1100*RoomScale Or EntityDistance(e\room\NPC[2]\Collider, Collider)<1.0 Then
+									If e\room\NPC[2]\State <> 1 And KillTimer >= 0
+										If EntityZ(e\room\NPC[2]\Collider) < e\room\z-1150*RoomScale Then
 											e\room\RoomDoors[5]\open = False
 											LightBlink = 3.0
 											PlaySound_Strict(IntroSFX(11))
@@ -191,24 +191,29 @@ Function UpdateEvents()
 									EndIf
 								EndIf
 								
-								If (CurrTrigger = "173scene_end")
+								;If Ulgrin can see the player then start shooting at them.
+								If (CurrTrigger = "173scene_end") And EntityVisible(e\room\NPC[2]\Collider, Collider) And (Not GodMode) Then
 									e\room\NPC[2]\State = 1
 									e\room\NPC[2]\State3 = 1
+								ElseIf e\room\NPC[2]\State = 1 And (Not EntityVisible(e\room\NPC[2]\Collider, Collider))
+									e\room\NPC[2]\State = 0
+									e\room\NPC[2]\State3 = 0
 								EndIf
+								
 								If e\room\NPC[2]\State = 1 Then e\room\RoomDoors[5]\open = True
 							Else
 								CanSave = True
-								If e\room\NPC[2]\State<>1
-								If EntityX(Collider)<(e\room\x+1384*RoomScale) Then e\EventState = Max(e\EventState,900)
-								
-								If e\room\RoomDoors[5]\openstate=0 Then 
-									HideEntity e\room\NPC[1]\obj
-									HideEntity e\room\NPC[1]\Collider
+								If e\room\NPC[2]\State <> 1
+									If EntityX(Collider)<(e\room\x+1384*RoomScale) Then e\EventState = Max(e\EventState,900)
 									
-									HideEntity e\room\NPC[2]\obj
-									HideEntity e\room\NPC[2]\Collider
-									e\EventState2=1
-								EndIf
+									If e\room\RoomDoors[5]\openstate = 0 Then 
+										HideEntity e\room\NPC[1]\obj
+										HideEntity e\room\NPC[1]\Collider
+										
+										HideEntity e\room\NPC[2]\obj
+										HideEntity e\room\NPC[2]\Collider
+										e\EventState2=1
+									EndIf
 								EndIf
 							EndIf
 						EndIf
@@ -1449,20 +1454,33 @@ Function UpdateEvents()
 							de.Decals = CreateDecal(0, EntityX(e\room\Objects[1],True), -1531.0*RoomScale, EntityZ(e\room\Objects[1],True), 90, Rand(360), 0)
 							de\Size = 0.05 : de\SizeChange = 0.001 : EntityAlpha(de\obj, 0.8) : UpdateDecals()
 							
-							PositionEntity Curr106\Collider, EntityX(e\room\Objects[1],True), -2000*RoomScale, EntityZ(e\room\Objects[1],True)
-							Curr106\State = -0.1
-							ShowEntity Curr106\obj
-							e\EventState2 = 1
+							If Curr106\State > 0 Then
+								PositionEntity Curr106\Collider, EntityX(e\room\Objects[1],True), -10240*RoomScale, EntityZ(e\room\Objects[1],True)
+								Curr106\State = -0.1
+								ShowEntity Curr106\obj
+								e\EventState2 = 1
+							EndIf
 						EndIf
 					EndIf
-					
-					If WearingNightVision>0 Then
+
+					If WearingNightVision > 0 Then
+						Local hasBatteryFor895% = 0
+						For i% = 0 To MaxItemAmount - 1
+							If (Inventory(i) <> Null) Then
+								If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+									If Inventory(i)\state > 0.0 Then
+										hasBatteryFor895 = 1
+										Exit
+									EndIf
+								EndIf
+							EndIf
+						Next
 						;If EntityVisible(Camera,e\room\Objects[2]) Then
 							;If EntityInView(e\room\Objects[2], Camera) Then
 						;If EntityVisible(Camera,e\room\Objects[1])
-							If CoffinDistance<4.0
+							If (CoffinDistance < 4.0) And (hasBatteryFor895) Then
 								
-								Sanity=Sanity-FPSfactor*1.1
+								Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
 								BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
 								
 								tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
@@ -1483,7 +1501,7 @@ Function UpdateEvents()
 									EntityColor(NVOverlay, 255,255,255)
 								EndIf
 								If Sanity < (-1000) Then 
-									If WearingNightVision=2
+									If WearingNightVision > 1
 										DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
 										DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
 									Else
@@ -1968,25 +1986,23 @@ Function UpdateEvents()
 											TurnEntity(em\Obj, -80+20*i, 0, 0)
 											EntityParent em\Obj, e\room\NPC[3]\Collider
 											
-											If ParticleAmount>0
-												For i = 0 To (3+(4*(ParticleAmount-1)))
-													p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, Rnd(0.5,1.0), -0.1, 200)
-													p\speed = 0.01
-													p\SizeChange = 0.01
-													p\A = 1.0
-													p\Achange = -0.005
-													RotateEntity p\pvt, Rnd(360),Rnd(360),0
-													MoveEntity p\pvt, 0,0,0.3
-												Next
-												
-												For i = 0 To (6+(6*(ParticleAmount-1)))
-													p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, 0.02, 0.003, 200)
-													p\speed = 0.04
-													p\A = 1.0
-													p\Achange = -0.005
-													RotateEntity p\pvt, Rnd(360),Rnd(360),0
-												Next
-											EndIf
+											For i = 0 To 7
+												p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, Rnd(0.5,1.0), -0.1, 200)
+												p\speed = 0.01
+												p\SizeChange = 0.01
+												p\A = 1.0
+												p\Achange = -0.005
+												RotateEntity p\pvt, Rnd(360),Rnd(360),0
+												MoveEntity p\pvt, 0,0,0.3
+											Next
+											
+											For i = 0 To 12
+												p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, 0.02, 0.003, 200)
+												p\speed = 0.04
+												p\A = 1.0
+												p\Achange = -0.005
+												RotateEntity p\pvt, Rnd(360),Rnd(360),0
+											Next
 										EndIf
 									Else
 										HideEntity e\room\Objects[12]
@@ -2020,15 +2036,13 @@ Function UpdateEvents()
 						
 						AmbientLight (140, 140, 140)
 						
-						If ParticleAmount>0
-							If Rand(3) = 1 Then
-								p.Particles = CreateParticle(EntityX(Camera)+Rnd(-2.0,2.0), EntityY(Camera)+Rnd(0.9,2.0), EntityZ(Camera)+Rnd(-2.0,2.0), 2, 0.006, 0, 300)
-								p\speed = Rnd(0.002,0.003)
-								RotateEntity(p\pvt, Rnd(-20, 20), e\room\angle-90+Rnd(-15,15),0, 0)
-								
-								p\SizeChange = -0.00001
-							End If
-						EndIf
+						If Rand(3) = 1 Then
+							p.Particles = CreateParticle(EntityX(Camera)+Rnd(-2.0,2.0), EntityY(Camera)+Rnd(0.9,2.0), EntityZ(Camera)+Rnd(-2.0,2.0), 2, 0.006, 0, 300)
+							p\speed = Rnd(0.002,0.003)
+							RotateEntity(p\pvt, Rnd(-20, 20), e\room\angle-90+Rnd(-15,15),0, 0)
+							
+							p\SizeChange = -0.00001
+						End If
 
 						;Helicopter spots or player is within range. --> Start shooting.
 						If ((EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) Or EntityVisible(e\room\NPC[0]\Collider,Collider)) And e\room\NPC[1]\State <> 1
@@ -2341,15 +2355,13 @@ Function UpdateEvents()
 													EndIf
 												EndIf
 												
-												If ParticleAmount>0
-													For i = 0 To Rand(2,2+(6*(ParticleAmount-1)))-Int(dist)
-														p.Particles = CreateParticle(EntityX(Curr106\obj,True),EntityY(Curr106\obj,True)+Rnd(0.4,0.9), EntityZ(Curr106\obj), 0, 0.006, -0.002, 40)
-														p\speed = 0.005
-														p\A = 0.8
-														p\Achange = -0.01
-														RotateEntity p\pvt, -Rnd(70,110), Rnd(360),0	
-													Next
-												EndIf
+												For i = 0 To Rand(2,8)-Int(dist)
+													p.Particles = CreateParticle(EntityX(Curr106\obj,True),EntityY(Curr106\obj,True)+Rnd(0.4,0.9), EntityZ(Curr106\obj), 0, 0.006, -0.002, 40)
+													p\speed = 0.005
+													p\A = 0.8
+													p\Achange = -0.01
+													RotateEntity p\pvt, -Rnd(70,110), Rnd(360),0	
+												Next										
 											EndIf
 											
 											
@@ -3060,18 +3072,16 @@ Function UpdateEvents()
 						CameraFogColor Camera, 38*0.5, 55*0.5, 47*0.5
 						CameraClsColor Camera, 38*0.5, 55*0.5, 47*0.5
 						
-						If ParticleAmount>0
-							If Rand(800)=1 Then
-								angle = EntityYaw(Camera,True)+Rnd(150,210)
-								p.Particles = CreateParticle(EntityX(Collider)+Cos(angle)*7.5, 0.0, EntityZ(Collider)+Sin(angle)*7.5, 3, 4.0, 0.0, 2500)
-								EntityBlend(p\obj, 2)
-								;EntityFX(p\obj, 1)
-								p\speed = 0.01
-								p\SizeChange = 0
-								PointEntity(p\pvt, Camera)
-								TurnEntity(p\pvt, 0, 145, 0, True)
-								TurnEntity(p\pvt, Rand(10,20), 0, 0, True)
-							EndIf
+						If Rand(800)=1 Then 
+							angle = EntityYaw(Camera,True)+Rnd(150,210)
+							p.Particles = CreateParticle(EntityX(Collider)+Cos(angle)*7.5, 0.0, EntityZ(Collider)+Sin(angle)*7.5, 3, 4.0, 0.0, 2500)
+							EntityBlend(p\obj, 2)
+							;EntityFX(p\obj, 1)
+							p\speed = 0.01
+							p\SizeChange = 0
+							PointEntity(p\pvt, Camera)
+							TurnEntity(p\pvt, 0, 145, 0, True)
+							TurnEntity(p\pvt, Rand(10,20), 0, 0, True)
 						EndIf
 						
 						If e\EventState2 > 12 Then 
@@ -3505,7 +3515,7 @@ Function UpdateEvents()
 				temp = True
 				If e\EventState2 > 70*3.5 And e\EventState2 < 70*90 Then temp = False
 				
-				If temp And EntityY(Collider, True)>EntityY(e\room\obj,True) Then
+				If temp And EntityY(Collider, True) > EntityY(e\room\obj,True) And EntityY(Collider, True) < 4.0 Then
 					
 					If e\Sound = 0 Then e\Sound = LoadSound_Strict("SFX\Room\Tesla\Shock.ogg")
 					
@@ -3610,7 +3620,6 @@ Function UpdateEvents()
 											ShowEntity Light
 											LightFlash = 0.4
 											CameraShake = 1.0
-											DeathMSG = ""
 											Kill()
 											DeathMSG = "Subject D-9341 killed by the Tesla gate at [REDACTED]."
 										EndIf
@@ -3626,17 +3635,15 @@ Function UpdateEvents()
 										If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 250.0*RoomScale Then
 											ShowEntity Light
 											LightFlash = 0.3
-											If ParticleAmount>0
-												For i = 0 To 5+(5*(ParticleAmount-1))
-													p.Particles = CreateParticle(EntityX(Curr106\Collider, True), EntityY(Curr106\Collider, True), EntityZ(Curr106\Collider, True), 0, 0.015, -0.2, 250)
-													p\size = 0.03
-													p\gravity = -0.2
-													p\lifetime = 200
-													p\SizeChange = 0.005
-													p\speed = 0.001
-													RotateEntity(p\pvt, Rnd(360), Rnd(360), 0, True)
-												Next
-											EndIf
+											For i = 0 To 10
+												p.Particles = CreateParticle(EntityX(Curr106\Collider, True), EntityY(Curr106\Collider, True), EntityZ(Curr106\Collider, True), 0, 0.015, -0.2, 250)
+												p\size = 0.03
+												p\gravity = -0.2
+												p\lifetime = 200
+												p\SizeChange = 0.005
+												p\speed = 0.001
+												RotateEntity(p\pvt, Rnd(360), Rnd(360), 0, True)
+											Next
 											Curr106\State = -20000
 											TranslateEntity(Curr106\Collider,0,-50.0,0,True)
 										EndIf
@@ -3667,7 +3674,7 @@ Function UpdateEvents()
 					If e\EventStr = "step1" And e\room\NPC[0]\State <> 3
 						If e\EventState = 0
 							For i = 0 To 2
-								If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale
+								If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 400.0*RoomScale
 									If KillTimer => 0 Then 
 										StopChannel(e\SoundCHN)
 										e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
@@ -3693,16 +3700,14 @@ Function UpdateEvents()
 						EndIf
 					ElseIf e\EventStr <> "" And e\EventStr <> "step1" And e\EventStr <> "done"
 						If Float(e\EventStr)<70*10
-							If ParticleAmount>0
-								If Rand(20-(10*(ParticleAmount-1)))=1
-									;p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),6,0.05,0,60)
-									p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),0,0.05,0,60)
-									p\speed = 0.002
-									RotateEntity(p\pvt, 0, EntityYaw(e\room\NPC[0]\Collider), 0)
-									MoveEntity p\pvt,Rnd(-0.1,0.1),0,0.1+Rnd(0,0.5)
-									RotateEntity(p\pvt, -90, EntityYaw(e\room\NPC[0]\Collider), 0)
-									p\Achange = -0.02
-								EndIf
+							If Rand(10)=1
+								;p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),6,0.05,0,60)
+								p.Particles = CreateParticle(EntityX(e\room\NPC[0]\Collider),EntityY(e\room\NPC[0]\obj)+0.05,EntityZ(e\room\NPC[0]\Collider),0,0.05,0,60)
+								p\speed = 0.002
+								RotateEntity(p\pvt, 0, EntityYaw(e\room\NPC[0]\Collider), 0)
+								MoveEntity p\pvt,Rnd(-0.1,0.1),0,0.1+Rnd(0,0.5)
+								RotateEntity(p\pvt, -90, EntityYaw(e\room\NPC[0]\Collider), 0)
+								p\Achange = -0.02
 							EndIf
 							e\EventStr = Float(e\EventStr) + FPSfactor
 						Else
@@ -3711,7 +3716,7 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				
-				If PlayerRoom\RoomTemplate\Name<>"pocketdimension" And (Not isIn8601) Then
+				If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "room860" Then
 					If e\EventState2 = 0 Then
 						If e\EventState3 <=0 Then 
 							temp = False
@@ -6840,8 +6845,6 @@ Function UpdateEvents()
 					;Local dp.DrawPortal
 					
 					If e\EventState=1.0 Then ;the player is in the forest
-						isIn8601 = True
-						
 						CurrStepSFX = 2
 						
 						Curr106\Idle = True
@@ -6937,8 +6940,6 @@ Function UpdateEvents()
 											UpdateDoors()
 											
 											e\EventState = 0.0
-											
-											isIn8601 = False
 											
 										Else
 											PlaySound_Strict(LoadTempSound("SFX\Door\WoodenDoorBudge.ogg"))
@@ -7185,13 +7186,15 @@ Function UpdateEvents()
 								e\room\NPC[0]\State = 3
 								PointEntity e\room\NPC[0]\Collider, Collider
 								AnimateNPC(e\room\NPC[0], 570, 596, 0.5, False)
-								If e\room\NPC[0]\Frame=>596 Then
-									e\EventState=5
-									e\EventState2=0
+								If e\room\NPC[0]\Frame => 596 Then
+									e\EventState = 5
+									e\EventState2 = 0
 									PositionEntity Collider, EntityX(e\room\obj,True),0.3,EntityZ(e\room\obj,True),True
 									ResetEntity Collider									
 									BlinkTimer = -10
 									BlurTimer = 500	
+									Injuries = 1.5
+									Bloodloss = 70
 								;PlaySound_Strict(LoadTempSound("SFX\Door\WoodenDoorClose.ogg"))							
 								EndIf								
 							EndIf
@@ -7201,9 +7204,9 @@ Function UpdateEvents()
 						;RemoveNPC(e\room\NPC[0])
 						;RemoveNPC(e\room\NPC[1])
 						;RemoveEvent(e)
-					ElseIf e\EventState=5
+					ElseIf e\EventState = 5
 						e\EventState2 = e\EventState2 + FPSfactor
-						If e\EventState2>1000 Then 
+						If e\EventState2 > 500 Then 
 							RotateEntity e\room\Objects[9],0,90,0,False
 							RotateEntity e\room\Objects[13],0,0,0,False
 							
@@ -7231,7 +7234,7 @@ Function UpdateEvents()
 							
 							e\EventState = 6
 						EndIf
-					ElseIf e\EventState=6
+					ElseIf e\EventState = 6
 						PointEntity e\room\NPC[0]\Collider, Collider
 						
 						If e\room\NPC[0]\Sound<>0 Then 
@@ -7257,6 +7260,15 @@ Function UpdateEvents()
 						
 						PrevInjuries = 0
 						PrevBloodloss = 0
+						
+						For i = 0 To MaxItemAmount-1
+							If Inventory(i) <> Null Then
+								If Inventory(i)\itemtemplate\name = "Leaflet"
+									RemoveItem(Inventory(i))
+									Exit
+								EndIf
+							EndIf
+						Next
 						
 						RemoveNPC(e\room\NPC[0])
 						RemoveEvent(e)						
@@ -7325,7 +7337,7 @@ Function UpdateEvents()
 							em\SizeChange = 0.007
 							;EntityParent(em\Obj, e\room\obj)
 							
-							For z = 0 To Ceil(3.3333*(ParticleAmount+1))
+							For z = 0 To 10
 								p.Particles = CreateParticle(EntityX(em\Obj, True), 448*RoomScale, EntityZ(em\Obj, True), Rand(em\MinImage, em\MaxImage), em\Size, em\Gravity, em\LifeTime)
 								p\speed = em\Speed
 								RotateEntity(p\pvt, Rnd(360), Rnd(360), 0, True)
@@ -7711,7 +7723,7 @@ Function UpdateEvents()
 				;[Block]
 				If e\EventState = 0 Then
 					If PlayerRoom = e\room Then e\EventState = 70 * Rand(300,1000)
-				ElseIf PlayerRoom\RoomTemplate\Name <> "pocketdimension"
+				ElseIf PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "room860" And PlayerRoom\RoomTemplate\Name <> "room1123" And PlayerRoom\RoomTemplate\Name <> "dimension1499" 
 					e\EventState = e\EventState-FPSfactor
 					
 					If e\EventState < 17*70 Then
@@ -8472,21 +8484,19 @@ Function UpdateEvents()
 									RotateEntity(pvt, 0, EntityYaw(d_ent%,True)+90, 0)
 									MoveEntity pvt,0,0,0.2
 									
-									If ParticleAmount>0
-										For i = 0 To (1+(2*(ParticleAmount-1)))
-											p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 7, 0.002, 0, 25)
-											p\speed = Rnd(0.01,0.05)
-											;RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
-											RotateEntity(p\pvt, Rnd(-45,0), EntityYaw(pvt)+Rnd(-10.0,10.0), 0)
-											
-											p\size = 0.0075
-											ScaleSprite p\obj,p\size,p\size
-											
-											;EntityOrder p\obj,-1
-											
-											p\Achange = -0.05
-										Next
-									EndIf
+									For i = 0 To 3									
+										p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 7, 0.002, 0, 25)
+										p\speed = Rnd(0.01,0.05)
+										;RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
+										RotateEntity(p\pvt, Rnd(-45,0), EntityYaw(pvt)+Rnd(-10.0,10.0), 0)
+										
+										p\size = 0.0075
+										ScaleSprite p\obj,p\size,p\size
+										
+										;EntityOrder p\obj,-1
+										
+										p\Achange = -0.05
+									Next
 									
 									FreeEntity pvt
 								EndIf
@@ -8589,7 +8599,7 @@ Function UpdateEvents()
 												EntityFX sc\ScrObj, 17
 												SpriteViewMode(sc\ScrObj, 2)
 												sc\ScrTexture = 0
-												;EntityTexture sc\ScrObj, ScreenTexs[sc\ScrTexture]
+													;EntityTexture sc\ScrObj, ScreenTexs[sc\ScrTexture]
 												ScaleSprite(sc\ScrObj, MeshWidth(Monitor) * scale * 0.95* 0.5, MeshHeight(Monitor) * scale * 0.95* 0.5)
 												
 												sc\ScrOverlay = CreateSprite(sc\ScrObj)
@@ -8623,13 +8633,13 @@ Function UpdateEvents()
 														TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
 														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 														DebugLog "Created Monitor for "+Chr(34)+"room2closets"+Chr(34)
-													Case "room1archive1074" ;ID=1 q
+													Case "room1archive" ;ID=1 q
 														PositionEntity pvt%,-231.489,872.0,95.7443,False
 														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 														EntityParent(sc\ScrObj, e\room\obj)
 														TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
 														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room1archive1074"+Chr(34)
+														DebugLog "Created Monitor for "+Chr(34)+"room1archive"+Chr(34)
 													Case "room3z3" ;ID=2 q
 														PositionEntity pvt%,-231.489,872.0,255.744,False
 														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
@@ -8767,7 +8777,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 					ElseIf e\EventStr = "load2"
-						;For SCP-049
+							;For SCP-049
 						If e\room\NPC[0]=Null Then
 							For n.NPCs = Each NPCs
 								If n\NPCtype = NPCtype049
@@ -9192,8 +9202,8 @@ Function UpdateEvents()
 			If ExplosionTimer-FPSfactor < 140.0 Then
 				BlinkTimer = 1.0
 				ExplosionSFX = LoadSound_Strict("SFX\Ending\GateB\Nuke2.ogg")
-				PlaySound_Strict ExplosionSFX
-				For i = 0 To (10+(10*(ParticleAmount+1)))
+				PlaySound_Strict ExplosionSFX				
+				For i = 0 To 40
 					p.Particles = CreateParticle(EntityX(Collider)+Rnd(-0.5,0.5),EntityY(Collider)-Rnd(0.2,1.5),EntityZ(Collider)+Rnd(-0.5,0.5),0, Rnd(0.2,0.6), 0.0, 350)	
 					RotateEntity p\pvt,-90,0,0,True
 					p\speed = Rnd(0.05,0.07)
@@ -9242,9 +9252,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#14#121#50E#51E#58A#5FA#65A#818#A08#A2F#A3D#A47#A54#C40#C61#CB0#D0F#D1C#D56#D6D
-;~F#D8D#D96#DA0#DAF#EA3#EC5#1171#11B8#11CE#11DA#11F7#1248#1261#132E#1430#14B0#14C9#14E8#155F#156C
-;~F#1585#161D#17D2#18E4#1938#19E9#1AB1#1B7E#1BA2#1C64#1C91#1CAE#1CD5#1D05#1D2B#1D53#1DAD#1DED#1E1E#1E31
-;~F#1EEB#1F58#1F6B#1F81#1FDE#1FFF#20ED#2162#2168#2263#234F#2353
-;~B#1492#2197
+;~B#1486#2189
 ;~C#Blitz3D
