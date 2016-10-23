@@ -120,6 +120,10 @@ Function UpdateMainMenu()
 		DrawTiledImageRect(MenuWhite, 0, 5, 512, 7 * MenuScale, 985.0 * MenuScale, 407.0 * MenuScale, (GraphicWidth - 1240 * MenuScale) + 300, 7 * MenuScale)
 	EndIf
 	
+	If (Not MouseDown1)
+		OnSliderID = 0
+	EndIf
+	
 	If MainMenuTab = 0 Then
 		For i% = 0 To 3
 			temp = False
@@ -235,16 +239,15 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
+					PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
+					PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
+					PutINIValue(OptionFile, "options", "prop fading",PropFading)
 					
 					PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 					PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
 					PutINIValue(OptionFile, "audio", "sfx release", EnableSFXRelease)
 					PutINIValue(OptionFile, "audio", "enable user tracks", EnableUserTracks%)
 					PutINIValue(OptionFile, "audio", "user track setting", UserTrackMode%)
-					PutINIValue(OptionFile, "options", "dof", DOF_Enabled)
-					PutINIValue(OptionFile, "options", "dof texture size",DOF_TexSize)
-					PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
-					PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
 					
 					PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
 					PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
@@ -525,7 +528,7 @@ Function UpdateMainMenu()
 					Color 100,100,100				
 					AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
 					DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)
-					If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
+					If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
 						;DrawTooltip("Not available in this version")
 						DrawOptionsTooltip(tx,ty,tw,th,"bump")
 					EndIf
@@ -535,7 +538,7 @@ Function UpdateMainMenu()
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "VSync:")
 					Vsync% = DrawTick(x + 310 * MenuScale, y + MenuScale, Vsync%)
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"vsync")
 					EndIf
 					
@@ -545,7 +548,7 @@ Function UpdateMainMenu()
 					AAText(x + 20 * MenuScale, y, "Anti-aliasing:")
 					Opt_AntiAlias = DrawTick(x + 310 * MenuScale, y + MenuScale, Opt_AntiAlias%)
 					;AAText(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"antialias")
 					EndIf
 					
@@ -554,7 +557,7 @@ Function UpdateMainMenu()
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Enable room lights:")
 					EnableRoomLights = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableRoomLights)
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"roomlights")
 					EndIf
 					
@@ -564,7 +567,7 @@ Function UpdateMainMenu()
 					ScreenGamma = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, ScreenGamma*50.0)/50.0)
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Screen gamma")
-					If MouseOn(x+310*MenuScale,y+6*MenuScale,150*MenuScale,20)
+					If MouseOn(x+310*MenuScale,y+6*MenuScale,150*MenuScale,20) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
 					EndIf
 					;Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
@@ -577,106 +580,62 @@ Function UpdateMainMenu()
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Resolution quality:")
-					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If ResolutionDetails < 4
-								ResolutionDetails = ResolutionDetails + 1
-							Else
-								ResolutionDetails = 0
-							EndIf
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
+					;DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
+					;If MouseHit1
+					;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+					;		If ResolutionDetails < 2
+					;			ResolutionDetails = ResolutionDetails + 1
+					;		Else
+					;			ResolutionDetails = 0
+					;		EndIf
+					;		PlaySound_Strict(ButtonSFX)
+					;	EndIf
+					;EndIf
+					;Color 255,255,255
+					;Select ResolutionDetails
+					;	Case 0
+					;		AAText(x + 340 * MenuScale, y + MenuScale, "LOW")
+					;		ResolutionScale = 0.33
+					;	Case 1
+					;		AAText(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
+					;		ResolutionScale = 0.5
+					;	Case 2
+					;		AAText(x + 340 * MenuScale, y + MenuScale, "STANDARD")
+					;		ResolutionScale = 1.0
+					;End Select
+					;If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+					;	DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
+					;EndIf
+					ResolutionDetails = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","STANDARD")
 					Color 255,255,255
 					Select ResolutionDetails
 						Case 0
-							AAText(x + 340 * MenuScale, y + MenuScale, "LOW")
 							ResolutionScale = 0.33
 						Case 1
-							AAText(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
 							ResolutionScale = 0.5
 						Case 2
-							AAText(x + 340 * MenuScale, y + MenuScale, "STANDARD")
 							ResolutionScale = 1.0
-						Case 3
-							AAText(x + 340 * MenuScale, y + MenuScale, "HIGH")
-							ResolutionScale = 1.33
-						Case 4
-							AAText(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
-							ResolutionScale = 1.5
 					End Select
-					If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=1
 						DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
 					EndIf
 					
-					y=y+30*MenuScale
+					y=y+50*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Particle amount:")
-					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If ParticleAmount < 2
-								ParticleAmount = ParticleAmount + 1
-							Else
-								ParticleAmount = 0
-							EndIf
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
-					Color 255,255,255
-					Select ParticleAmount
-						Case 0
-							AAText(x + 340 * MenuScale, y + MenuScale, "ALMOST NONE")
-						Case 1
-							AAText(x + 340 * MenuScale, y + MenuScale, "FEW")
-						Case 2
-							AAText(x + 340 * MenuScale, y + MenuScale, "ALL")
-					End Select
-					If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"ALMOST NONE","FEW","ALL")
+					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
 					EndIf
 					
-					y=y+30*MenuScale
+					y=y+50*MenuScale
 					
-					Local prevDOF_Enabled = DOF_Enabled
-					Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Depth of field:")
-					DOF_Enabled = DrawTick(x + 310 * MenuScale, y + MenuScale, DOF_Enabled)
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
-						If (prevDOF_Enabled <> DOF_Enabled) Or (CurrMenu_TestIMG <> "dof")
-							ChangeMenu_TestIMG("dof")
-						EndIf
-						DrawOptionsTooltip(tx,ty,tw,th,"dof")
-					EndIf
-					
-					y=y+30*MenuScale
-					
-					Local prevDOF_TexSize = DOF_TexSize
-					If DOF_Enabled
 						Color 255,255,255
-						AAText(x + 20 * MenuScale, y, "DOF Texture quality:")
-						DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-						If MouseHit1
-							If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-								If DOF_TexSize% < 8
-									DOF_TexSize% = DOF_TexSize% + 1
-								Else
-									DOF_TexSize% = 0
-								EndIf
-								PlaySound_Strict(ButtonSFX)
-							EndIf
-						EndIf
-						Color 255,255,255
-						DOF_TexSizeValue = 2^(4+DOF_TexSize)
-						AAText(x + 340 * MenuScale, y + MenuScale, DOF_TexSizeValue)
-						If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
-							If (prevDOF_TexSize <> DOF_TexSize) Or (CurrMenu_TestIMG <> "dof")
-								ChangeMenu_TestIMG("dof")
-							EndIf
-							DrawOptionsTooltip(tx,ty,tw,th,"dof")
-						EndIf
+					AAText(x + 20 * MenuScale, y, "Enable prop fading:")
+					PropFading = DrawTick(x + 310 * MenuScale, y + MenuScale, PropFading)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
 					EndIf
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
@@ -1647,7 +1606,7 @@ End Function
 
 Function SlideBar#(x%, y%, width%, value#)
 	
-	If MouseDown1 Then
+	If MouseDown1 And OnSliderID=0 Then
 		If ScaledMouseX() >= x And ScaledMouseX() <= x + width + 14 And ScaledMouseY() >= y And ScaledMouseY() <= y + 20 Then
 			value = Min(Max((ScaledMouseX() - x) * 100 / width, 0), 100)
 		EndIf
@@ -1861,12 +1820,6 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			txt = txt + "the monitor's brightness. Too high/low gamma can cause the graphics to look more undetailed."
 		Case "texquality"
 			txt = Chr(34)+"Texture quality"+Chr(34)+" determines with how many details the textures will be rendered in-game."
-		Case "dof"
-			txt = Chr(34)+"Depth of field"+Chr(34)+" is used to give the illusion of a realistic rendering camera. The texture size parameter determines with how many details in "
-			txt = txt + "pixels the DOF layer should render (16 is minimum and 4096 is maximum)."
-			txt2 = txt2 + "This option cannot be changed in-game."
-			R = 255
-			If (Not ingame) Then usetestimg% = True
 		Case "resquality"
 			txt = Chr(34)+"Resolution quality"+Chr(34)+" is used to adjust with how much quality the 3D scene will render."
 			txt2 = "Resolution details will be rendered with "
@@ -1876,18 +1829,11 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 					txt2 = txt2 + "33% details."
 				Case 1
 					R = 255
+					G = 255
 					txt2 = txt2 + "50% details."
 				Case 2
-					B = 255
-					R = 100
-					G = 100
+					G = 255
 					txt2 = txt2 + "100% details (default)."
-				Case 3
-					G = 255
-					txt2 = txt2 + "133% details."
-				Case 4
-					G = 255
-					txt2 = txt2 + "150% details."
 			End Select
 		Case "particleamount"
 			txt = Chr(34)+"Particle amount"+Chr(34)+" determines how many particles will be spawned per tick and what particles will be generated."
@@ -1903,6 +1849,13 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 					G = 255
 					txt2 = "Full amount of particle effects. This is recommended."
 			End Select
+		Case "propfading"
+			txt = Chr(34)+"Prop fading"+Chr(34)+" is used to determine if the map props should only be rendered within a specific distance or not. The fade distance is within the "
+			txt = txt + "range of the camera fog, but it might happen that you can see that effect in certain areas (if the fog goes further because of the amount of lights)."
+			txt2 = "This option isn't a perfect solution, as it's purpose is to just hide/show the props within a specific distance and is only for the case that the amount of "
+			txt2 = txt2 + "rendered objects at once is too high."
+			R = 255
+			G = 100
 			;[End Block]
 		;Sound options
 			;[Block]
@@ -2017,6 +1970,60 @@ Function ChangeMenu_TestIMG(change$)
 	FreeTexture AmbientLightRoomTex : AmbientLightRoomTex = 0
 	
 	CurrMenu_TestIMG = change$
+	
+End Function
+
+Global OnSliderID% = 0
+
+Function Slider3(x%,y%,width%,value%,ID%,val1$,val2$,val3$)
+	
+	If MouseDown1 Then
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			OnSliderID = ID
+		EndIf
+	EndIf
+	
+	Color 200,200,200
+	Rect(x,y,width+14,10,True)
+	Rect(x,y-8,4,14,True)
+	Rect(x+(width/2)+5,y-8,4,14,True)
+	Rect(x+width+10,y-8,4,14,True)
+	
+	If ID = OnSliderID
+		If (ScaledMouseX() <= x+8)
+			value = 0
+		ElseIf (ScaledMouseX() >= x+width/2) And (ScaledMouseX() <= x+(width/2)+8)
+			value = 1
+		ElseIf (ScaledMouseX() >= x+width)
+			value = 2
+		EndIf
+		Color 0,255,0
+		Rect(x,y,width+14,10,True)
+	Else
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			Color 0,200,0
+			Rect(x,y,width+14,10,False)
+		EndIf
+	EndIf
+	
+	If value = 0
+		DrawImage(BlinkMeterIMG,x,y-8)
+	ElseIf value = 1
+		DrawImage(BlinkMeterIMG,x+(width/2)+3,y-8)
+	Else
+		DrawImage(BlinkMeterIMG,x+width+6,y-8)
+	EndIf
+	
+	Color 170,170,170
+	If value = 0
+		AAText(x+2,y+10+MenuScale,val1,True)
+	ElseIf value = 1
+		AAText(x+(width/2)+7,y+10+MenuScale,val2,True)
+	Else
+		AAText(x+width+12,y+10+MenuScale,val3,True)
+	EndIf
+	
+	Return value
 	
 End Function
 
