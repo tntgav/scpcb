@@ -22,7 +22,7 @@ ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.2"
+Global VersionNumber$ = "1.3.3"
 Global CompatibleNumber$ = "1.3.2"
 
 AppTitle "SCP - Containment Breach Launcher"
@@ -74,11 +74,13 @@ Select TextureDetails%
 	Case 0
 		TextureFloat# = 1.5
 	Case 1
-		TextureFloat# = 0.75
+		TextureFloat# = 1.33
 	Case 2
-		TextureFloat# = 0.0
+		TextureFloat# = 1.0
 	Case 3
-		TextureFloat# = -0.75
+		TextureFloat# = 0.66
+	Case 4
+		TextureFloat# = 0.5
 End Select
 Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
 Global SFXVolume# = GetINIFloat(OptionFile, "audio", "sound volume")
@@ -108,6 +110,8 @@ If LauncherEnabled Then
 		Fullscreen = False
 	Else
 		AspectRatioRatio = 1.0
+		RealGraphicWidth = GraphicWidth
+		RealGraphicHeight = GraphicHeight
 		If Fullscreen Then
 			Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
 		Else
@@ -149,6 +153,8 @@ Else
 		Fullscreen = False
 	Else
 		AspectRatioRatio = 1.0
+		RealGraphicWidth = GraphicWidth
+		RealGraphicHeight = GraphicHeight
 		If Fullscreen Then
 			Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
 		Else
@@ -827,7 +833,7 @@ Function UpdateConsole()
 					Next
 					
 					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.",255,150,0)
-					
+
 				Case "spawnitem"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					temp = False 
@@ -1149,18 +1155,18 @@ Function UpdateConsole()
 					Select StrTemp
 						Case "a"
 							For e.Events = Each Events
-								If e\EventName = "gateaentrance" Then
+								If e\EventName="gateaentrance" Then
 									e\EventState3 = (Not e\EventState3)
 									Exit
 								EndIf
 							Next
 						Case "b"
 							For e.Events = Each Events
-								If e\EventName = "exit1" Then
+								If e\EventName="exit1" Then
 									e\EventState3 = (Not e\EventState3)
 									Exit
 								EndIf
-							Next
+							Next	
 						Default
 							For e.Events = Each Events
 								If e\EventName = "exit1" Or e\EventName = "gateaentrance" Then e\EventState3 = (Not e\EventState3)
@@ -1646,6 +1652,39 @@ Global IsZombie% = False
 Global room2gw_brokendoor% = False
 Global room2gw_x# = 0.0
 Global room2gw_z# = 0.0
+
+Include "DepthOfField.bb"
+Global DOF_Enabled% = GetINIInt(OptionFile,"options","dof")
+Global DOF.DepthOfField
+
+Global DOF_TexSize% = GetINIInt(OptionFile,"options","dof texture size")
+Global DOF_TexSizeValue = 0
+DOF_TexSizeValue = 2^(4+DOF_TexSizeValue)
+
+Global Menu_TestIMG
+Global menuroomscale# = 8.0 / 2048.0
+;Menu_TestIMG = Create3DIcon(200,200,"GFX\map\room3z3_opt.rmesh",0,-0.75,1,0,0,0,menuroomscale#,menuroomscale#,menuroomscale#,DOF_Enabled,True)
+;ScaleImage Menu_TestIMG,MenuScale,MenuScale
+;MaskImage Menu_TestIMG,255,0,255
+
+Global CurrMenu_TestIMG$ = ""
+
+Global ResolutionDetails% = GetINIInt(OptionFile,"options","res details")
+Global ResolutionScale# = 0.0
+Select ResolutionDetails
+	Case 0
+		ResolutionScale = 0.33
+	Case 1
+		ResolutionScale = 0.5
+	Case 2
+		ResolutionScale = 1.0
+	Case 3
+		ResolutionScale = 1.33
+	Case 4
+		ResolutionScale = 1.5
+End Select
+
+Global ParticleAmount% = GetINIInt(OptionFile,"options","particle amount")
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -1972,25 +2011,27 @@ Function UpdateDoors()
 							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 180.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
 							If d\openstate < 15 And d\openstate+FPSfactor => 15
-								For i = 0 To Rand(75,99)
-									Local pvt% = CreatePivot()
-									PositionEntity(pvt, EntityX(d\frameobj,True)+Rnd(-0.2,0.2), EntityY(d\frameobj,True)+Rnd(0.0,1.2), EntityZ(d\frameobj,True)+Rnd(-0.2,0.2))
-									RotateEntity(pvt, 0, Rnd(360), 0)
-									
-									Local p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 2, 0.002, 0, 300)
-									p\speed = 0.005
-									RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
-									
-									p\SizeChange = -0.00001
-									p\size = 0.01
-									ScaleSprite p\obj,p\size,p\size
-									
-									p\Achange = -0.01
-									
-									EntityOrder p\obj,-1
-									
-									FreeEntity pvt
-								Next
+								If ParticleAmount=2
+									For i = 0 To Rand(75,99)
+										Local pvt% = CreatePivot()
+										PositionEntity(pvt, EntityX(d\frameobj,True)+Rnd(-0.2,0.2), EntityY(d\frameobj,True)+Rnd(0.0,1.2), EntityZ(d\frameobj,True)+Rnd(-0.2,0.2))
+										RotateEntity(pvt, 0, Rnd(360), 0)
+										
+										Local p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 2, 0.002, 0, 300)
+										p\speed = 0.005
+										RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
+										
+										p\SizeChange = -0.00001
+										p\size = 0.01
+										ScaleSprite p\obj,p\size,p\size
+										
+										p\Achange = -0.01
+										
+										EntityOrder p\obj,-1
+										
+										FreeEntity pvt
+									Next
+								EndIf
 							EndIf
 						Case 2
 							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
@@ -2581,12 +2622,12 @@ Repeat
 		If KeyHit(KEY_INV) Then 
 			If InvOpen Then
 				ResumeSounds()
-				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1# = 0.0 : mouse_y_speed_1# = 0.0
+				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 			Else
 				PauseSounds()
 			EndIf
 			InvOpen = Not InvOpen
-			If OtherOpen <> Null Then OtherOpen = Null
+			If OtherOpen<>Null Then OtherOpen=Null
 			SelectedItem = Null 
 		EndIf
 		
@@ -2594,14 +2635,14 @@ Repeat
 			
 			If Rand(1500) = 1 Then
 				For i = 0 To 5
-					If AmbientSFX(i,CurrAmbientSFX) <> 0 Then
-						If ChannelPlaying(AmbientSFXCHN) = 0 Then FreeSound_Strict AmbientSFX(i,CurrAmbientSFX) : AmbientSFX(i,CurrAmbientSFX) = 0
+					If AmbientSFX(i,CurrAmbientSFX)<>0 Then
+						If ChannelPlaying(AmbientSFXCHN)=0 Then FreeSound_Strict AmbientSFX(i,CurrAmbientSFX) : AmbientSFX(i,CurrAmbientSFX) = 0
 					EndIf			
 				Next
 				
 				PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 0.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
 				
-				If Rand(3) = 1 Then PlayerZone = 3
+				If Rand(3)=1 Then PlayerZone = 3
 				
 				If PlayerRoom\RoomTemplate\Name = "173" Then 
 					PlayerZone = 4
@@ -2609,7 +2650,7 @@ Repeat
 					For e.Events = Each Events
 						If e\EventName = "room860"
 							If e\EventState = 1.0
-								PlayerZone = 5
+					PlayerZone = 5
 								PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 30.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
 							EndIf
 							
@@ -2677,6 +2718,9 @@ Repeat
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		
+		If DOF_Enabled
+			DOF_Update(DOF)
+		EndIf
 		UpdateWorld()
 		ManipulateNPCBones()
 		RenderWorld2()
@@ -3548,24 +3592,26 @@ Function MouseLook()
 	EndIf
 	
 	;pölyhiukkasia
-	If Rand(35) = 1 Then
-		Local pvt% = CreatePivot()
-		PositionEntity(pvt, EntityX(Camera, True), EntityY(Camera, True), EntityZ(Camera, True))
-		RotateEntity(pvt, 0, Rnd(360), 0)
-		If Rand(2) = 1 Then
-			MoveEntity(pvt, 0, Rnd(-0.5, 0.5), Rnd(0.5, 1.0))
-		Else
-			MoveEntity(pvt, 0, Rnd(-0.5, 0.5), Rnd(0.5, 1.0))
+	If ParticleAmount=2
+		If Rand(35) = 1 Then
+			Local pvt% = CreatePivot()
+			PositionEntity(pvt, EntityX(Camera, True), EntityY(Camera, True), EntityZ(Camera, True))
+			RotateEntity(pvt, 0, Rnd(360), 0)
+			If Rand(2) = 1 Then
+				MoveEntity(pvt, 0, Rnd(-0.5, 0.5), Rnd(0.5, 1.0))
+			Else
+				MoveEntity(pvt, 0, Rnd(-0.5, 0.5), Rnd(0.5, 1.0))
+			End If
+			
+			Local p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 2, 0.002, 0, 300)
+			p\speed = 0.001
+			RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
+			
+			p\SizeChange = -0.00001
+			
+			FreeEntity pvt
 		End If
-		
-		Local p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 2, 0.002, 0, 300)
-		p\speed = 0.001
-		RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
-		
-		p\SizeChange = -0.00001
-		
-		FreeEntity pvt
-	End If
+	EndIf
 	
 	; -- Limit the mouse;s movement. Using this method produces smoother mouselook movement than centering the mouse Each loop.
 	If (MouseX() > mouse_right_limit) Or (MouseX() < mouse_left_limit) Or (MouseY() > mouse_bottom_limit) Or (MouseY() < mouse_top_limit)
@@ -4621,7 +4667,7 @@ Function DrawGUI()
 						StoredCameraFogFar = CameraFogFar
 						CameraFogFar = 30
 					EndIf
-					
+						
 					WearingNightVision = (Not WearingNightVision) * 3
 					SelectedItem = Null	
 
@@ -5817,6 +5863,10 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "audio", "sfx release", EnableSFXRelease)
 				PutINIValue(OptionFile, "audio", "enable user tracks", EnableUserTracks%)
 				PutINIValue(OptionFile, "audio", "user track setting", UserTrackMode%)
+				PutINIValue(OptionFile, "options", "dof", DOF_Enabled)
+				PutINIValue(OptionFile, "options", "dof texture size",DOF_TexSize)
+				PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
+				PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
 				
 				PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
@@ -5849,6 +5899,10 @@ Function DrawMenu()
 			If DrawButton(x+215*MenuScale,y,100*MenuScale,30*MenuScale,"CONTROLS",False) Then OptionsMenu = 3
 			If DrawButton(x+325*MenuScale,y,100*MenuScale,30*MenuScale,"ADVANCED",False) Then OptionsMenu = 4
 			
+			Local tx# = (GraphicWidth/2)+(width/2)
+			Local ty# = y
+			Local tw# = 400*MenuScale
+			Local th# = 150*MenuScale
 			
 			Color 255,255,255
 			Select OptionsMenu
@@ -5857,17 +5911,11 @@ Function DrawMenu()
 					;[Block]
 					y=y+50*MenuScale
 					
-					Color 255,255,255				
-					AAText(x, y, "Show HUD:")	
-					HUDenabled = DrawTick(x + 270 * MenuScale, y + MenuScale, HUDenabled)	
-					
-					y=y+30*MenuScale
-					
 					Color 100,100,100				
 					AAText(x, y, "Enable bump mapping:")	
 					DrawTick(x + 270 * MenuScale, y + MenuScale, False, True)
 					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
-						DrawTooltip("Not available in this version")
+						DrawOptionsTooltip(tx,ty,tw,th,"bump")
 					EndIf
 					
 					y=y+30*MenuScale
@@ -5875,43 +5923,142 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "VSync:")
 					Vsync% = DrawTick(x + 270 * MenuScale, y + MenuScale, Vsync%)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"vsync")
+					EndIf
 					
 					y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Anti-aliasing:")
 					Opt_AntiAlias = DrawTick(x + 270 * MenuScale, y + MenuScale, Opt_AntiAlias%)
-					AAText(x+5*MenuScale, y + 15 * MenuScale, "(fullscreen only)")
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"antialias")
+					EndIf
 					
-					y=y+40*MenuScale
+					y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Enable room lights:")
 					EnableRoomLights = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableRoomLights)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"roomlights")
+					EndIf
 					
 					y=y+30*MenuScale
 					
-					;Local prevGamma# = ScreenGamma
 					ScreenGamma = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, ScreenGamma*50.0)/50.0)
 					Color 255,255,255
 					AAText(x, y, "Screen gamma")
-					;Text(x+5+MenuScale, y + 15 * MenuScale, "(fullscreen only)")
-					
-					;If prevGamma<>ScreenGamma Then
-					;	UpdateScreenGamma()
-					;EndIf
-					
-					y=y+40*MenuScale
-					
-					Color 100,100,100
-					AAText(x, y, "Texture quality:")
-					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
-					
-					AAText(x + 300 * MenuScale, y + MenuScale, "DISABLED")
-					If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
-						DrawTooltip("Not available in this version")
+					If MouseOn(x+270*MenuScale,y+6*MenuScale,100*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
 					EndIf
 					
+					y = y + 50*MenuScale
+					
+					Color 255,255,255
+					AAText(x, y, "Resolution quality:")
+					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
+					If MouseHit1
+						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+							If ResolutionDetails < 4
+								ResolutionDetails = ResolutionDetails + 1
+							Else
+								ResolutionDetails = 0
+							EndIf
+							PlaySound_Strict(ButtonSFX)
+						EndIf
+					EndIf
+					Color 255,255,255
+					Select ResolutionDetails
+						Case 0
+							AAText(x + 300 * MenuScale, y + MenuScale, "LOW")
+							ResolutionScale = 0.33
+						Case 1
+							AAText(x + 300 * MenuScale, y + MenuScale, "MEDIUM")
+							ResolutionScale = 0.5
+						Case 2
+							AAText(x + 300 * MenuScale, y + MenuScale, "STANDARD")
+							ResolutionScale = 1.0
+						Case 3
+							AAText(x + 300 * MenuScale, y + MenuScale, "HIGH")
+							ResolutionScale = 1.33
+						Case 4
+							AAText(x + 300 * MenuScale, y + MenuScale, "VERY HIGH")
+							ResolutionScale = 1.5
+					End Select
+					If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+						DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
+					EndIf
+					
+					y=y+30*MenuScale
+					
+					Color 255,255,255
+					AAText(x, y, "Particle amount:")
+					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
+					If MouseHit1
+						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+							If ParticleAmount < 2
+								ParticleAmount = ParticleAmount + 1
+							Else
+								ParticleAmount = 0
+							EndIf
+							PlaySound_Strict(ButtonSFX)
+						EndIf
+					EndIf
+					Color 255,255,255
+					Select ParticleAmount
+						Case 0
+							AAText(x + 300 * MenuScale, y + MenuScale, "ALMOST NONE")
+						Case 1
+							AAText(x + 300 * MenuScale, y + MenuScale, "FEW")
+						Case 2
+							AAText(x + 300 * MenuScale, y + MenuScale, "ALL")
+					End Select
+					If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
+					EndIf
+					
+					y=y+30*MenuScale
+					
+					Local prevDOF_Enabled = DOF_Enabled
+					Color 100,100,100
+					AAText(x, y, "Depth of field:")
+					DOF_Enabled = DrawTick(x + 270 * MenuScale, y + MenuScale, DOF_Enabled, True)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						;If (prevDOF_Enabled <> DOF_Enabled) Or (CurrMenu_TestIMG <> "dof")
+						;	ChangeMenu_TestIMG("dof")
+						;EndIf
+						DrawOptionsTooltip(tx,ty,tw,th,"dof",0,True)
+					EndIf
+					
+					y=y+30*MenuScale
+					
+					Local prevDOF_TexSize = DOF_TexSize
+					If DOF_Enabled
+						Color 100,100,100
+						AAText(x, y, "DOF Texture quality:")
+						DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
+						;If MouseHit1
+						;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+						;		If DOF_TexSize% < 8
+						;			DOF_TexSize% = DOF_TexSize% + 1
+						;		Else
+						;			DOF_TexSize% = 0
+						;		EndIf
+						;		PlaySound_Strict(ButtonSFX)
+						;	EndIf
+						;EndIf
+						Color 100,100,100
+						DOF_TexSizeValue = 2^(4+DOF_TexSize)
+						AAText(x + 300 * MenuScale, y + MenuScale, DOF_TexSizeValue)
+						If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+							;If (prevDOF_TexSize <> DOF_TexSize) Or (CurrMenu_TestIMG <> "dof")
+							;	ChangeMenu_TestIMG("dof")
+							;EndIf
+							DrawOptionsTooltip(tx,ty,tw,th,"dof",0,True)
+						EndIf
+					EndIf
 					;[End Block]
 				Case 2 ;Audio
 					AASetFont Font1
@@ -5921,6 +6068,9 @@ Function DrawMenu()
 					MusicVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, MusicVolume*100.0)/100.0)
 					Color 255,255,255
 					AAText(x, y, "Music volume:")
+					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"musicvol")
+					EndIf
 					
 					y = y + 30*MenuScale
 					
@@ -5928,14 +6078,17 @@ Function DrawMenu()
 					If (Not DeafPlayer) Then SFXVolume# = PrevSFXVolume#
 					Color 255,255,255
 					AAText(x, y, "Sound volume:")
+					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"soundvol")
+					EndIf
 					
 					y = y + 30*MenuScale
 					
 					Color 100,100,100
 					AAText x, y, "Sound auto-release:"
 					EnableSFXRelease = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableSFXRelease,True)
-					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
-						DrawTooltip("Not available in-game")
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th+220*MenuScale,"sfxautorelease")
 					EndIf
 					
 					y = y + 30*MenuScale
@@ -5943,8 +6096,8 @@ Function DrawMenu()
 					Color 100,100,100
 					AAText x, y, "Enable user tracks:"
 					EnableUserTracks = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableUserTracks,True)
-					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
-						DrawTooltip("Not available in-game")
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"usertrack")
 					EndIf
 					
 					If EnableUserTracks
@@ -5957,10 +6110,16 @@ Function DrawMenu()
 						Else
 							AAText x, y + 20 * MenuScale, "Random"
 						EndIf
+						If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+							DrawOptionsTooltip(tx,ty,tw,th,"usertrackmode")
+						EndIf
+						;DrawButton(x, y + 30 * MenuScale, 190 * MenuScale, 25 * MenuScale, "Scan for User Tracks",False)
+						;If MouseOn(x,y+30*MenuScale,190*MenuScale,25*MenuScale)
+						;	DrawOptionsTooltip(tx,ty,tw,th,"usertrackscan")
+						;EndIf
 					EndIf
 					;[End Block]
 				Case 3 ;Controls
-					;Text(x+210*MenuScale,y,"CONTROLS",True,True)
 					AASetFont Font1
 					;[Block]
 					y = y + 50*MenuScale
@@ -5968,12 +6127,18 @@ Function DrawMenu()
 					MouseSens = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
 					Color(255, 255, 255)
 					AAText(x, y, "Mouse sensitivity:")
+					If MouseOn(x+270*MenuScale,y-4*MenuScale,100*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesensitivity")
+					EndIf
 					
 					y = y + 30*MenuScale
 					
 					Color(255, 255, 255)
 					AAText(x, y, "Invert mouse Y-axis:")
 					InvertMouse = DrawTick(x + 270 * MenuScale, y + MenuScale, InvertMouse)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"mouseinvert")
+					EndIf
 					
 					y = y + 30*MenuScale
 					AAText(x, y, "Control configuration:")
@@ -6000,6 +6165,10 @@ Function DrawMenu()
 					InputBox(x + 200 * MenuScale, y + 180 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)	
 					AAText(x, y + 200 * MenuScale, "Open/Close Console")
 					InputBox(x + 200 * MenuScale, y + 200 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
+					
+					If MouseOn(x,y,300*MenuScale,220*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"controls")
+					EndIf
 					
 					For i = 0 To 227
 						If KeyHit(i) Then key = i : Exit
@@ -6031,32 +6200,52 @@ Function DrawMenu()
 					EndIf
 					;[End Block]
 				Case 4 ;Advanced
-					;Text(x+210*MenuScale,y,"ADVANCED",True,True)
 					AASetFont Font1
 					;[Block]
 					y = y + 50*MenuScale
 					
+					Color 255,255,255				
+					AAText(x, y, "Show HUD:")	
+					HUDenabled = DrawTick(x + 270 * MenuScale, y + MenuScale, HUDenabled)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"hud")
+					EndIf
+					
+					y = y + 30*MenuScale
+					
 					Color 255,255,255
 					AAText(x, y, "Enable console:")
 					CanOpenConsole = DrawTick(x +270 * MenuScale, y + MenuScale, CanOpenConsole)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"consoleenable")
+					EndIf
 					
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Open console on error:")
 					ConsoleOpening = DrawTick(x + 270 * MenuScale, y + MenuScale, ConsoleOpening)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"consoleerror")
+					EndIf
 					
 					y = y + 50*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Achievement popups:")
 					AchvMSGenabled% = DrawTick(x + 270 * MenuScale, y, AchvMSGenabled%)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"achpopup")
+					EndIf
 					
 					y = y + 50*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Show FPS:")
 					ShowFPS% = DrawTick(x + 270 * MenuScale, y, ShowFPS%)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"showfps")
+					EndIf
 					
 					y = y + 30*MenuScale
 					
@@ -6073,6 +6262,12 @@ Function DrawMenu()
 					Else
 						CurrFrameLimit# = 0.0
 						Framelimit = 0
+					EndIf
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
+					EndIf
+					If MouseOn(x+150*MenuScale,y+30*MenuScale,100*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
 					EndIf
 					
 					y = y + 80*MenuScale
@@ -6104,6 +6299,9 @@ Function DrawMenu()
 						ConsoleFont% = AALoadFont("Blitz", Int(22 * (GraphicHeight / 1024.0)), 0,0,0,1)
 						;ReloadAAFont()
 						AATextEnable_Prev% = AATextEnable
+					EndIf
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"antialiastext")
 					EndIf
 					;[End Block]
 			End Select
@@ -6308,7 +6506,7 @@ Function DrawMenu()
 					CurrSave = ""
 					FlushKeys()
 				EndIf
-				y = y + 80*MenuScale
+				y= y + 80*MenuScale
 			EndIf
 			
 			If KillTimer >= 0 And (Not MainMenuOpen)
@@ -6370,6 +6568,9 @@ Function LoadEntities()
 	CameraFogRange (Camera, CameraFogNear, CameraFogFar)
 	CameraFogColor (Camera, GetINIInt("options.ini", "options", "fog r"), GetINIInt("options.ini", "options", "fog g"), GetINIInt("options.ini", "options", "fog b"))
 	AmbientLight Brightness, Brightness, Brightness
+	If DOF_Enabled
+		DOF.DepthOfField = DOF_Create(Camera,3,0.0)
+	EndIf
 	
 	ScreenTexs[0] = CreateTexture(512, 512, 1+256)
 	ScreenTexs[1] = CreateTexture(512, 512, 1+256)
@@ -7154,6 +7355,11 @@ Function NullGame()
 	
 	For rt.RoomTemplates = Each RoomTemplates
 		rt\obj = 0
+	Next
+	
+	Delete DOF
+	For do.DepthOfField = Each DepthOfField
+		Delete do
 	Next
 	
 	For i = 0 To 5
@@ -8181,7 +8387,7 @@ Function Use294()
 			
 			Input294 = Left(Input294, Min(Len(Input294),15))
 			
-			If temp And Input294 <> "" Then ;dispense
+			If temp And Input294<>"" Then ;dispense
 				Input294 = Trim(Lower(Input294))
 				If Left(Input294, Min(7,Len(Input294))) = "cup of " Then
 					Input294 = Right(Input294, Len(Input294)-7)
@@ -8193,7 +8399,7 @@ Function Use294()
 				
 				If loc > 0 Then
 					strtemp$ = GetINIString2("DATA\SCP-294.ini", loc, "dispensesound")
-					If strtemp = "" Then
+					If strtemp="" Then
 						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\SCP\294\dispense1.ogg"))
 					Else
 						PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound(strtemp))
@@ -8220,6 +8426,7 @@ Function Use294()
 					it.items = CreateItem("Cup", "cup", EntityX(PlayerRoom\Objects[1],True),EntityY(PlayerRoom\Objects[1],True),EntityZ(PlayerRoom\Objects[1],True), r,g,b,alpha)
 					it\name = "Cup of "+Input294
 					EntityType (it\collider, HIT_ITEM)
+					
 				Else
 					;out of range
 					Input294 = "OUT OF RANGE"
@@ -8397,13 +8604,15 @@ Function UpdateInfect()
 					If AnimTime(PlayerRoom\NPC[0]\obj) =< 13 Then PlayerRoom\NPC[0]\State2=0
 				EndIf
 				
-				If Rand(50)=1 Then
-					p.Particles = CreateParticle(EntityX(PlayerRoom\NPC[0]\Collider),EntityY(PlayerRoom\NPC[0]\Collider),EntityZ(PlayerRoom\NPC[0]\Collider), 5, Rnd(0.05,0.1), 0.15, 200)
-					p\speed = 0.01
-					p\SizeChange = 0.01
-					p\A = 0.5
-					p\Achange = -0.01
-					RotateEntity p\pvt, Rnd(360),Rnd(360),0
+				If ParticleAmount>0
+					If Rand(50)=1 Then
+						p.Particles = CreateParticle(EntityX(PlayerRoom\NPC[0]\Collider),EntityY(PlayerRoom\NPC[0]\Collider),EntityZ(PlayerRoom\NPC[0]\Collider), 5, Rnd(0.05,0.1), 0.15, 200)
+						p\speed = 0.01
+						p\SizeChange = 0.01
+						p\A = 0.5
+						p\Achange = -0.01
+						RotateEntity p\pvt, Rnd(360),Rnd(360),0
+					EndIf
 				EndIf
 				
 				PositionEntity Head, EntityX(PlayerRoom\NPC[0]\Collider,True), EntityY(PlayerRoom\NPC[0]\Collider,True)+0.65,EntityZ(PlayerRoom\NPC[0]\Collider,True),True
@@ -9142,24 +9351,26 @@ Function RenderWorld2()
 	IsNVGBlinking% = False
 	HideEntity NVBlink
 	
+	CameraViewport Camera,0,0,GraphicWidth*ResolutionScale,GraphicHeight*ResolutionScale
+	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision = 1) Or (WearingNightVision = 2)
+	If (WearingNightVision=1) Or (WearingNightVision=2)
 		For i% = 0 To MaxItemAmount - 1
-			If (Inventory(i) <> Null) Then
+			If (Inventory(i)<>Null) Then
 				If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
 					Inventory(i)\state = Inventory(i)\state - (FPSfactor * (0.02 * WearingNightVision))
-					power% = Int(Inventory(i)\state)
-					If Inventory(i)\state <= 0.0 Then ;this nvg can't be used
+					power%=Int(Inventory(i)\state)
+					If Inventory(i)\state<=0.0 Then ;this nvg can't be used
 						hasBattery = 0
 						Msg = "The batteries in these night vision goggles died."
 						BlinkTimer = -1.0
 						MsgTimer = 350
 						Exit
-					ElseIf Inventory(i)\state <= 100.0 Then
+					ElseIf Inventory(i)\state<=100.0 Then
 						hasBattery = 1
 					EndIf
-				EndIf
+					EndIf
 			EndIf
 		Next
 		
@@ -9169,6 +9380,15 @@ Function RenderWorld2()
 	Else
 		RenderWorld()
 	EndIf
+	
+	;Still WIP, High and Very High options don't work at the moment (I think i'll remove High and Very High, as they aren't that much worth implementing anyway) - ENDSHN
+	SetBuffer TextureBuffer(fresize_texture)
+	ClsColor 0,0,0 : Cls
+	CopyRect 0,0,GraphicWidth,GraphicHeight,1024-(GraphicWidth*ResolutionScale)/2,1024-(GraphicHeight*ResolutionScale)/2,BackBuffer(),TextureBuffer(fresize_texture)
+	SetBuffer BackBuffer()
+	ClsColor 0,0,0 : Cls
+	Local ratio# = (Float(GraphicWidth)/Float(GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
+	ScaleRender(0,0,2050.0 / Float(GraphicWidth) * (ratio/ResolutionScale), 2050.0 / Float(GraphicWidth) * (ratio/ResolutionScale))
 	
 	If hasBattery=0 And WearingNightVision<>3
 		IsNVGBlinking% = True
@@ -9551,6 +9771,44 @@ Function CatchErrors(location$)
 	EndIf
 End Function
 
+Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,modelPitch#=0,modelYaw#=0,modelRoll#=0,modelscaleX#=1,modelscaleY#=1,modelscaleZ#=1,withfog%=False)
+	Local img% = CreateImage(width,height)
+	Local cam% = CreateCamera()
+	Local model%, camdof.DepthOfField
+	
+	CameraRange cam,0.01,16
+	CameraViewport cam,0,0,width,height
+	If withfog
+		CameraFogMode cam,1
+		CameraFogRange cam,CameraFogNear,CameraFogFar
+	EndIf
+	If DOF_Enabled
+		camdof.DepthOfField = DOF_Create(cam,3,0.0)
+	EndIf
+	
+	If Right(Lower(modelpath$),6)=".rmesh"
+		model = LoadRMesh(modelpath$,Null)
+	Else
+		model = LoadMesh(modelpath$)
+	EndIf
+	ScaleEntity model,modelscaleX,modelscaleY,modelscaleZ
+	PositionEntity model,modelX#,modelY#,modelZ#
+	RotateEntity model,modelPitch#,modelYaw#,modelRoll#
+	
+	;Cls
+	If DOF_Enabled
+		DOF_Update(camdof,width,height)
+	EndIf
+	RenderWorld
+	CopyRect 0,0,width,height,0,0,BackBuffer(),ImageBuffer(img)
+	
+	FreeEntity model
+	If DOF_Enabled
+		DeleteDOF(camdof)
+	EndIf
+	FreeEntity cam
+	Return img%
+End Function
 
 
 

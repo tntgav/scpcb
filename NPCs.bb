@@ -6229,7 +6229,7 @@ Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False
 			
 			;Kill()
 			PlaySound_Strict BullethitSFX
-		ElseIf particles
+		ElseIf particles And ParticleAmount>0
 			pvt = CreatePivot()
 			PositionEntity pvt, EntityX(Collider),(EntityY(Collider)+EntityY(Camera))/2,EntityZ(Collider)
 			PointEntity pvt, p\obj
