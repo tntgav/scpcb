@@ -2650,7 +2650,7 @@ Repeat
 					For e.Events = Each Events
 						If e\EventName = "room860"
 							If e\EventState = 1.0
-					PlayerZone = 5
+								PlayerZone = 5
 								PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 30.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
 							EndIf
 							

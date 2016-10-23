@@ -759,9 +759,9 @@ Function UpdateMainMenu()
 						AAText x + 20 * MenuScale, y, "User track mode:"
 						UserTrackMode = DrawTick(x + 310 * MenuScale, y + MenuScale, UserTrackMode)
 						If UserTrackMode
-							AAText x + 350 * MenuScale, y + 5 * MenuScale, "Repeat"
+							AAText x + 350 * MenuScale, y + MenuScale, "Repeat"
 						Else
-							AAText x + 350 * MenuScale, y + 5 * MenuScale, "Random"
+							AAText x + 350 * MenuScale, y + MenuScale, "Random"
 						EndIf
 						If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 							DrawOptionsTooltip(tx,ty,tw,th,"usertrackmode")
@@ -793,7 +793,7 @@ Function UpdateMainMenu()
 							DrawOptionsTooltip(tx,ty,tw,th,"usertrackscan")
 						EndIf
 						If UserTrackCheck%>0
-							AAText x + 180 * MenuScale, y + 30 * MenuScale, "User tracks found ("+UserTrackCheck2+"/"+UserTrackCheck+" successfully loaded)"
+							AAText x + 20 * MenuScale, y + 100 * MenuScale, "User tracks found ("+UserTrackCheck2+"/"+UserTrackCheck+" successfully loaded)"
 						EndIf
 					Else
 						UserTrackCheck%=0
@@ -1839,140 +1839,123 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 		;Graphic options
 			;[Block]
 		Case "bump"
-			txt = Chr(34)+"Bump-mapping"+Chr(34)+" is used to give proper models and textures a better quality by giving the illusion of e.g. carvings."
-			txt2 = "Due to the removal of FastExtension in 1.3.1 the game doesn't support this feature at the moment."
+			txt = Chr(34)+"Bump mapping"+Chr(34)+" is used to simulate details on textures through the use of lighting calculations."
+			txt2 = "Due to the removal of FastExtension in version 1.3.1 the feature is no longer available."
 			R = 255
 		Case "vsync"
-			txt = Chr(34)+"VSync"+Chr(34)+" is used to check and correct each frame before displaying. This might cause lag for some PCs."
+			txt = Chr(34)+"Vertical sync"+Chr(34)+" waits for the display to finish its current refresh cycle before calculating the next frame, preventing issues such as "
+			txt = txt + "screen tearing. This ties the game's frame rate to your display's refresh rate and may cause some input lag."
 		Case "antialias"
-			txt = Chr(34)+"Anti-aliasing"+Chr(34)+" is used to smooth the rendered image before displaying."
-			If Fullscreen
-				G = 255
-				txt2 = "Fullscreen is enabled, so this feature is available."
-			Else
-				R = 255
-				txt2 = "Fullscreen mode is deactivated, so this feature won't have any effect at the moment."
-			EndIf
+			txt = Chr(34)+"Anti-Aliasing"+Chr(34)+" is used to smooth the rendered image before displaying in order to reduce aliasing around the edges of models."
+			txt2 = "This option only takes effect in fullscreen."
+			R = 255
 		Case "roomlights"
-			txt = "Enables/Disables the lens effect for the lights. This effect shows a lens effect on each lamp. However, due to the amount of calculations a PC has to do, "
-			txt = txt + "it is recommended to deactivate this if you get severe slowdowns."
+			txt = "Toggles the artificial lens flare effect generated over specific light sources."
 		Case "gamma"
-			txt = Chr(34)+"Screen gamma"+Chr(34)+" adjusts the brightness of the screen. The use of it is to achieve a good brightness factor so that it will be adjusted with "
-			txt = txt + "the monitor's brightness. Too high/low gamma can cause the graphics to look more undetailed."
+			txt = Chr(34)+"Gamma correction"+Chr(34)+" is used to achieve a good brightness factor to balance out your display's gamma if the game appears either too dark or bright. "
+			txt = txt + "Setting it too high or low can cause the graphics to look less detailed."
 		Case "texquality"
-			txt = Chr(34)+"Texture quality"+Chr(34)+" determines with how many details the textures will be rendered in-game."
+			txt = Chr(34)+"Texture quality"+Chr(34)+" smooths out the rendering of textures at extreme angles, making them appear less warped."
 		Case "dof"
-			txt = Chr(34)+"Depth of field"+Chr(34)+" is used to give the illusion of a realistic rendering camera. The texture size parameter determines with how many details in "
-			txt = txt + "pixels the DOF layer should render (16 is minimum and 4096 is maximum)."
-			txt2 = txt2 + "This option cannot be changed in-game."
+			txt = Chr(34)+"Depth of field"+Chr(34)+" blurs both close and distant objects, creating the illusion of depth. The texture size parameter determines how much detail in terms "
+			txt = txt + "of pixels the DOF layer should render (16 is the minimum, 4096 is the maximum)."
+			txt2 = "This option cannot be changed in-game."
 			R = 255
 			If (Not ingame) Then usetestimg% = True
 		Case "resquality"
-			txt = Chr(34)+"Resolution quality"+Chr(34)+" is used to adjust with how much quality the 3D scene will render."
-			txt2 = "Resolution details will be rendered with "
+			txt = Chr(34)+"Resolution quality"+Chr(34)+" adjusts the resolution at which the game will render."
+			txt2 = "The game will render at "
 			Select value
 				Case 0
 					R = 255
-					txt2 = txt2 + "33% details."
+					txt2 = txt2 + "33% "
 				Case 1
-					R = 255
-					txt2 = txt2 + "50% details."
-				Case 2
 					B = 255
 					R = 100
 					G = 100
-					txt2 = txt2 + "100% details (default)."
+					txt2 = txt2 + "50% "
+				Case 2
+					G = 255
+					txt2 = txt2 + "100% (default) "
 				Case 3
 					G = 255
-					txt2 = txt2 + "133% details."
+					txt2 = txt2 + "133% "
 				Case 4
 					G = 255
-					txt2 = txt2 + "150% details."
+					txt2 = txt2 + "150% "
 			End Select
+			txt2 = txt2 + "of the current resolution."
 		Case "particleamount"
-			txt = Chr(34)+"Particle amount"+Chr(34)+" determines how many particles will be spawned per tick and what particles will be generated."
+			txt = "Determines the amount of particles that can be rendered per tick."
 			Select value
 				Case 0
 					R = 255
-					txt2 = "Only smoke emitters produce particles and with only a few of them per tick. This is only recommended for slower PCs."
+					txt2 = "Only smoke emitters will produce particles."
 				Case 1
 					R = 255
 					G = 255
-					txt2 = "Only smoke emitters and some other particles will be rendered and less particles than usual will be generated per tick."
+					txt2 = "Only a few particles will be rendered per tick."
 				Case 2
 					G = 255
-					txt2 = "Full amount of particle effects. This is recommended."
+					txt2 = "All particles are rendered."
 			End Select
 			;[End Block]
 		;Sound options
 			;[Block]
 		Case "musicvol"
-			txt = "Sets the background music volume. 0% is mimimum and would mute the music entirely while 100% is the maximum."
+			txt = "Adjusts the volume of background music. Sliding the bar fully to the left will mute all music."
 		Case "soundvol"
-			txt = "Sets the in-game sound volume. 0% is mimimum and would mute the sound entirely while 100% is the maximum."
+			txt = "Adjusts the volume of sound effects. Sliding the bar fully to the left will mute all sounds."
 		Case "sfxautorelease"
-			txt = Chr(34)+"Sound auto-realease"+Chr(34)+" is used to determine if the in-game sounds will be loaded and released automatically or if all sounds will be loaded once. "
-			txt = txt + "When activated, it will only load sounds when the game needs to play them and after a sound has been played, it will be kept in memory for 5 seconds. If the "
-			txt = txt + "sound won't be used again during that time, it will be deleted from the memory. However, this migth cause some lag during in-game sessions. If this option is "
-			txt = txt + "deactivated, then the sounds will be loaded only once (some sounds will still be loaded during in-game, but most of them are already pre-loaded). However, this "
-			txt = txt + "can cause some RAM issues after a specific amount of gameplay thus, it is not recommended."
+			txt = Chr(34)+"Sound auto-release"+Chr(34)+" will free a sound from memory if it not used after 5 seconds. Prevents memory allocation issues."
 			R = 255
-			txt2 = "This option cannot be changed during an in-game session."
+			txt2 = "This option cannot be changed in-game."
 		Case "usertrack"
-			txt = "Enables/Disables the ability to play custom tracks over the radio on channel 1. User tracks is an easy way to implement your own music into the game."
+			txt = "Toggles the ability to play custom tracks over channel 1 of the radio. These tracks are loaded from the " + Chr(34) + "SFX\Radio\UserTracks\" + Chr(34)
+			txt = txt + " directory. Press " + Chr(34) + "1" + Chr(34) + " when the radio is selected to change track."
 			R = 255
-			txt2 = "This option cannot be changed during an in-game session."
+			txt2 = "This option cannot be changed in-game."
 		Case "usertrackmode"
-			txt = "Sets the playing mode for the custom tracks. The mode "+Chr(34)+"Repeat"+Chr(34)+" means that every sound file that has been found in the user track folder will "
-			txt = txt + "be played in alphabetic order. The mode "+Chr(34)+"Random"+Chr(34)+" means that the user tracks will be picked by random after each track."
+			txt = "Sets the playing mode for the custom tracks. "+Chr(34)+"Repeat"+Chr(34)+" plays every file in alphabetical order. "+Chr(34)+"Random"+Chr(34)+" chooses the "
+			txt = txt + "next track at random."
+			R = 255
 			G = 255
-			R = 200
-			B = 200
-			txt2 = "Little tip: You can manually switch the track by pressing "+Chr(34)+"1"+Chr(34)+". However, the track still changes depending on the mode."
+			txt2 = "Note that the random mode does not prevent the same track from playing frequently."
 		Case "usertrackscan"
-			txt = "Scans how many user tracks had been found and how many have been scanned successfully. The scanning folder for user tracks is "
-			txt = txt + Chr(34)+"SFX\Radio\UserTracks\"+Chr(34)+"."
+			txt = "Re-checks the user tracks directory for any new or removed sound files."
 			;[End Block]
 		;Control options	
 			;[Block]
 		Case "mousesensitivity"
-			txt = "Determines how fast/slow the mouse is supposed to rotate."
+			txt = "Adjusts the speed of the mouse pointer."
 		Case "mouseinvert"
-			txt = Chr(34)+"Invert mouse Y-axis"+Chr(34)+" is used to invert the mouse input detection on the Y-axis (looking up and down). Usually, it is recommended for left-handed "
-			txt = txt + "people, but is generally for people who like to have the mouse Y-axis inverted."
+			txt = Chr(34)+"Invert mouse Y-axis"+Chr(34)+" is self-explanatory."
 		Case "controls"
-			txt = "Configurates the in-game controls."
+			txt = "Configure the in-game control scheme."
 			;[End Block]
 		;Advanced options	
 			;[Block]
+		Case "hud"
+			txt = "Display the blink and stamina meters."
 		Case "consoleenable"
-			txt = "Enables/Disables the developer console."
+			txt = "Toggles the use of the developer console. Can be used in-game by pressing " + KeyName(KEY_CONSOLE) + "."
+			R = 255
+			txt2 = "Enabling this will trigger Vane Brain."
 		Case "consoleerror"
-			txt = Chr(34)+"Open console on error"+Chr(34)+" is used to determine if the console should open when an error occurs or not."
+			txt = Chr(34)+"Open console on error"+Chr(34)+" is self-explanatory."
 		Case "achpopup"
-			txt = "Enables/Disables the message displaying when getting an achievement. Usually it would be the best to have it enabled, so that you know that you got an achievement "
-			txt = txt + "or not."
+			txt = "Displays a pop-up notification when an achievement is unlocked."
 		Case "showfps"
-			txt = Chr(34)+"Show FPS"+Chr(34)+" determines if the FPS (frames per second) should be displayed at the top left-hand corner. This is useful for people to know how many "
-			txt = txt + "FPS they get in e.g. a specific part of the game or such."
+			txt = "Displays the frames per second counter at the top left-hand corner."
 		Case "framelimit"
-			txt = "Sets the maximum amount of FPS (frames per second). This option is useful in order to not overload the computer or in order to save some energy."
-			If value > 0 And value < 30
-				R = 255
-				txt2 = "A framelimit below 30 can cause the game to lag more heavily and to slow the updating tick-speed down which causes the game to render slower than usual."
-			ElseIf value >= 30
-				G = 255
-				txt2 = "A framelimit with 30 or more should be a better option, as the updating tick-speed won't slow down."
-			Else
+			txt = "Limits the frame rate that the game can run at to a desired value."
+			If value > 0 And value < 60
 				R = 255
 				G = 255
-				B = 255
-				txt2 = "No framelimit is set at the moment."
+				txt2 = "Usually, 60 FPS or higher is preferred. If you are noticing excessive stuttering at this setting, try lowering it to make your framerate more consistent."
 			EndIf
 		Case "antialiastext"
-			txt = Chr(34)+"Antialiased text"+Chr(34)+" is used to smooth the text before displaying. It is an alternative since version 1.3.1 as FastText was removed in that version."
-		Case "hud"
-			txt = "Enables/Disables the HUD (Heads-up display) in-game. If disabled, it gives a more realistic feeling, but it makes the game more difficult."
+			txt = Chr(34)+"Antialiased text"+Chr(34)+" smooths out the text before displaying. Makes text easier to read at high resolutions."
 			;[End Block]
 	End Select
 	
