@@ -7765,18 +7765,13 @@ Function UpdateMapProps()
 	
 	For mpr.MapProps = Each MapProps
 		If mpr\obj<>0
-			If PropFading
-				If EntityDistance(mpr\obj,Camera)>8.0
-					HideEntity mpr\obj
-				Else
-					ShowEntity mpr\obj
-				EndIf
+			If EntityDistance(mpr\obj,Camera)>8.0
+				HideEntity mpr\obj
 			Else
 				ShowEntity mpr\obj
 			EndIf
 		EndIf
 	Next
-	
 End Function
 
 

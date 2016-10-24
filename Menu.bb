@@ -1846,12 +1846,7 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 					txt2 = "All particles are rendered."
 			End Select
 		Case "propfading"
-			txt = Chr(34)+"Prop fading"+Chr(34)+" is used to determine if the map props should only be rendered within a specific distance or not. The fade distance is within the "
-			txt = txt + "range of the camera fog, but it might happen that you can see that effect in certain areas (if the fog goes further because of the amount of lights)."
-			txt2 = "This option isn't a perfect solution, as it's purpose is to just hide/show the props within a specific distance and is only for the case that the amount of "
-			txt2 = txt2 + "rendered objects at once is too high."
-			R = 255
-			G = 100
+			txt = "Hides props in the world when the player gets too far from them."
 			;[End Block]
 		;Sound options
 			;[Block]
@@ -1873,7 +1868,7 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			txt = txt + "next track at random."
 			R = 255
 			G = 255
-			txt2 = "Note that the random mode does not prevent the same track from playing frequently."
+			txt2 = "Note that the random mode does not prevent previously played tracks from repeating."
 		Case "usertrackscan"
 			txt = "Re-checks the user tracks directory for any new or removed sound files."
 			;[End Block]

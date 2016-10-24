@@ -2718,7 +2718,7 @@ Repeat
 			UpdateRoomLights(Camera)
 			TimeCheckpointMonitors()
 			UpdateLeave1499()
-			UpdateMapProps()
+			If (PropFading) Then UpdateMapProps()
 		EndIf
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
