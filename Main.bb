@@ -5014,9 +5014,9 @@ Function DrawGUI()
 						DeathMSG = GetINIString2(iniStr, loc, "deathmessage")
 						Kill()
 					EndIf
-					BlurTimer = GetINIInt2(iniStr, loc, "blur")*70*temp
-					Injuries = Injuries + GetINIInt2(iniStr, loc, "damage")*temp
-					Bloodloss = Bloodloss + GetINIInt2(iniStr, loc, "blood loss")*temp
+					BlurTimer = GetINIInt2(iniStr, loc, "blur")*70;*temp
+					Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
+					Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"),0);*temp
 					strtemp =  GetINIString2(iniStr, loc, "sound")
 					If strtemp<>"" Then
 						PlaySound_Strict LoadTempSound(strtemp)
