@@ -1664,14 +1664,6 @@ Global room2gw_brokendoor% = False
 Global room2gw_x# = 0.0
 Global room2gw_z# = 0.0
 
-Include "DepthOfField.bb"
-Global DOF_Enabled% = GetINIInt(OptionFile,"options","dof")
-Global DOF.DepthOfField
-
-Global DOF_TexSize% = GetINIInt(OptionFile,"options","dof texture size")
-Global DOF_TexSizeValue = 0
-DOF_TexSizeValue = 2^(4+DOF_TexSizeValue)
-
 Global Menu_TestIMG
 Global menuroomscale# = 8.0 / 2048.0
 ;Menu_TestIMG = Create3DIcon(200,200,"GFX\map\room3z3_opt.rmesh",0,-0.75,1,0,0,0,menuroomscale#,menuroomscale#,menuroomscale#,DOF_Enabled,True)
@@ -1696,6 +1688,7 @@ Select ResolutionDetails
 End Select
 
 Global ParticleAmount% = GetINIInt(OptionFile,"options","particle amount")
+Global PropFading% = GetINIInt(OptionFile,"options","prop fading")
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2725,13 +2718,11 @@ Repeat
 			UpdateRoomLights(Camera)
 			TimeCheckpointMonitors()
 			UpdateLeave1499()
+			UpdateMapProps()
 		EndIf
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		
-		If DOF_Enabled
-			DOF_Update(DOF)
-		EndIf
 		UpdateWorld()
 		ManipulateNPCBones()
 		RenderWorld2()
@@ -5815,6 +5806,10 @@ Function DrawMenu()
 		x = x+132*MenuScale
 		y = y+122*MenuScale	
 		
+		If (Not MouseDown1)
+			OnSliderID = 0
+		EndIf
+		
 		If AchievementsMenu > 0 Then
 			AASetFont Font2
 			AAText(x, y-(122-45)*MenuScale, "ACHIEVEMENTS",False,True)
@@ -5868,16 +5863,15 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
+				PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
+				PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
+				PutINIValue(OptionFile, "options", "prop fading",PropFading)
 				
 				PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 				PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
 				PutINIValue(OptionFile, "audio", "sfx release", EnableSFXRelease)
 				PutINIValue(OptionFile, "audio", "enable user tracks", EnableUserTracks%)
 				PutINIValue(OptionFile, "audio", "user track setting", UserTrackMode%)
-				PutINIValue(OptionFile, "options", "dof", DOF_Enabled)
-				PutINIValue(OptionFile, "options", "dof texture size",DOF_TexSize)
-				PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
-				PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
 				
 				PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
 				PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
@@ -5925,7 +5919,7 @@ Function DrawMenu()
 					Color 100,100,100				
 					AAText(x, y, "Enable bump mapping:")	
 					DrawTick(x + 270 * MenuScale, y + MenuScale, False, True)
-					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
+					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"bump")
 					EndIf
 					
@@ -5934,7 +5928,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "VSync:")
 					Vsync% = DrawTick(x + 270 * MenuScale, y + MenuScale, Vsync%)
-					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"vsync")
 					EndIf
 					
@@ -5943,7 +5937,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Anti-aliasing:")
 					Opt_AntiAlias = DrawTick(x + 270 * MenuScale, y + MenuScale, Opt_AntiAlias%)
-					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"antialias")
 					EndIf
 					
@@ -5952,7 +5946,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Enable room lights:")
 					EnableRoomLights = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableRoomLights)
-					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"roomlights")
 					EndIf
 					
@@ -5961,7 +5955,7 @@ Function DrawMenu()
 					ScreenGamma = (SlideBar(x + 270*MenuScale, y+6*MenuScale, 100*MenuScale, ScreenGamma*50.0)/50.0)
 					Color 255,255,255
 					AAText(x, y, "Screen gamma")
-					If MouseOn(x+270*MenuScale,y+6*MenuScale,100*MenuScale,20)
+					If MouseOn(x+270*MenuScale,y+6*MenuScale,100*MenuScale+14,20) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
 					EndIf
 					
@@ -5969,106 +5963,36 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, "Resolution quality:")
-					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If ResolutionDetails < 4
-								ResolutionDetails = ResolutionDetails + 1
-							Else
-								ResolutionDetails = 0
-							EndIf
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
+					ResolutionDetails = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","STANDARD")
 					Color 255,255,255
 					Select ResolutionDetails
 						Case 0
-							AAText(x + 300 * MenuScale, y + MenuScale, "LOW")
 							ResolutionScale = 0.33
 						Case 1
-							AAText(x + 300 * MenuScale, y + MenuScale, "MEDIUM")
 							ResolutionScale = 0.5
 						Case 2
-							AAText(x + 300 * MenuScale, y + MenuScale, "STANDARD")
 							ResolutionScale = 1.0
-						Case 3
-							AAText(x + 300 * MenuScale, y + MenuScale, "HIGH")
-							ResolutionScale = 1.33
-						Case 4
-							AAText(x + 300 * MenuScale, y + MenuScale, "VERY HIGH")
-							ResolutionScale = 1.5
 					End Select
-					If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+					If (MouseOn(x + 270 * MenuScale, y-6*MenuScale, 100*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=1
 						DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
 					EndIf
 					
-					y=y+30*MenuScale
+					y=y+50*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "Particle amount:")
-					DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If ParticleAmount < 2
-								ParticleAmount = ParticleAmount + 1
-							Else
-								ParticleAmount = 0
-							EndIf
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
-					Color 255,255,255
-					Select ParticleAmount
-						Case 0
-							AAText(x + 300 * MenuScale, y + MenuScale, "ALMOST NONE")
-						Case 1
-							AAText(x + 300 * MenuScale, y + MenuScale, "FEW")
-						Case 2
-							AAText(x + 300 * MenuScale, y + MenuScale, "ALL")
-					End Select
-					If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+					ParticleAmount = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ParticleAmount,2,"ALMOST NONE","FEW","ALL")
+					If (MouseOn(x + 270 * MenuScale, y-6*MenuScale, 100*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
 					EndIf
 					
-					y=y+30*MenuScale
+					y=y+50*MenuScale
 					
-					Local prevDOF_Enabled = DOF_Enabled
-					Color 100,100,100
-					AAText(x, y, "Depth of field:")
-					DOF_Enabled = DrawTick(x + 270 * MenuScale, y + MenuScale, DOF_Enabled, True)
-					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
-						;If (prevDOF_Enabled <> DOF_Enabled) Or (CurrMenu_TestIMG <> "dof")
-						;	ChangeMenu_TestIMG("dof")
-						;EndIf
-						DrawOptionsTooltip(tx,ty,tw,th,"dof",0,True)
-					EndIf
-					
-					y=y+30*MenuScale
-					
-					Local prevDOF_TexSize = DOF_TexSize
-					If DOF_Enabled
-						Color 100,100,100
-						AAText(x, y, "DOF Texture quality:")
-						DrawImage ArrowIMG(1),x + 270 * MenuScale, y-4*MenuScale
-						;If MouseHit1
-						;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-						;		If DOF_TexSize% < 8
-						;			DOF_TexSize% = DOF_TexSize% + 1
-						;		Else
-						;			DOF_TexSize% = 0
-						;		EndIf
-						;		PlaySound_Strict(ButtonSFX)
-						;	EndIf
-						;EndIf
-						Color 100,100,100
-						DOF_TexSizeValue = 2^(4+DOF_TexSize)
-						AAText(x + 300 * MenuScale, y + MenuScale, DOF_TexSizeValue)
-						If MouseOn(x + 270 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
-							;If (prevDOF_TexSize <> DOF_TexSize) Or (CurrMenu_TestIMG <> "dof")
-							;	ChangeMenu_TestIMG("dof")
-							;EndIf
-							DrawOptionsTooltip(tx,ty,tw,th,"dof",0,True)
-						EndIf
+					Color 255,255,255
+					AAText(x, y, "Enable prop fading:")
+					PropFading = DrawTick(x + 270 * MenuScale, y + MenuScale, PropFading)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
 					EndIf
 					;[End Block]
 				Case 2 ;Audio
@@ -6079,7 +6003,7 @@ Function DrawMenu()
 					MusicVolume = (SlideBar(x + 250*MenuScale, y-4*MenuScale, 100*MenuScale, MusicVolume*100.0)/100.0)
 					Color 255,255,255
 					AAText(x, y, "Music volume:")
-					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale,20)
+					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
 						DrawOptionsTooltip(tx,ty,tw,th,"musicvol")
 					EndIf
 					
@@ -6089,7 +6013,7 @@ Function DrawMenu()
 					If (Not DeafPlayer) Then SFXVolume# = PrevSFXVolume#
 					Color 255,255,255
 					AAText(x, y, "Sound volume:")
-					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale,20)
+					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
 						DrawOptionsTooltip(tx,ty,tw,th,"soundvol")
 					EndIf
 					
@@ -6579,9 +6503,6 @@ Function LoadEntities()
 	CameraFogRange (Camera, CameraFogNear, CameraFogFar)
 	CameraFogColor (Camera, GetINIInt("options.ini", "options", "fog r"), GetINIInt("options.ini", "options", "fog g"), GetINIInt("options.ini", "options", "fog b"))
 	AmbientLight Brightness, Brightness, Brightness
-	If DOF_Enabled
-		DOF.DepthOfField = DOF_Create(Camera,3,0.0)
-	EndIf
 	
 	ScreenTexs[0] = CreateTexture(512, 512, 1+256)
 	ScreenTexs[1] = CreateTexture(512, 512, 1+256)
@@ -7000,6 +6921,11 @@ Function InitNewGame()
 		
 	Next
 	
+	Local tmpr.TempMapProps
+	For tmpr.TempMapProps = Each TempMapProps
+		Delete tmpr
+	Next
+	
 	Local rt.RoomTemplates
 	For rt.RoomTemplates = Each RoomTemplates
 		FreeEntity (rt\obj)
@@ -7368,9 +7294,8 @@ Function NullGame()
 		rt\obj = 0
 	Next
 	
-	Delete DOF
-	For do.DepthOfField = Each DepthOfField
-		Delete do
+	For mpr.MapProps = Each MapProps
+		Delete mpr
 	Next
 	
 	For i = 0 To 5
@@ -9392,7 +9317,7 @@ Function RenderWorld2()
 		RenderWorld()
 	EndIf
 	
-	;Still WIP, High and Very High options don't work at the moment (I think i'll remove High and Very High, as they aren't that much worth implementing anyway) - ENDSHN
+	;Removed High and Very High settings - ENDSHN
 	SetBuffer TextureBuffer(fresize_texture)
 	ClsColor 0,0,0 : Cls
 	CopyRect 0,0,GraphicWidth,GraphicHeight,1024-(GraphicWidth*ResolutionScale)/2,1024-(GraphicHeight*ResolutionScale)/2,BackBuffer(),TextureBuffer(fresize_texture)
@@ -9785,16 +9710,13 @@ End Function
 Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,modelPitch#=0,modelYaw#=0,modelRoll#=0,modelscaleX#=1,modelscaleY#=1,modelscaleZ#=1,withfog%=False)
 	Local img% = CreateImage(width,height)
 	Local cam% = CreateCamera()
-	Local model%, camdof.DepthOfField
+	Local model%
 	
 	CameraRange cam,0.01,16
 	CameraViewport cam,0,0,width,height
 	If withfog
 		CameraFogMode cam,1
 		CameraFogRange cam,CameraFogNear,CameraFogFar
-	EndIf
-	If DOF_Enabled
-		camdof.DepthOfField = DOF_Create(cam,3,0.0)
 	EndIf
 	
 	If Right(Lower(modelpath$),6)=".rmesh"
@@ -9807,16 +9729,10 @@ Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,mo
 	RotateEntity model,modelPitch#,modelYaw#,modelRoll#
 	
 	;Cls
-	If DOF_Enabled
-		DOF_Update(camdof,width,height)
-	EndIf
 	RenderWorld
 	CopyRect 0,0,width,height,0,0,BackBuffer(),ImageBuffer(img)
 	
 	FreeEntity model
-	If DOF_Enabled
-		DeleteDOF(camdof)
-	EndIf
 	FreeEntity cam
 	Return img%
 End Function
