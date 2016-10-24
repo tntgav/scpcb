@@ -1149,28 +1149,39 @@ Function UpdateConsole()
 						EndIf
 					Next
 					
-				Case "unlockexits", "toggle_079_deal"
+				Case "unlockexits"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
 						Case "a"
 							For e.Events = Each Events
-								If e\EventName="gateaentrance" Then
-									e\EventState3 = (Not e\EventState3)
+								If e\EventName = "gateaentrance" Then
+									e\EventState3 = 1
+									e\room\RoomDoors[1]\open = True
 									Exit
 								EndIf
 							Next
+							CreateConsoleMsg("Gate A is now unlocked.")	
 						Case "b"
 							For e.Events = Each Events
-								If e\EventName="exit1" Then
-									e\EventState3 = (Not e\EventState3)
+								If e\EventName = "exit1" Then
+									e\EventState3 = 1
+									e\room\RoomDoors[4]\open = True
 									Exit
 								EndIf
 							Next	
+							CreateConsoleMsg("Gate B is now unlocked.")	
 						Default
 							For e.Events = Each Events
-								If e\EventName = "exit1" Or e\EventName = "gateaentrance" Then e\EventState3 = (Not e\EventState3)
+								If e\EventName = "gateaentrance" Then
+									e\EventState3 = 1
+									e\room\RoomDoors[1]\open = True
+								ElseIf e\EventName = "exit1" Then
+									e\EventState3 = 1
+									e\room\RoomDoors[4]\open = True
+								EndIf
 							Next
+							CreateConsoleMsg("Gate A and B are now unlocked.")	
 					End Select
 
 					RemoteDoorOn = True
@@ -2643,7 +2654,7 @@ Repeat
 					For e.Events = Each Events
 						If e\EventName = "room860"
 							If e\EventState = 1.0
-					PlayerZone = 5
+								PlayerZone = 5
 								PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 30.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
 							EndIf
 							
@@ -2707,7 +2718,7 @@ Repeat
 			UpdateRoomLights(Camera)
 			TimeCheckpointMonitors()
 			UpdateLeave1499()
-			UpdateMapProps()
+			If (PropFading) Then UpdateMapProps()
 		EndIf
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
@@ -4703,6 +4714,32 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
+					
+				Case "1123"
+					If Not (Wearing714 = 1) Then
+						If PlayerRoom\RoomTemplate\Name <> "room1123" Then
+							ShowEntity Light
+							LightFlash = 7
+							PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))		
+							DeathMSG = "Subject D-9341 was shot dead after attempting to attack a member of Nine-Tailed Fox. Surveillance tapes show that the subject had been "
+							DeathMSG = DeathMSG + "wandering around the site approximately 9 minutes prior shouting the phrase " + Chr(34) + "get rid of the four pests" + Chr(34)
+							DeathMSG = DeathMSG + " in chinese. SCP-1123 was found in [REDACTED] nearby, suggesting the subject had come into physical contact with it. How "
+							DeathMSG = DeathMSG + "exactly SCP-1123 was removed from its containment chamber is still unknown."
+							Kill()
+							Return
+						EndIf
+						For e.Events = Each Events
+							If e\EventName = "room1123" Then 
+								If e\EventState = 0 Then
+									ShowEntity Light
+									LightFlash = 3
+									PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))											
+								EndIf
+								e\EventState = Max(1, e\EventState)
+								Exit
+							EndIf
+						Next
+					EndIf
 					
 				Case "battery"
 					;InvOpen = True

@@ -1530,13 +1530,15 @@ Function UpdateEvents()
 						For sc.SecurityCams = Each SecurityCams
 							If (Not sc\SpecialCam)
 								If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" Then sc\CoffinEffect = 2
+								If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 3)
 								If sc\room = e\room Then sc\Screen = True
 							EndIf
 						Next
 					Else
 						For sc.SecurityCams = Each SecurityCams
 							If (Not sc\SpecialCam)
-								If sc\CoffinEffect<>1 Then sc\CoffinEffect = 0
+								If sc\CoffinEffect <> 1 Then sc\CoffinEffect = 0
+								If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 0)
 								If sc\room = e\room Then sc\Screen = False
 							EndIf
 						Next
@@ -1665,6 +1667,7 @@ Function UpdateEvents()
 							Next
 
 							CameraFogMode(Camera, 0)
+							SecondaryLightOn = True
 							
 							Music(5) = LoadSound_Strict("SFX\Music\GateB1.ogg")
 							DrawLoading(60,True)
@@ -2113,6 +2116,7 @@ Function UpdateEvents()
 						Next
 
 						CameraFogMode(Camera, 0)
+						SecondaryLightOn = True
 						
 						HideDistance = 35.0
 						
