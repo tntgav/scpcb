@@ -2642,7 +2642,7 @@ Function UpdateNPCs()
 					Else
 						dist = EntityDistance(Collider, n\Collider)
 						
-						;use the prev-values to do a "twitching" effect"
+						;use the prev-values to do a "twitching" effect
 						n\PrevX = CurveValue(0.0, n\PrevX, 10.0)
 						n\PrevZ = CurveValue(0.0, n\PrevZ, 10.0)
 						
@@ -2916,7 +2916,11 @@ Function UpdateNPCs()
 												If WrapAngle(EntityYaw(pvt)-EntityYaw(n\Collider))<10 Then
 													PlaySound2(Gunshot2SFX, Camera, n\Collider, 20)
 													
-													DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate B."+Chr(34)
+													If PlayerRoom\RoomTemplate\Name = "exit1" Then
+														DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate B."+Chr(34)
+													Else
+														DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate A."+Chr(34)
+													EndIf
 													
 													Shoot( EntityX(pvt),EntityY(pvt), EntityZ(pvt),((10/dist)*(1/dist))*(n\State=2),(n\State=2))
 													

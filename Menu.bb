@@ -239,9 +239,8 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-					PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
-					PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
-					PutINIValue(OptionFile, "options", "prop fading",PropFading)
+					PutINIValue(OptionFile, "options", "res details", ResolutionDetails)
+					PutINIValue(OptionFile, "options", "particle amount", ParticleAmount)
 					
 					PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 					PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
@@ -624,18 +623,9 @@ Function UpdateMainMenu()
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Particle amount:")
-					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"ALMOST NONE","FEW","ALL")
+					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"DECREASED","MINIMAL","ALL")
 					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
-					EndIf
-					
-					y=y+50*MenuScale
-					
-						Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Enable prop fading:")
-					PropFading = DrawTick(x + 310 * MenuScale, y + MenuScale, PropFading)
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
-						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
 					EndIf
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
@@ -1845,8 +1835,6 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 					G = 255
 					txt2 = "All particles are rendered."
 			End Select
-		Case "propfading"
-			txt = "Hides props in the world when the player gets too far from them."
 			;[End Block]
 		;Sound options
 			;[Block]
