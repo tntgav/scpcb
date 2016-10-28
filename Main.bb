@@ -583,8 +583,7 @@ Function UpdateConsole()
 						Case "2"
 							CreateConsoleMsg("LIST OF COMMANDS - PAGE 2/3")
 							CreateConsoleMsg("******************************")
-							CreateConsoleMsg("- spawn513-1")
-							CreateConsoleMsg("- spawn106")
+							CreateConsoleMsg("- spawn [npc type] [state]")
 							CreateConsoleMsg("- reset096")
 							CreateConsoleMsg("- disable173")
 							CreateConsoleMsg("- enable173")
@@ -601,15 +600,13 @@ Function UpdateConsole()
 							CreateConsoleMsg("- debughud")
 							CreateConsoleMsg("- camerafog [near] [far]")
 							CreateConsoleMsg("- gamma [value]")
+							CreateConsoleMsg("- infinitestamina")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Use "+Chr(34)+"help [command name]"+Chr(34)+" to get more information about a command.")
 							CreateConsoleMsg("******************************")
 						Case "3"
-							CreateConsoleMsg("- spawn [npc type]")
-							CreateConsoleMsg("- infinitestamina")
 							CreateConsoleMsg("- playmusic [clip + .wav/.ogg]")
 							CreateConsoleMsg("- notarget")
-							CreateConsoleMsg("- spawnnpcstate [npc type] [state]")
 							CreateConsoleMsg("- unlockexits")
 						Case "asd"
 							CreateConsoleMsg("HELP - asd")
@@ -897,13 +894,6 @@ Function UpdateConsole()
 					CreateConsoleMsg("Idle: " + Curr106\Idle)
 					CreateConsoleMsg("State: " + Curr106\State)
 
-				Case "spawn513-1"
-					CreateNPC(NPCtype5131, 0,0,0)
-
-				Case "spawn106"
-					Curr106\State = -1
-					PositionEntity Curr106\Collider, EntityX(Collider), EntityY(Curr106\Collider), EntityZ(Collider)
-
 				Case "reset096"
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
@@ -1105,8 +1095,10 @@ Function UpdateConsole()
 					CreateConsoleMsg("Gamma set to " + ScreenGamma)
 
 				Case "spawn"
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					Console_SpawnNPC(StrTemp$)
+					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					StrTemp$ = Piece$(args$,1," ")
+					StrTemp2$ = Piece$(args$,2," ")
+					Console_SpawnNPC(StrTemp$,Int(StrTemp2$))
 
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
 				Case "infinitestamina","infstam"
@@ -1134,12 +1126,6 @@ Function UpdateConsole()
 					Curr106\Idle = True
 					Curr106\State = 200000
 					Contained106 = True
-
-				Case "spawnnpcstate"
-					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					StrTemp$ = Piece$(args$,1," ")
-					StrTemp2$ = Piece$(args$,2," ")
-					Console_SpawnNPC(StrTemp$,Int(StrTemp2$))
 
 				Case "toggle_warhead_lever"
 					For e.Events = Each Events
@@ -2807,9 +2793,7 @@ Repeat
 			
 			If (Not WearingNightVision) Then darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
 			
-			If KillTimer >= 0 Then
-				
-			Else
+			If KillTimer < 0 Then
 				InvOpen = False
 				SelectedItem = Null
 				SelectedScreen = Null
@@ -2848,7 +2832,7 @@ Repeat
 		Else
 			HideEntity Light
 			;EntityAlpha(Light, LightFlash)
-		End If
+		EndIf
 		
 		EntityColor Light,255,255,255
 		
@@ -8380,7 +8364,7 @@ Function Use294()
 		EndIf
 		
 	Else ;playing a dispensing sound
-		If Input294 <> "OUT OF RANGE" Then Input294 = "DISPENSING..." : DebugLog "Generated dat dispenser"
+		If Input294 <> "OUT OF RANGE" Then Input294 = "DISPENSING..."
 		
 		If Not ChannelPlaying(PlayerRoom\SoundCHN) Then
 			If Input294 <> "OUT OF RANGE" Then
