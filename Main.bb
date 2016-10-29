@@ -1688,7 +1688,7 @@ Select ResolutionDetails
 End Select
 
 Global ParticleAmount% = GetINIInt(OptionFile,"options","particle amount")
-Global PropFading% = GetINIInt(OptionFile,"options","prop fading")
+Global PropFading% = False ;GetINIInt(OptionFile,"options","prop fading")
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -5988,12 +5988,12 @@ Function DrawMenu()
 					
 					y=y+50*MenuScale
 					
-					Color 255,255,255
-					AAText(x, y, "Enable prop fading:")
-					PropFading = DrawTick(x + 270 * MenuScale, y + MenuScale, PropFading)
-					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
-						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
-					EndIf
+					;Color 255,255,255
+					;AAText(x, y, "Enable prop fading:")
+					;PropFading = DrawTick(x + 270 * MenuScale, y + MenuScale, PropFading)
+					;If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+					;	DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
+					;EndIf
 					;[End Block]
 				Case 2 ;Audio
 					AASetFont Font1
