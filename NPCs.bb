@@ -2014,7 +2014,7 @@ Function UpdateNPCs()
 								EndIf
 							EndIf
 							
-							If Music(20) = 0 Then Music(20) = LoadSound_Strict("SFX\Horror\Horror12.ogg")
+							If Music(20) = 0 Then Music(20) = LoadSound_Strict("SFX\Music\049Chase.ogg")
 							ShouldPlay = 20
 							
 							If n\CurrSpeed > 0.005 Then
@@ -6229,7 +6229,7 @@ Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False
 			
 			;Kill()
 			PlaySound_Strict BullethitSFX
-		ElseIf particles
+		ElseIf particles And ParticleAmount>0
 			pvt = CreatePivot()
 			PositionEntity pvt, EntityX(Collider),(EntityY(Collider)+EntityY(Camera))/2,EntityZ(Collider)
 			PointEntity pvt, p\obj

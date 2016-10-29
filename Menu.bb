@@ -120,6 +120,10 @@ Function UpdateMainMenu()
 		DrawTiledImageRect(MenuWhite, 0, 5, 512, 7 * MenuScale, 985.0 * MenuScale, 407.0 * MenuScale, (GraphicWidth - 1240 * MenuScale) + 300, 7 * MenuScale)
 	EndIf
 	
+	If (Not MouseDown1)
+		OnSliderID = 0
+	EndIf
+	
 	If MainMenuTab = 0 Then
 		For i% = 0 To 3
 			temp = False
@@ -235,6 +239,9 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
+					PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
+					PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
+					PutINIValue(OptionFile, "options", "prop fading",PropFading)
 					
 					PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 					PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
@@ -504,24 +511,26 @@ Function UpdateMainMenu()
 					UserTrackCheck2% = 0
 				EndIf
 				
+				Local tx# = x+width
+				Local ty# = y
+				Local tw# = 400*MenuScale
+				Local th# = 150*MenuScale
+				
+				;DrawOptionsTooltip(tx,ty,tw,th,"")
+				
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
-					height = 300 * MenuScale
+					height = 320 * MenuScale
 					DrawFrame(x, y, width, height)
 					
 					y=y+20*MenuScale
 					
-					Color 255,255,255				
-					AAText(x + 20 * MenuScale, y, "Show HUD:")	
-					HUDenabled = DrawTick(x + 310 * MenuScale, y + MenuScale, HUDenabled)	
-					
-					y=y+30*MenuScale
-					
 					Color 100,100,100				
 					AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
 					DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)
-					If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale)
-						DrawTooltip("Not available in this version")
+					If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+						;DrawTooltip("Not available in this version")
+						DrawOptionsTooltip(tx,ty,tw,th,"bump")
 					EndIf
 					
 					y=y+30*MenuScale
@@ -529,26 +538,38 @@ Function UpdateMainMenu()
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "VSync:")
 					Vsync% = DrawTick(x + 310 * MenuScale, y + MenuScale, Vsync%)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"vsync")
+					EndIf
 					
 					y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Anti-aliasing:")
 					Opt_AntiAlias = DrawTick(x + 310 * MenuScale, y + MenuScale, Opt_AntiAlias%)
-					AAText(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					;AAText(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"antialias")
+					EndIf
 					
-					y=y+40*MenuScale
+					y=y+30*MenuScale ;40
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Enable room lights:")
 					EnableRoomLights = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableRoomLights)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"roomlights")
+					EndIf
 					
-					y=y+30+MenuScale
+					y=y+30*MenuScale
 					
 					;Local prevGamma# = ScreenGamma
 					ScreenGamma = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, ScreenGamma*50.0)/50.0)
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Screen gamma")
+					If MouseOn(x+310*MenuScale,y+6*MenuScale,150*MenuScale,20) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
+					EndIf
 					;Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
 					
 					;If prevGamma<>ScreenGamma Then
@@ -557,43 +578,65 @@ Function UpdateMainMenu()
 					
 					y = y + 50*MenuScale
 					
-					Color 100,100,100
-					AAText(x + 20 * MenuScale, y, "Texture quality:")
-					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
+					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Resolution quality:")
+					;DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
 					;If MouseHit1
 					;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-					;		If TextureDetails% < 3
-					;			TextureDetails% = TextureDetails% + 1
+					;		If ResolutionDetails < 2
+					;			ResolutionDetails = ResolutionDetails + 1
 					;		Else
-					;			TextureDetails% = 0
+					;			ResolutionDetails = 0
 					;		EndIf
 					;		PlaySound_Strict(ButtonSFX)
 					;	EndIf
 					;EndIf
 					;Color 255,255,255
-					;Select TextureDetails%
+					;Select ResolutionDetails
 					;	Case 0
 					;		AAText(x + 340 * MenuScale, y + MenuScale, "LOW")
-					;		TextureFloat# = 1.5
+					;		ResolutionScale = 0.33
 					;	Case 1
 					;		AAText(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
-					;		TextureFloat# = 0.75
+					;		ResolutionScale = 0.5
 					;	Case 2
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "HIGH")
-					;		TextureFloat# = 0.0
-					;	Case 3
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "VERY HIGH")
-					;		TextureFloat# = -0.75
+					;		AAText(x + 340 * MenuScale, y + MenuScale, "STANDARD")
+					;		ResolutionScale = 1.0
 					;End Select
-					AAText(x + 340 * MenuScale, y + MenuScale, "DISABLED")
-					If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
-						DrawTooltip("Not available in this version")
+					;If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
+					;	DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
+					;EndIf
+					ResolutionDetails = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","STANDARD")
+					Color 255,255,255
+					Select ResolutionDetails
+						Case 0
+							ResolutionScale = 0.33
+						Case 1
+							ResolutionScale = 0.5
+						Case 2
+							ResolutionScale = 1.0
+					End Select
+					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=1
+						DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
 					EndIf
 					
-					y=y+30*MenuScale
+					y=y+50*MenuScale
 					
-					;Color 255,255,255
-					;AAText(x + 20 * MenuScale, y, "Brightness")
+					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Particle amount:")
+					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"ALMOST NONE","FEW","ALL")
+					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
+						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
+					EndIf
+					
+					y=y+50*MenuScale
+					
+						Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Enable prop fading:")
+					PropFading = DrawTick(x + 310 * MenuScale, y + MenuScale, PropFading)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
+					EndIf
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -605,6 +648,9 @@ Function UpdateMainMenu()
 					MusicVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, MusicVolume*100.0)/100.0)
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Music volume:")
+					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"musicvol")
+					EndIf
 					
 					y = y + 40*MenuScale
 					
@@ -613,6 +659,9 @@ Function UpdateMainMenu()
 					SFXVolume = PrevSFXVolume
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Sound volume:")
+					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"soundvol")
+					EndIf
 					;If MouseDown1 Then
 					;	If MouseX() >= x And MouseX() <= x + width + 14 And MouseY() >= y And MouseY() <= y + 20 Then
 					;		PlayTestSound(True)
@@ -651,11 +700,17 @@ Function UpdateMainMenu()
 						EndIf
 						EnableSFXRelease_Prev% = EnableSFXRelease
 					EndIf
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th+220*MenuScale,"sfxautorelease")
+					EndIf
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
 					AAText x + 20 * MenuScale, y, "Enable user tracks:"
 					EnableUserTracks = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableUserTracks)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"usertrack")
+					EndIf
 					
 					If EnableUserTracks
 						y = y + 30 * MenuScale
@@ -663,9 +718,12 @@ Function UpdateMainMenu()
 						AAText x + 20 * MenuScale, y, "User track mode:"
 						UserTrackMode = DrawTick(x + 310 * MenuScale, y + MenuScale, UserTrackMode)
 						If UserTrackMode
-							AAText x + 350 * MenuScale, y + 5 * MenuScale, "Repeat"
+							AAText x + 350 * MenuScale, y + MenuScale, "Repeat"
 						Else
-							AAText x + 350 * MenuScale, y + 5 * MenuScale, "Random"
+							AAText x + 350 * MenuScale, y + MenuScale, "Random"
+						EndIf
+						If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+							DrawOptionsTooltip(tx,ty,tw,th,"usertrackmode")
 						EndIf
 						If DrawButton(x + 20 * MenuScale, y + 30 * MenuScale, 190 * MenuScale, 25 * MenuScale, "Scan for User Tracks",False)
 							DebugLog "User Tracks Check Started"
@@ -690,8 +748,11 @@ Function UpdateMainMenu()
 							
 							DebugLog "User Tracks Check Ended"
 						EndIf
+						If MouseOn(x+20*MenuScale,y+30*MenuScale,190*MenuScale,25*MenuScale)
+							DrawOptionsTooltip(tx,ty,tw,th,"usertrackscan")
+						EndIf
 						If UserTrackCheck%>0
-							AAText x + 180 * MenuScale, y + 30 * MenuScale, "User tracks found ("+UserTrackCheck2+"/"+UserTrackCheck+" successfully loaded)"
+							AAText x + 20 * MenuScale, y + 100 * MenuScale, "User tracks found ("+UserTrackCheck2+"/"+UserTrackCheck+" successfully loaded)"
 						EndIf
 					Else
 						UserTrackCheck%=0
@@ -707,12 +768,18 @@ Function UpdateMainMenu()
 					MouseSens = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
 					Color(255, 255, 255)
 					AAText(x + 20 * MenuScale, y, "Mouse sensitivity:")
+					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesensitivity")
+					EndIf
 					
 					y = y + 40*MenuScale
 					
 					Color(255, 255, 255)
 					AAText(x + 20 * MenuScale, y, "Invert mouse Y-axis:")
 					InvertMouse = DrawTick(x + 310 * MenuScale, y + MenuScale, InvertMouse)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"mouseinvert")
+					EndIf
 					
 					y = y + 30*MenuScale
 					AAText(x + 20 * MenuScale, y, "Control configuration:")
@@ -739,6 +806,10 @@ Function UpdateMainMenu()
 					InputBox(x + 470 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)	
 					AAText(x + 280 * MenuScale, y + 100 * MenuScale, "Open/Close Console")
 					InputBox(x + 470 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
+					
+					If MouseOn(x+20*MenuScale,y,width-40*MenuScale,120*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"controls")
+					EndIf
 					
 					For i = 0 To 227
 						If KeyHit(i) Then key = i : Exit
@@ -771,32 +842,53 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 7 ;Advanced
 					;[Block]
-					height = 310 * MenuScale
+					height = 320 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
 					
+					Color 255,255,255				
+					AAText(x + 20 * MenuScale, y, "Show HUD:")	
+					HUDenabled = DrawTick(x + 310 * MenuScale, y + MenuScale, HUDenabled)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"hud")
+					EndIf
+					
+					y=y+30*MenuScale
+					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Enable console:")
 					CanOpenConsole = DrawTick(x + 310 * MenuScale, y + MenuScale, CanOpenConsole)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"consoleenable")
+					EndIf
 					
 					y = y + 30*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Open console on error:")
 					ConsoleOpening = DrawTick(x + 310 * MenuScale, y + MenuScale, ConsoleOpening)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"consoleerror")
+					EndIf
 					
 					y = y + 50*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Achievement popups:")
 					AchvMSGenabled% = DrawTick(x + 310 * MenuScale, y + MenuScale, AchvMSGenabled%)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"achpopup")
+					EndIf
 					
 					y = y + 50*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Show FPS:")
 					ShowFPS% = DrawTick(x + 310 * MenuScale, y + MenuScale, ShowFPS%)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"showfps")
+					EndIf
 					
 					y = y + 30*MenuScale
 					
@@ -812,6 +904,12 @@ Function UpdateMainMenu()
 					Else
 						CurrFrameLimit# = 0.0
 						Framelimit = 0
+					EndIf
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
+					EndIf
+					If MouseOn(x+150*MenuScale,y+30*MenuScale,100*MenuScale,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
 					EndIf
 					
 					y = y + 80*MenuScale
@@ -843,6 +941,9 @@ Function UpdateMainMenu()
 						ConsoleFont% = AALoadFont("Blitz", Int(22 * (GraphicHeight / 1024.0)), 0,0,0,1)
 						;ReloadAAFont()
 						AATextEnable_Prev% = AATextEnable
+					EndIf
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"antialiastext")
 					EndIf
 					;[End Block]
 				EndIf
@@ -1505,7 +1606,7 @@ End Function
 
 Function SlideBar#(x%, y%, width%, value#)
 	
-	If MouseDown1 Then
+	If MouseDown1 And OnSliderID=0 Then
 		If ScaledMouseX() >= x And ScaledMouseX() <= x + width + 14 And ScaledMouseY() >= y And ScaledMouseY() <= y + 20 Then
 			value = Min(Max((ScaledMouseX() - x) * 100 / width, 0), 100)
 		EndIf
@@ -1573,6 +1674,45 @@ Function RowText(A$, X, Y, W, H, align% = 0, Leading#=1)
 			AAText(X, LinesShown * Height + Y, b) ;Print any remaining Text If it'll fit vertically
 		EndIf
 	EndIf
+	
+End Function
+
+Function GetLineAmount(A$, W, H, Leading#=1)
+	;Display A$ starting at X,Y - no wider than W And no taller than H (all in pixels).
+	;Leading is optional extra vertical spacing in pixels
+	
+	If H<1 Then H=2048
+	
+	Local LinesShown = 0
+	Local Height = AAStringHeight(A$) + Leading
+	Local b$
+	
+	While Len(A) > 0
+		Local space = Instr(A$, " ")
+		If space = 0 Then space = Len(A$)
+		Local temp$ = Left(A$, space)
+		Local trimmed$ = Trim(temp) ;we might ignore a final space 
+		Local extra = 0 ;we haven't ignored it yet
+		;ignore final space If doing so would make a word fit at End of Line:
+		If (AAStringWidth (b$ + temp$) > W) And (AAStringWidth (b$ + trimmed$) <= W) Then
+			temp = trimmed
+			extra = 1
+		EndIf
+		
+		If AAStringWidth (b$ + temp$) > W Then ;too big, so Print what will fit
+			
+			LinesShown = LinesShown + 1
+			b$=""
+		Else ;append it To b$ (which will eventually be printed) And remove it from A$
+			b$ = b$ + temp$
+			A$ = Right(A$, Len(A$) - (Len(temp$) + extra))
+		EndIf
+		
+		If ((LinesShown + 1) * Height) > H Then Exit ;the Next Line would be too tall, so leave
+	Wend
+	
+	Return LinesShown+1
+	
 End Function
 
 Function LimitText%(txt$, x%, y%, width%, usingAA%=True)
@@ -1642,9 +1782,226 @@ Function DrawQuickLoading()
 	
 End Function
 
+Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
+	Local fx# = x+6*MenuScale
+	Local fy# = y+6*MenuScale
+	Local fw# = width-12*MenuScale
+	Local fh# = height-12*MenuScale
+	Local lines% = 0, lines2% = 0
+	Local txt$ = ""
+	Local txt2$ = "", R% = 0, G% = 0, B% = 0
+	Local usetestimg% = False, extraspace% = 0
+	
+	AASetFont Font1
+	Color 255,255,255
+	Select Lower(option$)
+		;Graphic options
+			;[Block]
+		Case "bump"
+			txt = Chr(34)+"Bump mapping"+Chr(34)+" is used to simulate details on textures through the use of lighting calculations."
+			txt2 = "Due to the removal of FastExtension in version 1.3.1 the feature is no longer available."
+			R = 255
+		Case "vsync"
+			txt = Chr(34)+"Vertical sync"+Chr(34)+" waits for the display to finish its current refresh cycle before calculating the next frame, preventing issues such as "
+			txt = txt + "screen tearing. This ties the game's frame rate to your display's refresh rate and may cause some input lag."
+		Case "antialias"
+			txt = Chr(34)+"Anti-Aliasing"+Chr(34)+" is used to smooth the rendered image before displaying in order to reduce aliasing around the edges of models."
+			txt2 = "This option only takes effect in fullscreen."
+			R = 255
+		Case "roomlights"
+			txt = "Toggles the artificial lens flare effect generated over specific light sources."
+		Case "gamma"
+			txt = Chr(34)+"Gamma correction"+Chr(34)+" is used to achieve a good brightness factor to balance out your display's gamma if the game appears either too dark or bright. "
+			txt = txt + "Setting it too high or low can cause the graphics to look less detailed."
+		Case "texquality"
+			txt = Chr(34)+"Texture quality"+Chr(34)+" smooths out the rendering of textures at extreme angles, making them appear less warped."
+		Case "resquality"
+			txt = Chr(34)+"Resolution quality"+Chr(34)+" adjusts the resolution at which the game will render."
+			txt2 = "The game will render at "
+			Select value
+				Case 0
+					R = 255
+					txt2 = txt2 + "33% "
+				Case 1
+					R = 255
+					G = 255
+					txt2 = txt2 + "50% "
+				Case 2
+					G = 255
+					txt2 = txt2 + "100% (default) "
+			End Select
+			txt2 = txt2 + "of the current resolution."
+		Case "particleamount"
+			txt = "Determines the amount of particles that can be rendered per tick."
+			Select value
+				Case 0
+					R = 255
+					txt2 = "Only smoke emitters will produce particles."
+				Case 1
+					R = 255
+					G = 255
+					txt2 = "Only a few particles will be rendered per tick."
+				Case 2
+					G = 255
+					txt2 = "All particles are rendered."
+			End Select
+		Case "propfading"
+			txt = "Hides props in the world when the player gets too far from them."
+			;[End Block]
+		;Sound options
+			;[Block]
+		Case "musicvol"
+			txt = "Adjusts the volume of background music. Sliding the bar fully to the left will mute all music."
+		Case "soundvol"
+			txt = "Adjusts the volume of sound effects. Sliding the bar fully to the left will mute all sounds."
+		Case "sfxautorelease"
+			txt = Chr(34)+"Sound auto-release"+Chr(34)+" will free a sound from memory if it not used after 5 seconds. Prevents memory allocation issues."
+			R = 255
+			txt2 = "This option cannot be changed in-game."
+		Case "usertrack"
+			txt = "Toggles the ability to play custom tracks over channel 1 of the radio. These tracks are loaded from the " + Chr(34) + "SFX\Radio\UserTracks\" + Chr(34)
+			txt = txt + " directory. Press " + Chr(34) + "1" + Chr(34) + " when the radio is selected to change track."
+			R = 255
+			txt2 = "This option cannot be changed in-game."
+		Case "usertrackmode"
+			txt = "Sets the playing mode for the custom tracks. "+Chr(34)+"Repeat"+Chr(34)+" plays every file in alphabetical order. "+Chr(34)+"Random"+Chr(34)+" chooses the "
+			txt = txt + "next track at random."
+			R = 255
+			G = 255
+			txt2 = "Note that the random mode does not prevent previously played tracks from repeating."
+		Case "usertrackscan"
+			txt = "Re-checks the user tracks directory for any new or removed sound files."
+			;[End Block]
+		;Control options	
+			;[Block]
+		Case "mousesensitivity"
+			txt = "Adjusts the speed of the mouse pointer."
+		Case "mouseinvert"
+			txt = Chr(34)+"Invert mouse Y-axis"+Chr(34)+" is self-explanatory."
+		Case "controls"
+			txt = "Configure the in-game control scheme."
+			;[End Block]
+		;Advanced options	
+			;[Block]
+		Case "hud"
+			txt = "Display the blink and stamina meters."
+		Case "consoleenable"
+			txt = "Toggles the use of the developer console. Can be used in-game by pressing " + KeyName(KEY_CONSOLE) + "."
+		Case "consoleerror"
+			txt = Chr(34)+"Open console on error"+Chr(34)+" is self-explanatory."
+		Case "achpopup"
+			txt = "Displays a pop-up notification when an achievement is unlocked."
+		Case "showfps"
+			txt = "Displays the frames per second counter at the top left-hand corner."
+		Case "framelimit"
+			txt = "Limits the frame rate that the game can run at to a desired value."
+			If value > 0 And value < 60
+				R = 255
+				G = 255
+				txt2 = "Usually, 60 FPS or higher is preferred. If you are noticing excessive stuttering at this setting, try lowering it to make your framerate more consistent."
+			EndIf
+		Case "antialiastext"
+			txt = Chr(34)+"Antialiased text"+Chr(34)+" smooths out the text before displaying. Makes text easier to read at high resolutions."
+			;[End Block]
+	End Select
+	
+	lines% = GetLineAmount(txt,fw,fh)
+	If usetestimg
+		extraspace = 210*MenuScale
+	EndIf
+	If txt2$ = ""
+		DrawFrame(x,y,width,((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)+extraspace)
+	Else
+		lines2% = GetLineAmount(txt2,fw,fh)
+		DrawFrame(x,y,width,(((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)+(AAStringHeight(txt2)*lines2)+(10+lines2)*MenuScale)+extraspace)
+	EndIf
+	RowText(txt,fx,fy,fw,fh)
+	If txt2$ <> ""
+		Color R,G,B
+		RowText(txt2,fx,(fy+(AAStringHeight(txt)*lines)+(5+lines)*MenuScale),fw,fh)
+	EndIf
+	If usetestimg
+		MidHandle Menu_TestIMG
+		If txt2$ = ""
+			DrawImage Menu_TestIMG,x+(width/2),y+100*MenuScale+((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)
+		Else
+			DrawImage Menu_TestIMG,x+(width/2),y+100*MenuScale+(((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)+(AAStringHeight(txt2)*lines2)+(10+lines2)*MenuScale)
+		EndIf
+	EndIf
+	
+End Function
 
+Function ChangeMenu_TestIMG(change$)
+	
+	If Menu_TestIMG <> 0 Then FreeImage Menu_TestIMG
+	AmbientLightRoomTex% = CreateTexture(2,2,257)
+	TextureBlend AmbientLightRoomTex,5
+	SetBuffer(TextureBuffer(AmbientLightRoomTex))
+	ClsColor 0,0,0
+	Cls
+	SetBuffer BackBuffer()
+	Menu_TestIMG = Create3DIcon(200,200,"GFX\map\room3z3_opt.rmesh",0,-0.75,1,0,0,0,menuroomscale#,menuroomscale#,menuroomscale#,True)
+	ScaleImage Menu_TestIMG,MenuScale,MenuScale
+	MaskImage Menu_TestIMG,255,0,255
+	FreeTexture AmbientLightRoomTex : AmbientLightRoomTex = 0
+	
+	CurrMenu_TestIMG = change$
+	
+End Function
 
+Global OnSliderID% = 0
 
+Function Slider3(x%,y%,width%,value%,ID%,val1$,val2$,val3$)
+	
+	If MouseDown1 Then
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			OnSliderID = ID
+		EndIf
+	EndIf
+	
+	Color 200,200,200
+	Rect(x,y,width+14,10,True)
+	Rect(x,y-8,4,14,True)
+	Rect(x+(width/2)+5,y-8,4,14,True)
+	Rect(x+width+10,y-8,4,14,True)
+	
+	If ID = OnSliderID
+		If (ScaledMouseX() <= x+8)
+			value = 0
+		ElseIf (ScaledMouseX() >= x+width/2) And (ScaledMouseX() <= x+(width/2)+8)
+			value = 1
+		ElseIf (ScaledMouseX() >= x+width)
+			value = 2
+		EndIf
+		Color 0,255,0
+		Rect(x,y,width+14,10,True)
+	Else
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			Color 0,200,0
+			Rect(x,y,width+14,10,False)
+		EndIf
+	EndIf
+	
+	If value = 0
+		DrawImage(BlinkMeterIMG,x,y-8)
+	ElseIf value = 1
+		DrawImage(BlinkMeterIMG,x+(width/2)+3,y-8)
+	Else
+		DrawImage(BlinkMeterIMG,x+width+6,y-8)
+	EndIf
+	
+	Color 170,170,170
+	If value = 0
+		AAText(x+2,y+10+MenuScale,val1,True)
+	ElseIf value = 1
+		AAText(x+(width/2)+7,y+10+MenuScale,val2,True)
+	Else
+		AAText(x+width+12,y+10+MenuScale,val3,True)
+	EndIf
+	
+	Return value
+	
+End Function
 
 
 

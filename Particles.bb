@@ -80,6 +80,7 @@ End Function
 
 Global InSmoke%
 Global HissSFX% = LoadSound_Strict("SFX\General\Hiss.ogg")
+Global SmokeDelay# = 0.0
 
 Type Emitters
 	Field Obj%
@@ -103,7 +104,7 @@ Function UpdateEmitters()
 	InSmoke = False
 	For e.emitters = Each Emitters
 		If FPSfactor > 0 And (PlayerRoom = e\room Or e\room\dist < 8) Then
-			;If EntityDistance(Camera, e\Obj) < 6.0 Then
+			If ParticleAmount = 2 Or SmokeDelay#=0.0
 				Local p.Particles = CreateParticle(EntityX(e\obj, True), EntityY(e\obj, True), EntityZ(e\obj, True), Rand(e\minimage, e\maximage), e\size, e\gravity, e\lifetime)
 				p\speed = e\speed
 				RotateEntity(p\pvt, EntityPitch(e\Obj, True), EntityYaw(e\Obj, True), EntityRoll(e\Obj, True), True)
@@ -114,7 +115,7 @@ Function UpdateEmitters()
 				p\SizeChange = e\SizeChange
 				
 				p\Achange = e\achange
-				
+			EndIf
 				e\SoundCHN = LoopSound2(HissSFX, e\SoundCHN, Camera, e\Obj)
 				
 				If InSmoke = False Then
@@ -125,7 +126,13 @@ Function UpdateEmitters()
 						EndIf
 					EndIf					
 				EndIf
-			;EndIf
+			If ParticleAmount <> 2
+				If SmokeDelay#<(10-(5*ParticleAmount))
+					SmokeDelay#=SmokeDelay#+FPSfactor
+				Else
+					SmokeDelay#=0.0
+				EndIf
+			EndIf
 		End If
 	Next
 	

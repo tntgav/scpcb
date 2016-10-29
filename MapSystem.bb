@@ -667,20 +667,26 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 			Case "model"
 				file = ReadString(f)
 				If file<>""
-					Local model = CreatePropObj("GFX\Map\Props\"+file);LoadMesh("GFX\Map\Props\"+file)
-					
-					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
-					PositionEntity model,temp1,temp2,temp3
-					
-					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
-					RotateEntity model,temp1,temp2,temp3
-					
-					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
-					ScaleEntity model,temp1,temp2,temp3
-					
-					EntityParent model,Opaque
-					EntityType model,HIT_MAP
-					EntityPickMode model,2
+					;Local model = CreatePropObj("GFX\Map\Props\"+file);LoadMesh("GFX\Map\Props\"+file)
+					;
+					;temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
+					;PositionEntity model,temp1,temp2,temp3
+					;
+					;temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
+					;RotateEntity model,temp1,temp2,temp3
+					;
+					;temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
+					;ScaleEntity model,temp1,temp2,temp3
+					;
+					;EntityParent model,Opaque
+					;EntityType model,HIT_MAP
+					;EntityPickMode model,2
+					Local tmpr.TempMapProps = New TempMapProps
+					tmpr\file = file
+					tmpr\x=ReadFloat(f)*RoomScale : tmpr\y=ReadFloat(f)*RoomScale : tmpr\z=ReadFloat(f)*RoomScale
+					tmpr\pitch=ReadFloat(f) : tmpr\yaw=ReadFloat(f) : tmpr\roll=ReadFloat(f)
+					tmpr\scaleX=ReadFloat(f)*RoomScale : tmpr\scaleY=ReadFloat(f)*RoomScale : tmpr\scaleZ=ReadFloat(f)*RoomScale
+					tmpr\rt = rt
 				Else
 					DebugLog "file = 0"
 					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
@@ -3305,7 +3311,6 @@ Function FillRoom(r.Rooms)
 			d.Doors = CreateDoor(0, r\x - 240.0 * RoomScale, 0.0, r\z, 90, r, False)
 			d\open = False : d\AutoClose = False 
 			MoveEntity(d\buttons[0], 0.0, 0.0, 22.0 * RoomScale)
-			DebugLog "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 			MoveEntity(d\buttons[1], 0.0, 0.0, 22.0 * RoomScale)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x, r\y + 704*RoomScale, r\z + 863*RoomScale, r)
@@ -4844,6 +4849,20 @@ Function FillRoom(r.Rooms)
 		EndIf
 	Next
 	
+	For tmpr.TempMapProps = Each TempMapProps
+		If tmpr\rt = r\RoomTemplate
+			mpr.MapProps = New MapProps
+			mpr\obj% = CreatePropObj("GFX\Map\Props\"+tmpr\file)
+			PositionEntity mpr\obj%,r\x+tmpr\x,r\y+tmpr\y,r\z+tmpr\z
+			RotateEntity mpr\obj%,tmpr\pitch,tmpr\yaw,tmpr\roll
+			ScaleEntity mpr\obj%,tmpr\scaleX,tmpr\scaleY,tmpr\scaleZ
+			EntityParent mpr\obj%,r\obj
+			EntityType mpr\obj%,HIT_MAP
+			EntityPickMode mpr\obj%,2
+			DebugLog "Created prop: "+tmpr\file+"|"+mpr\obj
+		EndIf
+	Next
+	
 	CatchErrors("FillRoom ("+r\RoomTemplate\Name+")")
 End Function
 
@@ -5892,7 +5911,7 @@ Function UpdateSecurityCams()
 						EndIf
 					EndIf 
 					
-					If sc\InSight And (Not isIn8601) And sc\CoffinEffect=0 Or sc\CoffinEffect=2 Then
+					If sc\InSight And sc\CoffinEffect=0 Or sc\CoffinEffect=2 Then
 						If sc\PlayerState = 0 Then
 							sc\PlayerState = Rand(60000, 65000)
 						EndIf
@@ -7729,7 +7748,31 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	
 End Function
 
+Type TempMapProps
+	Field rt.RoomTemplates
+	Field x#,y#,z#
+	Field pitch#,yaw#,roll#
+	Field scaleX#,scaleY#,scaleZ#
+	Field file$
+End Type
 
+Type MapProps
+	Field obj%
+End Type
+
+Function UpdateMapProps()
+	Local mpr.MapProps
+	
+	For mpr.MapProps = Each MapProps
+		If mpr\obj<>0
+			If EntityDistance(mpr\obj,Camera)>8.0
+				HideEntity mpr\obj
+			Else
+				ShowEntity mpr\obj
+			EndIf
+		EndIf
+	Next
+End Function
 
 
 
