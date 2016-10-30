@@ -1,42 +1,32 @@
 ﻿----------------------------------------------------------------------------------
 
 v1.3.3
-- Fixed a bug that caused AAText to not render properly at small resolutions.
 - Moved audio settings to their own location in options.ini.
-- Finally fixed 860-1's ambience not playing inside the forest.
-
-- Fixed the Tesla gate activating when the player is above the room.
-
-- Removed room1archive1074.
-
 - Added the ability for the night vision goggles to somewhat supress 895's effects.
+- The propaganda leaflet now disappears from the player's inventory when the SCP-1123 event finishes.
+- The player now dies when using SCP-1123 outside of its chamber (via SCP-714).
+- Added tooltips to the options menu.
+- Added resolution quality and particle amount settings.
+- Updated item grab icon. (by Irontaco)
 
-- Fixed a bug that prevented swapping between night vision goggle variants.
-
-- Fixed night vision goggles not working when secondary lighting is off.
-
-- Fixed the reset096 console command so it will work for not just lockroom096.
-
-- Fixed 106's spawn in 895's chamber
-- Fixed bugs relating to the "Ulgrin shooting the player" event in the post-breach intro.
-
-- The propaganda leaflet disappears from the player's inventory when the 1123 event finishes.
-
-- Fixed SCP-079's broadcasts triggering during SCP-1123's event.
-- Fixed an oversight that allowed the player to leave 1123's chamber before the event completed.
-- Fixed 682 roar playing in 1499, 860-1, and 1123's events.
-
-- Fixed 294's injuries + bloodloss parameters not having an effect
-.
-- Fixed 294's dispensing sounds.
-- Fixed SCP-1123's pickup sound (when SCP-714 is equipped).
-
-- The player dies when using SCP-1123 outside of its chamber.
+Bug Fixes:
+- Fixed the Tesla gate activating when the player is above the room.
+- Fixed a bug that caused AAText to not render properly at small resolutions.
+- Finally fixed 860-1's ambience not playing inside the forest.
 - Fixed a bug that caused secondary lighting to affect Gate A and B.
+- Fixed a bug that prevented swapping between night vision goggle variants.
+- Fixed the night vision goggles not working when secondary lighting is off.
+- Fixed the "reset096" console command so it will work for not just lockroom096.
+- Fixed SCP-079's broadcasts triggering during SCP-1123's event.
+- Fixed SCP-682's roar playing in 1499, 860-1, and 1123's events.
+- Fixed SCP-106's spawn in 895's chamber
+- Fixed bugs relating to the "Ulgrin shooting the player" event in the post-breach intro.
 - Fixed SCP-895's monitor freezing when the coffin camera was disabled.
-- Added tooltips to the option menu.
-- Added texture quality and particle amount settings.
-- Updated hand icon
+- Fixed SCP-294's injuries, bloodloss, explosion, and blink/stamina effect parameters.
+- Fixed SCP-294's dispensing sounds.
+- Fixed an oversight that allowed the player to leave 1123's chamber before the event completed.
+- Fixed SCP-1123's pickup sound (when SCP-714 is equipped).
+- Fixed the very fine night vision goggles staying equipped when they are dropped.
 
 ----------------------------------------------------------------------------------
 

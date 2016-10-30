@@ -560,7 +560,7 @@ Function PickItem(item.Items)
 								LightFlash = 7
 								PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))		
 								DeathMSG = "Subject D-9341 was shot dead after attempting to attack a member of Nine-Tailed Fox. Surveillance tapes show that the subject had been "
-								DeathMSG = DeathMSG + "wandering around the site approximately 9 minutes prior shouting the phrase " + Chr(34) + "get rid of the four pests" + Chr(34)
+								DeathMSG = DeathMSG + "wandering around the site approximately 9 minutes prior, shouting the phrase " + Chr(34) + "get rid of the four pests" + Chr(34)
 								DeathMSG = DeathMSG + " in chinese. SCP-1123 was found in [REDACTED] nearby, suggesting the subject had come into physical contact with it. How "
 								DeathMSG = DeathMSG + "exactly SCP-1123 was removed from its containment chamber is still unknown."
 								Kill()
@@ -687,9 +687,12 @@ Function DropItem(item.Items)
 			WearingHazmat = False
 		Case "vest", "finevest"
 			WearingVest = False
-		Case "nvgoggles", "supernv"
-			If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-			WearingNightVision = False
+		Case "nvgoggles"
+			If WearingNightVision = 1 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
+		Case "supernv"
+			If WearingNightVision = 2 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
+		Case "veryfinenvgoggles"
+			If WearingNightVision = 3 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
 		Case "scp714"
 			Wearing714 = False
 		Case "scp178"
