@@ -26,6 +26,7 @@ Bug Fixes:
 - Fixed SCP-294's dispensing sounds.
 - Fixed an oversight that allowed the player to leave 1123's chamber before the event completed.
 - Fixed SCP-1123's pickup sound (when SCP-714 is equipped).
+- Fixed the very fine night vision goggles staying equipped when they are dropped.
 
 ----------------------------------------------------------------------------------
 
