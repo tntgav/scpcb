@@ -12,6 +12,11 @@ Include "KeyName.bb"
 
 Global OptionFile$ = "options.ini"
 
+Include "Blitz_Basic_Bank.bb"
+Include "Blitz_File_FileName.bb"
+Include "Blitz_File_ZipApi.bb"
+Include "Update.bb"
+
 Global ErrorFile$ = "error_log_"
 Local ErrorFileInd% = 0
 While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
