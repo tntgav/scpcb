@@ -2,6 +2,8 @@
 
 v1.3.3
 - Moved audio settings to their own location in options.ini.
+- Two new rooms.
+- Little something for Halloween.
 - Added the ability for the night vision goggles to somewhat supress 895's effects.
 - The propaganda leaflet now disappears from the player's inventory when the SCP-1123 event finishes.
 - The player now dies when using SCP-1123 outside of its chamber (via SCP-714).
