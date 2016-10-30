@@ -2772,8 +2772,8 @@ Repeat
 
 				BlinkTimer = BlinkTimer - FPSfactor
 			Else
-				BlinkTimer = BlinkTimer - FPSfactor * 0.6
-				If EyeIrritation > 0 Then BlinkTimer=BlinkTimer-Min(EyeIrritation / 100.0 + 1.0, 4.0) * FPSfactor * BlinkEffect
+				BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect
+				If EyeIrritation > 0 Then BlinkTimer=BlinkTimer-Min(EyeIrritation / 100.0 + 1.0, 4.0) * FPSfactor
 				
 				darkA = Max(darkA, 0.0)
 			End If
@@ -2783,6 +2783,7 @@ Repeat
 			If BlinkEffectTimer > 0 Then
 				BlinkEffectTimer = BlinkEffectTimer - (FPSfactor/70)
 			Else
+				BlinkEffect = 1.0
 				BlinkEffect = CurveValue(1.0,BlinkEffect,500)
 			EndIf
 			
@@ -3216,6 +3217,7 @@ Function MovePlayer()
 	If StaminaEffectTimer > 0 Then
 		StaminaEffectTimer = StaminaEffectTimer - (FPSfactor/70)
 	Else
+		StaminaEffect = 1.0
 		StaminaEffect = CurveValue(1.0, StaminaEffect, 50)
 	EndIf
 	
@@ -4878,7 +4880,7 @@ Function DrawGUI()
 											Msg = "You feel nauseated."
 										Case 4
 											BlinkEffect = 0.6
-											BlinkEffectTimer = 70*Rand(20,30)
+											BlinkEffectTimer = Rand(20,30)
 										Case 5
 											Bloodloss = 0
 											Injuries = 0
@@ -4898,14 +4900,14 @@ Function DrawGUI()
 				Case "eyedrops"
 					If (Not (Wearing714=1)) Then
 						BlinkEffect = 0.6
-						BlinkEffectTimer = 70*Rand(20,30)
+						BlinkEffectTimer = Rand(20,30)
 						BlurTimer = 200
 					EndIf
 					RemoveItem(SelectedItem)
 				Case "fineeyedrops"
 					If (Not (Wearing714=1)) Then 
 						BlinkEffect = 0.4
-						BlinkEffectTimer = 70*Rand(30,40)
+						BlinkEffectTimer = Rand(30,40)
 						Bloodloss = Max(Bloodloss-1.0, 0)
 						BlurTimer = 200
 					EndIf
@@ -4994,9 +4996,9 @@ Function DrawGUI()
 					strtemp = GetINIString2(iniStr, loc, "message")
 					If strtemp <> "" Then Msg = strtemp : MsgTimer = 70*6
 					
-					If GetINIInt2(iniStr, loc, "lethal") Then 
+					If GetINIInt2(iniStr, loc, "lethal") Or GetINIInt2(iniStr, loc, "deathtimer") Then 
 						DeathMSG = GetINIString2(iniStr, loc, "deathmessage")
-						Kill()
+						If GetINIInt2(iniStr, loc, "lethal") Then Kill()
 					EndIf
 					BlurTimer = GetINIInt2(iniStr, loc, "blur")*70;*temp
 					Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
@@ -5009,11 +5011,11 @@ Function DrawGUI()
 					
 					DeathTimer=GetINIInt2(iniStr, loc, "deathtimer")*70
 					
-					BlinkEffect = (BlinkEffect + Float(GetINIString2(iniStr, loc, "blinkeffect", 1.0))*x2)/2.0
-					BlinkEffectTimer = (BlinkEffectTimer + Float(GetINIString2(iniStr, loc, "blinkeffecttimer", 1.0))*x2)/2.0
+					BlinkEffect = Float(GetINIString2(iniStr, loc, "blink effect", 1.0))*x2
+					BlinkEffectTimer = Float(GetINIString2(iniStr, loc, "blink effect timer", 1.0))*x2
 					
-					StaminaEffect = (StaminaEffect + Float(GetINIString2(iniStr, loc, "stamina effect", 1.0))*x2)/2.0
-					StaminaEffectTimer = (StaminaEffectTimer + Float(GetINIString2(iniStr, loc, "staminaeffecttimer", 1.0))*x2)/2.0
+					StaminaEffect = Float(GetINIString2(iniStr, loc, "stamina effect", 1.0))*x2
+					StaminaEffectTimer = Float(GetINIString2(iniStr, loc, "stamina effect timer", 1.0))*x2
 					
 					strtemp = GetINIString2(iniStr, loc, "refusemessage")
 					If strtemp <> "" Then
