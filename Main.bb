@@ -1674,6 +1674,7 @@ Select ResolutionDetails
 End Select
 
 Global ParticleAmount% = GetINIInt(OptionFile,"options","particle amount")
+Global PropFading% = GetINIInt(OptionFile,"options","prop fading")
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2703,6 +2704,7 @@ Repeat
 			UpdateRoomLights(Camera)
 			TimeCheckpointMonitors()
 			UpdateLeave1499()
+			If (PropFading) Then UpdateMapProps()
 		EndIf
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
@@ -5844,8 +5846,9 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 				PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 				PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-				PutINIValue(OptionFile, "options", "res details", ResolutionDetails)
-				PutINIValue(OptionFile, "options", "particle amount", ParticleAmount)
+				PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
+				PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
+				PutINIValue(OptionFile, "options", "prop fading",PropFading)
 				
 				PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 				PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
@@ -5964,6 +5967,15 @@ Function DrawMenu()
 					ParticleAmount = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ParticleAmount,2,"DECREASED","MINIMAL","ALL")
 					If (MouseOn(x + 270 * MenuScale, y-6*MenuScale, 100*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
+					EndIf
+					
+					y=y+50*MenuScale
+					
+					Color 255,255,255
+					AAText(x, y, "Enable prop fading:")
+					PropFading = DrawTick(x + 270 * MenuScale, y + MenuScale, PropFading)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
 					EndIf
 					;[End Block]
 				Case 2 ;Audio
@@ -6892,6 +6904,11 @@ Function InitNewGame()
 		
 	Next
 	
+	Local tmpr.TempMapProps
+	For tmpr.TempMapProps = Each TempMapProps
+		Delete tmpr
+	Next
+	
 	Local rt.RoomTemplates
 	For rt.RoomTemplates = Each RoomTemplates
 		FreeEntity (rt\obj)
@@ -7258,6 +7275,10 @@ Function NullGame()
 	
 	For rt.RoomTemplates = Each RoomTemplates
 		rt\obj = 0
+	Next
+	
+	For mpr.MapProps = Each MapProps
+		Delete mpr
 	Next
 	
 	For i = 0 To 5
