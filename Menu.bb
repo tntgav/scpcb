@@ -1012,7 +1012,6 @@ Function UpdateMainMenu()
 End Function
 
 Function UpdateLauncher()
-	
 	MenuScale = 1
 	
 	Graphics3DExt(LauncherWidth, LauncherHeight, 0, 2)
@@ -1051,6 +1050,9 @@ Function UpdateLauncher()
 			GFXModes=GFXModes+1 
 		End If
 	Next
+	
+	BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
+	CheckForUpdates()
 	
 	Repeat
 		
@@ -1152,6 +1154,12 @@ Function UpdateLauncher()
 			EndIf
 		EndIf
 		
+		UpdateCheckEnabled = DrawTick(LauncherWidth - 275, LauncherHeight - 50, UpdateCheckEnabled)
+		Color 255,255,255
+		Text LauncherWidth-250,LauncherHeight-70,"Check for"
+		Text LauncherWidth-250,LauncherHeight-50,"updates on"
+		Text LauncherWidth-250,LauncherHeight-30,"launch"
+		
 		If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 55, 100, 30, "LAUNCH", False, False, False) Then
 			GraphicWidth = GfxModeWidths(SelectedGFXMode)
 			GraphicHeight = GfxModeHeights(SelectedGFXMode)
@@ -1187,6 +1195,11 @@ Function UpdateLauncher()
 		PutINIValue(OptionFile, "options", "16bit", "false")
 	EndIf
 	PutINIValue(OptionFile, "options", "gfx driver", SelectedGFXDriver)
+	If UpdateCheckEnabled Then
+		PutINIValue(OptionFile, "options", "check for updates", "true")
+	Else
+		PutINIValue(OptionFile, "options", "check for updates", "false")
+	EndIf
 	
 End Function
 
@@ -1567,6 +1580,26 @@ Function DrawButton%(x%, y%, width%, height%, txt$, bigfont% = True, waitForMous
 		If bigfont Then SetFont Font2 Else SetFont Font1
 		Text(x + width / 2, y + height / 2, txt, True, True)
 	EndIf
+	
+	Return clicked
+End Function
+
+Function DrawButton2%(x%, y%, width%, height%, txt$, bigfont% = True)
+	Local clicked% = False
+	
+	DrawFrame (x, y, width, height)
+	Local hit% = MouseHit(1)
+	If MouseOn(x, y, width, height) Then
+		Color(30, 30, 30)
+		If hit Then clicked = True : PlaySound_Strict(ButtonSFX)
+		Rect(x + 4, y + 4, width - 8, height - 8)	
+	Else
+		Color(0, 0, 0)
+	EndIf
+	
+	Color (255, 255, 255)
+	If bigfont Then SetFont Font2 Else SetFont Font1
+	Text(x + width / 2, y + height / 2, txt, True, True)
 	
 	Return clicked
 End Function
