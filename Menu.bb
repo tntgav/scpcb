@@ -525,15 +525,15 @@ Function UpdateMainMenu()
 					
 					y=y+20*MenuScale
 					
-					Color 100,100,100				
-					AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
-					DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)
-					If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+					;Color 100,100,100				
+					;AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
+					;DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)
+					;If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
 						;DrawTooltip("Not available in this version")
-						DrawOptionsTooltip(tx,ty,tw,th,"bump")
-					EndIf
+					;	DrawOptionsTooltip(tx,ty,tw,th,"bump")
+					;EndIf
 					
-					y=y+30*MenuScale
+					;y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "VSync:")
@@ -606,7 +606,7 @@ Function UpdateMainMenu()
 					;If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
 					;	DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
 					;EndIf
-					ResolutionDetails = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","STANDARD")
+					ResolutionDetails = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","FULL")
 					Color 255,255,255
 					Select ResolutionDetails
 						Case 0
@@ -624,7 +624,7 @@ Function UpdateMainMenu()
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Particle amount:")
-					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"DECREASED","MINIMAL","ALL")
+					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"MINIMAL","REDUCED","FULL")
 					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
 					EndIf

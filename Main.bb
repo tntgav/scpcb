@@ -5902,13 +5902,13 @@ Function DrawMenu()
 					y=y+50*MenuScale
 					
 					Color 100,100,100				
-					AAText(x, y, "Enable bump mapping:")	
-					DrawTick(x + 270 * MenuScale, y + MenuScale, False, True)
-					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
-						DrawOptionsTooltip(tx,ty,tw,th,"bump")
-					EndIf
+					;AAText(x, y, "Enable bump mapping:")	
+					;DrawTick(x + 270 * MenuScale, y + MenuScale, False, True)
+					;If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+					;	DrawOptionsTooltip(tx,ty,tw,th,"bump")
+					;EndIf
 					
-					y=y+30*MenuScale
+					;y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "VSync:")
@@ -5948,7 +5948,7 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, "Resolution quality:")
-					ResolutionDetails = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","STANDARD")
+					ResolutionDetails = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","FULL")
 					Color 255,255,255
 					Select ResolutionDetails
 						Case 0
@@ -5966,7 +5966,7 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, "Particle amount:")
-					ParticleAmount = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ParticleAmount,2,"DECREASED","MINIMAL","ALL")
+					ParticleAmount = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ParticleAmount,2,"MINIMAL","REDUCED","FULL")
 					If (MouseOn(x + 270 * MenuScale, y-6*MenuScale, 100*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
 					EndIf
