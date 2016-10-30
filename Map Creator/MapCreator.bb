@@ -227,6 +227,8 @@ Function InitEvents()
 				rt\events[0]="exit1"	
 			Case "endroom"
 				rt\events[0]="endroom106"	
+			Case "medibay"
+				rt\events[0]="medibay"
 			Case "start"
 				rt\events[0]="alarm"	
 			Case "pocketdimension"

@@ -12,6 +12,11 @@ Include "KeyName.bb"
 
 Global OptionFile$ = "options.ini"
 
+Include "Blitz_Basic_Bank.bb"
+Include "Blitz_File_FileName.bb"
+Include "Blitz_File_ZipApi.bb"
+Include "Update.bb"
+
 Global ErrorFile$ = "error_log_"
 Local ErrorFileInd% = 0
 While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
@@ -2445,6 +2450,7 @@ Function InitEvents()
 	CreateEvent("room2scps2","room2scps2",0)
 	CreateEvent("room_gw","room3gw",0,1.0)
 	CreateEvent("room2sl","room2sl",0)
+	CreateEvent("medibay","medibay",0)
 	
 	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
 	
@@ -5902,13 +5908,13 @@ Function DrawMenu()
 					y=y+50*MenuScale
 					
 					Color 100,100,100				
-					AAText(x, y, "Enable bump mapping:")	
-					DrawTick(x + 270 * MenuScale, y + MenuScale, False, True)
-					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
-						DrawOptionsTooltip(tx,ty,tw,th,"bump")
-					EndIf
+					;AAText(x, y, "Enable bump mapping:")	
+					;DrawTick(x + 270 * MenuScale, y + MenuScale, False, True)
+					;If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+					;	DrawOptionsTooltip(tx,ty,tw,th,"bump")
+					;EndIf
 					
-					y=y+30*MenuScale
+					;y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "VSync:")
@@ -5948,7 +5954,7 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, "Resolution quality:")
-					ResolutionDetails = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","STANDARD")
+					ResolutionDetails = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","FULL")
 					Color 255,255,255
 					Select ResolutionDetails
 						Case 0
@@ -5966,7 +5972,7 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, "Particle amount:")
-					ParticleAmount = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ParticleAmount,2,"DECREASED","MINIMAL","ALL")
+					ParticleAmount = Slider3(x+270*MenuScale,y+6*MenuScale,100*MenuScale,ParticleAmount,2,"MINIMAL","REDUCED","FULL")
 					If (MouseOn(x + 270 * MenuScale, y-6*MenuScale, 100*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
 					EndIf
