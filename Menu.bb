@@ -33,6 +33,7 @@ Global IntroEnabled% = GetINIInt(OptionFile, "options", "intro enabled")
 Global SelectedInputBox%
 
 Global SavePath$ = "Saves\"
+Global SaveMSG$
 
 ;nykyisen tallennuksen nimi ja samalla missä kansiossa tallennustiedosto sijaitsee saves-kansiossa
 Global CurrSave$
@@ -451,24 +452,53 @@ Function UpdateMainMenu()
 						AAText(x + 20 * MenuScale, y + (10+23) * MenuScale, SaveGameTime(i - 1))
 						AAText(x + 120 * MenuScale, y + (10+23) * MenuScale, SaveGameDate(i - 1))
 						
-						If DrawButton(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Load", False) Then
-							LoadEntities()
-							LoadGame(SavePath + SaveGames(i - 1) + "\")
-							CurrSave = SaveGames(i - 1)
-							InitLoadGame()
-							MainMenuOpen = False
+						If SaveMSG = "" Then
+							If DrawButton(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Load", False) Then
+								LoadEntities()
+								LoadGame(SavePath + SaveGames(i - 1) + "\")
+								CurrSave = SaveGames(i - 1)
+								InitLoadGame()
+								MainMenuOpen = False
+							EndIf
+							
+							If DrawButton(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Delete", False) Then
+								SaveMSG = SaveGames(i - 1)
+								DebugLog SaveMSG
+								Exit
+							EndIf
+							
+						Else
+							DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
+							Color(100, 100, 100)
+							AAText(x + 330 * MenuScale, y + 35 * MenuScale, "Load", True, True)
+							
+							DrawFrame(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
+							Color(100, 100, 100)
+							AAText(x + 450 * MenuScale, y + 35 * MenuScale, "Delete", True, True)
 						EndIf
 						
-						If DrawButton(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Delete", False) Then
-							DeleteFile(CurrentDir()+SavePath + SaveGames(i - 1)+"\save.txt")
-							DeleteDir(CurrentDir()+SavePath + SaveGames(i - 1))
-							LoadSaveGames()
-							Exit
-						EndIf
+						y = y + 80 * MenuScale
 						
-						y=y+80 * MenuScale
 					Next
+					
+					If SaveMSG <> ""
+						x = GraphicWidth / 2
+						y = GraphicHeight / 2
+						DrawFrame(x, y, 400 * MenuScale, 200 * MenuScale)
+						AAText(x + 20 * MenuScale, y + 15 * MenuScale, "Are you sure you want to delete this save?")
+						If DrawButton(x + 250 * MenuScale, y + 150 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Yes", False) Then
+							DeleteFile(CurrentDir() + SavePath + SaveMSG + "\save.txt")
+							DeleteDir(CurrentDir() + SavePath + SaveMSG)
+							SaveMSG = ""
+							LoadSaveGames()
+						EndIf
+						If DrawButton(x + 50 * MenuScale, y + 150 * MenuScale, 100 * MenuScale, 30 * MenuScale, "No", False) Then
+							SaveMSG = ""
+						EndIf
+					EndIf
 				EndIf
+				
+				
 				
 				;[End Block]
 			Case 3,5,6,7 ;options
@@ -525,15 +555,15 @@ Function UpdateMainMenu()
 					
 					y=y+20*MenuScale
 					
-					Color 100,100,100				
-					AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
-					DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)
-					If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+					;Color 100,100,100				
+					;AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
+					;DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)
+					;If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
 						;DrawTooltip("Not available in this version")
-						DrawOptionsTooltip(tx,ty,tw,th,"bump")
-					EndIf
+					;	DrawOptionsTooltip(tx,ty,tw,th,"bump")
+					;EndIf
 					
-					y=y+30*MenuScale
+					;y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "VSync:")
@@ -606,7 +636,7 @@ Function UpdateMainMenu()
 					;If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
 					;	DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
 					;EndIf
-					ResolutionDetails = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","STANDARD")
+					ResolutionDetails = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","FULL")
 					Color 255,255,255
 					Select ResolutionDetails
 						Case 0
@@ -624,19 +654,19 @@ Function UpdateMainMenu()
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Particle amount:")
-					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"ALMOST NONE","FEW","ALL")
+					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"MINIMAL","REDUCED","FULL")
 					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
 					EndIf
 					
-					y=y+50*MenuScale
-					
-						Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Enable prop fading:")
-					PropFading = DrawTick(x + 310 * MenuScale, y + MenuScale, PropFading)
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
-						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
-					EndIf
+;					y=y+50*MenuScale
+;					
+;						Color 255,255,255
+;					AAText(x + 20 * MenuScale, y, "Enable prop fading:")
+;					PropFading = DrawTick(x + 310 * MenuScale, y + MenuScale, PropFading)
+;					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+;						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
+;					EndIf
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]

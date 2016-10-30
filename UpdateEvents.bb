@@ -9193,6 +9193,42 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				;[End Block]
+			Case "medibay"
+				;[Block]
+				;e\EventState: Determines if the player has entered the room or not
+				;	- 0 : Not entered
+				;	- 1 : Has entered
+				;e\EventState2: A timer for the zombie wake up
+				
+				;Hiding/Showing the props in this room
+				If PlayerRoom <> e\room
+					HideEntity e\room\Objects[0]
+				Else
+					ShowEntity e\room\Objects[0]
+					;Setup
+					If e\EventState = 0
+						e\room\NPC[0] = CreateNPC(NPCtype008,EntityX(e\room\Objects[3],True),0.5,EntityZ(e\room\Objects[3],True))
+						RotateEntity e\room\NPC[0]\Collider,0,e\room\angle-90,0
+						e\EventState = 1
+					EndIf
+					
+					If EntityDistance(e\room\NPC[0]\Collider,Collider)<1.2
+						If e\EventState2 = 0
+							LightBlink = 5.0
+							PlaySound_Strict LightSFX
+							e\EventState2 = FPSfactor
+						EndIf
+					EndIf
+				EndIf
+				
+				If e\EventState2 > 0 And e\EventState2 < 70*4
+					e\EventState2 = e\EventState2 + FPSfactor
+				ElseIf e\EventState2 >= 70*4
+					If e\room\NPC[0]\State = 0
+						e\room\NPC[0]\State = 1
+					EndIf
+				EndIf
+				;[End Block]
 		End Select
 		
 		If e<>Null Then
@@ -9228,7 +9264,7 @@ Function UpdateEvents()
 				Next
 			EndIf
 			LightFlash = Min((ExplosionTimer-160.0)/40.0,2.0)
-			If ExplosionTimer > 160 Then KillTimer = Min(KillTimer,-0.1) : EndingTimer = Min(KillTimer,-0.1)
+			If ExplosionTimer > 160 Then KillTimer = Min(KillTimer,-0.1)
 			If ExplosionTimer > 500 Then ExplosionTimer = 0
 		EndIf
 		

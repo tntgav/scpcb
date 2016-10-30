@@ -6,7 +6,7 @@ Const NPCtype173% = 1, NPCtypeOldMan% = 2, NPCtypeGuard% = 3, NPCtypeD% = 4
 Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
 Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtype178% = 17, NPCtypePdPlane% = 18
-Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21
+Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21, NPCtype008% = 22
 
 Type NPCs
 	Field obj%, obj2%, obj3%, obj4%, Collider%
@@ -609,6 +609,26 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, temp, temp, temp
 			
 			EntityFX n\obj,1
+			;[End Block]
+		Case NPCtype008
+			;[Block]
+			n\NVName = "Human"
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.2
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = LoadAnimMesh_Strict("GFX\npcs\zombiesurgeon.b3d")
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(n\obj), -MeshHeight(n\obj), -MeshDepth(n\obj), MeshWidth(n\obj)*2, MeshHeight(n\obj)*2, MeshDepth(n\obj)*2)
+			
+			SetNPCFrame n,9
+			
+			n\Sound = LoadSound_Strict("SFX\SCP\049\0492Breath.ogg")
 			;[End Block]
 	End Select
 	
@@ -2642,7 +2662,7 @@ Function UpdateNPCs()
 					Else
 						dist = EntityDistance(Collider, n\Collider)
 						
-						;use the prev-values to do a "twitching" effect"
+						;use the prev-values to do a "twitching" effect
 						n\PrevX = CurveValue(0.0, n\PrevX, 10.0)
 						n\PrevZ = CurveValue(0.0, n\PrevZ, 10.0)
 						
@@ -2916,7 +2936,11 @@ Function UpdateNPCs()
 												If WrapAngle(EntityYaw(pvt)-EntityYaw(n\Collider))<10 Then
 													PlaySound2(Gunshot2SFX, Camera, n\Collider, 20)
 													
-													DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate B."+Chr(34)
+													If PlayerRoom\RoomTemplate\Name = "exit1" Then
+														DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate B."+Chr(34)
+													Else
+														DeathMSG = Chr(34)+"CH-2 to control. Shot down a runaway Class D at Gate A."+Chr(34)
+													EndIf
 													
 													Shoot( EntityX(pvt),EntityY(pvt), EntityZ(pvt),((10/dist)*(1/dist))*(n\State=2),(n\State=2))
 													
@@ -4445,6 +4469,183 @@ Function UpdateNPCs()
 					HideEntity n\obj
 				EndIf
 				
+				;[End Block]
+			Case NPCtype008
+				;[Block]
+				;n\State: Main State
+				;n\State2: A timer used for the player detection
+				;n\State3: A timer for making the NPC idle (if the player escapes during that time)
+				
+				If (Not n\IsDead)
+					If n\State = 0
+						EntityType n\Collider,HIT_DEAD
+					Else
+						EntityType n\Collider,HIT_PLAYER
+					EndIf
+					
+					prevFrame = n\Frame
+					
+					n\BlinkTimer = 1
+					
+					Select n\State
+						Case 0 ;Lying next to the wall
+							SetNPCFrame(n,9)
+						Case 1 ;Standing up
+							AnimateNPC(n,9,30,0.1,False)
+							If n\Frame => 29
+								n\State = 2
+							EndIf
+						Case 2 ;Being active
+							PlayerSeeAble = MeNPCSeesPlayer(n)
+							If PlayerSeeAble=1 Or n\State2 > 0.0
+								If PlayerSeeAble=1
+									n\State2 = 70*2
+								Else
+									n\State2 = Max(n\State2-FPSfactor,0)
+								EndIf
+								PointEntity n\obj, Collider
+								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
+								
+								AnimateNPC(n, 61, 112, n\CurrSpeed*30)
+								n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
+								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+								
+								If EntityDistance(n\Collider,Collider)<1.0
+									n\State = 3
+								EndIf
+								
+								n\PathTimer = 0
+								n\PathStatus = 0
+								n\PathLocation = 0
+								n\State3 = 0
+							Else
+								If n\PathStatus = 1
+									If n\Path[n\PathLocation]=Null Then 
+										If n\PathLocation > 19 Then 
+											n\PathLocation = 0 : n\PathStatus = 0
+										Else
+											n\PathLocation = n\PathLocation + 1
+										EndIf
+									Else
+										PointEntity n\obj, n\Path[n\PathLocation]\obj
+										RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
+										
+										AnimateNPC(n, 61, 112, n\CurrSpeed*30)
+										n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
+										MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+										
+										;opens doors in front of him
+										dist2# = EntityDistance(n\Collider,n\Path[n\PathLocation]\obj)
+										If dist2 < 0.6 Then
+											temp = True
+											If n\Path[n\PathLocation]\door <> Null Then
+												If (Not n\Path[n\PathLocation]\door\IsElevatorDoor)
+													If n\Path[n\PathLocation]\door\locked Or n\Path[n\PathLocation]\door\KeyCard>0 Or n\Path[n\PathLocation]\door\Code<>"" Then
+														temp = False
+													Else
+														If n\Path[n\PathLocation]\door\open = False Then UseDoor(n\Path[n\PathLocation]\door, False)
+													EndIf
+												EndIf
+											EndIf
+											If dist2#<0.2 And temp
+												n\PathLocation = n\PathLocation + 1
+											ElseIf dist2#<0.5 And (Not temp)
+												n\PathStatus = 0
+												n\PathTimer# = 0.0
+											EndIf
+										EndIf
+										
+										;If Rand(100)=3
+										;	n\PathStatus = FindPath(n,EntityX(Collider),EntityY(Collider),EntityZ(Collider))
+										;EndIf
+									EndIf
+								Else
+									AnimateNPC(n, 152, 173, 0.2, True)
+									n\CurrSpeed = 0
+									If n\PathTimer < 70*5
+										n\PathTimer = n\PathTimer + Rnd(1,2+(2*SelectedDifficulty\aggressiveNPCs))*FPSfactor
+									Else
+										n\PathStatus = FindPath(n,EntityX(Collider),EntityY(Collider),EntityZ(Collider))
+										n\PathTimer = 0
+									EndIf
+								EndIf
+								
+								If EntityDistance(n\Collider,Collider)>HideDistance
+									If n\State3 < 70*(15+(10*SelectedDifficulty\aggressiveNPCs))
+										n\State3 = n\State3+FPSfactor
+									Else
+										DebugLog "SCP-008-1 IDLE"
+										n\State3 = 70*(6*60)
+										n\State = 4
+									EndIf
+								EndIf
+							EndIf
+							
+							If n\CurrSpeed > 0.005 Then
+								If (prevFrame < 72 And n\Frame=>72) Or (prevFrame < 85 And n\Frame=>85) Or (prevFrame < 98 And n\Frame > 98) Or (prevFrame > 110 And n\Frame<62)
+									PlaySound2(StepSFX(0,0,Rand(0,7)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
+								EndIf
+							EndIf
+							
+							n\SoundChn = LoopSound2(n\Sound,n\SoundChn,Camera,n\Collider)
+						Case 3 ;Attacking
+							AnimateNPC(n, 113, 151, 0.2, False)
+							If (n\Frame => 127 And prevFrame < 127) Or (n\Frame => 135 And prevFrame < 135)
+								If EntityDistance(n\Collider,Collider)<1.1
+									If (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
+										PlaySound_Strict DamageSFX(Rand(5,8))
+										Injuries = Injuries+Rnd(0.4,1.0)
+										Infect = Infect + (1+(1*SelectedDifficulty\aggressiveNPCs))
+										DeathMSG = "Subject D-9341. Cause of death: multiple lacerations and severe blunt force trauma caused by an instance of SCP-008-1."
+									EndIf
+								EndIf
+							ElseIf n\Frame => 150
+								n\State = 2
+							EndIf
+						Case 4 ;Idling
+							HideEntity n\obj
+							HideEntity n\Collider
+							n\DropSpeed = 0
+							PositionEntity n\Collider,0,500,0
+							ResetEntity n\Collider
+							If n\Idle > 0
+								n\Idle = Max(n\Idle-(1+(1*SelectedDifficulty\aggressiveNPCs))*FPSfactor,0)
+							Else
+								If PlayerInReachableRoom() ;Player is in a room where SCP-008-1 can teleport to
+									If Rand(50-(20*SelectedDifficulty\aggressiveNPCs))=1
+										ShowEntity n\Collider
+										ShowEntity n\obj
+										For w.waypoints = Each WayPoints
+											If w\door=Null And w\room\dist < HideDistance And Rand(3)=1 Then
+												If EntityDistance(w\room\obj,n\Collider)<EntityDistance(Collider,n\Collider)
+													x = Abs(EntityX(n\Collider)-EntityX(w\obj,True))
+													If x < 12.0 And x > 4.0 Then
+														z = Abs(EntityZ(n\Collider)-EntityZ(w\obj,True))
+														If z < 12 And z > 4.0 Then
+															If w\room\dist > 4
+																DebugLog "MOVING 008-1 TO "+w\room\roomtemplate\name
+																PositionEntity n\Collider, EntityX(w\obj,True), EntityY(w\obj,True)+0.25,EntityZ(w\obj,True)
+																ResetEntity n\Collider
+																n\PathStatus = 0
+																n\PathTimer# = 0.0
+																n\PathLocation = 0
+																Exit
+															EndIf
+														EndIf
+													EndIf
+												EndIf
+											EndIf
+										Next
+										n\State = 2
+										n\State3 = 0
+									EndIf
+								EndIf
+							EndIf
+					End Select
+				EndIf
+				
+				RotateEntity n\obj,0,EntityYaw(n\Collider)-180,0
+				PositionEntity n\obj,EntityX(n\Collider),EntityY(n\Collider)-0.2,EntityZ(n\Collider)
 				;[End Block]
 		End Select
 		
@@ -6382,10 +6583,11 @@ Function Console_SpawnNPC(c_input$,state%=-9999)
 	Select c_input$ 
 		Case "mtf"
 			n.NPCs = CreateNPC(NPCtypeMTF, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "173","scp173","scp-173"
+		Case "173","scp173","scp-173","statue"
 			n.NPCs = CreateNPC(NPCtype173, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
 		Case "106","scp106","scp-106","larry"
-			n.NPCs = CreateNPC(NPCtypeOldMan, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+			Curr106\State = -1
+			PositionEntity(Curr106\Collider, EntityX(Collider), EntityY(Curr106\Collider), EntityZ(Collider))
 		Case "guard"
 			n.NPCs = CreateNPC(NPCtypeGuard, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
 		Case "096","scp096","scp-096"
@@ -6416,7 +6618,7 @@ Function Console_SpawnNPC(c_input$,state%=-9999)
 			If state%=-9999 Then n\State = 1
 		Case "066","scp066","scp-066"
 			n.NPCs = CreateNPC(NPCtype066, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "npc178"
+		Case "npc178","178-1"
 			n.NPCs = CreateNPC(NPCtype178, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
 		Case "pdplane"
 			n.NPCs = CreateNPC(NPCtypePdPlane, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
