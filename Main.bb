@@ -28,7 +28,7 @@ Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
 Global VersionNumber$ = "1.3.3"
-Global CompatibleNumber$ = "1.3.2"
+Global CompatibleNumber$ = "1.3.3"
 
 AppTitle "SCP - Containment Breach Launcher"
 
@@ -4725,7 +4725,17 @@ Function DrawGUI()
 								If e\EventState = 0 Then
 									ShowEntity Light
 									LightFlash = 3
-									PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))											
+									PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))		
+									
+									;Remove 1123 from the player's inventory.
+									For z% = 0 To MaxItemAmount - 1
+										If Inventory(z) <> Null Then
+											If Inventory(z)\itemtemplate\tempname="1123" Then
+												DropItem(Inventory(z))
+												Exit
+											EndIf
+										EndIf
+									Next
 								EndIf
 								e\EventState = Max(1, e\EventState)
 								Exit
