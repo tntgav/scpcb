@@ -574,6 +574,19 @@ Function PickItem(item.Items)
 										PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))											
 									EndIf
 									e\eventstate = Max(1, e\eventstate)
+
+									;Remove 1123 from the player's inventory and place it back in its chamber.
+									For z% = 0 To MaxItemAmount - 1
+										If Inventory(z) <> Null Then
+											If Inventory(z)\itemtemplate\tempname="1123" Then
+												RemoveItem(Inventory(z))
+												it = CreateItem("SCP-1123", "1123", r\x + 832.0 * RoomScale, r\y + 166.0 * RoomScale, r\z + 784.0 * RoomScale)
+												EntityParent(it\collider, r\obj)
+												Exit
+											EndIf
+										EndIf
+									Next
+
 									Exit
 								EndIf
 							Next
