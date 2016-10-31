@@ -2345,7 +2345,10 @@ Function FillRoom(r.Rooms)
 			;[End Block]
 		Case "room2shaft"
 			;[Block]
-			d = CreateDoor(r\zone, r\x + 1552.0 * RoomScale, r\y, r\z + 552.0 * RoomScale, 0, r, False, False, 4)
+			d = CreateDoor(r\zone, r\x + 1552.0 * RoomScale, r\y, r\z + 552.0 * RoomScale, 0, r, False, False)
+			d\AutoClose = False : d\open = False
+			
+			d = CreateDoor(r\zone, r\x + 256.0 * RoomScale, r\y, r\z + 744.0 * RoomScale, 90, r, False, False, 2)
 			d\AutoClose = False : d\open = False
 			
 			it = CreateItem("Level 2 Key Card", "key2", r\x + 256.0 * RoomScale, r\y, r\z + 744.0 * RoomScale)
@@ -2363,7 +2366,7 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("9V Battery", "bat", r\x + 1061.0 * RoomScale, r\y + 161.0 * RoomScale, r\z + 494.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			
-			it = CreateItem("ReVision Eyedrops", "eyedrops", r\x + 1930.0*RoomScale, r\y + 225.0 * RoomScale, r\z - 128.0*RoomScale)
+			it = CreateItem("ReVision Eyedrops", "eyedrops", r\x + 1930.0*RoomScale, r\y + 225.0 * RoomScale, r\z + 128.0*RoomScale)
 			EntityParent(it\collider, r\obj)	
 			;[End Block]
 			
@@ -6812,7 +6815,6 @@ Function CreateMap()
 	SetRoom("room2sl", ROOM2, Floor(0.5*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room012", ROOM2, Floor(0.55*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2scps2",ROOM2,Floor(0.6*Float(Room2Amount[0])),min_pos,max_pos)
-	SetRoom("room2shaft",ROOM2,Floor(0.65*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room1123",ROOM2,Floor(0.7*Float(Room2Amount[0])),min_pos,max_pos)
 	SetRoom("room2elevator",ROOM2,Floor(0.85*Float(Room2Amount[0])),min_pos,max_pos)
 	
@@ -6838,6 +6840,7 @@ Function CreateMap()
 	MapRoom(ROOM2, Room2Amount[0]+Floor(0.1*Float(Room2Amount[1]))) = "room2nuke"
 	SetRoom("room2tunnel", ROOM2, Room2Amount[0]+Floor(0.25*Float(Room2Amount[1])),min_pos,max_pos)
 	SetRoom("room049", ROOM2, Room2Amount[0]+Floor(0.4*Float(Room2Amount[1])),min_pos,max_pos)
+	SetRoom("room2shaft",ROOM2,Room2Amount[0]+Floor(0.6*Float(Room2Amount[1])),min_pos,max_pos)
 	SetRoom("room2servers", ROOM2, Room2Amount[0]+Floor(0.7*Room2Amount[1]),min_pos,max_pos)
 	SetRoom("testroom", ROOM2, Room2Amount[0]+Floor(0.9*Float(Room2Amount[1])),min_pos,max_pos)
 	
