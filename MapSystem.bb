@@ -3,7 +3,7 @@
 Type Materials
 	Field name$
 	Field Diff
-	;Field Bump
+	Field Bump
 	
 	Field StepSound%
 End Type
@@ -27,14 +27,20 @@ Function LoadMaterials(file$)
 			
 			mat\name = Lower(TemporaryString)
 			
-			;If BumpEnabled Then
-			;	StrTemp = GetINIString(file, TemporaryString, "bump")
-			;	If StrTemp <> "" Then 
-			;		mat\Bump =  LoadTexture_Strict(StrTemp)
-			;		
-			;		TextureBlend mat\Bump, FE_BUMP				
-			;	EndIf
-			;EndIf
+			If BumpEnabled Then
+				StrTemp = GetINIString(file, TemporaryString, "bump")
+				If StrTemp <> "" Then 
+					mat\Bump =  LoadTexture_Strict(StrTemp)
+					
+					TextureBlend mat\Bump, 6
+					TextureBumpEnvMat mat\Bump,0,0,-0.012
+					TextureBumpEnvMat mat\Bump,0,1,-0.012
+					TextureBumpEnvMat mat\Bump,1,0,0.012
+					TextureBumpEnvMat mat\Bump,1,1,0.012
+					TextureBumpEnvOffset mat\Bump,0.5
+					TextureBumpEnvScale mat\Bump,1.0				
+				EndIf
+			EndIf
 			
 			mat\StepSound = (GetINIInt(file, TemporaryString, "stepsound")+1)
 		EndIf
@@ -272,12 +278,12 @@ Function GetTextureFromCache%(name$)
 	Return 0
 End Function
 
-;Function GetBumpFromCache%(name$)
-;	For tc.Materials=Each Materials
-;		If tc\name = name Then Return tc\Bump
-;	Next
-;	Return 0
-;End Function
+Function GetBumpFromCache%(name$)
+	For tc.Materials=Each Materials
+		If tc\name = name Then Return tc\Bump
+	Next
+	Return 0
+End Function
 
 Function GetCache.Materials(name$)
 	For tc.Materials=Each Materials
@@ -291,13 +297,21 @@ Function AddTextureToCache(texture%)
 	If tc.Materials=Null Then
 		tc.Materials=New Materials
 		tc\name=StripPath(TextureName(texture))
-		;Local temp$=GetINIString("Data\materials.ini",tc\name,"bump")
-		;If temp<>"" Then
-		;	tc\Bump=LoadTexture_Strict(temp)
-		;	TextureBlend tc\Bump,FE_BUMP
-		;Else
-		;	tc\Bump=0
-		;EndIf
+		If BumpEnabled Then
+			Local temp$=GetINIString("Data\materials.ini",tc\name,"bump")
+			If temp<>"" Then
+				tc\Bump=LoadTexture_Strict(temp)
+				TextureBlend tc\Bump,6
+				TextureBumpEnvMat tc\Bump,0,0,-0.012
+				TextureBumpEnvMat tc\Bump,0,1,-0.012
+				TextureBumpEnvMat tc\Bump,1,0,0.012
+				TextureBumpEnvMat tc\Bump,1,1,0.012
+				TextureBumpEnvOffset tc\Bump,0.5
+				TextureBumpEnvScale tc\Bump,1.0
+			Else
+				tc\Bump=0
+			EndIf
+		EndIf
 		tc\Diff=0
 	EndIf
 	If tc\Diff=0 Then tc\Diff=texture
@@ -306,7 +320,7 @@ End Function
 Function ClearTextureCache()
 	For tc.Materials=Each Materials
 		If tc\Diff<>0 Then FreeTexture tc\Diff
-		;If tc\Bump<>0 Then FreeTexture tc\Bump
+		If tc\Bump<>0 Then FreeTexture tc\Bump
 		Delete tc
 	Next
 End Function
@@ -314,8 +328,8 @@ End Function
 Function FreeTextureCache()
 	For tc.Materials=Each Materials
 		If tc\Diff<>0 Then FreeTexture tc\Diff
-		;If tc\Bump<>0 Then FreeTexture tc\Bump
-		tc\Diff = 0; : tc\Bump = 0
+		If tc\Bump<>0 Then FreeTexture tc\Bump
+		tc\Diff = 0 : tc\Bump = 0
 	Next
 End Function
 
@@ -434,12 +448,20 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				BrushTexture brush,blankTexture,0,0
 			EndIf
 		Else
-			
 			If tex[0]<>0 And tex[1]<>0 Then
+				bumptex% = GetBumpFromCache(StripPath(TextureName(tex[1])))
+				;If bumptex<>0 Then
+				;	DebugLog StripPath(TextureName(bumptex))
+				;	Stop
+				;EndIf
 				For j=0 To 1
-					BrushTexture brush,tex[j],0,j+1
+					BrushTexture brush,tex[j],0,j+1+(bumptex<>0)
 				Next
+				
 				BrushTexture brush,AmbientLightRoomTex,0
+				If (bumptex<>0) Then
+					BrushTexture brush,bumptex,0,1
+				EndIf
 			Else
 				For j=0 To 1
 					If tex[j]<>0 Then

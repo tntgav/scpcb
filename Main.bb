@@ -77,15 +77,15 @@ Global TextureDetails% = GetINIInt(OptionFile, "options", "texture details")
 Global TextureFloat#
 Select TextureDetails%
 	Case 0
-		TextureFloat# = 1.5
+		TextureFloat# = 0.0
 	Case 1
-		TextureFloat# = 1.33
+		TextureFloat# = 0.4
 	Case 2
-		TextureFloat# = 1.0
+		TextureFloat# = 0.8
 	Case 3
-		TextureFloat# = 0.66
+		TextureFloat# = -0.8
 	Case 4
-		TextureFloat# = 0.5
+		TextureFloat# = -0.4
 End Select
 Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
 Global SFXVolume# = GetINIFloat(OptionFile, "audio", "sound volume")
@@ -5876,7 +5876,7 @@ Function DrawMenu()
 				PutINIValue(OptionFile, "binds", "Console key", KEY_CONSOLE)
 				
 				AntiAlias Opt_AntiAlias
-				;TextureLodBias TextureFloat#
+				TextureLodBias TextureFloat#
 			EndIf
 			
 			Color 0,255,0
@@ -5907,14 +5907,14 @@ Function DrawMenu()
 					;[Block]
 					y=y+50*MenuScale
 					
-					Color 100,100,100				
-					;AAText(x, y, "Enable bump mapping:")	
-					;DrawTick(x + 270 * MenuScale, y + MenuScale, False, True)
-					;If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
-					;	DrawOptionsTooltip(tx,ty,tw,th,"bump")
-					;EndIf
+					Color 100,100,100
+					AAText(x, y, "Enable bump mapping:")	
+					BumpEnabled = DrawTick(x + 270 * MenuScale, y + MenuScale, BumpEnabled, True)
+					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"bump")
+					EndIf
 					
-					;y=y+30*MenuScale
+					y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x, y, "VSync:")
@@ -5978,6 +5978,39 @@ Function DrawMenu()
 					EndIf
 					
 					y=y+50*MenuScale
+					
+					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Texture LOD Bias:")
+					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
+					If MouseHit1
+						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+							If TextureDetails% < 4
+								TextureDetails% = TextureDetails% + 1
+							Else
+								TextureDetails% = 0
+							EndIf
+							Select TextureDetails%
+								Case 0
+									TextureFloat# = 0.0
+								Case 1
+									TextureFloat# = 0.4
+								Case 2
+									TextureFloat# = 0.8
+								Case 3
+									TextureFloat# = -0.8
+								Case 4
+									TextureFloat# = -0.4
+							End Select
+							TextureLodBias TextureFloat
+							PlaySound_Strict(ButtonSFX)
+						EndIf
+					EndIf
+					Color 255,255,255
+					AAText(x + 340 * MenuScale, y + MenuScale, Str(TextureFloat))
+					
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
+					EndIf
 					
 					;Color 255,255,255
 					;AAText(x, y, "Enable prop fading:")
@@ -6822,7 +6855,7 @@ Function LoadEntities()
 	
 	LoadMaterials("DATA\materials.ini")
 	
-	;TextureLodBias TextureFloat#
+	TextureLodBias TextureFloat#
 	
 	DrawLoading(30)
 	
@@ -7513,7 +7546,21 @@ Function GetStepSound(entity%)
         If GetEntityType(picker) <> HIT_MAP Then Return 0
         brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
         If brush <> 0 Then
-            texture = GetBrushTexture(brush,2)
+            texture = GetBrushTexture(brush,3)
+            If texture <> 0 Then
+                name = StripPath(TextureName(texture))
+                If (name <> "") FreeTexture(texture)
+                For mat.Materials = Each Materials
+                    If mat\name = name Then
+                        If mat\StepSound > 0 Then
+                            FreeBrush(brush)
+                            Return mat\StepSound-1
+                        EndIf
+                        Exit
+                    EndIf
+                Next                
+            EndIf
+			texture = GetBrushTexture(brush,2)
             If texture <> 0 Then
                 name = StripPath(TextureName(texture))
                 If (name <> "") FreeTexture(texture)
