@@ -470,11 +470,11 @@ Function UpdateMainMenu()
 						Else
 							DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
 							Color(100, 100, 100)
-							AAText(x + 330 * MenuScale, y + 35 * MenuScale, "Load", True, True)
+							AAText(x + 330 * MenuScale, y + 34 * MenuScale, "Load", True, True)
 							
 							DrawFrame(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
 							Color(100, 100, 100)
-							AAText(x + 450 * MenuScale, y + 35 * MenuScale, "Delete", True, True)
+							AAText(x + 450 * MenuScale, y + 34 * MenuScale, "Delete", True, True)
 						EndIf
 						
 						y = y + 80 * MenuScale
