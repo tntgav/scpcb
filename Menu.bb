@@ -470,11 +470,11 @@ Function UpdateMainMenu()
 						Else
 							DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
 							Color(100, 100, 100)
-							AAText(x + 330 * MenuScale, y + 35 * MenuScale, "Load", True, True)
+							AAText(x + 330 * MenuScale, y + 34 * MenuScale, "Load", True, True)
 							
 							DrawFrame(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
 							Color(100, 100, 100)
-							AAText(x + 450 * MenuScale, y + 35 * MenuScale, "Delete", True, True)
+							AAText(x + 450 * MenuScale, y + 34 * MenuScale, "Delete", True, True)
 						EndIf
 						
 						y = y + 80 * MenuScale
@@ -555,15 +555,15 @@ Function UpdateMainMenu()
 					
 					y=y+20*MenuScale
 					
-					;Color 100,100,100				
-					;AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
-					;DrawTick(x + 310 * MenuScale, y + MenuScale, False, True)
-					;If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+					Color 255,255,255				
+					AAText(x + 20 * MenuScale, y, "Enable bump mapping:")	
+					BumpEnabled = DrawTick(x + 310 * MenuScale, y + MenuScale, BumpEnabled)
+					If MouseOn(x + 310 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
 						;DrawTooltip("Not available in this version")
-					;	DrawOptionsTooltip(tx,ty,tw,th,"bump")
-					;EndIf
+						DrawOptionsTooltip(tx,ty,tw,th,"bump")
+					EndIf
 					
-					;y=y+30*MenuScale
+					y=y+30*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "VSync:")
@@ -657,6 +657,41 @@ Function UpdateMainMenu()
 					ParticleAmount = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ParticleAmount,2,"MINIMAL","REDUCED","FULL")
 					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=2
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
+					EndIf
+					
+					y=y+40*MenuScale
+					
+					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Texture LOD Bias:")
+					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
+					If MouseHit1
+						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
+							If TextureDetails% < 4
+								TextureDetails% = TextureDetails% + 1
+							Else
+								TextureDetails% = 0
+							EndIf
+							Select TextureDetails%
+								Case 0
+									TextureFloat# = 0.0
+								Case 1
+									TextureFloat# = 0.4
+								Case 2
+									TextureFloat# = 0.8
+								Case 3
+									TextureFloat# = -0.8
+								Case 4
+									TextureFloat# = -0.4
+							End Select
+							TextureLodBias TextureFloat
+							PlaySound_Strict(ButtonSFX)
+						EndIf
+					EndIf
+					Color 255,255,255
+					AAText(x + 340 * MenuScale, y + MenuScale, Str(TextureFloat))
+					
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
 					
 ;					y=y+50*MenuScale
@@ -1861,8 +1896,8 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 		;Graphic options
 			;[Block]
 		Case "bump"
-			txt = Chr(34)+"Bump mapping"+Chr(34)+" is used to simulate details on textures through the use of lighting calculations."
-			txt2 = "Due to the removal of FastExtension in version 1.3.1 the feature is no longer available."
+			txt = Chr(34)+"Bump mapping"+Chr(34)+" is used to simulate bumps and dents by distorting the lightmaps."
+			If Not MainMenuOpen Then txt2 = "This option cannot be changed in-game."
 			R = 255
 		Case "vsync"
 			txt = Chr(34)+"Vertical sync"+Chr(34)+" waits for the display to finish its current refresh cycle before calculating the next frame, preventing issues such as "
@@ -1877,7 +1912,7 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			txt = Chr(34)+"Gamma correction"+Chr(34)+" is used to achieve a good brightness factor to balance out your display's gamma if the game appears either too dark or bright. "
 			txt = txt + "Setting it too high or low can cause the graphics to look less detailed."
 		Case "texquality"
-			txt = Chr(34)+"Texture quality"+Chr(34)+" smooths out the rendering of textures at extreme angles, making them appear less warped."
+			txt = Chr(34)+"Texture LOD Bias"+Chr(34)+" affects the distance at which texture detail will change to prevent aliasing. Change this option if textures flicker or look too blurry."
 		Case "resquality"
 			txt = Chr(34)+"Resolution quality"+Chr(34)+" adjusts the resolution at which the game will render."
 			txt2 = "The game will render at "
