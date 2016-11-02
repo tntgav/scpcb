@@ -266,6 +266,8 @@ Global BlinkTimer#, EyeIrritation#, EyeStuck#, BlinkEffect# = 1.0, BlinkEffectTi
 
 Global Stamina#, StaminaEffect#=1.0, StaminaEffectTimer#
 
+Global CameraShakeTimer#, Vomit%, VomitTimer#, Regurgitate%
+
 Global SCP1025state#[6]
 
 Global HeartBeatRate#, HeartBeatTimer#, HeartBeatVolume#
@@ -1566,7 +1568,7 @@ Next
 Dim MTFSFX%(8)
 
 Dim CoughSFX%(3)
-Global CoughCHN%
+Global CoughCHN%, VomitCHN%
 For i = 0 To 2
 	CoughSFX(i) = LoadSound_Strict("SFX\Character\D9341\Cough" + (i + 1) + ".ogg")
 Next
@@ -2708,6 +2710,7 @@ Repeat
 			UpdateParticles()
 			UpdateScreens()
 			UpdateRoomLights(Camera)
+			Update294()
 			TimeCheckpointMonitors()
 			UpdateLeave1499()
 			If (PropFading) Then UpdateMapProps()
@@ -5017,6 +5020,8 @@ Function DrawGUI()
 						If GetINIInt2(iniStr, loc, "lethal") Then Kill()
 					EndIf
 					BlurTimer = GetINIInt2(iniStr, loc, "blur")*70;*temp
+					VomitTimer = GetINIInt2(iniStr, loc, "vomit")
+					CameraShakeTimer = GetINIString2(iniStr, loc, "camerashake")
 					Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
 					Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"),0);*temp
 					strtemp =  GetINIString2(iniStr, loc, "sound")
@@ -5035,6 +5040,7 @@ Function DrawGUI()
 					
 					strtemp = GetINIString2(iniStr, loc, "refusemessage")
 					If strtemp <> "" Then
+						DebugLog "MEMES"
 						Msg = strtemp 
 						MsgTimer = 70*6		
 					Else
@@ -5047,6 +5053,8 @@ Function DrawGUI()
 						
 						RemoveItem(SelectedItem)						
 					EndIf
+					
+					SelectedItem = Null	
 					
 				Case "radio","18vradio","fineradio","veryfineradio"
 					If SelectedItem\state <= 100 Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.004)
@@ -9642,6 +9650,10 @@ Function IsItemGoodFor1162(itt.ItemTemplates)
 		Case "radio","18vradio"
 			Return True
 		Case "clipboard","eyedrops","nvgoggles"
+			Return True
+		Case "drawing"
+			If itt\img<>0 Then FreeImage itt\img	
+			itt\img = LoadImage_Strict("GFX\items\1048\1048_"+Rand(1,20)+".jpg") ;Gives a random drawing.
 			Return True
 		Default
 			If itt\tempname <> "paper" Then

@@ -186,7 +186,6 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Mysterious Note", "paper", "GFX\items\paper.x", "GFX\items\INVnote.jpg", "GFX\items\sn.it", 0.003, "GFX\items\notetexture.jpg") : it\sound = 0	
 	
 	it = CreateItemTemplate("Mobile Task Forces", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docMTF.jpg", 0.003) : it\sound = 0
-	it = CreateItemTemplate("Mobile Task Force Epsilon-11", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docNTF.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Security Clearance Levels", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docSC.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Object Classes", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docOBJC.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Document", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docRAND3.jpg", 0.003) : it\sound = 0 
@@ -706,10 +705,61 @@ Function DropItem(item.Items)
 	
 End Function
 
-
-
-
-
+;Update any ailments inflicted by SCP-294 drinks.
+Function Update294()
+	CatchErrors("Uncaught (Update294)")
+	
+	If CameraShakeTimer > 0 Then
+		CameraShakeTimer = CameraShakeTimer - (FPSfactor/70)
+		CameraShake = 2
+	EndIf
+	
+	If VomitTimer > 0 Then
+		DebugLog VomitTimer
+		VomitTimer = VomitTimer - (FPSfactor/70)
+		
+		If (MilliSecs2() Mod 1600) < Rand(200, 400) Then
+			If BlurTimer = 0 Then BlurTimer = Rnd(10, 20)*70
+			CameraShake = Rnd(0, 2)
+		EndIf
+		
+;		If (MilliSecs2() Mod 1000) < Rand(1200) Then 
+		
+		If Rand(50) = 50 And (MilliSecs2() Mod 4000) < 200 Then PlaySound_Strict(CoughSFX(Rand(0,2)))
+		
+		;Regurgitate when timer is below 10 seconds. (ew)
+		If VomitTimer < 10 And Rnd(0, 200) < 2 Then
+			If (Not ChannelPlaying(VomitCHN)) And (Not Regurgitate) Then
+				VomitCHN = PlaySound_Strict(LoadTempSound("SFX\SCP\294\Retch" + Rand(1, 2) + ".ogg"))
+				Regurgitate = MilliSecs2()+100
+			EndIf
+		EndIf
+		
+		If Regurgitate > MilliSecs2() And Regurgitate <> 0 Then
+			user_camera_pitch = CurveAngle(70.0, user_camera_pitch + 2.0, 100)
+		Else
+			Regurgitate = 0
+		EndIf
+		
+	ElseIf VomitTimer < 0 Then ;vomit
+		VomitTimer = VomitTimer - (FPSfactor/70)
+		If (MilliSecs2() Mod 400) < 50 Then CameraShake = 4
+		If CoughCHN = 0 Then
+			BlurTimer = 40*70
+			Vomit = LoadSound_Strict("SFX\SCP\294\Vomit.ogg")
+			CoughCHN = PlaySound_Strict(Vomit)
+		EndIf
+		
+		user_camera_pitch = CurveAngle(70.0, user_camera_pitch + 4.0, 120)
+		
+		If VomitTimer < -6 Then
+			FreeSound_Strict(Vomit)
+			VomitTimer = 0
+		EndIf
+	EndIf
+	
+	CatchErrors("Update294")
+End Function
 
 ;~IDEal Editor Parameters:
 ;~F#B#1E
