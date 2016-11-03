@@ -728,33 +728,59 @@ Function Update294()
 		If Rand(50) = 50 And (MilliSecs2() Mod 4000) < 200 Then PlaySound_Strict(CoughSFX(Rand(0,2)))
 		
 		;Regurgitate when timer is below 10 seconds. (ew)
-		If VomitTimer < 10 And Rnd(0, 200) < 2 Then
+		If VomitTimer < 10 And Rnd(0, 500 * VomitTimer) < 2 Then
 			If (Not ChannelPlaying(VomitCHN)) And (Not Regurgitate) Then
 				VomitCHN = PlaySound_Strict(LoadTempSound("SFX\SCP\294\Retch" + Rand(1, 2) + ".ogg"))
-				Regurgitate = MilliSecs2()+100
+				Regurgitate = MilliSecs2() + 50
 			EndIf
 		EndIf
 		
 		If Regurgitate > MilliSecs2() And Regurgitate <> 0 Then
-			user_camera_pitch = CurveAngle(70.0, user_camera_pitch + 2.0, 100)
+			mouse_y_speed_1 = mouse_y_speed_1 + 1.0
 		Else
 			Regurgitate = 0
 		EndIf
 		
 	ElseIf VomitTimer < 0 Then ;vomit
 		VomitTimer = VomitTimer - (FPSfactor/70)
-		If (MilliSecs2() Mod 400) < 50 Then CameraShake = 4
-		If CoughCHN = 0 Then
-			BlurTimer = 40*70
-			Vomit = LoadSound_Strict("SFX\SCP\294\Vomit.ogg")
-			CoughCHN = PlaySound_Strict(Vomit)
+		If VomitTimer > -5 Then
+			If (MilliSecs2() Mod 400) < 50 Then CameraShake = 4 
+			mouse_x_speed_1 = 0.0
+			Playable = False
+		Else
+			Playable = True
 		EndIf
 		
-		user_camera_pitch = CurveAngle(70.0, user_camera_pitch + 4.0, 120)
+		If (Not Vomit) Then
+			BlurTimer = 40 * 70
+			VomitSFX = LoadSound_Strict("SFX\SCP\294\Vomit.ogg")
+			VomitCHN = PlaySound_Strict(VomitSFX)
+			PrevInjuries = Injuries
+			PrevBloodloss = Bloodloss
+			Injuries = 1.5
+			Bloodloss = 70
+			
+			pvt = CreatePivot()
+			PositionEntity(pvt, EntityX(Collider), EntityY(Collider) - 0.05, EntityZ(Collider) + 0.1)
+			TurnEntity(pvt, 90, 0, 0)
+			EntityPick(pvt, 0.3)
+			de.decals = CreateDecal(15, PickedX(), PickedY() + 0.005, PickedZ(), 90, 180, 0)
+			de\Size = 0.05 : de\SizeChange = 0.001 : EntityAlpha(de\obj, 1.0) : EntityColor(de\obj, 0.0, Rnd(200, 255), 0.0) : ScaleSprite de\obj, de\size, de\size
+			FreeEntity pvt
+			Vomit = True
+		EndIf
 		
-		If VomitTimer < -6 Then
-			FreeSound_Strict(Vomit)
+		UpdateDecals()
+		
+		mouse_y_speed_1 = mouse_y_speed_1 + Max((1.0 + VomitTimer / 10), 0.0)
+		
+		If VomitTimer < -15 Then
+			FreeSound_Strict(VomitSFX)
 			VomitTimer = 0
+			PlaySound_Strict(BreathSFX(0,0))
+			Injuries = PrevInjuries
+			Bloodloss = PrevBloodloss
+			Vomit = False
 		EndIf
 	EndIf
 	

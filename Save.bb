@@ -63,6 +63,8 @@ Function SaveGame(file$)
 		WriteFloat f, SCP1025state[i]
 	Next
 	
+	WriteFloat f, VomitTimer
+	WriteFloat f, CameraShakeTimer
 	WriteFloat f, Infect
 	
 	For i = 0 To CUSTOM
@@ -509,7 +511,9 @@ Function LoadGame(file$)
 		SCP1025state[i]=ReadFloat(f)
 	Next
 	
-	Infect=ReadFloat(f)
+	VomitTimer = ReadFloat(f)
+	CameraShakeTimer = ReadFloat(f)
+	Infect = ReadFloat(f)
 	
 	Local difficultyIndex = ReadByte(f)
 	SelectedDifficulty = difficulties(difficultyIndex)
@@ -1184,7 +1188,9 @@ Function LoadGameQuick(file$)
 		SCP1025state[i]=ReadFloat(f)
 	Next
 	
-	Infect=ReadFloat(f)
+	VomitTimer = ReadFloat(f)
+	CameraShakeTimer = ReadFloat(f)
+	Infect = ReadFloat(f)
 	
 	Local difficultyIndex = ReadByte(f)
 	SelectedDifficulty = difficulties(difficultyIndex)
@@ -1880,7 +1886,6 @@ Function LoadMap(file$)
 	
 	CatchErrors("LoadMap")
 End Function
-
 
 
 

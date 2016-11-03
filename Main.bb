@@ -1547,6 +1547,8 @@ Dim CommotionState%(23)
 
 Global HeartBeatSFX = LoadSound_Strict("SFX\Character\D9341\Heartbeat.ogg")
 
+Global VomitSFX%
+
 Dim BreathSFX(2,5)
 Global BreathCHN%
 For i = 0 To 4
@@ -2617,7 +2619,7 @@ Repeat
 		
 		If FPSfactor > 0 Then UpdateSecurityCams()
 		
-		If KeyHit(KEY_INV) Then 
+		If KeyHit(KEY_INV) And VomitTimer >= 0 Then 
 			If InvOpen Then
 				ResumeSounds()
 				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
@@ -5020,7 +5022,7 @@ Function DrawGUI()
 						If GetINIInt2(iniStr, loc, "lethal") Then Kill()
 					EndIf
 					BlurTimer = GetINIInt2(iniStr, loc, "blur")*70;*temp
-					VomitTimer = GetINIInt2(iniStr, loc, "vomit")
+					If VomitTimer = 0 Then VomitTimer = GetINIInt2(iniStr, loc, "vomit")
 					CameraShakeTimer = GetINIString2(iniStr, loc, "camerashake")
 					Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
 					Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"),0);*temp
@@ -9798,7 +9800,6 @@ End Function
 
 
 
-
 ;~IDEal Editor Parameters:
-;~B#11AB#13E3#1A65
+;~B#11AD#13E5#1A67
 ;~C#Blitz3D
