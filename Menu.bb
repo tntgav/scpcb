@@ -550,7 +550,7 @@ Function UpdateMainMenu()
 				
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
-					height = 320 * MenuScale
+					height = 330 * MenuScale
 					DrawFrame(x, y, width, height)
 					
 					y=y+20*MenuScale
@@ -659,38 +659,25 @@ Function UpdateMainMenu()
 						DrawOptionsTooltip(tx,ty,tw,th,"particleamount",ParticleAmount)
 					EndIf
 					
-					y=y+40*MenuScale
+					y=y+50*MenuScale
 					
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Texture LOD Bias:")
-					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If TextureDetails% < 4
-								TextureDetails% = TextureDetails% + 1
-							Else
-								TextureDetails% = 0
-							EndIf
+					TextureDetails = Slider5(x+310*MenuScale,y+6*MenuScale,150*MenuScale,TextureDetails,3,"0.8","0.4","0.0","-0.4","-0.8")
 							Select TextureDetails%
 								Case 0
-									TextureFloat# = 0.0
+							TextureFloat# = 0.8
 								Case 1
 									TextureFloat# = 0.4
 								Case 2
-									TextureFloat# = 0.8
+							TextureFloat# = 0.0
 								Case 3
-									TextureFloat# = -0.8
-								Case 4
 									TextureFloat# = -0.4
+						Case 4
+							TextureFloat# = -0.8
 							End Select
 							TextureLodBias TextureFloat
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
-					Color 255,255,255
-					AAText(x + 340 * MenuScale, y + MenuScale, Str(TextureFloat))
-					
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+					If (MouseOn(x+310*MenuScale,y-6*MenuScale,150*MenuScale+14,20) And OnSliderID=0) Or OnSliderID=3
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
 					
@@ -1897,7 +1884,7 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			;[Block]
 		Case "bump"
 			txt = Chr(34)+"Bump mapping"+Chr(34)+" is used to simulate bumps and dents by distorting the lightmaps."
-			If Not MainMenuOpen Then txt2 = "This option cannot be changed in-game."
+			txt2 = "This option cannot be changed in-game."
 			R = 255
 		Case "vsync"
 			txt = Chr(34)+"Vertical sync"+Chr(34)+" waits for the display to finish its current refresh cycle before calculating the next frame, preventing issues such as "
@@ -2095,6 +2082,72 @@ Function Slider3(x%,y%,width%,value%,ID%,val1$,val2$,val3$)
 		AAText(x+(width/2)+7,y+10+MenuScale,val2,True)
 	Else
 		AAText(x+width+12,y+10+MenuScale,val3,True)
+	EndIf
+	
+	Return value
+	
+End Function
+
+Function Slider5(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$,val5$)
+	
+	If MouseDown1 Then
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			OnSliderID = ID
+		EndIf
+	EndIf
+	
+	Color 200,200,200
+	Rect(x,y,width+14,10,True)
+	Rect(x,y-8,4,14,True) ;1
+	Rect(x+(width/4)+2.5,y-8,4,14,True) ;2
+	Rect(x+(width/2)+5,y-8,4,14,True) ;3
+	Rect(x+(width*0.75)+7.5,y-8,4,14,True) ;4
+	Rect(x+width+10,y-8,4,14,True) ;5
+	
+	If ID = OnSliderID
+		If (ScaledMouseX() <= x+8)
+			value = 0
+		ElseIf (ScaledMouseX() >= x+width/4) And (ScaledMouseX() <= x+(width/4)+8)
+			value = 1
+		ElseIf (ScaledMouseX() >= x+width/2) And (ScaledMouseX() <= x+(width/2)+8)
+			value = 2
+		ElseIf (ScaledMouseX() >= x+width*0.75) And (ScaledMouseX() <= x+(width*0.75)+8)
+			value = 3
+		ElseIf (ScaledMouseX() >= x+width)
+			value = 4
+		EndIf
+		Color 0,255,0
+		Rect(x,y,width+14,10,True)
+	Else
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			Color 0,200,0
+			Rect(x,y,width+14,10,False)
+		EndIf
+	EndIf
+	
+	If value = 0
+		DrawImage(BlinkMeterIMG,x,y-8)
+	ElseIf value = 1
+		DrawImage(BlinkMeterIMG,x+(width/4)+1.5,y-8)
+	ElseIf value = 2
+		DrawImage(BlinkMeterIMG,x+(width/2)+3,y-8)
+	ElseIf value = 3
+		DrawImage(BlinkMeterIMG,x+(width*0.75)+4.5,y-8)
+	Else
+		DrawImage(BlinkMeterIMG,x+width+6,y-8)
+	EndIf
+	
+	Color 170,170,170
+	If value = 0
+		AAText(x+2,y+10+MenuScale,val1,True)
+	ElseIf value = 1
+		AAText(x+(width/4)+4.5,y+10+MenuScale,val2,True)
+	ElseIf value = 2
+		AAText(x+(width/2)+7,y+10+MenuScale,val3,True)
+	ElseIf value = 3
+		AAText(x+(width*0.75)+9.5,y+10+MenuScale,val4,True)
+	Else
+		AAText(x+width+12,y+10+MenuScale,val5,True)
 	EndIf
 	
 	Return value

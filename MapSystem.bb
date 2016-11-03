@@ -3329,7 +3329,7 @@ Function FillRoom(r.Rooms)
 			EntityParent(it\collider, r\obj)
 			
 			it = CreateItem("Gas Mask", "gasmask", r\x + 736.0 * RoomScale, r\y + 176.0 * RoomScale, r\z + 544.0 * RoomScale)
-			ScaleEntity(it\collider, 0.02, 0.02, 0.02) : EntityParent(it\collider, r\obj)
+			EntityParent(it\collider, r\obj)
 			
 			it = CreateItem("9V Battery", "bat", r\x + 736.0 * RoomScale, r\y + 176.0 * RoomScale, r\z - 448.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
@@ -7602,6 +7602,7 @@ End Function
 
 Type Chunk
 	Field obj%[128]
+	Field objShown%[128]
 	Field x#,z#,y#
 	Field Amount%
 	;Field debugobj%
@@ -7633,6 +7634,8 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#,spawnNPCs%=True)
 					PositionEntity ch\obj[i],x#,y#,z#
 					;ScaleEntity ch\obj[i],RoomScale,RoomScale,RoomScale
 					MoveEntity ch\obj[i],EntityX(chp\obj[i]),0,EntityZ(chp\obj[i])
+					EntityType ch\obj[i],HIT_MAP
+					EntityPickMode ch\obj[i],2
 				Next
 				Exit
 			EndIf
@@ -7678,7 +7681,10 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 		;EndIf
 		If ch\obj[0]<>0
 			For i = 0 To ch\Amount
+				If (Not ch\objShown[i])
 				ShowEntity ch\obj[i]
+					ch\objShown[i]=True
+				EndIf
 			Next
 		EndIf
 		y# = ch\y
@@ -7739,6 +7745,7 @@ Function HideChunks()
 		If ch\obj[0]<>0
 			For i = 0 To ch\Amount
 				HideEntity ch\obj[i]
+				ch\objShown[i]=False
 			Next
 		EndIf
 	Next

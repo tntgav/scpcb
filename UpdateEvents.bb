@@ -6148,6 +6148,7 @@ Function UpdateEvents()
 										e\room\NPC[0]=n
 										e\room\NPC[0]\State = 2
 										e\room\NPC[0]\Idle = 1
+										e\room\NPC[0]\HideFromNVG = True
 										PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+3,EntityZ(e\room\Objects[4],True)
 										ResetEntity e\room\NPC[0]\Collider
 										Exit
@@ -6158,6 +6159,7 @@ Function UpdateEvents()
 									PointEntity n\Collider, e\room\obj
 									n\State = 2
 									n\Idle = 1
+									n\HideFromNVG = True
 									e\room\NPC[0]=n
 								EndIf
 								QuickLoadPercent = 100
@@ -6202,6 +6204,7 @@ Function UpdateEvents()
 											e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 											PlaySound2(LoadTempSound("SFX\SCP\049\Greeting"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
 											e\room\NPC[0]\Idle = 0
+											e\room\NPC[0]\HideFromNVG = False
 											;EndIf
 										EndIf
 									EndIf
@@ -6490,6 +6493,7 @@ Function UpdateEvents()
 					TFormPoint(1088, 1096, 1728, e\room\obj, 0)
 					e\room\NPC[0] = CreateNPC(NPCtypeD, TFormedX(), TFormedY(), TFormedZ())
 					TurnEntity e\room\NPC[0]\Collider,0,e\room\angle+90,0,True
+					e\room\NPC[0]\HideFromNVG = True
 				EndIf
 				
 				If PlayerRoom = e\room And e\room\NPC[0]<>Null Then
@@ -8163,8 +8167,10 @@ Function UpdateEvents()
 						ShowEntity NTF_1499Sky
 						Update1499Sky()
 						ShouldPlay = 18
-						If EntityY(Collider)<800.0 Then PositionEntity Collider,EntityX(Collider),800.1,EntityZ(Collider),True
+						If EntityY(Collider)<800.0
+							PositionEntity Collider,EntityX(Collider),800.1,EntityZ(Collider),True
 						ResetEntity Collider
+						EndIf
 					Else
 						DropSpeed = 0
 					EndIf
@@ -8807,6 +8813,7 @@ Function UpdateEvents()
 							If e\room\NPC[0]=Null Then
 								e\room\NPC[0] = CreateNPC(NPCtype049,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True))
 							EndIf
+							e\room\NPC[0]\HideFromNVG = True
 						EndIf
 						QuickLoadPercent = 80
 						e\EventStr = "load3"
@@ -8872,6 +8879,7 @@ Function UpdateEvents()
 							PointEntity e\room\NPC[0]\Collider,e\room\obj
 							MoveEntity e\room\NPC[0]\Collider,0,0,-1
 							ResetEntity e\room\NPC[0]\Collider
+							e\room\NPC[0]\HideFromNVG = False
 							e\room\NPC[0]\PathX = EntityX(e\room\NPC[0]\Collider)
 							e\room\NPC[0]\PathZ = EntityZ(e\room\NPC[0]\Collider)
 							e\room\NPC[0]\State = 5

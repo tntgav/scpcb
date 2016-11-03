@@ -27,8 +27,8 @@ ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.3"
-Global CompatibleNumber$ = "1.3.3"
+Global VersionNumber$ = "1.3.4"
+Global CompatibleNumber$ = "1.3.3" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 AppTitle "SCP - Containment Breach Launcher"
 
@@ -77,15 +77,15 @@ Global TextureDetails% = GetINIInt(OptionFile, "options", "texture details")
 Global TextureFloat#
 Select TextureDetails%
 	Case 0
-		TextureFloat# = 0.0
+		TextureFloat# = 0.8
 	Case 1
 		TextureFloat# = 0.4
 	Case 2
-		TextureFloat# = 0.8
+		TextureFloat# = 0.0
 	Case 3
-		TextureFloat# = -0.8
-	Case 4
 		TextureFloat# = -0.4
+	Case 4
+		TextureFloat# = -0.8
 End Select
 Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
 Global SFXVolume# = GetINIFloat(OptionFile, "audio", "sound volume")
@@ -181,7 +181,7 @@ Global Vsync% = GetINIInt(OptionFile, "options", "vsync")
 
 Global Opt_AntiAlias = GetINIInt(OptionFile, "options", "antialias")
 
-Global CurrFrameLimit# = Framelimit%
+Global CurrFrameLimit# = Framelimit%/100.0
 
 Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
 ;If Fullscreen Then UpdateScreenGamma()
@@ -5990,35 +5990,22 @@ Function DrawMenu()
 					y=y+50*MenuScale
 					
 					Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Texture LOD Bias:")
-					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If TextureDetails% < 4
-								TextureDetails% = TextureDetails% + 1
-							Else
-								TextureDetails% = 0
-							EndIf
+					AAText(x, y, "Texture LOD Bias:")
+					TextureDetails = Slider5(x+270*MenuScale,y+6*MenuScale,100*MenuScale,TextureDetails,3,"0.8","0.4","0.0","-0.4","-0.8")
 							Select TextureDetails%
 								Case 0
-									TextureFloat# = 0.0
+							TextureFloat# = 0.8
 								Case 1
 									TextureFloat# = 0.4
 								Case 2
-									TextureFloat# = 0.8
+							TextureFloat# = 0.0
 								Case 3
-									TextureFloat# = -0.8
-								Case 4
 									TextureFloat# = -0.4
+						Case 4
+							TextureFloat# = -0.8
 							End Select
 							TextureLodBias TextureFloat
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
-					Color 255,255,255
-					AAText(x + 340 * MenuScale, y + MenuScale, Str(TextureFloat))
-					
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+					If (MouseOn(x+270*MenuScale,y-6*MenuScale,100*MenuScale+14,20) And OnSliderID=0) Or OnSliderID=3
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
 					
@@ -9410,7 +9397,7 @@ Function RenderWorld2()
 			Color 255,255,255;*(NVTimer/600.0)
 			
 			For np.NPCs = Each NPCs
-				If np\NVName<>"" Then ;don't waste your time if the string is empty
+				If np\NVName<>"" And (Not np\HideFromNVG) Then ;don't waste your time if the string is empty
 					PositionEntity temp2,np\NVX,np\NVY,np\NVZ
 					dist# = EntityDistance(temp2,Collider)
 					If dist<23.5 Then ;don't draw text if the NPC is too far away
