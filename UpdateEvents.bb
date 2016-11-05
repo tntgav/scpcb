@@ -2681,7 +2681,7 @@ Function UpdateEvents()
 					ShowEntity e\room\obj
 					
 					Injuries = Injuries+FPSfactor*0.00005
-					If (Not SecondaryLightOn) Then PrevSecondaryLightOn = SecondaryLightOn : SecondaryLightOn = True
+					PrevSecondaryLightOn = SecondaryLightOn : SecondaryLightOn = True
 					
 					If (EntityY(Collider)<2000*RoomScale Or EntityY(Collider)>2608*RoomScale) Then CurrStepSFX = 1
 					
