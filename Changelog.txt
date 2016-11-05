@@ -9,7 +9,7 @@
 Bug Fixes:
 - Fixed collsion issues with structures in SCP-1499's dimension.
 - Fixed visual bugs relating to the disabling of seconday lights.
-- Fixed a bug that caused SCP-1048 drawings acquired via SCP-1662 to not work.
+- Fixed a bug that caused SCP-1048 drawings acquired via SCP-1162 to not work.
 - Fixed the framelimit value resetting itself to large values after quitting the game.
 - Fixed the eyedrops texture using the strange bottle texture.
 - Fixed the gas mask in room2closets having a reduced size.

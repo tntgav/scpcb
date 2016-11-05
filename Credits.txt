@@ -124,7 +124,7 @@
 		Brandon Smith
 			Various 3D props.
 			
-		Wilbur Frisk ("Cridone")
+		Lionel Ruskin ("Cridone")
 			Battery textures and dared question Regalis' font choices.
 
 		Tom Malinowski
