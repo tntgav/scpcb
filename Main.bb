@@ -27,8 +27,8 @@ ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.3"
-Global CompatibleNumber$ = "1.3.3"
+Global VersionNumber$ = "1.3.4"
+Global CompatibleNumber$ = "1.3.3" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 AppTitle "SCP - Containment Breach Launcher"
 
@@ -77,15 +77,15 @@ Global TextureDetails% = GetINIInt(OptionFile, "options", "texture details")
 Global TextureFloat#
 Select TextureDetails%
 	Case 0
-		TextureFloat# = 0.0
+		TextureFloat# = 0.8
 	Case 1
 		TextureFloat# = 0.4
 	Case 2
-		TextureFloat# = 0.8
+		TextureFloat# = 0.0
 	Case 3
-		TextureFloat# = -0.8
-	Case 4
 		TextureFloat# = -0.4
+	Case 4
+		TextureFloat# = -0.8
 End Select
 Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
 Global SFXVolume# = GetINIFloat(OptionFile, "audio", "sound volume")
@@ -181,7 +181,7 @@ Global Vsync% = GetINIInt(OptionFile, "options", "vsync")
 
 Global Opt_AntiAlias = GetINIInt(OptionFile, "options", "antialias")
 
-Global CurrFrameLimit# = Framelimit%
+Global CurrFrameLimit# = Framelimit%/100.0
 
 Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
 ;If Fullscreen Then UpdateScreenGamma()
@@ -1684,6 +1684,15 @@ End Select
 
 Global ParticleAmount% = GetINIInt(OptionFile,"options","particle amount")
 Global PropFading% = False ;GetINIInt(OptionFile,"options","prop fading")
+
+Dim NavImages(5)
+For i = 0 To 3
+	NavImages(i) = LoadImage_Strict("GFX\navigator\roomborder"+i+".png")
+	MaskImage NavImages(i),255,0,255
+Next
+NavImages(4) = LoadImage_Strict("GFX\navigator\batterymeter.png")
+
+Global NavBG = CreateImage(GraphicWidth,GraphicHeight)
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -5480,6 +5489,8 @@ Function DrawGUI()
 					width = 287
 					height = 256
 					
+					Local PlayerX,PlayerZ
+					
 					DrawImage(SelectedItem\itemtemplate\img, x - ImageWidth(SelectedItem\itemtemplate\img) / 2, y - ImageHeight(SelectedItem\itemtemplate\img) / 2 + 85)
 					
 					AASetFont Font3
@@ -5493,6 +5504,59 @@ Function DrawGUI()
 						
 						If SelectedItem\state > 0 And (Rnd(CoffinDistance + 15.0) > 1.0 Or PlayerRoom\RoomTemplate\Name <> "coffin") Then
 							
+							PlayerX% = Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5)
+							PlayerZ% = Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5)
+							
+							SetBuffer ImageBuffer(NavBG)
+							Local xx = x-ImageWidth(SelectedItem\itemtemplate\img)/2
+							Local yy = y-ImageHeight(SelectedItem\itemtemplate\img)/2+85
+							DrawImage(SelectedItem\itemtemplate\img, xx, yy)
+							
+							x = x - 12 + ((EntityX(Collider) - 4.0) Mod 8.0)*3
+							y = y + 12 - ((EntityZ(Collider)-4.0) Mod 8.0)*3
+							For x2 = Max(1, PlayerX - 6) To Min(MapWidth - 1, PlayerX + 6)
+								For z2 = Max(1, PlayerZ - 6) To Min(MapHeight - 1, PlayerZ + 6)
+									
+									If CoffinDistance > 16.0 Or Rnd(16.0)<CoffinDistance Then 
+										If MapTemp(x2, z2) And (MapFound(x2, z2) > 0 Or SelectedItem\itemtemplate\name = "S-NAV 310 Navigator" Or SelectedItem\itemtemplate\name = "S-NAV Navigator Ultimate") Then
+											Local drawx% = x + (PlayerX - x2) * 24 , drawy% = y - (PlayerZ - z2) * 24 
+											
+											;Color (30,30,30)
+											;If SelectedItem\itemtemplate\name = "S-NAV Navigator" Then Color(100, 0, 0)
+											;
+											;If MapTemp(x2 + 1, z2) = False Then Line(drawx - 12, drawy - 12, drawx - 12, drawy + 12)
+											;If MapTemp(x2 - 1, z2) = False Then Line(drawx + 12, drawy - 12, drawx + 12, drawy + 12)
+											;
+											;If MapTemp(x2, z2 - 1) = False Then Line(drawx - 12, drawy - 12, drawx + 12, drawy - 12)
+											;If MapTemp(x2, z2 + 1)= False Then Line(drawx - 12, drawy + 12, drawx + 12, drawy + 12)
+											
+											If MapTemp(x2+1,z2)=False
+												DrawImage NavImages(3),drawx-12,drawy-12
+											EndIf
+											If MapTemp(x2-1,z2)=False
+												DrawImage NavImages(1),drawx-12,drawy-12
+											EndIf
+											If MapTemp(x2,z2-1)=False
+												DrawImage NavImages(0),drawx-12,drawy-12
+											EndIf
+											If MapTemp(x2,z2+1)=False
+												DrawImage NavImages(2),drawx-12,drawy-12
+											EndIf
+										EndIf
+									EndIf
+									
+								Next
+							Next
+							
+							SetBuffer BackBuffer()
+							DrawImageRect NavBG,xx+80,yy+70,xx+80,yy+70,270,230
+							Color 30,30,30
+							If SelectedItem\itemtemplate\name = "S-NAV Navigator" Then Color(100, 0, 0)
+							Rect xx+80,yy+70,270,230,False
+							
+							x = GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20
+							y = GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
+							
 							If SelectedItem\itemtemplate\name = "S-NAV Navigator" Then 
 								Color(100, 0, 0)
 							Else
@@ -5500,8 +5564,7 @@ Function DrawGUI()
 							EndIf
 							If (MilliSecs2() Mod 1000) > 300 Then
 								If SelectedItem\itemtemplate\name <> "S-NAV 310 Navigator" And SelectedItem\itemtemplate\name <> "S-NAV Navigator Ultimate" Then
-									AAText(x, y + height / 2 - 40, "COULD NOT CONNECT", True)
-									AAText(x, y + height / 2 - 20, "TO MAP DATABASE", True)
+									AAText(x - width/2 + 10, y - height/2 + 10, "MAP DATABASE OFFLINE")
 								EndIf
 								
 								yawvalue = EntityYaw(Collider)-90
@@ -5514,7 +5577,6 @@ Function DrawGUI()
 								Line x2,y2,x3,y3
 							EndIf
 							
-							Local PlayerX% = Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5), PlayerZ% = Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5)
 							Local SCPs_found% = 0
 							If SelectedItem\itemtemplate\name = "S-NAV Navigator Ultimate" And (MilliSecs2() Mod 600) < 400 Then
 								Local dist# = EntityDistance(Camera, Curr173\obj)
@@ -5522,14 +5584,14 @@ Function DrawGUI()
 								If dist < 8.0 * 4 Then
 									Color 100, 0, 0
 									Oval(x - dist * 3, y - 7 - dist * 3, dist * 3 * 2, dist * 3 * 2, False)
-									AAText(x - width / 2 + 20, y - height / 2 + 20, "SCP-173")
+									AAText(x - width / 2 + 10, y - height / 2 + 30, "SCP-173")
 									SCPs_found% = SCPs_found% + 1
 								EndIf
 								dist# = EntityDistance(Camera, Curr106\obj)
 								If dist < 8.0 * 4 Then
 									Color 100, 0, 0
 									Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-									AAText(x - width / 2 + 20, y - height / 2 + 20 + (20*SCPs_found), "SCP-106")
+									AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-106")
 									SCPs_found% = SCPs_found% + 1
 								EndIf
 								If Curr096<>Null Then 
@@ -5537,7 +5599,7 @@ Function DrawGUI()
 									If dist < 8.0 * 4 Then
 										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-										AAText(x - width / 2 + 20, y - height / 2 + 20 + (20*SCPs_found), "SCP-096")
+										AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-096")
 										SCPs_found% = SCPs_found% + 1
 									EndIf
 								EndIf
@@ -5545,20 +5607,21 @@ Function DrawGUI()
 									If np\NPCtype = NPCtype049
 										dist# = EntityDistance(Camera, np\obj)
 										If dist < 8.0 * 4 Then
+											If (Not np\HideFromNVG)
 											Color 100, 0, 0
 											Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-											AAText(x - width / 2 + 20, y - height / 2 + 20 + (20*SCPs_found), "SCP-049")
+												AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-049")
 											SCPs_found% = SCPs_found% + 1
 										EndIf
 									EndIf
+									EndIf
 								Next
-								
 								If PlayerRoom\RoomTemplate\Name = "coffin" Then
 									If CoffinDistance < 8.0 Then
 										dist = Rnd(4.0, 8.0)
 										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-										AAText(x - width / 2 + 20, y - height / 2 + 20 + (20*SCPs_found), "SCP-895")
+										AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-895")
 									EndIf
 								EndIf
 							End If
@@ -5566,46 +5629,31 @@ Function DrawGUI()
 							Color (30,30,30)
 							If SelectedItem\itemtemplate\name = "S-NAV Navigator" Then Color(100, 0, 0)
 							If SelectedItem\state <= 100 Then
-								AAText (x - width/2 + 10, y - height/2 + 10, "BATTERY")
-								xtemp = x - width/2 + 10
-								ytemp = y - height/2 + 30		
-								Line xtemp, ytemp, xtemp+20, ytemp
-								Line xtemp, ytemp+100, xtemp+20, ytemp+100
-								Line xtemp, ytemp, xtemp, ytemp+100
-								Line xtemp+20, ytemp, xtemp+20, ytemp+100
+								;AAText (x - width/2 + 10, y - height/2 + 10, "BATTERY")
+								;xtemp = x - width/2 + 10
+								;ytemp = y - height/2 + 30		
+								;Line xtemp, ytemp, xtemp+20, ytemp
+								;Line xtemp, ytemp+100, xtemp+20, ytemp+100
+								;Line xtemp, ytemp, xtemp, ytemp+100
+								;Line xtemp+20, ytemp, xtemp+20, ytemp+100
+								;
+								;AASetFont Font4
+								;For i = 1 To Ceil(SelectedItem\state / 10.0)
+								;	AAText (xtemp+11, ytemp+i*10-26, "-", True)
+								;	;Rect(x - width/2, y+i*15, 40 - i * 6, 5, Ceil(SelectedItem\state / 20.0) > 4 - i)
+								;Next
+								;AASetFont Font3
 								
-								AASetFont Font4
+								xtemp = x - width/2 + 196
+								ytemp = y - height/2 + 10
+								Rect xtemp,ytemp,80,20,False
+								
 								For i = 1 To Ceil(SelectedItem\state / 10.0)
-									AAText (xtemp+11, ytemp+i*10-26, "-", True)
-									;Rect(x - width/2, y+i*15, 40 - i * 6, 5, Ceil(SelectedItem\state / 20.0) > 4 - i)
+									DrawImage NavImages(4),xtemp+i*8-6,ytemp+4
 								Next
+											
 								AASetFont Font3
-							EndIf
-							
-							x = x - 19 + ((EntityX(Collider) - 4.0) Mod 8.0)*3
-							y = y + 14 - ((EntityZ(Collider)-4.0) Mod 8.0)*3
-							For x2 = Max(1, PlayerX - 4) To Min(MapWidth - 1, PlayerX + 4)
-								For z2 = Max(1, PlayerZ - 4) To Min(MapHeight - 1, PlayerZ + 4)
-									
-									If CoffinDistance > 16.0 Or Rnd(16.0)<CoffinDistance Then 
-										If MapTemp(x2, z2) And (MapFound(x2, z2) > 0 Or SelectedItem\itemtemplate\name = "S-NAV 310 Navigator" Or SelectedItem\itemtemplate\name = "S-NAV Navigator Ultimate") Then
-											Local drawx% = x + (PlayerX - x2) * 24 , drawy% = y - (PlayerZ - z2) * 24 
-											
-											Color (30,30,30)
-											If SelectedItem\itemtemplate\name = "S-NAV Navigator" Then Color(100, 0, 0)
-											
-											If MapTemp(x2 + 1, z2) = False Then Line(drawx - 12, drawy - 12, drawx - 12, drawy + 12)
-											If MapTemp(x2 - 1, z2) = False Then Line(drawx + 12, drawy - 12, drawx + 12, drawy + 12)
-											
-											If MapTemp(x2, z2 - 1) = False Then Line(drawx - 12, drawy - 12, drawx + 12, drawy - 12)
-											If MapTemp(x2, z2 + 1)= False Then Line(drawx - 12, drawy + 12, drawx + 12, drawy + 12)
-											
-										End If
-									EndIf
-									
-								Next
-							Next
-							
+						EndIf
 						EndIf
 						
 					EndIf
@@ -6000,35 +6048,22 @@ Function DrawMenu()
 					y=y+50*MenuScale
 					
 					Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Texture LOD Bias:")
-					DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-							If TextureDetails% < 4
-								TextureDetails% = TextureDetails% + 1
-							Else
-								TextureDetails% = 0
-							EndIf
+					AAText(x, y, "Texture LOD Bias:")
+					TextureDetails = Slider5(x+270*MenuScale,y+6*MenuScale,100*MenuScale,TextureDetails,3,"0.8","0.4","0.0","-0.4","-0.8")
 							Select TextureDetails%
 								Case 0
-									TextureFloat# = 0.0
+							TextureFloat# = 0.8
 								Case 1
 									TextureFloat# = 0.4
 								Case 2
-									TextureFloat# = 0.8
+							TextureFloat# = 0.0
 								Case 3
-									TextureFloat# = -0.8
-								Case 4
 									TextureFloat# = -0.4
+						Case 4
+							TextureFloat# = -0.8
 							End Select
 							TextureLodBias TextureFloat
-							PlaySound_Strict(ButtonSFX)
-						EndIf
-					EndIf
-					Color 255,255,255
-					AAText(x + 340 * MenuScale, y + MenuScale, Str(TextureFloat))
-					
-					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+					If (MouseOn(x+270*MenuScale,y-6*MenuScale,100*MenuScale+14,20) And OnSliderID=0) Or OnSliderID=3
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
 					
@@ -9420,7 +9455,7 @@ Function RenderWorld2()
 			Color 255,255,255;*(NVTimer/600.0)
 			
 			For np.NPCs = Each NPCs
-				If np\NVName<>"" Then ;don't waste your time if the string is empty
+				If np\NVName<>"" And (Not np\HideFromNVG) Then ;don't waste your time if the string is empty
 					PositionEntity temp2,np\NVX,np\NVY,np\NVZ
 					dist# = EntityDistance(temp2,Collider)
 					If dist<23.5 Then ;don't draw text if the NPC is too far away

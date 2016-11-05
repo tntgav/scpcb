@@ -1,4 +1,14 @@
-﻿----------------------------------------------------------------------------------
+﻿v1.3.4
+###Please fill in the other bug fixes/changes for this version### - ENDSHN
+
+Bug Fixes:
+- Fixed SCP-1499's dimension not having any collisions except the ground
+- The framelimiter now doesn't has values like "20000" after quitting the game
+- The lure subject and idle SCP-049 shouldn't be shown by the blue NVG anymore
+- The eyedrops now have the proper texture instead of the "Strange bottle" texture
+- The gas mask in room2closets now has the proper size
+
+----------------------------------------------------------------------------------
 
 v1.3.3
 - Moved audio settings to their own location in options.ini.

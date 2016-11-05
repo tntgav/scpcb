@@ -63,6 +63,7 @@ Type NPCs
 	Field PathX#,PathZ#
 	Field Model$
 	Field ModelScaleX#,ModelScaleY#,ModelScaleZ#
+	Field HideFromNVG
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
