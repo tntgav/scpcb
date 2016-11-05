@@ -7299,7 +7299,7 @@ Function UpdateEvents()
 						BlurTimer = 500	
 						Injuries = PrevInjuries
 						Bloodloss = PrevBloodloss
-						SecondaryLightOn = SecondaryLightOn
+						SecondaryLightOn = PrevSecondaryLightOn
 						
 						PrevInjuries = 0
 						PrevBloodloss = 0
