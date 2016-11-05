@@ -1,12 +1,20 @@
 ﻿v1.3.4
-###Please fill in the other bug fixes/changes for this version### - ENDSHN
+- Added bump mapping and texture LOD selection.
+- Added syringes.
+- Added new SCP-294 drinks.
+- Added a vomit parameter to SCP-294.
+- New battery textures (by Cridone).
+- Leaving the name field blank when creating a new game now sets the game name to "untitled".
 
 Bug Fixes:
-- Fixed SCP-1499's dimension not having any collisions except the ground
-- The framelimiter now doesn't has values like "20000" after quitting the game
-- The lure subject and idle SCP-049 shouldn't be shown by the blue NVG anymore
-- The eyedrops now have the proper texture instead of the "Strange bottle" texture
-- The gas mask in room2closets now has the proper size
+- Fixed collsion issues with structures in SCP-1499's dimension.
+- Fixed visual bugs relating to the disabling of seconday lights.
+- Fixed a bug that caused SCP-1048 drawings acquired via SCP-1662 to not work.
+- Fixed the framelimit value resetting itself to large values after quitting the game.
+- Fixed the eyedrops texture using the strange bottle texture.
+- Fixed the gas mask in room2closets having a reduced size.
+- Fixed the maintenance tunnels not generating based on the selected seed.
+- Fixed a button in room2shaft being placed inside a wall.
 
 ----------------------------------------------------------------------------------
 

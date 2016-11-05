@@ -28,7 +28,7 @@ Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
 Global VersionNumber$ = "1.3.4"
-Global CompatibleNumber$ = "1.3.3" ;Only change this if the version given isn't working with the current build version - ENDSHN
+Global CompatibleNumber$ = "1.3.4" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 AppTitle "SCP - Containment Breach Launcher"
 
@@ -277,7 +277,7 @@ Global NVTimer#
 
 Global SuperMan%, SuperManTimer#
 
-Global Injuries#, Bloodloss#, Infect#
+Global Injuries#, Bloodloss#, Infect#, HealTimer#
 
 Global RefinedItems%
 
@@ -2162,7 +2162,11 @@ Function UseDoor(d.Doors, showmsg%=True)
 			If showmsg = True Then 
 				If Not (d\IsElevatorDoor>0) Then
 					PlaySound_Strict ButtonSFX2
-					Msg = "The door appears to be locked."
+					If PlayerRoom\RoomTemplate\Name <> "room2elevator" Then
+						Msg = "The door appears to be locked."
+					Else
+						Msg = "The elevator appears to be broken."
+					EndIf
 					MsgTimer = 70 * 5
 				Else
 					If d\IsElevatorDoor = 1 Then
@@ -2640,7 +2644,7 @@ Repeat
 			SelectedItem = Null 
 		EndIf
 		
-		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "exit1" And (Not MenuOpen) And (Not ConsoleOpen) Then 
+		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "exit1" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then 
 			
 			If Rand(1500) = 1 Then
 				For i = 0 To 5
@@ -2660,7 +2664,7 @@ Repeat
 						If e\EventName = "room860"
 							If e\EventState = 1.0
 								PlayerZone = 5
-								PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 30.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
+								PositionEntity (SoundEmitter, EntityX(SoundEmitter), 30.0, EntityZ(SoundEmitter))
 							EndIf
 							
 							Exit
@@ -2804,7 +2808,6 @@ Repeat
 				BlinkEffectTimer = BlinkEffectTimer - (FPSfactor/70)
 			Else
 				If BlinkEffect <> 1.0 Then BlinkEffect = 1.0
-				BlinkEffect = CurveValue(1.0,BlinkEffect,500)
 			EndIf
 			
 			LightBlink = Max(LightBlink - (FPSfactor / 35.0), 0)
@@ -3238,7 +3241,6 @@ Function MovePlayer()
 		StaminaEffectTimer = StaminaEffectTimer - (FPSfactor/70)
 	Else
 		If StaminaEffect <> 1.0 Then StaminaEffect = 1.0
-		StaminaEffect = CurveValue(1.0, StaminaEffect, 50)
 	EndIf
 	
 	If PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then 
@@ -3478,6 +3480,13 @@ Function MovePlayer()
 		EndIf
 	EndIf
 	
+	If HealTimer > 0 Then
+		DebugLog HealTimer
+		HealTimer = HealTimer - (FPSfactor / 70)
+		Bloodloss = Min(Bloodloss + (2 / 400.0) * FPSfactor, 100)
+		Injuries = Max(Injuries - (FPSfactor / 70) / 30, 0.0)
+	EndIf
+		
 	If Playable Then
 		If KeyHit(KEY_BLINK) Then BlinkTimer = 0
 		If KeyDown(KEY_BLINK) And BlinkTimer < - 10 Then BlinkTimer = -10
@@ -4694,12 +4703,12 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
-				Case "book"
+				Case "scp1025"
 					;Achievements(Achv1025)=True 
-					If SelectedItem\itemtemplate\img=0 Then
+					If SelectedItem\itemtemplate\img = 0 Then
 						SelectedItem\state = Rand(0,5)
-						SelectedItem\itemtemplate\img=LoadImage("GFX\items\1025\1025_"+Int(SelectedItem\state)+".jpg")	
-						SelectedItem\itemtemplate\img=ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
+						SelectedItem\itemtemplate\img = LoadImage("GFX\items\1025\1025_"+Int(SelectedItem\state)+".jpg")	
+						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
 						
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
@@ -5051,7 +5060,6 @@ Function DrawGUI()
 					
 					strtemp = GetINIString2(iniStr, loc, "refusemessage")
 					If strtemp <> "" Then
-						DebugLog "MEMES"
 						Msg = strtemp 
 						MsgTimer = 70*6		
 					Else
@@ -5066,6 +5074,44 @@ Function DrawGUI()
 					EndIf
 					
 					SelectedItem = Null	
+					
+				Case "syringe"
+					HealTimer = 30
+					StaminaEffect = 0.5
+					StaminaEffectTimer = 20
+					
+					Msg = "You injected yourself with the syringe and feel a slight adrenaline rush."
+					MsgTimer = 70 * 8
+					
+					RemoveItem(SelectedItem)
+					
+				Case "finesyringe"
+					HealTimer = Rnd(20, 40)
+					StaminaEffect = Rnd(0.5, 0.8)
+					StaminaEffectTimer = Rnd(20, 30)
+					
+					Msg = "You injected yourself with the syringe and feel an adrenaline rush."
+					MsgTimer = 70 * 8
+					
+					RemoveItem(SelectedItem)
+					
+				Case "veryfinesyringe"
+					Select Rand(3)
+						Case 1
+							HealTimer = Rnd(40, 60)
+							StaminaEffect = 0.1
+							StaminaEffectTimer = 30
+							Msg = "You injected yourself with the syringe and feel a huge adrenaline rush."
+						Case 2
+							SuperMan = True
+							Msg = "You injected yourself with the syringe and feel a humongous adrenaline rush."
+						Case 3
+							VomitTimer = 30
+							Msg = "You injected yourself with the syringe and feel a pain in your stomach."
+					End Select
+					
+					MsgTimer = 70 * 8
+					RemoveItem(SelectedItem)
 					
 				Case "radio","18vradio","fineradio","veryfineradio"
 					If SelectedItem\state <= 100 Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.004)
@@ -7251,7 +7297,7 @@ Function NullGame()
 	Playable = True
 	
 	Contained106 = False
-	Curr173\Idle = False
+	If Curr173 <> Null Then Curr173\Idle = False
 	
 	MTFtimer = 0
 	For i = 0 To 9
@@ -8239,6 +8285,47 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 			End Select
 			
 			RemoveItem(item)
+			
+		Case "Syringe"
+			Select item\itemtemplate\tempname
+				Case "syringe"
+					Select setting
+						Case "rough", "coarse"
+							d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+							d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
+						Case "1:1"
+							it2 = CreateItem("Small First Aid Kit", "finefirstaid", x, y, z)	
+						Case "fine"
+							it2 = CreateItem("Syringe", "finesyringe", x, y, z)
+						Case "very fine"
+							it2 = CreateItem("Syringe", "veryfinesyringe", x, y, z)
+					End Select
+					
+				Case "finesyringe"
+					Select setting
+						Case "rough"
+							d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+							d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
+						Case "coarse"
+							it2 = CreateItem("First Aid Kit", "firstaid", x, y, z)
+						Case "1:1"
+							it2 = CreateItem("Blue First Aid Kit", "firstaid2", x, y, z)	
+						Case "fine", "very fine"
+							it2 = CreateItem("Syringe", "veryfinesyringe", x, y, z)
+					End Select
+				
+				Case "veryfinesyringe"
+					Select setting
+						Case "rough", "coarse", "1:1", "fine"
+							it2 = CreateItem("Electronical components", "misc", x, y, z)	
+						Case "very fine"
+							n.NPCs = CreateNPC(NPCtype008,x,y,z)
+							n\State = 2
+					End Select
+			End Select
+			
+			RemoveItem(item)
+			
 		Default
 			
 			Select item\itemtemplate\tempname

@@ -41,6 +41,7 @@ Function SaveGame(file$)
 	
 	WriteInt f, DeathTimer
 	WriteInt f, BlurTimer
+	WriteFloat f, HealTimer
 	
 	WriteByte f, Crouch
 	
@@ -64,6 +65,7 @@ Function SaveGame(file$)
 	Next
 	
 	WriteFloat f, VomitTimer
+	WriteByte f, Vomit
 	WriteFloat f, CameraShakeTimer
 	WriteFloat f, Infect
 	
@@ -112,6 +114,7 @@ Function SaveGame(file$)
 	WriteString f, RandomSeed
 	
 	WriteFloat f, SecondaryLightOn
+	WriteFloat f, PrevSecondaryLightOn
 	WriteByte f, RemoteDoorOn
 	WriteByte f, SoundTransmission
 	WriteByte f, Contained106
@@ -485,10 +488,11 @@ Function LoadGame(file$)
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	
-	BlinkEffectTimer = ReadFloat(f)	
+	BlinkEffectTimer = ReadFloat(f)
 	
 	DeathTimer = ReadInt(f)	
 	BlurTimer = ReadInt(f)	
+	HealTimer = ReadFloat(f)
 	
 	Crouch = ReadByte(f)
 	
@@ -496,8 +500,8 @@ Function LoadGame(file$)
 	StaminaEffect = ReadFloat(f)	
 	StaminaEffectTimer = ReadFloat(f)	
 	
-	EyeStuck	= ReadFloat(f)
-	EyeIrritation= ReadFloat(f)
+	EyeStuck = ReadFloat(f)
+	EyeIrritation = ReadFloat(f)
 	
 	Injuries = ReadFloat(f)
 	Bloodloss = ReadFloat(f)
@@ -512,6 +516,7 @@ Function LoadGame(file$)
 	Next
 	
 	VomitTimer = ReadFloat(f)
+	Vomit = ReadByte(f)
 	CameraShakeTimer = ReadFloat(f)
 	Infect = ReadFloat(f)
 	
@@ -551,6 +556,7 @@ Function LoadGame(file$)
 	RandomSeed = ReadString(f)
 	
 	SecondaryLightOn = ReadFloat(f)
+	PrevSecondaryLightOn = ReadFloat(f)
 	RemoteDoorOn = ReadByte(f)
 	SoundTransmission = ReadByte(f)	
 	Contained106 = ReadByte(f)	
@@ -1166,6 +1172,7 @@ Function LoadGameQuick(file$)
 	
 	DeathTimer = ReadInt(f)	
 	BlurTimer = ReadInt(f)	
+	HealTimer = ReadFloat(f)
 	
 	Crouch = ReadByte(f)
 	
@@ -1189,6 +1196,7 @@ Function LoadGameQuick(file$)
 	Next
 	
 	VomitTimer = ReadFloat(f)
+	Vomit = ReadByte(f)
 	CameraShakeTimer = ReadFloat(f)
 	Infect = ReadFloat(f)
 	
@@ -1228,6 +1236,7 @@ Function LoadGameQuick(file$)
 	RandomSeed = ReadString(f)
 	
 	SecondaryLightOn = ReadFloat(f)
+	PrevSecondaryLightOn = ReadFloat(f)
 	RemoteDoorOn = ReadByte(f)
 	SoundTransmission = ReadByte(f)	
 	Contained106 = ReadByte(f)	
