@@ -1525,6 +1525,7 @@ Global Sky
 Global HideDistance# = 15.0
 
 Global SecondaryLightOn# = True
+Global PrevSecondaryLightOn# = True
 Global RemoteDoorOn = True
 Global Contained106 = False
 
@@ -2368,6 +2369,7 @@ Function FillRoom(r.Rooms)
 		Case "room2shaft"
 			;[Block]
 			d = CreateDoor(r\zone, r\x + 1552.0 * RoomScale, r\y, r\z + 552.0 * RoomScale, 0, r, False, False)
+			PositionEntity(d\buttons[0], EntityX(d\buttons[0],True), EntityY(d\buttons[0],True), r\z + 512.0 * RoomScale,True)
 			d\AutoClose = False : d\open = False
 			
 			d = CreateDoor(r\zone, r\x + 256.0 * RoomScale, r\y, r\z + 744.0 * RoomScale, 90, r, False, False, 2)
@@ -4861,6 +4863,10 @@ Function FillRoom(r.Rooms)
 			r\Objects[2] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[2], (EntityX(r\Objects[1],True)+(126.0 * RoomScale)), EntityY(r\Objects[1],True), EntityZ(r\Objects[1],True), True)
 			it = CreateItem("First Aid Kit", "firstaid", r\x - 506.0 * RoomScale, r\y + 192.0 * RoomScale, r\z - 322.0 * RoomScale)
+			EntityParent(it\collider, r\obj)
+			it = CreateItem("Syringe", "syringe", r\x - 333.0 * RoomScale, r\y + 100.0 * RoomScale, r\z + 97.3 * RoomScale)
+			EntityParent(it\collider, r\obj)
+			it = CreateItem("Syringe", "syringe", r\x - 340.0 * RoomScale, r\y + 100.0 * RoomScale, r\z + 52.3 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 264.0 * RoomScale, r\y - 0.0 * RoomScale, r\z + 640.0 * RoomScale, 90, r, False, False, 3)
 			

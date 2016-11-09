@@ -2681,6 +2681,7 @@ Function UpdateEvents()
 					ShowEntity e\room\obj
 					
 					Injuries = Injuries+FPSfactor*0.00005
+					PrevSecondaryLightOn = SecondaryLightOn : SecondaryLightOn = True
 					
 					If (EntityY(Collider)<2000*RoomScale Or EntityY(Collider)>2608*RoomScale) Then CurrStepSFX = 1
 					
@@ -2936,6 +2937,8 @@ Function UpdateEvents()
 													e\EventState = 0
 													e\EventState2 = 0
 													FreeSound_Strict Music(3) : Music(3)=0
+													SecondaryLightOn = PrevSecondaryLightOn
+													PrevSecondaryLightOn = 0.0
 													
 													BlinkTimer = -10
 													LightBlink = 5
@@ -2975,6 +2978,8 @@ Function UpdateEvents()
 										PositionEntity(Collider, EntityX(r\obj,True), 0.4, EntityX(r\obj,True))
 										
 										GiveAchievement(AchvPD)
+										SecondaryLightOn = PrevSecondaryLightOn
+										PrevSecondaryLightOn = 0.0
 										
 										Curr106\State = 10000
 										Curr106\Idle = False
@@ -3051,6 +3056,8 @@ Function UpdateEvents()
 											e\EventState = 0
 											e\EventState2 = 0
 											FreeSound_Strict Music(3) : Music(3)=0
+											SecondaryLightOn = PrevSecondaryLightOn
+											PrevSecondaryLightOn = 0.0
 											PositionEntity(Collider, EntityX(r\obj), 0.4, EntityZ(r\obj))
 											ResetEntity Collider
 											Curr106\Idle = False
@@ -3823,7 +3830,14 @@ Function UpdateEvents()
 					
 					If e\room\grid = Null Then
 						
-						e\room\grid=New Grids
+						e\room\grid = New Grids
+						
+						oldSeed% = RndSeed()
+						Local seedDec$ = ""
+						For i = 1 To Len(RandomSeed)
+							seedDec = seedDec+Asc(Mid(RandomSeed,i,1))
+						Next
+						SeedRnd Abs(Int(seedDec))
 						
 						Local dir%
 						
@@ -4418,6 +4432,8 @@ Function UpdateEvents()
 						For i=0 To 6
 							e\room\grid\Meshes[i]=Meshes[i]
 						Next
+						
+						SeedRnd oldSeed
 						
 						For it.Items = Each Items
 							If (EntityY(it\collider,True)>=8.0) And (EntityY(it\collider,True)<=12.0) Then
@@ -6868,6 +6884,8 @@ Function UpdateEvents()
 						CurrStepSFX = 2
 						
 						Curr106\Idle = True
+						PrevSecondaryLightOn = SecondaryLightOn
+						SecondaryLightOn = True
 						
 						;ShowEntity fr\DetailEntities[0]
 						;ShowEntity fr\DetailEntities[1]
@@ -6958,6 +6976,9 @@ Function UpdateEvents()
 											
 											UpdateDoorsTimer = 0
 											UpdateDoors()
+											
+											SecondaryLightOn = PrevSecondaryLightOn
+											SecondaryLightOn = 0.0
 											
 											e\EventState = 0.0
 											
@@ -7109,6 +7130,8 @@ Function UpdateEvents()
 						;Saving Injuries and Bloodloss, so that the player won't be healed automatically
 						PrevInjuries = Injuries
 						PrevBloodloss = Bloodloss
+						PrevSecondaryLightOn = SecondaryLightOn
+						SecondaryLightOn = True
 						
 						e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[6],True),EntityY(e\room\Objects[6],True),EntityZ(e\room\Objects[6],True))
 						;e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
@@ -7276,10 +7299,12 @@ Function UpdateEvents()
 						BlurTimer = 500	
 						Injuries = PrevInjuries
 						Bloodloss = PrevBloodloss
-						Crouch = False
+						SecondaryLightOn = PrevSecondaryLightOn
 						
 						PrevInjuries = 0
 						PrevBloodloss = 0
+						PrevSecondaryLightOn = 0.0
+						Crouch = False
 						
 						For i = 0 To MaxItemAmount-1
 							If Inventory(i) <> Null Then

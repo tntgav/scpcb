@@ -383,33 +383,32 @@ Function UpdateMainMenu()
 				AASetFont Font2
 				
 				If DrawButton(x + 420 * MenuScale, y + height + 20 * MenuScale, 160 * MenuScale, 70 * MenuScale, "START", False) Then
-					If CurrSave <> "" Then
-						If RandomSeed = "" Then
-							RandomSeed = Abs(MilliSecs())
-						EndIf
-						Local strtemp$ = ""
-						For i = 1 To Len(RandomSeed)
-							strtemp = strtemp+Asc(Mid(RandomSeed,i,1))
-						Next
-						SeedRnd Abs(Int(strtemp))
+					If CurrSave = "" Then CurrSave = "untitled"
+					
+					If RandomSeed = "" Then
+						RandomSeed = Abs(MilliSecs())
+					EndIf
+					Local strtemp$ = ""
+					For i = 1 To Len(RandomSeed)
+						strtemp = strtemp+Asc(Mid(RandomSeed,i,1))
+					Next
+					SeedRnd Abs(Int(strtemp))
+					
+					Local SameFound% = False
+					
+					For  i% = 1 To SaveGameAmount
+						If SaveGames(i - 1) = CurrSave Then SameFound = SameFound + 1
+					Next
 						
-						Local SameFound% = False
-						For  i% = 1 To SaveGameAmount
-							If SaveGames(i - 1) = CurrSave Then SameFound=SameFound+1
-						Next
-						
-						If SameFound > 0 Then CurrSave = CurrSave + " (" + (SameFound + 1) + ")"
-						
-						LoadEntities()
-						InitNewGame()
-						MainMenuOpen = False
-						FlushKeys()
-						FlushMouse()
-						
-						PutINIValue(OptionFile, "options", "intro enabled", IntroEnabled%)
-					Else
-						
-					End If
+					If SameFound > 0 Then CurrSave = CurrSave + " (" + (SameFound + 1) + ")"
+					
+					LoadEntities()
+					InitNewGame()
+					MainMenuOpen = False
+					FlushKeys()
+					FlushMouse()
+					
+					PutINIValue(OptionFile, "options", "intro enabled", IntroEnabled%)
 					
 				EndIf
 				
@@ -484,8 +483,9 @@ Function UpdateMainMenu()
 					If SaveMSG <> ""
 						x = GraphicWidth / 2
 						y = GraphicHeight / 2
-						DrawFrame(x, y, 400 * MenuScale, 200 * MenuScale)
-						AAText(x + 20 * MenuScale, y + 15 * MenuScale, "Are you sure you want to delete this save?")
+						DrawFrame(x, y, 420 * MenuScale, 200 * MenuScale)
+						RowText("Are you sure you want to delete this save?", x + 20 * MenuScale, y + 15 * MenuScale, 400 * MenuScale, 200 * MenuScale)
+						;AAText(x + 20 * MenuScale, y + 15 * MenuScale, "Are you sure you want to delete this save?")
 						If DrawButton(x + 250 * MenuScale, y + 150 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Yes", False) Then
 							DeleteFile(CurrentDir() + SavePath + SaveMSG + "\save.txt")
 							DeleteDir(CurrentDir() + SavePath + SaveMSG)

@@ -6391,7 +6391,7 @@ Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False
 					EndIf
 				EndIf
 				
-				If Injuries >= 3
+				If Injuries >= 5
 					If Rand(3) = 1 Then Kill()
 				EndIf
 			Else

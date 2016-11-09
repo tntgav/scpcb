@@ -153,6 +153,8 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Document SCP-966", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc966.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Document SCP-970", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc970.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Document SCP-1048", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1048.jpg", 0.003) : it\sound = 0
+	it = CreateItemTemplate("Document SCP-1123", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1123.jpg", 0.003) : it\sound = 0
+	it = CreateItemTemplate("Document SCP-1162", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1162.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Incident Report SCP-1048-A", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1048a.jpg", 0.003) : it\sound = 0
 	
 	it = CreateItemTemplate("Drawing", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1048.jpg", 0.003) : it\sound = 0
@@ -186,7 +188,6 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Mysterious Note", "paper", "GFX\items\paper.x", "GFX\items\INVnote.jpg", "GFX\items\sn.it", 0.003, "GFX\items\notetexture.jpg") : it\sound = 0	
 	
 	it = CreateItemTemplate("Mobile Task Forces", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docMTF.jpg", 0.003) : it\sound = 0
-	it = CreateItemTemplate("Mobile Task Force Epsilon-11", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docNTF.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Security Clearance Levels", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docSC.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Object Classes", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docOBJC.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Document", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docRAND3.jpg", 0.003) : it\sound = 0 
@@ -248,9 +249,9 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Severed Hand", "hand", "GFX\items\severedhand.b3d", "GFX\items\INVhand.jpg", "", 0.04) : it\sound = 2
 	it = CreateItemTemplate("Black Severed Hand", "hand2", "GFX\items\severedhand.b3d", "GFX\items\INVhand2.jpg", "", 0.04, "GFX\items\shand2.png") : it\sound = 2
 	
-	CreateItemTemplate("9V Battery", "bat", "GFX\items\battery.x", "GFX\items\INVbattery.jpg", "", 0.008)
-	CreateItemTemplate("18V Battery", "18vbat", "GFX\items\battery.x", "GFX\items\INVbattery.jpg", "", 0.01)
-	CreateItemTemplate("Strange Battery", "killbat", "GFX\items\battery.x", "GFX\items\INVbattery.jpg", "", 0.01)
+	CreateItemTemplate("9V Battery", "bat", "GFX\items\Battery\Battery.x", "GFX\items\Battery\INVbattery9v.jpg", "", 0.008)
+	CreateItemTemplate("18V Battery", "18vbat", "GFX\items\Battery\Battery.x", "GFX\items\Battery\INVbattery18v.jpg", "", 0.01, "GFX\items\Battery\Battery 18V.jpg")
+	CreateItemTemplate("Strange Battery", "killbat", "GFX\items\Battery\Battery.x", "GFX\items\Battery\INVbattery22900.jpg", "", 0.01,"GFX\items\Battery\Strange Battery.jpg")
 	
 	CreateItemTemplate("Eyedrops", "fineeyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, "GFX\items\eyedrops.jpg")
 	CreateItemTemplate("Eyedrops", "supereyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, "GFX\items\eyedrops.jpg")
@@ -273,19 +274,22 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("SCP-1123", "1123", "GFX\items\HGIB_Skull1.b3d", "GFX\items\inv1123.jpg", "", 0.015) : it\sound = 2
 	it = CreateItemTemplate("SCP-178", "scp178", "GFX\items\scp178.b3d", "GFX\items\INV178.jpg", "", 0.02,"","",1)
 	
-	it = CreateItemTemplate("Document SCP-1123", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1123.jpg", 0.003) : it\sound = 0
 	;it = CreateItemTemplate("Document SCP-1074", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1074.jpg", 0.003) : it\sound = 0
 	;it = CreateItemTemplate("SCP-1074 Containment Notice", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc_arce.jpg", 0.003) : it\sound = 0
 	
 	it = CreateItemTemplate("Night Vision Goggles", "supernv", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.02) : it\sound = 2
 	it = CreateItemTemplate("Night Vision Goggles", "nvgoggles", "GFX\items\NVG.b3d", "GFX\items\INVnightvision.jpg", "", 0.02) : it\sound = 2
+	it = CreateItemTemplate("Night Vision Goggles", "veryfinenvgoggles", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02) : it\sound = 2
+	
+	it = CreateItemTemplate("Syringe", "syringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005) : it\sound = 2
+	it = CreateItemTemplate("Syringe", "finesyringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005) : it\sound = 2
+	it = CreateItemTemplate("Syringe", "veryfinesyringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005) : it\sound = 2
 	
 	;.........
 	
 	;new Items in SCP:CB 1.3 - ENDSHN
 	it = CreateItemTemplate("SCP-1499","scp1499","GFX\items\SCP-1499.3ds","GFX\items\INVscp1499.jpg", "", 0.023,"GFX\items\SCP-1499.jpg") : it\sound = 2
 	it = CreateItemTemplate("SCP-1499","super1499","GFX\items\SCP-1499.3ds","GFX\items\INVscp1499.jpg", "", 0.023,"GFX\items\SCP-1499.jpg") : it\sound = 2
-	it = CreateItemTemplate("Document SCP-1162", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1162.jpg", 0.003) : it\sound = 0
 	CreateItemTemplate("Emily Ross' Badge", "badge", "GFX\items\badge.x", "GFX\items\INVbadge.jpg", "GFX\items\badge1.jpg", 0.0001, "GFX\items\badge1_tex.jpg")
 	it = CreateItemTemplate("Lost Key", "key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, "GFX\items\key2.png","",0,1+2+8) : it\sound = 3
 	it = CreateItemTemplate("Disciplinary Hearing DH-S-4137-17092", "oldpaper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\dh.s", 0.003) : it\sound = 0
@@ -295,8 +299,6 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Movie Ticket", "ticket", "GFX\items\key.b3d", "GFX\items\INVticket.jpg", "GFX\items\ticket.png", 0.002, "GFX\items\tickettexture.png","",0,1+2+8) : it\sound = 0
 	
 	CreateItemTemplate("Old Badge", "badge", "GFX\items\badge.x", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, "GFX\items\badge2_tex.png","",0,1+2+8)
-	
-	it = CreateItemTemplate("Night Vision Goggles", "veryfinenvgoggles", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02) : it\sound = 2
 	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -706,10 +708,89 @@ Function DropItem(item.Items)
 	
 End Function
 
-
-
-
-
+;Update any ailments inflicted by SCP-294 drinks.
+Function Update294()
+	CatchErrors("Uncaught (Update294)")
+	
+	If CameraShakeTimer > 0 Then
+		CameraShakeTimer = CameraShakeTimer - (FPSfactor/70)
+		CameraShake = 2
+	EndIf
+	
+	If VomitTimer > 0 Then
+		DebugLog VomitTimer
+		VomitTimer = VomitTimer - (FPSfactor/70)
+		
+		If (MilliSecs2() Mod 1600) < Rand(200, 400) Then
+			If BlurTimer = 0 Then BlurTimer = Rnd(10, 20)*70
+			CameraShake = Rnd(0, 2)
+		EndIf
+		
+;		If (MilliSecs2() Mod 1000) < Rand(1200) Then 
+		
+		If Rand(50) = 50 And (MilliSecs2() Mod 4000) < 200 Then PlaySound_Strict(CoughSFX(Rand(0,2)))
+		
+		;Regurgitate when timer is below 10 seconds. (ew)
+		If VomitTimer < 10 And Rnd(0, 500 * VomitTimer) < 2 Then
+			If (Not ChannelPlaying(VomitCHN)) And (Not Regurgitate) Then
+				VomitCHN = PlaySound_Strict(LoadTempSound("SFX\SCP\294\Retch" + Rand(1, 2) + ".ogg"))
+				Regurgitate = MilliSecs2() + 50
+			EndIf
+		EndIf
+		
+		If Regurgitate > MilliSecs2() And Regurgitate <> 0 Then
+			mouse_y_speed_1 = mouse_y_speed_1 + 1.0
+		Else
+			Regurgitate = 0
+		EndIf
+		
+	ElseIf VomitTimer < 0 Then ;vomit
+		VomitTimer = VomitTimer - (FPSfactor/70)
+		
+		If VomitTimer > -5 Then
+			If (MilliSecs2() Mod 400) < 50 Then CameraShake = 4 
+			mouse_x_speed_1 = 0.0
+			Playable = False
+		Else
+			Playable = True
+		EndIf
+		
+		If (Not Vomit) Then
+			BlurTimer = 40 * 70
+			VomitSFX = LoadSound_Strict("SFX\SCP\294\Vomit.ogg")
+			VomitCHN = PlaySound_Strict(VomitSFX)
+			PrevInjuries = Injuries
+			PrevBloodloss = Bloodloss
+			Injuries = 1.5
+			Bloodloss = 70
+			EyeIrritation = 9 * 70
+			
+			pvt = CreatePivot()
+			PositionEntity(pvt, EntityX(Camera), EntityY(Collider) - 0.05, EntityZ(Camera))
+			TurnEntity(pvt, 90, 0, 0)
+			EntityPick(pvt, 0.3)
+			de.decals = CreateDecal(5, PickedX(), PickedY() + 0.005, PickedZ(), 90, 180, 0)
+			de\Size = 0.001 : de\SizeChange = 0.001 : de\MaxSize = 0.6 : EntityAlpha(de\obj, 1.0) : EntityColor(de\obj, 0.0, Rnd(200, 255), 0.0) : ScaleSprite de\obj, de\size, de\size
+			FreeEntity pvt
+			Vomit = True
+		EndIf
+		
+		UpdateDecals()
+		
+		mouse_y_speed_1 = mouse_y_speed_1 + Max((1.0 + VomitTimer / 10), 0.0)
+		
+		If VomitTimer < -15 Then
+			FreeSound_Strict(VomitSFX)
+			VomitTimer = 0
+			PlaySound_Strict(BreathSFX(0,0))
+			Injuries = PrevInjuries
+			Bloodloss = PrevBloodloss
+			Vomit = False
+		EndIf
+	EndIf
+	
+	CatchErrors("Update294")
+End Function
 
 ;~IDEal Editor Parameters:
 ;~F#B#1E
