@@ -225,41 +225,7 @@ Function UpdateMainMenu()
 					PutINIValue(OptionFile, "options", "intro enabled", IntroEnabled%)
 					MainMenuTab = 0
 				Case 3,5,6,7 ;save the options
-					PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
-					PutINIValue(OptionFile, "options", "invert mouse y", InvertMouse)
-					PutINIValue(OptionFile, "options", "bump mapping enabled", BumpEnabled)			
-					PutINIValue(OptionFile, "options", "HUD enabled", HUDenabled)
-					PutINIValue(OptionFile, "options", "screengamma", ScreenGamma)
-					PutINIValue(OptionFile, "options", "antialias", Opt_AntiAlias)
-					PutINIValue(OptionFile, "options", "vsync", Vsync)
-					PutINIValue(OptionFile, "options", "show FPS", ShowFPS)
-					PutINIValue(OptionFile, "options", "framelimit", Framelimit%)
-					PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
-					PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
-					PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
-					PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
-					PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
-					PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-					PutINIValue(OptionFile, "options", "res details",ResolutionDetails)
-					PutINIValue(OptionFile, "options", "particle amount",ParticleAmount)
-					PutINIValue(OptionFile, "options", "prop fading",PropFading)
-					
-					PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
-					PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
-					PutINIValue(OptionFile, "audio", "sfx release", EnableSFXRelease)
-					PutINIValue(OptionFile, "audio", "enable user tracks", EnableUserTracks%)
-					PutINIValue(OptionFile, "audio", "user track setting", UserTrackMode%)
-					
-					PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
-					PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
-					PutINIValue(OptionFile, "binds", "Up key", KEY_UP)
-					PutINIValue(OptionFile, "binds", "Down key", KEY_DOWN)
-					PutINIValue(OptionFile, "binds", "Blink key", KEY_BLINK)
-					PutINIValue(OptionFile, "binds", "Sprint key", KEY_SPRINT)
-					PutINIValue(OptionFile, "binds", "Inventory key", KEY_INV)
-					PutINIValue(OptionFile, "binds", "Crouch key", KEY_CROUCH)
-					PutINIValue(OptionFile, "binds", "Save key", KEY_SAVE)
-					PutINIValue(OptionFile, "binds", "Console key", KEY_CONSOLE)
+					SaveOptionsINI()
 					
 					UserTrackCheck% = 0
 					UserTrackCheck2% = 0
@@ -481,8 +447,8 @@ Function UpdateMainMenu()
 					Next
 					
 					If SaveMSG <> ""
-						x = GraphicWidth / 2
-						y = GraphicHeight / 2
+						x = 740 * MenuScale
+						y = 376 * MenuScale
 						DrawFrame(x, y, 420 * MenuScale, 200 * MenuScale)
 						RowText("Are you sure you want to delete this save?", x + 20 * MenuScale, y + 15 * MenuScale, 400 * MenuScale, 200 * MenuScale)
 						;AAText(x + 20 * MenuScale, y + 15 * MenuScale, "Are you sure you want to delete this save?")
@@ -681,14 +647,6 @@ Function UpdateMainMenu()
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
 					
-;					y=y+50*MenuScale
-;					
-;						Color 255,255,255
-;					AAText(x + 20 * MenuScale, y, "Enable prop fading:")
-;					PropFading = DrawTick(x + 310 * MenuScale, y + MenuScale, PropFading)
-;					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
-;						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"propfading")
-;					EndIf
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -1930,8 +1888,6 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 					G = 255
 					txt2 = "All particles are rendered."
 			End Select
-		Case "propfading"
-			txt = "Hides props in the world when the player gets too far from them."
 			;[End Block]
 		;Sound options
 			;[Block]
