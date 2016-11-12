@@ -5,6 +5,7 @@
 - Added a vomit parameter to SCP-294.
 - New battery textures (by Cridone).
 - Leaving the name field blank when creating a new game now sets the game name to "untitled".
+- The options menu is now saved when the "esc" key is pressed to unpause the game.
 
 Bug Fixes:
 - Fixed collsion issues with structures in SCP-1499's dimension.
@@ -15,6 +16,7 @@ Bug Fixes:
 - Fixed the gas mask in room2closets having a reduced size.
 - Fixed the maintenance tunnels not generating based on the selected seed.
 - Fixed a button in room2shaft being placed inside a wall.
+- Fixed the floating buttons in room2closets.
 
 ----------------------------------------------------------------------------------
 
