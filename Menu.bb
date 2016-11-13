@@ -573,49 +573,7 @@ Function UpdateMainMenu()
 					;EndIf
 					
 					y = y + 50*MenuScale
-					
-					Color 255,255,255
-					AAText(x + 20 * MenuScale, y, "Resolution quality:")
-					;DrawImage ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale
-					;If MouseHit1
-					;	If ImageRectOverlap(ArrowIMG(1),x + 310 * MenuScale, y-4*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
-					;		If ResolutionDetails < 2
-					;			ResolutionDetails = ResolutionDetails + 1
-					;		Else
-					;			ResolutionDetails = 0
-					;		EndIf
-					;		PlaySound_Strict(ButtonSFX)
-					;	EndIf
-					;EndIf
-					;Color 255,255,255
-					;Select ResolutionDetails
-					;	Case 0
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "LOW")
-					;		ResolutionScale = 0.33
-					;	Case 1
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "MEDIUM")
-					;		ResolutionScale = 0.5
-					;	Case 2
-					;		AAText(x + 340 * MenuScale, y + MenuScale, "STANDARD")
-					;		ResolutionScale = 1.0
-					;End Select
-					;If MouseOn(x + 310 * MenuScale, y-4*MenuScale, ImageWidth(ArrowIMG(1)),ImageHeight(ArrowIMG(1)))
-					;	DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
-					;EndIf
-					ResolutionDetails = Slider3(x+310*MenuScale,y+6*MenuScale,150*MenuScale,ResolutionDetails,1,"LOW","MEDIUM","FULL")
-					Color 255,255,255
-					Select ResolutionDetails
-						Case 0
-							ResolutionScale = 0.33
-						Case 1
-							ResolutionScale = 0.5
-						Case 2
-							ResolutionScale = 1.0
-					End Select
-					If (MouseOn(x + 310 * MenuScale, y-6*MenuScale, 150*MenuScale+14, 20) And OnSliderID=0) Or OnSliderID=1
-						DrawOptionsTooltip(tx,ty,tw,th,"resquality",ResolutionDetails)
-					EndIf
-					
+										
 					y=y+50*MenuScale
 					
 					Color 255,255,255
