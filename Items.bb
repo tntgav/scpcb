@@ -566,7 +566,6 @@ Function PickItem(item.Items)
 								DeathMSG = DeathMSG + " in chinese. SCP-1123 was found in [REDACTED] nearby, suggesting the subject had come into physical contact with it. How "
 								DeathMSG = DeathMSG + "exactly SCP-1123 was removed from its containment chamber is still unknown."
 								Kill()
-								Return
 							EndIf
 							For e.Events = Each Events
 								If e\eventname = "room1123" Then 
@@ -581,6 +580,8 @@ Function PickItem(item.Items)
 								EndIf
 							Next
 						EndIf
+						
+						Return
 					Case "killbat"
 						ShowEntity Light
 						LightFlash = 1.0
