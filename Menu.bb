@@ -1078,7 +1078,7 @@ Function UpdateLauncher()
 		Text(20, 240 - 65, "Resolution: ")
 		
 		Local x% = 40
-		Local y% = 280 - 65
+		Local y% = 270 - 65
 		For i = 0 To (GFXModes - 1)
 			Color 0, 0, 0
 			If SelectedGFXMode = i Then Rect(x - 1, y - 1, 100, 20, False)
@@ -1091,7 +1091,7 @@ Function UpdateLauncher()
 			EndIf
 			
 			y=y+20
-			If y >= 240 - 65 + (LauncherHeight - 80 - 260) Then y = 280 - 65 : x=x+100
+			If y >= 250 - 65 + (LauncherHeight - 80 - 260) Then y = 270 - 65 : x=x+100
 		Next
 		
 		;-----------------------------------------------------------------
