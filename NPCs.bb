@@ -3786,7 +3786,7 @@ Function UpdateNPCs()
 				PositionEntity n\obj,EntityX(n\Collider,True)+n\PrevX*temp,EntityY(n\Collider,True)-0.2,EntityZ(n\Collider,True)+n\PrevZ*temp
 				RotateEntity n\obj,0.0,EntityYaw(n\Collider)-180,0.0
 				
-				;use the prev-values to do a "twitching" effect"
+				;use the prev-values to do a "twitching" effect
 				n\PrevX = CurveValue(0.0, n\PrevX, 10.0)
 				n\PrevZ = CurveValue(0.0, n\PrevZ, 10.0)
 				
