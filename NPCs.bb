@@ -6583,7 +6583,7 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 	Local consoleMSG$
 	
 	Select c_input$ 
-		Case "008zombie", "008"
+		Case "008", "008zombie"
 			n.NPCs = CreateNPC(NPCtype008, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			n\State = 1
 			consoleMSG = "SCP-008 infected human spawned."
@@ -6605,7 +6605,7 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 		Case "096", "scp096", "scp-096"
 			n.NPCs = CreateNPC(NPCtype096, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			n\State = 5
-			If Curr096 = Null Then Curr096 = n
+			If (Curr096 = Null) Then Curr096 = n
 			consoleMSG = "SCP-096 spawned."
 			
 		Case "106", "scp106", "scp-106", "larry"
@@ -6616,6 +6616,7 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 		Case "173", "scp173", "scp-173", "statue"
 			n.NPCs = CreateNPC(NPCtype173, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			Curr173 = n
+			If (Curr173\Idle = 3) Then Curr173\Idle = False
 			consoleMSG = "SCP-173 spawned."
 			
 		Case "178-1", "1781", "scp-178-1", "scp178-1"
@@ -6634,12 +6635,12 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 		Case "860-2", "8602", "scp860-2", "scp-860-2"
 			CreateConsoleMsg("SCP-860-2 cannot be spawned with the console. Sorry!", 255, 0, 0)
 			
+		Case "939", "scp939", "scp-939"
+			CreateConsoleMsg("SCP-939 instances cannot be spawned with the console. Sorry!", 255, 0, 0)
+
 		Case "966", "scp966", "scp-966"
 			n.NPCs = CreateNPC(NPCtype966, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "SCP-966 instance spawned."
-			
-		Case "939", "scp939", "scp-939"
-			CreateConsoleMsg("SCP-939 instances cannot be spawned with the console. Sorry!", 255, 0, 0)
 			
 		Case "1048-a", "scp1048-a", "scp-1048-a", "scp1048a", "scp-1048a"
 			CreateConsoleMsg("SCP-1048-A cannot be spawned with the console. Sorry!", 255, 0, 0)
@@ -6673,7 +6674,7 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 	End Select
 	
 	If n <> Null
-		If c_state <> "" Then n\State = Int(c_state) : consoleMSG = consoleMSG + " (State = " + n\State + ")"
+		If c_state <> "" Then n\State = Float(c_state) : consoleMSG = consoleMSG + " (State = " + n\State + ")"
 	EndIf
 	
 	CreateConsoleMsg(consoleMSG)
