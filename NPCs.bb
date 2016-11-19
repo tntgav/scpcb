@@ -6578,66 +6578,105 @@ Function Find860Angle(n.NPCs, fr.Forest)
 	EndIf		
 End Function
 
-Function Console_SpawnNPC(c_input$,state%=-9999)
+Function Console_SpawnNPC(c_input$, c_state$ = "")
 	Local n.NPCs
+	Local consoleMSG$
 	
 	Select c_input$ 
-		Case "mtf"
-			n.NPCs = CreateNPC(NPCtypeMTF, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "173","scp173","scp-173","statue"
-			n.NPCs = CreateNPC(NPCtype173, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "106","scp106","scp-106","larry"
-			Curr106\State = -1
-			PositionEntity(Curr106\Collider, EntityX(Collider), EntityY(Curr106\Collider), EntityZ(Collider))
-		Case "guard"
-			n.NPCs = CreateNPC(NPCtypeGuard, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "096","scp096","scp-096"
-			n.NPCs = CreateNPC(NPCtype096, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+		Case "008zombie", "008"
+			n.NPCs = CreateNPC(NPCtype008, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 1
+			consoleMSG = "SCP-008 infected human spawned."
+			
+		Case "049", "scp049", "scp-049"
+			n.NPCs = CreateNPC(NPCtype049, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 1
+			consoleMSG = "SCP-049 spawned."
+			
+		Case "049-2", "0492", "scp-049-2", "scp049-2", "049zombie"
+			n.NPCs = CreateNPC(NPCtypeZombie, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 1
+			consoleMSG = "SCP-049-2 spawned."
+			
+		Case "066", "scp066", "scp-066"
+			n.NPCs = CreateNPC(NPCtype066, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "SCP-066 spawned."
+			
+		Case "096", "scp096", "scp-096"
+			n.NPCs = CreateNPC(NPCtype096, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 5
 			If Curr096 = Null Then Curr096 = n
-		Case "049","scp049","scp-049"
-			n.NPCs = CreateNPC(NPCtype049, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-			If state%=-9999 Then n\State = 2
-		Case "zombie","scp-049-2"
-			n.NPCs = CreateNPC(NPCtypeZombie, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-			If state%=-9999 Then n\State = 1
+			consoleMSG = "SCP-096 spawned."
+			
+		Case "106", "scp106", "scp-106", "larry"
+			n.NPCs = CreateNPC(NPCtypeOldMan, EntityX(Collider), EntityY(Collider) - 0.5, EntityZ(Collider))
+			n\State = -1
+			consoleMSG = "SCP-106 spawned."
+			
+		Case "173", "scp173", "scp-173", "statue"
+			n.NPCs = CreateNPC(NPCtype173, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			Curr173 = n
+			consoleMSG = "SCP-173 spawned."
+			
+		Case "178-1", "1781", "scp-178-1", "scp178-1"
+			n.NPCs = CreateNPC(NPCtype178, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "SCP-178-1 instance spawned."
+			CreateConsoleMsg("SCP-178-1 instances will be invisible unless you equip SCP-178.", 255, 255, 0)
+			
+		Case "372", "scp372", "scp-372"
+			n.NPCs = CreateNPC(NPCtype372, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "SCP-372 spawned."
+			
+		Case "513-1", "5131", "scp513-1", "scp-513-1"
+			n.NPCs = CreateNPC(NPCtype5131, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "SCP-513-1 spawned."
+			
+		Case "860-2", "8602", "scp860-2", "scp-860-2"
+			CreateConsoleMsg("SCP-860-2 cannot be spawned with the console. Sorry!", 255, 0, 0)
+			
 		Case "966", "scp966", "scp-966"
-			n.NPCs = CreateNPC(NPCtype966, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "class-d","classd","d"
-			n.NPCs = CreateNPC(NPCtypeD, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "372","scp372","scp-372"
-			n.NPCs = CreateNPC(NPCtype372, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "apache"
-			n.NPCs = CreateNPC(NPCtypeApache, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "513-1","scp513-1","scp-513-1"
-			n.NPCs = CreateNPC(NPCtype5131, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+			n.NPCs = CreateNPC(NPCtype966, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "SCP-966 instance spawned."
+			
+		Case "939", "scp939", "scp-939"
+			CreateConsoleMsg("SCP-939 instances cannot be spawned with the console. Sorry!", 255, 0, 0)
+			
+		Case "1048-a", "scp1048-a", "scp-1048-a", "scp1048a", "scp-1048a"
+			CreateConsoleMsg("SCP-1048-A cannot be spawned with the console. Sorry!", 255, 0, 0)
+			
+		Case "1499-1", "14991", "scp-1499-1", "scp1499-1"
+			n.NPCs = CreateNPC(NPCtype1499, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "SCP-1499-1 instance spawned."
+			
+		Case "class-d", "classd", "d"
+			n.NPCs = CreateNPC(NPCtypeD, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "D-Class spawned."
+			
+		Case "guard"
+			n.NPCs = CreateNPC(NPCtypeGuard, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Guard spawned."
+			
+		Case "mtf"
+			n.NPCs = CreateNPC(NPCtypeMTF, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "MTF unit spawned."
+			
+		Case "apache", "helicopter"
+			n.NPCs = CreateNPC(NPCtypeApache, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Apache spawned."
+			
 		Case "tentacle"
-			n.NPCs = CreateNPC(NPCtypeTentacle, EntityX(Collider),EntityY(Collider),EntityZ(Collider))
-		Case "860-2","scp860-2","scp-860-2"
-			n.NPCs = CreateNPC(NPCtype860, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "939","scp939","scp-939"
-			n.NPCs = CreateNPC(NPCtype939, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-			If state%=-9999 Then n\State = 1
-		Case "066","scp066","scp-066"
-			n.NPCs = CreateNPC(NPCtype066, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "npc178","178-1"
-			n.NPCs = CreateNPC(NPCtype178, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "pdplane"
-			n.NPCs = CreateNPC(NPCtypePdPlane, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "1048-a","scp1048-a","scp-1048-a","scp1048a","scp-1048a"
-			n.NPCs = CreateNPC(NPCtype1048a, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "scp-008-1","008-1","scp008-1"
-			n.NPCs = CreateNPC(NPCtype008, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
-		Case "scp-1499-1","scp1499-1","1499-1"
-			n.NPCs = CreateNPC(NPCtype1499, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))
+			n.NPCs = CreateNPC(NPCtypeTentacle, EntityX(Collider), EntityY(Collider), EntityZ(Collider))
+			consoleMSG = "SCP-035 tentacle spawned."
+			
 		Default 
-			CreateConsoleMsg("NPC type not found.")
+			CreateConsoleMsg("NPC type not found.", 255, 0, 0) : Return
 	End Select
 	
 	If n <> Null
-		If state%<>-9999
-			n\State = state%
-		EndIf
+		If c_state <> "" Then n\State = Int(c_state) : consoleMSG = consoleMSG + " (State = " + n\State + ")"
 	EndIf
+	
+	CreateConsoleMsg(consoleMSG)
 	
 End Function
 

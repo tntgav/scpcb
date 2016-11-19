@@ -1103,9 +1103,15 @@ Function UpdateConsole()
 
 				Case "spawn"
 					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					StrTemp$ = Piece$(args$,1," ")
-					StrTemp2$ = Piece$(args$,2," ")
-					Console_SpawnNPC(StrTemp$,Int(StrTemp2$))
+					StrTemp$ = Piece$(args$, 1)
+					StrTemp2$ = Piece$(args$, 2)
+					
+					;Hacky fix for when the user doesn't input a second parameter.
+					If (StrTemp <> StrTemp2) Then
+						Console_SpawnNPC(StrTemp, StrTemp2)
+					Else
+						Console_SpawnNPC(StrTemp)
+					EndIf
 
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
 				Case "infinitestamina","infstam"
@@ -9280,7 +9286,6 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 	PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 	PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-	PutINIValue(OptionFile, "options", "res details", ResolutionDetails)
 	PutINIValue(OptionFile, "options", "particle amount", ParticleAmount)
 	
 	PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
