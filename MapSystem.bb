@@ -4079,13 +4079,13 @@ Function FillRoom(r.Rooms)
 			r\Objects[9] = CreatePivot(r\obj)
 			PositionEntity (r\Objects[9], r\x - 272 * RoomScale, r\y - 672.0 * RoomScale, r\z + 2736.0 * RoomScale, True)
 			
-			sc.SecurityCams = CreateSecurityCam(r\x-1216.0*RoomScale, r\y-336.0*RoomScale, r\z+1468.0*RoomScale, r, True)
-			sc\angle = 315
-			sc\turn = 45
-			sc\room = r
-			TurnEntity(sc\CameraObj, 20, 0, 0)
-			EntityParent(sc\obj, r\obj)
-			sc\ID = 4
+			;sc.SecurityCams = CreateSecurityCam(r\x-1216.0*RoomScale, r\y-336.0*RoomScale, r\z+1468.0*RoomScale, r, True)
+			;sc\angle = 315
+			;sc\turn = 45
+			;sc\room = r
+			;TurnEntity(sc\CameraObj, 20, 0, 0)
+			;EntityParent(sc\obj, r\obj)
+			;sc\ID = 4
 			;[End Block]
 		Case "room1archive"
 			;[Block]
@@ -4720,12 +4720,12 @@ Function FillRoom(r.Rooms)
 			EntityParent r\Objects[16],r\obj
 			
 			;Faked room409
-			r\Objects[17] = LoadMesh_Strict("GFX\map\room2sl_2.b3d",r\obj)
-			sc.SecurityCams = CreateSecurityCam(r\x-160.0*RoomScale,r\y-22689.1*RoomScale,r\z-288.0*RoomScale,Null)
-			sc\angle = 225
-			TurnEntity sc\CameraObj, 20, 0, 0
-			EntityParent sc\obj,r\obj
-			sc\SpecialCam = True
+			;r\Objects[17] = LoadMesh_Strict("GFX\map\room2sl_2.b3d",r\obj)
+			;sc.SecurityCams = CreateSecurityCam(r\x-160.0*RoomScale,r\y-22689.1*RoomScale,r\z-288.0*RoomScale,Null)
+			;sc\angle = 225
+			;TurnEntity sc\CameraObj, 20, 0, 0
+			;EntityParent sc\obj,r\obj
+			;sc\SpecialCam = True
 			
 			;-49.0 689.0 912.0
 			;Objects [18],[19]

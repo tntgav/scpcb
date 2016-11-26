@@ -6,9 +6,21 @@
 ;since the strange parts of the extensions are gone.
 ;In addition, you won't need FastExt.bb in the first place, making redistribution easier.
 
+Local InitErrorStr$ = ""
+;If FileSize("BlitzAL.dll")=0 Then InitErrorStr=InitErrorStr+ "BlitzAl.dll"+Chr(13)+Chr(10)
+If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
+If FileSize("OpenAl32.dll")=0 Then InitErrorStr=InitErrorStr+ "OpenAl32.dll"+Chr(13)+Chr(10)
+If FileSize("wrap_oal.dll")=0 Then InitErrorStr=InitErrorStr+ "wrap_oal.dll"+Chr(13)+Chr(10)
+If FileSize("zlibwapi.dll")=0 Then InitErrorStr=InitErrorStr+ "zlibwapi.dll"+Chr(13)+Chr(10)
+
+If Len(InitErrorStr)>0 Then
+	RuntimeError "The following DLLs were not found in the game directory:"+Chr(13)+Chr(10)+Chr(13)+Chr(10)+InitErrorStr
+EndIf
+
 Include "StrictLoads.bb"
 Include "fullscreen_window_fix.bb"
 Include "KeyName.bb"
+Include "BlitzAl.bb"
 
 Global OptionFile$ = "options.ini"
 
@@ -196,6 +208,8 @@ Global GameSaved%
 Global CanSave% = True
 
 AppTitle "SCP - Containment Breach v"+VersionNumber
+
+alInitialise()
 
 ;---------------------------------------------------------------------------------------------------------------------
 
@@ -1379,10 +1393,10 @@ Global TempSoundCHN%
 Global TempSoundIndex% = 0
 
 
-Dim Music%(40)
-Music(0) = LoadSound_Strict("SFX\Music\The Dread.ogg")
-Music(1) = LoadSound_Strict("SFX\Music\HeavyContainment.ogg") 
-Music(2) = LoadSound_Strict("SFX\Music\EntranceZone.ogg") 
+;Dim Music%(40)
+;Music(0) = LoadSound_Strict("SFX\Music\The Dread.ogg")
+;Music(1) = LoadSound_Strict("SFX\Music\HeavyContainment.ogg") 
+;Music(2) = LoadSound_Strict("SFX\Music\EntranceZone.ogg") 
 ;Music(3) = LoadSound_Strict("SFX\Music\PD.ogg")
 ;Music(4) = LoadSound_Strict("SFX\Music\079.ogg")
 ;Music(5) = LoadSound_Strict("SFX\Music\GateB1.ogg")
@@ -1390,8 +1404,8 @@ Music(2) = LoadSound_Strict("SFX\Music\EntranceZone.ogg")
 ;Music(7) = LoadSound_Strict("SFX\Music\Room3Storage.ogg") 
 ;Music(8) = LoadSound_Strict("SFX\Music\Room049.ogg") 
 ;Music(9) = LoadSound_Strict("SFX\Music\8601.ogg") 
-Music(10) = LoadSound_Strict("SFX\Music\106.ogg")
-Music(11) = LoadSound_Strict("SFX\Music\Menu.ogg")
+;Music(10) = LoadSound_Strict("SFX\Music\106.ogg")
+;Music(11) = LoadSound_Strict("SFX\Music\Menu.ogg")
 ;Music(12) = LoadSound_strict("SFX\Music\8601Cancer.ogg")
 ;Music(13) = LoadSound_strict("SFX\Music\Intro.ogg")
 ;Music(14) = LoadSound("SFX\178.ogg")
@@ -1403,11 +1417,39 @@ Music(11) = LoadSound_Strict("SFX\Music\Menu.ogg")
 ;Music(20): SCP-049 tension theme (for "room2sl")
 ;Music(21): Breath theme after beating the game
 
+Dim Music$(40)
+Music(0) = "The Dread"
+Music(1) = "HeavyContainment"
+Music(2) = "EntranceZone"
+Music(3) = "PD"
+Music(4) = "079"
+Music(5) = "GateB1"
+Music(6) = "GateB2"
+Music(7) = "Room3Storage"
+Music(8) = "Room049"
+Music(9) = "8601"
+Music(10) = "106"
+Music(11) = "Menu"
+Music(12) = "8601Cancer"
+Music(13) = "Intro"
+Music(14) = "..\178"
+Music(15) = "PDTrench"
+Music(16) = "205"
+Music(17) = ""
+Music(18) = "1499"
+Music(19) = "1499Danger"
+Music(20) = "049Chase"
+Music(21) = ""
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
-Global MusicCHN% = PlaySound_Strict(Music(2))
-ChannelVolume(MusicCHN, MusicVolume)
+;Global MusicCHN% = PlaySound_Strict(Music(2))
+Global MusicCHN% = alCreateSource("SFX\Music\"+Music(2)+".ogg",True,False)
+alSourcePlay(MusicCHN,True)
+alSourceSetLoop(MusicCHN,True)
+alSourceSetVolume(MusicCHN, MusicVolume)
+;ChannelVolume(MusicCHN, MusicVolume)
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
+Global CurrMusic% = 1
 
 DrawLoading(10, True)
 
@@ -2589,6 +2631,7 @@ Repeat
 	
 	If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
 	
+	alUpdate()
 	UpdateMusic()
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
@@ -7459,7 +7502,11 @@ Function UpdateMusic()
 				CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
 				If CurrMusicVolume = 0 Then
 					NowPlaying = ShouldPlay
-					If MusicCHN <> 0 Then StopChannel MusicCHN
+					;If MusicCHN <> 0 Then StopChannel MusicCHN
+					alSourceStop(MusicCHN)
+					alFreeSource(MusicCHN)
+					MusicCHN = 0
+					CurrMusic=0
 				EndIf
 			Else ; playing the right clip
 				CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * 0.1
@@ -7467,14 +7514,23 @@ Function UpdateMusic()
 		EndIf
 		
 		If NowPlaying < 66 Then
-			If MusicCHN = 0 Then
-				MusicCHN = PlaySound_Strict(Music(NowPlaying))
+			;If MusicCHN = 0 Then
+			If CurrMusic = 0
+				MusicCHN% = alCreateSource("SFX\Music\"+Music(NowPlaying)+".ogg",True,False)
+				alSourcePlay(MusicCHN,True)
+				alSourceSetLoop(MusicCHN,True)
+				CurrMusic = 1
+				;alSourceSetLoop(MusicCHN,True)
 			Else
-				If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
+				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
+			EndIf
+			
+			If alSourceIsPlaying%(MusicCHN)
+				alSourceSetVolume(MusicCHN, CurrMusicVolume)
 			EndIf
 		EndIf
 		
-		ChannelVolume MusicCHN, CurrMusicVolume
+		;ChannelVolume MusicCHN, CurrMusicVolume
 	Else
 		If FPSfactor > 0 Or OptionsMenu = 2 Then
 			;CurrMusicVolume = 1.0

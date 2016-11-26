@@ -198,6 +198,7 @@ Function UpdateMainMenu()
 					txt = "QUIT"
 					If temp Then
 						;DeInitExt
+						alDestroy()
 						End
 					EndIf
 			End Select
