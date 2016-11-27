@@ -313,9 +313,18 @@ Function UpdateEvents()
 								PositionEntity Collider, x, 0.302, z	
 								RotateEntity Camera, -70, 0, 0
 								
-								StopChannel MusicCHN
+								;StopChannel MusicCHN
 								CurrMusicVolume = 1.0
-								MusicCHN = PlaySound_Strict(Music(13))
+								;MusicCHN = PlaySound_Strict(Music(13))
+								alSourceStop(MusicCHN)
+								alFreeSource(MusicCHN)
+								MusicCHN% = alCreateSource("SFX\Music\"+Music(13)+".ogg",True,False)
+								alSourcePlay(MusicCHN,True)
+								alSourceSetLoop(MusicCHN,True)
+								CurrMusic = 1
+								If alSourceIsPlaying%(MusicCHN)
+									alSourceSetVolume(MusicCHN, CurrMusicVolume)
+								EndIf
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
@@ -2202,7 +2211,7 @@ Function UpdateEvents()
 						DrawLoading(100)
 					Else
 						
-						ShouldPlay = 5
+						ShouldPlay = 17
 						
 						e\EventState = e\EventState+FPSfactor
 						HideEntity Fog
@@ -6678,7 +6687,7 @@ Function UpdateEvents()
 			Case "room205"
 				;[Block]
 				If PlayerRoom = e\room Then
-					ShouldPlay = 15
+					ShouldPlay = 16
 					If e\EventState=0 Or e\room\Objects[0]=0 Then
 						If e\EventStr = ""
 							QuickLoadPercent = 0
@@ -8771,11 +8780,12 @@ Function UpdateEvents()
 					If e\EventStr <> "" And Left(e\EventStr,4) <> "load"
 						QuickLoadPercent = QuickLoadPercent + 5
 						If Int(e\EventStr) > 9
-							e\EventStr = "load1"
+							;e\EventStr = "load1"
+							e\EventStr = "load2"
 						Else
 							e\EventStr = Int(e\EventStr) + 1
 						EndIf
-					ElseIf e\EventStr = "load1"
+					;ElseIf e\EventStr = "load1"
 						;For sc.SecurityCams = Each SecurityCams
 						;	If sc\SpecialCam Then
 						;		sc\Screen = True
@@ -8829,8 +8839,6 @@ Function UpdateEvents()
 						;		Exit
 						;	EndIf
 						;Next
-								QuickLoadPercent = 70
-								e\EventStr = "load2"
 					ElseIf e\EventStr = "load2"
 							;For SCP-049
 						If e\room\NPC[0]=Null Then

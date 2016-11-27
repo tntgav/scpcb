@@ -7,7 +7,7 @@
 ;In addition, you won't need FastExt.bb in the first place, making redistribution easier.
 
 Local InitErrorStr$ = ""
-;If FileSize("BlitzAL.dll")=0 Then InitErrorStr=InitErrorStr+ "BlitzAl.dll"+Chr(13)+Chr(10)
+If FileSize("BlitzAL.dll")=0 Then InitErrorStr=InitErrorStr+ "BlitzAl.dll"+Chr(13)+Chr(10)
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
 If FileSize("OpenAl32.dll")=0 Then InitErrorStr=InitErrorStr+ "OpenAl32.dll"+Chr(13)+Chr(10)
 If FileSize("wrap_oal.dll")=0 Then InitErrorStr=InitErrorStr+ "wrap_oal.dll"+Chr(13)+Chr(10)
@@ -1417,6 +1417,7 @@ Global TempSoundIndex% = 0
 ;Music(20): SCP-049 tension theme (for "room2sl")
 ;Music(21): Breath theme after beating the game
 
+;The Music now has to be pre-defined, as the new system uses streaming instead of the usual sound loading system Blitz3D has
 Dim Music$(40)
 Music(0) = "The Dread"
 Music(1) = "HeavyContainment"
@@ -1435,11 +1436,11 @@ Music(13) = "Intro"
 Music(14) = "..\178"
 Music(15) = "PDTrench"
 Music(16) = "205"
-Music(17) = ""
+Music(17) = "GateA"
 Music(18) = "1499"
 Music(19) = "1499Danger"
 Music(20) = "049Chase"
-Music(21) = ""
+Music(21) = "..\Ending\MenuBreath.ogg"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = PlaySound_Strict(Music(2))
@@ -3207,7 +3208,7 @@ Function DrawEnding()
 					
 					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
 						NullGame()
-						Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
+						;Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
 						ShouldPlay = 21
 						MenuOpen = False
 						MainMenuOpen = True
