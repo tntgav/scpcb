@@ -29,6 +29,8 @@ Include "Blitz_File_FileName.bb"
 Include "Blitz_File_ZipApi.bb"
 Include "Update.bb"
 
+Include "DevilParticleSystem.bb"
+
 Global ErrorFile$ = "error_log_"
 Local ErrorFileInd% = 0
 While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
@@ -392,6 +394,7 @@ Function CreateConsoleMsg(txt$,r%=-1,g%=-1,b%=-1,isCommand%=False)
 End Function
 
 Function UpdateConsole()
+	Local e.Events
 	
 	If CanOpenConsole = False Then
 		ConsoleOpen = False
@@ -1087,8 +1090,8 @@ Function UpdateConsole()
 						Next
 					Next
 
-					For e.events = Each Events
-						If e\eventname = "alarm" Then 
+					For e.Events = Each Events
+						If e\EventName = "alarm" Then 
 							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
 							If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
 							If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
@@ -1286,6 +1289,35 @@ Function UpdateConsole()
 				Case "teleport173"
 					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
 					ResetEntity Curr173\Collider
+				Case "seteventstate"
+					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					StrTemp$ = Piece$(args$,1," ")
+					StrTemp2$ = Piece$(args$,2," ")
+					StrTemp3$ = Piece$(args$,3," ")
+					Local pl_room_found% = False
+					If StrTemp="" Or StrTemp2="" Or StrTemp3=""
+						CreateConsoleMsg("Too few parameters. This command requires 3.",255,150,0)
+					Else
+						For e.Events = Each Events
+							If e\room = PlayerRoom
+								If Lower(StrTemp)<>"keep"
+									e\EventState = Float(StrTemp)
+								EndIf
+								If Lower(StrTemp2)<>"keep"
+									e\EventState2 = Float(StrTemp2)
+								EndIf
+								If Lower(StrTemp3)<>"keep"
+									e\EventState3 = Float(StrTemp3)
+								EndIf
+								CreateConsoleMsg("Changed event states from current player room to: "+e\EventState+"|"+e\EventState2+"|"+e\EventState3)
+								pl_room_found = True
+								Exit
+							EndIf
+						Next
+						If (Not pl_room_found)
+							CreateConsoleMsg("The current room doesn't has any event applied.",255,150,0)
+						EndIf
+					EndIf
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
 					ConsoleFlush = True 
 					
@@ -1444,8 +1476,8 @@ Music(21) = "..\Ending\MenuBreath.ogg"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = PlaySound_Strict(Music(2))
-Global MusicCHN% = alCreateSource("SFX\Music\"+Music(2)+".ogg",True,False)
-alSourcePlay(MusicCHN,True)
+Global MusicCHN% = alCreateSource_("SFX\Music\"+Music(2)+".ogg",True,False)
+alSourcePlay2D_(MusicCHN,True)
 alSourceSetLoop(MusicCHN,True)
 alSourceSetVolume(MusicCHN, MusicVolume)
 ;ChannelVolume(MusicCHN, MusicVolume)
@@ -1720,6 +1752,10 @@ Next
 NavImages(4) = LoadImage_Strict("GFX\navigator\batterymeter.png")
 
 Global NavBG = CreateImage(GraphicWidth,GraphicHeight)
+
+Global LightConeModel
+
+Global ParticleEffect[10]
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2585,6 +2621,16 @@ DrawLoading(100, True)
 
 LoopDelay = MilliSecs()
 
+Global fpPointer1 = 0
+Global fpPointer2 = 0
+Global fpPointer3 = 0
+
+Pointer1()
+Pointer2()
+Pointer3()
+
+Global UpdateParticles_Time# = 0.0
+
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------       		MAIN LOOP                 ---------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2593,7 +2639,7 @@ Repeat
 	
 	Cls
 	
-	CurTime = MilliSecs()
+	CurTime = MilliSecs2()
 	ElapsedTime = (CurTime - PrevTime) / 1000.0
 	PrevTime = CurTime
 	FPSfactor = Max(Min(ElapsedTime * 70, 5.0), 0.2)
@@ -2603,10 +2649,10 @@ Repeat
 	
 	If Framelimit > 0 Then
 	    ;Framelimit
-		Local WaitingTime% = (1000.0 / Framelimit) - (MilliSecs() - LoopDelay)
+		Local WaitingTime% = (1000.0 / Framelimit) - (MilliSecs2() - LoopDelay)
 		Delay WaitingTime%
 		
-	   LoopDelay = MilliSecs()
+		LoopDelay = MilliSecs2()
 	EndIf
 	
 	;Counting the fps
@@ -2646,9 +2692,15 @@ Repeat
 						EndIf
 					Next
 				Next
-				TempSoundCHN = PlaySound_Strict(Music(21))
+				;TempSoundCHN = PlaySound_Strict(Music(21))
+				TempSoundCHN = 1
+				alSourceSetLoop(MusicCHN,False)
 			EndIf
-			If (Not ChannelPlaying(TempSoundCHN)) Then FreeSound_Strict Music(21) : ShouldPlay = 11
+			;If (Not ChannelPlaying(TempSoundCHN)) Then FreeSound_Strict Music(21) : ShouldPlay = 11
+			If (Not alSourceIsPlaying(MusicCHN))
+				ShouldPlay = 11
+				TempSoundCHN = 0
+			EndIf
 		Else
 			ShouldPlay = 11
 		EndIf
@@ -2658,7 +2710,8 @@ Repeat
 		
 		DrawHandIcon = False
 		
-		If FPSfactor > 0 Then UpdateSecurityCams()
+		;If FPSfactor > 0 Then UpdateSecurityCams()
+		BP_CallFunctionV fpPointer2
 		
 		If KeyHit(KEY_INV) And VomitTimer >= 0 Then 
 			If InvOpen Then
@@ -2741,7 +2794,7 @@ Repeat
 			CanSave% = True
 			UpdateDeafPlayer()
 			UpdateEmitters()
-			MouseLook()			
+			MouseLook()
 			MovePlayer()
 			InFacility = CheckForPlayerInFacility()
 			UpdateDoors()
@@ -2756,6 +2809,12 @@ Repeat
 			Update294()
 			TimeCheckpointMonitors()
 			UpdateLeave1499()
+			;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
+			UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
+			If UpdateParticles_Time#=1
+				UpdateParticles_Devil()
+				UpdateParticles_Time#=0
+			EndIf
 		EndIf
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
@@ -3054,6 +3113,40 @@ Forever
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Function Pointer1()
+	
+	If fpPointer1 = 0
+		fpPointer1 = BP_GetFunctionPointer()
+		Return
+	EndIf
+	
+	
+	
+End Function
+
+Function Pointer2()
+	
+	If fpPointer2 = 0
+		fpPointer2 = BP_GetFunctionPointer()
+		Return
+	EndIf
+	
+	If FPSfactor > 0 Then UpdateSecurityCams()
+	
+End Function
+
+Function Pointer3()
+	
+	If fpPointer3 = 0
+		fpPointer3 = BP_GetFunctionPointer()
+		Return
+	EndIf
+	
+	
+	
+End Function
+
 
 
 Function Kill()
@@ -6847,6 +6940,8 @@ Function LoadEntities()
 	ClsColor 0,0,0
 	Cls
 	SetBuffer BackBuffer()
+	LightConeModel = LoadMesh_Strict("GFX\lightcone.b3d")
+	HideEntity LightConeModel
 	
 	For i = 2 To CountSurfaces(Monitor2)
 		sf = GetSurface(Monitor2,i)
@@ -6915,10 +7010,42 @@ Function LoadEntities()
 	ParticleTextures(5) = LoadTexture_Strict("GFX\bloodsprite.png", 1 + 2)
 	ParticleTextures(6) = LoadTexture_Strict("GFX\smoke2.png", 1 + 2)
 	ParticleTextures(7) = LoadTexture_Strict("GFX\spark.jpg", 1 + 2)
+	ParticleTextures(8) = LoadTexture_Strict("GFX\particle.png", 1 + 2)
 	
 	LoadMaterials("DATA\materials.ini")
 	
 	TextureLodBias TextureFloat#
+	
+	;Devil Particle System
+	;ParticleEffect[] numbers:
+	;	0 - electric spark
+	;	1 - smoke effect
+	
+	Local t0
+	
+	InitParticles(Camera)
+	
+	;Main Sparks (1)
+	ParticleEffect[0] = CreateTemplate()
+	SetTemplateEmitterBlend(ParticleEffect[0], 3)
+	SetTemplateInterval(ParticleEffect[0], 1)
+	;SetTemplateParticlesPerInterval(ParticleEffect[0], 5)
+	SetTemplateParticlesPerInterval(ParticleEffect[0], 6)
+	;SetTemplateEmitterLifeTime(ParticleEffect[0], 165)
+	SetTemplateEmitterLifeTime(ParticleEffect[0], 6)
+	SetTemplateParticleLifeTime(ParticleEffect[0], 20, 30)
+	SetTemplateTexture(ParticleEffect[0], "GFX\Spark.png", 2, 3)
+	SetTemplateOffset(ParticleEffect[0], -.1, .1, -.1, .1, -.1, .1)
+	;SetTemplateVelocity(ParticleEffect[0], -.3, .3, -.3, .3, .2, .2)
+	SetTemplateVelocity(ParticleEffect[0], -0.0375, 0.0375, -0.0375, 0.0375, -0.0375, 0.0375)
+	SetTemplateAlignToFall(ParticleEffect[0], True, 45)
+	;SetTemplateGravity(ParticleEffect[0], .02)
+	SetTemplateGravity(ParticleEffect[0], .001)
+	SetTemplateAlphaVel(ParticleEffect[0], True)
+	;SetTemplateSize(ParticleEffect[0], .5, 1, .7, 1)
+	SetTemplateSize(ParticleEffect[0], 0.0625, 0.125, 0.7, 1)
+	SetTemplateColors(ParticleEffect[0], $0000FF, $6565FF)
+	SetTemplateFloor(ParticleEffect[0], -5.5, .5)
 	
 	DrawLoading(30)
 	
@@ -7001,6 +7128,14 @@ Function InitNewGame()
 		If (r\RoomTemplate\Name = "start" And IntroEnabled = False) Then 
 			PositionEntity (Collider, EntityX(r\obj)+3584*RoomScale, 704*RoomScale, EntityZ(r\obj)+1024*RoomScale)
 			PlayerRoom = r
+			it = CreateItem("Class D Orientation Leaflet", "paper", 1, 1, 1)
+			it\Picked = True
+			it\Dropped = -1
+			it\itemtemplate\found=True
+			Inventory(0) = it
+			HideEntity(it\collider)
+			EntityType (it\collider, HIT_ITEM)
+			EntityParent(it\collider, 0)
 		ElseIf (r\RoomTemplate\Name = "173" And IntroEnabled) Then
 			PositionEntity (Collider, EntityX(r\obj), 1.0, EntityZ(r\obj))
 			PlayerRoom = r
@@ -7172,6 +7307,8 @@ Function NullGame()
 	Local i%, x%, y%, lvl
 	Local itt.ItemTemplates, s.Screens, lt.LightTemplates, d.Doors, m.Materials
 	Local wp.WayPoints, twp.TempWayPoints, r.Rooms, it.Items
+	
+	FreeParticles()
 	
 	ClearTextureCache
 	
@@ -7498,27 +7635,29 @@ Function UpdateMusic()
 	If ConsoleFlush Then
 		If Not ChannelPlaying(MusicCHN) Then MusicCHN = PlaySound(ConsoleMusFlush)
 	ElseIf (Not PlayCustomMusic)
-		If FPSfactor > 0 Or OptionsMenu = 2 Then 
+		;If FPSfactor > 0 Or OptionsMenu = 2 Then 
 			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
 				CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
 				If CurrMusicVolume = 0 Then
-					NowPlaying = ShouldPlay
 					;If MusicCHN <> 0 Then StopChannel MusicCHN
-					alSourceStop(MusicCHN)
-					alFreeSource(MusicCHN)
+					If NowPlaying<66
+						alSourceStop(MusicCHN)
+						alFreeSource(MusicCHN)
+					EndIf
+					NowPlaying = ShouldPlay
 					MusicCHN = 0
 					CurrMusic=0
 				EndIf
 			Else ; playing the right clip
 				CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * 0.1
 			EndIf
-		EndIf
+		;EndIf
 		
 		If NowPlaying < 66 Then
 			;If MusicCHN = 0 Then
 			If CurrMusic = 0
-				MusicCHN% = alCreateSource("SFX\Music\"+Music(NowPlaying)+".ogg",True,False)
-				alSourcePlay(MusicCHN,True)
+				MusicCHN% = alCreateSource_("SFX\Music\"+Music(NowPlaying)+".ogg",True,False)
+				alSourcePlay2D_(MusicCHN,True)
 				alSourceSetLoop(MusicCHN,True)
 				CurrMusic = 1
 				;alSourceSetLoop(MusicCHN,True)
@@ -7526,7 +7665,7 @@ Function UpdateMusic()
 				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
 			EndIf
 			
-			If alSourceIsPlaying%(MusicCHN)
+			If alSourceIsPlaying(MusicCHN)
 				alSourceSetVolume(MusicCHN, CurrMusicVolume)
 			EndIf
 		EndIf

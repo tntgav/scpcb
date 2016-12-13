@@ -412,91 +412,103 @@ Function UpdateEvents()
 							
 						ElseIf e\EventState3 => 150.0 And e\EventState3 < 700
 							If e\room\NPC[3]\State = 7 Then
-								;BlinkTimer = -10
-								
-								e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCell.ogg")
-								e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-								
-								;e\room\NPC[3]\State = 7
-								;e\room\NPC[4]\State = 7
-								;e\room\NPC[5]\State = 7
-								e\room\NPC[3]\State = 9
-								e\room\NPC[4]\State = 9
-								e\room\NPC[5]\State = 9
-								
-								e\room\RoomDoors[6]\locked = False		
-								UseDoor(e\room\RoomDoors[6], False)
-								e\room\RoomDoors[6]\locked = True									
-							EndIf
-							
-							;PointEntity e\room\NPC[3]\obj, Collider
-							;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\obj), 0
-							
-							;PointEntity e\room\NPC[4]\obj, Collider
-							;RotateEntity e\room\NPC[4]\Collider, 0, EntityYaw(e\room\NPC[4]\obj), 0
-							
-							e\EventState3 = Min(e\EventState3+FPSfactor/4,699)
-							
-							;outside the cell
-							If Distance(EntityX(Collider),EntityZ(Collider),PlayerRoom\x-(3072+1024)*RoomScale, PlayerRoom\z+192.0*RoomScale)>1.5 Then
-								;e\room\NPC[3]\State = 5
-								;e\room\NPC[3]\EnemyX = EntityX(Collider)
-								;e\room\NPC[3]\EnemyY = EntityY(Collider)
-								;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
-								
-								If e\EventState3 > 250 Then
-									If e\room\NPC[3]\SoundChn<>0 Then
-										If ChannelPlaying(e\room\NPC[3]\SoundChn) Then StopChannel e\room\NPC[3]\SoundChn
-									EndIf
-									FreeSound_Strict e\room\NPC[3]\Sound
-									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\Escort"+Rand(1,2)+".ogg")
-									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-									
-									;e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
-									;e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
-									e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
-									e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
-									
-									e\EventState3 = 710
-								EndIf
-							Else ;inside the cell
-								e\room\NPC[3]\State = 9
-								;PointEntity e\room\NPC[3]\Collider, Collider		
-								;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\Collider), 0
-								
-								If e\EventState3-(FPSfactor/4) < 350 And e\EventState3=>350 Then
-									FreeSound_Strict e\room\NPC[3]\Sound
-									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCellRefuse"+Rand(1,2)+".ogg")
-									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-								ElseIf e\EventState3-(FPSfactor/4) < 550 And e\EventState3=>550 
-									FreeSound_Strict e\room\NPC[3]\Sound
-									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\CellGas"+Rand(1,2)+".ogg")
-									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-								ElseIf e\EventState3>630
-									PositionEntity Collider, EntityX(Collider), EntityY(Collider), Min(EntityZ(Collider), EntityZ(e\room\obj,True)+490*RoomScale)
-									If e\room\RoomDoors[6]\open = True Then 
-										e\room\RoomDoors[6]\locked = False		
-										UseDoor(e\room\RoomDoors[6],False)
-										e\room\RoomDoors[6]\locked = True
-										
-										em.Emitters = CreateEmitter(PlayerRoom\x - (2976.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
-										TurnEntity(em\Obj, 90, 0, 0, True)
-										em\RandAngle = 7
-										em\Speed = 0.03
-										em\SizeChange = 0.003
-										em\Room = PlayerRoom
-										
-										em.Emitters = CreateEmitter(PlayerRoom\x - (3168.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
-										TurnEntity(em\Obj, 90, 0, 0, True)
-										em\RandAngle = 7
-										em\Speed = 0.03
-										em\SizeChange = 0.003
-										em\Room = PlayerRoom
-									EndIf
-									
-									EyeIrritation=Max(EyeIrritation+FPSfactor * 4, 1.0)
+								If e\room\NPC[3]\Sound2 = 0
+									e\room\NPC[3]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\BeforeDoorOpen.ogg")
+									e\room\NPC[3]\SoundChn2 = PlaySound2(e\room\NPC[3]\Sound2,Camera,e\room\NPC[3]\Collider)
+									DebugLog "Playing guard sound before cell opening"
 								EndIf
 								
+								UpdateSoundOrigin(e\room\NPC[3]\SoundChn2,Camera,e\room\NPC[3]\Collider)
+								
+								If (Not ChannelPlaying(e\room\NPC[3]\SoundChn2))
+									;BlinkTimer = -10
+									
+									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCell.ogg")
+									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									
+									;e\room\NPC[3]\State = 7
+									;e\room\NPC[4]\State = 7
+									;e\room\NPC[5]\State = 7
+									e\room\NPC[3]\State = 9
+									e\room\NPC[4]\State = 9
+									e\room\NPC[5]\State = 9
+									
+									e\room\RoomDoors[6]\locked = False		
+									UseDoor(e\room\RoomDoors[6], False)
+									e\room\RoomDoors[6]\locked = True
+								EndIf
+							Else
+								FreeSound_Strict e\room\NPC[3]\Sound2
+								
+								;PointEntity e\room\NPC[3]\obj, Collider
+								;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\obj), 0
+								
+								;PointEntity e\room\NPC[4]\obj, Collider
+								;RotateEntity e\room\NPC[4]\Collider, 0, EntityYaw(e\room\NPC[4]\obj), 0
+								
+								e\EventState3 = Min(e\EventState3+FPSfactor/4,699)
+								
+								;outside the cell
+								If Distance(EntityX(Collider),EntityZ(Collider),PlayerRoom\x-(3072+1024)*RoomScale, PlayerRoom\z+192.0*RoomScale)>1.5 Then
+									;e\room\NPC[3]\State = 5
+									;e\room\NPC[3]\EnemyX = EntityX(Collider)
+									;e\room\NPC[3]\EnemyY = EntityY(Collider)
+									;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
+									
+									If e\EventState3 > 250 Then
+										If e\room\NPC[3]\SoundChn<>0 Then
+											If ChannelPlaying(e\room\NPC[3]\SoundChn) Then StopChannel e\room\NPC[3]\SoundChn
+										EndIf
+										FreeSound_Strict e\room\NPC[3]\Sound
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\Escort"+Rand(1,2)+".ogg")
+										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+										
+										;e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
+										;e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
+										e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
+										e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
+										
+										e\EventState3 = 710
+									EndIf
+								Else ;inside the cell
+									e\room\NPC[3]\State = 9
+									;PointEntity e\room\NPC[3]\Collider, Collider		
+									;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\Collider), 0
+									
+									If e\EventState3-(FPSfactor/4) < 350 And e\EventState3=>350 Then
+										FreeSound_Strict e\room\NPC[3]\Sound
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCellRefuse"+Rand(1,2)+".ogg")
+										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									ElseIf e\EventState3-(FPSfactor/4) < 550 And e\EventState3=>550 
+										FreeSound_Strict e\room\NPC[3]\Sound
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\CellGas"+Rand(1,2)+".ogg")
+										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									ElseIf e\EventState3>630
+										PositionEntity Collider, EntityX(Collider), EntityY(Collider), Min(EntityZ(Collider), EntityZ(e\room\obj,True)+490*RoomScale)
+										If e\room\RoomDoors[6]\open = True Then 
+											e\room\RoomDoors[6]\locked = False		
+											UseDoor(e\room\RoomDoors[6],False)
+											e\room\RoomDoors[6]\locked = True
+											
+											em.Emitters = CreateEmitter(PlayerRoom\x - (2976.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
+											TurnEntity(em\Obj, 90, 0, 0, True)
+											em\RandAngle = 7
+											em\Speed = 0.03
+											em\SizeChange = 0.003
+											em\Room = PlayerRoom
+											
+											em.Emitters = CreateEmitter(PlayerRoom\x - (3168.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
+											TurnEntity(em\Obj, 90, 0, 0, True)
+											em\RandAngle = 7
+											em\Speed = 0.03
+											em\SizeChange = 0.003
+											em\Room = PlayerRoom
+										EndIf
+										
+										EyeIrritation=Max(EyeIrritation+FPSfactor * 4, 1.0)
+									EndIf
+									
+								EndIf
 							EndIf
 						ElseIf e\EventState3 < 800
 							e\EventState3 = e\EventState3+FPSfactor/4.0
