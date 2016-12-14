@@ -3114,17 +3114,433 @@ Forever
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
+;Quick Loading function
 Function Pointer1()
+	Local e.Events,r.Rooms,sc.SecurityCams,sc2.SecurityCams,scale#,pvt%,n.NPCs,tex%,i%,x#,z#
 	
 	If fpPointer1 = 0
 		fpPointer1 = BP_GetFunctionPointer()
 		Return
 	EndIf
 	
-	
+	For e.Events = Each Events
+		If e\room = QuickLoad_CurrRoom
+			Select e\EventName
+				Case "room2sl"
+					;[Block]
+					If e\EventState = 0 And e\EventStr <> ""
+						For r.Rooms = Each Rooms
+							If ValidRoom2slCamRoom(r)
+								For sc.SecurityCams = Each SecurityCams
+									If sc\room = r And (Not sc\SpecialCam)
+										Local HasCamera% = False
+										For sc2.SecurityCams = Each SecurityCams
+											If sc2\room <> sc\room And (Not sc2\SpecialCam)
+												If sc2\room\RoomTemplate\Name = sc\room\RoomTemplate\Name
+													If sc2\Screen
+														HasCamera% = True
+														DebugLog "HasCamera% = True ("+Chr(34)+sc2\room\RoomTemplate\Name+Chr(34)+")"
+														Exit
+													EndIf
+												EndIf
+											EndIf
+										Next
+										If (Not HasCamera%) Then
+											If Left(e\EventStr,4) <> "load"
+												DebugLog "### "+Int(e\EventStr)
+												If Int(e\EventStr)=sc\ID
+													sc\Screen = True
+													sc\AllowSaving = False
+													
+													sc\RenderInterval = 12
+													
+													scale# = RoomScale * 4.5 * 0.4
+													
+													sc\ScrObj = CreateSprite()
+													EntityFX sc\ScrObj, 17
+													SpriteViewMode(sc\ScrObj, 2)
+													sc\ScrTexture = 0
+													;EntityTexture sc\ScrObj, ScreenTexs[sc\ScrTexture]
+													ScaleSprite(sc\ScrObj, MeshWidth(Monitor) * scale * 0.95* 0.5, MeshHeight(Monitor) * scale * 0.95* 0.5)
+													
+													sc\ScrOverlay = CreateSprite(sc\ScrObj)
+													
+													ScaleSprite(sc\ScrOverlay, MeshWidth(Monitor) * scale * 0.95 * 0.5, MeshHeight(Monitor) * scale * 0.95 * 0.5)
+													MoveEntity(sc\ScrOverlay, 0, 0, -0.0005)
+													EntityTexture(sc\ScrOverlay, MonitorTexture)
+													SpriteViewMode(sc\ScrOverlay, 2)
+													EntityBlend(sc\ScrOverlay , 3)
+													
+													sc\MonitorObj = CopyEntity(Monitor, sc\ScrObj)
+													
+													ScaleEntity(sc\MonitorObj, scale, scale, scale)
+													
+													sc\Cam = CreateCamera()
+													CameraViewport(sc\Cam, 0, 0, 512, 512)
+													CameraRange sc\Cam, 0.05, 6.0
+													CameraZoom(sc\Cam, 0.8)
+													HideEntity(sc\Cam)
+													
+													sc\IsRoom2slCam = True
+													sc\Room2slTexs%[0] = CreateTexture(512, 512, 1+256)
+													EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
+													
+													pvt% = CreatePivot(e\room\obj)
+													Select r\RoomTemplate\Name$
+														Case "room2closets" ;ID=0 q
+															PositionEntity pvt%,-207.94,872.0,-60.0686,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"room2closets"+Chr(34)
+														Case "room1archive" ;ID=1 q
+															PositionEntity pvt%,-231.489,872.0,95.7443,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"room1archive"+Chr(34)
+														Case "room3z3" ;ID=2 q
+															PositionEntity pvt%,-231.489,872.0,255.744,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"room3z3"+Chr(34)
+														Case "room1lifts" ;ID=3 q
+															PositionEntity pvt%,-231.489,872.0,415.744,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"room1lifts"+Chr(34)
+															;ID=4 q
+														Case "checkpoint1" ;ID=5 q
+															PositionEntity pvt%,-207.94,760.0,-60.0686,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"checkpoint1"+Chr(34)
+														Case "room2nuke" ;ID=6 q
+															PositionEntity pvt%,-231.489,760.0,415.744,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"room2nuke"+Chr(34)
+														Case "008" ;ID=7 q
+															PositionEntity pvt%,-208.138,760.0,571.583,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 75+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"008"+Chr(34)
+														Case "room1162" ;ID=8 q
+															PositionEntity pvt%,-207.94,648.0,-60.0686,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"room1162"+Chr(34)
+														Case "room966" ;ID=9 q
+															PositionEntity pvt%,-231.489,648.0,255.744,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"room966"+Chr(34)
+														Case "room2ccont" ;ID=10 q
+															PositionEntity pvt%,-231.489,648.0,415.744,False
+															PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
+															EntityParent(sc\ScrObj, e\room\obj)
+															TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+															FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
+															DebugLog "Created Monitor for "+Chr(34)+"room2ccont"+Chr(34)
+													End Select
+													
+													FreeEntity pvt%
+													
+													Exit
+												EndIf
+											EndIf
+										EndIf
+									EndIf
+								Next
+							EndIf
+						Next
+						If e\EventStr <> "" And Left(e\EventStr,4) <> "load"
+							QuickLoadPercent = QuickLoadPercent + 5
+							If Int(e\EventStr) > 9
+								e\EventStr = "load2"
+							Else
+								e\EventStr = Int(e\EventStr) + 1
+							EndIf
+						ElseIf e\EventStr = "load2"
+							;For SCP-049
+							If e\room\NPC[0]=Null Then
+								For n.NPCs = Each NPCs
+									If n\NPCtype = NPCtype049
+										e\room\NPC[0] = n
+										Exit
+									EndIf
+								Next
+								
+								If e\room\NPC[0]=Null Then
+									e\room\NPC[0] = CreateNPC(NPCtype049,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True))
+								EndIf
+								e\room\NPC[0]\HideFromNVG = True
+							EndIf
+							QuickLoadPercent = 80
+							e\EventStr = "load3"
+						ElseIf e\EventStr = "load3"
+							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
+							ResetEntity e\room\NPC[0]\Collider
+							RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
+							
+							DebugLog(EntityX(e\room\Objects[7],True)+", "+EntityY(e\room\Objects[7],True)+", "+EntityZ(e\room\Objects[7],True))
+							
+							e\room\NPC[0]\State = 0
+							e\room\NPC[0]\PrevState = 2
+							
+							e\EventState = 1
+							If e\EventState2 = 0 Then e\EventState2 = -(70*5)
+							
+							QuickLoadPercent = 100
+						EndIf
+					EndIf
+					;[End Block]
+				Case "room2closets"
+					;[Block]
+					If e\EventState = 0
+						If e\EventStr = "load0"
+							QuickLoadPercent = 10
+							If e\room\NPC[0]=Null Then
+								e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True),EntityY(e\room\Objects[0],True),EntityZ(e\room\Objects[0],True))
+							EndIf
+							e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
+							tex = LoadTexture_Strict(e\room\NPC[0]\texture)
+							
+							EntityTexture e\room\NPC[0]\obj, tex
+							FreeTexture tex
+							e\EventStr = "load1"
+						ElseIf e\EventStr = "load1"
+							QuickLoadPercent = 20
+							e\room\NPC[0]\Sound=LoadSound_Strict("SFX\Room\Storeroom\Escape1.ogg")
+							e\EventStr = "load2"
+						ElseIf e\EventStr = "load2"
+							QuickLoadPercent = 35
+							e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 12)
+							e\EventStr = "load3"
+						ElseIf e\EventStr = "load3"
+							QuickLoadPercent = 55
+							If e\room\NPC[1]=Null Then
+								e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1],True),EntityY(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
+							EndIf
+							e\room\NPC[1]\texture = "GFX\npcs\scientist.jpg"
+							tex = LoadTexture_Strict(e\room\NPC[1]\texture)
+							EntityTexture e\room\NPC[1]\obj, tex
+							
+							FreeTexture tex
+							e\EventStr = "load4"
+						ElseIf e\EventStr = "load4"
+							QuickLoadPercent = 80
+							e\room\NPC[1]\Sound=LoadSound_Strict("SFX\Room\Storeroom\Escape2.ogg")
+							e\EventStr = "load5"
+						ElseIf e\EventStr = "load5"
+							QuickLoadPercent = 100
+							PointEntity e\room\NPC[0]\Collider, e\room\NPC[1]\Collider
+							PointEntity e\room\NPC[1]\Collider, e\room\NPC[0]\Collider
+							
+							e\EventState=1
+						EndIf
+					EndIf
+					;[End Block]
+				Case "room3storage"
+					;[Block]
+					If e\room\NPC[2]=Null Or e\EventState = 3
+						If e\EventState = 1
+							e\room\NPC[0]=CreateNPC(NPCtype939, 0,0,0)
+							QuickLoadPercent = 20
+							e\EventState = 2
+						ElseIf e\EventState = 2
+							e\room\NPC[1]=CreateNPC(NPCtype939, 0,0,0)
+							QuickLoadPercent = 50
+							e\EventState = 3
+						ElseIf e\EventState = 3
+							e\room\NPC[2]=CreateNPC(NPCtype939, 0,0,0)
+							QuickLoadPercent = 100
+							e\EventState = 0
+						EndIf
+					EndIf
+					;[End Block]
+				Case "room049"
+					;[Block]
+					If e\EventState = 0 Then
+						If e\EventStr = "load0"
+							n.NPCs = CreateNPC(NPCtypeZombie, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
+							PointEntity n\Collider, e\room\obj
+							TurnEntity n\Collider, 0, 190, 0
+							QuickLoadPercent = 20
+							e\EventStr = "load1"
+						ElseIf e\EventStr = "load1"
+							n.NPCs = CreateNPC(NPCtypeZombie, EntityX(e\room\Objects[5],True),EntityY(e\room\Objects[5],True),EntityZ(e\room\Objects[5],True))
+							PointEntity n\Collider, e\room\obj
+							TurnEntity n\Collider, 0, 20, 0
+							QuickLoadPercent = 60
+							e\EventStr = "load2"
+						ElseIf e\EventStr = "load2"
+							For n.NPCs = Each NPCs
+								If n\NPCtype = NPCtype049
+									e\room\NPC[0]=n
+									e\room\NPC[0]\State = 2
+									e\room\NPC[0]\Idle = 1
+									e\room\NPC[0]\HideFromNVG = True
+									PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+3,EntityZ(e\room\Objects[4],True)
+									ResetEntity e\room\NPC[0]\Collider
+									Exit
+								EndIf
+							Next
+							If e\room\NPC[0]=Null
+								n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True)+3, EntityZ(e\room\Objects[4],True))
+								PointEntity n\Collider, e\room\obj
+								n\State = 2
+								n\Idle = 1
+								n\HideFromNVG = True
+								e\room\NPC[0]=n
+							EndIf
+							QuickLoadPercent = 100
+							e\EventState=1
+						EndIf
+					EndIf
+					;[End Block]
+				Case "room205"
+					;[Block]
+					If e\EventState=0 Or e\room\Objects[0]=0 Then
+						If e\EventStr = "load0"
+							e\room\Objects[3] = LoadAnimMesh_Strict("GFX\npcs\205_demon1.b3d")
+							QuickLoadPercent = 10
+							e\EventStr = "load1"
+						ElseIf e\EventStr = "load1"
+							e\room\Objects[4] = LoadAnimMesh_Strict("GFX\npcs\205_demon2.b3d")
+							QuickLoadPercent = 20
+							e\EventStr = "load2"
+						ElseIf e\EventStr = "load2"
+							e\room\Objects[5] = LoadAnimMesh_Strict("GFX\npcs\205_demon3.b3d")
+							QuickLoadPercent = 30
+							e\EventStr = "load3"
+						ElseIf e\EventStr = "load3"
+							e\room\Objects[6] = LoadAnimMesh_Strict("GFX\npcs\205_woman.b3d")
+							QuickLoadPercent = 40
+							e\EventStr = "load4"
+						ElseIf e\EventStr = "load4"
+							QuickLoadPercent = 50
+							e\EventStr = "load5"
+						ElseIf e\EventStr = "load5"
+							For i = 3 To 6
+								PositionEntity e\room\Objects[i], EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True), True
+								RotateEntity e\room\Objects[i], -90, EntityYaw(e\room\Objects[0],True), 0, True
+								ScaleEntity(e\room\Objects[i], 0.05, 0.05, 0.05, True)
+							Next
+							QuickLoadPercent = 70
+							e\EventStr = "load6"
+						ElseIf e\EventStr = "load6"
+							GiveAchievement(Achv205)
+							
+							HideEntity(e\room\Objects[3])
+							HideEntity(e\room\Objects[4])
+							HideEntity(e\room\Objects[5])
+							QuickLoadPercent = 100
+							e\EventState = 1
+						EndIf
+					EndIf
+					;[End Block]
+				Case "room860"
+					;[Block]
+					If e\EventStr = "load0"
+						QuickLoadPercent = 15
+						e\EventStr = "load1"
+					ElseIf e\EventStr = "load1"
+						QuickLoadPercent = 40
+						e\EventStr = "load2"
+					ElseIf e\EventStr = "load2"
+						QuickLoadPercent = 100
+						If e\room\NPC[0]=Null Then e\room\NPC[0]=CreateNPC(NPCtype860, 0,0,0)
+						e\EventStr = "loaddone"
+					EndIf
+					;[End Block]
+				Case "room966"
+					;[Block]
+					If e\EventState = 1
+						e\EventState2 = e\EventState2+FPSfactor
+						If e\EventState2>30 Then
+							If e\EventStr = ""
+								CreateNPC(NPCtype966, EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True))
+								QuickLoadPercent = 50
+								e\EventStr = "load0"
+							ElseIf e\EventStr = "load0"
+								CreateNPC(NPCtype966, EntityX(e\room\Objects[1],True), EntityY(e\room\Objects[1],True), EntityZ(e\room\Objects[1],True))
+								QuickLoadPercent = 70
+								e\EventStr = "load1"
+							ElseIf e\EventStr = "load1"
+								CreateNPC(NPCtype966, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True), EntityZ(e\room\Objects[2],True))
+								QuickLoadPercent = 100
+								e\EventState=2
+							EndIf
+						Else
+							QuickLoadPercent = Int(e\EventState2)
+						EndIf
+					EndIf
+					;[End Block]
+				Case "dimension1499"
+					;[Block]
+					If e\EventState = 0.0
+						If e\EventStr = "load0"
+							QuickLoadPercent = 10
+							e\room\Objects[0] = CreatePlane()
+							Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
+							EntityTexture e\room\Objects[0],planetex%
+							FreeTexture planetex%
+							PositionEntity e\room\Objects[0],0,EntityY(e\room\obj),0
+							EntityType e\room\Objects[0],HIT_MAP
+							e\EventStr = "load1"
+						ElseIf e\EventStr = "load1"
+							QuickLoadPercent = 30
+							NTF_1499Sky = sky_CreateSky("GFX\map\sky\1499sky")
+							e\EventStr = 1
+						Else
+							If Int(e\EventStr)<16
+								QuickLoadPercent = QuickLoadPercent + 2
+								e\room\Objects[Int(e\EventStr)] = LoadMesh_Strict("GFX\map\dimension1499\1499object"+(Int(e\EventStr))+".b3d")
+								HideEntity e\room\Objects[Int(e\EventStr)]
+								e\EventStr = Int(e\EventStr)+1
+							ElseIf Int(e\EventStr)=16
+								QuickLoadPercent = 90
+								CreateChunkParts(e\room)
+								e\EventStr = 17
+							ElseIf Int(e\EventStr) = 17
+								QuickLoadPercent = 100
+								x# = EntityX(e\room\obj)
+								z# = EntityZ(e\room\obj)
+								Local ch.Chunk
+								For i = -2 To 2 Step 2
+									ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
+								Next
+								e\EventState = 2.0
+								e\EventStr = 18
+							EndIf
+						EndIf
+					EndIf
+					;[End Block]
+			End Select
+			Exit
+		EndIf
+	Next
 	
 End Function
 
+;UpdateSecurityCams function
 Function Pointer2()
 	
 	If fpPointer2 = 0
@@ -7316,6 +7732,7 @@ Function NullGame()
 	
 	QuickLoadPercent = -1
 	QuickLoadPercent_DisplayTimer# = 0
+	QuickLoad_CurrRoom = Null
 	
 	DeathMSG$=""
 	
