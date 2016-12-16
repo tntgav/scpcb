@@ -193,6 +193,7 @@ Function SaveGame(file$)
 		WriteFloat f, n\ModelScaleX#
 		WriteFloat f, n\ModelScaleY#
 		WriteFloat f, n\ModelScaleZ#
+		WriteInt f, n\TextureID
 	Next
 	
 	WriteFloat f, MTFtimer
@@ -648,6 +649,10 @@ Function LoadGame(file$)
 			n\obj = LoadAnimMesh_Strict(n\Model)
 			ScaleEntity n\obj,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
 			SetAnimTime n\obj,frame
+		EndIf
+		n\TextureID = ReadInt(f)
+		If n\TextureID > -1
+			ChangeNPCTextureID(n.NPCs,n\TextureID)
 		EndIf
 	Next
 	
@@ -1332,6 +1337,10 @@ Function LoadGameQuick(file$)
 			n\obj = LoadAnimMesh_Strict(n\Model)
 			ScaleEntity n\obj,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
 			SetAnimTime n\obj,frame
+		EndIf
+		n\TextureID = ReadInt(f)
+		If n\TextureID > -1
+			ChangeNPCTextureID(n.NPCs,n\TextureID)
 		EndIf
 	Next
 	

@@ -1832,8 +1832,8 @@ Global LightConeModel
 
 Global ParticleEffect[10]
 
-Const MaxNPCTextures=5
-Global NPCTextures[MaxNPCTextures]
+Const MaxDTextures=5
+Global DTextures[MaxDTextures]
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -7469,11 +7469,33 @@ Function LoadEntities()
 	ParticleTextures(7) = LoadTexture_Strict("GFX\spark.jpg", 1 + 2)
 	ParticleTextures(8) = LoadTexture_Strict("GFX\particle.png", 1 + 2)
 	
-	NPCTextures[0] = LoadTexture_Strict("GFX\npcs\gonzales.jpg")
-	NPCTextures[1] = LoadTexture_Strict("GFX\npcs\corpse.jpg")
-	NPCTextures[2] = LoadTexture_Strict("GFX\npcs\scientist.jpg")
-	NPCTextures[3] = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
-	NPCTextures[4] = LoadTexture_Strict("GFX\npcs\janitor.jpg")
+	;NPCtypeD - different models with different textures (loaded using "CopyEntity") - ENDSHN
+	;[Block]
+	For i=0 To MaxDTextures-1
+		DTextures[i] = CopyEntity(ClassDObj)
+		HideEntity DTextures[i]
+	Next
+	;Gonzales
+	tex = LoadTexture("GFX\npcs\gonzales.jpg")
+	EntityTexture DTextures[0],tex
+	FreeTexture tex
+	;SCP-970 corpse
+	tex = LoadTexture("GFX\npcs\corpse.jpg")
+	EntityTexture DTextures[1],tex
+	FreeTexture tex
+	;scientist 1
+	tex = LoadTexture("GFX\npcs\scientist.jpg")
+	EntityTexture DTextures[2],tex
+	FreeTexture tex
+	;scientist 2
+	tex = LoadTexture("GFX\npcs\scientist2.jpg")
+	EntityTexture DTextures[3],tex
+	FreeTexture tex
+	;janitor
+	tex = LoadTexture("GFX\npcs\janitor.jpg")
+	EntityTexture DTextures[4],tex
+	FreeTexture tex
+	;[End Block]
 	
 	LoadMaterials("DATA\materials.ini")
 	
@@ -8155,6 +8177,9 @@ Function PauseSounds()
 		If n\soundchn <> 0 Then
 			If ChannelPlaying(n\soundchn) Then PauseChannel(n\soundchn)
 		EndIf
+		If n\soundchn2 <> 0 Then
+			If ChannelPlaying(n\soundchn2) Then PauseChannel(n\soundchn2)
+		EndIf
 	Next	
 	
 	For d.doors = Each Doors
@@ -8185,6 +8210,9 @@ Function ResumeSounds()
 	For n.npcs = Each NPCs
 		If n\soundchn <> 0 Then
 			If ChannelPlaying(n\soundchn) Then ResumeChannel(n\soundchn)
+		EndIf
+		If n\soundchn2 <> 0 Then
+			If ChannelPlaying(n\soundchn2) Then ResumeChannel(n\soundchn2)
 		EndIf
 	Next	
 	
