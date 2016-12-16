@@ -573,6 +573,7 @@ Function UpdateConsole()
 			
 			Select Lower(StrTemp)
 				Case "help"
+					;[Block]
 					If Instr(ConsoleInput, " ")<>0 Then
 						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Else
@@ -740,15 +741,18 @@ Function UpdateConsole()
 							CreateConsoleMsg("There is no help available for that command.",255,150,0)
 					End Select
 					
+					;[End Block]
 				Case "asd"
+					;[Block]
 					WireFrame 1
 					WireframeState=1
 					GodMode = 1
 					NoClip = 1
 					CameraFogNear = 15
 					CameraFogFar = 20
-
+					;[End Block]
 				Case "status"
+					;[Block]
 					ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 0
 					CreateConsoleMsg("******************************")
 					CreateConsoleMsg("Status: ")
@@ -778,8 +782,9 @@ Function UpdateConsole()
 					CreateConsoleMsg("Injuries: "+Injuries)
 					CreateConsoleMsg("Bloodloss: "+Bloodloss)
 					CreateConsoleMsg("******************************")
-
+					;[End Block]
 				Case "camerapick"
+					;[Block]
 					ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 0
 					c = CameraPick(Camera,GraphicWidth/2, GraphicHeight/2)
 					If c = 0 Then
@@ -797,36 +802,43 @@ Function UpdateConsole()
 						CreateConsoleMsg("Coordinates: "+EntityX(c)+", "+EntityY(c)+", "+EntityZ(c))
 						CreateConsoleMsg("******************************")							
 					EndIf
-
+					;[End Block]
 				Case "hidedistance"
+					;[Block]
 					HideDistance = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					CreateConsoleMsg("Hidedistance set to "+HideDistance)		
-
+					CreateConsoleMsg("Hidedistance set to "+HideDistance)
+					;[End Block]
 				Case "ending"
+					;[Block]
 					SelectedEnding = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					KillTimer = -0.1
 					;EndingTimer = -0.1
-
+					;[End Block]
 				Case "noclipspeed"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					NoClipSpeed = Float(StrTemp)
-
+					;[End Block]
 				Case "injure"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Injuries = Float(StrTemp)
-
+					;[End Block]
 				Case "infect"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Infect = Float(StrTemp)
-
+					;[End Block]
 				Case "heal"
+					;[Block]
 					Injuries = 0
 					Bloodloss = 0
-
+					;[End Block]
 				Case "teleport"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
@@ -854,8 +866,9 @@ Function UpdateConsole()
 					Next
 					
 					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.",255,150,0)
-
+					;[End Block]
 				Case "spawnitem"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					temp = False 
 					For itt.Itemtemplates = Each ItemTemplates
@@ -875,8 +888,9 @@ Function UpdateConsole()
 					Next
 					
 					If temp = False Then CreateConsoleMsg("Item not found.",255,150,0)
-
+					;[End Block]
 				Case "wireframe"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
@@ -895,59 +909,69 @@ Function UpdateConsole()
 					EndIf
 					
 					WireFrame WireframeState
-
+					;[End Block]
 				Case "173speed"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Curr173\Speed = Float(StrTemp)
 					CreateConsoleMsg("173's speed set to " + StrTemp)
-
+					;[End Block]
 				Case "106speed"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Curr106\Speed = Float(StrTemp)
 					CreateConsoleMsg("106's speed set to " + StrTemp)
-
+					;[End Block]
 				Case "173state"
+					;[Block]
 					CreateConsoleMsg("SCP-173")
 					CreateConsoleMsg("Position: " + EntityX(Curr173\obj) + ", " + EntityY(Curr173\obj) + ", " + EntityZ(Curr173\obj))
 					CreateConsoleMsg("Idle: " + Curr173\Idle)
 					CreateConsoleMsg("State: " + Curr173\State)
-
+					;[End Block]
 				Case "106state"
+					;[Block]
 					CreateConsoleMsg("SCP-106")
 					CreateConsoleMsg("Position: " + EntityX(Curr106\obj) + ", " + EntityY(Curr106\obj) + ", " + EntityZ(Curr106\obj))
 					CreateConsoleMsg("Idle: " + Curr106\Idle)
 					CreateConsoleMsg("State: " + Curr106\State)
-
+					;[End Block]
 				Case "reset096"
+					;[Block]
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
 							n\State = 0
 							Exit
 						EndIf
 					Next
-
+					;[End Block]
 				Case "disable173"
+					;[Block]
 					Curr173\Idle = 3 ;This phenominal comment is brought to you by PolyFox. His absolute wisdom in this fatigue of knowledge brought about a new era of 173 state checks.
 					HideEntity Curr173\obj
 					HideEntity Curr173\Collider
-
+					;[End Block]
 				Case "enable173"
+					;[Block]
 					Curr173\Idle = False
 					ShowEntity Curr173\obj
 					ShowEntity Curr173\Collider
-
+					;[End Block]
 				Case "disable106"
+					;[Block]
 					Curr106\Idle = True
 					Curr106\State = 200000
 					Contained106 = True
-
+					;[End Block]
 				Case "enable106"
+					;[Block]
 					Curr106\Idle = False
 					Contained106 = False
 					ShowEntity Curr106\Collider
 					ShowEntity Curr106\obj
-
+					;[End Block]
 				Case "halloween"
+					;[Block]
 					HalloweenTex = Not HalloweenTex
 					If HalloweenTex Then
 						Local tex = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
@@ -955,21 +979,23 @@ Function UpdateConsole()
 						FreeTexture tex
 						CreateConsoleMsg("173 JACK-O-LANTERN ON")
 					Else
-						Local tex2 = LoadTexture_Strict("GFX\npcs\173texture.png", 1)
+						Local tex2 = LoadTexture_Strict("GFX\npcs\173texture.jpg", 1)
 						EntityTexture Curr173\obj, tex2, 0, 0
 						FreeTexture tex2
 						CreateConsoleMsg("173 JACK-O-LANTERN OFF")
 					EndIf
-
+					;[End Block]
 				Case "sanic"
+					;[Block]
 					SuperMan = Not SuperMan
 					If SuperMan = True Then
 						CreateConsoleMsg("GOTTA GO FAST")
 					Else
 						CreateConsoleMsg("WHOA SLOW DOWN")
 					EndIf
-
+					;[End Block]
 				Case "scp-420-j","420","weed"
+					;[Block]
 					For i = 1 To 20
 						If Rand(2)=1 Then
 							it.Items = CreateItem("Some SCP-420-J","420", EntityX(Collider,True)+Cos((360.0/20.0)*i)*Rnd(0.3,0.5), EntityY(Camera,True), EntityZ(Collider,True)+Sin((360.0/20.0)*i)*Rnd(0.3,0.5))
@@ -979,8 +1005,9 @@ Function UpdateConsole()
 						EntityType (it\collider, HIT_ITEM)
 					Next
 					PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
-
+					;[End Block]
 				Case "godmode"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
@@ -996,8 +1023,9 @@ Function UpdateConsole()
 					Else
 						CreateConsoleMsg("GODMODE OFF")	
 					EndIf
-
+					;[End Block]
 				Case "revive","undead","resurrect"
+					;[Block]
 					DropSpeed = -0.1
 					HeadDropSpeed = 0.0
 					Shake = 0
@@ -1020,8 +1048,9 @@ Function UpdateConsole()
 					
 					KillTimer = 0
 					KillAnim = 0
-					
+					;[End Block]
 				Case "noclip","fly"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
@@ -1039,7 +1068,7 @@ Function UpdateConsole()
 								Playable = True
 							EndIf
 					End Select
-
+					
 					If NoClip Then
 						CreateConsoleMsg("NOCLIP ON")
 					Else
@@ -1047,12 +1076,14 @@ Function UpdateConsole()
 					EndIf
 					
 					DropSpeed = 0
-					
+					;[End Block]
 				Case "showfps"
+					;[Block]
 					ShowFPS = Not ShowFPS
 					CreateConsoleMsg("ShowFPS: "+Str(ShowFPS))
-					
+					;[End Block]
 				Case "096state"
+					;[Block]
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
 							CreateConsoleMsg("SCP-096")
@@ -1063,8 +1094,9 @@ Function UpdateConsole()
 						EndIf
 					Next
 					CreateConsoleMsg("SCP-096 has not spawned.")
-					
+					;[End Block]
 				Case "debughud"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Select StrTemp
 						Case "on", "1", "true"
@@ -1074,14 +1106,15 @@ Function UpdateConsole()
 						Default
 							DebugHUD = Not DebugHUD
 					End Select
-
+					
 					If DebugHUD Then
 						CreateConsoleMsg("Debug Mode On")
 					Else
 						CreateConsoleMsg("Debug Mode Off")
 					EndIf
-
+					;[End Block]
 				Case "stopsound", "stfu"
+					;[Block]
 					For snd.Sound = Each Sound
 						For i = 0 To 31
 							If snd\channels[i]<>0 Then
@@ -1089,7 +1122,7 @@ Function UpdateConsole()
 							EndIf
 						Next
 					Next
-
+					
 					For e.Events = Each Events
 						If e\EventName = "alarm" Then 
 							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
@@ -1105,27 +1138,30 @@ Function UpdateConsole()
 						EndIf
 					Next
 					CreateConsoleMsg("Stopped all sounds.")
-
-					
+					;[End Block]
 				Case "camerafog"
+					;[Block]
 					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					CameraFogNear = Float(Left(args, Len(args) - Instr(args, " ")))
 					CameraFogFar = Float(Right(args, Len(args) - Instr(args, " ")))
 					CreateConsoleMsg("Near set to: " + CameraFogNear + ", far set to: " + CameraFogFar)
-					
+					;[End Block]
 				Case "gamma"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					ScreenGamma = Int(StrTemp)
 					CreateConsoleMsg("Gamma set to " + ScreenGamma)
-
+					;[End Block]
 				Case "spawn"
+					;[Block]
 					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					StrTemp$ = Piece$(args$,1," ")
 					StrTemp2$ = Piece$(args$,2," ")
 					Console_SpawnNPC(StrTemp$,Int(StrTemp2$))
-
+					;[End Block]
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
 				Case "infinitestamina","infstam"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
@@ -1136,30 +1172,33 @@ Function UpdateConsole()
 						Default
 							InfiniteStamina% = Not InfiniteStamina%
 					End Select
-
+					
 					If InfiniteStamina
 						CreateConsoleMsg("INFINITE STAMINA ON")
 					Else
 						CreateConsoleMsg("INFINITE STAMINA OFF")	
 					EndIf
-					
+					;[End Block]
 				Case "asd2"
+					;[Block]
 					GodMode = 1
 					InfiniteStamina = 1
 					Curr173\Idle = 3
 					Curr106\Idle = True
 					Curr106\State = 200000
 					Contained106 = True
-
+					;[End Block]
 				Case "toggle_warhead_lever"
+					;[Block]
 					For e.Events = Each Events
 						If e\EventName = "room2nuke" Then
 							e\EventState = (Not e\EventState)
 							Exit
 						EndIf
 					Next
-					
+					;[End Block]
 				Case "unlockexits"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
@@ -1193,10 +1232,11 @@ Function UpdateConsole()
 							Next
 							CreateConsoleMsg("Gate A and B are now unlocked.")	
 					End Select
-
+					
 					RemoteDoorOn = True
-
+					;[End Block]
 				Case "kill","suicide"
+					;[Block]
 					KillTimer = -1
 					Select Rand(4)
 						Case 1
@@ -1211,9 +1251,10 @@ Function UpdateConsole()
 							DeathMSG = "Subject D-9341 found dead in Sector [REDACTED]. "
 							DeathMSG = DeathMSG + "The subject appears to have scribbled the letters "+Chr(34)+"kys"+Chr(34)+" in his own blood beside him. "
 							DeathMSG = DeathMSG + "No other signs of physical trauma or struggle can be observed. Body was sent for autopsy."
-					End Select 
-
+					End Select
+					;[End Block]
 				Case "playmusic"
+					;[Block]
 					If Instr(ConsoleInput, " ")<>0 Then
 						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Else
@@ -1233,8 +1274,9 @@ Function UpdateConsole()
 						If CustomMusic <> 0 Then FreeSound_Strict CustomMusic : CustomMusic = 0
 						If MusicCHN <> 0 Then StopChannel MusicCHN
 					EndIf
-
+					;[End Block]
 				Case "tp"
+					;[Block]
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtypeMTF
 							If n\MTFLeader = Null
@@ -1244,17 +1286,19 @@ Function UpdateConsole()
 							EndIf
 						EndIf
 					Next
-
+					;[End Block]
 				Case "tele"
+					;[Block]
 					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					StrTemp$ = Piece$(args$,1," ")
 					StrTemp2$ = Piece$(args$,2," ")
 					StrTemp3$ = Piece$(args$,3," ")
-					PositionEntity Collider,StrTemp$,StrTemp2$,StrTemp3$
-					PositionEntity Camera,StrTemp$,StrTemp2$,StrTemp3$
+					PositionEntity Collider,Float(StrTemp$),Float(StrTemp2$),Float(StrTemp3$)
+					PositionEntity Camera,Float(StrTemp$),Float(StrTemp2$),Float(StrTemp3$)
 					CreateConsoleMsg("Teleported to coordinates (X|Y|Z): "+EntityX(Collider)+"|"+EntityY(Collider)+"|"+EntityZ(Collider))
-
+					;[End Block]
 				Case "notarget"
+					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
@@ -1265,31 +1309,42 @@ Function UpdateConsole()
 						Default
 							NoTarget% = Not NoTarget%
 					End Select
-
+					
 					If NoTarget% = False Then
 						CreateConsoleMsg("NOTARGET OFF")
 					Else
 						CreateConsoleMsg("NOTARGET ON")	
 					EndIf
-
+					;[End Block]
 				Case "spawnradio"
+					;[Block]
 					it.Items = CreateItem("Radio Transceiver", "fineradio", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
 					EntityType(it\collider, HIT_ITEM)
 					it\state = 101
+					;[End Block]
 				Case "spawnnvg"
+					;[Block]
 					it.Items = CreateItem("Night Vision Goggles", "nvgoggles", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
 					EntityType(it\collider, HIT_ITEM)
 					it\state = 1000
+					;[End Block]
 				Case "spawnpumpkin","pumpkin"
+					;[Block]
 					CreateConsoleMsg("What pumpkin?")
+					;[End Block]
 				Case "spawnnav"
+					;[Block]
 					it.Items = CreateItem("S-NAV Navigator Ultimate", "nav", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
 					EntityType(it\collider, HIT_ITEM)
 					it\state = 101
+					;[End Block]
 				Case "teleport173"
+					;[Block]
 					PositionEntity Curr173\Collider,EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider)
 					ResetEntity Curr173\Collider
+					;[End Block]
 				Case "seteventstate"
+					;[Block]
 					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					StrTemp$ = Piece$(args$,1," ")
 					StrTemp2$ = Piece$(args$,2," ")
@@ -1318,7 +1373,24 @@ Function UpdateConsole()
 							CreateConsoleMsg("The current room doesn't has any event applied.",255,150,0)
 						EndIf
 					EndIf
+					;[End Block]
+				Case "spawnparticles"
+					;[Block]
+					If Instr(ConsoleInput, " ")<>0 Then
+						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					Else
+						StrTemp$ = ""
+					EndIf
+					
+					If Int(StrTemp) > -1 And Int(StrTemp) <= 0 ;<--- This is the maximum ID of particles by Devil Particle system, will be increased after time - ENDSHN
+						SetEmitter(Collider,ParticleEffect[Int(StrTemp)])
+						CreateConsoleMsg("Spawned particle emitter with ID "+Int(StrTemp)+" at player's position.")
+					Else
+						CreateConsoleMsg("Particle emitter with ID "+Int(StrTemp)+" not found.",255,150,0)
+					EndIf
+					;[End Block]
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
+					;[Block]
 					ConsoleFlush = True 
 					
 					If ConsoleFlushSnd = 0 Then
@@ -1329,8 +1401,11 @@ Function UpdateConsole()
 					Else
 						CreateConsoleMsg(Chr(74)+Chr(32)+Chr(79)+Chr(32)+Chr(82)+Chr(32)+Chr(71)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(65)+Chr(32)+Chr(78)+Chr(32)+Chr(78)+Chr(32)+Chr(79)+Chr(32)+Chr(84)+Chr(32)+Chr(32)+Chr(66)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(79)+Chr(32)+Chr(78)+Chr(32)+Chr(84)+Chr(32)+Chr(65)+Chr(32)+Chr(73)+Chr(32)+Chr(78)+Chr(32)+Chr(69)+Chr(32)+Chr(68)+Chr(46))
 					EndIf
+					;[End Block]
 				Default
+					;[Block]
 					CreateConsoleMsg("Command not found.",255,0,0)
+					;[End Block]
 			End Select
 			
 			ConsoleInput = ""
@@ -1756,6 +1831,9 @@ Global NavBG = CreateImage(GraphicWidth,GraphicHeight)
 Global LightConeModel
 
 Global ParticleEffect[10]
+
+Const MaxNPCTextures=5
+Global NPCTextures[MaxNPCTextures]
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2621,14 +2699,6 @@ DrawLoading(100, True)
 
 LoopDelay = MilliSecs()
 
-Global fpPointer1 = 0
-Global fpPointer2 = 0
-Global fpPointer3 = 0
-
-Pointer1()
-Pointer2()
-Pointer3()
-
 Global UpdateParticles_Time# = 0.0
 
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2710,8 +2780,7 @@ Repeat
 		
 		DrawHandIcon = False
 		
-		;If FPSfactor > 0 Then UpdateSecurityCams()
-		BP_CallFunctionV fpPointer2
+		If FPSfactor > 0 Then UpdateSecurityCams()
 		
 		If KeyHit(KEY_INV) And VomitTimer >= 0 Then 
 			If InvOpen Then
@@ -2798,7 +2867,9 @@ Repeat
 			MovePlayer()
 			InFacility = CheckForPlayerInFacility()
 			UpdateDoors()
-			UpdateEvents()
+			If QuickLoadPercent = -1 Or QuickLoadPercent = 100
+				UpdateEvents()
+			EndIf
 			UpdateDecals()
 			UpdateMTF()
 			UpdateNPCs()
@@ -3114,14 +3185,8 @@ Forever
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
-;Quick Loading function
-Function Pointer1()
+Function QuickLoadEvents()
 	Local e.Events,r.Rooms,sc.SecurityCams,sc2.SecurityCams,scale#,pvt%,n.NPCs,tex%,i%,x#,z#
-	
-	If fpPointer1 = 0
-		fpPointer1 = BP_GetFunctionPointer()
-		Return
-	EndIf
 	
 	For e.Events = Each Events
 		If e\room = QuickLoad_CurrRoom
@@ -3319,11 +3384,12 @@ Function Pointer1()
 							If e\room\NPC[0]=Null Then
 								e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True),EntityY(e\room\Objects[0],True),EntityZ(e\room\Objects[0],True))
 							EndIf
-							e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
-							tex = LoadTexture_Strict(e\room\NPC[0]\texture)
-							
-							EntityTexture e\room\NPC[0]\obj, tex
-							FreeTexture tex
+							;e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
+							;tex = LoadTexture_Strict(e\room\NPC[0]\texture)
+							;
+							;EntityTexture e\room\NPC[0]\obj, tex
+							;FreeTexture tex
+							ChangeNPCTextureID(e\room\NPC[0],4)
 							e\EventStr = "load1"
 						ElseIf e\EventStr = "load1"
 							QuickLoadPercent = 20
@@ -3338,11 +3404,12 @@ Function Pointer1()
 							If e\room\NPC[1]=Null Then
 								e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1],True),EntityY(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
 							EndIf
-							e\room\NPC[1]\texture = "GFX\npcs\scientist.jpg"
-							tex = LoadTexture_Strict(e\room\NPC[1]\texture)
-							EntityTexture e\room\NPC[1]\obj, tex
-							
-							FreeTexture tex
+							;e\room\NPC[1]\texture = "GFX\npcs\scientist.jpg"
+							;tex = LoadTexture_Strict(e\room\NPC[1]\texture)
+							;EntityTexture e\room\NPC[1]\obj, tex
+							;
+							;FreeTexture tex
+							ChangeNPCTextureID(e\room\NPC[1],2)
 							e\EventStr = "load4"
 						ElseIf e\EventStr = "load4"
 							QuickLoadPercent = 80
@@ -3536,34 +3603,8 @@ Function Pointer1()
 			End Select
 			Exit
 		EndIf
-	Next
-	
+	Next	
 End Function
-
-;UpdateSecurityCams function
-Function Pointer2()
-	
-	If fpPointer2 = 0
-		fpPointer2 = BP_GetFunctionPointer()
-		Return
-	EndIf
-	
-	If FPSfactor > 0 Then UpdateSecurityCams()
-	
-End Function
-
-Function Pointer3()
-	
-	If fpPointer3 = 0
-		fpPointer3 = BP_GetFunctionPointer()
-		Return
-	EndIf
-	
-	
-	
-End Function
-
-
 
 Function Kill()
 	If GodMode Then Return
@@ -7427,6 +7468,12 @@ Function LoadEntities()
 	ParticleTextures(6) = LoadTexture_Strict("GFX\smoke2.png", 1 + 2)
 	ParticleTextures(7) = LoadTexture_Strict("GFX\spark.jpg", 1 + 2)
 	ParticleTextures(8) = LoadTexture_Strict("GFX\particle.png", 1 + 2)
+	
+	NPCTextures[0] = LoadTexture_Strict("GFX\npcs\gonzales.jpg")
+	NPCTextures[1] = LoadTexture_Strict("GFX\npcs\corpse.jpg")
+	NPCTextures[2] = LoadTexture_Strict("GFX\npcs\scientist.jpg")
+	NPCTextures[3] = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
+	NPCTextures[4] = LoadTexture_Strict("GFX\npcs\janitor.jpg")
 	
 	LoadMaterials("DATA\materials.ini")
 	

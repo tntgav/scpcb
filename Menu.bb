@@ -1778,7 +1778,7 @@ Function DrawQuickLoading()
 				QuickLoadPercent = -1
 			EndIf
 		EndIf
-		BP_CallFunctionV fpPointer1
+		QuickLoadEvents()
 	Else
 		QuickLoadPercent = -1
 		QuickLoadPercent_DisplayTimer# = 0

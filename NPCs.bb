@@ -64,6 +64,7 @@ Type NPCs
 	Field Model$
 	Field ModelScaleX#,ModelScaleY#,ModelScaleZ#
 	Field HideFromNVG
+	Field TextureID%=-1
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -156,7 +157,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\obj2 = CreateSprite()
 			ScaleSprite(n\obj2, 0.03, 0.03)
 			EntityTexture(n\obj2, OldManEyes)
-			EntityBlend (n\obj2, BLEND_ADD)
+			EntityBlend (n\obj2, 3)
 			EntityFX(n\obj2, 1 + 8)
 			SpriteViewMode(n\obj2, 2)
 			
@@ -6986,6 +6987,13 @@ Function RotateToDirection(n.NPCs)
 		EndIf
 	EndIf
 	ShowEntity n\Collider
+	
+End Function
+
+Function ChangeNPCTextureID(n.NPCs,textureid%)
+	
+	n\TextureID = textureid%
+	EntityTexture n\obj,NPCTextures[textureid%]
 	
 End Function
 
