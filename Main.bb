@@ -1547,7 +1547,8 @@ Music(17) = "GateA"
 Music(18) = "1499"
 Music(19) = "1499Danger"
 Music(20) = "049Chase"
-Music(21) = "..\Ending\MenuBreath.ogg"
+Music(21) = "..\Ending\MenuBreath"
+Music(22) = "914"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = PlaySound_Strict(Music(2))
@@ -3186,6 +3187,8 @@ Forever
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
 Function QuickLoadEvents()
+	CatchErrors("Uncaught (QuickLoadEvents)")
+	
 	Local e.Events,r.Rooms,sc.SecurityCams,sc2.SecurityCams,scale#,pvt%,n.NPCs,tex%,i%,x#,z#
 	
 	For e.Events = Each Events
@@ -3513,13 +3516,14 @@ Function QuickLoadEvents()
 							QuickLoadPercent = 70
 							e\EventStr = "load6"
 						ElseIf e\EventStr = "load6"
-							GiveAchievement(Achv205)
+							;GiveAchievement(Achv205)
 							
 							HideEntity(e\room\Objects[3])
 							HideEntity(e\room\Objects[4])
 							HideEntity(e\room\Objects[5])
 							QuickLoadPercent = 100
-							e\EventState = 1
+							e\EventStr = "loaddone"
+							;e\EventState = 1
 						EndIf
 					EndIf
 					;[End Block]
@@ -3601,9 +3605,15 @@ Function QuickLoadEvents()
 					EndIf
 					;[End Block]
 			End Select
+			CatchErrors("QuickLoadEvents "+e\EventName)
 			Exit
 		EndIf
-	Next	
+	Next
+	
+	If QuickLoad_CurrRoom = Null
+		CatchErrors("QuickLoadEvents NULL")
+	EndIf
+	
 End Function
 
 Function Kill()

@@ -52,7 +52,6 @@ Local i
 Const ClrR = 50, ClrG = 50, ClrB = 50
 
 Global MouseHit1,MouseDown1
-Global ResFactor# = 1.0
 
 Global OnSliderID=0
 
@@ -79,16 +78,24 @@ Repeat
 	height = 25
 	If CurrMusicWindow=0
 		For i = 0 To MusicAmount-1
-			If Button(x,y,width,height,ShortLine(Music(i),25),(i=CurrMusic))
-				CurrMusic = i
-				DebugLog "Playing Music: "+Music(i)
-				CurrBarTime# = 0.0
-				PrevBarTime# = 0.0
-				AppTitle "SCP:CB Music Player - playing "+Chr(34)+Music(i)+Chr(34)
+			If Right(Music(i),4)=".ogg"
+				If Button(x,y,width,height,ShortLine(Music(i),25),(i=CurrMusic))
+					CurrMusic = i
+					DebugLog "Playing Music: "+Music(i)
+					CurrBarTime# = 0.0
+					PrevBarTime# = 0.0
+					AppTitle "SCP:CB Music Player - playing "+Chr(34)+Music(i)+Chr(34)
+				EndIf
+			Else
+				Button(x,y,width,height,ShortLine(Music(i),25),True)
+				Color 210,50,55
+				Rect x+1,y+1,width-2,height-2,False
+				Text (x+width/2),(y+height/2-1),ShortLine(Music(i),25),True,True
 			EndIf
 			If i=CurrMusic
 				Color 50,210,55
 				Rect x+1,y+1,width-2,height-2,False
+				Text (x+width/2),(y+height/2-1),ShortLine(Music(i),25),True,True
 			EndIf
 			y=y+height
 			If y > 600
@@ -98,16 +105,24 @@ Repeat
 		Next
 	Else
 		For i = 0 To MusicAmount2-1
-			If Button(x,y,width,height,ShortLine(Music(i+MusicAmount),25),(i+MusicAmount=CurrMusic))
-				CurrMusic = i+MusicAmount
-				DebugLog "Playing Music: "+Music(i+MusicAmount)
-				CurrBarTime# = 0.0
-				PrevBarTime# = 0.0
-				AppTitle "SCP:CB Music Player - playing "+Chr(34)+Music(i+MusicAmount)+Chr(34)
+			If Right(Music(i+MusicAmount),4)=".ogg" Or Right(Music(i+MusicAmount),4)=".wav"
+				If Button(x,y,width,height,ShortLine(Music(i+MusicAmount),25),(i+MusicAmount=CurrMusic))
+					CurrMusic = i+MusicAmount
+					DebugLog "Playing Music: "+Music(i+MusicAmount)
+					CurrBarTime# = 0.0
+					PrevBarTime# = 0.0
+					AppTitle "SCP:CB Music Player - playing "+Chr(34)+Music(i+MusicAmount)+Chr(34)
+				EndIf
+			Else
+				Button(x,y,width,height,ShortLine(Music(i+MusicAmount),25),True)
+				Color 210,50,55
+				Rect x+1,y+1,width-2,height-2,False
+				Text (x+width/2),(y+height/2-1),ShortLine(Music(i+MusicAmount),25),True,True
 			EndIf
 			If i+MusicAmount=CurrMusic
 				Color 50,210,55
 				Rect x+1,y+1,width-2,height-2,False
+				Text (x+width/2),(y+height/2-1),ShortLine(Music(i+MusicAmount),25),True,True
 			EndIf
 			y=y+height
 			If y > 600
@@ -129,11 +144,15 @@ Repeat
 			CurrMusicWindow = 1
 		EndIf
 		Button(0,y-20,50,20,"Prev",True)
+		Color 140,140,140
+		Text 520,90,"Compatible Audio file(s): OGG",0,1
 	Else
 		If Button(0,y-20,50,20,"Prev")
 			CurrMusicWindow = 0
 		EndIf
 		Button(750,y-20,50,20,"Next",True)
+		Color 140,140,140
+		Text 520,90,"Compatible Audio file(s): OGG,WAV",0,1
 	EndIf
 	Color 130,140,150
 	If CurrMusicWindow=0
@@ -212,8 +231,8 @@ Function Button%(x,y,width,height,txt$, disabled%=False)
 	
 	Color ClrR, ClrG, ClrB
 	If Not disabled Then 
-		If MouseX() > x*ResFactor And MouseX() < (x+width)*ResFactor Then
-			If MouseY() > y*ResFactor And MouseY() < (y+height)*ResFactor Then
+		If MouseX() > x And MouseX() < (x+width) Then
+			If MouseY() > y And MouseY() < (y+height) Then
 				If MouseDown1 Then
 					Pushed = True
 					Color ClrR*0.6, ClrG*0.6, ClrB*0.6
@@ -225,28 +244,28 @@ Function Button%(x,y,width,height,txt$, disabled%=False)
 	EndIf
 	
 	If Pushed Then 
-		Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor
+		Rect x,y,width,height
 		Color 133,130,125
-		Rect (x+1)*ResFactor,(y+1)*ResFactor,(width-1)*ResFactor,(height-1)*ResFactor,False	
+		Rect (x+1),(y+1),(width-1),(height-1),False	
 		Color 10,10,10
-		Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor,False
+		Rect x,y,width,height,False
 		Color 250,250,250
-		Line x*ResFactor,(y+height-1)*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor
-		Line (x+width-1)*ResFactor,y*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor
+		Line x,(y+height-1),(x+width-1),(y+height-1)
+		Line (x+width-1),y,(x+width-1),(y+height-1)
 	Else
-		Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor
+		Rect x,y,width,height
 		Color 133,130,125
-		Rect x*ResFactor,y*ResFactor,(width-1)*ResFactor,(height-1)*ResFactor,False	
+		Rect x,y,(width-1),(height-1),False	
 		Color 250,250,250
-		Rect x*ResFactor,y*ResFactor,width*ResFactor,height*ResFactor,False
+		Rect x,y,width,height,False
 		Color 10,10,10
-		Line x*ResFactor,(y+height-1)*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor
-		Line (x+width-1)*ResFactor,y*ResFactor,(x+width-1)*ResFactor,(y+height-1)*ResFactor		
+		Line x,(y+height-1),(x+width-1),(y+height-1)
+		Line (x+width-1),y,(x+width-1),(y+height-1)		
 	EndIf
 	
 	Color 255,255,255
 	If disabled Then Color 70,70,70
-	Text (x+width/2)*ResFactor,(y+height/2-1)*ResFactor, txt, True, True
+	Text (x+width/2),(y+height/2-1), txt, True, True
 	
 	Color 0,0,0
 	
@@ -367,5 +386,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#D1#FF#103#107#10B#113#127#143#14D
+;~F#E4#112#116#11A#11E#126#13A#156#160
 ;~C#Blitz3D

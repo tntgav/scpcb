@@ -6617,7 +6617,6 @@ Function UpdateEvents()
 			Case "room205"
 				;[Block]
 				If PlayerRoom = e\room Then
-					ShouldPlay = 16
 					If e\EventState=0 Or e\room\Objects[0]=0 Then
 						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
@@ -6625,8 +6624,12 @@ Function UpdateEvents()
 							e\EventStr = "load0"
 						EndIf
 						
+						If e\room\RoomDoors[1]\open = True
+							e\EventState = 1
+							GiveAchievement(Achv205)
+						EndIf
 					Else
-						
+						ShouldPlay = 16
 						If (e\EventState<65) Then
 							If (Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True))<2.0) Then
 								PlaySound_Strict(LoadTempSound("SFX\SCP\205\Enter.ogg"))
@@ -7661,7 +7664,14 @@ Function UpdateEvents()
 				If PlayerRoom = e\room Then
 					;GiveAchievement(Achv914)
 					
-					If e\room\RoomDoors[2]\open Then GiveAchievement(Achv914)
+					If e\room\RoomDoors[2]\open
+						GiveAchievement(Achv914)
+						e\EventState2=1
+					EndIf
+					
+					If e\EventState2=1
+						ShouldPlay = 22
+					EndIf
 					
 					EntityPick(Camera, 1.0)
 					If PickedEntity() = e\room\Objects[0] Then
@@ -7950,7 +7960,7 @@ Function UpdateEvents()
 				EndIf
 				
 				;[End Block]
-			;New Events in SCP:CB version 1.3 - ENDSHN	
+			;New Events in SCP:CB version 1.3 - ENDSHN
 			Case "room4tunnels"
 				;[Block]
 				If e\room\dist < 10.0 And e\room\dist > 0 Then
