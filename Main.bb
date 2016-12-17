@@ -7481,29 +7481,29 @@ Function LoadEntities()
 	
 	;NPCtypeD - different models with different textures (loaded using "CopyEntity") - ENDSHN
 	;[Block]
-	For i=0 To MaxDTextures-1
+	For i=1 To MaxDTextures
 		DTextures[i] = CopyEntity(ClassDObj)
 		HideEntity DTextures[i]
 	Next
 	;Gonzales
 	tex = LoadTexture("GFX\npcs\gonzales.jpg")
-	EntityTexture DTextures[0],tex
+	EntityTexture DTextures[1],tex
 	FreeTexture tex
 	;SCP-970 corpse
 	tex = LoadTexture("GFX\npcs\corpse.jpg")
-	EntityTexture DTextures[1],tex
+	EntityTexture DTextures[2],tex
 	FreeTexture tex
 	;scientist 1
 	tex = LoadTexture("GFX\npcs\scientist.jpg")
-	EntityTexture DTextures[2],tex
+	EntityTexture DTextures[3],tex
 	FreeTexture tex
 	;scientist 2
 	tex = LoadTexture("GFX\npcs\scientist2.jpg")
-	EntityTexture DTextures[3],tex
+	EntityTexture DTextures[4],tex
 	FreeTexture tex
 	;janitor
 	tex = LoadTexture("GFX\npcs\janitor.jpg")
-	EntityTexture DTextures[4],tex
+	EntityTexture DTextures[5],tex
 	FreeTexture tex
 	;[End Block]
 	

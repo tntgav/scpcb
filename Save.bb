@@ -651,8 +651,8 @@ Function LoadGame(file$)
 			SetAnimTime n\obj,frame
 		EndIf
 		n\TextureID = ReadInt(f)
-		If n\TextureID > -1
-			ChangeNPCTextureID(n.NPCs,n\TextureID)
+		If n\TextureID > 0
+			ChangeNPCTextureID(n.NPCs,n\TextureID-1)
 		EndIf
 	Next
 	
@@ -1339,8 +1339,8 @@ Function LoadGameQuick(file$)
 			SetAnimTime n\obj,frame
 		EndIf
 		n\TextureID = ReadInt(f)
-		If n\TextureID > -1
-			ChangeNPCTextureID(n.NPCs,n\TextureID)
+		If n\TextureID > 0
+			ChangeNPCTextureID(n.NPCs,n\TextureID-1)
 		EndIf
 	Next
 	

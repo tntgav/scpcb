@@ -6992,9 +6992,9 @@ End Function
 
 Function ChangeNPCTextureID(n.NPCs,textureid%)
 	
-	n\TextureID = textureid%
+	n\TextureID = textureid%+1
 	FreeEntity n\obj
-	n\obj = CopyEntity(DTextures[textureid%])
+	n\obj = CopyEntity(DTextures[textureid%+1])
 	
 	temp# = 0.5 / MeshWidth(n\obj)
 	ScaleEntity n\obj, temp, temp, temp
