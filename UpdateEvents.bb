@@ -300,7 +300,7 @@ Function UpdateEvents()
 					
 					If e\EventState3>0 Then
 						
-						If Music(13)=0 Then Music(13) = LoadSound_Strict("SFX\Music\Intro.ogg")
+						;;If Music(13)=0 Then Music(13) = LoadSound_Strict("SFX\Music\Intro.ogg")
 						ShouldPlay = 13
 						
 						;slow the player down to match his speed to the guards
@@ -313,9 +313,18 @@ Function UpdateEvents()
 								PositionEntity Collider, x, 0.302, z	
 								RotateEntity Camera, -70, 0, 0
 								
-								StopChannel MusicCHN
+								;StopChannel MusicCHN
 								CurrMusicVolume = 1.0
-								MusicCHN = PlaySound_Strict(Music(13))
+								;MusicCHN = PlaySound_Strict(Music(13))
+								alSourceStop(MusicCHN)
+								alFreeSource(MusicCHN)
+								MusicCHN% = alCreateSource("SFX\Music\"+Music(13)+".ogg",True,False)
+								alSourcePlay(MusicCHN,True)
+								alSourceSetLoop(MusicCHN,True)
+								CurrMusic = 1
+								If alSourceIsPlaying%(MusicCHN)
+									alSourceSetVolume(MusicCHN, CurrMusicVolume)
+								EndIf
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
@@ -403,91 +412,103 @@ Function UpdateEvents()
 							
 						ElseIf e\EventState3 => 150.0 And e\EventState3 < 700
 							If e\room\NPC[3]\State = 7 Then
-								;BlinkTimer = -10
-								
-								e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCell.ogg")
-								e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-								
-								;e\room\NPC[3]\State = 7
-								;e\room\NPC[4]\State = 7
-								;e\room\NPC[5]\State = 7
-								e\room\NPC[3]\State = 9
-								e\room\NPC[4]\State = 9
-								e\room\NPC[5]\State = 9
-								
-								e\room\RoomDoors[6]\locked = False		
-								UseDoor(e\room\RoomDoors[6], False)
-								e\room\RoomDoors[6]\locked = True									
-							EndIf
-							
-							;PointEntity e\room\NPC[3]\obj, Collider
-							;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\obj), 0
-							
-							;PointEntity e\room\NPC[4]\obj, Collider
-							;RotateEntity e\room\NPC[4]\Collider, 0, EntityYaw(e\room\NPC[4]\obj), 0
-							
-							e\EventState3 = Min(e\EventState3+FPSfactor/4,699)
-							
-							;outside the cell
-							If Distance(EntityX(Collider),EntityZ(Collider),PlayerRoom\x-(3072+1024)*RoomScale, PlayerRoom\z+192.0*RoomScale)>1.5 Then
-								;e\room\NPC[3]\State = 5
-								;e\room\NPC[3]\EnemyX = EntityX(Collider)
-								;e\room\NPC[3]\EnemyY = EntityY(Collider)
-								;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
-								
-								If e\EventState3 > 250 Then
-									If e\room\NPC[3]\SoundChn<>0 Then
-										If ChannelPlaying(e\room\NPC[3]\SoundChn) Then StopChannel e\room\NPC[3]\SoundChn
-									EndIf
-									FreeSound_Strict e\room\NPC[3]\Sound
-									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\Escort"+Rand(1,2)+".ogg")
-									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-									
-									;e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
-									;e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
-									e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
-									e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
-									
-									e\EventState3 = 710
-								EndIf
-							Else ;inside the cell
-								e\room\NPC[3]\State = 9
-								;PointEntity e\room\NPC[3]\Collider, Collider		
-								;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\Collider), 0
-								
-								If e\EventState3-(FPSfactor/4) < 350 And e\EventState3=>350 Then
-									FreeSound_Strict e\room\NPC[3]\Sound
-									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCellRefuse"+Rand(1,2)+".ogg")
-									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-								ElseIf e\EventState3-(FPSfactor/4) < 550 And e\EventState3=>550 
-									FreeSound_Strict e\room\NPC[3]\Sound
-									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\CellGas"+Rand(1,2)+".ogg")
-									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-								ElseIf e\EventState3>630
-									PositionEntity Collider, EntityX(Collider), EntityY(Collider), Min(EntityZ(Collider), EntityZ(e\room\obj,True)+490*RoomScale)
-									If e\room\RoomDoors[6]\open = True Then 
-										e\room\RoomDoors[6]\locked = False		
-										UseDoor(e\room\RoomDoors[6],False)
-										e\room\RoomDoors[6]\locked = True
-										
-										em.Emitters = CreateEmitter(PlayerRoom\x - (2976.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
-										TurnEntity(em\Obj, 90, 0, 0, True)
-										em\RandAngle = 7
-										em\Speed = 0.03
-										em\SizeChange = 0.003
-										em\Room = PlayerRoom
-										
-										em.Emitters = CreateEmitter(PlayerRoom\x - (3168.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
-										TurnEntity(em\Obj, 90, 0, 0, True)
-										em\RandAngle = 7
-										em\Speed = 0.03
-										em\SizeChange = 0.003
-										em\Room = PlayerRoom
-									EndIf
-									
-									EyeIrritation=Max(EyeIrritation+FPSfactor * 4, 1.0)
+								If e\room\NPC[3]\Sound2 = 0
+									e\room\NPC[3]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\BeforeDoorOpen.ogg")
+									e\room\NPC[3]\SoundChn2 = PlaySound2(e\room\NPC[3]\Sound2,Camera,e\room\NPC[3]\Collider)
+									DebugLog "Playing guard sound before cell opening"
 								EndIf
 								
+								UpdateSoundOrigin(e\room\NPC[3]\SoundChn2,Camera,e\room\NPC[3]\Collider)
+								
+								If (Not ChannelPlaying(e\room\NPC[3]\SoundChn2))
+									;BlinkTimer = -10
+									
+									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCell.ogg")
+									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									
+									;e\room\NPC[3]\State = 7
+									;e\room\NPC[4]\State = 7
+									;e\room\NPC[5]\State = 7
+									e\room\NPC[3]\State = 9
+									e\room\NPC[4]\State = 9
+									e\room\NPC[5]\State = 9
+									
+									e\room\RoomDoors[6]\locked = False		
+									UseDoor(e\room\RoomDoors[6], False)
+									e\room\RoomDoors[6]\locked = True
+								EndIf
+							Else
+								FreeSound_Strict e\room\NPC[3]\Sound2
+								
+								;PointEntity e\room\NPC[3]\obj, Collider
+								;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\obj), 0
+								
+								;PointEntity e\room\NPC[4]\obj, Collider
+								;RotateEntity e\room\NPC[4]\Collider, 0, EntityYaw(e\room\NPC[4]\obj), 0
+								
+								e\EventState3 = Min(e\EventState3+FPSfactor/4,699)
+								
+								;outside the cell
+								If Distance(EntityX(Collider),EntityZ(Collider),PlayerRoom\x-(3072+1024)*RoomScale, PlayerRoom\z+192.0*RoomScale)>1.5 Then
+									;e\room\NPC[3]\State = 5
+									;e\room\NPC[3]\EnemyX = EntityX(Collider)
+									;e\room\NPC[3]\EnemyY = EntityY(Collider)
+									;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
+									
+									If e\EventState3 > 250 Then
+										If e\room\NPC[3]\SoundChn<>0 Then
+											If ChannelPlaying(e\room\NPC[3]\SoundChn) Then StopChannel e\room\NPC[3]\SoundChn
+										EndIf
+										FreeSound_Strict e\room\NPC[3]\Sound
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\Escort"+Rand(1,2)+".ogg")
+										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+										
+										;e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
+										;e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
+										e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
+										e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
+										
+										e\EventState3 = 710
+									EndIf
+								Else ;inside the cell
+									e\room\NPC[3]\State = 9
+									;PointEntity e\room\NPC[3]\Collider, Collider		
+									;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\Collider), 0
+									
+									If e\EventState3-(FPSfactor/4) < 350 And e\EventState3=>350 Then
+										FreeSound_Strict e\room\NPC[3]\Sound
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCellRefuse"+Rand(1,2)+".ogg")
+										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									ElseIf e\EventState3-(FPSfactor/4) < 550 And e\EventState3=>550 
+										FreeSound_Strict e\room\NPC[3]\Sound
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\CellGas"+Rand(1,2)+".ogg")
+										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									ElseIf e\EventState3>630
+										PositionEntity Collider, EntityX(Collider), EntityY(Collider), Min(EntityZ(Collider), EntityZ(e\room\obj,True)+490*RoomScale)
+										If e\room\RoomDoors[6]\open = True Then 
+											e\room\RoomDoors[6]\locked = False		
+											UseDoor(e\room\RoomDoors[6],False)
+											e\room\RoomDoors[6]\locked = True
+											
+											em.Emitters = CreateEmitter(PlayerRoom\x - (2976.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
+											TurnEntity(em\Obj, 90, 0, 0, True)
+											em\RandAngle = 7
+											em\Speed = 0.03
+											em\SizeChange = 0.003
+											em\Room = PlayerRoom
+											
+											em.Emitters = CreateEmitter(PlayerRoom\x - (3168.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
+											TurnEntity(em\Obj, 90, 0, 0, True)
+											em\RandAngle = 7
+											em\Speed = 0.03
+											em\SizeChange = 0.003
+											em\Room = PlayerRoom
+										EndIf
+										
+										EyeIrritation=Max(EyeIrritation+FPSfactor * 4, 1.0)
+									EndIf
+									
+								EndIf
 							EndIf
 						ElseIf e\EventState3 < 800
 							e\EventState3 = e\EventState3+FPSfactor/4.0
@@ -1559,10 +1580,11 @@ Function UpdateEvents()
 								
 								e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\RoomDoors[0]\obj,True), 0.5, EntityZ(e\room\RoomDoors[0]\obj,True))
 								
-								tex = LoadTexture_Strict("GFX\npcs\janitor.jpg")
-								e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
-								EntityTexture e\room\NPC[0]\obj, tex
-								FreeTexture tex
+								;tex = LoadTexture_Strict("GFX\npcs\janitor.jpg")
+								;e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
+								;EntityTexture e\room\NPC[0]\obj, tex
+								;FreeTexture tex
+								ChangeNPCTextureID(e\room\NPC[0],4)
 								
 								PointEntity e\room\NPC[0]\Collider, e\room\obj
 								RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider),0, True
@@ -1669,9 +1691,9 @@ Function UpdateEvents()
 							CameraFogMode(Camera, 0)
 							SecondaryLightOn = True
 							
-							Music(5) = LoadSound_Strict("SFX\Music\GateB1.ogg")
+							;Music(5) = LoadSound_Strict("SFX\Music\GateB1.ogg")
 							DrawLoading(60,True)
-							Music(6) = LoadSound_Strict("SFX\Music\GateB2.ogg")
+							;Music(6) = LoadSound_Strict("SFX\Music\GateB2.ogg")
 							DrawLoading(90,True)
 							
 							e\room\NPC[0] = CreateNPC(NPCtypeApache, e\room\x, 100.0, e\room\z)
@@ -2127,7 +2149,7 @@ Function UpdateEvents()
 							e\room\NPC[i]\State = (Not Contained106)
 						Next
 						
-						Music(5) = LoadSound_Strict("SFX\Music\GateA.ogg")
+						;Music(5) = LoadSound_Strict("SFX\Music\GateA.ogg")
 						
 						CreateConsoleMsg("WARNING! Teleporting away from this area may cause bugs or crashing.")
 						
@@ -2204,7 +2226,7 @@ Function UpdateEvents()
 						DrawLoading(100)
 					Else
 						
-						ShouldPlay = 5
+						ShouldPlay = 17
 						
 						e\EventState = e\EventState+FPSfactor
 						HideEntity Fog
@@ -2696,7 +2718,7 @@ Function UpdateEvents()
 						e\EventState = 0.1
 					EndIf
 					
-					If Music(3)=0 Then Music(3) = LoadSound_Strict("SFX\Music\PD.ogg")	
+					;;If Music(3)=0 Then Music(3) = LoadSound_Strict("SFX\Music\PD.ogg")	
 					If EntityY(Collider)<2000*RoomScale Or e\EventState3=0 Or EntityY(Collider)>2608*RoomScale Then 
 						ShouldPlay = 3
 					Else 
@@ -2761,7 +2783,7 @@ Function UpdateEvents()
 							;the trenches
 							If EntityY(Collider)>6.0 Then
 								ShouldPlay = 15
-								If Music(15)=0 Then Music(15) = LoadSound("SFX\Music\PDTrench.ogg")
+								;If Music(15)=0 Then Music(15) = LoadSound("SFX\Music\PDTrench.ogg")
 								
 								CameraFogColor Camera, 38, 55, 47
 								CameraClsColor Camera, 38, 55, 47
@@ -3280,51 +3302,11 @@ Function UpdateEvents()
 				;[Block]
 				If e\EventState = 0 Then
 					If PlayerRoom = e\room And Curr173\Idle<2 Then
-						If e\EventStr = ""
+						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
+							QuickLoad_CurrRoom = e\room
 							e\EventStr = "load0"
 						EndIf
-					EndIf
-					If e\EventStr = "load0"
-						QuickLoadPercent = 10
-						If e\room\NPC[0]=Null Then
-							e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True),EntityY(e\room\Objects[0],True),EntityZ(e\room\Objects[0],True))
-						EndIf
-						e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
-						tex = LoadTexture_Strict(e\room\NPC[0]\texture)
-						
-						EntityTexture e\room\NPC[0]\obj, tex
-						FreeTexture tex
-						e\EventStr = "load1"
-					ElseIf e\EventStr = "load1"
-						QuickLoadPercent = 20
-						e\room\NPC[0]\Sound=LoadSound_Strict("SFX\Room\Storeroom\Escape1.ogg")
-						e\EventStr = "load2"
-					ElseIf e\EventStr = "load2"
-						QuickLoadPercent = 35
-						e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 12)
-						e\EventStr = "load3"
-					ElseIf e\EventStr = "load3"
-						QuickLoadPercent = 55
-						If e\room\NPC[1]=Null Then
-							e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1],True),EntityY(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
-						EndIf
-						e\room\NPC[1]\texture = "GFX\npcs\scientist.jpg"
-						tex = LoadTexture_Strict(e\room\NPC[1]\texture)
-						EntityTexture e\room\NPC[1]\obj, tex
-						
-						FreeTexture tex
-						e\EventStr = "load4"
-					ElseIf e\EventStr = "load4"
-						QuickLoadPercent = 80
-						e\room\NPC[1]\Sound=LoadSound_Strict("SFX\Room\Storeroom\Escape2.ogg")
-						e\EventStr = "load5"
-					ElseIf e\EventStr = "load5"
-						QuickLoadPercent = 100
-						PointEntity e\room\NPC[0]\Collider, e\room\NPC[1]\Collider
-						PointEntity e\room\NPC[1]\Collider, e\room\NPC[0]\Collider
-						
-						e\EventState=1
 					EndIf
 				Else
 					e\EventState=e\EventState+FPSfactor
@@ -3452,10 +3434,11 @@ Function UpdateEvents()
 ;					de\size = 0.5
 					
 					e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True), 0.5, EntityZ(e\room\Objects[0],True))
-					e\room\NPC[0]\texture = "GFX\NPCs\gonzales.jpg"
-					tex = LoadTexture_Strict(e\room\NPC[0]\texture)
-					EntityTexture(e\room\NPC[0]\obj, tex)
-					FreeTexture tex
+					;e\room\NPC[0]\texture = "GFX\NPCs\gonzales.jpg"
+					;tex = LoadTexture_Strict(e\room\NPC[0]\texture)
+					;EntityTexture(e\room\NPC[0]\obj, tex)
+					;FreeTexture tex
+					ChangeNPCTextureID(e\room\NPC[0],0)
 					
 					RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\obj)-80,0, True	
 					
@@ -4462,7 +4445,7 @@ Function UpdateEvents()
 					EndIf
 					
 					If EntityY(Collider,True)>4.0 Then
-						If Music(7)=0 Then Music(7) = LoadSound_Strict("SFX\Music\Room3Storage.ogg") 
+						;If Music(7)=0 Then Music(7) = LoadSound_Strict("SFX\Music\Room3Storage.ogg") 
 						ShouldPlay = 7
 						
 						If e\EventState = 0 Then
@@ -5403,7 +5386,7 @@ Function UpdateEvents()
 						
 						GiveAchievement(Achv939)
 						
-						If Music(7)=0 Then Music(7) = LoadSound_Strict("SFX\Music\Room3Storage.ogg") 
+						;If Music(7)=0 Then Music(7) = LoadSound_Strict("SFX\Music\Room3Storage.ogg") 
 						ShouldPlay = 7
 						
 						;If e\room\NPC[0]=Null Then
@@ -5419,21 +5402,10 @@ Function UpdateEvents()
 							;DrawLoading(100, True)
 						;EndIf
 						If e\room\NPC[2]=Null Or e\EventState = 3
-							If e\EventState = 0
+							If e\EventState = 0 And QuickLoadPercent = -1
 								QuickLoadPercent = 0
+								QuickLoad_CurrRoom = e\room
 								e\EventState = 1
-							ElseIf e\EventState = 1
-								e\room\NPC[0]=CreateNPC(NPCtype939, 0,0,0)
-								QuickLoadPercent = 20
-								e\EventState = 2
-							ElseIf e\EventState = 2
-								e\room\NPC[1]=CreateNPC(NPCtype939, 0,0,0)
-								QuickLoadPercent = 50
-								e\EventState = 3
-							ElseIf e\EventState = 3
-								e\room\NPC[2]=CreateNPC(NPCtype939, 0,0,0)
-								QuickLoadPercent = 100
-								e\EventState = 0
 							EndIf
 						Else
 							If e\EventState = 0 Then
@@ -6145,47 +6117,14 @@ Function UpdateEvents()
 						e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1],e\room\Objects[0],e\room\Objects[1], e)
 						e\EventState3 = UpdateElevators(e\EventState3, e\room\RoomDoors[2], e\room\RoomDoors[3],e\room\Objects[2],e\room\Objects[3], e)
 					Else
-						If Music(8)=0 Then Music(8) = LoadSound_Strict("SFX\Music\Room049.ogg") 
+						;If Music(8)=0 Then Music(8) = LoadSound_Strict("SFX\Music\Room049.ogg") 
 						ShouldPlay = 8
 						
 						If e\EventState = 0 Then
-							If e\EventStr = ""
+							If e\EventStr = "" And QuickLoadPercent = -1
 								QuickLoadPercent = 0
+								QuickLoad_CurrRoom = e\room
 								e\EventStr = "load0"
-							ElseIf e\EventStr = "load0"
-								n.NPCs = CreateNPC(NPCtypeZombie, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
-								PointEntity n\Collider, e\room\obj
-								TurnEntity n\Collider, 0, 190, 0
-								QuickLoadPercent = 20
-								e\EventStr = "load1"
-							ElseIf e\EventStr = "load1"
-								n.NPCs = CreateNPC(NPCtypeZombie, EntityX(e\room\Objects[5],True),EntityY(e\room\Objects[5],True),EntityZ(e\room\Objects[5],True))
-								PointEntity n\Collider, e\room\obj
-								TurnEntity n\Collider, 0, 20, 0
-								QuickLoadPercent = 60
-								e\EventStr = "load2"
-							ElseIf e\EventStr = "load2"
-								For n.NPCs = Each NPCs
-									If n\NPCtype = NPCtype049
-										e\room\NPC[0]=n
-										e\room\NPC[0]\State = 2
-										e\room\NPC[0]\Idle = 1
-										e\room\NPC[0]\HideFromNVG = True
-										PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+3,EntityZ(e\room\Objects[4],True)
-										ResetEntity e\room\NPC[0]\Collider
-										Exit
-									EndIf
-								Next
-								If e\room\NPC[0]=Null
-									n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True)+3, EntityZ(e\room\Objects[4],True))
-									PointEntity n\Collider, e\room\obj
-									n\State = 2
-									n\Idle = 1
-									n\HideFromNVG = True
-									e\room\NPC[0]=n
-								EndIf
-								QuickLoadPercent = 100
-								e\EventState=1
 							EndIf
 						ElseIf e\EventState > 0
 							
@@ -6680,58 +6619,19 @@ Function UpdateEvents()
 			Case "room205"
 				;[Block]
 				If PlayerRoom = e\room Then
-					ShouldPlay = 15
 					If e\EventState=0 Or e\room\Objects[0]=0 Then
-						If e\EventStr = ""
+						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
+							QuickLoad_CurrRoom = e\room
 							e\EventStr = "load0"
-						ElseIf e\EventStr = "load0"
-							e\room\Objects[3] = LoadAnimMesh_Strict("GFX\npcs\205_demon1.b3d")
-							QuickLoadPercent = 10
-							e\EventStr = "load1"
-						ElseIf e\EventStr = "load1"
-							e\room\Objects[4] = LoadAnimMesh_Strict("GFX\npcs\205_demon2.b3d")
-							QuickLoadPercent = 20
-							e\EventStr = "load2"
-						ElseIf e\EventStr = "load2"
-							e\room\Objects[5] = LoadAnimMesh_Strict("GFX\npcs\205_demon3.b3d")
-							QuickLoadPercent = 30
-							e\EventStr = "load3"
-						ElseIf e\EventStr = "load3"
-							e\room\Objects[6] = LoadAnimMesh_Strict("GFX\npcs\205_woman.b3d")
-							QuickLoadPercent = 40
-							e\EventStr = "load4"
-						ElseIf e\EventStr = "load4"
-							If Music(15) = 0 Then
-								Music(15) = LoadSound_Strict("SFX\Music\205.ogg")
-							EndIf
-							QuickLoadPercent = 50
-							e\EventStr = "load5"
-						ElseIf e\EventStr = "load5"
-							For i = 3 To 6
-							;EntityColor e\room\Objects[i], 30,30,30
-							;EntityShininess e\room\Objects[i],0.0
-							;vertex color + flatshaded
-							;EntityFX e\room\Objects[i], 2
-								
-								PositionEntity e\room\Objects[i], EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True), True
-								RotateEntity e\room\Objects[i], -90, EntityYaw(e\room\Objects[0],True), 0, True
-								ScaleEntity(e\room\Objects[i], 0.05, 0.05, 0.05, True)
-							Next
-							QuickLoadPercent = 70
-							e\EventStr = "load6"
-						ElseIf e\EventStr = "load6"
-							GiveAchievement(Achv205)
-							
-							HideEntity(e\room\Objects[3])
-							HideEntity(e\room\Objects[4])
-							HideEntity(e\room\Objects[5])
-							QuickLoadPercent = 100
-							e\EventState = 1
 						EndIf
 						
+						If e\room\RoomDoors[1]\open = True
+							e\EventState = 1
+							GiveAchievement(Achv205)
+						EndIf
 					Else
-						
+						ShouldPlay = 16
 						If (e\EventState<65) Then
 							If (Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True))<2.0) Then
 								PlaySound_Strict(LoadTempSound("SFX\SCP\205\Enter.ogg"))
@@ -6898,21 +6798,10 @@ Function UpdateEvents()
 						
 						UpdateForest(fr,Collider)
 						
-						If e\EventStr = ""
+						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
+							QuickLoad_CurrRoom = e\room
 							e\EventStr = "load0"
-						ElseIf e\EventStr = "load0"
-							If Music(9) = 0 Then Music(9) = LoadSound_Strict("SFX\Music\8601.ogg")
-							QuickLoadPercent = 15
-							e\EventStr = "load1"
-						ElseIf e\EventStr = "load1"
-							QuickLoadPercent = 40
-							If Music(12) = 0 Then Music(12) = LoadSound_Strict("SFX\Music\8601Cancer.ogg")
-							e\EventStr = "load2"
-						ElseIf e\EventStr = "load2"
-							QuickLoadPercent = 100
-							If e\room\NPC[0]=Null Then e\room\NPC[0]=CreateNPC(NPCtype860, 0,0,0)
-							e\EventStr = "loaddone"
 						EndIf
 						
 						If e\room\NPC[0]<>Null Then
@@ -6932,7 +6821,7 @@ Function UpdateEvents()
 						EndIf
 						
 						If e\room\NPC[0]<>Null
-							If e\room\NPC[0]\State = 0 Or EntityDistance(Collider, e\room\NPC[0]\Collider)>12.0 Then
+							If e\room\NPC[0]\State = 0 Or EntityDistance(Collider, e\room\NPC[0]\Collider)>20.0 Then
 								e\EventState3 = e\EventState3 + (1+CurrSpeed)* FPSfactor
 								If (e\EventState3 Mod 500) < 10.0 And ((e\EventState3-FPSfactor) Mod 500) > 490.0 Then
 									;If e\EventState3 > 3500 And Rnd(10000)<e\EventState3 Then
@@ -7089,31 +6978,14 @@ Function UpdateEvents()
 					Select e\EventState
 						Case 0
 							;a dirty workaround to hide the pause when loading 966 model
-							LightBlink = 5.0
-							e\EventState = 1
-							PlaySound_Strict LightSFX
-							QuickLoadPercent = 0
-						Case 1
-							e\EventState2 = e\EventState2+FPSfactor
-							If e\EventState2>30 Then
-								If e\EventStr = ""
-									CreateNPC(NPCtype966, EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True))
-									QuickLoadPercent = 50
-									e\EventStr = "load0"
-								ElseIf e\EventStr = "load0"
-									CreateNPC(NPCtype966, EntityX(e\room\Objects[1],True), EntityY(e\room\Objects[1],True), EntityZ(e\room\Objects[1],True))
-									QuickLoadPercent = 70
-									e\EventStr = "load1"
-								ElseIf e\EventStr = "load1"
-									CreateNPC(NPCtype966, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True), EntityZ(e\room\Objects[2],True))
-									QuickLoadPercent = 100
-									e\EventState=2
-								EndIf
-							Else
-								QuickLoadPercent = Int(e\EventState2)
-							EndIf							
+							If QuickLoadPercent = -1
+								LightBlink = 5.0
+								e\EventState = 1
+								PlaySound_Strict LightSFX
+								QuickLoadPercent = 0
+								QuickLoad_CurrRoom = e\room
+							EndIf
 						Case 2
-							
 							e\EventState = 2
 							RemoveEvent (e)
 					End Select
@@ -7794,7 +7666,14 @@ Function UpdateEvents()
 				If PlayerRoom = e\room Then
 					;GiveAchievement(Achv914)
 					
-					If e\room\RoomDoors[2]\open Then GiveAchievement(Achv914)
+					If e\room\RoomDoors[2]\open
+						GiveAchievement(Achv914)
+						e\EventState2=1
+					EndIf
+					
+					If e\EventState2=1
+						ShouldPlay = 22
+					EndIf
 					
 					EntityPick(Camera, 1.0)
 					If PickedEntity() = e\room\Objects[0] Then
@@ -8083,7 +7962,7 @@ Function UpdateEvents()
 				EndIf
 				
 				;[End Block]
-			;New Events in SCP:CB version 1.3 - ENDSHN	
+			;New Events in SCP:CB version 1.3 - ENDSHN
 			Case "room4tunnels"
 				;[Block]
 				If e\room\dist < 10.0 And e\room\dist > 0 Then
@@ -8128,45 +8007,10 @@ Function UpdateEvents()
 						;1499 random generator
 						;[Block]
 						If e\EventState = 0.0
-							If e\EventStr = ""
+							If e\EventStr = "" And QuickLoadPercent = -1
 								QuickLoadPercent = 0
+								QuickLoad_CurrRoom = e\room
 								e\EventStr = "load0"
-							ElseIf e\EventStr = "load0"
-								QuickLoadPercent = 10
-								e\room\Objects[0] = CreatePlane()
-								Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
-								EntityTexture e\room\Objects[0],planetex%
-								FreeTexture planetex%
-								PositionEntity e\room\Objects[0],0,EntityY(e\room\obj),0
-								EntityType e\room\Objects[0],HIT_MAP
-								;EntityParent e\room\Objects[0],e\room\obj
-								e\EventStr = "load1"
-							ElseIf e\EventStr = "load1"
-								QuickLoadPercent = 30
-								NTF_1499Sky = sky_CreateSky("GFX\map\sky\1499sky")
-								e\EventStr = 1
-							Else
-								If Int(e\EventStr)<16
-									QuickLoadPercent = QuickLoadPercent + 2
-									e\room\Objects[Int(e\EventStr)] = LoadMesh_Strict("GFX\map\dimension1499\1499object"+(Int(e\EventStr))+".b3d")
-									HideEntity e\room\Objects[Int(e\EventStr)]
-									e\EventStr = Int(e\EventStr)+1
-								ElseIf Int(e\EventStr)=16
-									QuickLoadPercent = 90
-									CreateChunkParts(e\room)
-									e\EventStr = 17
-								ElseIf Int(e\EventStr) = 17
-									QuickLoadPercent = 100
-									x# = EntityX(e\room\obj)
-									z# = EntityZ(e\room\obj)
-									Local ch.Chunk
-									For i = -2 To 2 Step 2
-										ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
-									Next
-									If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\1499.ogg")
-									e\EventState = 2.0
-									e\EventStr = 18
-								EndIf
 							EndIf
 						Else
 							e\EventState = 2.0
@@ -8614,254 +8458,13 @@ Function UpdateEvents()
 				;e\EventState2: Variable used for the SCP-049 event
 				;e\EventState3: Checks if Lever is activated or not
 				
-				;Camera-Spawning Code + SCP-049-Spawning (it is a little messy!)
+				;Camera-Spawning Code + SCP-049-Spawning (will now be loaded in a pointer)
 				;[Block]
 				If PlayerRoom = e\room
-					If e\EventStr = ""
+					If e\EventStr = "" And QuickLoadPercent = -1
 						QuickLoadPercent = 0
+						QuickLoad_CurrRoom = e\room
 						e\EventStr = 0
-					EndIf
-				EndIf
-				If e\EventState = 0 And e\EventStr <> ""
-					For r.Rooms = Each Rooms
-						If ValidRoom2slCamRoom(r)
-							For sc.SecurityCams = Each SecurityCams
-								If sc\room = r And (Not sc\SpecialCam)
-									Local HasCamera% = False
-									For sc2.SecurityCams = Each SecurityCams
-										If sc2\room <> sc\room And (Not sc2\SpecialCam)
-											If sc2\room\RoomTemplate\Name = sc\room\RoomTemplate\Name
-												If sc2\Screen
-													HasCamera% = True
-													DebugLog "HasCamera% = True ("+Chr(34)+sc2\room\RoomTemplate\Name+Chr(34)+")"
-													Exit
-												EndIf
-											EndIf
-										EndIf
-									Next
-									If (Not HasCamera%) Then
-										If Left(e\EventStr,4) <> "load"
-											DebugLog "### "+Int(e\EventStr)
-											If Int(e\EventStr)=sc\ID
-												sc\Screen = True
-												sc\AllowSaving = False
-												
-												sc\RenderInterval = 12
-												
-												scale# = RoomScale * 4.5 * 0.4
-												
-												sc\ScrObj = CreateSprite()
-												EntityFX sc\ScrObj, 17
-												SpriteViewMode(sc\ScrObj, 2)
-												sc\ScrTexture = 0
-													;EntityTexture sc\ScrObj, ScreenTexs[sc\ScrTexture]
-												ScaleSprite(sc\ScrObj, MeshWidth(Monitor) * scale * 0.95* 0.5, MeshHeight(Monitor) * scale * 0.95* 0.5)
-												
-												sc\ScrOverlay = CreateSprite(sc\ScrObj)
-												
-												ScaleSprite(sc\ScrOverlay, MeshWidth(Monitor) * scale * 0.95 * 0.5, MeshHeight(Monitor) * scale * 0.95 * 0.5)
-												MoveEntity(sc\ScrOverlay, 0, 0, -0.0005)
-												EntityTexture(sc\ScrOverlay, MonitorTexture)
-												SpriteViewMode(sc\ScrOverlay, 2)
-												EntityBlend(sc\ScrOverlay , 3)
-												
-												sc\MonitorObj = CopyEntity(Monitor, sc\ScrObj)
-												
-												ScaleEntity(sc\MonitorObj, scale, scale, scale)
-												
-												sc\Cam = CreateCamera()
-												CameraViewport(sc\Cam, 0, 0, 512, 512)
-												CameraRange sc\Cam, 0.05, 6.0
-												CameraZoom(sc\Cam, 0.8)
-												HideEntity(sc\Cam)
-												
-												sc\IsRoom2slCam = True
-												sc\Room2slTexs%[0] = CreateTexture(512, 512, 1+256)
-												EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
-												
-												pvt% = CreatePivot(e\room\obj)
-												Select r\RoomTemplate\Name$
-													Case "room2closets" ;ID=0 q
-														PositionEntity pvt%,-207.94,872.0,-60.0686,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room2closets"+Chr(34)
-													Case "room1archive" ;ID=1 q
-														PositionEntity pvt%,-231.489,872.0,95.7443,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room1archive"+Chr(34)
-													Case "room3z3" ;ID=2 q
-														PositionEntity pvt%,-231.489,872.0,255.744,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room3z3"+Chr(34)
-													Case "room1lifts" ;ID=3 q
-														PositionEntity pvt%,-231.489,872.0,415.744,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room1lifts"+Chr(34)
-													Case "room106" ;ID=4 q
-														PositionEntity pvt%,-208.138,872.0,571.583,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 75+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room106"+Chr(34)
-													Case "checkpoint1" ;ID=5 q
-														PositionEntity pvt%,-207.94,760.0,-60.0686,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"checkpoint1"+Chr(34)
-													Case "room2nuke" ;ID=6 q
-														PositionEntity pvt%,-231.489,760.0,415.744,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room2nuke"+Chr(34)
-													Case "008" ;ID=7 q
-														PositionEntity pvt%,-208.138,760.0,571.583,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 75+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"008"+Chr(34)
-													Case "room1162" ;ID=8 q
-														PositionEntity pvt%,-207.94,648.0,-60.0686,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room1162"+Chr(34)
-													Case "room966" ;ID=9 q
-														PositionEntity pvt%,-231.489,648.0,255.744,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room966"+Chr(34)
-													Case "room2ccont" ;ID=10 q
-														PositionEntity pvt%,-231.489,648.0,415.744,False
-														PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-														EntityParent(sc\ScrObj, e\room\obj)
-														TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-														FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-														DebugLog "Created Monitor for "+Chr(34)+"room2ccont"+Chr(34)
-												End Select
-												
-												FreeEntity pvt%
-												
-												Exit
-											EndIf
-										EndIf
-									EndIf
-								EndIf
-							Next
-						EndIf
-					Next
-					If e\EventStr <> "" And Left(e\EventStr,4) <> "load"
-						QuickLoadPercent = QuickLoadPercent + 5
-						If Int(e\EventStr) > 9
-							e\EventStr = "load1"
-						Else
-							e\EventStr = Int(e\EventStr) + 1
-						EndIf
-					ElseIf e\EventStr = "load1"
-						For sc.SecurityCams = Each SecurityCams
-							If sc\SpecialCam Then
-								sc\Screen = True
-								sc\AllowSaving = False
-								
-								sc\RenderInterval = 12
-								
-								scale# = RoomScale * 4.5 * 0.4
-								
-								sc\ScrObj = CreateSprite()
-								EntityFX sc\ScrObj, 17
-								SpriteViewMode(sc\ScrObj, 2)
-								sc\ScrTexture = 0
-								ScaleSprite(sc\ScrObj, MeshWidth(Monitor) * scale * 0.95* 0.5, MeshHeight(Monitor) * scale * 0.95* 0.5)
-								
-								sc\ScrOverlay = CreateSprite(sc\ScrObj)
-								
-								ScaleSprite(sc\ScrOverlay, MeshWidth(Monitor) * scale * 0.95 * 0.5, MeshHeight(Monitor) * scale * 0.95 * 0.5)
-								MoveEntity(sc\ScrOverlay, 0, 0, -0.0005)
-								EntityTexture(sc\ScrOverlay, MonitorTexture)
-								SpriteViewMode(sc\ScrOverlay, 2)
-								EntityBlend(sc\ScrOverlay , 3)
-								
-								sc\MonitorObj = CopyEntity(Monitor, sc\ScrObj)
-								
-								ScaleEntity(sc\MonitorObj, scale, scale, scale)
-								
-								sc\Cam = CreateCamera()
-								CameraViewport(sc\Cam, 0, 0, 512, 512)
-								CameraRange sc\Cam, 0.05, 6.0
-								CameraZoom(sc\Cam, 0.8)
-								HideEntity(sc\Cam)
-								
-								sc\Room2slTexs%[0] = CreateTexture(512, 512, 1+256)
-								EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
-								
-								pvt% = CreatePivot(e\room\obj)
-								
-								PositionEntity pvt%,-231.489,648.0,95.7443,False
-								PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-								EntityParent(sc\ScrObj, e\room\obj)
-								TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-								FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-								DebugLog "Created Monitor for "+Chr(34)+"room2sl"+Chr(34)+" (faked SCP-409 Camera)"
-								
-								FreeEntity pvt%
-								
-								QuickLoadPercent = 70
-								
-								e\EventStr = "load2"
-								Exit
-							EndIf
-						Next
-					ElseIf e\EventStr = "load2"
-							;For SCP-049
-						If e\room\NPC[0]=Null Then
-							For n.NPCs = Each NPCs
-								If n\NPCtype = NPCtype049
-									e\room\NPC[0] = n
-									Exit
-								EndIf
-							Next
-							
-							If e\room\NPC[0]=Null Then
-								e\room\NPC[0] = CreateNPC(NPCtype049,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True))
-							EndIf
-							e\room\NPC[0]\HideFromNVG = True
-						EndIf
-						QuickLoadPercent = 80
-						e\EventStr = "load3"
-					ElseIf e\EventStr = "load3"
-						PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
-						ResetEntity e\room\NPC[0]\Collider
-						RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
-						
-						DebugLog(EntityX(e\room\Objects[7],True)+", "+EntityY(e\room\Objects[7],True)+", "+EntityZ(e\room\Objects[7],True))
-						
-						e\room\NPC[0]\State = 0
-						e\room\NPC[0]\PrevState = 2
-						
-						e\EventState = 1
-						If e\EventState2 = 0 Then e\EventState2 = -(70*5)
-						
-						QuickLoadPercent = 100
 					EndIf
 				EndIf
 				;[End Block]
@@ -9037,7 +8640,7 @@ Function UpdateEvents()
 							e\EventState2 = 7
 						Else
 							;Still playing the Music for SCP-049 (in the real, SCP-049's State will be set to 2, causing it to stop playing the chasing track)
-							If Music(20) = 0 Then Music(20) = LoadSound_Strict("SFX\Horror\Horror12.ogg")
+							;If Music(20) = 0 Then Music(20) = LoadSound_Strict("SFX\Horror\Horror12.ogg")
 							ShouldPlay = 20
 							If e\room\NPC[0]\PathStatus<>1
 								e\room\NPC[0]\Idle = 70*60 ;(Making SCP-049 idle for one minute (twice as fast for aggressive NPCs = True))

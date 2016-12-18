@@ -35,7 +35,7 @@ difficulties(EUCLID)\description = difficulties(EUCLID)\description +"In Euclid 
 difficulties(EUCLID)\permaDeath = False
 difficulties(EUCLID)\aggressiveNPCs = False
 difficulties(EUCLID)\saveType = SAVEONSCREENS
-difficulties(SAFE)\otherFactors = NORMAL
+difficulties(EUCLID)\otherFactors = NORMAL
 
 difficulties(KETER) = New Difficulty
 difficulties(KETER)\name = "Keter"
@@ -44,7 +44,7 @@ difficulties(KETER)\description = difficulties(KETER)\description +"The same can
 difficulties(KETER)\permaDeath = True
 difficulties(KETER)\aggressiveNPCs = True
 difficulties(KETER)\saveType = SAVEONQUIT
-difficulties(SAFE)\otherFactors = HARD
+difficulties(KETER)\otherFactors = HARD
 
 difficulties(CUSTOM) = New Difficulty
 difficulties(CUSTOM)\name = "Custom"
@@ -52,7 +52,7 @@ difficulties(CUSTOM)\permaDeath = False
 difficulties(CUSTOM)\aggressiveNPCs = True
 difficulties(CUSTOM)\saveType = SAVEANYWHERE
 difficulties(CUSTOM)\customizable = True
-difficulties(SAFE)\otherFactors = EASY
+difficulties(CUSTOM)\otherFactors = EASY
 
 SelectedDifficulty = difficulties(SAFE)
 ;~IDEal Editor Parameters:

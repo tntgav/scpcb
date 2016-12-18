@@ -198,6 +198,7 @@ Function UpdateMainMenu()
 					txt = "QUIT"
 					If temp Then
 						;DeInitExt
+						alDestroy()
 						End
 					EndIf
 			End Select
@@ -1760,6 +1761,7 @@ End Function
 
 Global QuickLoadPercent% = -1
 Global QuickLoadPercent_DisplayTimer# = 0
+Global QuickLoad_CurrRoom.Rooms
 
 Function DrawQuickLoading()
 	
@@ -1776,9 +1778,11 @@ Function DrawQuickLoading()
 				QuickLoadPercent = -1
 			EndIf
 		EndIf
+		QuickLoadEvents()
 	Else
 		QuickLoadPercent = -1
 		QuickLoadPercent_DisplayTimer# = 0
+		QuickLoad_CurrRoom = Null
 	EndIf
 	
 End Function

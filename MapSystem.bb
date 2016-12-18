@@ -1396,6 +1396,8 @@ Type RoomTemplates
 	Field TempTriggerboxAmount
 	Field TempTriggerbox[128]
 	Field TempTriggerboxName$[128]
+	
+	Field UseLightCones%
 End Type 	
 
 Function CreateRoomTemplate.RoomTemplates(meshpath$)
@@ -1449,6 +1451,7 @@ Function LoadRoomTemplates(file$)
 			rt\Commonness = Max(Min(GetINIInt(file, TemporaryString, "commonness"), 100), 0)
 			rt\Large = GetINIInt(file, TemporaryString, "large")
 			rt\DisableDecals = GetINIInt(file, TemporaryString, "disabledecals")
+			rt\UseLightCones = GetINIInt(file, TemporaryString, "usevolumelighting")
 			
 		EndIf
 	Wend
@@ -1574,6 +1577,10 @@ Type Rooms
 	Field Triggerbox[128]
 	Field TriggerboxName$[128]
 	Field MaxWayPointY#
+	Field LightR#[MaxRoomLights],LightG#[MaxRoomLights],LightB#[MaxRoomLights]
+	Field LightCone%[MaxRoomLights]
+	Field LightConeSpark%[MaxRoomLights]
+	Field LightConeSparkTimer#[MaxRoomLights]
 End Type 
 
 Const gridsz%=20
@@ -1631,6 +1638,10 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 				PositionEntity(r\obj, x, y, z)
 				FillRoom(r)
 				
+				If r\RoomTemplate\UseLightCones
+					AddLightCones(r)
+				EndIf
+				
 				Return r
 			EndIf
 		Next
@@ -1665,6 +1676,10 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 					
 					PositionEntity(r\obj, x, y, z)
 					FillRoom(r)
+					
+					If r\RoomTemplate\UseLightCones
+						AddLightCones(r)
+					EndIf
 					
 					Return r	
 				End If
@@ -2537,7 +2552,7 @@ Function FillRoom(r.Rooms)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x+624.0*RoomScale, r\y+1888.0*RoomScale, r\z-312.0*RoomScale, r)
 			sc\angle = 90
-			sc\turn = 45
+			;sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			sc\ID = 6
 			;[End Block]
@@ -2661,7 +2676,7 @@ Function FillRoom(r.Rooms)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x+578.956*RoomScale, r\y+444.956*RoomScale, r\z+772.0*RoomScale, r)
 			sc\angle = 135
-			sc\turn = 45
+			;sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			sc\ID = 7
 			;[End Block]
@@ -2780,7 +2795,7 @@ Function FillRoom(r.Rooms)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x-312.0 * RoomScale, r\y + 414*RoomScale, r\z + 656*RoomScale, r)
 			sc\angle = 225
-			sc\turn = 45
+			;sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
 			sc\ID = 9
@@ -3361,7 +3376,7 @@ Function FillRoom(r.Rooms)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x, r\y + 704*RoomScale, r\z + 863*RoomScale, r)
 			sc\angle = 180
-			sc\turn = 45
+			;sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			sc\ID = 0
 			;sc\FollowPlayer = True
@@ -3587,8 +3602,10 @@ Function FillRoom(r.Rooms)
 			
 		Case "room205"
 			;[Block]
-			d.Doors = CreateDoor(r\zone, r\x + 128.0 * RoomScale, 0, r\z + 640.0 *RoomScale, 90, r, True, False, 3)
-			d\AutoClose = False : d\open = False
+			;d.Doors = CreateDoor(r\zone, r\x + 128.0 * RoomScale, 0, r\z + 640.0 *RoomScale, 90, r, True, False, 3)
+			;d\AutoClose = False : d\open = False
+			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 128.0 * RoomScale, 0, r\z + 640.0 *RoomScale, 90, r, True, False, 3)
+			r\RoomDoors[1]\AutoClose = False : r\RoomDoors[1]\open = False
 			;PositionEntity(d\buttons[0], r\x + 320.0 * RoomScale, EntityY(d\buttons[0],True), EntityZ(d\buttons[0],True), True)
 			;PositionEntity(d\buttons[1], r\x + 224.0 * RoomScale, EntityY(d\buttons[1],True), EntityZ(d\buttons[1],True), True)
 			
@@ -3966,7 +3983,7 @@ Function FillRoom(r.Rooms)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x-265.0*RoomScale, r\y+1280.0*RoomScale, r\z+105.0*RoomScale, r)
 			sc\angle = 45
-			sc\turn = 45
+			;sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			sc\ID = 10
 			;[End Block]
@@ -4079,13 +4096,13 @@ Function FillRoom(r.Rooms)
 			r\Objects[9] = CreatePivot(r\obj)
 			PositionEntity (r\Objects[9], r\x - 272 * RoomScale, r\y - 672.0 * RoomScale, r\z + 2736.0 * RoomScale, True)
 			
-			sc.SecurityCams = CreateSecurityCam(r\x-1216.0*RoomScale, r\y-336.0*RoomScale, r\z+1468.0*RoomScale, r, True)
-			sc\angle = 315
-			sc\turn = 45
-			sc\room = r
-			TurnEntity(sc\CameraObj, 20, 0, 0)
-			EntityParent(sc\obj, r\obj)
-			sc\ID = 4
+			;sc.SecurityCams = CreateSecurityCam(r\x-1216.0*RoomScale, r\y-336.0*RoomScale, r\z+1468.0*RoomScale, r, True)
+			;sc\angle = 315
+			;sc\turn = 45
+			;sc\room = r
+			;TurnEntity(sc\CameraObj, 20, 0, 0)
+			;EntityParent(sc\obj, r\obj)
+			;sc\ID = 4
 			;[End Block]
 		Case "room1archive"
 			;[Block]
@@ -4165,7 +4182,7 @@ Function FillRoom(r.Rooms)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x-256.0*RoomScale, r\y+384.0*RoomScale, r\z+640.0*RoomScale, r)
 			sc\angle = 180
-			sc\turn = 45
+			;sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			sc\ID = 1
 			;[End Block]
@@ -4462,7 +4479,7 @@ Function FillRoom(r.Rooms)
 			;[Block]
 			sc.SecurityCams = CreateSecurityCam(r\x-320.0*RoomScale, r\y+384.0*RoomScale, r\z+512.25*RoomScale, r)
 			sc\angle = 225
-			sc\turn = 45
+			;sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
 			sc\ID = 2
@@ -4481,7 +4498,7 @@ Function FillRoom(r.Rooms)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x+384.0*RoomScale, r\y+(448-64)*RoomScale, r\z-960.0*RoomScale, r, True)
 			sc\angle = 45
-			sc\turn = 45
+			;sc\turn = 45
 			sc\room = r
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			EntityParent(sc\obj, r\obj)
@@ -4615,7 +4632,7 @@ Function FillRoom(r.Rooms)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x-192.0*RoomScale, r\y+704.0*RoomScale, r\z+192.0*RoomScale, r)
 			sc\angle = 225
-			sc\turn = 45
+			;sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			sc\ID = 8
 			;[End Block]
@@ -4720,12 +4737,12 @@ Function FillRoom(r.Rooms)
 			EntityParent r\Objects[16],r\obj
 			
 			;Faked room409
-			r\Objects[17] = LoadMesh_Strict("GFX\map\room2sl_2.b3d",r\obj)
-			sc.SecurityCams = CreateSecurityCam(r\x-160.0*RoomScale,r\y-22689.1*RoomScale,r\z-288.0*RoomScale,Null)
-			sc\angle = 225
-			TurnEntity sc\CameraObj, 20, 0, 0
-			EntityParent sc\obj,r\obj
-			sc\SpecialCam = True
+			;r\Objects[17] = LoadMesh_Strict("GFX\map\room2sl_2.b3d",r\obj)
+			;sc.SecurityCams = CreateSecurityCam(r\x-160.0*RoomScale,r\y-22689.1*RoomScale,r\z-288.0*RoomScale,Null)
+			;sc\angle = 225
+			;TurnEntity sc\CameraObj, 20, 0, 0
+			;EntityParent sc\obj,r\obj
+			;sc\SpecialCam = True
 			
 			;-49.0 689.0 912.0
 			;Objects [18],[19]
@@ -5104,6 +5121,10 @@ Function AddLight%(room.Rooms, x#, y#, z#, ltype%, range#, r%, g%, b%)
 				room\LightSpriteHidden%[i] = True
 				HideEntity room\LightSprites2[i]
 				room\LightFlicker%[i] = Rand(1,10)
+				
+				room\LightR[i] = r
+				room\LightG[i] = g
+				room\LightB[i] = b
 				
 				HideEntity room\Lights[i]
 				
@@ -7356,8 +7377,20 @@ Function UpdateRoomLights(cam%)
 							EndIf
 						EndIf
 						
-						If EntityDistance(cam%,r\LightSprites2[i])<8.5
-							If EntityVisible(cam%,r\LightSpritesPivot[i])
+						If r\LightCone[i]<>0 Then ShowEntity r\LightCone[i]
+						;[TODO]
+						If r\LightConeSpark[i]<>0 
+							If r\LightConeSparkTimer[i]>0 And r\LightConeSparkTimer[i]<10 ;Needs testing
+								ShowEntity r\LightConeSpark[i]
+								r\LightConeSparkTimer[i]=r\LightConeSparkTimer[i]+FPSfactor
+							Else
+								HideEntity r\LightConeSpark[i]
+								r\LightConeSparkTimer[i]=0
+							EndIf
+						EndIf
+						
+						If EntityDistance(cam%,r\LightSprites2[i])<8.5 Or r\RoomTemplate\UseLightCones
+							If EntityVisible(cam%,r\LightSpritesPivot[i]) Or r\RoomTemplate\UseLightCones
 								If r\LightSpriteHidden%[i]
 									ShowEntity r\LightSprites2%[i]
 									r\LightSpriteHidden%[i] = False
@@ -7374,6 +7407,18 @@ Function UpdateRoomLights(cam%)
 									EndIf
 								EndIf
 								ScaleSprite r\LightSprites2[i],random#,random#
+								If r\LightCone[i]<>0
+									;ScaleEntity r\LightCone[i],0.01+((-0.4+random#)*0.025),0.01+((-0.4+random#)*0.025),0.01+((-0.4+random#)*0.025)
+									ScaleEntity r\LightCone[i],0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025)
+									If r\LightFlicker%[i]>4
+										If Rand(400)=1
+											SetEmitter(r\LightSpritesPivot[i],ParticleEffect[0])
+											PlaySound2(IntroSFX(Rand(10,12)),cam,r\LightSpritesPivot[i])
+											ShowEntity r\LightConeSpark[i]
+											r\LightConeSparkTimer[i] = FPSfactor
+										EndIf
+									EndIf
+								EndIf
 								dist# = (EntityDistance(cam%,r\LightSpritesPivot[i])+0.5)/7.5
 								dist# = Max(Min(dist#,1.0),0.0)
 								alpha# = Float(Inverse(dist#))
@@ -7385,6 +7430,13 @@ Function UpdateRoomLights(cam%)
 									If (Not r\LightSpriteHidden%[i])
 										HideEntity r\LightSprites2[i]
 										r\LightSpriteHidden%[i]=True
+									EndIf
+								EndIf
+								
+								If r\RoomTemplate\UseLightCones
+									If EntityDistance(cam%,r\LightSprites2[i])>=8.5 Or (Not EntityVisible(cam%,r\LightSpritesPivot[i]))
+										HideEntity r\LightSprites2%[i]
+										r\LightSpriteHidden%[i] = True
 									EndIf
 								EndIf
 							Else
@@ -7408,6 +7460,8 @@ Function UpdateRoomLights(cam%)
 							HideEntity r\LightSprites2[i]
 							r\LightSpriteHidden[i]=True
 						EndIf
+						If r\LightCone[i]<>0 Then HideEntity r\LightCone[i]
+						If r\LightConeSpark[i]<>0 HideEntity r\LightConeSpark[i]
 					EndIf
 				EndIf
 			Next
@@ -7817,7 +7871,41 @@ End Function
 
 
 
+
+
 ;~IDEal Editor Parameters:
 ;~F#2#A
 ;~B#122B
 ;~C#Blitz3D
+Function AddLightCones(room.Rooms)
+	Local i
+	
+	For i = 0 To MaxRoomLights-1
+		If room\Lights[i]<>0
+			room\LightCone[i] = CopyEntity(LightConeModel)
+			ScaleEntity room\LightCone[i],0.01,0.01,0.01
+			EntityColor room\LightCone[i],room\LightR[i],room\LightG[i],room\LightB[i]
+			EntityAlpha room\LightCone[i],0.15
+			EntityBlend room\LightCone[i],3
+			PositionEntity room\LightCone[i],EntityX(room\LightSpritesPivot[i],True),EntityY(room\LightSpritesPivot[i],True),EntityZ(room\LightSpritesPivot[i],True),True
+			EntityParent room\LightCone[i],room\LightSpritesPivot[i]
+			
+			If room\LightFlicker%[i] > 4
+				room\LightConeSpark[i] = CreateSprite()
+				ScaleSprite room\LightConeSpark[i],1.0,1.0
+				EntityTexture room\LightConeSpark[i],ParticleTextures(8)
+				SpriteViewMode room\LightConeSpark[i],2
+				EntityFX room\LightConeSpark[i],1
+				RotateEntity room\LightConeSpark[i],-90,0,0
+				EntityBlend room\LightConeSpark[i],3
+				EntityAlpha room\LightConeSpark[i],1.0
+				PositionEntity room\LightConeSpark[i],EntityX(room\LightSpritesPivot[i],True),EntityY(room\LightSpritesPivot[i],True)+0.05,EntityZ(room\LightSpritesPivot[i],True),True
+				EntityParent room\LightConeSpark[i],room\LightSpritesPivot[i]
+			EndIf
+		EndIf
+	Next
+	
+End Function
+
+
+
