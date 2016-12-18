@@ -64,6 +64,7 @@ Type NPCs
 	Field Model$
 	Field ModelScaleX#,ModelScaleY#,ModelScaleZ#
 	Field HideFromNVG
+	Field TextureID%=-1
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -156,7 +157,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\obj2 = CreateSprite()
 			ScaleSprite(n\obj2, 0.03, 0.03)
 			EntityTexture(n\obj2, OldManEyes)
-			EntityBlend (n\obj2, BLEND_ADD)
+			EntityBlend (n\obj2, 3)
 			EntityFX(n\obj2, 1 + 8)
 			SpriteViewMode(n\obj2, 2)
 			
@@ -3123,28 +3124,33 @@ Function UpdateNPCs()
 							n\DropSpeed = 0
 							
 							If EntityY(n\Collider)<= -100 Then
-								TFormPoint(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,PlayerRoom\obj)
+								;transform the position of the player to the local coordinates of the forest
+								TFormPoint(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,fr\Forest_Pivot)
 								
-								x = Floor((TFormedX()*RoomScale+6.0)/12.0)
-								z = Floor((TFormedZ()*RoomScale+6.0)/12.0)
+								;calculate the indices of the forest cell the player is in
+								x = Floor((TFormedX()+6.0)/12.0)
+								z = Floor((TFormedZ()+6.0)/12.0)
 								
-								TFormPoint(x/RoomScale*12.0,0,z/RoomScale*12.0,fr\Forest_Pivot,0)
-								
-								For x2 = Max(x-1,0) To Min(x+1,gridsize) Step 2
-									For z2 = Max(z-1,0) To Min(z+1,gridsize) Step 2
+								;step through nearby cells
+								For x2 = Max(x-1,1) To Min(x+1,gridsize) Step 2
+									For z2 = Max(z-1,1) To Min(z+1,gridsize) Step 2
+										;choose an empty cell (not on the path)
 										If fr\grid[(z2*gridsize)+x2]=0 Then
+											;spawn the monster between the empty cell and the cell the player is in
+											TFormPoint(((x2+x)/2)*12.0,0,((z2+z)/2)*12.0,fr\Forest_Pivot,0)
 											
-											TFormPoint((x*12 + (x2-x)*6)/RoomScale,0,(z*12 + (z2-z)*6)/RoomScale,PlayerRoom\obj,0)
-											
-											PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+2.3, TFormedZ()
-											
+											;in view -> nope, keep searching for a more suitable cell
 											If EntityInView(n\Collider, Camera) Then
 												PositionEntity n\Collider, 0, -110, 0
-											Else ;only spawn the monster outside the player's field of view
-												x2 = Min(x+1,gridsize)
+												DebugLog("spawned monster in view -> hide")
+											Else ; not in view -> all good
+												DebugLog("spawned monster successfully")
+												
+												PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+2.3, TFormedZ()
+												
+												x2 = gridsize
 												Exit												
 											EndIf
-											
 										EndIf
 									Next
 								Next
@@ -3188,17 +3194,11 @@ Function UpdateNPCs()
 									If n\Frame<=199 Then
 										AnimateNPC(n, 2, 199, 0.5,False)
 										If n\Frame=199 Then n\Frame = 298 : PlaySound2(Step2SFX(Rand(3,5)), Camera, n\Collider, 15.0)
-										
-										;Animate2(n\obj, AnimTime(n\obj), 2, 199, 0.5,False)
-										;If AnimTime(n\obj)=199 Then SetAnimTime(n\obj,298) : PlaySound2(Step2SFX(Rand(3,5)), Camera, n\Collider, 15.0)
 									ElseIf n\Frame <= 297
 										PointEntity n\Collider, Collider
 										
 										AnimateNPC(n, 200, 297, 0.5, False)
 										If n\Frame=297 Then n\Frame=298 : PlaySound2(Step2SFX(Rand(3,5)), Camera, n\Collider, 15.0)
-										
-										;Animate2(n\obj, AnimTime(n\obj), 200, 297, 0.5,False)
-										;If AnimTime(n\obj)=297 Then SetAnimTime(n\obj,298) : PlaySound2(Step2SFX(Rand(3,5)), Camera, n\Collider, 15.0)
 									Else
 										angle = CurveAngle(point_direction(EntityX(n\Collider),EntityZ(n\Collider),EntityX(Collider),EntityZ(Collider)),EntityYaw(n\Collider)+90,20.0)
 										
@@ -3229,31 +3229,35 @@ Function UpdateNPCs()
 							prevFrame = n\Frame
 							
 							If EntityY(n\Collider)<= -100 Then
-								TFormPoint(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,PlayerRoom\obj)
-								x = Floor((TFormedX()*RoomScale+6.0)/12.0)
-								z = Floor((TFormedZ()*RoomScale+6.0)/12.0)
+								;transform the position of the player to the local coordinates of the forest
+								TFormPoint(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,fr\Forest_Pivot)
 								
-								For x2 = Max(x-1,0) To Min(x+1,gridsize)
-									For z2 = Max(z-1,0) To Min(z+1,gridsize)
+								;calculate the indices of the forest cell the player is in
+								x = Floor((TFormedX()+6.0)/12.0)
+								z = Floor((TFormedZ()+6.0)/12.0)
+								
+								For x2 = Max(x-1,1) To Min(x+1,gridsize)
+									For z2 = Max(z-1,1) To Min(z+1,gridsize)
+										;find a nearby cell that's on the path and NOT the cell the player is in
 										If fr\grid[(z2*gridsize)+x2]>0 And (x2<>x Or z2<>z) And (x2=x Or z2=z) Then
 											
-											TFormPoint((x2*12)/RoomScale,0,(z2*12)/RoomScale,PlayerRoom\obj,0)
+											;transform the position of the cell back to world coordinates
+											TFormPoint(x2*12.0, 0,z2*12.0, fr\Forest_Pivot,0)
 											
-											;PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+0.5, TFormedZ()
-											PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+1.0, TFormedZ()
-											DebugLog EntityY(fr\Forest_Pivot,True)
+											PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+1.0,TFormedZ()
+											
+											DebugLog(TFormedX()+", "+TFormedZ())
 											
 											If EntityInView(n\Collider, Camera) Then
 												BlinkTimer=-10
 											Else
-												x2 = Min(x+1,gridsize)
+												x2 = gridsize
 												Exit
 											EndIf
 										EndIf
 									Next
 								Next
 							Else
-								
 								angle = CurveAngle(Find860Angle(n, fr),EntityYaw(n\Collider)+90,80.0)
 								
 								RotateEntity n\Collider, 0, angle-90, 0, True
@@ -3262,8 +3266,6 @@ Function UpdateNPCs()
 								MoveEntity n\Collider, 0,0,n\CurrSpeed*FPSfactor
 								
 								AnimateNPC(n, 494, 569, n\CurrSpeed*25)
-								
-								;Animate2(n\obj, AnimTime(n\obj), 494, 569, n\CurrSpeed*25)
 								
 								If n\State2 = 0 Then
 									If dist<8.0 Then
@@ -3296,7 +3298,7 @@ Function UpdateNPCs()
 									n\State = 3
 								EndIf
 								
-								If dist > 16.0 Then
+								If dist > 20.0 Then
 									n\State = 0
 									n\State2 = 0
 									PositionEntity n\Collider, 0,-110,0
@@ -3321,18 +3323,8 @@ Function UpdateNPCs()
 							If n\Sound = 0 Then n\Sound = LoadSound_Strict("SFX\General\Slash1.ogg")
 							If n\Sound2 = 0 Then n\Sound2 = LoadSound_Strict("SFX\General\Slash2.ogg")
 							
-							If dist>1.1 And KillTimer => 0 Then 
-								n\CurrSpeed = CurveValue(n\Speed*0.8, n\CurrSpeed, 10.0)
-								
-								AnimateNPC(n, 298, 316, n\CurrSpeed*10)
-								;Animate2(n\obj, AnimTime(n\obj), 298, 316, n\CurrSpeed*10)
-								
-								If (prevFrame < 307 And n\Frame=>307) Then
-									PlaySound2(Step2SFX(Rand(3,5)), Camera, n\Collider, 10.0)
-								EndIf
-							Else
-								;461, 476
-								
+							;if close enough to attack OR already attacking, play the attack anim
+							If (dist<1.1 Or (n\Frame>451 And n\Frame<493) Or KillTimer < 0) Then
 								DeathMSG = ""
 								
 								n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
@@ -3346,7 +3338,15 @@ Function UpdateNPCs()
 								EndIf
 								If (prevFrame < 476 And n\Frame=>476) Then PlaySound_Strict(n\Sound2)
 								If (prevFrame < 486 And n\Frame=>486) Then PlaySound_Strict(n\Sound2)
+							Else
+								n\CurrSpeed = CurveValue(n\Speed*0.8, n\CurrSpeed, 10.0)
 								
+								AnimateNPC(n, 298, 316, n\CurrSpeed*10)
+								;Animate2(n\obj, AnimTime(n\obj), 298, 316, n\CurrSpeed*10)
+								
+								If (prevFrame < 307 And n\Frame=>307) Then
+									PlaySound2(Step2SFX(Rand(3,5)), Camera, n\Collider, 10.0)
+								EndIf
 							EndIf
 							
 							MoveEntity n\Collider, 0,0,n\CurrSpeed*FPSfactor
@@ -6549,13 +6549,13 @@ Function ForceSetNPCID(n.NPCs, newID%)
 End Function
 
 Function Find860Angle(n.NPCs, fr.Forest)
-	TFormPoint(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,PlayerRoom\obj)
-	Local playerx = Floor((TFormedX()*RoomScale+6.0)/12.0)
-	Local playerz = Floor((TFormedZ()*RoomScale+6.0)/12.0)
+	TFormPoint(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,fr\Forest_Pivot)
+	Local playerx = Floor((TFormedX()+6.0)/12.0)
+	Local playerz = Floor((TFormedZ()+6.0)/12.0)
 	
-	TFormPoint(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,PlayerRoom\obj)
-	Local x# = (TFormedX()*RoomScale+6.0)/12.0
-	Local z# = (TFormedZ()*RoomScale+6.0)/12.0
+	TFormPoint(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,fr\Forest_Pivot)
+	Local x# = (TFormedX()+6.0)/12.0
+	Local z# = (TFormedZ()+6.0)/12.0
 	
 	Local xt = Floor(x), zt = Floor(z)
 	
@@ -6567,7 +6567,10 @@ Function Find860Angle(n.NPCs, fr.Forest)
 					
 					;tile (x2,z2) is closer to the player than the monsters current tile
 					If (Abs(playerx-x2)+Abs(playerz-z2))<(Abs(playerx-xt)+Abs(playerz-zt)) Then
-						Return point_direction(x-0.5,z-0.5,x2,z2)+EntityYaw(PlayerRoom\obj)+180
+						;calculate the position of the tile in world coordinates
+						TFormPoint(x2*12.0,0,z2*12.0,fr\Forest_Pivot,0)
+						
+						Return point_direction(EntityX(n\Collider),EntityZ(n\Collider),TFormedX(),TFormedZ())+180
 					EndIf
 					
 				EndIf
@@ -7024,6 +7027,20 @@ Function RotateToDirection(n.NPCs)
 		EndIf
 	EndIf
 	ShowEntity n\Collider
+	
+End Function
+
+Function ChangeNPCTextureID(n.NPCs,textureid%)
+	
+	n\TextureID = textureid%+1
+	FreeEntity n\obj
+	n\obj = CopyEntity(DTextures[textureid%+1])
+	
+	temp# = 0.5 / MeshWidth(n\obj)
+	ScaleEntity n\obj, temp, temp, temp
+	MeshCullBox (n\obj, -MeshWidth(ClassDObj), -MeshHeight(ClassDObj), -MeshDepth(ClassDObj), MeshWidth(ClassDObj)*2, MeshHeight(ClassDObj)*2, MeshDepth(ClassDObj)*2)
+	
+	SetNPCFrame(n,n\Frame)
 	
 End Function
 
