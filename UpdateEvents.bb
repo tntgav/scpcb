@@ -8914,6 +8914,89 @@ Function UpdateEvents()
 	
 End Function
 
+Function UpdateDimension1499()
+	Local e.Events,n.NPCs,r.Rooms
+	
+	For e.Events = Each Events
+		If e\EventName = "dimension1499"
+			;[Block]
+			;e\EventState: If player entered dimension (will be resetted after the player leaves it)
+				;0: The player never entered SCP-1499
+				;1: The player had already entered the dimension at least once
+				;2: The player is in dimension
+			If PlayerRoom = e\room Then
+				If e\EventState < 2.0
+					;1499 random generator
+					;[Block]
+					If e\EventState = 0.0
+						If e\EventStr = "" And QuickLoadPercent = -1
+							QuickLoadPercent = 0
+							QuickLoad_CurrRoom = e\room
+							e\EventStr = "load0"
+						EndIf
+					Else
+						e\EventState = 2.0
+					EndIf
+					;[End Block]
+					;For n.NPCs = Each NPCs
+					;	If n\NPCtype = NPCtype1499
+					;		n\Idle = False
+					;		n\State = 0
+					;		;If Rand(2)=1 Then n\State2 = 500*3
+					;		n\Angle = Rnd(360)
+					;		PositionEntity n\Collider,EntityX(n\Collider)+Rnd(-60.0,60.0),EntityY(n\Collider)+0.05,EntityZ(n\Collider)+Rnd(-60.0,60.0)
+					;		ResetEntity n\Collider
+					;	EndIf
+					;Next
+				EndIf
+				;PositionEntity e\room\Objects[0],0,800,0
+				If (Not DebugHUD)
+					CameraFogRange Camera,40,80
+					CameraFogColor Camera,96,97,104
+					CameraClsColor Camera,96,97,104
+					CameraRange Camera,0.05,90
+				Else
+					CameraFogRange Camera,120,120
+					CameraFogColor Camera,96,97,104
+					CameraClsColor Camera,96,97,104
+					CameraRange Camera,0.05,120
+				EndIf
+				
+				For r.Rooms = Each Rooms
+					HideEntity r\obj
+				Next
+				ShowEntity e\room\obj
+				If QuickLoadPercent = 100 Or QuickLoadPercent = -1
+					UpdateChunks(e\room,15)
+					ShowEntity NTF_1499Sky
+					Update1499Sky()
+					ShouldPlay = 18
+					If EntityY(Collider)<800.0
+						PositionEntity Collider,EntityX(Collider),800.5,EntityZ(Collider),True
+						ResetEntity Collider
+					EndIf
+				Else
+					DropSpeed = 0
+				EndIf
+				CurrStepSFX=3
+			Else
+				If e\EventState = 2.0
+					HideEntity NTF_1499Sky
+					HideChunks()
+					For n.NPCs = Each NPCs
+						If n\NPCtype = NPCtype1499
+							RemoveNPC(n)
+							;n\Idle = True
+						EndIf
+					Next
+					e\EventState = 1.0
+				EndIf
+			EndIf
+			;[End Block]
+		EndIf
+	Next
+	
+End Function
 
 
 

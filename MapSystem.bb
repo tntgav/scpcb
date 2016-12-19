@@ -7582,6 +7582,31 @@ Function AmbientLightRooms(value%=0)
 	SetBuffer oldbuffer
 End Function
 
+;#########################################################################
+;CHUNKS FOR 1499
+;#########################################################################
+
+Dim CHUNKDATA(64,64)
+
+Function SetChunkDataValues()
+	Local StrTemp$,i%,j%
+	
+	StrTemp$ = ""
+	For i = 1 To Len(RandomSeed)
+		StrTemp = StrTemp+Asc(Mid(RandomSeed,i,1))
+	Next
+	SeedRnd Abs(Int(StrTemp))
+	
+	For i = 0 To 63
+		For j = 0 To 63
+			CHUNKDATA(i,j)=Rand(0,GetINIInt("Data\1499chunks.INI","general","count"))
+		Next
+	Next
+	
+	SeedRnd MilliSecs2()
+	
+End Function
+
 Type ChunkPart
 	Field Amount%
 	Field obj%[128]
@@ -7637,144 +7662,151 @@ Function CreateChunkParts(r.Rooms)
 		EndIf
 	Next
 	
-	SeedRnd MilliSecs()
+	SeedRnd MilliSecs2()
 	
 End Function
 
 Type Chunk
 	Field obj%[128]
-	Field objShown%[128]
 	Field x#,z#,y#
 	Field Amount%
-	;Field debugobj%
+	Field IsSpawnChunk%
+	Field ChunkPivot%
+	Field ChunkPivotDebug%
+	Field ChunkDebugObj%
+	Field PlatForm%
 End Type
 
-Function CreateChunk.Chunk(obj%,x#,y#,z#,spawnNPCs%=True)
+Function CreateChunk.Chunk(obj%,x#,y#,z#,isSpawnChunk%=False)
 	Local ch.Chunk = New Chunk
-	Local chp.ChunkPart,i,n.NPCs
+	Local i%, chp.ChunkPart
 	
-	;If obj%<>0
-	;	ch\obj% = CopyEntity(obj%)
-	;	PositionEntity ch\obj%,x,y,z
-	;	ScaleEntity ch\obj%,RoomScale,RoomScale,RoomScale
-	;	EntityType ch\obj%,HIT_MAP
-	;EndIf
+	ch\ChunkPivot = CreatePivot()
+	ch\x = x#
+	ch\y = y#
+	ch\z = z#
+	PositionEntity ch\ChunkPivot,ch\x+20.0,ch\y,ch\z+20.0,True
 	
-	;ch\debugobj% = CreateCube()
-	;ScaleEntity ch\debugobj%,20,20,20
-	;PositionEntity ch\debugobj%,x#,y#+20,z#
-	;EntityColor ch\debugobj%,Rand(0,255),Rand(0,255),Rand(0,255)
-	;EntityFX ch\debugobj%,1+FE_WIRE
+	ch\IsSpawnChunk = isSpawnChunk
+	
+	ch\ChunkPivotDebug% = CreateSphere(8,ch\ChunkPivot)
+	EntityColor ch\ChunkPivotDebug,255*(Not isSpawnChunk),255*(isSpawnChunk),0
+	EntityFX ch\ChunkPivotDebug,1
+	
+	ch\ChunkDebugObj = CreateCube(ch\ChunkPivotDebug)
+	ScaleEntity ch\ChunkDebugObj,20,0.1,20
+	EntityColor ch\ChunkDebugObj,Rand(255),Rand(255),Rand(255)
+	EntityFX ch\ChunkDebugObj,1
+	EntityAlpha ch\ChunkDebugObj,0.2
 	
 	If obj% > -1
+		ch\Amount% = GetINIInt("Data\1499chunks.INI","chunk"+obj,"count")
 		For chp = Each ChunkPart
 			If chp\ID = obj%
-				ch\Amount% = chp\Amount%
-				For i = 0 To chp\Amount
-					ch\obj[i] = CopyEntity(chp\obj[i])
-					PositionEntity ch\obj[i],x#,y#,z#
-					;ScaleEntity ch\obj[i],RoomScale,RoomScale,RoomScale
-					MoveEntity ch\obj[i],EntityX(chp\obj[i]),0,EntityZ(chp\obj[i])
-					EntityType ch\obj[i],HIT_MAP
-					EntityPickMode ch\obj[i],2
+				For i = 0 To ch\Amount
+					ch\obj[i] = CopyEntity(chp\obj[i],ch\ChunkPivot)
 				Next
-				Exit
 			EndIf
 		Next
-		If spawnNPCs%
-		For i = 0 To Rand(5,10)
-			n.NPCs = CreateNPC(NPCtype1499,x+Rnd(-60.0,60.0),y+0.5,z+Rnd(-60.0,60.0))
-			If Rand(2)=1 Then n\State2 = 500*3
-			n\Angle = Rnd(360)
-		Next
-	EndIf
 	EndIf
 	
-	ch\x = x
-	ch\z = z
-	ch\y = y
+	ch\PlatForm = CopyEntity(PlayerRoom\Objects[0],ch\ChunkPivot)
+	EntityType ch\PlatForm,HIT_MAP
+	EntityPickMode ch\PlatForm,2
 	
 	Return ch
 End Function
 
 Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
-	Local ch.Chunk, ch2.Chunk, chp.ChunkPart, ChunkPartAmount2%
-	Local ChunkHideDistance% = 120
-	Local temp% = False, temp2% = False
-	Local x#,z#,i%,y#,CurrChunkX#,CurrChunkZ#
-	Local obj%
+	Local ch.Chunk,StrTemp$,i%,x#,z#,ch2.Chunk,y#,n.NPCs,j%
+	Local ChunkX#,ChunkZ#,ChunkMaxDistance#=3*40
 	
-	For ch = Each Chunk
-		;If Distance(EntityX(Collider),EntityZ(Collider),ch\x,ch\z)<ChunkHideDistance
-		;	;If ch\obj <> 0 Then ShowEntity ch\obj
-		;	If ch\obj[0]<>0
-		;		For i = 0 To ch\Amount
-		;			ShowEntity ch\obj[i]
-		;		Next
-		;	EndIf
-		;Else
-		;	;If ch\obj <> 0 Then HideEntity ch\obj
-		;	If ch\obj[0]<>0
-		;		For i = 0 To ch\Amount
-		;			HideEntity ch\obj[i]
-		;		Next
-		;	EndIf
-		;EndIf
-		If ch\obj[0]<>0
-			For i = 0 To ch\Amount
-				If (Not ch\objShown[i])
-				ShowEntity ch\obj[i]
-					ch\objShown[i]=True
-				EndIf
-			Next
-		EndIf
-		y# = ch\y
-		If Abs(EntityX(Collider)-ch\x)<20
-			If Abs(EntityZ(Collider)-ch\z)<20
-				CurrChunkX# = ch\x
-				CurrChunkZ# = ch\z
-			EndIf
-		EndIf
-	Next
+	ChunkX# = Int(EntityX(Collider)/40)
+	ChunkZ# = Int(EntityZ(Collider)/40)
 	
-	;CurrChunkX# = Int(EntityX(Collider)/40)*40
-	;CurrChunkZ# = Int(EntityZ(Collider)/40)*40
+	y# = EntityY(PlayerRoom\obj)
+	x# = -ChunkMaxDistance#+(ChunkX*40)
+	z# = -ChunkMaxDistance#+(ChunkZ*40)
 	
-	x# = -(ChunkHideDistance+(CurrChunkX#))
-	z# = -(ChunkHideDistance+(CurrChunkZ#))
-	
-	Local StrTemp$ = ""
-	For i = 1 To Len(RandomSeed)
-		StrTemp = StrTemp+Asc(Mid(RandomSeed,i,1))
-	Next
-	SeedRnd Abs(Int(StrTemp))
+	Local CurrChunkData% = 0, MaxChunks% = GetINIInt("Data\1499chunks.INI","general","count")
 	
 	Repeat
-		temp2% = False
+		Local chunkfound% = False
 		For ch = Each Chunk
-			If (ch\x=x#) And (ch\z=z#)
-				temp2% = True
-				Exit
+			If ch\x# = x#
+				If ch\z# = z#
+					chunkfound% = True
+					Exit
+				EndIf
 			EndIf
 		Next
-		If (Not temp2%)
-			;ch2 = CreateChunk(r\Objects[Rand(1,ChunkPartAmount%)],x#,y#,z#)
-			ChunkPartAmount2 = GetINIInt("Data\1499chunks.INI","general","count")
-			ch2 = CreateChunk(Rand(0,ChunkPartAmount2),x#,y#,z#,spawnNPCs%)
+		If (Not chunkfound)
+			CurrChunkData = CHUNKDATA(Abs(((x+32)/40) Mod 64),Abs(((z+32)/40) Mod 64))
+			;ch2 = CreateChunk(Rand(0,GetINIInt("Data\1499chunks.INI","general","count")),x#,y#,z#)
+			ch2 = CreateChunk(CurrChunkData%,x#,y#,z#)
+			ch2\IsSpawnChunk = False
 		EndIf
-		If x# < (ChunkHideDistance+(CurrChunkX#))
-			x# = x# + 40
+		x#=x#+40.0
+		If x# > (ChunkMaxDistance#+(ChunkX*40))
+			z#=z#+40.0
+			x# = -ChunkMaxDistance#+(ChunkX*40)
+		EndIf
+	Until z# > (ChunkMaxDistance#+(ChunkZ*40))
+	
+	For ch = Each Chunk
+		If DebugHUD
+			ShowEntity ch\ChunkPivotDebug
 		Else
-			If z# < (ChunkHideDistance+(CurrChunkZ#))
-				x# = -(ChunkHideDistance+(CurrChunkX#))
-				z# = z# + 40
-			Else
-				Exit
+			HideEntity ch\ChunkPivotDebug
+		EndIf
+		If (Not ch\IsSpawnChunk)
+			If Distance(EntityX(Collider),EntityZ(Collider),EntityX(ch\ChunkPivot),EntityZ(ch\ChunkPivot))>ChunkMaxDistance
+				FreeEntity ch\ChunkPivot
+				Delete ch
 			EndIf
 		EndIf
-	Forever
+	Next
 	
-	SeedRnd MilliSecs()
+	Local currNPCNumb% = 0
+	For n = Each NPCs
+		If n\NPCtype = NPCtype1499
+			currNPCNumb% = currNPCNumb% + 1
+		EndIf
+	Next
+	
+	Local MaxNPCs% = 64 ;<---- the maximum amount of NPCs in dimension1499
+	
+	If currNPCNumb < MaxNPCs
+		Select Rand(1,8)
+			Case 1
+				n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(40,80),EntityY(PlayerRoom\obj)+0.5,EntityZ(Collider)+Rnd(40,80))
+			Case 2
+				n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(40,80),EntityY(PlayerRoom\obj)+0.5,EntityZ(Collider)+Rnd(-40,40))
+			Case 3
+				n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(40,80),EntityY(PlayerRoom\obj)+0.5,EntityZ(Collider)+Rnd(-40,-80))
+			Case 4
+				n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(-40,40),EntityY(PlayerRoom\obj)+0.5,EntityZ(Collider)+Rnd(-40,-80))
+			Case 5
+				n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(-40,-80),EntityY(PlayerRoom\obj)+0.5,EntityZ(Collider)+Rnd(-40,-80))
+			Case 6
+				n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(-40,-80),EntityY(PlayerRoom\obj)+0.5,EntityZ(Collider)+Rnd(-40,40))
+			Case 7
+				n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(-40,-80),EntityY(PlayerRoom\obj)+0.5,EntityZ(Collider)+Rnd(40,80))
+			Case 8
+				n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(-40,40),EntityY(PlayerRoom\obj)+0.5,EntityZ(Collider)+Rnd(40,80))
+		End Select
+		If Rand(2)=1 Then n\State2 = 500*3
+		n\Angle = Rnd(360)
+	Else
+		For n = Each NPCs
+			If n\NPCtype = NPCtype1499
+				If EntityDistance(n\Collider,Collider)>ChunkMaxDistance Or EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5
+					;This will be updated like this so that new NPCs can spawn for the player
+					RemoveNPC(n)
+				EndIf
+			EndIf
+		Next
+	EndIf
 	
 End Function
 
@@ -7782,12 +7814,9 @@ Function HideChunks()
 	Local ch.Chunk,i
 	
 	For ch = Each Chunk
-		;If ch\obj <> 0 Then HideEntity ch\obj
-		If ch\obj[0]<>0
-			For i = 0 To ch\Amount
-				HideEntity ch\obj[i]
-				ch\objShown[i]=False
-			Next
+		If (Not ch\IsSpawnChunk)
+			FreeEntity ch\ChunkPivot
+			Delete ch
 		EndIf
 	Next
 	
@@ -7799,6 +7828,10 @@ Function DeleteChunks()
 	Delete Each ChunkPart
 	
 End Function
+
+;#########################################################################
+;END CHUNKS
+;#########################################################################
 
 Type ElevatorObj
 	Field obj%

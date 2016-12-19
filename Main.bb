@@ -1302,6 +1302,8 @@ Function UpdateConsole()
 					StrTemp3$ = Piece$(args$,3," ")
 					PositionEntity Collider,Float(StrTemp$),Float(StrTemp2$),Float(StrTemp3$)
 					PositionEntity Camera,Float(StrTemp$),Float(StrTemp2$),Float(StrTemp3$)
+					ResetEntity Collider
+					ResetEntity Camera
 					CreateConsoleMsg("Teleported to coordinates (X|Y|Z): "+EntityX(Collider)+"|"+EntityY(Collider)+"|"+EntityZ(Collider))
 					;[End Block]
 				Case "notarget"
@@ -2788,7 +2790,7 @@ Repeat
 		
 		DrawHandIcon = False
 		
-		If FPSfactor > 0 Then UpdateSecurityCams()
+		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
 		
 		If KeyHit(KEY_INV) And VomitTimer >= 0 Then 
 			If InvOpen Then
@@ -2874,20 +2876,26 @@ Repeat
 			MouseLook()
 			MovePlayer()
 			InFacility = CheckForPlayerInFacility()
-			UpdateDoors()
-			If QuickLoadPercent = -1 Or QuickLoadPercent = 100
-				UpdateEvents()
+			If PlayerRoom\RoomTemplate\Name = "dimension1499"
+				If QuickLoadPercent = -1 Or QuickLoadPercent = 100
+					UpdateDimension1499()
+				EndIf
+				UpdateLeave1499()
+			Else
+				UpdateDoors()
+				If QuickLoadPercent = -1 Or QuickLoadPercent = 100
+					UpdateEvents()
+				EndIf
+				UpdateScreens()
+				TimeCheckpointMonitors()
+				Update294()
+				UpdateRoomLights(Camera)
 			EndIf
 			UpdateDecals()
 			UpdateMTF()
 			UpdateNPCs()
 			UpdateItems()
 			UpdateParticles()
-			UpdateScreens()
-			UpdateRoomLights(Camera)
-			Update294()
-			TimeCheckpointMonitors()
-			UpdateLeave1499()
 			;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
 			UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
 			If UpdateParticles_Time#=1
@@ -3576,12 +3584,12 @@ Function QuickLoadEvents()
 					If e\EventState = 0.0
 						If e\EventStr = "load0"
 							QuickLoadPercent = 10
-							e\room\Objects[0] = CreatePlane()
+							e\room\Objects[0] = LoadMesh_Strict("GFX\map\dimension1499\1499plane.b3d")
 							Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
+							ScaleTexture planetex%,0.5,0.5
 							EntityTexture e\room\Objects[0],planetex%
 							FreeTexture planetex%
-							PositionEntity e\room\Objects[0],0,EntityY(e\room\obj),0
-							EntityType e\room\Objects[0],HIT_MAP
+							HideEntity e\room\Objects[0]
 							e\EventStr = "load1"
 						ElseIf e\EventStr = "load1"
 							QuickLoadPercent = 30
@@ -3602,8 +3610,11 @@ Function QuickLoadEvents()
 								x# = EntityX(e\room\obj)
 								z# = EntityZ(e\room\obj)
 								Local ch.Chunk
-								For i = -2 To 2 Step 2
-									ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
+								For i = -2 To 0 Step 2
+									ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#,True)
+								Next
+								For i = -2 To 0 Step 2
+									ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#-40,True)
 								Next
 								e\EventState = 2.0
 								e\EventStr = 18
@@ -4582,6 +4593,14 @@ Function DrawGUI()
 					offset = offset + 1
 				EndIf
 			Next
+			If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
+				AAText x + 350, 50, "Current Chunk X/Z: ("+(Int(EntityX(Collider)/40)*20)+", "+(Int(EntityZ(Collider)/40)*20)+")"
+				Local CH_Amount% = 0
+				For ch.Chunk = Each Chunk
+					CH_Amount = CH_Amount + 1
+				Next
+				AAText x+ 350, 70, "Current Chunk Amount: "+CH_Amount
+			EndIf
 			
 			AASetFont Font1
 		EndIf
@@ -7486,6 +7505,8 @@ Function LoadEntities()
 	ParticleTextures(7) = LoadTexture_Strict("GFX\spark.jpg", 1 + 2)
 	ParticleTextures(8) = LoadTexture_Strict("GFX\particle.png", 1 + 2)
 	
+	SetChunkDataValues()
+	
 	;NPCtypeD - different models with different textures (loaded using "CopyEntity") - ENDSHN
 	;[Block]
 	For i=1 To MaxDTextures
@@ -9507,13 +9528,13 @@ Function Inverse#(number#)
 	
 End Function
 
-Function Rnd_Array(numb1#,numb2#,Array1#,Array2#)
+Function Rnd_Array#(numb1#,numb2#,Array1#,Array2#)
 	Local whatarray% = Rand(1,2)
 	
 	If whatarray% = 1
-		Return Rnd(numb1#,Array1#)
+		Return Rnd(Array1#,numb1#)
 	Else
-		Return Rnd(Array2#,numb2#)
+		Return Rnd(numb2#,Array2#)
 	EndIf
 	
 End Function

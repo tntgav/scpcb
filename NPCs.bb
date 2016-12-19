@@ -606,7 +606,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "speed") / 100.0) * Rnd(0.9,1.1)
-			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 6.0) * Rnd(0.8,1.0)
+			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
 			
 			ScaleEntity n\obj, temp, temp, temp
 			
@@ -4251,7 +4251,7 @@ Function UpdateNPCs()
 				
 				prevFrame# = n\Frame
 				
-				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*2
+				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*3
 					If n\State = 0 Or n\State = 2
 						For n2.NPCs = Each NPCs
 							If n2\NPCtype = n\NPCtype And n2 <> n
