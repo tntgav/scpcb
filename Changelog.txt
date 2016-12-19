@@ -1,22 +1,28 @@
 ﻿v1.3.4
+- Added an OpenAL wrapper created by Mirage Labs.
 - Added bump mapping and texture LOD selection.
 - Added syringes.
 - Added new SCP-294 drinks.
 - Added a vomit parameter to SCP-294.
-- New battery textures (by Cridone).
+- New battery textures.
 - Leaving the name field blank when creating a new game now sets the game name to "untitled".
-- The options menu is now saved when the "esc" key is pressed to unpause the game.
+- Any changes to the player's options from the pause menu are now saved when the "esc" key is pressed to unpause the game.
+- Class-D/Scientist textures are now pre-loaded into memory, optimi.
+- Changed the theme that plays inside SCP-1499's dimension.
+- Added a theme to SCP-914's containment chamber.
 
 Bug Fixes:
-- Fixed collsion issues with structures in SCP-1499's dimension.
-- Fixed visual bugs relating to the disabling of seconday lights.
+- Fixed collsion issues with the structures in SCP-1499's dimension.
+- Tweaked SCP-860-2's spawning logic and fixed a bug that made it unable to attack the player while they are moving.
+- Fixed visual bugs relating to the disabling of secondary lights.
 - Fixed a bug that caused SCP-1048 drawings acquired via SCP-1162 to not work.
 - Fixed the framelimit value resetting itself to large values after quitting the game.
 - Fixed the eyedrops texture using the strange bottle texture.
 - Fixed the gas mask in room2closets having a reduced size.
 - Fixed the maintenance tunnels not generating based on the selected seed.
-- Fixed a button in room2shaft being placed inside a wall.
+- Repositioned a button in room2shaft that was being placed inside a wall.
 - Fixed the floating buttons in room2closets.
+- Fixed bugs relating to the "spawn" console command.
 
 ----------------------------------------------------------------------------------
 

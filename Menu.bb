@@ -1820,22 +1820,6 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			txt = txt + "Setting it too high or low can cause the graphics to look less detailed."
 		Case "texquality"
 			txt = Chr(34)+"Texture LOD Bias"+Chr(34)+" affects the distance at which texture detail will change to prevent aliasing. Change this option if textures flicker or look too blurry."
-		Case "resquality"
-			txt = Chr(34)+"Resolution quality"+Chr(34)+" adjusts the resolution at which the game will render."
-			txt2 = "The game will render at "
-			Select value
-				Case 0
-					R = 255
-					txt2 = txt2 + "33% "
-				Case 1
-					R = 255
-					G = 255
-					txt2 = txt2 + "50% "
-				Case 2
-					G = 255
-					txt2 = txt2 + "100% (default) "
-			End Select
-			txt2 = txt2 + "of the current resolution."
 		Case "particleamount"
 			txt = "Determines the amount of particles that can be rendered per tick."
 			Select value

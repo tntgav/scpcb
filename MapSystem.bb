@@ -1098,7 +1098,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 	;detail meshes
 	;fr\DetailMesh[0]=LoadMesh_strict("GFX\map\forest\detail\860_1_tree1.b3d")
 	;fr\DetailMesh[1]=LoadMesh_strict("GFX\map\forest\detail\860_1_tree1_leaves.b3d")
-	fr\DetailMesh[1]=LoadMesh_Strict("GFX\map\forest\detail\treetest4.b3d");1.b3d")
+	fr\DetailMesh[1]=LoadMesh_Strict("GFX\map\forest\detail\treetest4.b3d");1.b3d)
 	;EntityParent fr\DetailMesh[1],fr\DetailMesh[0]
 	fr\DetailMesh[2]=LoadMesh_Strict("GFX\map\forest\detail\rock.b3d")
 	fr\DetailMesh[3]=LoadMesh_Strict("GFX\map\forest\detail\rock2.b3d")
@@ -7901,7 +7901,10 @@ End Function
 
 
 
+
 ;~IDEal Editor Parameters:
 ;~F#2#A
 ;~B#122B
 ;~C#Blitz3D
+
+

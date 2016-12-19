@@ -691,8 +691,9 @@ Function UpdateConsole()
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Spawns an NPC at the player's location.")
 							CreateConsoleMsg("Valid parameters are:")
-							CreateConsoleMsg("049 / zombie (049-2) / 096 / 106 / 173 / 513-1")
-							CreateConsoleMsg("/ 966 / 1499-1 / guard / mtf")
+							CreateConsoleMsg("008zombie / 049 / 049-2 / 066 / 096 / 106 / 173")
+							CreateConsoleMsg("/ 178-1 / 372 / 513-1 / 966 / 1499-1 / class-d")
+							CreateConsoleMsg("/ guard / mtf / apache / tentacle")
 							CreateConsoleMsg("******************************")
 						Case "revive","undead","resurrect"
 							CreateConsoleMsg("HELP - revive")
@@ -1155,10 +1156,16 @@ Function UpdateConsole()
 				Case "spawn"
 					;[Block]
 					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					StrTemp$ = Piece$(args$,1," ")
-					StrTemp2$ = Piece$(args$,2," ")
-					Console_SpawnNPC(StrTemp$,Int(StrTemp2$))
-					;[End Block]
+					StrTemp$ = Piece$(args$, 1)
+					StrTemp2$ = Piece$(args$, 2)
+					
+					;Hacky fix for when the user doesn't input a second parameter.
+					If (StrTemp <> StrTemp2) Then
+						Console_SpawnNPC(StrTemp, StrTemp2)
+					Else
+						Console_SpawnNPC(StrTemp)
+					EndIf
+
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
 				Case "infinitestamina","infstam"
 					;[Block]
@@ -9974,7 +9981,6 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 	PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 	PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
-	PutINIValue(OptionFile, "options", "res details", ResolutionDetails)
 	PutINIValue(OptionFile, "options", "particle amount", ParticleAmount)
 	
 	PutINIValue(OptionFile, "audio", "music volume", MusicVolume)

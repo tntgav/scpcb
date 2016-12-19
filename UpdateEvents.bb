@@ -2074,9 +2074,11 @@ Function UpdateEvents()
 						EndIf
 
 						;Helicopter spots or player is within range. --> Start shooting.
-						If ((EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) Or EntityVisible(e\room\NPC[0]\Collider,Collider)) And e\room\NPC[1]\State <> 1
-							e\room\NPC[1]\State = 1
-							e\room\NPC[1]\State3 = 1
+						If (e\room\NPC[1]\State <> 1) Then
+							If ((EntityDistance(e\room\NPC[1]\Collider,Collider) < 15.0) Or EntityVisible(e\room\NPC[0]\Collider,Collider)) Then
+								e\room\NPC[1]\State = 1
+								e\room\NPC[1]\State3 = 1
+							EndIf
 						EndIf
 						
 						;Below roof or inside catwalk. --> Stop shooting.
