@@ -7865,18 +7865,6 @@ Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
 	
 End Function
 
-
-
-
-
-
-
-
-
-;~IDEal Editor Parameters:
-;~F#2#A
-;~B#122B
-;~C#Blitz3D
 Function AddLightCones(room.Rooms)
 	Local i
 	
@@ -7908,4 +7896,15 @@ Function AddLightCones(room.Rooms)
 End Function
 
 
-
+
+
+
+
+
+
+;~IDEal Editor Parameters:
+;~F#2#A
+;~B#122B
+;~C#Blitz3D
+
+

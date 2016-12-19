@@ -1,4 +1,5 @@
 ﻿v1.3.4
+- Added an OpenAL wrapper created by Mirage Labs.
 - Added bump mapping and texture LOD selection.
 - Added syringes.
 - Added new SCP-294 drinks.
@@ -6,9 +7,13 @@
 - New battery textures.
 - Leaving the name field blank when creating a new game now sets the game name to "untitled".
 - Any changes to the player's options from the pause menu are now saved when the "esc" key is pressed to unpause the game.
+- Class-D/Scientist textures are now pre-loaded into memory, optimi.
+- Changed the theme that plays inside SCP-1499's dimension.
+- Added a theme to SCP-914's containment chamber.
 
 Bug Fixes:
 - Fixed collsion issues with the structures in SCP-1499's dimension.
+- Tweaked SCP-860-2's spawning logic and fixed a bug that made it unable to attack the player while they are moving.
 - Fixed visual bugs relating to the disabling of secondary lights.
 - Fixed a bug that caused SCP-1048 drawings acquired via SCP-1162 to not work.
 - Fixed the framelimit value resetting itself to large values after quitting the game.
