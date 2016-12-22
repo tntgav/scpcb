@@ -6359,7 +6359,7 @@ Function UpdateEvents()
 				If PlayerRoom = e\room Then
 					
 					If e\EventState = 0 Then
-						Music(4) = LoadSound_Strict("SFX\Music\079.ogg")
+						;Music(4) = LoadSound_Strict("SFX\Music\079.ogg")
 						e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True)+0.5, EntityZ(e\room\Objects[2],True))
 						PointEntity e\room\NPC[0]\Collider, e\room\obj
 						RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider),0, True
