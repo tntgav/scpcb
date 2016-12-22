@@ -1839,8 +1839,10 @@ Global LightConeModel
 
 Global ParticleEffect[10]
 
-Const MaxDTextures=5
+Const MaxDTextures=6
 Global DTextures[MaxDTextures]
+
+Global NPC049OBJ, NPC0492OBJ
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2896,6 +2898,7 @@ Repeat
 			;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
 			UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
 			If UpdateParticles_Time#=1
+				UpdateDevilEmitters()
 				UpdateParticles_Devil()
 				UpdateParticles_Time#=0
 			EndIf
@@ -7530,6 +7533,17 @@ Function LoadEntities()
 	tex = LoadTexture("GFX\npcs\janitor.jpg")
 	EntityTexture DTextures[5],tex
 	FreeTexture tex
+	tex = LoadTexture("GFX\npcs\106victim.jpg")
+	EntityTexture DTextures[6],tex
+	FreeTexture tex
+	;[End Block]
+	
+	;Other NPCs pre-loaded
+	;[Block]
+	NPC049OBJ = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
+	HideEntity NPC049OBJ
+	NPC0492OBJ = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+	HideEntity NPC0492OBJ
 	;[End Block]
 	
 	LoadMaterials("DATA\materials.ini")
@@ -7563,20 +7577,48 @@ Function LoadEntities()
 	SetTemplateColors(ParticleEffect[0], $0000FF, $6565FF)
 	SetTemplateFloor(ParticleEffect[0], 0.0, 0.5)
 	
+	;Smoke effect (for some vents)
 	ParticleEffect[1] = CreateTemplate()
 	SetTemplateEmitterBlend(ParticleEffect[1], 1)
-	SetTemplateInterval(ParticleEffect[1], 2)
-	SetTemplateEmitterLifeTime(ParticleEffect[1], -1)
+	SetTemplateInterval(ParticleEffect[1], 1)
+	SetTemplateEmitterLifeTime(ParticleEffect[1], 3)
 	SetTemplateParticleLifeTime(ParticleEffect[1], 30, 45)
 	SetTemplateTexture(ParticleEffect[1], "GFX\smoke2.png", 2, 1)
 	;SetTemplateOffset(ParticleEffect[1], -.3, .3, -.3, .3, -.3, .3)
 	SetTemplateOffset(ParticleEffect[1], -0.1, 0.1, -0.1, 0.1, -0.1, 0.1)
 	;SetTemplateVelocity(ParticleEffect[1], -.04, .04, .1, .2, -.04, .04)
-	SetTemplateVelocity(ParticleEffect[1], -0.02, 0.02, 0.025, 0.03, -0.02, 0.02)
+	SetTemplateVelocity(ParticleEffect[1], -0.005, 0.005, 0.02, 0.025, -0.005, 0.005)
 	SetTemplateAlphaVel(ParticleEffect[1], True)
 	;SetTemplateSize(ParticleEffect[1], 3, 3, .5, 1.5)
 	SetTemplateSize(ParticleEffect[1], 0.45, 0.45, 0.5, 1.5)
 	SetTemplateSizeVel(ParticleEffect[1], .01, 1.01)
+	
+	;Smoke effect (for decontamination gas)
+	ParticleEffect[2] = CreateTemplate()
+	SetTemplateEmitterBlend(ParticleEffect[2], 1)
+	SetTemplateInterval(ParticleEffect[2], 1)
+	SetTemplateEmitterLifeTime(ParticleEffect[2], 3)
+	SetTemplateParticleLifeTime(ParticleEffect[2], 30, 45)
+	SetTemplateTexture(ParticleEffect[2], "GFX\smoke.png", 2, 1)
+	SetTemplateOffset(ParticleEffect[2], -0.1, 0.1, -0.1, 0.1, -0.1, 0.1)
+	SetTemplateVelocity(ParticleEffect[2], -0.005, 0.005, 0.0, -0.03, -0.005, 0.005)
+	SetTemplateAlphaVel(ParticleEffect[2], True)
+	SetTemplateSize(ParticleEffect[2], 0.4, 0.4, 0.5, 1.5)
+	SetTemplateSizeVel(ParticleEffect[2], .01, 1.01)
+	SetTemplateGravity(ParticleEffect[2], 0.005)
+	t0 = CreateTemplate()
+	SetTemplateEmitterBlend(t0, 1)
+	SetTemplateInterval(t0, 1)
+	SetTemplateEmitterLifeTime(t0, 3)
+	SetTemplateParticleLifeTime(t0, 30, 45)
+	SetTemplateTexture(t0, "GFX\smoke2.png", 2, 1)
+	SetTemplateOffset(t0, -0.1, 0.1, -0.1, 0.1, -0.1, 0.1)
+	SetTemplateVelocity(t0, -0.005, 0.005, 0.0, -0.03, -0.005, 0.005)
+	SetTemplateAlphaVel(t0, True)
+	SetTemplateSize(t0, 0.4, 0.4, 0.5, 1.5)
+	SetTemplateSizeVel(t0, .01, 1.01)
+	SetTemplateGravity(ParticleEffect[2], 0.005)
+	SetTemplateSubTemplate(ParticleEffect[2], t0)
 	
 	DrawLoading(30)
 	
@@ -8232,7 +8274,13 @@ Function PauseSounds()
 		If d\soundchn <> 0 Then
 			If ChannelPlaying(d\soundchn) Then PauseChannel(d\soundchn)
 		EndIf
-	Next	
+	Next
+	
+	For dem.DevilEmitters = Each DevilEmitters
+		If dem\soundchn <> 0 Then
+			If ChannelPlaying(dem\soundchn) Then PauseChannel(dem\soundchn)
+		EndIf
+	Next
 	
 	If AmbientSFXCHN <> 0 Then
 		If ChannelPlaying(AmbientSFXCHN) Then PauseChannel(AmbientSFXCHN)
@@ -8266,7 +8314,13 @@ Function ResumeSounds()
 		If d\soundchn <> 0 Then
 			If ChannelPlaying(d\soundchn) Then ResumeChannel(d\soundchn)
 		EndIf
-	Next	
+	Next
+	
+	For dem.DevilEmitters = Each DevilEmitters
+		If dem\soundchn <> 0 Then
+			If ChannelPlaying(dem\soundchn) Then ResumeChannel(dem\soundchn)
+		EndIf
+	Next
 	
 	If AmbientSFXCHN <> 0 Then
 		If ChannelPlaying(AmbientSFXCHN) Then ResumeChannel(AmbientSFXCHN)

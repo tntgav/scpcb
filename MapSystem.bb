@@ -1846,6 +1846,12 @@ Function FillRoom(r.Rooms)
 			em\SizeChange = 0.007
 			em\Achange = -0.006
 			em\Gravity = -0.24
+			
+			;This needs more work
+			;dem.DevilEmitters = CreateDevilEmitter(r\x-175.0*RoomScale,r\y+370.0*RoomScale,r\z+656.0*RoomScale,r,2)
+			;dem\isDeconGas = True
+			;dem.DevilEmitters = CreateDevilEmitter(r\x-655.0*RoomScale,r\y+370.0*RoomScale,r\z+240.0*RoomScale,r,2)
+			;dem\isDeconGas = True
 			;[End Block]
 		Case "lockroom2"
 			;[Block]
@@ -3555,8 +3561,8 @@ Function FillRoom(r.Rooms)
 				EntityParent(r\Objects[i], r\obj)
 			Next
 			
-			;3384,510,2490
-			CreateDevilEmitter(r\x+3384.0*RoomScale,r\y+510.0*RoomScale,r\z+2490.0*RoomScale,r,1)
+			;3384,510,2480
+			CreateDevilEmitter(r\x+3384.0*RoomScale,r\y+510.0*RoomScale,r\z+2480.0*RoomScale,r,1)
 			
 			;[End Block]
 		Case "room2scps"

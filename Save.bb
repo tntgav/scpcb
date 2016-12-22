@@ -1,5 +1,4 @@
 
-
 Function SaveGame(file$)
 	CatchErrors("Uncaught (SaveGame)")
 	If Not Playable Then Return ;don't save if the player can't move at all
@@ -653,6 +652,7 @@ Function LoadGame(file$)
 		n\TextureID = ReadInt(f)
 		If n\TextureID > 0
 			ChangeNPCTextureID(n.NPCs,n\TextureID-1)
+			SetAnimTime(n\obj,frame)
 		EndIf
 	Next
 	
@@ -1341,6 +1341,7 @@ Function LoadGameQuick(file$)
 		n\TextureID = ReadInt(f)
 		If n\TextureID > 0
 			ChangeNPCTextureID(n.NPCs,n\TextureID-1)
+			SetAnimTime(n\obj,frame)
 		EndIf
 	Next
 	

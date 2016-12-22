@@ -7549,10 +7549,11 @@ Function UpdateEvents()
 							If e\room\NPC[0]=Null Then
 								e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\obj), 900.0*RoomScale, EntityZ(e\room\obj))
 								RotateEntity e\room\NPC[0]\Collider, 0, Rnd(360), 0, True
-								tex=LoadTexture("GFX\NPCs\106victim.jpg")
-								e\room\NPC[0]\texture = "GFX\NPCs\106victim.jpg"
-								EntityTexture e\room\NPC[0]\obj, tex
-								FreeTexture tex
+								;tex=LoadTexture("GFX\NPCs\106victim.jpg")
+								;e\room\NPC[0]\texture = "GFX\NPCs\106victim.jpg"
+								;EntityTexture e\room\NPC[0]\obj, tex
+								;FreeTexture tex
+								ChangeNPCTextureID(n,5)
 								e\room\NPC[0]\State=6
 								
 								PlaySound_Strict HorrorSFX(0)

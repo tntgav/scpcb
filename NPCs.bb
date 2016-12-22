@@ -287,7 +287,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
-			n\obj = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
+			;n\obj = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
+			n\obj = CopyEntity(NPC049OBJ)
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-049", "speed") / 100.0)
 			
@@ -307,15 +308,16 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
 			
-			For n2.NPCs = Each NPCs
-				If n\NPCtype = n2\NPCtype And n<>n2 Then
-					n\obj = CopyEntity (n2\obj)
-					Exit
-				EndIf
-			Next
+			;For n2.NPCs = Each NPCs
+			;	If n\NPCtype = n2\NPCtype And n<>n2 Then
+			;		n\obj = CopyEntity (n2\obj)
+			;		Exit
+			;	EndIf
+			;Next
 			
 			If n\obj = 0 Then 
-				n\obj = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+				;n\obj = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+				n\obj = CopyEntity(NPC0492OBJ)
 				
 				temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-049-2", "scale") / 2.5)
 				ScaleEntity n\obj, temp, temp, temp
