@@ -167,6 +167,34 @@ Function FreeSound_Strict(sndHandle%)
 	EndIf
 End Function
 
+Function StreamSound_Strict(file$, volume#)
+	If FileType(file) <> 1 Then
+		CreateConsoleMsg("Sound " + Chr(34) + file + Chr(34) + " not found.")
+		If ConsoleOpening Then
+			ConsoleOpen = True
+		EndIf
+		
+		Return 0
+	EndIf
+	
+	Local chn% = alCreateSource(file,True,False)
+	
+	If chn%=0 Then	
+		CreateConsoleMsg("Failed to stream sound " + Chr(34) + file + Chr(34) + ".")
+		If ConsoleOpening Then
+			ConsoleOpen = True
+		EndIf
+		
+		Return 0
+	EndIf
+	
+	alSourcePlay2D(chn%,True)
+	alSourceSetLoop(chn%,True)
+	alSourceSetVolume(chn%,volume)
+	
+	Return chn%
+End Function
+
 Function LoadMesh_Strict(File$,parent=0)
 	If FileType(File$) <> 1 Then RuntimeError "3D Mesh " + File$ + " not found."
 	tmp = LoadMesh(File$, parent)

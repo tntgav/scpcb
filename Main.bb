@@ -20,7 +20,7 @@ EndIf
 Include "StrictLoads.bb"
 Include "fullscreen_window_fix.bb"
 Include "KeyName.bb"
-Include "BlitzAl.bb"
+Include "BlitzAL.bb"
 
 Global OptionFile$ = "options.ini"
 
@@ -1561,11 +1561,8 @@ Music(22) = "914"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = PlaySound_Strict(Music(2))
-Global MusicCHN% = alCreateSource_("SFX\Music\"+Music(2)+".ogg",True,False)
-alSourcePlay2D_(MusicCHN,True)
-alSourceSetLoop(MusicCHN,True)
-alSourceSetVolume(MusicCHN, MusicVolume)
-;ChannelVolume(MusicCHN, MusicVolume)
+Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume)
+
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
 Global CurrMusic% = 1
 
@@ -8188,19 +8185,15 @@ Function UpdateMusic()
 			EndIf
 		;EndIf
 		
-		If NowPlaying < 66 Then
-			;If MusicCHN = 0 Then
+			If NowPlaying < 66 Then
 			If CurrMusic = 0
-				MusicCHN% = alCreateSource_("SFX\Music\"+Music(NowPlaying)+".ogg",True,False)
-				alSourcePlay2D_(MusicCHN,True)
-				alSourceSetLoop(MusicCHN,True)
+				MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",MusicVolume)
 				CurrMusic = 1
-				;alSourceSetLoop(MusicCHN,True)
 			Else
 				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
 			EndIf
 			
-			If alSourceIsPlaying(MusicCHN)
+			If alSourceIsPlaying(MusicCHN) Then
 				alSourceSetVolume(MusicCHN, CurrMusicVolume)
 			EndIf
 		EndIf
