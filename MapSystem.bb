@@ -3958,10 +3958,6 @@ Function FillRoom(r.Rooms)
 			EntityPickMode r\Objects[9],2
 			
 			r\Objects[10] = LoadMesh_Strict("GFX\map\intro_labels.b3d",r\obj)
-			
-			;-325,130,1175
-			CreateDevilEmitter(r\x-325.0*RoomScale,r\y+130.0*RoomScale,r\z+1175.0*RoomScale,r,1)
-			
 			;[End Block]
 		Case "room2ccont"
 			;[Block]
