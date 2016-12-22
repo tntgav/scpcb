@@ -5210,11 +5210,9 @@ Function UpdateMTFUnit(n.NPCs)
 								n\PathStatus = 0
 								n\Target = n2
 								DebugLog "049 spotted :"+n\State2
-								;If n\MTFLeader=Null
-								;	If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-								;	n\Sound = LoadSound_Strict("SFX\Character\MTF\
-								;	PlayMTFSound(n\Sound, n)
-								;EndIf
+								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+								n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Spotted"+Rand(1,5)+".ogg")
+								PlayMTFSound(n\Sound, n)
 								Exit
 							EndIf
 						EndIf
@@ -5539,11 +5537,9 @@ Function UpdateMTFUnit(n.NPCs)
 								n\PathStatus = 0
 								n\Target = n2
 								DebugLog "049 spotted :"+n\State2
-								;If n\MTFLeader=Null
-								;	If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-								;	n\Sound = LoadSound_Strict("SFX\Character\MTF\
-								;	PlayMTFSound(n\Sound, n)
-								;EndIf
+								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+								n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Spotted"+Rand(1,5)+".ogg")
+								PlayMTFSound(n\Sound, n)
 								Exit
 							EndIf
 						EndIf
