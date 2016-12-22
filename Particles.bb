@@ -194,7 +194,37 @@ Function CreateEmitter.Emitters(x#, y#, z#, emittertype%)
 	Return e
 		
 End Function
+
+Type DevilEmitters
+	Field obj%
+	Field x#,y#,z#
+	Field ParticleID%
+	Field room.Rooms
+	Field emitter.Emitter
+End Type
+
+Function CreateDevilEmitter.DevilEmitters(x#, y#, z#, room.Rooms, particleID%)
+	Local dem.DevilEmitters = New DevilEmitters
+	Local em.Emitter
 	
+	dem\obj = CreatePivot()
+	PositionEntity dem\obj,x#,y#,z#,True
+	dem\x = x#
+	dem\y = y#
+	dem\z = z#
+	EntityParent dem\obj,room\obj
+	dem\room = room
+	dem\ParticleID = particleID
+	Local ent% = SetEmitter(dem\obj,ParticleEffect[1])
+	For em = Each Emitter
+		If em\ent = ent%
+			dem\emitter = em
+			Exit
+		EndIf
+	Next
+	
+	Return dem
+End Function
 	
 
 ;~IDEal Editor Parameters:

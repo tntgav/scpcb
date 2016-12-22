@@ -3555,6 +3555,9 @@ Function FillRoom(r.Rooms)
 				EntityParent(r\Objects[i], r\obj)
 			Next
 			
+			;3384,510,2490
+			CreateDevilEmitter(r\x+3384.0*RoomScale,r\y+510.0*RoomScale,r\z+2490.0*RoomScale,r,1)
+			
 			;[End Block]
 		Case "room2scps"
 			;[Block]
@@ -3953,6 +3956,12 @@ Function FillRoom(r.Rooms)
 			r\Objects[9] = LoadMesh_Strict("GFX\map\173_2.b3d",r\obj)
 			EntityType r\Objects[9],HIT_MAP
 			EntityPickMode r\Objects[9],2
+			
+			r\Objects[10] = LoadMesh_Strict("GFX\map\intro_labels.b3d",r\obj)
+			
+			;-325,130,1175
+			CreateDevilEmitter(r\x-325.0*RoomScale,r\y+130.0*RoomScale,r\z+1175.0*RoomScale,r,1)
+			
 			;[End Block]
 		Case "room2ccont"
 			;[Block]
