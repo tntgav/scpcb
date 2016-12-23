@@ -13,7 +13,7 @@
 - Added Devil Particle System by bytecode77 for better particle effects
 
 Bug Fixes:
-- Fixed collsion issues with the structures in SCP-1499's dimension.
+- Fixed collision issues with the structures in SCP-1499's dimension.
 - Fixed some errors with the chunk mechanics within SCP-1499's dimension (chunks can now be spawned to infinity).
 - Tweaked SCP-860-2's spawning logic and fixed a bug that made it unable to attack the player while they are moving.
 - Fixed visual bugs relating to the disabling of secondary lights.

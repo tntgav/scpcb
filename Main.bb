@@ -6643,19 +6643,19 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Texture LOD Bias:")
 					TextureDetails = Slider5(x+270*MenuScale,y+6*MenuScale,100*MenuScale,TextureDetails,3,"0.8","0.4","0.0","-0.4","-0.8")
-							Select TextureDetails%
-								Case 0
+					Select TextureDetails%
+						Case 0
 							TextureFloat# = 0.8
-								Case 1
-									TextureFloat# = 0.4
-								Case 2
+						Case 1
+							TextureFloat# = 0.4
+						Case 2
 							TextureFloat# = 0.0
-								Case 3
-									TextureFloat# = -0.4
+						Case 3
+							TextureFloat# = -0.4
 						Case 4
 							TextureFloat# = -0.8
-							End Select
-							TextureLodBias TextureFloat
+					End Select
+					TextureLodBias TextureFloat
 					If (MouseOn(x+270*MenuScale,y-6*MenuScale,100*MenuScale+14,20) And OnSliderID=0) Or OnSliderID=3
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
