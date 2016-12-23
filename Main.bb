@@ -7585,12 +7585,12 @@ Function LoadEntities()
 	SetTemplateParticleLifeTime(ParticleEffect[1], 30, 45)
 	SetTemplateTexture(ParticleEffect[1], "GFX\smoke2.png", 2, 1)
 	;SetTemplateOffset(ParticleEffect[1], -.3, .3, -.3, .3, -.3, .3)
-	SetTemplateOffset(ParticleEffect[1], -0.1, 0.1, -0.1, 0.1, -0.1, 0.1)
+	SetTemplateOffset(ParticleEffect[1], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 	;SetTemplateVelocity(ParticleEffect[1], -.04, .04, .1, .2, -.04, .04)
-	SetTemplateVelocity(ParticleEffect[1], -0.005, 0.005, 0.02, 0.025, -0.005, 0.005)
+	SetTemplateVelocity(ParticleEffect[1], 0.0, 0.0, 0.02, 0.025, 0.0, 0.0)
 	SetTemplateAlphaVel(ParticleEffect[1], True)
 	;SetTemplateSize(ParticleEffect[1], 3, 3, .5, 1.5)
-	SetTemplateSize(ParticleEffect[1], 0.45, 0.45, 0.5, 1.5)
+	SetTemplateSize(ParticleEffect[1], 0.4, 0.4, 0.5, 1.5)
 	SetTemplateSizeVel(ParticleEffect[1], .01, 1.01)
 	
 	;Smoke effect (for decontamination gas)
@@ -8102,6 +8102,8 @@ Function NullGame()
 	DeleteChunks()
 	
 	DeleteElevatorObjects()
+	
+	DeleteDevilEmitters()
 	
 	NoTarget% = False
 	

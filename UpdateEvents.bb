@@ -4789,11 +4789,12 @@ Function UpdateEvents()
 						ElseIf e\EventState-FPSfactor =< 70*15 Then ;walk to the doorway
 							If e\EventState > 70*15 Then
 								e\room\NPC[0]\State=3
-								e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0], EntityX(e\room\Objects[8],True),0.5,EntityZ(e\room\Objects[8],True))
+								;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0], EntityX(e\room\Objects[8],True),0.5,EntityZ(e\room\Objects[8],True))
+								e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0], EntityX(Curr096\Collider,True),0.4,EntityZ(Curr096\Collider,True))
 								e\room\NPC[0]\PathTimer=300
 							EndIf
 						ElseIf e\EventState<70*20 Then
-							If e\room\NPC[0]\PathStatus=0 Then  
+							If e\room\NPC[0]\PathStatus=0 Then
 								e\room\RoomDoors[2]\open = False
 								
 								e\room\NPC[0]\State=7
@@ -4818,6 +4819,7 @@ Function UpdateEvents()
 									e\room\NPC[0]\State=3
 									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0], EntityX(e\room\obj,True),0.4,EntityZ(e\room\obj,True))
 									e\room\NPC[0]\PathTimer=300
+									e\room\NPC[0]\Speed = e\room\NPC[0]\Speed*1.8 ;Making the guard walking a bit faster
 								EndIf
 							EndIf
 						EndIf
