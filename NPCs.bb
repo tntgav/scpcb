@@ -6,7 +6,7 @@ Const NPCtype173% = 1, NPCtypeOldMan% = 2, NPCtypeGuard% = 3, NPCtypeD% = 4
 Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
 Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtype178% = 17, NPCtypePdPlane% = 18
-Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21, NPCtype008% = 22
+Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21, NPCtype008% = 22, NPCtypeClerk% = 23
 
 Type NPCs
 	Field obj%, obj2%, obj3%, obj4%, Collider%
@@ -633,6 +633,22 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			SetNPCFrame n,9
 			
 			n\Sound = LoadSound_Strict("SFX\SCP\049\0492Breath.ogg")
+			;[End Block]
+		Case NPCtypeClerk
+			;[Block]
+			n\NVName = "Human"
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(ClerkOBJ)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(ClerkOBJ), -MeshHeight(ClerkOBJ), -MeshDepth(ClerkOBJ), MeshWidth(ClerkOBJ)*2, MeshHeight(ClerkOBJ)*2, MeshDepth(ClerkOBJ)*2)
 			;[End Block]
 	End Select
 	
@@ -2574,7 +2590,7 @@ Function UpdateNPCs()
 				UpdateMTFUnit(n)
 				
 				;[End Block]
-			Case NPCtypeD 	;------------------------------------------------------------------------------------------------------------------
+			Case NPCtypeD,NPCtypeClerk 	;------------------------------------------------------------------------------------------------------------------
 				;[Block]
 				RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
 				
@@ -2628,6 +2644,8 @@ Function UpdateNPCs()
 				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
 				
 				RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider)-180.0, 0
+				
+				n\Frame = AnimTime(n\obj)
 				;[End Block]
 			Case NPCtype5131
 				;[Block}
@@ -6669,6 +6687,10 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 		Case "tentacle"
 			n.NPCs = CreateNPC(NPCtypeTentacle, EntityX(Collider), EntityY(Collider), EntityZ(Collider))
 			consoleMSG = "SCP-035 tentacle spawned."
+			
+		Case "clerk"
+			n.NPCs = CreateNPC(NPCtypeClerk, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Clerk spawned."
 			
 		Default 
 			CreateConsoleMsg("NPC type not found.", 255, 0, 0) : Return

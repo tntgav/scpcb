@@ -1843,6 +1843,7 @@ Const MaxDTextures=6
 Global DTextures[MaxDTextures]
 
 Global NPC049OBJ, NPC0492OBJ
+Global ClerkOBJ
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -7544,6 +7545,8 @@ Function LoadEntities()
 	HideEntity NPC049OBJ
 	NPC0492OBJ = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
 	HideEntity NPC0492OBJ
+	ClerkOBJ = LoadAnimMesh_Strict("GFX\npcs\clerk.b3d")
+	HideEntity ClerkOBJ
 	;[End Block]
 	
 	LoadMaterials("DATA\materials.ini")
