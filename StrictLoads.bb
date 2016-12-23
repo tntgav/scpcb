@@ -188,7 +188,7 @@ Function StreamSound_Strict(file$, volume#)
 		Return 0
 	EndIf
 	
-	alSourcePlay2D(chn%,True)
+	alSourcePlay(chn%,True)
 	alSourceSetLoop(chn%,True)
 	alSourceSetVolume(chn%,volume)
 	

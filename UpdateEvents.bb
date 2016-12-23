@@ -1580,10 +1580,6 @@ Function UpdateEvents()
 								
 								e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\RoomDoors[0]\obj,True), 0.5, EntityZ(e\room\RoomDoors[0]\obj,True))
 								
-								;tex = LoadTexture_Strict("GFX\npcs\janitor.jpg")
-								;e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
-								;EntityTexture e\room\NPC[0]\obj, tex
-								;FreeTexture tex
 								ChangeNPCTextureID(e\room\NPC[0],4)
 								
 								PointEntity e\room\NPC[0]\Collider, e\room\obj
@@ -3430,14 +3426,7 @@ Function UpdateEvents()
 					
 					de.Decals = CreateDecal(3, EntityX(e\room\Objects[0],True), 0.0005, EntityZ(e\room\Objects[0],True),90,Rnd(360),0)
 					
-;					de.Decals = CreateDecal(17, EntityX(e\room\Objects[0],True), 0.002, EntityZ(e\room\Objects[0],True),90,Rnd(360),0)
-;					de\size = 0.5
-					
 					e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True), 0.5, EntityZ(e\room\Objects[0],True))
-					;e\room\NPC[0]\texture = "GFX\NPCs\gonzales.jpg"
-					;tex = LoadTexture_Strict(e\room\NPC[0]\texture)
-					;EntityTexture(e\room\NPC[0]\obj, tex)
-					;FreeTexture tex
 					ChangeNPCTextureID(e\room\NPC[0],0)
 					
 					RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\obj)-80,0, True	
@@ -7554,11 +7543,7 @@ Function UpdateEvents()
 							If e\room\NPC[0]=Null Then
 								e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\obj), 900.0*RoomScale, EntityZ(e\room\obj))
 								RotateEntity e\room\NPC[0]\Collider, 0, Rnd(360), 0, True
-								;tex=LoadTexture("GFX\NPCs\106victim.jpg")
-								;e\room\NPC[0]\texture = "GFX\NPCs\106victim.jpg"
-								;EntityTexture e\room\NPC[0]\obj, tex
-								;FreeTexture tex
-								ChangeNPCTextureID(n,5)
+								ChangeNPCTextureID(e\room\NPC[0],5)
 								e\room\NPC[0]\State=6
 								
 								PlaySound_Strict HorrorSFX(0)
@@ -9036,6 +9021,7 @@ End Function
 
 
 
+
 ;~IDEal Editor Parameters:
-;~B#1486#2189
+;~B#147B#217A
 ;~C#Blitz3D

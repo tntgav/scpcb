@@ -7051,6 +7051,13 @@ Function RotateToDirection(n.NPCs)
 End Function
 
 Function ChangeNPCTextureID(n.NPCs,textureid%)
+	If (n=Null) Then
+		CreateConsoleMsg("Tried to change the texture of an invalid NPC")
+		If ConsoleOpening Then
+			ConsoleOpen = True
+		EndIf
+		Return
+	EndIf
 	
 	n\TextureID = textureid%+1
 	FreeEntity n\obj

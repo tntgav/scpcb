@@ -3403,11 +3403,7 @@ Function QuickLoadEvents()
 							If e\room\NPC[0]=Null Then
 								e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True),EntityY(e\room\Objects[0],True),EntityZ(e\room\Objects[0],True))
 							EndIf
-							;e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
-							;tex = LoadTexture_Strict(e\room\NPC[0]\texture)
-							;
-							;EntityTexture e\room\NPC[0]\obj, tex
-							;FreeTexture tex
+							
 							ChangeNPCTextureID(e\room\NPC[0],4)
 							e\EventStr = "load1"
 						ElseIf e\EventStr = "load1"
@@ -3423,11 +3419,7 @@ Function QuickLoadEvents()
 							If e\room\NPC[1]=Null Then
 								e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1],True),EntityY(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
 							EndIf
-							;e\room\NPC[1]\texture = "GFX\npcs\scientist.jpg"
-							;tex = LoadTexture_Strict(e\room\NPC[1]\texture)
-							;EntityTexture e\room\NPC[1]\obj, tex
-							;
-							;FreeTexture tex
+							
 							ChangeNPCTextureID(e\room\NPC[1],2)
 							e\EventStr = "load4"
 						ElseIf e\EventStr = "load4"
