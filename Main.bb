@@ -4586,13 +4586,16 @@ Function DrawGUI()
 					offset = offset + 1
 				EndIf
 			Next
+			
 			If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
-				AAText x + 350, 50, "Current Chunk X/Z: ("+(Int(EntityX(Collider)/40)*20)+", "+(Int(EntityZ(Collider)/40)*20)+")"
+				AAText x + 350, 50, "Current Chunk X/Z: ("+(Int((EntityX(Collider)+20)/40))+", "+(Int((EntityZ(Collider)+20)/40))+")"
 				Local CH_Amount% = 0
 				For ch.Chunk = Each Chunk
 					CH_Amount = CH_Amount + 1
 				Next
-				AAText x+ 350, 70, "Current Chunk Amount: "+CH_Amount
+				AAText x + 350, 70, "Current Chunk Amount: "+CH_Amount
+			Else
+				AAText x + 350, 50, "Current Room Position: ("+PlayerRoom\x+", "+PlayerRoom\y+", "+PlayerRoom\z+")"
 			EndIf
 			
 			AASetFont Font1
