@@ -2644,8 +2644,6 @@ Function UpdateNPCs()
 				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
 				
 				RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider)-180.0, 0
-				
-				n\Frame = AnimTime(n\obj)
 				;[End Block]
 			Case NPCtype5131
 				;[Block}
