@@ -1,4 +1,12 @@
-﻿v1.3.4
+﻿v1.3.5
+Bug Fixes:
+- Fixed a lightmap bug with the props in the medibay room.
+- Removed the "fullbright" flag from the syringe model.
+- Fixed an animation bug with the clerk NPC at the tesla gates.
+
+----------------------------------------------------------------------------------
+
+v1.3.4
 - Added an OpenAL wrapper created by Mirage Labs.
 - Added bump mapping and texture LOD selection.
 - Added syringes.
@@ -10,7 +18,9 @@
 - Class-D/Scientist textures are now pre-loaded into memory, optimi.
 - Changed the theme that plays inside SCP-1499's dimension.
 - Added a theme to SCP-914's containment chamber.
-- Added Devil Particle System by bytecode77 for better particle effects
+- Added Devil Particle System by bytecode77 for better particle effects.
+- Added lines for the MTF Units when they encounter SCP-049.
+- Added signs above the doors in the intro room and a new line for Ulgrin before he opens the player's door.
 
 Bug Fixes:
 - Fixed collision issues with the structures in SCP-1499's dimension.
@@ -25,7 +35,8 @@ Bug Fixes:
 - Repositioned a button in room2shaft that was being placed inside a wall.
 - Fixed the floating buttons in room2closets.
 - Fixed bugs relating to the "spawn" console command.
-- Fixed teleportation bug with the "tele X Y Z" command
+- Fixed teleportation bug with the "tele X Y Z" command.
+- Fixed a clipping bug with the floor in SCP-1123's room.
 
 ----------------------------------------------------------------------------------
 
