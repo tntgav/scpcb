@@ -6988,8 +6988,6 @@ Function UpdateEvents()
 			Case "room1123"
 				;[Block]
 				If PlayerRoom = e\room Then
-					GiveAchievement(Achv1123)
-					
 					;the event is started when the player picks up SCP-1123 (in Items.bb/UpdateItems())
 					
 					If e\EventState = 1 Then
@@ -7186,6 +7184,8 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 						Next
+						
+						GiveAchievement(Achv1123)
 						
 						RemoveNPC(e\room\NPC[0])
 						RemoveEvent(e)						
