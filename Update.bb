@@ -555,9 +555,20 @@ Function Download(link$, savepath$ = "", savefile$ = "", latest$="")
 	End Select
 End Function
 
+Global UpdaterBG
+
+Type ChangeLogLines
+	Field txt$
+End Type
+
+Global UpdaterIMG
+Global LinesAmount% = 0
+
 Function CheckForUpdates()
 	
 	;If GetINIInt(OptionFile,"box_of_horrors","check for updates")=False Then Return
+	
+	AppTitle "SCP - Containment Breach Updater"
 	
 	Local delExe$
 	delExe=StripPath(GetINIString(OptionFile,"updater","old_exe"))
@@ -604,7 +615,7 @@ Function CheckForUpdates()
 	
 	If latest<>VersionNumber And latest<>"" Then ;a new version is available!
 		updateCheck% = OpenRemoteFile("http://www.scpcbgame.com/index.html")
-	
+		
 		If updateCheck=0 Then Return ;remote file couldn't be opened
 		
 		DownloadURL$ = ""
@@ -621,11 +632,37 @@ Function CheckForUpdates()
 		
 		CloseRemoteFile(updateCheck)
 		
+		UpdaterBG = LoadImage_Strict("GFX\menu\updater.jpg")
+		UpdaterIMG = CreateImage(452,254)
+		
+		Local ChangeLogURL$ = "http://www.scpcbgame.com/changelog.txt"
+		Local ChangeLogFile = OpenRemoteFile(ChangeLogURL)
+		Local ChangeLogLineAmount% = 0
+		While Not EORF(ChangeLogFile)
+			l$ = ReadRemoteLine(ChangeLogFile)
+			If Left(l,5)<>"-----"
+				chl.ChangeLogLines = New ChangeLogLines
+				If l = "v"+latest
+					chl\txt$ = "NEW UPDATE: "+l
+				Else
+					chl\txt$ = l
+				EndIf
+				ChangeLogLineAmount = ChangeLogLineAmount + 1
+			Else
+				Exit
+			EndIf
+		Wend
+		CloseRemoteFile(ChangeLogFile)
+		
+		UpdaterFont = LoadFont("GFX\font\cour\Courier New.ttf",16,0,0,0)
+		
 		Repeat
 			SetBuffer BackBuffer()
 			Cls
 			Color 255,255,255
 			MouseHit1 = MouseHit(1)
+			MouseDown1 = MouseDown(1)
+			DrawImage UpdaterBG,0,0
 			If DownloadURL="" Then
 				Text 320,100,"A new version ("+latest+") is available!",True,False
 				Text 320,125,"However, a manual download is required",True,False
@@ -641,10 +678,51 @@ Function CheckForUpdates()
 					Exit
 				EndIf
 			Else
-				Text 320,100,"A new version ("+latest+") is available!",True,False
-				Text 320,125,"Would you like to download the update?",True,False
+				SetFont UpdaterFont
+				If ScrollMenuHeight > 13
+					If LinesAmount-13 > 13
+						Local y# = 200-(20*((ScrollMenuHeight)*ScrollBarY))
+					Else
+						y# = 200-(20*(((13+LinesAmount-26))*ScrollBarY))
+					EndIf
+					LinesAmount%=0
+					SetBuffer(ImageBuffer(UpdaterIMG))
+					DrawImage UpdaterBG,-20,-195
+					For chl.ChangeLogLines = Each ChangeLogLines
+						Color 0,0,0
+						If Right(chl\txt$,6) = "v"+latest
+							Color 200,0,0
+						EndIf
+						RowText2(chl\txt$,3,y#-195,430,254)
+						y# = y#+(20*GetLineAmount2(chl\txt$,430,254))
+						LinesAmount = LinesAmount + (GetLineAmount2(chl\txt$,430,254))
+					Next
+					SetBuffer BackBuffer()
+					DrawImage UpdaterIMG,20,195
+					Color 10,10,10
+					Rect 452,195,20,254,True
+					If LinesAmount-13 > 13
+						ScrollMenuHeight# = LinesAmount-13
+						ScrollBarY = DrawScrollBar(452,195,20,254,452,195+(254-ScrollMenuHeight)*ScrollBarY,20,ScrollMenuHeight,ScrollBarY,1)
+					Else
+						ScrollMenuHeight# = LinesAmount-(12+LinesAmount-26)
+						ScrollBarY = DrawScrollBar(452,195,20,254,452,195+(254-(13+LinesAmount-26))*ScrollBarY,20,Max((13+LinesAmount-26),20),ScrollBarY,1)
+					EndIf
+				Else
+					y# = 200
+					LinesAmount%=0
+					Color 0,0,0
+					For chl.ChangeLogLines = Each ChangeLogLines
+						RowText2(chl\txt$,20,y#,432,254)
+						y# = y#+(20*GetLineAmount2(chl\txt$,432,254))
+						LinesAmount = LinesAmount + (GetLineAmount2(chl\txt$,432,254))
+					Next
+					ScrollMenuHeight# = LinesAmount
+				EndIf
+				Color 255,255,255
 				
-				If DrawButton%(200, 240, 100, 20, "Yes", False, False, False) Then
+				SetFont Font1
+				If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 55, 100, 30, "UPDATE", False, False, False)
 					ConfirmDownload=True
 					Cls
 					Color 255,255,255
@@ -652,7 +730,9 @@ Function CheckForUpdates()
 					Flip
 					Delay 100
 					Exit
-				Else If DrawButton%(340, 240, 100, 20, "No", False, False, False) Then
+				EndIf
+				
+				If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50, 100, 30, "IGNORE", False, False, False)
 					Delay 100
 					Exit
 				EndIf
@@ -748,6 +828,9 @@ Function CheckForUpdates()
 			Return
 		EndIf
 	EndIf
+	Delete Each ChangeLogLines
+	If UpdaterIMG <> 0 Then FreeImage UpdaterIMG
+	
 End Function
 
 Function GetSelfEXEName$() ;use this to make the new version delete the old exe

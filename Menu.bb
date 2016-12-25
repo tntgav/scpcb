@@ -1023,6 +1023,8 @@ Function UpdateLauncher()
 	BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
 	CheckForUpdates()
 	
+	AppTitle "SCP - Containment Breach Launcher"
+	
 	Repeat
 		
 		;Cls
@@ -1679,6 +1681,55 @@ Function RowText(A$, X, Y, W, H, align% = 0, Leading#=1)
 	
 End Function
 
+Function RowText2(A$, X, Y, W, H, align% = 0, Leading#=1)
+	;Display A$ starting at X,Y - no wider than W And no taller than H (all in pixels).
+	;Leading is optional extra vertical spacing in pixels
+	
+	If H<1 Then H=2048
+	
+	Local LinesShown = 0
+	Local Height = StringHeight(A$) + Leading
+	Local b$
+	
+	While Len(A) > 0
+		Local space = Instr(A$, " ")
+		If space = 0 Then space = Len(A$)
+		Local temp$ = Left(A$, space)
+		Local trimmed$ = Trim(temp) ;we might ignore a final space 
+		Local extra = 0 ;we haven't ignored it yet
+		;ignore final space If doing so would make a word fit at End of Line:
+		If (StringWidth (b$ + temp$) > W) And (StringWidth (b$ + trimmed$) <= W) Then
+			temp = trimmed
+			extra = 1
+		EndIf
+		
+		If StringWidth (b$ + temp$) > W Then ;too big, so Print what will fit
+			If align Then
+				Text(X + W / 2 - (StringWidth(b) / 2), LinesShown * Height + Y, b)
+			Else
+				Text(X, LinesShown * Height + Y, b)
+			EndIf
+			
+			LinesShown = LinesShown + 1
+			b$=""
+		Else ;append it To b$ (which will eventually be printed) And remove it from A$
+			b$ = b$ + temp$
+			A$ = Right(A$, Len(A$) - (Len(temp$) + extra))
+		EndIf
+		
+		If ((LinesShown + 1) * Height) > H Then Exit ;the Next Line would be too tall, so leave
+	Wend
+	
+	If (b$ <> "") And((LinesShown + 1) <= H) Then
+		If align Then
+			Text(X + W / 2 - (StringWidth(b) / 2), LinesShown * Height + Y, b) ;Print any remaining Text If it'll fit vertically
+		Else
+			Text(X, LinesShown * Height + Y, b) ;Print any remaining Text If it'll fit vertically
+		EndIf
+	EndIf
+	
+End Function
+
 Function GetLineAmount(A$, W, H, Leading#=1)
 	;Display A$ starting at X,Y - no wider than W And no taller than H (all in pixels).
 	;Leading is optional extra vertical spacing in pixels
@@ -1702,6 +1753,44 @@ Function GetLineAmount(A$, W, H, Leading#=1)
 		EndIf
 		
 		If AAStringWidth (b$ + temp$) > W Then ;too big, so Print what will fit
+			
+			LinesShown = LinesShown + 1
+			b$=""
+		Else ;append it To b$ (which will eventually be printed) And remove it from A$
+			b$ = b$ + temp$
+			A$ = Right(A$, Len(A$) - (Len(temp$) + extra))
+		EndIf
+		
+		If ((LinesShown + 1) * Height) > H Then Exit ;the Next Line would be too tall, so leave
+	Wend
+	
+	Return LinesShown+1
+	
+End Function
+
+Function GetLineAmount2(A$, W, H, Leading#=1)
+	;Display A$ starting at X,Y - no wider than W And no taller than H (all in pixels).
+	;Leading is optional extra vertical spacing in pixels
+	
+	If H<1 Then H=2048
+	
+	Local LinesShown = 0
+	Local Height = StringHeight(A$) + Leading
+	Local b$
+	
+	While Len(A) > 0
+		Local space = Instr(A$, " ")
+		If space = 0 Then space = Len(A$)
+		Local temp$ = Left(A$, space)
+		Local trimmed$ = Trim(temp) ;we might ignore a final space 
+		Local extra = 0 ;we haven't ignored it yet
+		;ignore final space If doing so would make a word fit at End of Line:
+		If (StringWidth (b$ + temp$) > W) And (StringWidth (b$ + trimmed$) <= W) Then
+			temp = trimmed
+			extra = 1
+		EndIf
+		
+		If StringWidth (b$ + temp$) > W Then ;too big, so Print what will fit
 			
 			LinesShown = LinesShown + 1
 			b$=""
@@ -2056,8 +2145,128 @@ Function Slider5(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$,val5$)
 	
 End Function
 
+Global OnBar%
+Global ScrollBarY# = 0.0
+Global ScrollMenuHeight# = 0.0
+
+Function DrawScrollBar#(x, y, width, height, barx, bary, barwidth, barheight, bar#, dir = 0)
+	;0 = vaakasuuntainen, 1 = pystysuuntainen
+	
+	Local MouseSpeedX = MouseXSpeed()
+	Local MouseSpeedY = MouseYSpeed()
+	
+	Color(0, 0, 0)
+	;Rect(x, y, width, height)
+	Button(barx, bary, barwidth, barheight, "")
+	
+	If dir = 0 Then ;vaakasuunnassa
+		If height > 10 Then
+			Color 250,250,250
+			Rect(barx + barwidth / 2, bary + 5*MenuScale, 2*MenuScale, barheight - 10)
+			Rect(barx + barwidth / 2 - 3*MenuScale, bary + 5*MenuScale, 2*MenuScale, barheight - 10)
+			Rect(barx + barwidth / 2 + 3*MenuScale, bary + 5*MenuScale, 2*MenuScale, barheight - 10)
+		EndIf
+	Else ;pystysuunnassa
+		If width > 10 Then
+			Color 250,250,250
+			Rect(barx + 4*MenuScale, bary + barheight / 2, barwidth - 10*MenuScale, 2*MenuScale)
+			Rect(barx + 4*MenuScale, bary + barheight / 2 - 3*MenuScale, barwidth - 10*MenuScale, 2*MenuScale)
+			Rect(barx + 4*MenuScale, bary + barheight / 2 + 3*MenuScale, barwidth - 10*MenuScale, 2*MenuScale)
+		EndIf
+	EndIf
+	
+	;If MouseDown1 Then
+	;	If MouseX()>barx And MouseX()<barx+barwidth Then
+	;		If MouseY()>bary And MouseY()<bary+barheight Then
+	;			If dir = 0 Then
+	;				Return Min(Max(bar + MouseSpeedX / Float(width - barwidth), 0), 1)
+	;			Else
+	;				Return Min(Max(bar + MouseSpeedY / Float(height - barheight), 0), 1)
+	;			End If				
+	;		EndIf
+	;	EndIf
+	;End If
+	
+	If MouseX()>barx And MouseX()<barx+barwidth
+		If MouseY()>bary And MouseY()<bary+barheight
+			OnBar = True
+		Else
+			If (Not MouseDown1)
+				OnBar = False
+			EndIf
+		EndIf
+	Else
+		If (Not MouseDown1)
+			OnBar = False
+		EndIf
+	EndIf
+	
+	If MouseDown1
+		If OnBar
+			If dir = 0
+				Return Min(Max(bar + MouseSpeedX / Float(width - barwidth), 0), 1)
+			Else
+				Return Min(Max(bar + MouseSpeedY / Float(height - barheight), 0), 1)
+			EndIf
+		EndIf
+	EndIf
+	
+	Return bar
+	
+End Function
+
+Function Button%(x,y,width,height,txt$, disabled%=False)
+	Local Pushed = False
+	
+	Color 50, 50, 50
+	If Not disabled Then 
+		If MouseX() > x And MouseX() < x+width Then
+			If MouseY() > y And MouseY() < y+height Then
+				If MouseDown1 Then
+					Pushed = True
+					Color 50*0.6, 50*0.6, 50*0.6
+				Else
+					Color Min(50*1.2,255),Min(50*1.2,255),Min(50*1.2,255)
+				EndIf
+			EndIf
+		EndIf
+	EndIf
+	
+	If Pushed Then 
+		Rect x,y,width,height
+		Color 133,130,125
+		Rect x+1*MenuScale,y+1*MenuScale,width-1*MenuScale,height-1*MenuScale,False	
+		Color 10,10,10
+		Rect x,y,width,height,False
+		Color 250,250,250
+		Line x,y+height-1*MenuScale,x+width-1*MenuScale,y+height-1*MenuScale
+		Line x+width-1*MenuScale,y,x+width-1*MenuScale,y+height-1*MenuScale
+	Else
+		Rect x,y,width,height
+		Color 133,130,125
+		Rect x,y,width-1*MenuScale,height-1*MenuScale,False	
+		Color 250,250,250
+		Rect x,y,width,height,False
+		Color 10,10,10
+		Line x,y+height-1,x+width-1,y+height-1
+		Line x+width-1,y,x+width-1,y+height-1		
+	EndIf
+	
+	Color 255,255,255
+	If disabled Then Color 70,70,70
+	Text x+width/2, y+height/2-1*MenuScale, txt, True, True
+	
+	Color 0,0,0
+	
+	If Pushed And MouseHit1 Then PlaySound_Strict ButtonSFX : Return True
+End Function
+
+
+
 
 
 
 ;~IDEal Editor Parameters:
+;~F#33#499#4AB#4B5#4E8#5C3#5D6#5F3#5FA#615#629#64A#662#693#6C4#6EA#710#72D#73E#756
+;~F#764#787#79F#7A8#7D9#7ED#821#867#8A9
 ;~C#Blitz3D

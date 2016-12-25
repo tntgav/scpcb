@@ -1,5 +1,6 @@
 ﻿v1.3.5
 - Tweaked the SCP-914 refinery syste, for the Keycard Omni a bit
+- Updated the auto-updater overlay
 
 Bug Fixes:
 - Fixed a lightmap bug with the props in the medibay room.
