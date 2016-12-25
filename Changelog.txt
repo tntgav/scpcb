@@ -1,4 +1,6 @@
 ﻿v1.3.5
+- Tweaked the SCP-914 refinery syste, for the Keycard Omni a bit
+
 Bug Fixes:
 - Fixed a lightmap bug with the props in the medibay room.
 - Removed the "fullbright" flag from the syringe model.
@@ -21,6 +23,7 @@ v1.3.4
 - Added Devil Particle System by bytecode77 for better particle effects.
 - Added lines for the MTF Units when they encounter SCP-049.
 - Added signs above the doors in the intro room and a new line for Ulgrin before he opens the player's door.
+- Added room2C (a corner variant of the room3 room in LCZ)
 
 Bug Fixes:
 - Fixed collision issues with the structures in SCP-1499's dimension.

@@ -1165,7 +1165,7 @@ Function UpdateConsole()
 					Else
 						Console_SpawnNPC(StrTemp)
 					EndIf
-
+					;[End Block]
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
 				Case "infinitestamina","infstam"
 					;[Block]
@@ -1391,11 +1391,26 @@ Function UpdateConsole()
 						StrTemp$ = ""
 					EndIf
 					
-					If Int(StrTemp) > -1 And Int(StrTemp) <= 0 ;<--- This is the maximum ID of particles by Devil Particle system, will be increased after time - ENDSHN
+					If Int(StrTemp) > -1 And Int(StrTemp) <= 1 ;<--- This is the maximum ID of particles by Devil Particle system, will be increased after time - ENDSHN
 						SetEmitter(Collider,ParticleEffect[Int(StrTemp)])
 						CreateConsoleMsg("Spawned particle emitter with ID "+Int(StrTemp)+" at player's position.")
 					Else
 						CreateConsoleMsg("Particle emitter with ID "+Int(StrTemp)+" not found.",255,150,0)
+					EndIf
+					;[End Block]
+				Case "giveachievement"
+					;[Block]
+					If Instr(ConsoleInput, " ")<>0 Then
+						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					Else
+						StrTemp$ = ""
+					EndIf
+					
+					If Int(StrTemp)>=0 And Int(StrTemp)<MAXACHIEVEMENTS
+						Achievements(Int(StrTemp))=True
+						CreateConsoleMsg("Achievemt "+AchievementStrings(Int(StrTemp))+" unlocked.")
+					Else
+						CreateConsoleMsg("Achievement with ID "+Int(StrTemp)+" doesn't exist.",255,150,0)
 					EndIf
 					;[End Block]
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
@@ -8802,21 +8817,30 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 										EndIf
 								End Select
 							Case "Level 5 Key Card"	
+								Local CurrAchvAmount%=0
+								For i = 0 To MAXACHIEVEMENTS-1
+									If Achievements(i)=True
+										CurrAchvAmount=CurrAchvAmount+1
+									EndIf
+								Next
+								
+								DebugLog CurrAchvAmount
+								
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(500)=1 Then
+										If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*5))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(700)=1 Then
+										If Rand(0,((MAXACHIEVEMENTS-1)*7)-((CurrAchvAmount-1)*5))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(1000)=1 Then
+										If Rand(0,((MAXACHIEVEMENTS-1)*10)-((CurrAchvAmount-1)*5))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -8825,27 +8849,36 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						End Select
 					EndIf
 				Case "very fine"
+					CurrAchvAmount%=0
+					For i = 0 To MAXACHIEVEMENTS-1
+						If Achievements(i)=True
+							CurrAchvAmount=CurrAchvAmount+1
+						EndIf
+					Next
+					
+					DebugLog CurrAchvAmount
+					
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(500)=5 Then
+							If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*5))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case NORMAL
-							If Rand(700)=7 Then
+							If Rand(0,((MAXACHIEVEMENTS-1)*7)-((CurrAchvAmount-1)*5))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case HARD
-							If Rand(1000)=10 Then
+							If Rand(0,((MAXACHIEVEMENTS-1)*10)-((CurrAchvAmount-1)*5))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 					End Select
-			End Select			
+			End Select
 			
 			RemoveItem(item)
 		Case "Key Card Omni"
@@ -8870,9 +8903,9 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
-						it2 = CreateItem("Level 1 Key Card", "key1", x, y, z)	
+					it2 = CreateItem("Level 1 Key Card", "key1", x, y, z)	
 			    Case "fine", "very fine"
-			            it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+					it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 			End Select
 			RemoveItem(item)
 		Case "S-NAV 300 Navigator", "S-NAV 310 Navigator", "S-NAV Navigator", "S-NAV Navigator Ultimate"
