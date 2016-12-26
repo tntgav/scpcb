@@ -663,7 +663,7 @@ Function CheckForUpdates()
 			MouseHit1 = MouseHit(1)
 			MouseDown1 = MouseDown(1)
 			DrawImage UpdaterBG,0,0
-			If DownloadURL<>"" Then
+			If DownloadURL="" Then
 				SetFont UpdaterFont
 				Local y# = 200
 				Color 200,0,0

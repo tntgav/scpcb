@@ -316,15 +316,18 @@ Function UpdateEvents()
 								;StopChannel MusicCHN
 								CurrMusicVolume = 1.0
 								;MusicCHN = PlaySound_Strict(Music(13))
-								alSourceStop(MusicCHN)
-								alFreeSource(MusicCHN)
-								MusicCHN% = alCreateSource("SFX\Music\"+Music(13)+".ogg",True,False)
-								alSourcePlay(MusicCHN,True)
-								alSourceSetLoop(MusicCHN,True)
-								CurrMusic = 1
-								If alSourceIsPlaying%(MusicCHN)
-									alSourceSetVolume(MusicCHN, CurrMusicVolume)
-								EndIf
+								;alSourceStop(MusicCHN)
+								;alFreeSource(MusicCHN)
+								;MusicCHN% = alCreateSource("SFX\Music\"+Music(13)+".ogg",True,False)
+								;alSourcePlay(MusicCHN,True)
+								;alSourceSetLoop(MusicCHN,True)
+								;CurrMusic = 1
+								;If alSourceIsPlaying%(MusicCHN)
+								;	alSourceSetVolume(MusicCHN, CurrMusicVolume)
+								;EndIf
+								FMOD_Pause(MusicCHN)
+								FMOD_CloseStream(CurrMusicStream)
+								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,CurrMusicStream)
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
