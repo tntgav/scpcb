@@ -636,10 +636,12 @@ Function CheckForUpdates()
 		UpdaterIMG = CreateImage(452,254)
 		
 		Local ChangeLogURL$ = "http://www.scpcbgame.com/changelog.txt"
-		Local ChangeLogFile = OpenRemoteFile(ChangeLogURL)
+		Download(ChangeLogURL$,"","Changelog_Prev.txt",latest)
+		Local ChangeLogFile = OpenFile("Changelog_Prev.txt")
 		Local ChangeLogLineAmount% = 0
-		While Not EORF(ChangeLogFile)
-			l$ = ReadRemoteLine(ChangeLogFile)
+		
+		While Not Eof(ChangeLogFile)
+			l$ = ReadLine(ChangeLogFile)
 			If Left(l,5)<>"-----"
 				chl.ChangeLogLines = New ChangeLogLines
 				If l = "v"+latest
@@ -652,7 +654,8 @@ Function CheckForUpdates()
 				Exit
 			EndIf
 		Wend
-		CloseRemoteFile(ChangeLogFile)
+		CloseFile(ChangeLogFile)
+		DeleteFile("Changelog_Prev.txt")
 		
 		UpdaterFont = LoadFont("GFX\font\cour\Courier New.ttf",16,0,0,0)
 		
