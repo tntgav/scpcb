@@ -198,7 +198,11 @@ Function UpdateMainMenu()
 					txt = "QUIT"
 					If temp Then
 						;DeInitExt
-						alDestroy()
+						;alDestroy()
+						;FMOD_Pause(MusicCHN)
+						;FMOD_CloseStream(CurrMusicStream)
+						;FMOD_Close()
+						FMOD_StopStream(CurrMusicStream)
 						End
 					EndIf
 			End Select
@@ -2174,18 +2178,6 @@ Function DrawScrollBar#(x, y, width, height, barx, bary, barwidth, barheight, ba
 			Rect(barx + 4*MenuScale, bary + barheight / 2 + 3*MenuScale, barwidth - 10*MenuScale, 2*MenuScale)
 		EndIf
 	EndIf
-	
-	;If MouseDown1 Then
-	;	If MouseX()>barx And MouseX()<barx+barwidth Then
-	;		If MouseY()>bary And MouseY()<bary+barheight Then
-	;			If dir = 0 Then
-	;				Return Min(Max(bar + MouseSpeedX / Float(width - barwidth), 0), 1)
-	;			Else
-	;				Return Min(Max(bar + MouseSpeedY / Float(height - barheight), 0), 1)
-	;			End If				
-	;		EndIf
-	;	EndIf
-	;End If
 	
 	If MouseX()>barx And MouseX()<barx+barwidth
 		If MouseY()>bary And MouseY()<bary+barheight

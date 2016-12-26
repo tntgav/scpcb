@@ -663,28 +663,35 @@ Function CheckForUpdates()
 			MouseHit1 = MouseHit(1)
 			MouseDown1 = MouseDown(1)
 			DrawImage UpdaterBG,0,0
-			If DownloadURL="" Then
-				Text 320,100,"A new version ("+latest+") is available!",True,False
-				Text 320,125,"However, a manual download is required",True,False
-				Text 320,150,"to update the game.",True,False
+			If DownloadURL<>"" Then
+				SetFont UpdaterFont
+				Local y# = 200
+				Color 200,0,0
+				Text 20,y#,"NEW UPDATE: "+latest
+				Color 0,0,0
+				RowText2("However, a manual download is required to update the game.",20,y#+20,430,254)
 				
-				If DrawButton%(175, 240, 150, 20, "Visit website", False, False, False) Then
+				SetFont Font1
+				If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 110, 100, 30, "TRY AGAIN", False, False, False)
+					Delete Each ChangeLogLines
+					If UpdaterIMG <> 0 Then FreeImage UpdaterIMG
+					CheckForUpdates()
+					Return
+				EndIf
+				If DrawButton(LauncherWidth - 55 - 90, LauncherHeight - 50 - 55, 145, 30, "VISIT WEBSITE", False, False, False)
 					ExecFile("http://scpcbgame.com")
 					
 					Delay 100
 					End
-				Else If DrawButton%(340, 240, 100, 20, "Ignore", False, False, False) Then
+				EndIf
+				If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50, 100, 30, "IGNORE", False, False, False)
 					Delay 100
 					Exit
 				EndIf
 			Else
 				SetFont UpdaterFont
-				If ScrollMenuHeight > 13
-					If LinesAmount-13 > 13
-						Local y# = 200-(20*((ScrollMenuHeight)*ScrollBarY))
-					Else
-						y# = 200-(20*(((13+LinesAmount-26))*ScrollBarY))
-					EndIf
+				If LinesAmount > 13
+					y# = 200-(20*ScrollMenuHeight*ScrollBarY)
 					LinesAmount%=0
 					SetBuffer(ImageBuffer(UpdaterIMG))
 					DrawImage UpdaterBG,-20,-195
@@ -701,13 +708,8 @@ Function CheckForUpdates()
 					DrawImage UpdaterIMG,20,195
 					Color 10,10,10
 					Rect 452,195,20,254,True
-					If LinesAmount-13 > 13
-						ScrollMenuHeight# = LinesAmount-13
-						ScrollBarY = DrawScrollBar(452,195,20,254,452,195+(254-ScrollMenuHeight)*ScrollBarY,20,ScrollMenuHeight,ScrollBarY,1)
-					Else
-						ScrollMenuHeight# = LinesAmount-(12+LinesAmount-26)
-						ScrollBarY = DrawScrollBar(452,195,20,254,452,195+(254-(13+LinesAmount-26))*ScrollBarY,20,Max((13+LinesAmount-26),20),ScrollBarY,1)
-					EndIf
+					ScrollMenuHeight# = LinesAmount-13
+					ScrollBarY = DrawScrollBar(452,195,20,254,452,195+(254-(254-4*ScrollMenuHeight))*ScrollBarY,20,254-(4*ScrollMenuHeight),ScrollBarY,1)
 				Else
 					y# = 200
 					LinesAmount%=0
@@ -731,7 +733,6 @@ Function CheckForUpdates()
 					Delay 100
 					Exit
 				EndIf
-				
 				If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50, 100, 30, "IGNORE", False, False, False)
 					Delay 100
 					Exit

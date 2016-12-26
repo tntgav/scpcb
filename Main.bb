@@ -7,20 +7,19 @@
 ;In addition, you won't need FastExt.bb in the first place, making redistribution easier.
 
 Local InitErrorStr$ = ""
-If FileSize("BlitzAL.dll")=0 Then InitErrorStr=InitErrorStr+ "BlitzAl.dll"+Chr(13)+Chr(10)
+If FileSize("bb_fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "bb_fmod.dll"+Chr(13)+Chr(10)
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
-If FileSize("OpenAl32.dll")=0 Then InitErrorStr=InitErrorStr+ "OpenAl32.dll"+Chr(13)+Chr(10)
-If FileSize("wrap_oal.dll")=0 Then InitErrorStr=InitErrorStr+ "wrap_oal.dll"+Chr(13)+Chr(10)
 If FileSize("zlibwapi.dll")=0 Then InitErrorStr=InitErrorStr+ "zlibwapi.dll"+Chr(13)+Chr(10)
 
 If Len(InitErrorStr)>0 Then
 	RuntimeError "The following DLLs were not found in the game directory:"+Chr(13)+Chr(10)+Chr(13)+Chr(10)+InitErrorStr
 EndIf
 
+Include "FMod.bb"
+
 Include "StrictLoads.bb"
 Include "fullscreen_window_fix.bb"
 Include "KeyName.bb"
-Include "BlitzAL.bb"
 
 Global OptionFile$ = "options.ini"
 
@@ -210,7 +209,7 @@ Global CanSave% = True
 
 AppTitle "SCP - Containment Breach v"+VersionNumber
 
-alInitialise()
+;alInitialise()
 
 ;---------------------------------------------------------------------------------------------------------------------
 
@@ -1573,9 +1572,10 @@ Music(20) = "049Chase"
 Music(21) = "..\Ending\MenuBreath"
 Music(22) = "914"
 
+Global CurrMusicStream
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = PlaySound_Strict(Music(2))
-Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume)
+Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
 
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
 Global CurrMusic% = 1
@@ -2772,7 +2772,7 @@ Repeat
 	
 	If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
 	
-	alUpdate()
+	;alUpdate()
 	UpdateMusic()
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
@@ -8229,8 +8229,10 @@ Function UpdateMusic()
 				If CurrMusicVolume = 0 Then
 					;If MusicCHN <> 0 Then StopChannel MusicCHN
 					If NowPlaying<66
-						alSourceStop(MusicCHN)
-						alFreeSource(MusicCHN)
+						;alSourceStop(MusicCHN)
+						;alFreeSource(MusicCHN)
+						FMOD_Pause(MusicCHN)
+						FMOD_CloseStream(CurrMusicStream)
 					EndIf
 					NowPlaying = ShouldPlay
 					MusicCHN = 0
@@ -8243,15 +8245,16 @@ Function UpdateMusic()
 		
 			If NowPlaying < 66 Then
 			If CurrMusic = 0
-				MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",MusicVolume)
+				MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",MusicVolume,CurrMusicStream)
 				CurrMusic = 1
 			Else
 				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
 			EndIf
 			
-			If alSourceIsPlaying(MusicCHN) Then
-				alSourceSetVolume(MusicCHN, CurrMusicVolume)
-			EndIf
+			;If alSourceIsPlaying(MusicCHN) Then
+			;	alSourceSetVolume(MusicCHN, CurrMusicVolume)
+			;EndIf
+			FMOD_SetVolume(CurrMusicVolume*255.0,MusicCHN)
 		EndIf
 		
 		;ChannelVolume MusicCHN, CurrMusicVolume
