@@ -1,5 +1,5 @@
 ﻿v1.3.5
-- Tweaked the SCP-914 refinery syste, for the Keycard Omni a bit
+- Tweaked the SCP-914 refinery system for the Keycard Omni a bit
 - Updated the auto-updater overlay
 - Replaced OpenAL wrapper with fmod.dll library streaming
 
@@ -20,7 +20,7 @@ v1.3.4
 - New battery textures.
 - Leaving the name field blank when creating a new game now sets the game name to "untitled".
 - Any changes to the player's options from the pause menu are now saved when the "esc" key is pressed to unpause the game.
-- Class-D/Scientist textures are now pre-loaded into memory, optimi.
+- Class-D/Scientist textures are now pre-loaded into memory.
 - Changed the theme that plays inside SCP-1499's dimension.
 - Added a theme to SCP-914's containment chamber.
 - Added Devil Particle System by bytecode77 for better particle effects.
