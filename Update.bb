@@ -668,11 +668,41 @@ Function CheckForUpdates()
 			DrawImage UpdaterBG,0,0
 			If DownloadURL="" Then
 				SetFont UpdaterFont
-				Local y# = 200
-				Color 200,0,0
-				Text 20,y#,"NEW UPDATE: "+latest
+				If LinesAmount > 13
+					Local y# = 200-(20*ScrollMenuHeight*ScrollBarY)
+					LinesAmount%=0
+					SetBuffer(ImageBuffer(UpdaterIMG))
+					DrawImage UpdaterBG,-20,-195
+					For chl.ChangeLogLines = Each ChangeLogLines
+						Color 0,0,0
+						If Right(chl\txt$,6) = "v"+latest
+							Color 200,0,0
+						EndIf
+						RowText2(chl\txt$,2,y#-195,430,254)
+						y# = y#+(20*GetLineAmount2(chl\txt$,430,254))
+						LinesAmount = LinesAmount + (GetLineAmount2(chl\txt$,430,254))
+					Next
+					SetBuffer BackBuffer()
+					DrawImage UpdaterIMG,20,195
+					Color 10,10,10
+					Rect 452,195,20,254,True
+					ScrollMenuHeight# = LinesAmount-13
+					ScrollBarY = DrawScrollBar(452,195,20,254,452,195+(254-(254-4*ScrollMenuHeight))*ScrollBarY,20,254-(4*ScrollMenuHeight),ScrollBarY,1)
+				Else
+					y# = 200
+					LinesAmount%=0
+					Color 0,0,0
+					For chl.ChangeLogLines = Each ChangeLogLines
+						RowText2(chl\txt$,20,y#,432,254)
+						y# = y#+(20*GetLineAmount2(chl\txt$,432,254))
+						LinesAmount = LinesAmount + (GetLineAmount2(chl\txt$,432,254))
+					Next
+					ScrollMenuHeight# = LinesAmount
+				EndIf
+				Color 255,255,255
+				Rect(480, 200, 155, 95)
 				Color 0,0,0
-				RowText2("However, a manual download is required to update the game.",20,y#+20,430,254)
+				RowText2("However, a manual download is required to update the game.",482,210,150,90)
 				
 				SetFont Font1
 				If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 110, 100, 30, "TRY AGAIN", False, False, False)
@@ -703,7 +733,7 @@ Function CheckForUpdates()
 						If Right(chl\txt$,6) = "v"+latest
 							Color 200,0,0
 						EndIf
-						RowText2(chl\txt$,3,y#-195,430,254)
+						RowText2(chl\txt$,2,y#-195,430,254)
 						y# = y#+(20*GetLineAmount2(chl\txt$,430,254))
 						LinesAmount = LinesAmount + (GetLineAmount2(chl\txt$,430,254))
 					Next

@@ -5,8 +5,9 @@
 
 Bug Fixes:
 - Fixed a lightmap bug with the props in the medibay room.
-- Removed the "fullbright" flag from the syringe model.
 - Fixed an animation bug with the clerk NPC at the tesla gates.
+- Fixed a bug that caused the event of SCP-008's chamber to glitch out if SCP-173 was disabled/contained
+- Removed the "fullbright" flag from the syringe model.
 - Some fixes for the following rooms: room2offices4
 
 ----------------------------------------------------------------------------------
