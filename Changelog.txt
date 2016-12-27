@@ -1,17 +1,17 @@
 ﻿v1.3.5
-- Tweaked the SCP-914 refinery system for the keycards a bit
-- Updated the auto-updater overlay
-- Replaced OpenAL wrapper with fmod.dll library streaming
-- Increased SCP-173's speed slightly
+- Tweaked the SCP-914 refinery system for the keycards a bit.
+- Updated the auto-updater overlay.
+- Replaced OpenAL wrapper with fmod.dll library streaming.
+- Increased SCP-173's speed slightly.
 
 Bug Fixes:
 - Fixed a lightmap bug with the props in the medibay room.
 - Fixed an animation bug with the clerk NPC at the tesla gates.
-- Fixed a bug that caused the event of SCP-008's chamber to glitch out if SCP-173 was disabled/contained
-- Fixed a bug where multiple SCP-513-1 instances could be spawned
-- Fixed the sound playing of SCP-513 and the nostalgia items
+- Fixed a bug that caused the event of SCP-008's chamber to glitch out if SCP-173 was disabled/contained.
+- Fixed a bug where multiple SCP-513-1 instances could be spawned.
+- Fixed the sound playing of SCP-513 and the nostalgia items.
 - Removed the "fullbright" flag from the syringe model.
-- Some fixes for the following rooms: room2offices4
+- Some fixes for the following rooms: room2offices4.
 
 ----------------------------------------------------------------------------------
 
