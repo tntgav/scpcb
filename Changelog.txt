@@ -2,6 +2,7 @@
 - Tweaked the SCP-914 refinery system for the Keycard Omni a bit
 - Updated the auto-updater overlay
 - Replaced OpenAL wrapper with fmod.dll library streaming
+- Increased SCP-173's speed slightly
 
 Bug Fixes:
 - Fixed a lightmap bug with the props in the medibay room.
