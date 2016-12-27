@@ -4674,10 +4674,10 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 						Else If e\EventState=1
-							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 414, 543, 0.5, False)
-							If AnimTime(e\room\Objects[2])=543 Then e\EventState=2
+							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 1, 205, 0.5, False)
+							If AnimTime(e\room\Objects[2])=205 Then e\EventState=2
 						Else If e\EventState = 2
-							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 543, 692, 1.0)	
+							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 205, 353, 1.0)	
 							If (EntityDistance(Collider, e\room\Objects[2])<1.5) Then
 								DrawHandIcon = True
 								
@@ -7228,7 +7228,7 @@ Function UpdateEvents()
 							e\EventState = e\EventState * -1
 						EndIf
 						If e\room\Objects[7]<>0 Then
-							Animate2(e\room\Objects[7],AnimTime(e\room\Objects[7]),284,308,0.3)
+							Animate2(e\room\Objects[7],AnimTime(e\room\Objects[7]),284,295,0.3)
 							MoveEntity e\room\Objects[7],0,-0.008*FPSfactor,0
 							TFormPoint EntityX(e\room\Objects[7]),EntityY(e\room\Objects[7]),EntityZ(e\room\Objects[7]),0,e\room\obj
 							
