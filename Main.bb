@@ -5259,9 +5259,8 @@ Function DrawGUI()
 		
 		If SelectedItem <> Null Then
 			Select SelectedItem\itemtemplate\tempname
-					
-					;[Block]
 				Case "nvgoggles"
+					;[Block]
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
 					If WearingNightVision = 1 Then
 						Msg = "You removed the goggles."
@@ -5278,7 +5277,9 @@ Function DrawGUI()
 					WearingNightVision = (Not WearingNightVision)
 					SelectedItem = Null	
 					
+					;[End Block]
 				Case "supernv"
+					;[Block]
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
 					If WearingNightVision = 2 Then
 						Msg = "You removed the goggles."
@@ -5295,7 +5296,9 @@ Function DrawGUI()
 					WearingNightVision = (Not WearingNightVision) * 2
 					SelectedItem = Null	
 					
+					;[End Block]
 				Case "veryfinenvgoggles"
+					;[Block]
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
 					If WearingNightVision = 3 Then
 						Msg = "You removed the goggles."
@@ -5311,8 +5314,10 @@ Function DrawGUI()
 						
 					WearingNightVision = (Not WearingNightVision) * 3
 					SelectedItem = Null	
-
+					
+					;[End Block]
 				Case "scp178"
+					;[Block]
 					If Wearing178=1 Then
 						Msg = "You removed the glasses."
 						Wearing178 = 0
@@ -5327,7 +5332,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
+					;[End Block]
 				Case "scp1025"
+					;[Block]
 					;Achievements(Achv1025)=True 
 					If SelectedItem\itemtemplate\img = 0 Then
 						SelectedItem\state = Rand(0,5)
@@ -5341,7 +5348,9 @@ Function DrawGUI()
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
+					;[End Block]
 				Case "ring"
+					;[Block]
 					If Wearing714=2 Then
 						Msg = "You removed the ring."
 						Wearing714 = False
@@ -5354,7 +5363,9 @@ Function DrawGUI()
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
 					
+					;[End Block]
 				Case "1123"
+					;[Block]
 					If Not (Wearing714 = 1) Then
 						If PlayerRoom\RoomTemplate\Name <> "room1123" Then
 							ShowEntity Light
@@ -5380,26 +5391,26 @@ Function DrawGUI()
 						Next
 					EndIf
 					
+					;[End Block]
 				Case "battery"
+					;[Block]
 					;InvOpen = True
-
+					;[End Block]
 				Case "key1", "key2", "key3", "key4", "key5", "key6", "keyomni", "scp860", "hand", "hand2"
+					;[Block]
 					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					;[End Block]
 				Case "scp513"
-					PlaySound_Strict LoadTempSound("SFX\SCP\513\Bell"+Rand(1,3)+".ogg")
+					;[Block]
+					PlaySound_Strict LoadTempSound("SFX\SCP\513\Bell1.ogg")
 					
-					temp = True
-					For np.NPCs = Each NPCs
-						If np\NPCtype = NPCtype5131 Then
-							temp = False
-							Exit
-						EndIf
-					Next
-					If temp = True Then
-						CreateNPC(NPCtype5131, 0,0,0)
+					If Curr5131 = Null
+						Curr5131 = CreateNPC(NPCtype5131, 0,0,0)
 					EndIf	
 					SelectedItem = Null
+					;[End Block]
 				Case "scp500"
+					;[Block]
 					GiveAchievement(Achv500)
 					
 					If (Injuries > 0 Or Bloodloss > 0) And Infect > 0 Then
@@ -5423,7 +5434,9 @@ Function DrawGUI()
 					RemoveItem(SelectedItem)
 					SelectedItem = Null
 					
+					;[End Block]
 				Case "veryfinefirstaid"
+					;[Block]
 					Select Rand(5)
 						Case 1
 							Injuries = 3.5
@@ -5463,7 +5476,9 @@ Function DrawGUI()
 					End Select
 					
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "firstaid", "finefirstaid", "firstaid2"
+					;[Block]
 					If Bloodloss = 0 And Injuries = 0 Then
 						Msg = "You do not need to use a first aid right now."
 						MsgTimer = 70*5
@@ -5550,14 +5565,18 @@ Function DrawGUI()
 						EndIf
 						
 					EndIf
+					;[End Block]
 				Case "eyedrops"
+					;[Block]
 					If (Not (Wearing714=1)) Then
 						BlinkEffect = 0.6
 						BlinkEffectTimer = Rand(20,30)
 						BlurTimer = 200
 					EndIf
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "fineeyedrops"
+					;[Block]
 					If (Not (Wearing714=1)) Then 
 						BlinkEffect = 0.4
 						BlinkEffectTimer = Rand(30,40)
@@ -5565,7 +5584,9 @@ Function DrawGUI()
 						BlurTimer = 200
 					EndIf
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "supereyedrops"
+					;[Block]
 					If (Not (Wearing714 = 1)) Then
 						BlinkEffect = 0.0
 						BlinkEffectTimer = 60
@@ -5573,7 +5594,9 @@ Function DrawGUI()
 					EndIf
 					BlurTimer = 1000
 					RemoveItem(SelectedItem)					
+					;[End Block]
 				Case "paper", "ticket"
+					;[Block]
 					If SelectedItem\itemtemplate\img = 0 Then
 						Select SelectedItem\itemtemplate\name
 							Case "Burnt Note" 
@@ -5602,7 +5625,7 @@ Function DrawGUI()
 								If (SelectedItem\state = 0) Then
 									Msg = Chr(34)+"Hey, I remember this movie!"+Chr(34)
 									MsgTimer = 70*10
-									PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+									PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,5)+".ogg")
 									SelectedItem\state = 1
 								EndIf
 							Default 
@@ -5614,7 +5637,9 @@ Function DrawGUI()
 					EndIf
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
+					;[End Block]
 				Case "scp1025"
+					;[Block]
 					GiveAchievement(Achv1025) 
 					If SelectedItem\itemtemplate\img=0 Then
 						SelectedItem\state = Rand(0,5)
@@ -5628,7 +5653,9 @@ Function DrawGUI()
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
+					;[End Block]
 				Case "cup"
+					;[Block]
 					
 					SelectedItem\name = Trim(Lower(SelectedItem\name))
 					If Left(SelectedItem\name, Min(6,Len(SelectedItem\name))) = "cup of" Then
@@ -5689,7 +5716,9 @@ Function DrawGUI()
 					
 					SelectedItem = Null	
 					
+					;[End Block]
 				Case "syringe"
+					;[Block]
 					HealTimer = 30
 					StaminaEffect = 0.5
 					StaminaEffectTimer = 20
@@ -5699,7 +5728,9 @@ Function DrawGUI()
 					
 					RemoveItem(SelectedItem)
 					
+					;[End Block]
 				Case "finesyringe"
+					;[Block]
 					HealTimer = Rnd(20, 40)
 					StaminaEffect = Rnd(0.5, 0.8)
 					StaminaEffectTimer = Rnd(20, 30)
@@ -5709,7 +5740,9 @@ Function DrawGUI()
 					
 					RemoveItem(SelectedItem)
 					
+					;[End Block]
 				Case "veryfinesyringe"
+					;[Block]
 					Select Rand(3)
 						Case 1
 							HealTimer = Rnd(40, 60)
@@ -5727,7 +5760,9 @@ Function DrawGUI()
 					MsgTimer = 70 * 8
 					RemoveItem(SelectedItem)
 					
+					;[End Block]
 				Case "radio","18vradio","fineradio","veryfineradio"
+					;[Block]
 					If SelectedItem\state <= 100 Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.004)
 					
 					If SelectedItem\itemtemplate\img=0 Then
@@ -6030,7 +6065,9 @@ Function DrawGUI()
 						
 					EndIf
 					
+					;[End Block]
 				Case "cigarette"
+					;[Block]
 					If SelectedItem\state = 0 Then
 						Select Rand(6)
 							Case 1
@@ -6054,7 +6091,9 @@ Function DrawGUI()
 					EndIf
 
 					MsgTimer = 70 * 5
+					;[End Block]
 				Case "420"
+					;[Block]
 					If Wearing714=1 Then
 						Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
 					Else
@@ -6066,7 +6105,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "420s"
+					;[Block]
 					If Wearing714=1 Then
 						Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
 					Else
@@ -6078,7 +6119,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 6
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "scp714"
+					;[Block]
 					If Wearing714=1 Then
 						Msg = "You removed the ring."
 						Wearing714 = False
@@ -6089,13 +6132,17 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
+					;[End Block]
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
+					;[Block]
 					Msg = "You removed the hazmat suit."
 					WearingHazmat = 0
 					MsgTimer = 70 * 5
 					DropItem(SelectedItem)
 					SelectedItem = Null	
+					;[End Block]
 				Case "vest"
+					;[Block]
 					If WearingVest Then
 						Msg = "You removed the vest."
 						WearingVest = False
@@ -6106,7 +6153,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 7
 					SelectedItem = Null
+					;[End Block]
 				Case "finevest"
+					;[Block]
 					If WearingVest Then
 						Msg = "You removed the vest."
 						WearingVest = False						
@@ -6116,7 +6165,9 @@ Function DrawGUI()
 						TakeOffStuff(2)
 					EndIf
 					SelectedItem = Null	
+					;[End Block]
 				Case "gasmask", "supergasmask", "gasmask3"
+					;[Block]
 					If WearingGasMask Then
 						Msg = "You removed the gas mask."
 					Else
@@ -6135,7 +6186,9 @@ Function DrawGUI()
 						WearingGasMask = (Not WearingGasMask)
 					EndIf
 					SelectedItem = Null				
+					;[End Block]
 				Case "navigator", "nav"
+					;[Block]
 					
 					If SelectedItem\itemtemplate\img=0 Then
 						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
@@ -6317,8 +6370,10 @@ Function DrawGUI()
 						EndIf
 						
 					EndIf
+					;[End Block]
 				;new Items in SCP:CB 1.3
 				Case "scp1499","super1499"
+					;[Block]
 					If (Not Wearing1499%) Then
 						GiveAchievement(Achv1499)
 						
@@ -6361,7 +6416,9 @@ Function DrawGUI()
 						Wearing1499% = (Not Wearing1499%)
 					EndIf
 					SelectedItem = Null
+					;[End Block]
 				Case "badge"
+					;[Block]
 					If SelectedItem\itemtemplate\img=0 Then
 						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 						;SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
@@ -6372,7 +6429,7 @@ Function DrawGUI()
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
 					If SelectedItem\state = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
 						Select SelectedItem\itemtemplate\name
 							Case "Old Badge"
 								Msg = Chr(34)+"Huh? This guy looks just like me!"+Chr(34)
@@ -6381,9 +6438,11 @@ Function DrawGUI()
 						
 						SelectedItem\state = 1
 					EndIf
+					;[End Block]
 				Case "key"
+					;[Block]
 					If SelectedItem\state = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
 						
 						Msg = Chr(34)+"Isn't this the key to that old shack? The one where I... No, it can't be."+Chr(34)
 						MsgTimer = 70*10						
@@ -6391,7 +6450,9 @@ Function DrawGUI()
 					
 					SelectedItem\state = 1
 					SelectedItem = Null
+					;[End Block]
 				Case "oldpaper"
+					;[Block]
 					If SelectedItem\itemtemplate\img = 0 Then
 						SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
@@ -6408,20 +6469,24 @@ Function DrawGUI()
 								
 								Msg = Chr(34)+"Why does this seem so familiar?"+Chr(34)
 								MsgTimer = 70*10
-								PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+								PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
 								SelectedItem\state = 1
 						End Select
 					EndIf
+					;[End Block]
 				Case "coin"
+					;[Block]
 					If SelectedItem\state = 0
-						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,5)+".ogg")
 					EndIf
 					
 					Msg = ""
 					
 					SelectedItem\state = 1
 					SelectedItem = Null
+					;[End Block]
 				Default
+					;[Block]
 					;check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
 						DoubleClick = 0
@@ -6432,6 +6497,7 @@ Function DrawGUI()
 						SelectedItem = Null
 					EndIf
 					
+					;[End Block]
 			End Select
 			
 			If SelectedItem <> Null Then
@@ -8694,7 +8760,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						EndIf
 					EndIf					
 			End Select
-
 		Case "Severed Hand", "Black Severed Hand"
 			Select setting
 				Case "rough", "coarse"
@@ -8708,7 +8773,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					EndIf
 			End Select
 			RemoveItem(item)
-
 		Case "First Aid Kit", "Blue First Aid Kit"
 			Select setting
 				Case "rough", "coarse"
@@ -8741,7 +8805,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 1 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+										it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 									Case NORMAL
 										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -8758,18 +8822,18 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 2 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(3)=1 Then
+										If Rand(6)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										Else
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(4)=1 Then
+										If Rand(3)=1 Then
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
-									 Case HARD
+									Case HARD
 										If Rand(5)=1 Then
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										Else

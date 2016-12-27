@@ -592,6 +592,8 @@ Function LoadGame(file$)
 				Curr106 = n
 			Case NPCtype096
 				Curr096 = n
+			Case NPCtype5131
+				Curr5131 = n
 		End Select
 		
 		x = ReadFloat(f)
@@ -1283,6 +1285,8 @@ Function LoadGameQuick(file$)
 				Curr106 = n
 			Case NPCtype096
 				Curr096 = n
+			Case NPCtype5131
+				Curr5131 = n
 		End Select
 		
 		x = ReadFloat(f)

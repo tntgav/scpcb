@@ -1,7 +1,7 @@
 ;[Block]
 
 ;[End Block]
-Global Curr173.NPCs, Curr106.NPCs, Curr096.NPCs
+Global Curr173.NPCs, Curr106.NPCs, Curr096.NPCs, Curr5131.NPCs
 Const NPCtype173% = 1, NPCtypeOldMan% = 2, NPCtypeGuard% = 3, NPCtypeD% = 4
 Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
