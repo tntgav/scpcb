@@ -4964,6 +4964,7 @@ Function UpdateMTFUnit(n.NPCs)
 											If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 											n\Sound = LoadSound_Strict("SFX\Character\MTF\173\Cont"+Rand(1,4)+".ogg")
 											PlayMTFSound(n\Sound, n)
+											PlayAnnouncement("SFX\Character\MTF\Announc173Contain.ogg")
 											DebugLog "173 contained"
 											Exit
 										EndIf
@@ -5025,8 +5026,6 @@ Function UpdateMTFUnit(n.NPCs)
 							
 							PointEntity n\Collider,n\Path[n\PathLocation]\obj
 							RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
-							
-							RotateToDirection(n)
 							
 							n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 							
@@ -7023,28 +7022,6 @@ Function FinishWalking(n.NPCs,startframe#,endframe#,speed#)
 			AnimateNPC(n,endframe#,startframe#,-speed#,False)
 		EndIf
 	EndIf
-	
-End Function
-
-Function RotateToDirection(n.NPCs)
-	
-	HideEntity n\Collider
-	EntityPick(n\Collider, 1.0)
-	If PickedEntity() <> 0 Then
-		Local turnToSide% = 0
-		TurnEntity n\Collider,0,90,0
-		EntityPick(n\Collider,1.0)
-		If PickedEntity()=0
-			turnToSide% = 1
-		EndIf
-		TurnEntity n\Collider,0,270,0
-		If turnToSide% = 1
-			TurnEntity n\Collider,0.0,45,0.0,True
-		Else
-			TurnEntity n\Collider,0.0,-45,0.0,True
-		EndIf
-	EndIf
-	ShowEntity n\Collider
 	
 End Function
 

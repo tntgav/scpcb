@@ -1762,7 +1762,8 @@ Function UpdateEvents()
 									
 									e\room\NPC[0]\State = 3
 									
-									e\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\Ending\GateB\682Battle.ogg"))
+									;e\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\Ending\GateB\682Battle.ogg"))
+									PlayAnnouncement("SFX\Ending\GateB\682Battle.ogg")
 								EndIf								
 							Else
 								ShouldPlay = 6
@@ -1810,7 +1811,9 @@ Function UpdateEvents()
 								ElseIf e\EventState > 35.0*70 And e\EventState < 36.5*70	
 									CameraShake = 1.5		
 									If e\EventState-FPSfactor =< 35.0*70 Then
-										e\SoundCHN2 = PlaySound_Strict (LoadTempSound("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg"))
+										;e\SoundCHN2 = PlaySound_Strict (LoadTempSound("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg"))
+										e\SoundCHN2 = StreamSound_Strict("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",SFXVolume,e\Sound2,0)
+										e\SoundCHN2_isStream = True
 									EndIf									
 								ElseIf e\EventState > 39.5*70 And e\EventState < 39.8*70		
 									CameraShake = 1.0
@@ -1830,56 +1833,66 @@ Function UpdateEvents()
 							EndIf
 							
 							If e\EventState => 45.0*70 Then
-								If e\EventState < 75.0*70 Then 
-									If NuclearSirenSFX = 0 Then NuclearSirenSFX = LoadSound_Strict("SFX\Ending\GateB\Siren.ogg")
-									If e\SoundCHN = 0 Then
-										e\SoundCHN = PlaySound_Strict(NuclearSirenSFX)
-									Else
-										If ChannelPlaying(e\SoundCHN)=False Then e\SoundCHN = PlaySound_Strict(NuclearSirenSFX) 
+								If e\EventState < 75.0*70 Then
+									;If NuclearSirenSFX = 0 Then NuclearSirenSFX = LoadSound_Strict("SFX\Ending\GateB\Siren.ogg")
+									;If e\SoundCHN = 0 Then
+									;	e\SoundCHN = PlaySound_Strict(NuclearSirenSFX)
+									;Else
+									;	If ChannelPlaying(e\SoundCHN)=False Then e\SoundCHN = PlaySound_Strict(NuclearSirenSFX) 
+									;EndIf
+									If e\SoundCHN=0
+										e\SoundCHN = StreamSound_Strict("SFX\Ending\GateB\Siren.ogg",SFXVolume#,e\Sound)
+										e\SoundCHN_isStream = True
 									EndIf
 								Else
 									If SelectedEnding = "" Then
-										If ChannelPlaying(e\SoundCHN)=False Then 
-											temp = True
-											For e2.Events = Each Events
-												If e2\EventName = "room2nuke" Then
-													temp = e2\EventState
-													Exit
+										;If ChannelPlaying(e\SoundCHN)=False Then
+										FMOD_Pause(e\SoundCHN2)
+										FMOD_CloseStream(e\Sound2)
+										FMOD_Pause(e\SoundCHN)
+										FMOD_CloseStream(e\Sound)
+										
+										temp = True
+										For e2.Events = Each Events
+											If e2\EventName = "room2nuke" Then
+												temp = e2\EventState
+												Exit
+											EndIf
+										Next
+										
+										If temp = 1 Then ;remote detonation on -> explode
+											ExplosionTimer = Max(ExplosionTimer, 0.1)
+											SelectedEnding = "B2"
+										Else
+											;LoadEventSound(e,"SFX\Ending\GateB\AlphaWarheadsFail.ogg")
+											;e\SoundCHN = PlaySound_Strict(e\Sound)
+											PlayAnnouncement("SFX\Ending\GateB\AlphaWarheadsFail.ogg")
+											
+											For i = 0 To 1
+												n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[18],True)+(i*0.4),EntityY(e\room\Objects[18],True)+0.29,EntityZ(e\room\Objects[18],True)+(i*0.4))
+											Next
+											
+											n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\RoomDoors[2]\obj,True),EntityY(e\room\RoomDoors[2]\obj,True)+0.29,(EntityZ(e\room\RoomDoors[2]\obj,True)+EntityZ(e\room\RoomDoors[3]\obj,True))/2)
+											
+											For n.NPCs = Each NPCs
+												If n\NPCtype = NPCtypeMTF Then
+													n\LastSeen = (70*Rnd(30,35))
+													n\State = 3
+													n\State2 = 10
+													n\EnemyX = EntityX(Collider)
+													n\EnemyY = EntityY(Collider)
+													n\EnemyZ = EntityZ(Collider)
 												EndIf
 											Next
 											
-											If temp = 1 Then ;remote detonation on -> explode
-												ExplosionTimer = Max(ExplosionTimer, 0.1)
-												SelectedEnding = "B2"
-											Else
-												LoadEventSound(e,"SFX\Ending\GateB\AlphaWarheadsFail.ogg")
-												e\SoundCHN = PlaySound_Strict(e\Sound)
-												
-												For i = 0 To 1
-													n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\Objects[18],True)+(i*0.4),EntityY(e\room\Objects[18],True)+0.29,EntityZ(e\room\Objects[18],True)+(i*0.4))
-												Next
-												
-												n.NPCs = CreateNPC(NPCtypeMTF, EntityX(e\room\RoomDoors[2]\obj,True),EntityY(e\room\RoomDoors[2]\obj,True)+0.29,(EntityZ(e\room\RoomDoors[2]\obj,True)+EntityZ(e\room\RoomDoors[3]\obj,True))/2)
-												
-												For n.NPCs = Each NPCs
-													If n\NPCtype = NPCtypeMTF Then
-														n\LastSeen = (70*Rnd(30,35))
-														n\State = 3
-														n\State2 = 10
-														n\EnemyX = EntityX(Collider)
-														n\EnemyY = EntityY(Collider)
-														n\EnemyZ = EntityZ(Collider)
-													EndIf
-												Next
-												
-												DebugLog "MTF Units spawned!"
-												
-												e\EventState = 85.0*70
-												
-												SelectedEnding = "B3"
-											EndIf
+											DebugLog "MTF Units spawned!"
 											
-										EndIf										
+											e\EventState = 85.0*70
+											
+											SelectedEnding = "B3"
+										EndIf
+										
+										;EndIf										
 									Else
 										If SelectedEnding = "B3" Then
 											e\room\NPC[0]\EnemyX = EntityX(e\room\Objects[11],True)+Sin(MilliSecs2()/25.0)*3

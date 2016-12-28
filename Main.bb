@@ -52,6 +52,8 @@ Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
 Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
 
+Global kCPUid$, kCPUfamily%, kCPUsteppingId%, kCPUbrand$, kCPUextendedId$, kCPUfeatures$
+
 Dim ArrowIMG(4)
 
 ;[Block]
@@ -1858,6 +1860,8 @@ Global DTextures[MaxDTextures]
 
 Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
+
+Global IntercomStream,IntercomStreamCHN%,IntercomAnnouncementLoaded%
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2413,6 +2417,7 @@ Type Events
 	Field EventState#, EventState2#, EventState3#
 	Field SoundCHN%, SoundCHN2%
 	Field Sound, Sound2
+	Field SoundCHN_isStream%, SoundCHN2_isStream%
 	
 	Field EventStr$
 	
@@ -2777,7 +2782,7 @@ Repeat
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
 	If MainMenuOpen Then
-		If ShouldPlay = 21 Then
+		If ShouldPlay = 21 Or ShouldPlay = 66 Then
 			If TempSoundCHN = 0 Then
 				For snd.Sound = Each Sound
 					For i = 0 To 31
@@ -2787,13 +2792,18 @@ Repeat
 					Next
 				Next
 				;TempSoundCHN = PlaySound_Strict(Music(21))
-				TempSoundCHN = 1
-				alSourceSetLoop(MusicCHN,False)
+				;TempSoundCHN = 1
+				;alSourceSetLoop(MusicCHN,False)
 			EndIf
 			;If (Not ChannelPlaying(TempSoundCHN)) Then FreeSound_Strict Music(21) : ShouldPlay = 11
-			If (Not alSourceIsPlaying(MusicCHN))
+			;If (Not alSourceIsPlaying(MusicCHN))
+				;ShouldPlay = 11
+				;TempSoundCHN = 0
+			;EndIf
+			ShouldPlay = 66
+			MusicCHN = PlaySound_Strict(LoadTempSound("SFX\Ending\MenuBreath.ogg"))
+			If (Not ChannelPlaying(TempSoundCHN))
 				ShouldPlay = 11
-				TempSoundCHN = 0
 			EndIf
 		Else
 			ShouldPlay = 11
@@ -4600,16 +4610,27 @@ Function DrawGUI()
 					offset = offset + 1
 				EndIf
 			Next
-			
+			kCPUid$         = CPUid$()
+			kCPUfamily%     = CPUfamily%()
+			kCPUsteppingId% = CPUsteppingId%()
+			kCPUbrand$      = CPUbrand$()
+			kCPUextendedId$ = CPUextendedId$()
+			kCPUfeatures$   = CPUfeatures$()
+			Text x + 350,50,LSet("CPU ID: ",18)+kCPUid
+			Text x + 350,70,LSet("CPU family: ",18)+kCPUfamily
+			Text x + 350,90,LSet("CPU stepping ID: ",18)+kCPUsteppingId
+			Text x + 350,110,LSet("CPU brand: ",18)+kCPUbrand
+			Text x + 350,130,LSet("CPU name: ",18)+kCPUextendedId
+			Text x + 350,150,LSet("CPU features: ",18)+kCPUfeatures
 			If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
-				AAText x + 350, 50, "Current Chunk X/Z: ("+(Int((EntityX(Collider)+20)/40))+", "+(Int((EntityZ(Collider)+20)/40))+")"
+				AAText x + 350, 180, "Current Chunk X/Z: ("+(Int((EntityX(Collider)+20)/40))+", "+(Int((EntityZ(Collider)+20)/40))+")"
 				Local CH_Amount% = 0
 				For ch.Chunk = Each Chunk
 					CH_Amount = CH_Amount + 1
 				Next
-				AAText x + 350, 70, "Current Chunk Amount: "+CH_Amount
+				AAText x + 350, 200, "Current Chunk Amount: "+CH_Amount
 			Else
-				AAText x + 350, 50, "Current Room Position: ("+PlayerRoom\x+", "+PlayerRoom\y+", "+PlayerRoom\z+")"
+				AAText x + 350, 180, "Current Room Position: ("+PlayerRoom\x+", "+PlayerRoom\y+", "+PlayerRoom\z+")"
 			EndIf
 			
 			AASetFont Font1
@@ -8337,10 +8358,18 @@ End Function
 Function PauseSounds()
 	For e.events = Each Events
 		If e\soundchn <> 0 Then
-			If ChannelPlaying(e\soundchn) Then PauseChannel(e\soundchn)
+			If (Not e\soundchn_isstream)
+				If ChannelPlaying(e\soundchn) Then PauseChannel(e\soundchn)
+			Else
+				FMOD_Pause(e\soundchn)
+			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
-			If ChannelPlaying(e\soundchn2) Then PauseChannel(e\soundchn2)
+			If (Not e\soundchn2_isstream)
+				If ChannelPlaying(e\soundchn2) Then PauseChannel(e\soundchn2)
+			Else
+				FMOD_Pause(e\soundchn2)
+			EndIf
 		EndIf		
 	Next
 	
@@ -8372,15 +8401,27 @@ Function PauseSounds()
 	If BreathCHN <> 0 Then
 		If ChannelPlaying(BreathCHN) Then PauseChannel(BreathCHN)
 	EndIf
+	
+	If IntercomAnnouncementLoaded
+		FMOD_Pause(IntercomStreamCHN)
+	EndIf
 End Function
 
 Function ResumeSounds()
 	For e.events = Each Events
 		If e\soundchn <> 0 Then
-			If ChannelPlaying(e\soundchn) Then ResumeChannel(e\soundchn)
+			If (Not e\soundchn_isstream)
+				If ChannelPlaying(e\soundchn) Then ResumeChannel(e\soundchn)
+			Else
+				FMOD_Resume(e\soundchn)
+			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
-			If ChannelPlaying(e\soundchn2) Then ResumeChannel(e\soundchn2)
+			If (Not e\soundchn2_isstream)
+				If ChannelPlaying(e\soundchn2) Then ResumeChannel(e\soundchn2)
+			Else
+				FMOD_Resume(e\soundchn2)
+			EndIf
 		EndIf	
 	Next
 	
@@ -8411,6 +8452,10 @@ Function ResumeSounds()
 	
 	If BreathCHN <> 0 Then
 		If ChannelPlaying(BreathCHN) Then ResumeChannel(BreathCHN)
+	EndIf
+	
+	If IntercomAnnouncementLoaded
+		FMOD_Resume(IntercomStreamCHN)
 	EndIf
 End Function
 
@@ -9387,10 +9432,11 @@ Function UpdateMTF%()
 				If Abs(EntityZ(entrance\obj)-EntityZ(Collider))<30.0 Then
 					;If PlayerRoom\RoomTemplate\Name<>"room860" And PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then
 					If PlayerInReachableRoom()
-						PlaySound_Strict LoadTempSound("SFX\Character\MTF\Announc.ogg")
+						;PlaySound_Strict LoadTempSound("SFX\Character\MTF\Announc.ogg")
+						PlayAnnouncement("SFX\Character\MTF\Announc.ogg")
 					EndIf
 					
-					MTFtimer = 1
+					MTFtimer = FPSfactor
 					Local leader.NPCs
 					For i = 0 To 2
 						n.NPCs = CreateNPC(NPCtypeMTF, EntityX(entrance\obj)+0.3*(i-1), 1.0,EntityZ(entrance\obj)+8.0)
@@ -9405,6 +9451,22 @@ Function UpdateMTF%()
 					Next
 				EndIf
 			EndIf
+		EndIf
+	Else
+		If MTFtimer <= 70*120 ;70*120
+			MTFtimer = MTFtimer + FPSfactor
+		ElseIf MTFtimer > 70*120 And MTFtimer < 10000
+			If PlayerInReachableRoom()
+				PlayAnnouncement("SFX\Character\MTF\AnnouncAfter1.ogg")
+			EndIf
+			MTFtimer = 10000
+		ElseIf MTFtimer >= 10000 And MTFtimer <= 10000+(70*120) ;70*120
+			MTFtimer = MTFtimer + FPSfactor
+		ElseIf MTFtimer > 10000+(70*120) And MTFtimer < 20000
+			If PlayerInReachableRoom()
+				PlayAnnouncement("SFX\Character\MTF\AnnouncAfter2.ogg")
+			EndIf
+			MTFtimer = 20000
 		EndIf
 	EndIf
 	
@@ -10743,8 +10805,34 @@ Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,mo
 	Return img%
 End Function
 
+Function PlayAnnouncement(file$) ;This function streams the announcement currently playing
+	
+	If IntercomAnnouncementLoaded
+		FMOD_Pause(IntercomStreamCHN)
+		FMOD_CloseStream(IntercomStream)
+	EndIf
+	
+	IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,IntercomStream,0)
+	
+	IntercomAnnouncementLoaded = True
+	
+End Function
+
+
+
 
 
 ;~IDEal Editor Parameters:
-;~B#11AD#13E5#1A67
+;~F#3A#D9#175#17B#18B#23F#2EA#2F3#313#327#32C#332#338#33E#344#349#367#37D#392#398
+;~F#39E#3A5#3AC#3B5#3BB#3C1#3C7#3CE#3DD#3E6#3F2#404#41D#439#43E#44B#45D#477#47E#484
+;~F#492#4A5#4AE#4B7#4DD#4EF#505#511#51D#530#536#53C#540#546#54B#56A#579#588#595#5EE
+;~F#6F2#76D#78E#806#813#8CA#955#96C#97A#9AC#A63#A72#B81#C9C#CA5#D5E#D86#D98#DC0#DEA
+;~F#DF8#E0F#E45#EF6#1025#1146#12B7#14A3#14B6#14C9#14DC#14ED#14FD#150C#1528#152C#1530#1539#1553#157D
+;~F#15D6#15DF#15E9#15F3#161E#162E#166D#1679#1685#1699#17CA#17E4#17F2#1800#180D#1815#1822#182E#1843#18FC
+;~F#1929#193F#194B#1962#196D#19AD#1A1F#1A71#1AAC#1AFC#1C43#1C4E#1DB7#1DD6#1E30#1ECB#1EF8#1F28#202E#2040
+;~F#205C#2066#2073#210D#2146#215A#216F#2173#2193#219B#21C6#2412#2503#2582#2588#2592#259E#25A9#25AD#25E8
+;~F#25F0#25F8#25FF#2606#2613#2619#2624#2666#2675#2693#26C1#26C8#26DB#26F4#2721#272C#2731#274B#2757#2772
+;~F#27C4#27D2#27DA#27E2#280D#2816#283F#2844#2849#284E#2858#2869#2909#2917#295F#2986#2998#29B7#29C6#29DD
+;~F#29FA#29FE#2A02#2A19
+;~B#11C5#140B#1ACF
 ;~C#Blitz3D

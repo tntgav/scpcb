@@ -195,7 +195,7 @@ End Function
 ;	Return chn%
 ;End Function
 
-Function StreamSound_Strict(file$, volume#, stream%)
+Function StreamSound_Strict(file$, volume#, stream%, custommode%=Mode)
 	If FileType(file) <> 1 Then
 		CreateConsoleMsg("Sound " + Chr(34) + file + Chr(34) + " not found.")
 		If ConsoleOpening Then
@@ -205,7 +205,7 @@ Function StreamSound_Strict(file$, volume#, stream%)
 		Return 0
 	EndIf
 	
-	stream% = FMOD_LoadStream(file$, Mode, F_Offset, Lenght)
+	stream% = FMOD_LoadStream(file$, custommode, F_Offset, Lenght)
 	Local chn%=FMOD_PlayStream(stream)
 	
 	If chn%=0 Then	
