@@ -1,10 +1,11 @@
-;This is the Source Code from SCP:CB Version 1.3.0 and onwards. This version was created by the "Third Subdivision Team".
-;Original credit goes to Regalis and all the other contributers to SCP:CB.
+;SCP - Containment Breach
 
-;Modified by juanjp600 to remove FastExt and FastText due to stability and compatibility concerns.
-;Removing this code also makes a potential engine conversion marginally easier to do (try parsing the code and converting it to C?),
-;since the strange parts of the extensions are gone.
-;In addition, you won't need FastExt.bb in the first place, making redistribution easier.
+;    The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
+
+;    The source code is licensed under Creative Commons Attribution-ShareAlike 3.0 License.
+;    http://creativecommons.org/licenses/by-sa/3.0/
+
+;    See Credits.txt for a list of contributors
 
 Local InitErrorStr$ = ""
 If FileSize("bb_fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "bb_fmod.dll"+Chr(13)+Chr(10)
@@ -3706,8 +3707,7 @@ Function DrawEnding()
 		EndIf
 		
 		If EndingTimer <-400 Then 
-			If Music(5)=0 Then Music(5) = LoadSound_Strict("SFX\Music\Intro.ogg")
-			ShouldPlay = 5
+			ShouldPlay = 13
 		EndIf
 		
 		If EndingScreen = 0 Then 
@@ -4291,7 +4291,6 @@ Function MouseLook()
 	EndIf
 	
 	If Wearing178>0 Then
-		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\Music\178.ogg")
 		ShouldPlay = 14
 		ShowEntity(GlassesOverlay)
 	Else
@@ -7951,7 +7950,6 @@ Function InitLoadGame()
 				For i = -2 To 2 Step 2
 					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
 				Next
-				If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\1499.ogg")
 				DrawLoading(98)
 				UpdateChunks(e\room,15,False)
 				;MoveEntity Collider,0,10,0

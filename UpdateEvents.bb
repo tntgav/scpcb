@@ -300,7 +300,6 @@ Function UpdateEvents()
 					
 					If e\EventState3>0 Then
 						
-						;;If Music(13)=0 Then Music(13) = LoadSound_Strict("SFX\Music\Intro.ogg")
 						ShouldPlay = 13
 						
 						;slow the player down to match his speed to the guards
@@ -313,18 +312,8 @@ Function UpdateEvents()
 								PositionEntity Collider, x, 0.302, z	
 								RotateEntity Camera, -70, 0, 0
 								
-								;StopChannel MusicCHN
 								CurrMusicVolume = 1.0
-								;MusicCHN = PlaySound_Strict(Music(13))
-								;alSourceStop(MusicCHN)
-								;alFreeSource(MusicCHN)
-								;MusicCHN% = alCreateSource("SFX\Music\"+Music(13)+".ogg",True,False)
-								;alSourcePlay(MusicCHN,True)
-								;alSourceSetLoop(MusicCHN,True)
-								;CurrMusic = 1
-								;If alSourceIsPlaying%(MusicCHN)
-								;	alSourceSetVolume(MusicCHN, CurrMusicVolume)
-								;EndIf
+								
 								FMOD_Pause(MusicCHN)
 								FMOD_CloseStream(CurrMusicStream)
 								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,CurrMusicStream)
@@ -1228,7 +1217,6 @@ Function UpdateEvents()
 													ResetEntity(e\room\NPC[i]\Collider)
 												Next
 												
-												FreeSound_Strict Music(13)
 												ShouldPlay = 0
 												
 												For i = 0 To 9
@@ -2161,8 +2149,6 @@ Function UpdateEvents()
 							e\room\NPC[i]\State = (Not Contained106)
 						Next
 						
-						;Music(5) = LoadSound_Strict("SFX\Music\GateA.ogg")
-						
 						CreateConsoleMsg("WARNING! Teleporting away from this area may cause bugs or crashing.")
 						
 						TranslateEntity(e\room\obj, 0,12000.0*RoomScale,0)
@@ -2730,7 +2716,6 @@ Function UpdateEvents()
 						e\EventState = 0.1
 					EndIf
 					
-					;;If Music(3)=0 Then Music(3) = LoadSound_Strict("SFX\Music\PD.ogg")	
 					If EntityY(Collider)<2000*RoomScale Or e\EventState3=0 Or EntityY(Collider)>2608*RoomScale Then 
 						ShouldPlay = 3
 					Else 
@@ -2795,7 +2780,6 @@ Function UpdateEvents()
 							;the trenches
 							If EntityY(Collider)>6.0 Then
 								ShouldPlay = 15
-								;If Music(15)=0 Then Music(15) = LoadSound("SFX\Music\PDTrench.ogg")
 								
 								CameraFogColor Camera, 38, 55, 47
 								CameraClsColor Camera, 38, 55, 47
@@ -2972,7 +2956,7 @@ Function UpdateEvents()
 													GiveAchievement(AchvPD)
 													e\EventState = 0
 													e\EventState2 = 0
-													FreeSound_Strict Music(3) : Music(3)=0
+													
 													SecondaryLightOn = PrevSecondaryLightOn
 													PrevSecondaryLightOn = 0.0
 													
@@ -3010,7 +2994,7 @@ Function UpdateEvents()
 									If r\RoomTemplate\Name = "room106" Then
 										e\EventState = 0
 										e\EventState2 = 0
-										FreeSound_Strict Music(3) : Music(3)=0
+										
 										PositionEntity(Collider, EntityX(r\obj,True), 0.4, EntityX(r\obj,True))
 										
 										GiveAchievement(AchvPD)
@@ -3091,7 +3075,7 @@ Function UpdateEvents()
 											GiveAchievement(AchvPD)
 											e\EventState = 0
 											e\EventState2 = 0
-											FreeSound_Strict Music(3) : Music(3)=0
+											
 											SecondaryLightOn = PrevSecondaryLightOn
 											PrevSecondaryLightOn = 0.0
 											PositionEntity(Collider, EntityX(r\obj), 0.4, EntityZ(r\obj))
@@ -4453,7 +4437,7 @@ Function UpdateEvents()
 					EndIf
 					
 					If EntityY(Collider,True)>4.0 Then
-						;If Music(7)=0 Then Music(7) = LoadSound_Strict("SFX\Music\Room3Storage.ogg") 
+						
 						ShouldPlay = 7
 						
 						If e\EventState = 0 Then
@@ -5396,7 +5380,6 @@ Function UpdateEvents()
 						
 						GiveAchievement(Achv939)
 						
-						;If Music(7)=0 Then Music(7) = LoadSound_Strict("SFX\Music\Room3Storage.ogg") 
 						ShouldPlay = 7
 						
 						;If e\room\NPC[0]=Null Then
@@ -6127,7 +6110,7 @@ Function UpdateEvents()
 						e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1],e\room\Objects[0],e\room\Objects[1], e)
 						e\EventState3 = UpdateElevators(e\EventState3, e\room\RoomDoors[2], e\room\RoomDoors[3],e\room\Objects[2],e\room\Objects[3], e)
 					Else
-						;If Music(8)=0 Then Music(8) = LoadSound_Strict("SFX\Music\Room049.ogg") 
+						
 						ShouldPlay = 8
 						
 						If e\EventState = 0 Then
@@ -6369,7 +6352,7 @@ Function UpdateEvents()
 				If PlayerRoom = e\room Then
 					
 					If e\EventState = 0 Then
-						;Music(4) = LoadSound_Strict("SFX\Music\079.ogg")
+						
 						e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True)+0.5, EntityZ(e\room\Objects[2],True))
 						PointEntity e\room\NPC[0]\Collider, e\room\obj
 						RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider),0, True
@@ -8639,7 +8622,6 @@ Function UpdateEvents()
 							e\EventState2 = 7
 						Else
 							;Still playing the Music for SCP-049 (in the real, SCP-049's State will be set to 2, causing it to stop playing the chasing track)
-							;If Music(20) = 0 Then Music(20) = LoadSound_Strict("SFX\Horror\Horror12.ogg")
 							ShouldPlay = 20
 							If e\room\NPC[0]\PathStatus<>1
 								e\room\NPC[0]\Idle = 70*60 ;(Making SCP-049 idle for one minute (twice as fast for aggressive NPCs = True))
