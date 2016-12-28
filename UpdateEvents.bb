@@ -8837,7 +8837,7 @@ Function UpdateEvents()
 					
 					If EntityDistance(e\room\NPC[0]\Collider,Collider)<1.2
 						If e\EventState2 = 0
-							LightBlink = 5.0
+							LightBlink = 12.0
 							PlaySound_Strict LightSFX
 							e\EventState2 = FPSfactor
 						EndIf
@@ -8848,7 +8848,7 @@ Function UpdateEvents()
 					e\EventState2 = e\EventState2 + FPSfactor
 				ElseIf e\EventState2 >= 70*4
 					If e\room\NPC[0]\State = 0
-						e\room\NPC[0]\State = 1
+						e\room\NPC[0]\State = 2
 					EndIf
 				EndIf
 				;[End Block]
