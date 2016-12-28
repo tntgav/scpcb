@@ -2731,6 +2731,13 @@ LoopDelay = MilliSecs()
 
 Global UpdateParticles_Time# = 0.0
 
+kCPUid$         = CPUid$()
+kCPUfamily%     = CPUfamily%()
+kCPUsteppingId% = CPUsteppingId%()
+kCPUbrand$      = CPUbrand$()
+kCPUextendedId$ = CPUextendedId$()
+kCPUfeatures$   = CPUfeatures$()
+
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------       		MAIN LOOP                 ---------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4609,12 +4616,6 @@ Function DrawGUI()
 					offset = offset + 1
 				EndIf
 			Next
-			kCPUid$         = CPUid$()
-			kCPUfamily%     = CPUfamily%()
-			kCPUsteppingId% = CPUsteppingId%()
-			kCPUbrand$      = CPUbrand$()
-			kCPUextendedId$ = CPUextendedId$()
-			kCPUfeatures$   = CPUfeatures$()
 			Text x + 350,50,LSet("CPU ID: ",18)+kCPUid
 			Text x + 350,70,LSet("CPU family: ",18)+kCPUfamily
 			Text x + 350,90,LSet("CPU stepping ID: ",18)+kCPUsteppingId
