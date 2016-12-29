@@ -213,8 +213,6 @@ Global CanSave% = True
 
 AppTitle "SCP - Containment Breach v"+VersionNumber
 
-;alInitialise()
-
 ;---------------------------------------------------------------------------------------------------------------------
 
 ;[Block]
@@ -1800,8 +1798,6 @@ MaskImage NVGImages,255,0,255
 Global Wearing1499% = False
 Global AmbientLightRoomTex%, AmbientLightRoomVal%
 
-;Global NVGImage% = CreateImage(GraphicWidth,GraphicHeight),NVGCam%
-
 Global EnableUserTracks% = GetINIInt(OptionFile, "audio", "enable user tracks")
 Global UserTrackMode% = GetINIInt(OptionFile, "audio", "user track setting")
 Global UserTrackCheck% = 0, UserTrackCheck2% = 0
@@ -1820,7 +1816,6 @@ Global NTF_1499Sky%
 Global OptionsMenu% = 0
 Global QuitMSG% = 0
 
-;Global StoredBrightness% = 40
 Global InFacility% = True
 
 Global PrevMusicVolume# = MusicVolume#
@@ -1836,9 +1831,6 @@ Global room2gw_z# = 0.0
 
 Global Menu_TestIMG
 Global menuroomscale# = 8.0 / 2048.0
-;Menu_TestIMG = Create3DIcon(200,200,"GFX\map\room3z3_opt.rmesh",0,-0.75,1,0,0,0,menuroomscale#,menuroomscale#,menuroomscale#,DOF_Enabled,True)
-;ScaleImage Menu_TestIMG,MenuScale,MenuScale
-;MaskImage Menu_TestIMG,255,0,255
 
 Global CurrMenu_TestIMG$ = ""
 
@@ -2786,7 +2778,6 @@ Repeat
 	
 	If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
 	
-	;alUpdate()
 	UpdateMusic()
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
@@ -2800,15 +2791,8 @@ Repeat
 						EndIf
 					Next
 				Next
-				;TempSoundCHN = PlaySound_Strict(Music(21))
-				;TempSoundCHN = 1
-				;alSourceSetLoop(MusicCHN,False)
 			EndIf
-			;If (Not ChannelPlaying(TempSoundCHN)) Then FreeSound_Strict Music(21) : ShouldPlay = 11
-			;If (Not alSourceIsPlaying(MusicCHN))
-				;ShouldPlay = 11
-				;TempSoundCHN = 0
-			;EndIf
+			
 			ShouldPlay = 66
 			MusicCHN = PlaySound_Strict(LoadTempSound("SFX\Ending\MenuBreath.ogg"))
 			If (Not ChannelPlaying(TempSoundCHN))
@@ -10564,31 +10548,6 @@ Function InitFastResize()
 	
 	HideEntity fresize_cam
 End Function
-
-;Function RenderWorldToTexture()
-;	
-;	;EntityAlpha ark_blur_image, 1.0
-;	HideEntity fresize_image
-;	;old_buffer% = BackBuffer();GetBuffer()
-;	;SetBuffer(TextureBuffer(fresize_texture))
-;	RenderWorld()
-;	SetBuffer(old_buffer)
-;	;CopyRect ark_sw / 2 - 1024, ark_sh / 2 - 1024, 2048, 2048, 0, 0, BackBuffer(), TextureBuffer(ark_blur_texture)
-;	;CopyRect 0, 0, GraphicWidth, GraphicHeight, 1024.0 - GraphicWidth/2, 1024.0 - GraphicHeight/2, BackBuffer(), TextureBuffer(ark_blur_texture)
-;	
-;End Function
-
-
-;Function UpdateScreenGamma()
-;	Local n# = 1.0/ScreenGamma
-;	Local k%
-;	
-;	For k=0 To 255
-;		Local c# = Min(Max(0, ((k/255.0)^n)*255), 255)
-;		SetGamma k,k,k,c,c,c
-;	Next
-;	UpdateGamma
-;End Function
 
 ;--------------------------------------- Some new 1.3 -functions -------------------------------------------------------
 

@@ -1718,14 +1718,6 @@ Function UpdateEvents()
 							DrawLoading(100,True)
 						Else
 							
-							;em.Emitters = CreateEmitter(EntityX(e\room\Objects[0],True),EntityY(e\room\Objects[0],True),EntityZ(e\room\Objects[0],True), 1)
-							;TurnEntity(em\Obj, -90, 0, 0)
-							;e\room\Objects[4] = em\Obj
-							;em\RandAngle = 26
-							;em\SizeChange = 0.01
-							;em\Achange = -0.015
-							;em\Gravity = -0.12
-							
 							UpdateSky()
 							
 							If e\EventState < 2.0 Then 
@@ -5393,18 +5385,6 @@ Function UpdateEvents()
 						
 						ShouldPlay = 7
 						
-						;If e\room\NPC[0]=Null Then
-							;DrawLoading(0, True)
-							;e\room\NPC[0]=CreateNPC(NPCtype939, 0,0,0)
-							
-							;DrawLoading(20, True)
-							;e\room\NPC[1]=CreateNPC(NPCtype939, 0,0,0)
-							
-							;DrawLoading(50, True)
-							;e\room\NPC[2]=CreateNPC(NPCtype939, 0,0,0)
-							
-							;DrawLoading(100, True)
-						;EndIf
 						If e\room\NPC[2]=Null Or e\EventState = 3
 							If e\EventState = 0 And QuickLoadPercent = -1
 								QuickLoadPercent = 0
@@ -7000,12 +6980,6 @@ Function UpdateEvents()
 					;the event is started when the player picks up SCP-1123 (in Items.bb/UpdateItems())
 					
 					If e\EventState = 1 Then
-						;If e\SoundCHN = 0 Then
-						;	e\SoundCHN = 
-						;Else
-						;	If Not ChannelPlaying(e\SoundCHN) Then e\SoundCHN = PlaySound_Strict(moddedambience)
-						;End If
-						
 						;Saving Injuries and Bloodloss, so that the player won't be healed automatically
 						PrevInjuries = Injuries
 						PrevBloodloss = Bloodloss
@@ -7013,7 +6987,6 @@ Function UpdateEvents()
 						SecondaryLightOn = True
 						
 						e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[6],True),EntityY(e\room\Objects[6],True),EntityZ(e\room\Objects[6],True))
-						;e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
 						
 						nazi = LoadAnimMesh_Strict("GFX\npcs\naziofficer.b3d")
 						scale# = 0.5 / MeshWidth(nazi)
@@ -7022,15 +6995,11 @@ Function UpdateEvents()
 						e\room\NPC[0]\obj = CopyEntity(nazi)
 						ScaleEntity e\room\NPC[0]\obj, scale, scale, scale
 						
-						;FreeEntity e\room\NPC[1]\obj
-						;e\room\NPC[1]\obj = CopyEntity(nazi)
-						;ScaleEntity e\room\NPC[1]\obj, scale, scale, scale
-						
 						FreeEntity nazi
 						
 						PositionEntity Collider, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True),True
 						ResetEntity Collider
-						;PlaySound_Strict(HorrorSFX(9))
+						
 						CameraShake = 1.0
 						BlurTimer = 1200
 						Injuries = 1.0
@@ -8929,18 +8898,8 @@ Function UpdateDimension1499()
 						e\EventState = 2.0
 					EndIf
 					;[End Block]
-					;For n.NPCs = Each NPCs
-					;	If n\NPCtype = NPCtype1499
-					;		n\Idle = False
-					;		n\State = 0
-					;		;If Rand(2)=1 Then n\State2 = 500*3
-					;		n\Angle = Rnd(360)
-					;		PositionEntity n\Collider,EntityX(n\Collider)+Rnd(-60.0,60.0),EntityY(n\Collider)+0.05,EntityZ(n\Collider)+Rnd(-60.0,60.0)
-					;		ResetEntity n\Collider
-					;	EndIf
-					;Next
 				EndIf
-				;PositionEntity e\room\Objects[0],0,800,0
+				
 				If (Not DebugHUD)
 					CameraFogRange Camera,40,80
 					CameraFogColor Camera,96,97,104

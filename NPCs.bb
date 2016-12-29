@@ -97,28 +97,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "scale") / MeshDepth(n\obj))			
 			ScaleEntity n\obj, temp,temp,temp
 			
-			;If BumpEnabled Then 		
-			;	diff1 = LoadTexture_Strict("GFX\npcs\173texture.png") 
-			;	bump1 = LoadTexture_Strict("GFX\npcs\173_norm.jpg")
-			;	;spec1 = LoadTexture_Strict("GFX\npcs\173_spec.jpg")
-			;	TextureBlend bump1, 4
-			;	;TextureBlend spec1, FE_SPECULAR0
-			;	
-			;	;EntityTexture n\obj, spec1, 0, 0
-			;	EntityTexture n\obj, bump1, 0, 0
-			;	EntityTexture n\obj, diff1, 0, 1
-			;	FreeTexture diff1
-			;	FreeTexture bump1
-			;	
-			;	;FreeTexture spec1
-			;EndIf
-			;UpdateNormals n\obj
-			
-			;SetAnimTime n\obj, 68	
-			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "speed") / 100.0)
-			;n\obj = LoadMesh_Strict("GFX\mesh\173.3ds")
-			;scaleentity n\obj, 0.35 / meshWidth(n\obj), 0.30 / meshWidth(n\obj), 0.30 / meshWidth(n\obj)
 			
 			n\obj2 = LoadMesh_Strict("GFX\173box.b3d")
 			ScaleEntity n\obj2, RoomScale, RoomScale, RoomScale
@@ -134,18 +113,6 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\106_2.b3d")
-			
-			;If BumpEnabled Then 		
-			;	diff1 = LoadTexture_Strict("GFX\npcs\106_diffuse.png")
-			;	bump1 = LoadTexture_Strict("GFX\npcs\106_normals.png")
-			;	;TextureBlend bump1, FE_BUMP ;USE DOT3
-			;	;TextureBlend di1, FE_SPECULAR0
-			;	
-			;	;EntityTexture n\obj, bump1, 0, 0
-			;	EntityTexture n\obj, diff1, 0, 1
-			;	FreeTexture diff1
-			;	FreeTexture bump1
-			;EndIf
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-106", "scale") / 2.2)		
 			ScaleEntity n\obj, temp, temp, temp
