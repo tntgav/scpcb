@@ -3560,17 +3560,7 @@ Function UpdateEvents()
 									Else
 										temp3 = 5
 									EndIf
-									;e\room\NPC[0] = CreateNPC(NPCtypeD,EntityX(e\room\Objects[temp3],True),0.5,EntityZ(e\room\Objects[temp3],True))
-									;PointEntity e\room\NPC[0]\Collider,e\room\Objects[2]
-									;FreeEntity e\room\NPC[0]\obj
-									;e\room\NPC[0]\obj = LoadAnimMesh_Strict("GFX\npcs\clerk.b3d")
-									;e\room\NPC[0]\State = 2
-									;Local tempscale# = 0.5 / MeshWidth(e\room\NPC[0]\obj)
-									;ScaleEntity e\room\NPC[0]\obj, tempscale#, tempscale#, tempscale#
-									;e\room\NPC[0]\Model$ = "GFX\npcs\clerk.b3d"
-									;e\room\NPC[0]\ModelScaleX = tempscale#
-									;e\room\NPC[0]\ModelScaleY = tempscale#
-									;e\room\NPC[0]\ModelScaleZ = tempscale#
+									
 									e\room\NPC[0] = CreateNPC(NPCtypeClerk,EntityX(e\room\Objects[temp3],True),0.5,EntityZ(e\room\Objects[temp3],True))
 									PointEntity e\room\NPC[0]\Collider,e\room\Objects[2]
 									e\room\NPC[0]\State = 2
@@ -3600,6 +3590,7 @@ Function UpdateEvents()
 					Else
 						e\EventState = e\EventState+FPSfactor
 						If e\EventState =< 40 Then
+							HideEntity e\room\Objects[3]
 							If (MilliSecs2() Mod 100) < 50 Then
 								ShowEntity e\room\Objects[4]
 							Else
