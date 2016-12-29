@@ -33,22 +33,6 @@ Function LoadImage_Strict(file$)
 	Return tmp
 End Function
 
-;Function LoadSound_Strict(file$)
-;	
-;	If FileType(file$)<>1 Then 
-;		CreateConsoleMsg("Sound " + Chr(34) + file$ + Chr(34) + " not found.")
-;		ConsoleInput = ""
-;		ConsoleOpen = True
-;		Return 0
-;	EndIf
-;   tmp = LoadSound(file$)
-;	If tmp = 0 Then 
-;		CreateConsoleMsg("Failed to load Sound: " + Chr(34) + file$ + Chr(34))
-;		ConsoleInput = ""
-;		ConsoleOpen = True
-;	EndIf
-;	Return tmp
-;End Function
 
 Type Sound
 	Field internalHandle%
@@ -167,34 +151,6 @@ Function FreeSound_Strict(sndHandle%)
 	EndIf
 End Function
 
-;Function StreamSound_Strict(file$, volume#)
-;	If FileType(file) <> 1 Then
-;		CreateConsoleMsg("Sound " + Chr(34) + file + Chr(34) + " not found.")
-;		If ConsoleOpening Then
-;			ConsoleOpen = True
-;		EndIf
-;		
-;		Return 0
-;	EndIf
-;	
-;	Local chn% = alCreateSource(file,True,False)
-;	
-;	If chn%=0 Then	
-;		CreateConsoleMsg("Failed to stream sound " + Chr(34) + file + Chr(34) + ".")
-;		If ConsoleOpening Then
-;			ConsoleOpen = True
-;		EndIf
-;		
-;		Return 0
-;	EndIf
-;	
-;	alSourcePlay(chn%,True)
-;	alSourceSetLoop(chn%,True)
-;	alSourceSetVolume(chn%,volume)
-;	
-;	Return chn%
-;End Function
-
 Function StreamSound_Strict(file$, volume#, stream%, custommode%=Mode)
 	If FileType(file) <> 1 Then
 		CreateConsoleMsg("Sound " + Chr(34) + file + Chr(34) + " not found.")
@@ -206,7 +162,7 @@ Function StreamSound_Strict(file$, volume#, stream%, custommode%=Mode)
 	EndIf
 	
 	stream% = FMOD_LoadStream(file$, custommode, F_Offset, Lenght)
-	Local chn%=FMOD_PlayStream(stream)
+	Local chn% = FMOD_PlayStream(stream)
 	
 	If chn%=0 Then	
 		CreateConsoleMsg("Failed to stream sound " + Chr(34) + file + Chr(34) + ".")

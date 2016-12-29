@@ -659,27 +659,6 @@ Function DropItem(item.Items)
 	
 	ResetEntity (item\collider)
 	
-	;move the item so that it doesn't overlap with other items
-	;For it.Items = Each Items
-	;	If it <> item And it\Picked = False Then
-	;		x = Abs(EntityX(item\collider, True)-EntityX(it\collider, True))
-	;		;If x < 0.2 Then 
-	;		If x < 0.01 Then
-	;			z = Abs(EntityZ(item\obj, True)-EntityZ(it\collider, True))
-	;			;If z < 0.2 Then
-	;			If z < 0.01 Then
-	;				;While (x+z)<0.25
-	;				While (x+z)<0.05
-	;					;MoveEntity(item\obj, 0, 0, 0.025)
-	;					MoveEntity(item\collider, 0, 0, 0.005)
-	;					x = Abs(EntityX(item\collider, True)-EntityX(it\collider, True))
-	;					z = Abs(EntityZ(item\collider, True)-EntityZ(it\collider, True))
-	;				Wend
-	;			EndIf
-	;		EndIf
-	;	EndIf
-	;Next
-	
 	item\Picked = False
 	For z% = 0 To MaxItemAmount - 1
 		If Inventory(z) = item Then Inventory(z) = Null
