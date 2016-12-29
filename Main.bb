@@ -9,6 +9,7 @@
 
 Local InitErrorStr$ = ""
 If FileSize("bb_fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "bb_fmod.dll"+Chr(13)+Chr(10)
+If filesite("cpuid.dll")=0 Then InitErrorStr=InitErrorStr+ "cpuid.dll",Chr(13)+Chr(10)
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
 If FileSize("zlibwapi.dll")=0 Then InitErrorStr=InitErrorStr+ "zlibwapi.dll"+Chr(13)+Chr(10)
 
@@ -2818,6 +2819,8 @@ Repeat
 		EndIf
 		UpdateMainMenu()
 	Else
+		UpdateStreamSounds()
+		
 		ShouldPlay = Min(PlayerZone,2)
 		
 		DrawHandIcon = False
@@ -8318,6 +8321,7 @@ Function UpdateMusic()
 						;alSourceStop(MusicCHN)
 						;alFreeSource(MusicCHN)
 						FMOD_Pause(MusicCHN)
+						FMOD_StopStream(CurrMusicStream)
 						FMOD_CloseStream(CurrMusicStream)
 					EndIf
 					NowPlaying = ShouldPlay
@@ -10808,6 +10812,7 @@ Function PlayAnnouncement(file$) ;This function streams the announcement current
 	
 	If IntercomAnnouncementLoaded
 		FMOD_Pause(IntercomStreamCHN)
+		FMOD_StopStream(IntercomStream)
 		FMOD_CloseStream(IntercomStream)
 	EndIf
 	
@@ -10817,21 +10822,69 @@ Function PlayAnnouncement(file$) ;This function streams the announcement current
 	
 End Function
 
+Function UpdateStreamSounds()
+	Local e.Events
+	
+	If IntercomAnnouncementLoaded
+		FMOD_SetVolume(SFXVolume*255.0,IntercomStream)
+	EndIf
+	For e = Each Events
+		If e\SoundCHN<>0
+			If e\SoundCHN_isStream
+				FMOD_SetVolume(SFXVolume*255.0,e\Sound)
+			EndIf
+		EndIf
+		If e\SoundCHN2<>0
+			If e\SoundCHN2_isStream
+				FMOD_SetVolume(SFXVolume*255.0,e\Sound2)
+			EndIf
+		EndIf
+	Next
+	
+	If (Not PlayerInReachableRoom())
+		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea"
+			DebugLog "Test"
+			If IntercomAnnouncementLoaded
+				FMOD_Pause(IntercomStreamCHN)
+				FMOD_StopStream(IntercomStream)
+				FMOD_CloseStream(IntercomStream)
+			EndIf
+			For e = Each Events
+				If e\SoundCHN<>0
+					If e\SoundCHN_isStream
+						FMOD_Pause(e\SoundCHN)
+						FMOD_StopStream(e\Sound)
+						FMOD_CloseStream(e\Sound)
+					EndIf
+				EndIf
+				If e\SoundCHN2<>0
+					If e\SoundCHN2_isStream
+						FMOD_Pause(e\SoundCHN2)
+						FMOD_StopStream(e\Sound2)
+						FMOD_CloseStream(e\Sound2)
+					EndIf
+				EndIf
+			Next
+		EndIf
+	EndIf
+	
+End Function
+
 
 
 
 
 ;~IDEal Editor Parameters:
-;~F#3A#D9#175#17B#18B#23F#2EA#2F3#313#327#32C#332#338#33E#344#349#367#37D#392#398
-;~F#39E#3A5#3AC#3B5#3BB#3C1#3C7#3CE#3DD#3E6#3F2#404#41D#439#43E#44B#45D#477#47E#484
-;~F#492#4A5#4AE#4B7#4DD#4EF#505#511#51D#530#536#53C#540#546#54B#56A#579#588#595#5EE
-;~F#6F2#76D#78E#806#813#8CA#955#96C#97A#9AC#A63#A72#B81#C9C#CA5#D5E#D86#D98#DC0#DEA
-;~F#DF8#E0F#E45#EF6#1025#1146#12B7#14A3#14B6#14C9#14DC#14ED#14FD#150C#1528#152C#1530#1539#1553#157D
-;~F#15D6#15DF#15E9#15F3#161E#162E#166D#1679#1685#1699#17CA#17E4#17F2#1800#180D#1815#1822#182E#1843#18FC
-;~F#1929#193F#194B#1962#196D#19AD#1A1F#1A71#1AAC#1AFC#1C43#1C4E#1DB7#1DD6#1E30#1ECB#1EF8#1F28#202E#2040
-;~F#205C#2066#2073#210D#2146#215A#216F#2173#2193#219B#21C6#2412#2503#2582#2588#2592#259E#25A9#25AD#25E8
-;~F#25F0#25F8#25FF#2606#2613#2619#2624#2666#2675#2693#26C1#26C8#26DB#26F4#2721#272C#2731#274B#2757#2772
-;~F#27C4#27D2#27DA#27E2#280D#2816#283F#2844#2849#284E#2858#2869#2909#2917#295F#2986#2998#29B7#29C6#29DD
-;~F#29FA#29FE#2A02#2A19
-;~B#11C5#140B#1ACF
+;~F#3C#DB#177#17D#18D#241#2EC#2F5#315#329#32E#334#33A#340#346#34B#369#37F#394#39A
+;~F#3A0#3A7#3AE#3B7#3BD#3C3#3C9#3D0#3DF#3E8#3F4#406#41F#43B#440#44D#45F#479#480#486
+;~F#494#4A7#4B0#4B9#4DF#4F1#507#513#51F#532#538#53E#542#548#54D#56C#57B#58A#597#5F0
+;~F#6F4#76F#790#808#815#8CC#957#96E#97C#9AE#A65#A74#B8C#CA7#CB0#D69#D91#DA3#DCB#DF5
+;~F#E03#E1A#E50#E68#F00#102F#114F#12BA#14A6#14B9#14CC#14DF#14F0#1500#150F#152B#152F#1533#153C#1556
+;~F#1580#15D9#15E2#15EC#15F6#1621#1631#1670#167C#1688#169C#17CD#17E7#17F5#1803#1810#1818#1825#1831#1846
+;~F#18FF#192C#1942#194E#1965#1970#19B0#1A22#1A74#1AAF#1AFF#1C46#1C51#1DBA#1DD9#1E33#1ECE#1EFB#1F2A#2030
+;~F#2042#205E#2068#2075#20A8#20DC#2110#2149#215D#2172#2176#2196#219E#21C9#2415#24CA#2506#2585#258B#2595
+;~F#25A1#25AC#25B0#25EB#25F3#25FB#2602#2609#2616#261C#2627#2669#2678#2696#26C4#26CB#26DE#26F7#2724#272F
+;~F#2734#274E#275A#2775#27C7#27D5#27DD#27E5#2810#2819#2842#2847#284C#2851#285B#286C#290C#291A#2962#2989
+;~F#299B#29BA#29C9#29E0#29FD#2A01#2A05#2A1C#2A3A#2A48
+;~B#11CF#140F#1AD3
 ;~C#Blitz3D

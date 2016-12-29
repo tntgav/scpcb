@@ -315,6 +315,7 @@ Function UpdateEvents()
 								CurrMusicVolume = 1.0
 								
 								FMOD_Pause(MusicCHN)
+								FMOD_StopStream(CurrMusicStream)
 								FMOD_CloseStream(CurrMusicStream)
 								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,CurrMusicStream)
 								NowPlaying = ShouldPlay
@@ -1701,6 +1702,8 @@ Function UpdateEvents()
 							
 							FreeEntity pvt
 							
+							Delay 100
+							
 							Sky = sky_CreateSky("GFX\map\sky\sky")
 							RotateEntity Sky,0,e\room\angle-90,0
 							
@@ -1836,8 +1839,10 @@ Function UpdateEvents()
 									If SelectedEnding = "" Then
 										;If ChannelPlaying(e\SoundCHN)=False Then
 										FMOD_Pause(e\SoundCHN2)
+										FMOD_StopStream(e\Sound2)
 										FMOD_CloseStream(e\Sound2)
 										FMOD_Pause(e\SoundCHN)
+										FMOD_StopStream(e\Sound)
 										FMOD_CloseStream(e\Sound)
 										
 										temp = True
@@ -3264,6 +3269,11 @@ Function UpdateEvents()
 								SecondaryLightOn = CurveValue(1.0, SecondaryLightOn, 10.0)
 								If prevpitch =< 83 Then
 									PlaySound2(LightSFX, Camera, e\room\Objects[i])
+									;For r.Rooms = Each Rooms
+									;	For z = 0 To MaxRoomLights-1
+									;		If r\LightSprites[z] <> 0 Then ShowEntity r\LightSprites[z]
+									;	Next 
+									;Next 
 								EndIf		
 							Else
 								RemoteDoorOn = True
@@ -3274,11 +3284,11 @@ Function UpdateEvents()
 							If i = 3 Then 
 								If prevpitch => -83 Then
 									PlaySound2(LightSFX, Camera, e\room\Objects[i])
-									For r.Rooms = Each Rooms
-										For z = 0 To 19
-											If r\LightSprites[z] <> 0 Then HideEntity r\LightSprites[z]
-										Next 
-									Next 
+									;For r.Rooms = Each Rooms
+									;	For z = 0 To MaxRoomLights-1
+									;		If r\LightSprites[z] <> 0 Then HideEntity r\LightSprites[z]
+									;	Next 
+									;Next 
 								EndIf 
 								SecondaryLightOn = CurveValue(0.0, SecondaryLightOn, 10.0)
 							Else
@@ -3733,8 +3743,9 @@ Function UpdateEvents()
 												n\Sound = LoadSound_Strict("SFX\Character\MTF\Tesla0.ogg")
 												PlayMTFSound(n\Sound,n)
 												
-												LoadEventSound(e,"SFX\Character\MTF\Tesla1.ogg")
-												e\SoundCHN = PlaySound_Strict (e\Sound)
+												;LoadEventSound(e,"SFX\Character\MTF\Tesla1.ogg")
+												;e\SoundCHN = PlaySound_Strict (e\Sound)
+												PlayAnnouncement("SFX\Character\MTF\Tesla1.ogg")
 												n\Idle = 70*10
 												e\EventState2 = 70*100
 											EndIf
@@ -6783,8 +6794,6 @@ Function UpdateEvents()
 						CurrStepSFX = 2
 						
 						Curr106\Idle = True
-						PrevSecondaryLightOn = SecondaryLightOn
-						SecondaryLightOn = True
 						
 						;ShowEntity fr\DetailEntities[0]
 						;ShowEntity fr\DetailEntities[1]
@@ -6866,7 +6875,7 @@ Function UpdateEvents()
 											UpdateDoors()
 											
 											SecondaryLightOn = PrevSecondaryLightOn
-											SecondaryLightOn = 0.0
+											;SecondaryLightOn = 0.0
 											
 											e\EventState = 0.0
 											
@@ -6926,7 +6935,8 @@ Function UpdateEvents()
 										RotateEntity Collider, 0.0, EntityYaw(fr\Door[0],True)-180, 0.0, True
 										MoveEntity Collider, -0.5,0.0,0.5
 										
-										
+										PrevSecondaryLightOn = SecondaryLightOn
+										SecondaryLightOn = True
 										
 										pvt = CreatePivot()
 										PositionEntity pvt, EntityX(Camera),EntityY(Camera),EntityZ(Camera)
@@ -8025,8 +8035,8 @@ Function UpdateEvents()
 						Update1499Sky()
 						ShouldPlay = 18
 						If EntityY(Collider)<800.0
-							PositionEntity Collider,EntityX(Collider),800.1,EntityZ(Collider),True
-						ResetEntity Collider
+							PositionEntity Collider,EntityX(Collider),800.5,EntityZ(Collider),True
+							ResetEntity Collider
 						EndIf
 					Else
 						DropSpeed = 0

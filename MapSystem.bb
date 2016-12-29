@@ -7375,7 +7375,9 @@ Function UpdateRoomLights(cam%)
 		If r\dist < HideDistance*0.7 Or r = PlayerRoom
 			For i = 0 To r\MaxLights%
 				If r\Lights%[i]<>0
-					If EnableRoomLights%
+					If EnableRoomLights% And (SecondaryLightOn>0.5)
+						ShowEntity r\LightSprites[i]
+						
 						If EntityDistance(cam%,r\Lights%[i])<8.5
 							If r\LightHidden[i]
 								ShowEntity r\Lights%[i]
@@ -7400,7 +7402,7 @@ Function UpdateRoomLights(cam%)
 							EndIf
 						EndIf
 						
-						If EntityDistance(cam%,r\LightSprites2[i])<8.5 Or r\RoomTemplate\UseLightCones
+						If (EntityDistance(cam%,r\LightSprites2[i])<8.5 Or r\RoomTemplate\UseLightCones)
 							If EntityVisible(cam%,r\LightSpritesPivot[i]) Or r\RoomTemplate\UseLightCones
 								If r\LightSpriteHidden%[i]
 									ShowEntity r\LightSprites2%[i]
@@ -7460,9 +7462,17 @@ Function UpdateRoomLights(cam%)
 							If (Not r\LightSpriteHidden%[i])
 								HideEntity r\LightSprites2%[i]
 								r\LightSpriteHidden%[i] = True
+								If r\LightCone[i]<>0 Then HideEntity r\LightCone[i]
+								If r\LightConeSpark[i]<>0 HideEntity r\LightConeSpark[i]
 							EndIf
 						EndIf
 					Else
+						If SecondaryLightOn<=0.5
+							HideEntity r\LightSprites[i]
+						Else
+							ShowEntity r\LightSprites[i]
+						EndIf
+						
 						If (Not r\LightHidden[i])
 							HideEntity r\Lights%[i]
 							r\LightHidden[i] = True
