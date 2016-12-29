@@ -9,7 +9,7 @@
 
 Local InitErrorStr$ = ""
 If FileSize("bb_fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "bb_fmod.dll"+Chr(13)+Chr(10)
-If filesize("cpuid.dll")=0 Then InitErrorStr=InitErrorStr+ "cpuid.dll"+Chr(13)+Chr(10)
+If FileSize("cpuid.dll")=0 Then InitErrorStr=InitErrorStr+ "cpuid.dll"+Chr(13)+Chr(10)
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
 If FileSize("zlibwapi.dll")=0 Then InitErrorStr=InitErrorStr+ "zlibwapi.dll"+Chr(13)+Chr(10)
 
@@ -2916,6 +2916,13 @@ Repeat
 					UpdateDimension1499()
 				EndIf
 				UpdateLeave1499()
+			ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Or (PlayerRoom\RoomTemplate\Name="exit1" And EntityY(Collider)>1040.0*RoomScale)
+				UpdateDoors()
+				If QuickLoadPercent = -1 Or QuickLoadPercent = 100
+					UpdateEndings()
+				EndIf
+				UpdateScreens()
+				UpdateRoomLights(Camera)
 			Else
 				UpdateDoors()
 				If QuickLoadPercent = -1 Or QuickLoadPercent = 100
@@ -3722,11 +3729,15 @@ Function DrawEnding()
 		
 		If EndingScreen = 0 Then 
 			EndingScreen = LoadImage_Strict("GFX\endingscreen.pt")
-			
-			temp = LoadSound_Strict ("SFX\Music\Ending.ogg")
+   			temp = LoadSound_Strict ("SFX\Music\Ending.ogg")
 			PlaySound_Strict temp
+			ShouldPlay = 66
 			
 			PlaySound_Strict LightSFX
+			
+			FMOD_Pause(MusicCHN)
+			FMOD_StopStream(CurrMusicStream)
+			FMOD_CloseStream(CurrMusicStream)
 		EndIf
 		
 		If EndingTimer > -700 Then 
@@ -3823,6 +3834,8 @@ Function DrawEnding()
 					EndIf					
 				Else
 					DrawMenu()
+					ShouldPlay = 21
+
 				EndIf
 				
 			EndIf
@@ -4597,13 +4610,17 @@ Function DrawGUI()
 			AAText x - 50, 320, "Blink timer: " + f2s(BlinkTimer, 3)
 			AAText x - 50, 340, "Injuries: " + Injuries
 			AAText x - 50, 360, "Bloodloss: " + Bloodloss
-			AAText x - 50, 390, "SCP - 173 Position (collider): (" + f2s(EntityX(Curr173\Collider), 3) + ", " + f2s(EntityY(Curr173\Collider), 3) + ", " + f2s(EntityZ(Curr173\Collider), 3) + ")"
-			AAText x - 50, 410, "SCP - 173 Position (obj): (" + f2s(EntityX(Curr173\obj), 3) + ", " + f2s(EntityY(Curr173\obj), 3) + ", " + f2s(EntityZ(Curr173\obj), 3) + ")"
-			;Text x - 50, 410, "SCP - 173 Idle: " + Curr173\Idle
-			AAText x - 50, 430, "SCP - 173 State: " + Curr173\State
-			AAText x - 50, 450, "SCP - 106 Position: (" + f2s(EntityX(Curr106\obj), 3) + ", " + f2s(EntityY(Curr106\obj), 3) + ", " + f2s(EntityZ(Curr106\obj), 3) + ")"
-			AAText x - 50, 470, "SCP - 106 Idle: " + Curr106\Idle
-			AAText x - 50, 490, "SCP - 106 State: " + Curr106\State
+			If Curr173 <> Null
+				AAText x - 50, 390, "SCP - 173 Position (collider): (" + f2s(EntityX(Curr173\Collider), 3) + ", " + f2s(EntityY(Curr173\Collider), 3) + ", " + f2s(EntityZ(Curr173\Collider), 3) + ")"
+				AAText x - 50, 410, "SCP - 173 Position (obj): (" + f2s(EntityX(Curr173\obj), 3) + ", " + f2s(EntityY(Curr173\obj), 3) + ", " + f2s(EntityZ(Curr173\obj), 3) + ")"
+				;Text x - 50, 410, "SCP - 173 Idle: " + Curr173\Idle
+				AAText x - 50, 430, "SCP - 173 State: " + Curr173\State
+			EndIf
+			If Curr106 <> Null
+				AAText x - 50, 450, "SCP - 106 Position: (" + f2s(EntityX(Curr106\obj), 3) + ", " + f2s(EntityY(Curr106\obj), 3) + ", " + f2s(EntityZ(Curr106\obj), 3) + ")"
+				AAText x - 50, 470, "SCP - 106 Idle: " + Curr106\Idle
+				AAText x - 50, 490, "SCP - 106 State: " + Curr106\State
+			EndIf
 			offset% = 0
 			For npc.NPCs = Each NPCs
 				If npc\NPCtype = NPCtype096 Then
@@ -6583,20 +6600,22 @@ Function DrawMenu()
 		
 		;DebugLog AchievementsMenu+"|"+OptionsMenu+"|"+QuitMSG
 		
-		If StopHidingTimer = 0 Then
-			If EntityDistance(Curr173\Collider, Collider)<4.0 Or EntityDistance(Curr106\Collider, Collider)<4.0 Then 
-				StopHidingTimer = 1
-			EndIf	
-		ElseIf StopHidingTimer < 40
-			If KillTimer >= 0 Then 
-				StopHidingTimer = StopHidingTimer+FPSfactor
-				
-				If StopHidingTimer => 40 Then
-					PlaySound_Strict(HorrorSFX(15))
-					Msg = "STOP HIDING"
-					MsgTimer = 6*70
-					MenuOpen = False
-					Return
+		If PlayerRoom\RoomTemplate\Name$ <> "exit1" And PlayerRoom\RoomTemplate\Name$ <> "gatea"
+			If StopHidingTimer = 0 Then
+				If EntityDistance(Curr173\Collider, Collider)<4.0 Or EntityDistance(Curr106\Collider, Collider)<4.0 Then 
+					StopHidingTimer = 1
+				EndIf	
+			ElseIf StopHidingTimer < 40
+				If KillTimer >= 0 Then 
+					StopHidingTimer = StopHidingTimer+FPSfactor
+					
+					If StopHidingTimer => 40 Then
+						PlaySound_Strict(HorrorSFX(15))
+						Msg = "STOP HIDING"
+						MsgTimer = 6*70
+						MenuOpen = False
+						Return
+					EndIf
 				EndIf
 			EndIf
 		EndIf

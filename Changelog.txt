@@ -13,6 +13,7 @@ Bug Fixes:
 - Fixed the sound playing of SCP-513 and the nostalgia items.
 - Fixed the secondary lighting being off when leaving the SCP-860-1 area.
 - Fixed SCP-1499's dimension sometimes not having proper collision detection.
+- Fixed some issues with the endings (mostly for Gate B).
 - Removed the "fullbright" flag from the syringe model.
 - Some fixes for the following rooms: room2offices4.
 - Some sounds will now be streamed rather than being loaded and then being played.
