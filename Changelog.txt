@@ -1,4 +1,6 @@
 ﻿v1.3.5
+Saves from version 1.3.4 are compatible with this version!
+
 - Tweaked the SCP-914 refinery system for the keycards a bit.
 - Updated the auto-updater overlay.
 - Replaced OpenAL wrapper with fmod.dll library streaming.
