@@ -12,11 +12,15 @@
 <Files>
  AbsPath="\AAText.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Achievements.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
+ AbsPath="\Blitz_Basic_Bank.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
+ AbsPath="\Blitz_File_FileName.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
+ AbsPath="\Blitz_File_ZipApi.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Converter.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Difficulty.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\DrawPortals.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Dreamfilter.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\FastExt.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
+ AbsPath="\FMod.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Items.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\KeyName.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Main.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
@@ -28,5 +32,6 @@
  AbsPath="\Save.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\Skybox.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\StrictLoads.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
+ AbsPath="\Update.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
  AbsPath="\UpdateEvents.bb" PrjFolder="" Line="0" Column="0" Tip="0" Visible="False"
 </Files>
