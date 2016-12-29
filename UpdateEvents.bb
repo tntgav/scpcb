@@ -2628,17 +2628,7 @@ Function UpdateEvents()
 									Else
 										temp3 = 5
 									EndIf
-									;e\room\NPC[0] = CreateNPC(NPCtypeD,EntityX(e\room\Objects[temp3],True),0.5,EntityZ(e\room\Objects[temp3],True))
-									;PointEntity e\room\NPC[0]\Collider,e\room\Objects[2]
-									;FreeEntity e\room\NPC[0]\obj
-									;e\room\NPC[0]\obj = LoadAnimMesh_Strict("GFX\npcs\clerk.b3d")
-									;e\room\NPC[0]\State = 2
-									;Local tempscale# = 0.5 / MeshWidth(e\room\NPC[0]\obj)
-									;ScaleEntity e\room\NPC[0]\obj, tempscale#, tempscale#, tempscale#
-									;e\room\NPC[0]\Model$ = "GFX\npcs\clerk.b3d"
-									;e\room\NPC[0]\ModelScaleX = tempscale#
-									;e\room\NPC[0]\ModelScaleY = tempscale#
-									;e\room\NPC[0]\ModelScaleZ = tempscale#
+									
 									e\room\NPC[0] = CreateNPC(NPCtypeClerk,EntityX(e\room\Objects[temp3],True),0.5,EntityZ(e\room\Objects[temp3],True))
 									PointEntity e\room\NPC[0]\Collider,e\room\Objects[2]
 									e\room\NPC[0]\State = 2
@@ -2668,13 +2658,13 @@ Function UpdateEvents()
 					Else
 						e\EventState = e\EventState+FPSfactor
 						If e\EventState =< 40 Then
+							HideEntity e\room\Objects[3]
 							If (MilliSecs2() Mod 100) < 50 Then
 								ShowEntity e\room\Objects[4]
 							Else
 								HideEntity e\room\Objects[4]
 							EndIf
 						Else
-							;If e\EventState-FPSfactor =< 40 Then PlaySound_Strict(e\Sound)
 							If e\room\dist < 2
 							If e\EventState-FPSfactor =< 40 Then PlaySound_Strict(e\Sound)	
 							Else
@@ -7932,37 +7922,6 @@ Function UpdateEvents()
 		
 	Next
 	
-	If ExplosionTimer > 0 Then
-		ExplosionTimer = ExplosionTimer+FPSfactor
-		
-		If ExplosionTimer < 140.0 Then
-			If ExplosionTimer-FPSfactor < 5.0 Then
-				ExplosionSFX = LoadSound_Strict("SFX\Ending\GateB\Nuke1.ogg")
-				PlaySound_Strict ExplosionSFX
-				CameraShake = 10.0
-				ExplosionTimer = 5.0
-			EndIf
-			
-			CameraShake = CurveValue(ExplosionTimer/60.0,CameraShake, 50.0)
-		Else
-			CameraShake = Min((ExplosionTimer/20.0),20.0)
-			If ExplosionTimer-FPSfactor < 140.0 Then
-				BlinkTimer = 1.0
-				ExplosionSFX = LoadSound_Strict("SFX\Ending\GateB\Nuke2.ogg")
-				PlaySound_Strict ExplosionSFX				
-				For i = 0 To (10+(10*(ParticleAmount+1)))
-					p.Particles = CreateParticle(EntityX(Collider)+Rnd(-0.5,0.5),EntityY(Collider)-Rnd(0.2,1.5),EntityZ(Collider)+Rnd(-0.5,0.5),0, Rnd(0.2,0.6), 0.0, 350)	
-					RotateEntity p\pvt,-90,0,0,True
-					p\speed = Rnd(0.05,0.07)
-				Next
-			EndIf
-			LightFlash = Min((ExplosionTimer-160.0)/40.0,2.0)
-			If ExplosionTimer > 160 Then KillTimer = Min(KillTimer,-0.1)
-			If ExplosionTimer > 500 Then ExplosionTimer = 0
-		EndIf
-		
-	EndIf
-	
 End Function
 
 Function UpdateDimension1499()
@@ -8123,14 +8082,6 @@ Function UpdateEndings()
 							DrawLoading(100,True)
 						Else
 							
-							;em.Emitters = CreateEmitter(EntityX(e\room\Objects[0],True),EntityY(e\room\Objects[0],True),EntityZ(e\room\Objects[0],True), 1)
-							;TurnEntity(em\Obj, -90, 0, 0)
-							;e\room\Objects[4] = em\Obj
-							;em\RandAngle = 26
-							;em\SizeChange = 0.01
-							;em\Achange = -0.015
-							;em\Gravity = -0.12
-							
 							UpdateSky()
 							
 							If e\EventState < 2.0 And SelectedEnding = "" Then 
@@ -8207,7 +8158,6 @@ Function UpdateEndings()
 								ElseIf e\EventState > 35.0*70 And e\EventState < 36.5*70	
 									CameraShake = 1.5		
 									If e\EventState-FPSfactor =< 35.0*70 Then
-										;e\SoundCHN2 = PlaySound_Strict (LoadTempSound("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg"))
 										e\SoundCHN = StreamSound_Strict("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",SFXVolume,e\Sound,0)
 										e\SoundCHN_isStream = True
 									EndIf									
@@ -8230,12 +8180,6 @@ Function UpdateEndings()
 							
 							If e\EventState => 45.0*70 Then
 								If e\EventState < 75.0*70 Then
-									;If NuclearSirenSFX = 0 Then NuclearSirenSFX = LoadSound_Strict("SFX\Ending\GateB\Siren.ogg")
-									;If e\SoundCHN = 0 Then
-									;	e\SoundCHN = PlaySound_Strict(NuclearSirenSFX)
-									;Else
-									;	If ChannelPlaying(e\SoundCHN)=False Then e\SoundCHN = PlaySound_Strict(NuclearSirenSFX) 
-									;EndIf
 									If e\SoundCHN2=0
 										e\SoundCHN2 = StreamSound_Strict("SFX\Ending\GateB\Siren.ogg",SFXVolume#,e\Sound2)
 										e\SoundCHN2_isStream = True
@@ -8243,7 +8187,7 @@ Function UpdateEndings()
 								Else
 									If SelectedEnding = "" Then
 									    ShouldPlay = 66
-										;If ChannelPlaying(e\SoundCHN)=False Then
+										
 										FMOD_Pause(e\SoundCHN2)
 										FMOD_StopStream(e\Sound2)
 										FMOD_CloseStream(e\Sound2)
@@ -8303,10 +8247,6 @@ Function UpdateEndings()
 											e\room\NPC[2]\EnemyZ = EntityZ(e\room\Objects[11],True)+Cos(MilliSecs()/23.0)*3
 											
 											e\room\RoomDoors[5]\open = True
-											
-											;If e\EventState-FPSfactor < 80.0*70 And e\EventState => 80.0*70 Then
-											;	
-											;EndIf
 											
 											;Update the MTF Units everytime they cannot detect the player
 											If e\EventState3 = 0.0
@@ -8376,12 +8316,7 @@ Function UpdateEndings()
 												DeathMSG = ""
 												Kill()
 												BlinkTimer = -10
-									    	;	FMOD_Pause(e\SoundCHN2)
-										     ;   FMOD_StopStream(e\Sound2)
-										      ;  FMOD_CloseStream(e\Sound2)
-										       ; FMOD_Pause(e\SoundCHN)
-										        ;FMOD_StopStream(e\Sound)
-										        ;FMOD_CloseStream(e\Sound)
+												
 												For n.NPCs = Each NPCs
 													If n\NPCtype = NPCtypeMTF
 														RemoveNPC(n)
@@ -9035,9 +8970,14 @@ Function UpdateEndings()
 					p\speed = Rnd(0.05,0.07)
 				Next
 			EndIf
-			LightFlash = Min((ExplosionTimer-160.0)/40.0,2.0)
+			LightFlash = Min((ExplosionTimer-140.0)/10.0,5.0)
+			
 			If ExplosionTimer > 160 Then KillTimer = Min(KillTimer,-0.1)
 			If ExplosionTimer > 500 Then ExplosionTimer = 0
+			
+			;a dirty workaround to prevent the collider from falling down into the facility once the nuke goes off,
+			;causing the UpdateEvent function to be called again and crashing the game
+			PositionEntity Collider, EntityX(Collider), 200, EntityZ(Collider)
 		EndIf
 		
 	EndIf
