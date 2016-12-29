@@ -8034,7 +8034,7 @@ Function UpdateEvents()
 						ShowEntity NTF_1499Sky
 						Update1499Sky()
 						ShouldPlay = 18
-						If EntityY(Collider)<800.0
+						If EntityY(Collider)<799.8
 							PositionEntity Collider,EntityX(Collider),800.5,EntityZ(Collider),True
 							ResetEntity Collider
 						EndIf
