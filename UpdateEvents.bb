@@ -2370,7 +2370,7 @@ Function UpdateEvents()
 					If PlayerRoom = e\room And Curr173\Idle<2 Then
 						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
-							QuickLoad_CurrRoom = e\room
+							QuickLoad_CurrEvent = e
 							e\EventStr = "load0"
 						EndIf
 					EndIf
@@ -4443,23 +4443,10 @@ Function UpdateEvents()
 						
 						ShouldPlay = 7
 						
-						;If e\room\NPC[0]=Null Then
-							;DrawLoading(0, True)
-							;e\room\NPC[0]=CreateNPC(NPCtype939, 0,0,0)
-							
-							;DrawLoading(20, True)
-							;e\room\NPC[1]=CreateNPC(NPCtype939, 0,0,0)
-							
-							;DrawLoading(50, True)
-							;e\room\NPC[2]=CreateNPC(NPCtype939, 0,0,0)
-							
-							;DrawLoading(100, True)
-						;EndIf
-						If e\room\NPC[2]=Null Or e\EventState = 3
-							If e\EventState = 0 And QuickLoadPercent = -1
+						If e\room\NPC[0]=Null Or e\room\NPC[1]=Null Or e\room\NPC[2]=Null Then
+							If QuickLoadPercent = -1 Then
 								QuickLoadPercent = 0
-								QuickLoad_CurrRoom = e\room
-								e\EventState = 1
+								QuickLoad_CurrEvent = e
 							EndIf
 						Else
 							If e\EventState = 0 Then
@@ -5177,7 +5164,7 @@ Function UpdateEvents()
 						If e\EventState = 0 Then
 							If e\EventStr = "" And QuickLoadPercent = -1
 								QuickLoadPercent = 0
-								QuickLoad_CurrRoom = e\room
+								QuickLoad_CurrEvent = e
 								e\EventStr = "load0"
 							EndIf
 						ElseIf e\EventState > 0
@@ -5676,7 +5663,7 @@ Function UpdateEvents()
 					If e\EventState=0 Or e\room\Objects[0]=0 Then
 						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
-							QuickLoad_CurrRoom = e\room
+							QuickLoad_CurrEvent = e
 							e\EventStr = "load0"
 						EndIf
 						
@@ -5852,7 +5839,7 @@ Function UpdateEvents()
 						
 						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
-							QuickLoad_CurrRoom = e\room
+							QuickLoad_CurrEvent = e
 							e\EventStr = "load0"
 						EndIf
 						
@@ -6036,7 +6023,7 @@ Function UpdateEvents()
 								e\EventState = 1
 								PlaySound_Strict LightSFX
 								QuickLoadPercent = 0
-								QuickLoad_CurrRoom = e\room
+								QuickLoad_CurrEvent = e
 							EndIf
 						Case 2
 							e\EventState = 2
@@ -7051,7 +7038,7 @@ Function UpdateEvents()
 						If e\EventState = 0.0
 							If e\EventStr = "" And QuickLoadPercent = -1
 								QuickLoadPercent = 0
-								QuickLoad_CurrRoom = e\room
+								QuickLoad_CurrEvent = e
 								e\EventStr = "load0"
 							EndIf
 						Else
@@ -7505,7 +7492,7 @@ Function UpdateEvents()
 				If PlayerRoom = e\room
 					If e\EventStr = "" And QuickLoadPercent = -1
 						QuickLoadPercent = 0
-						QuickLoad_CurrRoom = e\room
+						QuickLoad_CurrEvent = e
 						e\EventStr = 0
 					EndIf
 				EndIf
@@ -7941,7 +7928,7 @@ Function UpdateDimension1499()
 					If e\EventState = 0.0
 						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
-							QuickLoad_CurrRoom = e\room
+							QuickLoad_CurrEvent = e
 							e\EventStr = "load0"
 						EndIf
 					Else

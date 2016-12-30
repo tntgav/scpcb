@@ -1854,7 +1854,7 @@ End Function
 
 Global QuickLoadPercent% = -1
 Global QuickLoadPercent_DisplayTimer# = 0
-Global QuickLoad_CurrRoom.Rooms
+Global QuickLoad_CurrEvent.Events
 
 Function DrawQuickLoading()
 	
@@ -1875,7 +1875,7 @@ Function DrawQuickLoading()
 	Else
 		QuickLoadPercent = -1
 		QuickLoadPercent_DisplayTimer# = 0
-		QuickLoad_CurrRoom = Null
+		QuickLoad_CurrEvent = Null
 	EndIf
 	
 End Function
