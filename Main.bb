@@ -9,7 +9,6 @@
 
 Local InitErrorStr$ = ""
 If FileSize("bb_fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "bb_fmod.dll"+Chr(13)+Chr(10)
-If FileSize("cpuid.dll")=0 Then InitErrorStr=InitErrorStr+ "cpuid.dll"+Chr(13)+Chr(10)
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
 If FileSize("zlibwapi.dll")=0 Then InitErrorStr=InitErrorStr+ "zlibwapi.dll"+Chr(13)+Chr(10)
 
@@ -53,8 +52,6 @@ Global EnableSFXRelease% = GetINIInt(OptionFile, "audio", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
 Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
-
-Global kCPUid$, kCPUfamily%, kCPUsteppingId%, kCPUbrand$, kCPUextendedId$, kCPUfeatures$
 
 Dim ArrowIMG(4)
 
@@ -2724,13 +2721,6 @@ LoopDelay = MilliSecs()
 
 Global UpdateParticles_Time# = 0.0
 
-kCPUid$         = CPUid$()
-kCPUfamily%     = CPUfamily%()
-kCPUsteppingId% = CPUsteppingId%()
-kCPUbrand$      = CPUbrand$()
-kCPUextendedId$ = CPUextendedId$()
-kCPUfeatures$   = CPUfeatures$()
-
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------       		MAIN LOOP                 ---------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4620,21 +4610,15 @@ Function DrawGUI()
 					offset = offset + 1
 				EndIf
 			Next
-			Text x + 350,50,LSet("CPU ID: ",18)+kCPUid
-			Text x + 350,70,LSet("CPU family: ",18)+kCPUfamily
-			Text x + 350,90,LSet("CPU stepping ID: ",18)+kCPUsteppingId
-			Text x + 350,110,LSet("CPU brand: ",18)+kCPUbrand
-			Text x + 350,130,LSet("CPU name: ",18)+kCPUextendedId
-			Text x + 350,150,LSet("CPU features: ",18)+kCPUfeatures
 			If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
-				AAText x + 350, 180, "Current Chunk X/Z: ("+(Int((EntityX(Collider)+20)/40))+", "+(Int((EntityZ(Collider)+20)/40))+")"
+				AAText x + 350, 50, "Current Chunk X/Z: ("+(Int((EntityX(Collider)+20)/40))+", "+(Int((EntityZ(Collider)+20)/40))+")"
 				Local CH_Amount% = 0
 				For ch.Chunk = Each Chunk
 					CH_Amount = CH_Amount + 1
 				Next
-				AAText x + 350, 200, "Current Chunk Amount: "+CH_Amount
+				AAText x + 350, 70, "Current Chunk Amount: "+CH_Amount
 			Else
-				AAText x + 350, 180, "Current Room Position: ("+PlayerRoom\x+", "+PlayerRoom\y+", "+PlayerRoom\z+")"
+				AAText x + 350, 50, "Current Room Position: ("+PlayerRoom\x+", "+PlayerRoom\y+", "+PlayerRoom\z+")"
 			EndIf
 			
 			AASetFont Font1
