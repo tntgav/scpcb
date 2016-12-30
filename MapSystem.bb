@@ -4651,7 +4651,7 @@ Function FillRoom(r.Rooms)
 			;[Block]
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 288.0*RoomScale, r\y, r\z + 576.0*RoomScale, 90, r, False, False, 3)
 			r\RoomDoors[0]\open = False : r\RoomDoors[0]\locked = True
-			d = CreateDoor(r\zone, r\x + 777.0*RoomScale, r\y, r\z + 671.0*RoomScale, 90, r, False, False)
+			d = CreateDoor(r\zone, r\x + 777.0*RoomScale, r\y, r\z + 671.0*RoomScale, 90, r, False, False, 4)
 			d = CreateDoor(r\zone, r\x + 556.0*RoomScale, r\y, r\z + 296.0*RoomScale, 0, r, False, False)
 			r\Objects[0] = CreatePivot()
 			PositionEntity r\Objects[0],r\x + 576.0*RoomScale,r\y+160.0*RoomScale,r\z+632.0*RoomScale
@@ -4659,6 +4659,12 @@ Function FillRoom(r.Rooms)
 			
 			it = CreateItem("SCP-1499", "scp1499", r\x + 600.0 * RoomScale, r\y + 176.0 * RoomScale, r\z - 228.0 * RoomScale)
 			RotateEntity it\collider, 0, r\angle, 0
+			EntityParent(it\collider, r\obj)
+			
+			it = CreateItem("Document SCP-1499", "paper", r\x + 840.0 * RoomScale, r\y + 260.0 * RoomScale, r\z + 224.0 * RoomScale)
+			EntityParent(it\collider, r\obj)
+			
+			it = CreateItem("Document SCP-500", "paper", r\x + 1152.0 * RoomScale, r\y + 224.0 * RoomScale, r\z + 336.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			
 			it = CreateItem("Emily Ross' Badge", "badge", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
@@ -5378,18 +5384,15 @@ Function FindPath(n.NPCs, x#, y#, z#)
 	Local w.WayPoints, StartPoint.WayPoints, EndPoint.WayPoints   
 	
 	Local StartX% = Floor(EntityX(n\Collider,True) / 8.0 + 0.5), StartZ% = Floor(EntityZ(n\Collider,True) / 8.0 + 0.5)
-       ;If StartX < 0 Or StartX > MapWidth Then Return 2
-       ;If StartZ < 0 Or StartZ > MapWidth Then Return 2
 	
 	Local EndX% = Floor(x / 8.0 + 0.5), EndZ% = Floor(z / 8.0 + 0.5)
-       ;If EndX < 0 Or EndX > MapWidth Then Return 2
-       ;If EndZ < 0 Or EndZ > MapWidth Then Return 2
+	
 	
 	Local CurrX, CurrZ
-	
-       ;pathstatus = 0, ei ole etsitty reitti�
-       ;pathstatus = 1, reitti l�ydetty
-       ;pathstatus = 2, reitti� ei ole olemassa   
+
+   ;pathstatus = 0, route hasn't been searched for yet
+   ;pathstatus = 1, route found
+   ;pathstatus = 2, route not found (target unreachable)
 	
 	For w.WayPoints = Each WayPoints
 		w\state = 0
@@ -5539,10 +5542,10 @@ Function FindPath(n.NPCs, x#, y#, z#)
 	
 	If EndPoint\state > 0 Then
 		
-		currpoint.waypoints = EndPoint
-		twentiethpoint.waypoints = EndPoint
+		Local currpoint.WayPoints = EndPoint
+		Local twentiethpoint.WayPoints = EndPoint
 		
-		length = 0
+		Local length = 0
 		Repeat
 			length = length +1
 			currpoint = currpoint\parent
@@ -5551,43 +5554,17 @@ Function FindPath(n.NPCs, x#, y#, z#)
 			EndIf
 		Until currpoint = Null
 		
-		currpoint.waypoints = EndPoint
+		currpoint.WayPoints = EndPoint
 		While twentiethpoint<>Null
 			length=Min(length-1,19)
-             ;DebugLog "LENGTH "+length
 			twentiethpoint = twentiethpoint\parent
 			n\Path[length] = twentiethpoint
 		Wend
 		
 		Return 1
-          ;RuntimeError length
-    ;      For i = 0 To (length-1)
-    ;         temp =False
-    ;         If length < 20 Then
-    ;            n\Path[length-1-i] = currpoint.WayPoints
-    ;         Else
-    ;            If i < 20 Then
-    ;               n\Path[20-1-i] = w.WayPoints
-    ;            Else
-    ;               ;Return 1
-    ;            EndIf
-    ;         EndIf
-    ;         
-    ;         If currpoint = StartPoint Then Return 1
-    ;         
-    ;         If currpoint\parent <> Null Then
-    ;            currpoint = currpoint\parent
-    ;         Else
-    ;            Exit
-    ;         EndIf
-    ;         
-    ;      Next
-		
 	Else
-		
-		DebugLog "FUNCTION FindPath() - reitti� ei l�ytynyt"
-		Return 2 ;reitti� m��r�np��h�n ei l�ytynyt
-		
+		DebugLog "FUNCTION FindPath() - no route found"
+		Return 2 
 	EndIf
 	
 End Function
