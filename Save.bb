@@ -1047,7 +1047,7 @@ Function LoadGame(file$)
 		EndIf
 	Next
 	
-	If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
+	;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
 	
 	CloseFile f
 	
@@ -1680,7 +1680,7 @@ Function LoadGameQuick(file$)
 		EndIf
 	Next
 	
-	If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
+	;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
 	
 	If 0 Then 
 		closestroom = Null
