@@ -1,5 +1,4 @@
 
-
 Function SaveGame(file$)
 	CatchErrors("Uncaught (SaveGame)")
 	If Not Playable Then Return ;don't save if the player can't move at all
@@ -593,6 +592,8 @@ Function LoadGame(file$)
 				Curr106 = n
 			Case NPCtype096
 				Curr096 = n
+			Case NPCtype5131
+				Curr5131 = n
 		End Select
 		
 		x = ReadFloat(f)
@@ -630,7 +631,7 @@ Function LoadGame(file$)
 		
 		Local frame# = ReadFloat(f)
 		Select NPCtype
-			Case NPCtypeOldMan, NPCtypeD, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie
+			Case NPCtypeOldMan, NPCtypeD, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie, NPCtypeClerk
 				SetAnimTime(n\obj, frame)
 		End Select
 		
@@ -653,6 +654,7 @@ Function LoadGame(file$)
 		n\TextureID = ReadInt(f)
 		If n\TextureID > 0
 			ChangeNPCTextureID(n.NPCs,n\TextureID-1)
+			SetAnimTime(n\obj,frame)
 		EndIf
 	Next
 	
@@ -1283,6 +1285,8 @@ Function LoadGameQuick(file$)
 				Curr106 = n
 			Case NPCtype096
 				Curr096 = n
+			Case NPCtype5131
+				Curr5131 = n
 		End Select
 		
 		x = ReadFloat(f)
@@ -1318,7 +1322,7 @@ Function LoadGameQuick(file$)
 		
 		Local frame# = ReadFloat(f)
 		Select NPCtype
-			Case NPCtypeOldMan, NPCtypeD, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie
+			Case NPCtypeOldMan, NPCtypeD, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie, NPCtypeClerk
 				SetAnimTime(n\obj, frame)
 		End Select		
 		
@@ -1341,6 +1345,7 @@ Function LoadGameQuick(file$)
 		n\TextureID = ReadInt(f)
 		If n\TextureID > 0
 			ChangeNPCTextureID(n.NPCs,n\TextureID-1)
+			SetAnimTime(n\obj,frame)
 		EndIf
 	Next
 	

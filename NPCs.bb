@@ -1,12 +1,12 @@
 ;[Block]
 
 ;[End Block]
-Global Curr173.NPCs, Curr106.NPCs, Curr096.NPCs
+Global Curr173.NPCs, Curr106.NPCs, Curr096.NPCs, Curr5131.NPCs
 Const NPCtype173% = 1, NPCtypeOldMan% = 2, NPCtypeGuard% = 3, NPCtypeD% = 4
 Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
 Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtype178% = 17, NPCtypePdPlane% = 18
-Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21, NPCtype008% = 22
+Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21, NPCtype008% = 22, NPCtypeClerk% = 23
 
 Type NPCs
 	Field obj%, obj2%, obj3%, obj4%, Collider%
@@ -97,28 +97,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "scale") / MeshDepth(n\obj))			
 			ScaleEntity n\obj, temp,temp,temp
 			
-			;If BumpEnabled Then 		
-			;	diff1 = LoadTexture_Strict("GFX\npcs\173texture.png") 
-			;	bump1 = LoadTexture_Strict("GFX\npcs\173_norm.jpg")
-			;	;spec1 = LoadTexture_Strict("GFX\npcs\173_spec.jpg")
-			;	TextureBlend bump1, 4
-			;	;TextureBlend spec1, FE_SPECULAR0
-			;	
-			;	;EntityTexture n\obj, spec1, 0, 0
-			;	EntityTexture n\obj, bump1, 0, 0
-			;	EntityTexture n\obj, diff1, 0, 1
-			;	FreeTexture diff1
-			;	FreeTexture bump1
-			;	
-			;	;FreeTexture spec1
-			;EndIf
-			;UpdateNormals n\obj
-			
-			;SetAnimTime n\obj, 68	
-			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "speed") / 100.0)
-			;n\obj = LoadMesh_Strict("GFX\mesh\173.3ds")
-			;scaleentity n\obj, 0.35 / meshWidth(n\obj), 0.30 / meshWidth(n\obj), 0.30 / meshWidth(n\obj)
 			
 			n\obj2 = LoadMesh_Strict("GFX\173box.b3d")
 			ScaleEntity n\obj2, RoomScale, RoomScale, RoomScale
@@ -134,18 +113,6 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\106_2.b3d")
-			
-			;If BumpEnabled Then 		
-			;	diff1 = LoadTexture_Strict("GFX\npcs\106_diffuse.png")
-			;	bump1 = LoadTexture_Strict("GFX\npcs\106_normals.png")
-			;	;TextureBlend bump1, FE_BUMP ;USE DOT3
-			;	;TextureBlend di1, FE_SPECULAR0
-			;	
-			;	;EntityTexture n\obj, bump1, 0, 0
-			;	EntityTexture n\obj, diff1, 0, 1
-			;	FreeTexture diff1
-			;	FreeTexture bump1
-			;EndIf
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-106", "scale") / 2.2)		
 			ScaleEntity n\obj, temp, temp, temp
@@ -287,7 +254,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
-			n\obj = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
+			;n\obj = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
+			n\obj = CopyEntity(NPC049OBJ)
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-049", "speed") / 100.0)
 			
@@ -307,15 +275,16 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
 			
-			For n2.NPCs = Each NPCs
-				If n\NPCtype = n2\NPCtype And n<>n2 Then
-					n\obj = CopyEntity (n2\obj)
-					Exit
-				EndIf
-			Next
+			;For n2.NPCs = Each NPCs
+			;	If n\NPCtype = n2\NPCtype And n<>n2 Then
+			;		n\obj = CopyEntity (n2\obj)
+			;		Exit
+			;	EndIf
+			;Next
 			
 			If n\obj = 0 Then 
-				n\obj = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+				;n\obj = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+				n\obj = CopyEntity(NPC0492OBJ)
 				
 				temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-049-2", "scale") / 2.5)
 				ScaleEntity n\obj, temp, temp, temp
@@ -606,7 +575,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "speed") / 100.0) * Rnd(0.9,1.1)
-			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 6.0) * Rnd(0.8,1.0)
+			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
 			
 			ScaleEntity n\obj, temp, temp, temp
 			
@@ -631,6 +600,22 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			SetNPCFrame n,9
 			
 			n\Sound = LoadSound_Strict("SFX\SCP\049\0492Breath.ogg")
+			;[End Block]
+		Case NPCtypeClerk
+			;[Block]
+			n\NVName = "Human"
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(ClerkOBJ)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(ClerkOBJ), -MeshHeight(ClerkOBJ), -MeshDepth(ClerkOBJ), MeshWidth(ClerkOBJ)*2, MeshHeight(ClerkOBJ)*2, MeshDepth(ClerkOBJ)*2)
 			;[End Block]
 	End Select
 	
@@ -2572,7 +2557,7 @@ Function UpdateNPCs()
 				UpdateMTFUnit(n)
 				
 				;[End Block]
-			Case NPCtypeD 	;------------------------------------------------------------------------------------------------------------------
+			Case NPCtypeD,NPCtypeClerk 	;------------------------------------------------------------------------------------------------------------------
 				;[Block]
 				RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
 				
@@ -4251,7 +4236,7 @@ Function UpdateNPCs()
 				
 				prevFrame# = n\Frame
 				
-				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*2
+				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*3
 					If n\State = 0 Or n\State = 2
 						For n2.NPCs = Each NPCs
 							If n2\NPCtype = n\NPCtype And n2 <> n
@@ -4946,6 +4931,7 @@ Function UpdateMTFUnit(n.NPCs)
 											If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 											n\Sound = LoadSound_Strict("SFX\Character\MTF\173\Cont"+Rand(1,4)+".ogg")
 											PlayMTFSound(n\Sound, n)
+											PlayAnnouncement("SFX\Character\MTF\Announc173Contain.ogg")
 											DebugLog "173 contained"
 											Exit
 										EndIf
@@ -5007,8 +4993,6 @@ Function UpdateMTFUnit(n.NPCs)
 							
 							PointEntity n\Collider,n\Path[n\PathLocation]\obj
 							RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
-							
-							RotateToDirection(n)
 							
 							n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 							
@@ -5208,11 +5192,9 @@ Function UpdateMTFUnit(n.NPCs)
 								n\PathStatus = 0
 								n\Target = n2
 								DebugLog "049 spotted :"+n\State2
-								;If n\MTFLeader=Null
-								;	If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-								;	n\Sound = LoadSound_Strict("SFX\Character\MTF\
-								;	PlayMTFSound(n\Sound, n)
-								;EndIf
+								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+								n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Spotted"+Rand(1,5)+".ogg")
+								PlayMTFSound(n\Sound, n)
 								Exit
 							EndIf
 						EndIf
@@ -5537,11 +5519,9 @@ Function UpdateMTFUnit(n.NPCs)
 								n\PathStatus = 0
 								n\Target = n2
 								DebugLog "049 spotted :"+n\State2
-								;If n\MTFLeader=Null
-								;	If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-								;	n\Sound = LoadSound_Strict("SFX\Character\MTF\
-								;	PlayMTFSound(n\Sound, n)
-								;EndIf
+								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+								n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Spotted"+Rand(1,5)+".ogg")
+								PlayMTFSound(n\Sound, n)
 								Exit
 							EndIf
 						EndIf
@@ -6672,6 +6652,10 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 			n.NPCs = CreateNPC(NPCtypeTentacle, EntityX(Collider), EntityY(Collider), EntityZ(Collider))
 			consoleMSG = "SCP-035 tentacle spawned."
 			
+		Case "clerk"
+			n.NPCs = CreateNPC(NPCtypeClerk, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Clerk spawned."
+			
 		Default 
 			CreateConsoleMsg("NPC type not found.", 255, 0, 0) : Return
 	End Select
@@ -7008,29 +6992,14 @@ Function FinishWalking(n.NPCs,startframe#,endframe#,speed#)
 	
 End Function
 
-Function RotateToDirection(n.NPCs)
-	
-	HideEntity n\Collider
-	EntityPick(n\Collider, 1.0)
-	If PickedEntity() <> 0 Then
-		Local turnToSide% = 0
-		TurnEntity n\Collider,0,90,0
-		EntityPick(n\Collider,1.0)
-		If PickedEntity()=0
-			turnToSide% = 1
-		EndIf
-		TurnEntity n\Collider,0,270,0
-		If turnToSide% = 1
-			TurnEntity n\Collider,0.0,45,0.0,True
-		Else
-			TurnEntity n\Collider,0.0,-45,0.0,True
-		EndIf
-	EndIf
-	ShowEntity n\Collider
-	
-End Function
-
 Function ChangeNPCTextureID(n.NPCs,textureid%)
+	If (n=Null) Then
+		CreateConsoleMsg("Tried to change the texture of an invalid NPC")
+		If ConsoleOpening Then
+			ConsoleOpen = True
+		EndIf
+		Return
+	EndIf
 	
 	n\TextureID = textureid%+1
 	FreeEntity n\obj

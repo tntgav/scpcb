@@ -1,4 +1,28 @@
-﻿v1.3.4
+﻿v1.3.5
+Saves from version 1.3.4 are compatible with this version!
+
+- Tweaked the SCP-914 refinery system for the keycards a bit.
+- Updated the auto-updater overlay.
+- Replaced OpenAL wrapper with fmod.dll library streaming.
+- Increased SCP-173's speed slightly.
+- Added CPU details in the debug HUD.
+
+Bug Fixes:
+- Fixed a lightmap bug with the props in the medibay room.
+- Fixed an animation bug with the clerk NPC at the tesla gates.
+- Fixed a bug that caused the event of SCP-008's chamber to glitch out if SCP-173 was disabled/contained.
+- Fixed a bug where multiple SCP-513-1 instances could be spawned.
+- Fixed the sound playing of SCP-513 and the nostalgia items.
+- Fixed the secondary lighting being off when leaving the SCP-860-1 area.
+- Fixed SCP-1499's dimension sometimes not having proper collision detection.
+- Fixed some issues with the endings (mostly for Gate B).
+- Removed the "fullbright" flag from the syringe model.
+- Some fixes for the following rooms: room2offices4.
+- Some sounds will now be streamed rather than being loaded and then being played.
+
+----------------------------------------------------------------------------------
+
+v1.3.4
 - Added an OpenAL wrapper created by Mirage Labs.
 - Added bump mapping and texture LOD selection.
 - Added syringes.
@@ -7,12 +31,17 @@
 - New battery textures.
 - Leaving the name field blank when creating a new game now sets the game name to "untitled".
 - Any changes to the player's options from the pause menu are now saved when the "esc" key is pressed to unpause the game.
-- Class-D/Scientist textures are now pre-loaded into memory, optimi.
+- Class-D/Scientist textures are now pre-loaded into memory.
 - Changed the theme that plays inside SCP-1499's dimension.
 - Added a theme to SCP-914's containment chamber.
+- Added Devil Particle System by bytecode77 for better particle effects.
+- Added lines for the MTF Units when they encounter SCP-049.
+- Added signs above the doors in the intro room and a new line for Ulgrin before he opens the player's door.
+- Added room2C (a corner variant of the room3 room in LCZ)
 
 Bug Fixes:
-- Fixed collsion issues with the structures in SCP-1499's dimension.
+- Fixed collision issues with the structures in SCP-1499's dimension.
+- Fixed some errors with the chunk mechanics within SCP-1499's dimension (chunks can now be spawned to infinity).
 - Tweaked SCP-860-2's spawning logic and fixed a bug that made it unable to attack the player while they are moving.
 - Fixed visual bugs relating to the disabling of secondary lights.
 - Fixed a bug that caused SCP-1048 drawings acquired via SCP-1162 to not work.
@@ -23,6 +52,8 @@ Bug Fixes:
 - Repositioned a button in room2shaft that was being placed inside a wall.
 - Fixed the floating buttons in room2closets.
 - Fixed bugs relating to the "spawn" console command.
+- Fixed teleportation bug with the "tele X Y Z" command.
+- Fixed a clipping bug with the floor in SCP-1123's room.
 
 ----------------------------------------------------------------------------------
 

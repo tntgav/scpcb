@@ -1,26 +1,27 @@
-;This is the Source Code from SCP:CB Version 1.3.0 and onwards. This version was created by the "Third Subdivision Team".
-;Original credit goes to Regalis and all the other contributers to SCP:CB.
+;SCP - Containment Breach
 
-;Modified by juanjp600 to remove FastExt and FastText due to stability and compatibility concerns.
-;Removing this code also makes a potential engine conversion marginally easier to do (try parsing the code and converting it to C?),
-;since the strange parts of the extensions are gone.
-;In addition, you won't need FastExt.bb in the first place, making redistribution easier.
+;    The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
+
+;    The source code is licensed under Creative Commons Attribution-ShareAlike 3.0 License.
+;    http://creativecommons.org/licenses/by-sa/3.0/
+
+;    See Credits.txt for a list of contributors
 
 Local InitErrorStr$ = ""
-If FileSize("BlitzAL.dll")=0 Then InitErrorStr=InitErrorStr+ "BlitzAl.dll"+Chr(13)+Chr(10)
+If FileSize("bb_fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "bb_fmod.dll"+Chr(13)+Chr(10)
+If FileSize("cpuid.dll")=0 Then InitErrorStr=InitErrorStr+ "cpuid.dll"+Chr(13)+Chr(10)
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
-If FileSize("OpenAl32.dll")=0 Then InitErrorStr=InitErrorStr+ "OpenAl32.dll"+Chr(13)+Chr(10)
-If FileSize("wrap_oal.dll")=0 Then InitErrorStr=InitErrorStr+ "wrap_oal.dll"+Chr(13)+Chr(10)
 If FileSize("zlibwapi.dll")=0 Then InitErrorStr=InitErrorStr+ "zlibwapi.dll"+Chr(13)+Chr(10)
 
 If Len(InitErrorStr)>0 Then
 	RuntimeError "The following DLLs were not found in the game directory:"+Chr(13)+Chr(10)+Chr(13)+Chr(10)+InitErrorStr
 EndIf
 
+Include "FMod.bb"
+
 Include "StrictLoads.bb"
 Include "fullscreen_window_fix.bb"
 Include "KeyName.bb"
-Include "BlitzAl.bb"
 
 Global OptionFile$ = "options.ini"
 
@@ -38,13 +39,12 @@ While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
 Wend
 ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 
+Global UpdaterFont%
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.4"
+Global VersionNumber$ = "1.3.5"
 Global CompatibleNumber$ = "1.3.4" ;Only change this if the version given isn't working with the current build version - ENDSHN
-
-AppTitle "SCP - Containment Breach Launcher"
 
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%
@@ -53,6 +53,8 @@ Global EnableSFXRelease% = GetINIInt(OptionFile, "audio", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
 Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
+
+Global kCPUid$, kCPUfamily%, kCPUsteppingId%, kCPUbrand$, kCPUextendedId$, kCPUfeatures$
 
 Dim ArrowIMG(4)
 
@@ -210,8 +212,6 @@ Global GameSaved%
 Global CanSave% = True
 
 AppTitle "SCP - Containment Breach v"+VersionNumber
-
-alInitialise()
 
 ;---------------------------------------------------------------------------------------------------------------------
 
@@ -1165,7 +1165,7 @@ Function UpdateConsole()
 					Else
 						Console_SpawnNPC(StrTemp)
 					EndIf
-
+					;[End Block]
 				;new Console Commands in SCP:CB 1.3 - ENDSHN
 				Case "infinitestamina","infstam"
 					;[Block]
@@ -1302,6 +1302,8 @@ Function UpdateConsole()
 					StrTemp3$ = Piece$(args$,3," ")
 					PositionEntity Collider,Float(StrTemp$),Float(StrTemp2$),Float(StrTemp3$)
 					PositionEntity Camera,Float(StrTemp$),Float(StrTemp2$),Float(StrTemp3$)
+					ResetEntity Collider
+					ResetEntity Camera
 					CreateConsoleMsg("Teleported to coordinates (X|Y|Z): "+EntityX(Collider)+"|"+EntityY(Collider)+"|"+EntityZ(Collider))
 					;[End Block]
 				Case "notarget"
@@ -1389,11 +1391,26 @@ Function UpdateConsole()
 						StrTemp$ = ""
 					EndIf
 					
-					If Int(StrTemp) > -1 And Int(StrTemp) <= 0 ;<--- This is the maximum ID of particles by Devil Particle system, will be increased after time - ENDSHN
+					If Int(StrTemp) > -1 And Int(StrTemp) <= 1 ;<--- This is the maximum ID of particles by Devil Particle system, will be increased after time - ENDSHN
 						SetEmitter(Collider,ParticleEffect[Int(StrTemp)])
 						CreateConsoleMsg("Spawned particle emitter with ID "+Int(StrTemp)+" at player's position.")
 					Else
 						CreateConsoleMsg("Particle emitter with ID "+Int(StrTemp)+" not found.",255,150,0)
+					EndIf
+					;[End Block]
+				Case "giveachievement"
+					;[Block]
+					If Instr(ConsoleInput, " ")<>0 Then
+						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					Else
+						StrTemp$ = ""
+					EndIf
+					
+					If Int(StrTemp)>=0 And Int(StrTemp)<MAXACHIEVEMENTS
+						Achievements(Int(StrTemp))=True
+						CreateConsoleMsg("Achievemt "+AchievementStrings(Int(StrTemp))+" unlocked.")
+					Else
+						CreateConsoleMsg("Achievement with ID "+Int(StrTemp)+" doesn't exist.",255,150,0)
 					EndIf
 					;[End Block]
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
@@ -1557,13 +1574,11 @@ Music(20) = "049Chase"
 Music(21) = "..\Ending\MenuBreath"
 Music(22) = "914"
 
+Global CurrMusicStream
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = PlaySound_Strict(Music(2))
-Global MusicCHN% = alCreateSource_("SFX\Music\"+Music(2)+".ogg",True,False)
-alSourcePlay2D_(MusicCHN,True)
-alSourceSetLoop(MusicCHN,True)
-alSourceSetVolume(MusicCHN, MusicVolume)
-;ChannelVolume(MusicCHN, MusicVolume)
+Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
+
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
 Global CurrMusic% = 1
 
@@ -1783,8 +1798,6 @@ MaskImage NVGImages,255,0,255
 Global Wearing1499% = False
 Global AmbientLightRoomTex%, AmbientLightRoomVal%
 
-;Global NVGImage% = CreateImage(GraphicWidth,GraphicHeight),NVGCam%
-
 Global EnableUserTracks% = GetINIInt(OptionFile, "audio", "enable user tracks")
 Global UserTrackMode% = GetINIInt(OptionFile, "audio", "user track setting")
 Global UserTrackCheck% = 0, UserTrackCheck2% = 0
@@ -1803,7 +1816,6 @@ Global NTF_1499Sky%
 Global OptionsMenu% = 0
 Global QuitMSG% = 0
 
-;Global StoredBrightness% = 40
 Global InFacility% = True
 
 Global PrevMusicVolume# = MusicVolume#
@@ -1819,9 +1831,6 @@ Global room2gw_z# = 0.0
 
 Global Menu_TestIMG
 Global menuroomscale# = 8.0 / 2048.0
-;Menu_TestIMG = Create3DIcon(200,200,"GFX\map\room3z3_opt.rmesh",0,-0.75,1,0,0,0,menuroomscale#,menuroomscale#,menuroomscale#,DOF_Enabled,True)
-;ScaleImage Menu_TestIMG,MenuScale,MenuScale
-;MaskImage Menu_TestIMG,255,0,255
 
 Global CurrMenu_TestIMG$ = ""
 
@@ -1840,8 +1849,13 @@ Global LightConeModel
 
 Global ParticleEffect[10]
 
-Const MaxDTextures=5
+Const MaxDTextures=6
 Global DTextures[MaxDTextures]
+
+Global NPC049OBJ, NPC0492OBJ
+Global ClerkOBJ
+
+Global IntercomStream,IntercomStreamCHN%,IntercomAnnouncementLoaded%
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2397,6 +2411,7 @@ Type Events
 	Field EventState#, EventState2#, EventState3#
 	Field SoundCHN%, SoundCHN2%
 	Field Sound, Sound2
+	Field SoundCHN_isStream%, SoundCHN2_isStream%
 	
 	Field EventStr$
 	
@@ -2709,6 +2724,13 @@ LoopDelay = MilliSecs()
 
 Global UpdateParticles_Time# = 0.0
 
+kCPUid$         = CPUid$()
+kCPUfamily%     = CPUfamily%()
+kCPUsteppingId% = CPUsteppingId%()
+kCPUbrand$      = CPUbrand$()
+kCPUextendedId$ = CPUextendedId$()
+kCPUfeatures$   = CPUfeatures$()
+
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------       		MAIN LOOP                 ---------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2756,12 +2778,11 @@ Repeat
 	
 	If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
 	
-	alUpdate()
 	UpdateMusic()
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
 	If MainMenuOpen Then
-		If ShouldPlay = 21 Then
+		If ShouldPlay = 21 Or ShouldPlay = 66 Then
 			If TempSoundCHN = 0 Then
 				For snd.Sound = Each Sound
 					For i = 0 To 31
@@ -2770,25 +2791,25 @@ Repeat
 						EndIf
 					Next
 				Next
-				;TempSoundCHN = PlaySound_Strict(Music(21))
-				TempSoundCHN = 1
-				alSourceSetLoop(MusicCHN,False)
 			EndIf
-			;If (Not ChannelPlaying(TempSoundCHN)) Then FreeSound_Strict Music(21) : ShouldPlay = 11
-			If (Not alSourceIsPlaying(MusicCHN))
+			
+			ShouldPlay = 66
+			MusicCHN = PlaySound_Strict(LoadTempSound("SFX\Ending\MenuBreath.ogg"))
+			If (Not ChannelPlaying(TempSoundCHN))
 				ShouldPlay = 11
-				TempSoundCHN = 0
 			EndIf
 		Else
 			ShouldPlay = 11
 		EndIf
 		UpdateMainMenu()
 	Else
+		UpdateStreamSounds()
+		
 		ShouldPlay = Min(PlayerZone,2)
 		
 		DrawHandIcon = False
 		
-		If FPSfactor > 0 Then UpdateSecurityCams()
+		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
 		
 		If KeyHit(KEY_INV) And VomitTimer >= 0 Then 
 			If InvOpen Then
@@ -2874,23 +2895,37 @@ Repeat
 			MouseLook()
 			MovePlayer()
 			InFacility = CheckForPlayerInFacility()
-			UpdateDoors()
-			If QuickLoadPercent = -1 Or QuickLoadPercent = 100
-				UpdateEvents()
+			If PlayerRoom\RoomTemplate\Name = "dimension1499"
+				If QuickLoadPercent = -1 Or QuickLoadPercent = 100
+					UpdateDimension1499()
+				EndIf
+				UpdateLeave1499()
+			ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Or (PlayerRoom\RoomTemplate\Name="exit1" And EntityY(Collider)>1040.0*RoomScale)
+				UpdateDoors()
+				If QuickLoadPercent = -1 Or QuickLoadPercent = 100
+					UpdateEndings()
+				EndIf
+				UpdateScreens()
+				UpdateRoomLights(Camera)
+			Else
+				UpdateDoors()
+				If QuickLoadPercent = -1 Or QuickLoadPercent = 100
+					UpdateEvents()
+				EndIf
+				UpdateScreens()
+				TimeCheckpointMonitors()
+				Update294()
+				UpdateRoomLights(Camera)
 			EndIf
 			UpdateDecals()
 			UpdateMTF()
 			UpdateNPCs()
 			UpdateItems()
 			UpdateParticles()
-			UpdateScreens()
-			UpdateRoomLights(Camera)
-			Update294()
-			TimeCheckpointMonitors()
-			UpdateLeave1499()
 			;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
 			UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
 			If UpdateParticles_Time#=1
+				UpdateDevilEmitters()
 				UpdateParticles_Devil()
 				UpdateParticles_Time#=0
 			EndIf
@@ -3394,11 +3429,7 @@ Function QuickLoadEvents()
 							If e\room\NPC[0]=Null Then
 								e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True),EntityY(e\room\Objects[0],True),EntityZ(e\room\Objects[0],True))
 							EndIf
-							;e\room\NPC[0]\texture = "GFX\npcs\janitor.jpg"
-							;tex = LoadTexture_Strict(e\room\NPC[0]\texture)
-							;
-							;EntityTexture e\room\NPC[0]\obj, tex
-							;FreeTexture tex
+							
 							ChangeNPCTextureID(e\room\NPC[0],4)
 							e\EventStr = "load1"
 						ElseIf e\EventStr = "load1"
@@ -3414,11 +3445,7 @@ Function QuickLoadEvents()
 							If e\room\NPC[1]=Null Then
 								e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1],True),EntityY(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
 							EndIf
-							;e\room\NPC[1]\texture = "GFX\npcs\scientist.jpg"
-							;tex = LoadTexture_Strict(e\room\NPC[1]\texture)
-							;EntityTexture e\room\NPC[1]\obj, tex
-							;
-							;FreeTexture tex
+							
 							ChangeNPCTextureID(e\room\NPC[1],2)
 							e\EventStr = "load4"
 						ElseIf e\EventStr = "load4"
@@ -3576,12 +3603,12 @@ Function QuickLoadEvents()
 					If e\EventState = 0.0
 						If e\EventStr = "load0"
 							QuickLoadPercent = 10
-							e\room\Objects[0] = CreatePlane()
+							e\room\Objects[0] = LoadMesh_Strict("GFX\map\dimension1499\1499plane.b3d")
 							Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
+							ScaleTexture planetex%,0.5,0.5
 							EntityTexture e\room\Objects[0],planetex%
 							FreeTexture planetex%
-							PositionEntity e\room\Objects[0],0,EntityY(e\room\obj),0
-							EntityType e\room\Objects[0],HIT_MAP
+							HideEntity e\room\Objects[0]
 							e\EventStr = "load1"
 						ElseIf e\EventStr = "load1"
 							QuickLoadPercent = 30
@@ -3602,8 +3629,11 @@ Function QuickLoadEvents()
 								x# = EntityX(e\room\obj)
 								z# = EntityZ(e\room\obj)
 								Local ch.Chunk
-								For i = -2 To 2 Step 2
-									ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
+								For i = -2 To 0 Step 2
+									ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#,True)
+								Next
+								For i = -2 To 0 Step 2
+									ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#-40,True)
 								Next
 								e\EventState = 2.0
 								e\EventStr = 18
@@ -3678,17 +3708,20 @@ Function DrawEnding()
 		EndIf
 		
 		If EndingTimer <-400 Then 
-			If Music(5)=0 Then Music(5) = LoadSound_Strict("SFX\Music\Intro.ogg")
-			ShouldPlay = 5
+			ShouldPlay = 13
 		EndIf
 		
 		If EndingScreen = 0 Then 
 			EndingScreen = LoadImage_Strict("GFX\endingscreen.pt")
-			
-			temp = LoadSound_Strict ("SFX\Music\Ending.ogg")
+   			temp = LoadSound_Strict ("SFX\Music\Ending.ogg")
 			PlaySound_Strict temp
+			ShouldPlay = 66
 			
 			PlaySound_Strict LightSFX
+			
+			FMOD_Pause(MusicCHN)
+			FMOD_StopStream(CurrMusicStream)
+			FMOD_CloseStream(CurrMusicStream)
 		EndIf
 		
 		If EndingTimer > -700 Then 
@@ -3785,6 +3818,8 @@ Function DrawEnding()
 					EndIf					
 				Else
 					DrawMenu()
+					ShouldPlay = 21
+
 				EndIf
 				
 			EndIf
@@ -4263,7 +4298,6 @@ Function MouseLook()
 	EndIf
 	
 	If Wearing178>0 Then
-		If Music(14)=0 Then Music(14)=LoadSound_Strict("SFX\Music\178.ogg")
 		ShouldPlay = 14
 		ShowEntity(GlassesOverlay)
 	Else
@@ -4560,13 +4594,17 @@ Function DrawGUI()
 			AAText x - 50, 320, "Blink timer: " + f2s(BlinkTimer, 3)
 			AAText x - 50, 340, "Injuries: " + Injuries
 			AAText x - 50, 360, "Bloodloss: " + Bloodloss
-			AAText x - 50, 390, "SCP - 173 Position (collider): (" + f2s(EntityX(Curr173\Collider), 3) + ", " + f2s(EntityY(Curr173\Collider), 3) + ", " + f2s(EntityZ(Curr173\Collider), 3) + ")"
-			AAText x - 50, 410, "SCP - 173 Position (obj): (" + f2s(EntityX(Curr173\obj), 3) + ", " + f2s(EntityY(Curr173\obj), 3) + ", " + f2s(EntityZ(Curr173\obj), 3) + ")"
-			;Text x - 50, 410, "SCP - 173 Idle: " + Curr173\Idle
-			AAText x - 50, 430, "SCP - 173 State: " + Curr173\State
-			AAText x - 50, 450, "SCP - 106 Position: (" + f2s(EntityX(Curr106\obj), 3) + ", " + f2s(EntityY(Curr106\obj), 3) + ", " + f2s(EntityZ(Curr106\obj), 3) + ")"
-			AAText x - 50, 470, "SCP - 106 Idle: " + Curr106\Idle
-			AAText x - 50, 490, "SCP - 106 State: " + Curr106\State
+			If Curr173 <> Null
+				AAText x - 50, 390, "SCP - 173 Position (collider): (" + f2s(EntityX(Curr173\Collider), 3) + ", " + f2s(EntityY(Curr173\Collider), 3) + ", " + f2s(EntityZ(Curr173\Collider), 3) + ")"
+				AAText x - 50, 410, "SCP - 173 Position (obj): (" + f2s(EntityX(Curr173\obj), 3) + ", " + f2s(EntityY(Curr173\obj), 3) + ", " + f2s(EntityZ(Curr173\obj), 3) + ")"
+				;Text x - 50, 410, "SCP - 173 Idle: " + Curr173\Idle
+				AAText x - 50, 430, "SCP - 173 State: " + Curr173\State
+			EndIf
+			If Curr106 <> Null
+				AAText x - 50, 450, "SCP - 106 Position: (" + f2s(EntityX(Curr106\obj), 3) + ", " + f2s(EntityY(Curr106\obj), 3) + ", " + f2s(EntityZ(Curr106\obj), 3) + ")"
+				AAText x - 50, 470, "SCP - 106 Idle: " + Curr106\Idle
+				AAText x - 50, 490, "SCP - 106 State: " + Curr106\State
+			EndIf
 			offset% = 0
 			For npc.NPCs = Each NPCs
 				If npc\NPCtype = NPCtype096 Then
@@ -4582,6 +4620,22 @@ Function DrawGUI()
 					offset = offset + 1
 				EndIf
 			Next
+			Text x + 350,50,LSet("CPU ID: ",18)+kCPUid
+			Text x + 350,70,LSet("CPU family: ",18)+kCPUfamily
+			Text x + 350,90,LSet("CPU stepping ID: ",18)+kCPUsteppingId
+			Text x + 350,110,LSet("CPU brand: ",18)+kCPUbrand
+			Text x + 350,130,LSet("CPU name: ",18)+kCPUextendedId
+			Text x + 350,150,LSet("CPU features: ",18)+kCPUfeatures
+			If PlayerRoom\RoomTemplate\Name$ = "dimension1499"
+				AAText x + 350, 180, "Current Chunk X/Z: ("+(Int((EntityX(Collider)+20)/40))+", "+(Int((EntityZ(Collider)+20)/40))+")"
+				Local CH_Amount% = 0
+				For ch.Chunk = Each Chunk
+					CH_Amount = CH_Amount + 1
+				Next
+				AAText x + 350, 200, "Current Chunk Amount: "+CH_Amount
+			Else
+				AAText x + 350, 180, "Current Room Position: ("+PlayerRoom\x+", "+PlayerRoom\y+", "+PlayerRoom\z+")"
+			EndIf
 			
 			AASetFont Font1
 		EndIf
@@ -5230,9 +5284,8 @@ Function DrawGUI()
 		
 		If SelectedItem <> Null Then
 			Select SelectedItem\itemtemplate\tempname
-					
-					;[Block]
 				Case "nvgoggles"
+					;[Block]
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
 					If WearingNightVision = 1 Then
 						Msg = "You removed the goggles."
@@ -5249,7 +5302,9 @@ Function DrawGUI()
 					WearingNightVision = (Not WearingNightVision)
 					SelectedItem = Null	
 					
+					;[End Block]
 				Case "supernv"
+					;[Block]
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
 					If WearingNightVision = 2 Then
 						Msg = "You removed the goggles."
@@ -5266,7 +5321,9 @@ Function DrawGUI()
 					WearingNightVision = (Not WearingNightVision) * 2
 					SelectedItem = Null	
 					
+					;[End Block]
 				Case "veryfinenvgoggles"
+					;[Block]
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
 					If WearingNightVision = 3 Then
 						Msg = "You removed the goggles."
@@ -5282,8 +5339,10 @@ Function DrawGUI()
 						
 					WearingNightVision = (Not WearingNightVision) * 3
 					SelectedItem = Null	
-
+					
+					;[End Block]
 				Case "scp178"
+					;[Block]
 					If Wearing178=1 Then
 						Msg = "You removed the glasses."
 						Wearing178 = 0
@@ -5298,7 +5357,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
+					;[End Block]
 				Case "scp1025"
+					;[Block]
 					;Achievements(Achv1025)=True 
 					If SelectedItem\itemtemplate\img = 0 Then
 						SelectedItem\state = Rand(0,5)
@@ -5312,7 +5373,9 @@ Function DrawGUI()
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
+					;[End Block]
 				Case "ring"
+					;[Block]
 					If Wearing714=2 Then
 						Msg = "You removed the ring."
 						Wearing714 = False
@@ -5325,7 +5388,9 @@ Function DrawGUI()
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
 					
+					;[End Block]
 				Case "1123"
+					;[Block]
 					If Not (Wearing714 = 1) Then
 						If PlayerRoom\RoomTemplate\Name <> "room1123" Then
 							ShowEntity Light
@@ -5351,26 +5416,26 @@ Function DrawGUI()
 						Next
 					EndIf
 					
+					;[End Block]
 				Case "battery"
+					;[Block]
 					;InvOpen = True
-
+					;[End Block]
 				Case "key1", "key2", "key3", "key4", "key5", "key6", "keyomni", "scp860", "hand", "hand2"
+					;[Block]
 					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					;[End Block]
 				Case "scp513"
-					PlaySound_Strict LoadTempSound("SFX\SCP\513\Bell"+Rand(1,3)+".ogg")
+					;[Block]
+					PlaySound_Strict LoadTempSound("SFX\SCP\513\Bell1.ogg")
 					
-					temp = True
-					For np.NPCs = Each NPCs
-						If np\NPCtype = NPCtype5131 Then
-							temp = False
-							Exit
-						EndIf
-					Next
-					If temp = True Then
-						CreateNPC(NPCtype5131, 0,0,0)
+					If Curr5131 = Null
+						Curr5131 = CreateNPC(NPCtype5131, 0,0,0)
 					EndIf	
 					SelectedItem = Null
+					;[End Block]
 				Case "scp500"
+					;[Block]
 					GiveAchievement(Achv500)
 					
 					If (Injuries > 0 Or Bloodloss > 0) And Infect > 0 Then
@@ -5394,7 +5459,9 @@ Function DrawGUI()
 					RemoveItem(SelectedItem)
 					SelectedItem = Null
 					
+					;[End Block]
 				Case "veryfinefirstaid"
+					;[Block]
 					Select Rand(5)
 						Case 1
 							Injuries = 3.5
@@ -5434,7 +5501,9 @@ Function DrawGUI()
 					End Select
 					
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "firstaid", "finefirstaid", "firstaid2"
+					;[Block]
 					If Bloodloss = 0 And Injuries = 0 Then
 						Msg = "You do not need to use a first aid right now."
 						MsgTimer = 70*5
@@ -5521,14 +5590,18 @@ Function DrawGUI()
 						EndIf
 						
 					EndIf
+					;[End Block]
 				Case "eyedrops"
+					;[Block]
 					If (Not (Wearing714=1)) Then
 						BlinkEffect = 0.6
 						BlinkEffectTimer = Rand(20,30)
 						BlurTimer = 200
 					EndIf
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "fineeyedrops"
+					;[Block]
 					If (Not (Wearing714=1)) Then 
 						BlinkEffect = 0.4
 						BlinkEffectTimer = Rand(30,40)
@@ -5536,7 +5609,9 @@ Function DrawGUI()
 						BlurTimer = 200
 					EndIf
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "supereyedrops"
+					;[Block]
 					If (Not (Wearing714 = 1)) Then
 						BlinkEffect = 0.0
 						BlinkEffectTimer = 60
@@ -5544,7 +5619,9 @@ Function DrawGUI()
 					EndIf
 					BlurTimer = 1000
 					RemoveItem(SelectedItem)					
+					;[End Block]
 				Case "paper", "ticket"
+					;[Block]
 					If SelectedItem\itemtemplate\img = 0 Then
 						Select SelectedItem\itemtemplate\name
 							Case "Burnt Note" 
@@ -5573,7 +5650,7 @@ Function DrawGUI()
 								If (SelectedItem\state = 0) Then
 									Msg = Chr(34)+"Hey, I remember this movie!"+Chr(34)
 									MsgTimer = 70*10
-									PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+									PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,5)+".ogg")
 									SelectedItem\state = 1
 								EndIf
 							Default 
@@ -5585,7 +5662,9 @@ Function DrawGUI()
 					EndIf
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
+					;[End Block]
 				Case "scp1025"
+					;[Block]
 					GiveAchievement(Achv1025) 
 					If SelectedItem\itemtemplate\img=0 Then
 						SelectedItem\state = Rand(0,5)
@@ -5599,7 +5678,9 @@ Function DrawGUI()
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
+					;[End Block]
 				Case "cup"
+					;[Block]
 					
 					SelectedItem\name = Trim(Lower(SelectedItem\name))
 					If Left(SelectedItem\name, Min(6,Len(SelectedItem\name))) = "cup of" Then
@@ -5660,7 +5741,9 @@ Function DrawGUI()
 					
 					SelectedItem = Null	
 					
+					;[End Block]
 				Case "syringe"
+					;[Block]
 					HealTimer = 30
 					StaminaEffect = 0.5
 					StaminaEffectTimer = 20
@@ -5670,7 +5753,9 @@ Function DrawGUI()
 					
 					RemoveItem(SelectedItem)
 					
+					;[End Block]
 				Case "finesyringe"
+					;[Block]
 					HealTimer = Rnd(20, 40)
 					StaminaEffect = Rnd(0.5, 0.8)
 					StaminaEffectTimer = Rnd(20, 30)
@@ -5680,7 +5765,9 @@ Function DrawGUI()
 					
 					RemoveItem(SelectedItem)
 					
+					;[End Block]
 				Case "veryfinesyringe"
+					;[Block]
 					Select Rand(3)
 						Case 1
 							HealTimer = Rnd(40, 60)
@@ -5698,7 +5785,9 @@ Function DrawGUI()
 					MsgTimer = 70 * 8
 					RemoveItem(SelectedItem)
 					
+					;[End Block]
 				Case "radio","18vradio","fineradio","veryfineradio"
+					;[Block]
 					If SelectedItem\state <= 100 Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.004)
 					
 					If SelectedItem\itemtemplate\img=0 Then
@@ -6001,7 +6090,9 @@ Function DrawGUI()
 						
 					EndIf
 					
+					;[End Block]
 				Case "cigarette"
+					;[Block]
 					If SelectedItem\state = 0 Then
 						Select Rand(6)
 							Case 1
@@ -6025,7 +6116,9 @@ Function DrawGUI()
 					EndIf
 
 					MsgTimer = 70 * 5
+					;[End Block]
 				Case "420"
+					;[Block]
 					If Wearing714=1 Then
 						Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
 					Else
@@ -6037,7 +6130,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "420s"
+					;[Block]
 					If Wearing714=1 Then
 						Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
 					Else
@@ -6049,7 +6144,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 6
 					RemoveItem(SelectedItem)
+					;[End Block]
 				Case "scp714"
+					;[Block]
 					If Wearing714=1 Then
 						Msg = "You removed the ring."
 						Wearing714 = False
@@ -6060,13 +6157,17 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
+					;[End Block]
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
+					;[Block]
 					Msg = "You removed the hazmat suit."
 					WearingHazmat = 0
 					MsgTimer = 70 * 5
 					DropItem(SelectedItem)
 					SelectedItem = Null	
+					;[End Block]
 				Case "vest"
+					;[Block]
 					If WearingVest Then
 						Msg = "You removed the vest."
 						WearingVest = False
@@ -6077,7 +6178,9 @@ Function DrawGUI()
 					EndIf
 					MsgTimer = 70 * 7
 					SelectedItem = Null
+					;[End Block]
 				Case "finevest"
+					;[Block]
 					If WearingVest Then
 						Msg = "You removed the vest."
 						WearingVest = False						
@@ -6087,7 +6190,9 @@ Function DrawGUI()
 						TakeOffStuff(2)
 					EndIf
 					SelectedItem = Null	
+					;[End Block]
 				Case "gasmask", "supergasmask", "gasmask3"
+					;[Block]
 					If WearingGasMask Then
 						Msg = "You removed the gas mask."
 					Else
@@ -6106,7 +6211,9 @@ Function DrawGUI()
 						WearingGasMask = (Not WearingGasMask)
 					EndIf
 					SelectedItem = Null				
+					;[End Block]
 				Case "navigator", "nav"
+					;[Block]
 					
 					If SelectedItem\itemtemplate\img=0 Then
 						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
@@ -6288,8 +6395,10 @@ Function DrawGUI()
 						EndIf
 						
 					EndIf
+					;[End Block]
 				;new Items in SCP:CB 1.3
 				Case "scp1499","super1499"
+					;[Block]
 					If (Not Wearing1499%) Then
 						GiveAchievement(Achv1499)
 						
@@ -6332,7 +6441,9 @@ Function DrawGUI()
 						Wearing1499% = (Not Wearing1499%)
 					EndIf
 					SelectedItem = Null
+					;[End Block]
 				Case "badge"
+					;[Block]
 					If SelectedItem\itemtemplate\img=0 Then
 						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 						;SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
@@ -6343,7 +6454,7 @@ Function DrawGUI()
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
 					If SelectedItem\state = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
 						Select SelectedItem\itemtemplate\name
 							Case "Old Badge"
 								Msg = Chr(34)+"Huh? This guy looks just like me!"+Chr(34)
@@ -6352,9 +6463,11 @@ Function DrawGUI()
 						
 						SelectedItem\state = 1
 					EndIf
+					;[End Block]
 				Case "key"
+					;[Block]
 					If SelectedItem\state = 0 Then
-						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
 						
 						Msg = Chr(34)+"Isn't this the key to that old shack? The one where I... No, it can't be."+Chr(34)
 						MsgTimer = 70*10						
@@ -6362,7 +6475,9 @@ Function DrawGUI()
 					
 					SelectedItem\state = 1
 					SelectedItem = Null
+					;[End Block]
 				Case "oldpaper"
+					;[Block]
 					If SelectedItem\itemtemplate\img = 0 Then
 						SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
@@ -6379,20 +6494,24 @@ Function DrawGUI()
 								
 								Msg = Chr(34)+"Why does this seem so familiar?"+Chr(34)
 								MsgTimer = 70*10
-								PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+								PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
 								SelectedItem\state = 1
 						End Select
 					EndIf
+					;[End Block]
 				Case "coin"
+					;[Block]
 					If SelectedItem\state = 0
-						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,10)+".ogg")
+						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,5)+".ogg")
 					EndIf
 					
 					Msg = ""
 					
 					SelectedItem\state = 1
 					SelectedItem = Null
+					;[End Block]
 				Default
+					;[Block]
 					;check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
 						DoubleClick = 0
@@ -6403,6 +6522,7 @@ Function DrawGUI()
 						SelectedItem = Null
 					EndIf
 					
+					;[End Block]
 			End Select
 			
 			If SelectedItem <> Null Then
@@ -6464,20 +6584,22 @@ Function DrawMenu()
 		
 		;DebugLog AchievementsMenu+"|"+OptionsMenu+"|"+QuitMSG
 		
-		If StopHidingTimer = 0 Then
-			If EntityDistance(Curr173\Collider, Collider)<4.0 Or EntityDistance(Curr106\Collider, Collider)<4.0 Then 
-				StopHidingTimer = 1
-			EndIf	
-		ElseIf StopHidingTimer < 40
-			If KillTimer >= 0 Then 
-				StopHidingTimer = StopHidingTimer+FPSfactor
-				
-				If StopHidingTimer => 40 Then
-					PlaySound_Strict(HorrorSFX(15))
-					Msg = "STOP HIDING"
-					MsgTimer = 6*70
-					MenuOpen = False
-					Return
+		If PlayerRoom\RoomTemplate\Name$ <> "exit1" And PlayerRoom\RoomTemplate\Name$ <> "gatea"
+			If StopHidingTimer = 0 Then
+				If EntityDistance(Curr173\Collider, Collider)<4.0 Or EntityDistance(Curr106\Collider, Collider)<4.0 Then 
+					StopHidingTimer = 1
+				EndIf	
+			ElseIf StopHidingTimer < 40
+				If KillTimer >= 0 Then 
+					StopHidingTimer = StopHidingTimer+FPSfactor
+					
+					If StopHidingTimer => 40 Then
+						PlaySound_Strict(HorrorSFX(15))
+						Msg = "STOP HIDING"
+						MsgTimer = 6*70
+						MenuOpen = False
+						Return
+					EndIf
 				EndIf
 			EndIf
 		EndIf
@@ -6631,19 +6753,19 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Texture LOD Bias:")
 					TextureDetails = Slider5(x+270*MenuScale,y+6*MenuScale,100*MenuScale,TextureDetails,3,"0.8","0.4","0.0","-0.4","-0.8")
-							Select TextureDetails%
-								Case 0
+					Select TextureDetails%
+						Case 0
 							TextureFloat# = 0.8
-								Case 1
-									TextureFloat# = 0.4
-								Case 2
+						Case 1
+							TextureFloat# = 0.4
+						Case 2
 							TextureFloat# = 0.0
-								Case 3
-									TextureFloat# = -0.4
+						Case 3
+							TextureFloat# = -0.4
 						Case 4
 							TextureFloat# = -0.8
-							End Select
-							TextureLodBias TextureFloat
+					End Select
+					TextureLodBias TextureFloat
 					If (MouseOn(x+270*MenuScale,y-6*MenuScale,100*MenuScale+14,20) And OnSliderID=0) Or OnSliderID=3
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
@@ -7486,6 +7608,8 @@ Function LoadEntities()
 	ParticleTextures(7) = LoadTexture_Strict("GFX\spark.jpg", 1 + 2)
 	ParticleTextures(8) = LoadTexture_Strict("GFX\particle.png", 1 + 2)
 	
+	SetChunkDataValues()
+	
 	;NPCtypeD - different models with different textures (loaded using "CopyEntity") - ENDSHN
 	;[Block]
 	For i=1 To MaxDTextures
@@ -7512,6 +7636,19 @@ Function LoadEntities()
 	tex = LoadTexture("GFX\npcs\janitor.jpg")
 	EntityTexture DTextures[5],tex
 	FreeTexture tex
+	tex = LoadTexture("GFX\npcs\106victim.jpg")
+	EntityTexture DTextures[6],tex
+	FreeTexture tex
+	;[End Block]
+	
+	;Other NPCs pre-loaded
+	;[Block]
+	NPC049OBJ = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
+	HideEntity NPC049OBJ
+	NPC0492OBJ = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+	HideEntity NPC0492OBJ
+	ClerkOBJ = LoadAnimMesh_Strict("GFX\npcs\clerk.b3d")
+	HideEntity ClerkOBJ
 	;[End Block]
 	
 	LoadMaterials("DATA\materials.ini")
@@ -7544,6 +7681,49 @@ Function LoadEntities()
 	SetTemplateSize(ParticleEffect[0], 0.03125, 0.0625, 0.7, 1)
 	SetTemplateColors(ParticleEffect[0], $0000FF, $6565FF)
 	SetTemplateFloor(ParticleEffect[0], 0.0, 0.5)
+	
+	;Smoke effect (for some vents)
+	ParticleEffect[1] = CreateTemplate()
+	SetTemplateEmitterBlend(ParticleEffect[1], 1)
+	SetTemplateInterval(ParticleEffect[1], 1)
+	SetTemplateEmitterLifeTime(ParticleEffect[1], 3)
+	SetTemplateParticleLifeTime(ParticleEffect[1], 30, 45)
+	SetTemplateTexture(ParticleEffect[1], "GFX\smoke2.png", 2, 1)
+	;SetTemplateOffset(ParticleEffect[1], -.3, .3, -.3, .3, -.3, .3)
+	SetTemplateOffset(ParticleEffect[1], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+	;SetTemplateVelocity(ParticleEffect[1], -.04, .04, .1, .2, -.04, .04)
+	SetTemplateVelocity(ParticleEffect[1], 0.0, 0.0, 0.02, 0.025, 0.0, 0.0)
+	SetTemplateAlphaVel(ParticleEffect[1], True)
+	;SetTemplateSize(ParticleEffect[1], 3, 3, .5, 1.5)
+	SetTemplateSize(ParticleEffect[1], 0.4, 0.4, 0.5, 1.5)
+	SetTemplateSizeVel(ParticleEffect[1], .01, 1.01)
+	
+	;Smoke effect (for decontamination gas)
+	ParticleEffect[2] = CreateTemplate()
+	SetTemplateEmitterBlend(ParticleEffect[2], 1)
+	SetTemplateInterval(ParticleEffect[2], 1)
+	SetTemplateEmitterLifeTime(ParticleEffect[2], 3)
+	SetTemplateParticleLifeTime(ParticleEffect[2], 30, 45)
+	SetTemplateTexture(ParticleEffect[2], "GFX\smoke.png", 2, 1)
+	SetTemplateOffset(ParticleEffect[2], -0.1, 0.1, -0.1, 0.1, -0.1, 0.1)
+	SetTemplateVelocity(ParticleEffect[2], -0.005, 0.005, 0.0, -0.03, -0.005, 0.005)
+	SetTemplateAlphaVel(ParticleEffect[2], True)
+	SetTemplateSize(ParticleEffect[2], 0.4, 0.4, 0.5, 1.5)
+	SetTemplateSizeVel(ParticleEffect[2], .01, 1.01)
+	SetTemplateGravity(ParticleEffect[2], 0.005)
+	t0 = CreateTemplate()
+	SetTemplateEmitterBlend(t0, 1)
+	SetTemplateInterval(t0, 1)
+	SetTemplateEmitterLifeTime(t0, 3)
+	SetTemplateParticleLifeTime(t0, 30, 45)
+	SetTemplateTexture(t0, "GFX\smoke2.png", 2, 1)
+	SetTemplateOffset(t0, -0.1, 0.1, -0.1, 0.1, -0.1, 0.1)
+	SetTemplateVelocity(t0, -0.005, 0.005, 0.0, -0.03, -0.005, 0.005)
+	SetTemplateAlphaVel(t0, True)
+	SetTemplateSize(t0, 0.4, 0.4, 0.5, 1.5)
+	SetTemplateSizeVel(t0, .01, 1.01)
+	SetTemplateGravity(ParticleEffect[2], 0.005)
+	SetTemplateSubTemplate(ParticleEffect[2], t0)
 	
 	DrawLoading(30)
 	
@@ -7777,7 +7957,6 @@ Function InitLoadGame()
 				For i = -2 To 2 Step 2
 					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
 				Next
-				If Music(18)=0 Then Music(18) = LoadSound_Strict("SFX\Music\1499.ogg")
 				DrawLoading(98)
 				UpdateChunks(e\room,15,False)
 				;MoveEntity Collider,0,10,0
@@ -8028,6 +8207,8 @@ Function NullGame()
 	
 	DeleteElevatorObjects()
 	
+	DeleteDevilEmitters()
+	
 	NoTarget% = False
 	
 	OptionsMenu% = -1
@@ -8140,8 +8321,11 @@ Function UpdateMusic()
 				If CurrMusicVolume = 0 Then
 					;If MusicCHN <> 0 Then StopChannel MusicCHN
 					If NowPlaying<66
-						alSourceStop(MusicCHN)
-						alFreeSource(MusicCHN)
+						;alSourceStop(MusicCHN)
+						;alFreeSource(MusicCHN)
+						FMOD_Pause(MusicCHN)
+						FMOD_StopStream(CurrMusicStream)
+						FMOD_CloseStream(CurrMusicStream)
 					EndIf
 					NowPlaying = ShouldPlay
 					MusicCHN = 0
@@ -8152,21 +8336,18 @@ Function UpdateMusic()
 			EndIf
 		;EndIf
 		
-		If NowPlaying < 66 Then
-			;If MusicCHN = 0 Then
+			If NowPlaying < 66 Then
 			If CurrMusic = 0
-				MusicCHN% = alCreateSource_("SFX\Music\"+Music(NowPlaying)+".ogg",True,False)
-				alSourcePlay2D_(MusicCHN,True)
-				alSourceSetLoop(MusicCHN,True)
+				MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",MusicVolume,CurrMusicStream)
 				CurrMusic = 1
-				;alSourceSetLoop(MusicCHN,True)
 			Else
 				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
 			EndIf
 			
-			If alSourceIsPlaying(MusicCHN)
-				alSourceSetVolume(MusicCHN, CurrMusicVolume)
-			EndIf
+			;If alSourceIsPlaying(MusicCHN) Then
+			;	alSourceSetVolume(MusicCHN, CurrMusicVolume)
+			;EndIf
+			FMOD_SetVolume(CurrMusicVolume*255.0,MusicCHN)
 		EndIf
 		
 		;ChannelVolume MusicCHN, CurrMusicVolume
@@ -8183,10 +8364,18 @@ End Function
 Function PauseSounds()
 	For e.events = Each Events
 		If e\soundchn <> 0 Then
-			If ChannelPlaying(e\soundchn) Then PauseChannel(e\soundchn)
+			If (Not e\soundchn_isstream)
+				If ChannelPlaying(e\soundchn) Then PauseChannel(e\soundchn)
+			Else
+				FMOD_Pause(e\soundchn)
+			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
-			If ChannelPlaying(e\soundchn2) Then PauseChannel(e\soundchn2)
+			If (Not e\soundchn2_isstream)
+				If ChannelPlaying(e\soundchn2) Then PauseChannel(e\soundchn2)
+			Else
+				FMOD_Pause(e\soundchn2)
+			EndIf
 		EndIf		
 	Next
 	
@@ -8203,7 +8392,13 @@ Function PauseSounds()
 		If d\soundchn <> 0 Then
 			If ChannelPlaying(d\soundchn) Then PauseChannel(d\soundchn)
 		EndIf
-	Next	
+	Next
+	
+	For dem.DevilEmitters = Each DevilEmitters
+		If dem\soundchn <> 0 Then
+			If ChannelPlaying(dem\soundchn) Then PauseChannel(dem\soundchn)
+		EndIf
+	Next
 	
 	If AmbientSFXCHN <> 0 Then
 		If ChannelPlaying(AmbientSFXCHN) Then PauseChannel(AmbientSFXCHN)
@@ -8212,15 +8407,27 @@ Function PauseSounds()
 	If BreathCHN <> 0 Then
 		If ChannelPlaying(BreathCHN) Then PauseChannel(BreathCHN)
 	EndIf
+	
+	If IntercomAnnouncementLoaded
+		FMOD_Pause(IntercomStreamCHN)
+	EndIf
 End Function
 
 Function ResumeSounds()
 	For e.events = Each Events
 		If e\soundchn <> 0 Then
-			If ChannelPlaying(e\soundchn) Then ResumeChannel(e\soundchn)
+			If (Not e\soundchn_isstream)
+				If ChannelPlaying(e\soundchn) Then ResumeChannel(e\soundchn)
+			Else
+				FMOD_Resume(e\soundchn)
+			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
-			If ChannelPlaying(e\soundchn2) Then ResumeChannel(e\soundchn2)
+			If (Not e\soundchn2_isstream)
+				If ChannelPlaying(e\soundchn2) Then ResumeChannel(e\soundchn2)
+			Else
+				FMOD_Resume(e\soundchn2)
+			EndIf
 		EndIf	
 	Next
 	
@@ -8237,7 +8444,13 @@ Function ResumeSounds()
 		If d\soundchn <> 0 Then
 			If ChannelPlaying(d\soundchn) Then ResumeChannel(d\soundchn)
 		EndIf
-	Next	
+	Next
+	
+	For dem.DevilEmitters = Each DevilEmitters
+		If dem\soundchn <> 0 Then
+			If ChannelPlaying(dem\soundchn) Then ResumeChannel(dem\soundchn)
+		EndIf
+	Next
 	
 	If AmbientSFXCHN <> 0 Then
 		If ChannelPlaying(AmbientSFXCHN) Then ResumeChannel(AmbientSFXCHN)
@@ -8245,6 +8458,10 @@ Function ResumeSounds()
 	
 	If BreathCHN <> 0 Then
 		If ChannelPlaying(BreathCHN) Then ResumeChannel(BreathCHN)
+	EndIf
+	
+	If IntercomAnnouncementLoaded
+		FMOD_Resume(IntercomStreamCHN)
 	EndIf
 End Function
 
@@ -8594,7 +8811,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						EndIf
 					EndIf					
 			End Select
-
 		Case "Severed Hand", "Black Severed Hand"
 			Select setting
 				Case "rough", "coarse"
@@ -8608,7 +8824,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					EndIf
 			End Select
 			RemoveItem(item)
-
 		Case "First Aid Kit", "Blue First Aid Kit"
 			Select setting
 				Case "rough", "coarse"
@@ -8641,7 +8856,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 1 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+										it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 									Case NORMAL
 										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -8658,18 +8873,18 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							Case "Level 2 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(3)=1 Then
+										If Rand(6)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										Else
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(4)=1 Then
+										If Rand(3)=1 Then
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
-									 Case HARD
+									Case HARD
 										If Rand(5)=1 Then
 											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										Else
@@ -8719,21 +8934,30 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 										EndIf
 								End Select
 							Case "Level 5 Key Card"	
+								Local CurrAchvAmount%=0
+								For i = 0 To MAXACHIEVEMENTS-1
+									If Achievements(i)=True
+										CurrAchvAmount=CurrAchvAmount+1
+									EndIf
+								Next
+								
+								DebugLog CurrAchvAmount
+								
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(500)=1 Then
+										If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*5))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(700)=1 Then
+										If Rand(0,((MAXACHIEVEMENTS-1)*7)-((CurrAchvAmount-1)*5))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(1000)=1 Then
+										If Rand(0,((MAXACHIEVEMENTS-1)*10)-((CurrAchvAmount-1)*5))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -8742,27 +8966,36 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						End Select
 					EndIf
 				Case "very fine"
+					CurrAchvAmount%=0
+					For i = 0 To MAXACHIEVEMENTS-1
+						If Achievements(i)=True
+							CurrAchvAmount=CurrAchvAmount+1
+						EndIf
+					Next
+					
+					DebugLog CurrAchvAmount
+					
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(500)=5 Then
+							If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*5))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case NORMAL
-							If Rand(700)=7 Then
+							If Rand(0,((MAXACHIEVEMENTS-1)*7)-((CurrAchvAmount-1)*5))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case HARD
-							If Rand(1000)=10 Then
+							If Rand(0,((MAXACHIEVEMENTS-1)*10)-((CurrAchvAmount-1)*5))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 					End Select
-			End Select			
+			End Select
 			
 			RemoveItem(item)
 		Case "Key Card Omni"
@@ -8787,9 +9020,9 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
-						it2 = CreateItem("Level 1 Key Card", "key1", x, y, z)	
+					it2 = CreateItem("Level 1 Key Card", "key1", x, y, z)	
 			    Case "fine", "very fine"
-			            it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+					it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 			End Select
 			RemoveItem(item)
 		Case "S-NAV 300 Navigator", "S-NAV 310 Navigator", "S-NAV Navigator", "S-NAV Navigator Ultimate"
@@ -9205,10 +9438,11 @@ Function UpdateMTF%()
 				If Abs(EntityZ(entrance\obj)-EntityZ(Collider))<30.0 Then
 					;If PlayerRoom\RoomTemplate\Name<>"room860" And PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then
 					If PlayerInReachableRoom()
-						PlaySound_Strict LoadTempSound("SFX\Character\MTF\Announc.ogg")
+						;PlaySound_Strict LoadTempSound("SFX\Character\MTF\Announc.ogg")
+						PlayAnnouncement("SFX\Character\MTF\Announc.ogg")
 					EndIf
 					
-					MTFtimer = 1
+					MTFtimer = FPSfactor
 					Local leader.NPCs
 					For i = 0 To 2
 						n.NPCs = CreateNPC(NPCtypeMTF, EntityX(entrance\obj)+0.3*(i-1), 1.0,EntityZ(entrance\obj)+8.0)
@@ -9223,6 +9457,22 @@ Function UpdateMTF%()
 					Next
 				EndIf
 			EndIf
+		EndIf
+	Else
+		If MTFtimer <= 70*120 ;70*120
+			MTFtimer = MTFtimer + FPSfactor
+		ElseIf MTFtimer > 70*120 And MTFtimer < 10000
+			If PlayerInReachableRoom()
+				PlayAnnouncement("SFX\Character\MTF\AnnouncAfter1.ogg")
+			EndIf
+			MTFtimer = 10000
+		ElseIf MTFtimer >= 10000 And MTFtimer <= 10000+(70*120) ;70*120
+			MTFtimer = MTFtimer + FPSfactor
+		ElseIf MTFtimer > 10000+(70*120) And MTFtimer < 20000
+			If PlayerInReachableRoom()
+				PlayAnnouncement("SFX\Character\MTF\AnnouncAfter2.ogg")
+			EndIf
+			MTFtimer = 20000
 		EndIf
 	EndIf
 	
@@ -9507,13 +9757,13 @@ Function Inverse#(number#)
 	
 End Function
 
-Function Rnd_Array(numb1#,numb2#,Array1#,Array2#)
+Function Rnd_Array#(numb1#,numb2#,Array1#,Array2#)
 	Local whatarray% = Rand(1,2)
 	
 	If whatarray% = 1
-		Return Rnd(numb1#,Array1#)
+		Return Rnd(Array1#,numb1#)
 	Else
-		Return Rnd(Array2#,numb2#)
+		Return Rnd(numb2#,Array2#)
 	EndIf
 	
 End Function
@@ -10318,31 +10568,6 @@ Function InitFastResize()
 	HideEntity fresize_cam
 End Function
 
-;Function RenderWorldToTexture()
-;	
-;	;EntityAlpha ark_blur_image, 1.0
-;	HideEntity fresize_image
-;	;old_buffer% = BackBuffer();GetBuffer()
-;	;SetBuffer(TextureBuffer(fresize_texture))
-;	RenderWorld()
-;	SetBuffer(old_buffer)
-;	;CopyRect ark_sw / 2 - 1024, ark_sh / 2 - 1024, 2048, 2048, 0, 0, BackBuffer(), TextureBuffer(ark_blur_texture)
-;	;CopyRect 0, 0, GraphicWidth, GraphicHeight, 1024.0 - GraphicWidth/2, 1024.0 - GraphicHeight/2, BackBuffer(), TextureBuffer(ark_blur_texture)
-;	
-;End Function
-
-
-;Function UpdateScreenGamma()
-;	Local n# = 1.0/ScreenGamma
-;	Local k%
-;	
-;	For k=0 To 255
-;		Local c# = Min(Max(0, ((k/255.0)^n)*255), 255)
-;		SetGamma k,k,k,c,c,c
-;	Next
-;	UpdateGamma
-;End Function
-
 ;--------------------------------------- Some new 1.3 -functions -------------------------------------------------------
 
 Function UpdateLeave1499()
@@ -10561,8 +10786,83 @@ Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,mo
 	Return img%
 End Function
 
+Function PlayAnnouncement(file$) ;This function streams the announcement currently playing
+	
+	If IntercomAnnouncementLoaded
+		FMOD_Pause(IntercomStreamCHN)
+		FMOD_StopStream(IntercomStream)
+		FMOD_CloseStream(IntercomStream)
+	EndIf
+	
+	IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,IntercomStream,0)
+	
+	IntercomAnnouncementLoaded = True
+	
+End Function
+
+Function UpdateStreamSounds()
+	Local e.Events
+	
+	If IntercomAnnouncementLoaded
+		FMOD_SetVolume(SFXVolume*255.0,IntercomStream)
+	EndIf
+	For e = Each Events
+		If e\SoundCHN<>0
+			If e\SoundCHN_isStream
+				FMOD_SetVolume(SFXVolume*255.0,e\Sound)
+			EndIf
+		EndIf
+		If e\SoundCHN2<>0
+			If e\SoundCHN2_isStream
+				FMOD_SetVolume(SFXVolume*255.0,e\Sound2)
+			EndIf
+		EndIf
+	Next
+	
+	If (Not PlayerInReachableRoom())
+		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea"
+			DebugLog "Test"
+			If IntercomAnnouncementLoaded
+				FMOD_Pause(IntercomStreamCHN)
+				FMOD_StopStream(IntercomStream)
+				FMOD_CloseStream(IntercomStream)
+			EndIf
+			For e = Each Events
+				If e\SoundCHN<>0
+					If e\SoundCHN_isStream
+						FMOD_Pause(e\SoundCHN)
+						FMOD_StopStream(e\Sound)
+						FMOD_CloseStream(e\Sound)
+					EndIf
+				EndIf
+				If e\SoundCHN2<>0
+					If e\SoundCHN2_isStream
+						FMOD_Pause(e\SoundCHN2)
+						FMOD_StopStream(e\Sound2)
+						FMOD_CloseStream(e\Sound2)
+					EndIf
+				EndIf
+			Next
+		EndIf
+	EndIf
+	
+End Function
+
+
+
 
 
 ;~IDEal Editor Parameters:
-;~B#11AD#13E5#1A67
+;~F#3C#DB#177#17D#18D#241#2EC#2F5#315#329#32E#334#33A#340#346#34B#369#37F#394#39A
+;~F#3A0#3A7#3AE#3B7#3BD#3C3#3C9#3D0#3DF#3E8#3F4#406#41F#43B#440#44D#45F#479#480#486
+;~F#494#4A7#4B0#4B9#4DF#4F1#507#513#51F#532#538#53E#542#548#54D#56C#57B#58A#597#5F0
+;~F#6F4#76F#790#808#815#8CC#957#96E#97C#9AE#A65#A74#B8C#CA7#CB0#D69#D91#DA3#DCB#DF5
+;~F#E03#E1A#E50#E68#F00#102F#114F#12BA#14A6#14B9#14CC#14DF#14F0#1500#150F#152B#152F#1533#153C#1556
+;~F#1580#15D9#15E2#15EC#15F6#1621#1631#1670#167C#1688#169C#17CD#17E7#17F5#1803#1810#1818#1825#1831#1846
+;~F#18FF#192C#1942#194E#1965#1970#19B0#1A22#1A74#1AAF#1AFF#1C46#1C51#1DBA#1DD9#1E33#1ECE#1EFB#1F2A#2030
+;~F#2042#205E#2068#2075#20A8#20DC#2110#2149#215D#2172#2176#2196#219E#21C9#2415#24CA#2506#2585#258B#2595
+;~F#25A1#25AC#25B0#25EB#25F3#25FB#2602#2609#2616#261C#2627#2669#2678#2696#26C4#26CB#26DE#26F7#2724#272F
+;~F#2734#274E#275A#2775#27C7#27D5#27DD#27E5#2810#2819#2842#2847#284C#2851#285B#286C#290C#291A#2962#2989
+;~F#299B#29BA#29C9#29E0#29FD#2A01#2A05#2A1C#2A3A#2A48
+;~B#11CF#140F#1AD3
 ;~C#Blitz3D

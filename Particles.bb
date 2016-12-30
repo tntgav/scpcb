@@ -194,9 +194,95 @@ Function CreateEmitter.Emitters(x#, y#, z#, emittertype%)
 	Return e
 		
 End Function
+
+Type DevilEmitters
+	Field obj%
+	Field x#,y#,z#
+	Field particleID%
+	Field room.Rooms
+	Field timer#=0.0
+	Field maxtimer#
+	Field SoundCHN%
+	Field isDeconGas%=False
+End Type
+
+Function CreateDevilEmitter.DevilEmitters(x#, y#, z#, room.Rooms, particleID%, maxTime#=2.0)
+	Local dem.DevilEmitters = New DevilEmitters
 	
+	dem\obj = CreatePivot()
+	PositionEntity dem\obj,x#,y#,z#,True
+	EntityParent dem\obj,room\obj
+	dem\room = room
+	dem\x = x#
+	dem\y = y#
+	dem\z = z#
+	dem\particleID = particleID
+	dem\maxtimer = maxTime#
 	
+	Return dem
+End Function
+
+Function UpdateDevilEmitters()
+	Local dem.DevilEmitters
+	Local InSmoke = False
+	
+	For dem = Each DevilEmitters
+		If FPSfactor > 0 And (PlayerRoom = dem\room Or dem\room\dist < 8)
+			If dem\timer = 0
+				SetEmitter(dem\obj,ParticleEffect[dem\particleID])
+				dem\timer = FPSfactor
+			ElseIf dem\timer < dem\maxtimer
+				dem\timer = Min(dem\timer+FPSfactor,dem\maxtimer)
+			Else
+				dem\timer = 0.0
+			EndIf
+			If dem\isDeconGas
+				dem\SoundCHN = LoopSound2(HissSFX, dem\SoundCHN, Camera, dem\obj)
+				If InSmoke = False Then
+					If WearingGasMask=0 And WearingHazmat=0 Then
+						Local dist# = Distance(EntityX(Camera, True), EntityZ(Camera, True), EntityX(dem\obj, True), EntityZ(dem\obj, True))
+						If dist < 0.8 Then
+							If Abs(EntityY(Camera, True)-EntityY(dem\obj,True))<5.0 Then InSmoke = True
+						EndIf
+					EndIf					
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	If InSmoke Then
+		If EyeIrritation > (70 * 6) Then BlurVolume = Max(BlurVolume, (EyeIrritation - (70 * 6)) / (70.0 * 24.0))
+		If EyeIrritation > (70 * 24) Then 
+			DeathMSG = "Subject D-9341 found dead in [DATA REDACTED]. Cause of death: Suffocation due to decontamination gas."
+			Kill()
+		EndIf
+		
+		If KillTimer => 0 Then 
+			If Rand(150) = 1 Then
+				If CoughCHN = 0 Then
+					CoughCHN = PlaySound_Strict(CoughSFX(Rand(0, 2)))
+				Else
+					If Not ChannelPlaying(CoughCHN) Then CoughCHN = PlaySound_Strict(CoughSFX(Rand(0, 2)))
+				End If
+			EndIf
+		EndIf
+		
+		EyeIrritation=EyeIrritation+FPSfactor * 4
+	EndIf
+	
+End Function
+
+Function DeleteDevilEmitters()
+	
+	Delete Each DevilEmitters
+	
+End Function
+
+
+
+
+
 
 ;~IDEal Editor Parameters:
-;~F#4#10#2E#4A#53#65#99
+;~F#4#10#2E#4A#54#66#A0#C5#D0#E0#112
 ;~C#Blitz3D
