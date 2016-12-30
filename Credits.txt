@@ -125,7 +125,7 @@
 			Various 3D props.
 			
 		Lionel Ruskin ("Cridone")
-			Battery textures and dared question Regalis' font choices.
+			Intro sequence monitors, battery and syringe textures, dared question Regalis' font choices.
 
 		Tom Malinowski
 
