@@ -42,7 +42,7 @@ Global UpdaterFont%
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.6"
+Global VersionNumber$ = "1.3.7"
 Global CompatibleNumber$ = "1.3.4" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 Global MenuWhite%, MenuBlack%
@@ -7242,6 +7242,11 @@ Function LoadEntities()
 	For i=0 To 9
 		TempSounds[i]=0
 	Next
+	
+	Brightness% = GetINIFloat("options.ini", "options", "brightness")
+	CameraFogNear# = GetINIFloat("options.ini", "options", "camera fog near")
+	CameraFogFar# = GetINIFloat("options.ini", "options", "camera fog far")
+	StoredCameraFogFar# = CameraFogFar
 	
 	;TextureLodBias
 	
