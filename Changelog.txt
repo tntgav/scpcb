@@ -1,4 +1,19 @@
-﻿v1.3.6
+﻿v1.3.7
+Saves from version 1.3.4 and onwards are compatible with this version.
+
+- New animations for the SCP-008-1 zombie.
+
+Bug Fixes:
+- Fixed camera fog staying far after restarting the game whil having the nvg equipped.
+- Fixed transparency effect of the brushes on SCP-939's model.
+- Fixed a bug that prevented the player to save on a chat screen in Euclid mode
+- Fixed SCP-714 not preventing the effects of SCP-1025 and SCP-895.
+- Fixed SCP-1025 achievement unable to be unlocked.
+- Fixed the sanity system not working properly.
+
+----------------------------------------------------------------------------------
+
+v1.3.6
 Saves from version 1.3.4 and 1.3.5 are compatible with this version.
 
 - Removed CPU statistics from the debug HUD (should fix "user lib not found" errors).
