@@ -271,6 +271,7 @@ Global Mesh_MagX#, Mesh_MagY#, Mesh_MagZ#
 ;player stats -------------------------------------------------------------------------------------------------------
 Global KillTimer#, KillAnim%, FallTimer#, DeathTimer#
 Global Sanity#, ForceMove#, ForceAngle#
+Global RestoreSanity%
 
 Global Playable% = True
 
@@ -2799,6 +2800,8 @@ Repeat
 		
 		DrawHandIcon = False
 		
+		RestoreSanity = True
+		
 		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
 		
 		If KeyHit(KEY_INV) And VomitTimer >= 0 Then 
@@ -2940,7 +2943,7 @@ Repeat
 		Local darkA# = 0.0
 		If (Not MenuOpen)  Then
 			If Sanity < 0 Then
-				Sanity = Min(Sanity + FPSfactor, 0.0)
+				If RestoreSanity Then Sanity = Min(Sanity + FPSfactor, 0.0)
 				If Sanity < (-200) Then 
 					darkA = Max(Min((-Sanity - 200) / 700.0, 0.6), darkA)
 					If KillTimer => 0 Then 
@@ -2983,7 +2986,7 @@ Repeat
 					End Select 
 					BlinkTimer = BLINKFREQ
 				EndIf
-
+				
 				BlinkTimer = BlinkTimer - FPSfactor
 			Else
 				BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect
@@ -3890,7 +3893,7 @@ Function MovePlayer()
 		EndIf
 	Next
 	
-	If Wearing714 Then 
+	If Wearing714 Then
 		Stamina = Min(Stamina, 10)
 		Sanity = Max(-850, Sanity)
 	EndIf
