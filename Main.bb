@@ -3083,6 +3083,11 @@ Repeat
 							Msg = Msg + " (game is loading)"
 						EndIf
 					Else
+						If SelectedScreen<>Null
+							GameSaved = False
+							Playable = True
+							DropSpeed = 0
+						EndIf
 						SaveGame(SavePath + CurrSave + "\")
 					EndIf
 				EndIf
