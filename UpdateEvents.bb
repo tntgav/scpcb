@@ -7903,8 +7903,43 @@ Function UpdateEvents()
 		Else
 			CatchErrors("Deleted event")
 		EndIf
-		
 	Next
+	
+	;This here is necessary because the 294 drinks with explosion effect didn't worked anymore - ENDSHN
+	If ExplosionTimer > 0 Then
+		ExplosionTimer = ExplosionTimer+FPSfactor
+		
+		If ExplosionTimer < 140.0 Then
+			If ExplosionTimer-FPSfactor < 5.0 Then
+				ExplosionSFX = LoadSound_Strict("SFX\Ending\GateB\Nuke1.ogg")
+				PlaySound_Strict ExplosionSFX
+				CameraShake = 10.0
+				ExplosionTimer = 5.0
+			EndIf
+			
+			CameraShake = CurveValue(ExplosionTimer/60.0,CameraShake, 50.0)
+		Else
+			CameraShake = Min((ExplosionTimer/20.0),20.0)
+			If ExplosionTimer-FPSfactor < 140.0 Then
+				BlinkTimer = 1.0
+				ExplosionSFX = LoadSound_Strict("SFX\Ending\GateB\Nuke2.ogg")
+				PlaySound_Strict ExplosionSFX				
+				For i = 0 To (10+(10*(ParticleAmount+1)))
+					p.Particles = CreateParticle(EntityX(Collider)+Rnd(-0.5,0.5),EntityY(Collider)-Rnd(0.2,1.5),EntityZ(Collider)+Rnd(-0.5,0.5),0, Rnd(0.2,0.6), 0.0, 350)	
+					RotateEntity p\pvt,-90,0,0,True
+					p\speed = Rnd(0.05,0.07)
+				Next
+			EndIf
+			LightFlash = Min((ExplosionTimer-140.0)/10.0,5.0)
+			
+			If ExplosionTimer > 160 Then KillTimer = Min(KillTimer,-0.1)
+			If ExplosionTimer > 500 Then ExplosionTimer = 0
+			
+			;a dirty workaround to prevent the collider from falling down into the facility once the nuke goes off,
+			;causing the UpdateEvent function to be called again and crashing the game
+			PositionEntity Collider, EntityX(Collider), 200, EntityZ(Collider)
+		EndIf
+	EndIf
 	
 End Function
 
@@ -8452,10 +8487,11 @@ Function UpdateEndings()
 						Next
 						
 						For n.NPCs = Each NPCs
-							If n <> Curr106
+							If n <> Curr106 And n <> Curr173
 								RemoveNPC(n)
 							EndIf
 						Next
+						Curr173\Idle = True
 						
 						CameraFogMode(Camera, 0)
 						SecondaryLightOn = True

@@ -1140,11 +1140,13 @@ Function UpdateNPCs()
 							n\Frame = 110
 							;SetAnimTime n\obj, 110.0
 							
-							If (Not PlayerRoom\RoomTemplate\DisableDecals) Then 
-								If (SelectedDifficulty\aggressiveNPCs) Then
-									n\State=n\State-FPSfactor*2
-								Else
-									n\State=n\State-FPSfactor
+							If (Not PlayerRoom\RoomTemplate\DisableDecals) Then
+								If PlayerRoom\RoomTemplate\Name <> "gatea"
+									If (SelectedDifficulty\aggressiveNPCs) Then
+										n\State=n\State-FPSfactor*2
+									Else
+										n\State=n\State-FPSfactor
+									EndIf
 								EndIf
 							EndIf
 						End If
