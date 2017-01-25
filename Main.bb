@@ -42,7 +42,7 @@ Global UpdaterFont%
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.6"
+Global VersionNumber$ = "1.3.7"
 Global CompatibleNumber$ = "1.3.4" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 Global MenuWhite%, MenuBlack%
@@ -271,6 +271,7 @@ Global Mesh_MagX#, Mesh_MagY#, Mesh_MagZ#
 ;player stats -------------------------------------------------------------------------------------------------------
 Global KillTimer#, KillAnim%, FallTimer#, DeathTimer#
 Global Sanity#, ForceMove#, ForceAngle#
+Global RestoreSanity%
 
 Global Playable% = True
 
@@ -2704,6 +2705,7 @@ Global LiquidObj%,MTFObj%,GuardObj%,ClassDObj%
 Global ApacheObj%,ApacheRotorObj%
 
 Global UnableToMove% = False
+Global ShouldEntitiesFall% = True
 
 ;---------------------------------------------------------------------------------------------------
 
@@ -2799,6 +2801,9 @@ Repeat
 		
 		DrawHandIcon = False
 		
+		RestoreSanity = True
+		ShouldEntitiesFall = True
+		
 		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
 		
 		If KeyHit(KEY_INV) And VomitTimer >= 0 Then 
@@ -2883,6 +2888,9 @@ Repeat
 			UpdateDeafPlayer()
 			UpdateEmitters()
 			MouseLook()
+			If PlayerRoom\RoomTemplate\Name = "dimension1499" And QuickLoadPercent > 0 And QuickLoadPercent < 100
+				ShouldEntitiesFall = False
+			EndIf
 			MovePlayer()
 			InFacility = CheckForPlayerInFacility()
 			If PlayerRoom\RoomTemplate\Name = "dimension1499"
@@ -2940,7 +2948,7 @@ Repeat
 		Local darkA# = 0.0
 		If (Not MenuOpen)  Then
 			If Sanity < 0 Then
-				Sanity = Min(Sanity + FPSfactor, 0.0)
+				If RestoreSanity Then Sanity = Min(Sanity + FPSfactor, 0.0)
 				If Sanity < (-200) Then 
 					darkA = Max(Min((-Sanity - 200) / 700.0, 0.6), darkA)
 					If KillTimer => 0 Then 
@@ -2983,7 +2991,7 @@ Repeat
 					End Select 
 					BlinkTimer = BLINKFREQ
 				EndIf
-
+				
 				BlinkTimer = BlinkTimer - FPSfactor
 			Else
 				BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect
@@ -3083,6 +3091,11 @@ Repeat
 							Msg = Msg + " (game is loading)"
 						EndIf
 					Else
+						If SelectedScreen<>Null
+							GameSaved = False
+							Playable = True
+							DropSpeed = 0
+						EndIf
 						SaveGame(SavePath + CurrSave + "\")
 					EndIf
 				EndIf
@@ -3885,7 +3898,7 @@ Function MovePlayer()
 		EndIf
 	Next
 	
-	If Wearing714 Then 
+	If Wearing714 Then
 		Stamina = Min(Stamina, 10)
 		Sanity = Max(-850, Sanity)
 	EndIf
@@ -4050,7 +4063,7 @@ Function MovePlayer()
 			DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
 		EndIf	
 		
-		If (Not UnableToMove%) Then TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
+		If (Not UnableToMove%) And ShouldEntitiesFall Then TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
 	EndIf
 	
 	ForceMove = False
@@ -5341,22 +5354,6 @@ Function DrawGUI()
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
 					;[End Block]
-				Case "scp1025"
-					;[Block]
-					;Achievements(Achv1025)=True 
-					If SelectedItem\itemtemplate\img = 0 Then
-						SelectedItem\state = Rand(0,5)
-						SelectedItem\itemtemplate\img = LoadImage("GFX\items\1025\1025_"+Int(SelectedItem\state)+".jpg")	
-						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
-						
-						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
-					EndIf
-					
-					;SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])					
-					
-					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
-					
-					;[End Block]
 				Case "ring"
 					;[Block]
 					If Wearing714=2 Then
@@ -5657,7 +5654,7 @@ Function DrawGUI()
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
-					If (Not Wearing714) Then SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])					
+					If (Not Wearing714) Then SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
@@ -7242,6 +7239,11 @@ Function LoadEntities()
 	For i=0 To 9
 		TempSounds[i]=0
 	Next
+	
+	Brightness% = GetINIFloat("options.ini", "options", "brightness")
+	CameraFogNear# = GetINIFloat("options.ini", "options", "camera fog near")
+	CameraFogFar# = GetINIFloat("options.ini", "options", "camera fog far")
+	StoredCameraFogFar# = CameraFogFar
 	
 	;TextureLodBias
 	
@@ -10554,37 +10556,55 @@ End Function
 ;--------------------------------------- Some new 1.3 -functions -------------------------------------------------------
 
 Function UpdateLeave1499()
-	Local r.Rooms, it.Items
+	Local r.Rooms, it.Items,r2.Rooms,i%
+	Local r1499.Rooms
 	
 	If (Not Wearing1499) And PlayerRoom\RoomTemplate\Name$ = "dimension1499"
 		For r.Rooms = Each Rooms
 			If r = NTF_1499PrevRoom
 				BlinkTimer = -1
-				;Msg = "You removed the gas mask and reappeared inside the facility."
-				;MsgTimer = 70 * 5
 				NTF_1499X# = EntityX(Collider)
 				NTF_1499Y# = EntityY(Collider)
 				NTF_1499Z# = EntityZ(Collider)
 				PositionEntity (Collider, NTF_1499PrevX#, NTF_1499PrevY#+0.05, NTF_1499PrevZ#)
 				ResetEntity(Collider)
+				PlayerRoom = r
 				UpdateDoors()
 				UpdateRooms()
+				If PlayerRoom\RoomTemplate\Name = "room3storage"
+					If EntityY(Collider)<-4600*RoomScale
+						For i = 0 To 2
+							PlayerRoom\NPC[i]\State = 2
+							PositionEntity(PlayerRoom\NPC[i]\Collider, EntityX(PlayerRoom\Objects[PlayerRoom\NPC[i]\State2],True),EntityY(PlayerRoom\Objects[PlayerRoom\NPC[i]\State2],True)+0.2,EntityZ(PlayerRoom\Objects[PlayerRoom\NPC[i]\State2],True))
+							ResetEntity PlayerRoom\NPC[i]\Collider
+							PlayerRoom\NPC[i]\State2 = PlayerRoom\NPC[i]\State2 + 1
+							If PlayerRoom\NPC[i]\State2 > PlayerRoom\NPC[i]\PrevState Then PlayerRoom\NPC[i]\State2 = (PlayerRoom\NPC[i]\PrevState-3)
+						Next
+					EndIf
+				EndIf
+				For r2.Rooms = Each Rooms
+					If r2\RoomTemplate\Name = "dimension1499"
+						r1499 = r2
+						Exit
+					EndIf
+				Next
 				For it.Items = Each Items
 					it\disttimer = 0
 					If it\itemtemplate\tempname = "scp1499" Or it\itemtemplate\tempname = "super1499"
-						If EntityY(it\collider) >= EntityY(PlayerRoom\obj)-5
-							PositionEntity it\collider,NTF_1499PrevX#,NTF_1499PrevY#+(EntityY(it\collider)-EntityY(PlayerRoom\obj)),NTF_1499PrevZ#
+						If EntityY(it\collider) >= EntityY(r1499\obj)-5
+							PositionEntity it\collider,NTF_1499PrevX#,NTF_1499PrevY#+(EntityY(it\collider)-EntityY(r1499\obj)),NTF_1499PrevZ#
 							ResetEntity it\collider
+							Exit
 						EndIf
 					EndIf
 				Next
-				PlayerRoom = r
+				r1499 = Null
+				ShouldEntitiesFall = False
 				PlaySound_Strict NTF_1499LeaveSFX%
 				NTF_1499PrevX# = 0.0
 				NTF_1499PrevY# = 0.0
 				NTF_1499PrevZ# = 0.0
 				NTF_1499PrevRoom = Null
-				;Brightness = StoredBrightness
 				Exit
 			EndIf
 		Next
@@ -10804,7 +10824,6 @@ Function UpdateStreamSounds()
 	
 	If (Not PlayerInReachableRoom())
 		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea"
-			DebugLog "Test"
 			If IntercomAnnouncementLoaded
 				FMOD_Pause(IntercomStreamCHN)
 				FMOD_StopStream(IntercomStream)

@@ -597,7 +597,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			MeshCullBox (n\obj, -MeshWidth(n\obj), -MeshHeight(n\obj), -MeshDepth(n\obj), MeshWidth(n\obj)*2, MeshHeight(n\obj)*2, MeshDepth(n\obj)*2)
 			
-			SetNPCFrame n,9
+			SetNPCFrame n,11
 			
 			n\Sound = LoadSound_Strict("SFX\SCP\049\0492Breath.ogg")
 			;[End Block]
@@ -1140,11 +1140,13 @@ Function UpdateNPCs()
 							n\Frame = 110
 							;SetAnimTime n\obj, 110.0
 							
-							If (Not PlayerRoom\RoomTemplate\DisableDecals) Then 
-								If (SelectedDifficulty\aggressiveNPCs) Then
-									n\State=n\State-FPSfactor*2
-								Else
-									n\State=n\State-FPSfactor
+							If (Not PlayerRoom\RoomTemplate\DisableDecals) Then
+								If PlayerRoom\RoomTemplate\Name <> "gatea"
+									If (SelectedDifficulty\aggressiveNPCs) Then
+										n\State=n\State-FPSfactor*2
+									Else
+										n\State=n\State-FPSfactor
+									EndIf
 								EndIf
 							EndIf
 						End If
@@ -4475,9 +4477,9 @@ Function UpdateNPCs()
 					
 					Select n\State
 						Case 0 ;Lying next to the wall
-							SetNPCFrame(n,9)
+							SetNPCFrame(n,11)
 						Case 1 ;Standing up
-							AnimateNPC(n,9,30,0.1,False)
+							AnimateNPC(n,11,32,0.1,False)
 							If n\Frame => 29
 								n\State = 2
 							EndIf
@@ -4492,12 +4494,14 @@ Function UpdateNPCs()
 								PointEntity n\obj, Collider
 								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
 								
-								AnimateNPC(n, 61, 112, n\CurrSpeed*30)
+								AnimateNPC(n, 64, 93, n\CurrSpeed*30)
 								n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 								
 								If EntityDistance(n\Collider,Collider)<1.0
-									n\State = 3
+									If (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
+										n\State = 3
+									EndIf
 								EndIf
 								
 								n\PathTimer = 0
@@ -4516,7 +4520,7 @@ Function UpdateNPCs()
 										PointEntity n\obj, n\Path[n\PathLocation]\obj
 										RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
 										
-										AnimateNPC(n, 61, 112, n\CurrSpeed*30)
+										AnimateNPC(n, 64, 93, n\CurrSpeed*30)
 										n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 										MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 										
@@ -4546,7 +4550,7 @@ Function UpdateNPCs()
 										;EndIf
 									EndIf
 								Else
-									AnimateNPC(n, 152, 173, 0.2, True)
+									AnimateNPC(n, 323, 344, 0.2, True)
 									n\CurrSpeed = 0
 									If n\PathTimer < 70*5
 										n\PathTimer = n\PathTimer + Rnd(1,2+(2*SelectedDifficulty\aggressiveNPCs))*FPSfactor
@@ -4568,15 +4572,15 @@ Function UpdateNPCs()
 							EndIf
 							
 							If n\CurrSpeed > 0.005 Then
-								If (prevFrame < 72 And n\Frame=>72) Or (prevFrame < 85 And n\Frame=>85) Or (prevFrame < 98 And n\Frame > 98) Or (prevFrame > 110 And n\Frame<62)
+								If (prevFrame < 80 And n\Frame=>80) Or (prevFrame > 92 And n\Frame<65)
 									PlaySound2(StepSFX(0,0,Rand(0,7)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 								EndIf
 							EndIf
 							
 							n\SoundChn = LoopSound2(n\Sound,n\SoundChn,Camera,n\Collider)
 						Case 3 ;Attacking
-							AnimateNPC(n, 113, 151, 0.2, False)
-							If (n\Frame => 127 And prevFrame < 127) Or (n\Frame => 135 And prevFrame < 135)
+							AnimateNPC(n, 126, 165, 0.4, False)
+							If (n\Frame => 146 And prevFrame < 146)
 								If EntityDistance(n\Collider,Collider)<1.1
 									If (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
 										PlaySound_Strict DamageSFX(Rand(5,8))
@@ -4585,8 +4589,16 @@ Function UpdateNPCs()
 										DeathMSG = "Subject D-9341. Cause of death: multiple lacerations and severe blunt force trauma caused by [DATA EXPUNGED], who was infected with SCP-008. Said subject was located by Nine-Tailed Fox and terminated."
 									EndIf
 								EndIf
-							ElseIf n\Frame => 150
-								n\State = 2
+							ElseIf n\Frame => 164
+								If EntityDistance(n\Collider,Collider)<1.1
+									If (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
+										SetNPCFrame(n,126)
+									Else
+										n\State = 2
+									EndIf
+								Else
+									n\State = 2
+								EndIf
 							EndIf
 						Case 4 ;Idling
 							HideEntity n\obj
@@ -7020,7 +7032,11 @@ End Function
 
 
 
+
 ;~IDEal Editor Parameters:
-;~F#0
-;~B#197#129F#1339#13D2#1586#1691#1852#18AE
+;~F#0#A#4F#6B#85#95#C5#D5#DE#EC#FB#10F#12F#159#16D#18A#1CB#1E2#203#226
+;~F#230#248#25C#27C#2AC#3A0#49B#5FE#803#89E#9FB#A00#A37#AD9#B15#BA8#C14#D28#DF7#EAE
+;~F#F61#107F#1088#1248#126F#127A#12A2#12B5#12B6#1313#1472#15BE#1640#169F#171F#174F#1775#178E#180E#18BC
+;~F#1946#1957#1971#1982#198C#19AD#1A18#1A99#1AB2#1ACB#1AD9#1AF5#1B07#1B2B#1B4E#1B5C
+;~B#197#12A9#1343#13DC#1590#169B#185C#18B8
 ;~C#Blitz3D
