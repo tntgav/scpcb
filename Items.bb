@@ -495,9 +495,11 @@ Function UpdateItems()
 					i\xspeed = 0.0
 					i\zspeed = 0.0
 				Else
-					i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
-					TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
-					If i\WontColl Then ResetEntity(i\collider)
+					If ShouldEntitiesFall
+						i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
+						TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
+						If i\WontColl Then ResetEntity(i\collider)
+					EndIf
 				EndIf
 				
 				If i\dist<HideDist*0.2 Then

@@ -7944,7 +7944,7 @@ Function UpdateEvents()
 End Function
 
 Function UpdateDimension1499()
-	Local e.Events,n.NPCs,r.Rooms
+	Local e.Events,n.NPCs,r.Rooms,it.Items
 	
 	For e.Events = Each Events
 		If e\EventName = "dimension1499"
@@ -8004,6 +8004,15 @@ Function UpdateDimension1499()
 						PositionEntity Collider,EntityX(Collider),800.5,EntityZ(Collider),True
 						ResetEntity Collider
 					EndIf
+					;A hacky fix to make items not fall that are in dimension1499
+					For it.Items = Each Items
+						If EntityY(it\collider)>750.0
+							If EntityY(it\collider)<800.0
+								PositionEntity it\collider,EntityX(it\collider),800.5,EntityZ(it\collider)
+								ResetEntity it\collider
+							EndIf
+						EndIf
+					Next
 				Else
 					DropSpeed = 0
 				EndIf
