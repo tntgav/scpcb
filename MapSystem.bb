@@ -7116,8 +7116,10 @@ Function CreateMap()
 	r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, (MapHeight-1) * 8, "pocketdimension")
 	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1	
 	
-	r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "173")
-	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+	If IntroEnabled
+		r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "173")
+		MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+	EndIf
 	
 	r = CreateRoom(0, ROOM1, 8, 800, 0, "dimension1499")
 	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1

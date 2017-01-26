@@ -14,6 +14,8 @@ Bug Fixes:
 - Fixed the explosion effect for SCP-294 drinks.
 - Fixed items falling through SCP-1499's dimension if the player loaded a save file and re-entered it.
 - Fixed SCP-939 instances getting frozen when leaving SCP-1499's dimension.
+- Fixed SCP-173 having the ability to stand on the walkway in the starting room.
+- Fixed the guard and scientist in starting room to appear once you save and load during the breach event.
 
 ----------------------------------------------------------------------------------
 

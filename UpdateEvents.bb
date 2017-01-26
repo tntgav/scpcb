@@ -144,6 +144,9 @@ Function UpdateEvents()
 						e\EventState = Max(e\EventState, 500)
 					EndIf
 					
+					If e\EventState < 850
+						PositionEntity Curr173\Collider, e\room\x+32*RoomScale, 0.31, e\room\z+1072*RoomScale, True
+					EndIf
 					
 					If e\EventState >= 500 Then
 						e\EventState = e\EventState+FPSfactor
@@ -186,7 +189,7 @@ Function UpdateEvents()
 										PointEntity(e\room\NPC[2]\obj, Curr173\Collider)
 										RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj),EntityYaw(e\room\NPC[2]\Collider),15.0), 0
 									EndIf
-
+									
 								Else
 									If e\EventState-FPSfactor < 900+4*70 Then 
 										PlaySound_Strict(IntroSFX(11)) : LightBlink = 3.0
@@ -196,6 +199,7 @@ Function UpdateEvents()
 									EndIf
 									
 									PositionEntity Curr173\Collider, e\room\x-96*RoomScale, 0.31, e\room\z+592*RoomScale, True
+									RotateEntity Curr173\Collider,0,190,0
 									
 									If e\room\NPC[2]\State <> 1 And KillTimer >= 0
 										If EntityZ(e\room\NPC[2]\Collider) < e\room\z-1150*RoomScale Then
@@ -228,11 +232,15 @@ Function UpdateEvents()
 									If EntityX(Collider)<(e\room\x+1384*RoomScale) Then e\EventState = Max(e\EventState,900)
 									
 									If e\room\RoomDoors[5]\openstate = 0 Then 
-										HideEntity e\room\NPC[1]\obj
-										HideEntity e\room\NPC[1]\Collider
+										;HideEntity e\room\NPC[1]\obj
+										;HideEntity e\room\NPC[1]\Collider
+										;
+										;HideEntity e\room\NPC[2]\obj
+										;HideEntity e\room\NPC[2]\Collider
 										
-										HideEntity e\room\NPC[2]\obj
-										HideEntity e\room\NPC[2]\Collider
+										If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
+										If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
+										
 										e\EventState2=1
 									EndIf
 								EndIf
@@ -280,8 +288,8 @@ Function UpdateEvents()
 							
 							e\Sound2 = LoadSound_Strict("SFX\Alarm\Alarm2_"+Int(e\EventState3)+".ogg")
 							e\SoundCHN2 = PlaySound_Strict(e\Sound2)
-							Else
-								If Int(e\EventState3) = 8 Then CameraShake = 1.0
+						Else
+							If Int(e\EventState3) = 8 Then CameraShake = 1.0
 						EndIf
 					EndIf
 					
@@ -299,8 +307,8 @@ Function UpdateEvents()
 						
 						If (i>24) Then
 							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
-							If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
-							If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
+							;If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
+							;If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
 							
 							FreeEntity e\room\Objects[0]
 							FreeEntity e\room\Objects[1]
