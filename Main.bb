@@ -352,7 +352,7 @@ Dim OldAiPics%(5)
 
 Global PlayTime%
 Global ConsoleFlush%
-Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0
+Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0, ConsoleMusPlay% = 0
 
 Global InfiniteStamina% = False
 Global NVBlink%
@@ -661,7 +661,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("Allows the camera to move in any direction while")
 							CreateConsoleMsg("bypassing collision.")
 							CreateConsoleMsg("******************************")
-						Case "godmode"
+						Case "godmode","god"
 							CreateConsoleMsg("HELP - godmode")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Toggles godmode, unless a valid parameter")
@@ -1005,7 +1005,7 @@ Function UpdateConsole()
 					Next
 					PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
 					;[End Block]
-				Case "godmode"
+				Case "godmode", "god"
 					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
@@ -1260,6 +1260,7 @@ Function UpdateConsole()
 					;[End Block]
 				Case "playmusic"
 					;[Block]
+					; I think this might be broken since the FMod library streaming was added. -Mark
 					If Instr(ConsoleInput, " ")<>0 Then
 						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Else
@@ -1417,8 +1418,9 @@ Function UpdateConsole()
 					
 					If ConsoleFlushSnd = 0 Then
 						ConsoleFlushSnd = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(83)+Chr(67)+Chr(80)+Chr(92)+Chr(57)+Chr(55)+Chr(48)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
-						If MusicCHN <> 0 Then StopChannel MusicCHN
+						FMOD_Pause(MusicCHN)
 						ConsoleMusFlush% = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(77)+Chr(117)+Chr(115)+Chr(105)+Chr(99)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
+						ConsoleMusPlay = PlaySound(ConsoleMusFlush)
 						CreateConsoleMsg(Chr(74)+Chr(79)+Chr(82)+Chr(71)+Chr(69)+Chr(32)+Chr(72)+Chr(65)+Chr(83)+Chr(32)+Chr(66)+Chr(69)+Chr(69)+Chr(78)+Chr(32)+Chr(69)+Chr(88)+Chr(80)+Chr(69)+Chr(67)+Chr(84)+Chr(73)+Chr(78)+Chr(71)+Chr(32)+Chr(89)+Chr(79)+Chr(85)+Chr(46))
 					Else
 						CreateConsoleMsg(Chr(74)+Chr(32)+Chr(79)+Chr(32)+Chr(82)+Chr(32)+Chr(71)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(65)+Chr(32)+Chr(78)+Chr(32)+Chr(78)+Chr(32)+Chr(79)+Chr(32)+Chr(84)+Chr(32)+Chr(32)+Chr(66)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(79)+Chr(32)+Chr(78)+Chr(32)+Chr(84)+Chr(32)+Chr(65)+Chr(32)+Chr(73)+Chr(32)+Chr(78)+Chr(32)+Chr(69)+Chr(32)+Chr(68)+Chr(46))
@@ -8298,7 +8300,7 @@ End Function
 Function UpdateMusic()
 	
 	If ConsoleFlush Then
-		If Not ChannelPlaying(MusicCHN) Then MusicCHN = PlaySound(ConsoleMusFlush)
+		If Not ChannelPlaying(ConsoleMusPlay) Then ConsoleMusPlay = PlaySound(ConsoleMusFlush)
 	ElseIf (Not PlayCustomMusic)
 		;If FPSfactor > 0 Or OptionsMenu = 2 Then 
 			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
