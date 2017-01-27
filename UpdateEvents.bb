@@ -1496,7 +1496,7 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 					EndIf
-
+					
 					If WearingNightVision > 0 Then
 						Local hasBatteryFor895% = 0
 						For i% = 0 To MaxItemAmount - 1
@@ -1509,42 +1509,39 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 						Next
-						;If EntityVisible(Camera,e\room\Objects[2]) Then
-							;If EntityInView(e\room\Objects[2], Camera) Then
-						;If EntityVisible(Camera,e\room\Objects[1])
-							If (CoffinDistance < 4.0) And (hasBatteryFor895) Then
-								
-								Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
-								BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
-								
-								tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
-								tempF2# = EntityYaw(Collider)
-								tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
-								
-								TurnEntity Collider, 0,tempF3/4,0,True
-								
-								tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
-								tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
-								
-								user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
-								
-								If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
-									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
-									PlaySound_Strict(HorrorSFX(1))
-									e\EventState3 = 10.0
-									EntityColor(NVOverlay, 255,255,255)
-								EndIf
-								If Sanity < (-1000) Then 
-									If WearingNightVision > 1
-										DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
-										DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
-									Else
-										DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
-									EndIf
-									Kill()
-								EndIf
+						If (CoffinDistance < 4.0) And (hasBatteryFor895) And (Not Wearing714) Then
+							
+							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
+							RestoreSanity = False
+							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
+							
+							tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
+							tempF2# = EntityYaw(Collider)
+							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
+							
+							TurnEntity Collider, 0,tempF3/4,0,True
+							
+							tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
+							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
+							
+							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
+							
+							If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
+								EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
+								PlaySound_Strict(HorrorSFX(1))
+								e\EventState3 = 10.0
+								EntityColor(NVOverlay, 255,255,255)
 							EndIf
-						;EndIf
+							If Sanity < (-1000) Then 
+								If WearingNightVision > 1
+									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
+									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
+								Else
+									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
+								EndIf
+								Kill()
+							EndIf
+						EndIf
 					EndIf
 					
 					If e\EventState3>0.0 Then e\EventState3=Max(e\EventState3-FPSfactor,0.0)
@@ -7906,13 +7903,48 @@ Function UpdateEvents()
 		Else
 			CatchErrors("Deleted event")
 		EndIf
-		
 	Next
+	
+	;This here is necessary because the 294 drinks with explosion effect didn't worked anymore - ENDSHN
+	If ExplosionTimer > 0 Then
+		ExplosionTimer = ExplosionTimer+FPSfactor
+		
+		If ExplosionTimer < 140.0 Then
+			If ExplosionTimer-FPSfactor < 5.0 Then
+				ExplosionSFX = LoadSound_Strict("SFX\Ending\GateB\Nuke1.ogg")
+				PlaySound_Strict ExplosionSFX
+				CameraShake = 10.0
+				ExplosionTimer = 5.0
+			EndIf
+			
+			CameraShake = CurveValue(ExplosionTimer/60.0,CameraShake, 50.0)
+		Else
+			CameraShake = Min((ExplosionTimer/20.0),20.0)
+			If ExplosionTimer-FPSfactor < 140.0 Then
+				BlinkTimer = 1.0
+				ExplosionSFX = LoadSound_Strict("SFX\Ending\GateB\Nuke2.ogg")
+				PlaySound_Strict ExplosionSFX				
+				For i = 0 To (10+(10*(ParticleAmount+1)))
+					p.Particles = CreateParticle(EntityX(Collider)+Rnd(-0.5,0.5),EntityY(Collider)-Rnd(0.2,1.5),EntityZ(Collider)+Rnd(-0.5,0.5),0, Rnd(0.2,0.6), 0.0, 350)	
+					RotateEntity p\pvt,-90,0,0,True
+					p\speed = Rnd(0.05,0.07)
+				Next
+			EndIf
+			LightFlash = Min((ExplosionTimer-140.0)/10.0,5.0)
+			
+			If ExplosionTimer > 160 Then KillTimer = Min(KillTimer,-0.1)
+			If ExplosionTimer > 500 Then ExplosionTimer = 0
+			
+			;a dirty workaround to prevent the collider from falling down into the facility once the nuke goes off,
+			;causing the UpdateEvent function to be called again and crashing the game
+			PositionEntity Collider, EntityX(Collider), 200, EntityZ(Collider)
+		EndIf
+	EndIf
 	
 End Function
 
 Function UpdateDimension1499()
-	Local e.Events,n.NPCs,r.Rooms
+	Local e.Events,n.NPCs,r.Rooms,it.Items
 	
 	For e.Events = Each Events
 		If e\EventName = "dimension1499"
@@ -7972,6 +8004,15 @@ Function UpdateDimension1499()
 						PositionEntity Collider,EntityX(Collider),800.5,EntityZ(Collider),True
 						ResetEntity Collider
 					EndIf
+					;A hacky fix to make items not fall that are in dimension1499
+					For it.Items = Each Items
+						If EntityY(it\collider)>750.0
+							If EntityY(it\collider)<800.0
+								PositionEntity it\collider,EntityX(it\collider),800.5,EntityZ(it\collider)
+								ResetEntity it\collider
+							EndIf
+						EndIf
+					Next
 				Else
 					DropSpeed = 0
 				EndIf
@@ -8455,10 +8496,11 @@ Function UpdateEndings()
 						Next
 						
 						For n.NPCs = Each NPCs
-							If n <> Curr106
+							If n <> Curr106 And n <> Curr173
 								RemoveNPC(n)
 							EndIf
 						Next
+						Curr173\Idle = True
 						
 						CameraFogMode(Camera, 0)
 						SecondaryLightOn = True

@@ -5838,22 +5838,45 @@ Function UpdateSecurityCams()
 						SelectedMonitor = Null
 					EndIf
 					
+					If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) Then
+						If EntityVisible(Camera,sc\ScrObj) Then
+							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
+								If BlinkTimer > - 5
+									Sanity=Sanity-FPSfactor
+									DebugLog Sanity
+									RestoreSanity = False
+								EndIf
+								
+								If Sanity < (-1000) Then 
+									DeathMSG = Chr(34)+"What we know is that he died of cardiac arrest. My guess is that it was caused by SCP-895, although it has never been observed affecting video equipment from this far before. "
+									DeathMSG = DeathMSG + "Further testing is needed to determine whether SCP-895's "+Chr(34)+"Red Zone"+Chr(34)+" is increasing."+Chr(34)
+									
+									Kill()				
+								EndIf
+							EndIf
+						EndIf
+					EndIf
+					
 					If sc\State >= sc\RenderInterval Then
 						sc\InSight = False
 						If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) Then
 							If EntityVisible(Camera,sc\ScrObj) Then
 								sc\InSight = True
 								
-								If sc\CoffinEffect=1 Or sc\CoffinEffect=3 Then
-									If BlinkTimer > - 5 Then Sanity=Sanity-(FPSfactor * 16)
-									
-									If Sanity < (-1000) Then 
-										DeathMSG = Chr(34)+"What we know is that he died of cardiac arrest. My guess is that it was caused by SCP-895, although it has never been observed affecting video equipment from this far before. "
-										DeathMSG = DeathMSG + "Further testing is needed to determine whether SCP-895's "+Chr(34)+"Red Zone"+Chr(34)+" is increasing."+Chr(34)
-										
-										Kill()				
-									EndIf
-								End If
+;								If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
+;									If BlinkTimer > - 5
+;										Sanity=Sanity-(FPSfactor * 16)
+;										DebugLog Sanity
+;										RestoreSanity = False
+;									EndIf
+;									
+;									If Sanity < (-1000) Then 
+;										DeathMSG = Chr(34)+"What we know is that he died of cardiac arrest. My guess is that it was caused by SCP-895, although it has never been observed affecting video equipment from this far before. "
+;										DeathMSG = DeathMSG + "Further testing is needed to determine whether SCP-895's "+Chr(34)+"Red Zone"+Chr(34)+" is increasing."+Chr(34)
+;										
+;										Kill()				
+;									EndIf
+;								EndIf
 								
 								If (Not sc\IsRoom2slCam)
 									If (Not sc\SpecialCam)
@@ -5925,26 +5948,26 @@ Function UpdateSecurityCams()
 						sc\State = 0
 					End If
 					
-					If SelectedMonitor = sc Or sc\CoffinEffect=1 Or sc\CoffinEffect=3 Then
+					If SelectedMonitor = sc Or ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714)) Then
 						If sc\InSight Then
 						;If (Not NoClip) Then 
 							Local pvt% = CreatePivot()
 							PositionEntity pvt, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
 							PointEntity(pvt, sc\ScrObj)
 							
-							DebugLog("curvea: "+CurveAngle(EntityYaw(pvt), EntityYaw(Collider), Min(Max(15000.0 / (-Sanity), 20.0), 200.0)))
+							;DebugLog("curvea: "+CurveAngle(EntityYaw(pvt), EntityYaw(Collider), Min(Max(15000.0 / (-Sanity), 20.0), 200.0)))
 							RotateEntity(Collider, EntityPitch(Collider), CurveAngle(EntityYaw(pvt), EntityYaw(Collider), Min(Max(15000.0 / (-Sanity), 20.0), 200.0)), 0)
 							
 							TurnEntity(pvt, 90, 0, 0)
 							user_camera_pitch = CurveAngle(EntityPitch(pvt), user_camera_pitch + 90.0, Min(Max(15000.0 / (-Sanity), 20.0), 200.0))
 							user_camera_pitch=user_camera_pitch-90						
 							
-							DebugLog("pvt: "+EntityYaw(pvt)+"   - coll: "+EntityYaw(Collider))
+							;DebugLog("pvt: "+EntityYaw(pvt)+"   - coll: "+EntityYaw(Collider))
 							
 							
 							FreeEntity pvt
 						;EndIf
-							If sc\CoffinEffect=1 Or sc\CoffinEffect=3 Then
+							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
 								If Sanity < - 800 Then
 									If Rand(3) = 1 Then EntityTexture(sc\ScrOverlay, MonitorTexture)
 									If Rand(6) < 5 Then
@@ -5970,6 +5993,9 @@ Function UpdateSecurityCams()
 								Else
 									EntityTexture(sc\ScrOverlay, MonitorTexture)
 								EndIf
+							EndIf
+							If (Wearing714) Then
+								EntityTexture(sc\ScrOverlay, MonitorTexture)
 							EndIf
 						EndIf
 					EndIf 
