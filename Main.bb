@@ -1132,6 +1132,7 @@ Function UpdateConsole()
 							FreeEntity e\room\Objects[1]
 							PositionEntity Curr173\Collider, 0,0,0
 							ResetEntity Curr173\Collider
+							ShowEntity Curr173\obj
 							RemoveEvent(e)
 							Exit
 						EndIf

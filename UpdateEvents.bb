@@ -1,4 +1,3 @@
-
 Function UpdateEvents()
 	CatchErrors("Uncaught (UpdateEvents)")
 	Local dist#, i%, temp%, pvt%, strtemp$, j%, k%
@@ -146,6 +145,7 @@ Function UpdateEvents()
 					
 					If e\EventState < 850
 						PositionEntity Curr173\Collider, e\room\x+32*RoomScale, 0.31, e\room\z+1072*RoomScale, True
+						HideEntity Curr173\obj
 					EndIf
 					
 					If e\EventState >= 500 Then
@@ -153,6 +153,7 @@ Function UpdateEvents()
 						
 						If e\EventState2 = 0 Then
 							CanSave = False
+							ShowEntity Curr173\obj
 							If e\EventState > 900 And e\room\RoomDoors[5]\open Then
 								If e\EventState - FPSfactor <= 900 Then 
 									e\room\NPC[1]\Sound = LoadSound_Strict("SFX\Room\Intro\WhatThe.ogg")
@@ -162,7 +163,6 @@ Function UpdateEvents()
 								e\room\NPC[1]\CurrSpeed = CurveValue(-0.008, e\room\NPC[1]\CurrSpeed, 5.0)
 								AnimateNPC(e\room\NPC[1], 260, 236, e\room\NPC[1]\CurrSpeed * 18)
 								RotateEntity e\room\NPC[1]\Collider, 0, 0, 0
-								
 								
 								If e\EventState > 900+2.5*70 Then
 									If e\room\NPC[2]\State <> 1
@@ -2022,7 +2022,7 @@ Function UpdateEvents()
 										If temp < 130*RoomScale Then
 											
 											For r.Rooms = Each Rooms
-												If r\RoomTemplate\Name = "room2_3" Then
+												If r\RoomTemplate\Name = "room2shaft" Then
 													GiveAchievement(AchvPD)
 													e\EventState = 0
 													e\EventState2 = 0
@@ -2033,13 +2033,37 @@ Function UpdateEvents()
 													BlinkTimer = -10
 													LightBlink = 5
 													
+													BlurTimer = 1500
+													
+													PlayerRoom = r
+													UpdateRooms()
+													UpdateDoors()
+													
 													PlaySound_Strict(LoadTempSound("SFX\Room\PocketDimension\Exit.ogg"))
 													
-													de.Decals = CreateDecal(0, EntityX(r\obj), 381*RoomScale, EntityZ(r\obj), 270, Rand(360), 0)
-													
-													PositionEntity(Collider, EntityX(r\obj), 0.4, EntityZ(r\obj))
+													;1560, 250
+													PositionEntity(Collider, EntityX(r\Objects[0],True), 0.4, EntityZ(r\Objects[0],True))
 													ResetEntity Collider
 													Curr106\Idle = False
+													
+													entity% = CreatePivot()
+													PositionEntity entity%,EntityX(Collider),EntityY(Collider),EntityZ(Collider)
+													RotateEntity entity%,-90,0,0
+													pick = EntityPick(entity%,7)
+													If pick<>0
+														;de.Decals = CreateDecal(0, EntityX(r\Objects[0],True), 381*RoomScale, EntityZ(r\Objects[0],True), 270, Rand(360), 0)
+														de.Decals = CreateDecal(0, EntityX(r\Objects[0],True), PickedY()-0.01, EntityZ(r\Objects[0],True), 270, Rand(360), 0)
+														DebugLog "PickedEntity for Decal"
+													EndIf
+													FreeEntity entity%
+													
+													For e2.Events = Each Events
+														If e2\EventName = "room2sl"
+															e2\EventState3 = 0
+															TurnCheckpointMonitorsOff(0)
+															Exit
+														EndIf
+													Next
 													Exit
 												EndIf
 											Next
