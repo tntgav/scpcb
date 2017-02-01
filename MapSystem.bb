@@ -6132,7 +6132,7 @@ Function UpdateButton(obj)
 End Function
 
 Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.Events)
-	Local x#, z#, n.NPCs, NPC_inside.NPCs
+	Local x#, z#, n.NPCs, NPC_inside.NPCs, it.Items
 	
 	door1\IsElevatorDoor = 1
 	door2\IsElevatorDoor = 1
@@ -6216,7 +6216,31 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 					x# = Max(Min((EntityX(Collider)-EntityX(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
 					z# = Max(Min((EntityZ(Collider)-EntityZ(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
 					PositionEntity(Collider, EntityX(room2,True)+x,0.1+EntityY(room2,True)+(EntityY(Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,True)
-					ResetEntity Collider	
+					ResetEntity Collider
+					For n.NPCs = Each NPCs
+						If Abs(EntityX(n\Collider)-EntityX(room1,True))<280.0*RoomScale Then
+							If Abs(EntityZ(n\Collider)-EntityZ(room1,True))<280.0*RoomScale Then
+								If Abs(EntityY(n\Collider)-EntityY(room1,True))<280.0*RoomScale Then
+									x# = Max(Min((EntityX(n\Collider)-EntityX(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+									z# = Max(Min((EntityZ(n\Collider)-EntityZ(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+									PositionEntity(n\Collider, EntityX(room2,True)+x,0.1+EntityY(room2,True)+(EntityY(n\Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,True)
+									ResetEntity n\Collider
+								EndIf
+							EndIf
+						EndIf
+					Next
+					For it.Items = Each Items
+						If Abs(EntityX(it\collider)-EntityX(room1,True))<280.0*RoomScale Then
+							If Abs(EntityZ(it\collider)-EntityZ(room1,True))<280.0*RoomScale Then
+								If Abs(EntityY(it\collider)-EntityY(room1,True))<280.0*RoomScale Then
+									x# = Max(Min((EntityX(it\collider)-EntityX(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+									z# = Max(Min((EntityZ(it\collider)-EntityZ(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+									PositionEntity(it\collider, EntityX(room2,True)+x,0.1+EntityY(room2,True)+(EntityY(it\collider)-EntityY(room1,True)),EntityZ(room2,True)+z,True)
+									ResetEntity it\collider
+								EndIf
+							EndIf
+						EndIf
+					Next
 					UpdateDoorsTimer = 0
 					DropSpeed = 0
 					UpdateDoors()
@@ -6292,6 +6316,30 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 					z# = Max(Min((EntityZ(Collider)-EntityZ(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
 					PositionEntity(Collider, EntityX(room1,True)+x,0.1+EntityY(room1,True)+(EntityY(Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,True)
 					ResetEntity Collider
+					For n.NPCs = Each NPCs
+						If Abs(EntityX(n\Collider)-EntityX(room2,True))<280.0*RoomScale Then
+							If Abs(EntityZ(n\Collider)-EntityZ(room2,True))<280.0*RoomScale Then
+								If Abs(EntityY(n\Collider)-EntityY(room2,True))<280.0*RoomScale Then
+									x# = Max(Min((EntityX(n\Collider)-EntityX(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+									z# = Max(Min((EntityZ(n\Collider)-EntityZ(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+									PositionEntity(n\Collider, EntityX(room1,True)+x,0.1+EntityY(room1,True)+(EntityY(n\Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,True)
+									ResetEntity n\Collider
+								EndIf
+							EndIf
+						EndIf
+					Next
+					For it.Items = Each Items
+						If Abs(EntityX(it\collider)-EntityX(room2,True))<280.0*RoomScale Then
+							If Abs(EntityZ(it\collider)-EntityZ(room2,True))<280.0*RoomScale Then
+								If Abs(EntityY(it\collider)-EntityY(room2,True))<280.0*RoomScale Then
+									x# = Max(Min((EntityX(it\collider)-EntityX(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+									z# = Max(Min((EntityZ(it\collider)-EntityZ(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
+									PositionEntity(it\collider, EntityX(room1,True)+x,0.1+EntityY(room1,True)+(EntityY(it\collider)-EntityY(room2,True)),EntityZ(room1,True)+z,True)
+									ResetEntity it\collider
+								EndIf
+							EndIf
+						EndIf
+					Next
 					UpdateDoorsTimer = 0
 					DropSpeed = 0
 					UpdateDoors()
@@ -6401,7 +6449,41 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 					
 					PositionEntity Collider, EntityX(room2,True)+x,0.05+EntityY(room2,True)+(EntityY(Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,True
 					
-					ResetEntity Collider	
+					ResetEntity Collider
+					For n.NPCs = Each NPCs
+						If Abs(EntityX(n\Collider)-EntityX(room1,True))<280.0*RoomScale Then
+							If Abs(EntityZ(n\Collider)-EntityZ(room1,True))<280.0*RoomScale Then
+								If Abs(EntityY(n\Collider)-EntityY(room1,True))<280.0*RoomScale Then
+									dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room1,True),EntityZ(room1,True))
+									dir# = point_direction(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room1,True),EntityZ(room1,True))
+									dir=dir+EntityYaw(room2,True)-EntityYaw(room1,True)
+									dir=WrapAngle(dir)
+									x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.17),-280*RoomScale+0.17)
+									z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.17),-280*RoomScale+0.17)
+									RotateEntity n\Collider,EntityPitch(n\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(n\Collider,True),EntityYaw(room1,True)),EntityRoll(n\Collider,True),True
+									PositionEntity n\Collider, EntityX(room2,True)+x,0.05+EntityY(room2,True)+(EntityY(n\Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,True
+									ResetEntity n\Collider
+								EndIf
+							EndIf
+						EndIf
+					Next
+					For it.Items = Each Items
+						If Abs(EntityX(it\collider)-EntityX(room1,True))<280.0*RoomScale Then
+							If Abs(EntityZ(it\collider)-EntityZ(room1,True))<280.0*RoomScale Then
+								If Abs(EntityY(it\collider)-EntityY(room1,True))<280.0*RoomScale Then
+									dist# = Distance(EntityX(it\Collider,True),EntityZ(it\Collider,True),EntityX(room1,True),EntityZ(room1,True))
+									dir# = point_direction(EntityX(it\Collider,True),EntityZ(it\Collider,True),EntityX(room1,True),EntityZ(room1,True))
+									dir=dir+EntityYaw(room2,True)-EntityYaw(room1,True)
+									dir=WrapAngle(dir)
+									x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.17),-280*RoomScale+0.17)
+									z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.17),-280*RoomScale+0.17)
+									RotateEntity it\Collider,EntityPitch(it\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(it\Collider,True),EntityYaw(room1,True)),EntityRoll(it\Collider,True),True
+									PositionEntity it\Collider, EntityX(room2,True)+x,0.05+EntityY(room2,True)+(EntityY(it\Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,True
+									ResetEntity it\Collider
+								EndIf
+							EndIf
+						EndIf
+					Next
 					UpdateDoors()
 					UpdateRooms()
 				EndIf
@@ -6459,6 +6541,38 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 					PositionEntity Collider, EntityX(room1,True)+x,0.05+EntityY(room1,True)+(EntityY(Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,True
 					
 					ResetEntity Collider
+					For n.NPCs = Each NPCs
+						If Abs(EntityX(n\Collider)-EntityX(room2,True))<280.0*RoomScale Then
+							If Abs(EntityZ(n\Collider)-EntityZ(room2,True))<280.0*RoomScale Then
+								If Abs(EntityY(n\Collider)-EntityY(room2,True))<280.0*RoomScale Then
+									dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room2,True),EntityZ(room2,True))
+									dir# = point_direction(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room2,True),EntityZ(room2,True))
+									dir=dir+EntityYaw(room1,True)-EntityYaw(room2,True)
+									x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.17),-280*RoomScale+0.17)
+									z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.17),-280*RoomScale+0.17)
+									RotateEntity n\Collider,EntityPitch(n\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(n\Collider,True),EntityYaw(room1,True)),EntityRoll(n\Collider,True),True
+									PositionEntity n\Collider, EntityX(room1,True)+x,0.05+EntityY(room1,True)+(EntityY(n\Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,True
+									ResetEntity n\Collider
+								EndIf
+							EndIf
+						EndIf
+					Next
+					For it.Items = Each Items
+						If Abs(EntityX(it\collider)-EntityX(room2,True))<280.0*RoomScale Then
+							If Abs(EntityZ(it\collider)-EntityZ(room2,True))<280.0*RoomScale Then
+								If Abs(EntityY(it\collider)-EntityY(room2,True))<280.0*RoomScale Then
+									dist# = Distance(EntityX(it\Collider,True),EntityZ(it\Collider,True),EntityX(room2,True),EntityZ(room2,True))
+									dir# = point_direction(EntityX(it\Collider,True),EntityZ(it\Collider,True),EntityX(room2,True),EntityZ(room2,True))
+									dir=dir+EntityYaw(room1,True)-EntityYaw(room2,True)
+									x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.17),-280*RoomScale+0.17)
+									z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.17),-280*RoomScale+0.17)
+									RotateEntity it\Collider,EntityPitch(it\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(it\Collider,True),EntityYaw(room1,True)),EntityRoll(it\Collider,True),True
+									PositionEntity it\Collider, EntityX(room1,True)+x,0.05+EntityY(room1,True)+(EntityY(it\Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,True
+									ResetEntity it\Collider
+								EndIf
+							EndIf
+						EndIf
+					Next
 					UpdateDoors()
 					UpdateRooms()
 				EndIf
@@ -6876,10 +6990,11 @@ Function CreateMap()
 	min_pos = Room1Amount[0]
 	max_pos = Room1Amount[0]+Room1Amount[1]-1	
 	
-	MapRoom(ROOM1, Room1Amount[0]+Floor(0.1*Float(Room1Amount[1]))) = "room079"
-	SetRoom("room106", ROOM1, Room1Amount[0]+Floor(0.3*Float(Room1Amount[1])),min_pos,max_pos)
-	SetRoom("coffin", ROOM1, Room1Amount[0]+Floor(0.5*Float(Room1Amount[1])),min_pos,max_pos)
-	SetRoom("room035", ROOM1, Room1Amount[0]+Floor(0.7*Float(Room1Amount[1])),min_pos,max_pos)
+	;MapRoom(ROOM1, Room1Amount[0]+Floor(0.1*Float(Room1Amount[1]))) = "room079"
+	SetRoom("room079", ROOM1, Room1Amount[0]+Floor(0.15*Float(Room1Amount[1])),min_pos,max_pos)
+	SetRoom("coffin", ROOM1, Room1Amount[0]+Floor(0.3*Float(Room1Amount[1])),min_pos,max_pos)
+	SetRoom("room035", ROOM1, Room1Amount[0]+Floor(0.5*Float(Room1Amount[1])),min_pos,max_pos)
+	SetRoom("room106", ROOM1, Room1Amount[0]+Floor(0.7*Float(Room1Amount[1])),min_pos,max_pos)
 	SetRoom("008", ROOM1, Room1Amount[0]+Floor(0.9*Float(Room1Amount[1])),min_pos,max_pos)
 	
 	min_pos = Room2Amount[0]

@@ -271,6 +271,10 @@ Function UpdateMainMenu()
 				AAText (x + 20 * MenuScale, y + 20 * MenuScale, "Name:")
 				CurrSave = InputBox(x + 150 * MenuScale, y + 15 * MenuScale, 200 * MenuScale, 30 * MenuScale, CurrSave, 1)
 				CurrSave = Left(CurrSave, 15)
+				CurrSave = Replace(CurrSave,":","")
+				CurrSave = Replace(CurrSave,".","")
+				CurrSave = Replace(CurrSave,"/","")
+				CurrSave = Replace(CurrSave,"\","")
 				
 				Color 255,255,255
 				If SelectedMap = "" Then

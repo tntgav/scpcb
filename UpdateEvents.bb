@@ -2060,6 +2060,7 @@ Function UpdateEvents()
 													For e2.Events = Each Events
 														If e2\EventName = "room2sl"
 															e2\EventState3 = 0
+															RotateEntity e2\room\Levers[0],80,0,0
 															TurnCheckpointMonitorsOff(0)
 															Exit
 														EndIf
@@ -2089,7 +2090,7 @@ Function UpdateEvents()
 										e\EventState = 0
 										e\EventState2 = 0
 										
-										PositionEntity(Collider, EntityX(r\obj,True), 0.4, EntityX(r\obj,True))
+										PositionEntity(Collider, EntityX(r\obj,True), 0.4, EntityZ(r\obj,True))
 										
 										GiveAchievement(AchvPD)
 										SecondaryLightOn = PrevSecondaryLightOn
@@ -2097,6 +2098,15 @@ Function UpdateEvents()
 										
 										Curr106\State = 10000
 										Curr106\Idle = False
+										
+										For e2.Events = Each Events
+											If e2\EventName = "room2sl"
+												e2\EventState3 = 0
+												RotateEntity e2\room\Levers[0],80,0,0
+												TurnCheckpointMonitorsOff(0)
+												Exit
+											EndIf
+										Next
 										Exit
 									EndIf
 								Next
@@ -2175,6 +2185,15 @@ Function UpdateEvents()
 											PositionEntity(Collider, EntityX(r\obj), 0.4, EntityZ(r\obj))
 											ResetEntity Collider
 											Curr106\Idle = False
+											
+											For e2.Events = Each Events
+												If e2\EventName = "room2sl"
+													e2\EventState3 = 0
+													RotateEntity e2\room\Levers[0],80,0,0
+													TurnCheckpointMonitorsOff(0)
+													Exit
+												EndIf
+											Next
 											Exit
 										EndIf
 									Next

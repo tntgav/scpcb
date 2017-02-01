@@ -6179,7 +6179,11 @@ Function DrawGUI()
 					If WearingGasMask Then
 						Msg = "You removed the gas mask."
 					Else
-						Msg = "You put on the gas mask."
+						If SelectedItem\itemtemplate\tempname = "supergasmask"
+							Msg = "You put on the gas mask and you can breathe easier."
+						Else
+							Msg = "You put on the gas mask."
+						EndIf
 						;Wearing178 = 0
 						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
 						;WearingNightVision = 0
