@@ -1,12 +1,11 @@
 ;[Block]
-
-;[End Block]
 Global Curr173.NPCs, Curr106.NPCs, Curr096.NPCs, Curr5131.NPCs
 Const NPCtype173% = 1, NPCtypeOldMan% = 2, NPCtypeGuard% = 3, NPCtypeD% = 4
 Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
 Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtype178% = 17, NPCtypePdPlane% = 18
 Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21, NPCtype008% = 22, NPCtypeClerk% = 23
+;[End Block]
 
 Type NPCs
 	Field obj%, obj2%, obj3%, obj4%, Collider%
