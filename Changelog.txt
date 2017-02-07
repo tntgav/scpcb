@@ -20,6 +20,7 @@ Bug Fixes:
 - Fixed the blur effect when leaving the pocket dimension.
 - Fixed NPCs and items not getting teleported when travelling with the elevator.
 - The player cannot use ":","/","\" and "." characters for a save file anymore - this should prevent the unable to save bug.
+- Fixed teleportation issues with the elevators.
 
 ----------------------------------------------------------------------------------
 
