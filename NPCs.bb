@@ -64,6 +64,8 @@ Type NPCs
 	Field ModelScaleX#,ModelScaleY#,ModelScaleZ#
 	Field HideFromNVG
 	Field TextureID%=-1
+	Field CollRadius#
+	Field IdleTimer#
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -74,6 +76,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 	n\NPCtype = NPCtype
 	n\GravityMult = 1.0
 	n\MaxGravity = 0.2
+	n\CollRadius = 0.2
 	Select NPCtype
 		Case NPCtype173
 			;[Block]
@@ -102,6 +105,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj2, RoomScale, RoomScale, RoomScale
 			HideEntity n\obj2
 			
+			n\CollRadius = 0.32
 			;[End Block]
 		Case NPCtypeOldMan
 			;[Block]
@@ -208,6 +212,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Speed = 2.0 / 100
 			
 			MeshCullBox (n\obj, -MeshWidth(ClassDObj), -MeshHeight(ClassDObj), -MeshDepth(ClassDObj), MeshWidth(ClassDObj)*2, MeshHeight(ClassDObj)*2, MeshDepth(ClassDObj)*2)
+			
+			n\CollRadius = 0.32
 			;[End Block]
 		Case NPCtype372
 			;[Block]
@@ -246,6 +252,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, temp, temp, temp	
 			
 			MeshCullBox (n\obj, -MeshWidth(n\obj)*2, -MeshHeight(n\obj)*2, -MeshDepth(n\obj)*2, MeshWidth(n\obj)*2, MeshHeight(n\obj)*4, MeshDepth(n\obj)*4)
+			
+			n\CollRadius = 0.3
 			;[End Block]
 		Case NPCtype049
 			;[Block]
@@ -389,6 +397,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, temp, temp, temp	
 			
 			MeshCullBox (n\obj, -MeshWidth(n\obj)*2, -MeshHeight(n\obj)*2, -MeshDepth(n\obj)*2, MeshWidth(n\obj)*2, MeshHeight(n\obj)*4, MeshDepth(n\obj)*4)
+			
+			n\CollRadius = 0.25
 			;[End Block]
 		Case NPCtype939
 			;[Block]
@@ -454,6 +464,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-939", "speed") / 100.0)
+			
+			n\CollRadius = 0.3
 			;[End Block]
 		Case NPCtype066
 			;[Block]
@@ -615,6 +627,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Speed = 2.0 / 100
 			
 			MeshCullBox (n\obj, -MeshWidth(ClerkOBJ), -MeshHeight(ClerkOBJ), -MeshDepth(ClerkOBJ), MeshWidth(ClerkOBJ)*2, MeshHeight(ClerkOBJ)*2, MeshDepth(ClerkOBJ)*2)
+			
+			n\CollRadius = 0.32
 			;[End Block]
 	End Select
 	
@@ -688,7 +702,15 @@ Function UpdateNPCs()
 					
 					n\State3 = 1
 					
-					If n\Idle < 2 Then 
+					If n\Idle < 2 Then
+						If n\IdleTimer > 0.1
+							n\Idle = 1
+							n\IdleTimer = Max(n\IdleTimer-FPSfactor,0.1)
+						ElseIf n\IdleTimer = 0.1
+							n\Idle = 0
+							n\IdleTimer = 0
+						EndIf
+						
 						PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
 						RotateEntity (n\obj, 0, EntityYaw(n\Collider)-180, 0)
 						

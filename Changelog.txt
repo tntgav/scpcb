@@ -18,6 +18,9 @@ Bug Fixes:
 - Fixed SCP-173 having the ability to stand on the walkway in the starting room.
 - Fixed the guard and scientist in starting room to appear once you save and load during the breach event.
 - Fixed the blur effect when leaving the pocket dimension.
+- Fixed NPCs and items not getting teleported when travelling with the elevator.
+- The player cannot use ":","/","\" and "." characters for a save file anymore - this should prevent the unable to save bug.
+- Fixed teleportation issues with the elevators.
 
 ----------------------------------------------------------------------------------
 

@@ -6179,7 +6179,11 @@ Function DrawGUI()
 					If WearingGasMask Then
 						Msg = "You removed the gas mask."
 					Else
-						Msg = "You put on the gas mask."
+						If SelectedItem\itemtemplate\tempname = "supergasmask"
+							Msg = "You put on the gas mask and you can breathe easier."
+						Else
+							Msg = "You put on the gas mask."
+						EndIf
 						;Wearing178 = 0
 						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
 						;WearingNightVision = 0
@@ -10853,16 +10857,41 @@ Function UpdateStreamSounds()
 	
 End Function
 
+Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False)
+	Local pvt,pick
+	
+	pvt = CreatePivot()
+	PositionEntity(pvt, x,y+0.05,z,isglobal)
+	RotateEntity pvt,90,0,0
+	pick = EntityPick(pvt,7)
+	If pick<>0
+		PositionEntity(entity, x,PickedY()+customradius#+0.02,z,isglobal)
+		DebugLog "TeleportEntity konnte erfolgreich angewandt werden."
+	Else
+		PositionEntity(entity,x,y,z,isglobal)
+		DebugLog "Fehler: TeleportEntity konnte nicht genaue Position bestimmen."
+	EndIf
+	FreeEntity pvt
+	ResetEntity entity
+	
+End Function
+
+
 
 
 
 
 ;~IDEal Editor Parameters:
-;~F#39#D6#23C#2E7#2F0#310#324#329#32F#335#33B#341#346#364#37A#38F#395#39B#3A2#3A9
-;~F#3B2#3B8#3BE#3C4#3CB#3DA#3E3#3EF#401#41A#436#43B#448#45A#474#47B#481#48F#4A2#4AB
-;~F#4B4#4DA#4EC#502#50E#51A#52D#533#539#53D#543#548#567#576#585#592#5EB#6EF#B79#CA5
-;~F#D5E#12AA#1496#14A9#14BC#14CF#14E0#14F0#14FF#151B#151F#1523#152C#1546#1570#15C9#15D2#15DC#15E6#1611
-;~F#1660#166C#1678#168C#17BD#17D7#17E5#17F3#1800#1808#1815#1821#1836#18EF#191C#1932#193E#1955#1960#1A14
-;~F#1A66#1AA1#1AF1#1DAC#1DCB#1EED#2067#2608#2619#29B9
-;~B#11CE#140E#1AD2
+;~F#39#D6#173#179#189#23D#2E8#2F1#311#325#32A#330#336#33C#342#347#365#37B#390#396
+;~F#39C#3A3#3AA#3B3#3B9#3BF#3C5#3CC#3DB#3E4#3F0#402#41B#437#43C#449#45B#476#47D#483
+;~F#491#4A4#4AD#4B6#4DC#4EE#505#511#51D#530#536#53C#540#546#54B#56A#579#588#596#6F3
+;~F#768#789#801#80E#8C5#950#967#975#9A7#A5E#A6D#B84#CA4#CB5#D6E#D96#DA5#DCD#DF7#E05
+;~F#E1C#E4C#F02#1031#1151#12BA#14A6#14B9#14CC#14DF#14F0#14FF#151B#151F#1523#152C#1546#1570#15C9#15D2
+;~F#15DC#15E6#1611#1621#1660#166C#1678#168C#17BD#17D7#17E5#17F3#1800#1808#1815#1821#183A#18F3#1920#1936
+;~F#1942#1959#1964#19A4#1A18#1A6A#1AA5#1AF5#1C3C#1DB5#1DD4#1E2E#1EC9#1EF6#1F25#202B#203D#2059#2063#2070
+;~F#20A3#20D7#210B#2144#2158#216D#2171#2191#2199#21C4#2410#24C5#2501#2580#2586#2590#259C#25A7#25AB#25E6
+;~F#25EE#25F6#25FD#2604#2611#2617#2622#2664#2673#2691#26BF#26C6#26D9#26F2#271F#272A#272F#2749#2755#2770
+;~F#27C2#27D0#27D8#27E0#280B#2814#283D#2842#2847#284C#2856#2867#2907#2915#2944#297D#298F#29AE#29BD#29D4
+;~F#29F1#29F5#29F9#2A10#2A2E#2A3C#2A6B
+;~B#11CE#140E#1AD6
 ;~C#Blitz3D
