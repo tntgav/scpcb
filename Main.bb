@@ -10866,10 +10866,10 @@ Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False)
 	pick = EntityPick(pvt,7)
 	If pick<>0
 		PositionEntity(entity, x,PickedY()+customradius#+0.02,z,isglobal)
-		DebugLog "TeleportEntity konnte erfolgreich angewandt werden."
+		DebugLog "Entity teleported successfully"
 	Else
 		PositionEntity(entity,x,y,z,isglobal)
-		DebugLog "Fehler: TeleportEntity konnte nicht genaue Position bestimmen."
+		DebugLog "Warning: no ground found when teleporting an entity"
 	EndIf
 	FreeEntity pvt
 	ResetEntity entity
