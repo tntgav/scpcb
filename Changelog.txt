@@ -2,6 +2,7 @@
 Saves from version 1.3.4 and onwards are compatible with this version.
 
 - New animations for the SCP-008-1 zombie.
+- Changed the room where the player appears when leaving the pocket dimension.
 
 Bug Fixes:
 - Fixed camera fog staying far after restarting the game while having the nvg equipped.
@@ -14,6 +15,12 @@ Bug Fixes:
 - Fixed the explosion effect for SCP-294 drinks.
 - Fixed items falling through SCP-1499's dimension if the player loaded a save file and re-entered it.
 - Fixed SCP-939 instances getting frozen when leaving SCP-1499's dimension.
+- Fixed SCP-173 having the ability to stand on the walkway in the starting room.
+- Fixed the guard and scientist in starting room to appear once you save and load during the breach event.
+- Fixed the blur effect when leaving the pocket dimension.
+- Fixed NPCs and items not getting teleported when travelling with the elevator.
+- The player cannot use ":","/","\" and "." characters for a save file anymore - this should prevent the unable to save bug.
+- Fixed teleportation issues with the elevators.
 
 ----------------------------------------------------------------------------------
 
