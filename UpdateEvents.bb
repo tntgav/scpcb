@@ -2036,31 +2036,23 @@ Function UpdateEvents()
 													BlurTimer = 1500
 													
 													PlayerRoom = r
-													UpdateRooms()
-													UpdateDoors()
 													
 													PlaySound_Strict(LoadTempSound("SFX\Room\PocketDimension\Exit.ogg"))
 													
-													;1560, 250
-													PositionEntity(Collider, EntityX(r\Objects[0],True), 0.4, EntityZ(r\Objects[0],True))
-													ResetEntity Collider
+													TeleportEntity(Collider,EntityX(r\Objects[0],True),0.4,EntityZ(r\Objects[0],True),0.3,True)
+													
+													UpdateRooms()
+													UpdateDoors()
 													Curr106\Idle = False
 													
-													entity% = CreatePivot()
-													PositionEntity entity%,EntityX(Collider),EntityY(Collider),EntityZ(Collider)
-													RotateEntity entity%,-90,0,0
-													pick = EntityPick(entity%,7)
-													If pick<>0
-														;de.Decals = CreateDecal(0, EntityX(r\Objects[0],True), 381*RoomScale, EntityZ(r\Objects[0],True), 270, Rand(360), 0)
-														de.Decals = CreateDecal(0, EntityX(r\Objects[0],True), PickedY()-0.01, EntityZ(r\Objects[0],True), 270, Rand(360), 0)
-														DebugLog "PickedEntity for Decal"
-													EndIf
-													FreeEntity entity%
+													de.decals = CreateDecal(0, EntityX(r\Objects[0],True),EntityY(r\Objects[0],True),EntityZ(r\Objects[0],True), 270, Rand(360), 0)
+													TeleportEntity(de\obj,EntityX(r\Objects[0],True),EntityY(r\Objects[0],True)+0.6,EntityZ(r\Objects[0],True),0.0,True,4,1)
 													
 													For e2.Events = Each Events
 														If e2\EventName = "room2sl"
 															e2\EventState3 = 0
-															RotateEntity e2\room\Levers[0],80,0,0
+															UpdateLever(e2\room\Levers[0])
+															RotateEntity e2\room\Levers[0],0,EntityYaw(e2\room\Levers[0]),0
 															TurnCheckpointMonitorsOff(0)
 															Exit
 														EndIf
@@ -2090,7 +2082,7 @@ Function UpdateEvents()
 										e\EventState = 0
 										e\EventState2 = 0
 										
-										PositionEntity(Collider, EntityX(r\obj,True), 0.4, EntityZ(r\obj,True))
+										TeleportEntity(Collider,EntityX(r\obj,True),0.4,EntityZ(r\obj,True),0.3,True)
 										
 										GiveAchievement(AchvPD)
 										SecondaryLightOn = PrevSecondaryLightOn
@@ -2102,7 +2094,8 @@ Function UpdateEvents()
 										For e2.Events = Each Events
 											If e2\EventName = "room2sl"
 												e2\EventState3 = 0
-												RotateEntity e2\room\Levers[0],80,0,0
+												UpdateLever(e2\room\Levers[0])
+												RotateEntity e2\room\Levers[0],0,EntityYaw(e2\room\Levers[0]),0
 												TurnCheckpointMonitorsOff(0)
 												Exit
 											EndIf
@@ -2182,14 +2175,14 @@ Function UpdateEvents()
 											
 											SecondaryLightOn = PrevSecondaryLightOn
 											PrevSecondaryLightOn = 0.0
-											PositionEntity(Collider, EntityX(r\obj), 0.4, EntityZ(r\obj))
-											ResetEntity Collider
+											TeleportEntity(Collider,EntityX(r\obj,True),0.4,EntityZ(r\obj,True),0.3,True)
 											Curr106\Idle = False
 											
 											For e2.Events = Each Events
 												If e2\EventName = "room2sl"
 													e2\EventState3 = 0
-													RotateEntity e2\room\Levers[0],80,0,0
+													UpdateLever(e2\room\Levers[0])
+													RotateEntity e2\room\Levers[0],0,EntityYaw(e2\room\Levers[0]),0
 													TurnCheckpointMonitorsOff(0)
 													Exit
 												EndIf
@@ -5715,6 +5708,13 @@ Function UpdateEvents()
 							e\EventStr = "load0"
 						EndIf
 						
+						If e\room\Objects[3]<>0
+							HideEntity(e\room\Objects[3])
+							HideEntity(e\room\Objects[4])
+							HideEntity(e\room\Objects[5])
+							HideEntity(e\room\Objects[6])
+						EndIf
+						
 						If e\room\RoomDoors[1]\open = True
 							e\EventState = 1
 							GiveAchievement(Achv205)
@@ -5751,21 +5751,40 @@ Function UpdateEvents()
 						
 						Select e\EventState
 							Case 1
+								ShowEntity e\room\Objects[1]
+								HideEntity(e\room\Objects[5])
+								HideEntity(e\room\Objects[4])
+								HideEntity(e\room\Objects[3])
 								;sitting
+								ShowEntity(e\room\Objects[6])
 								Animate2(e\room\Objects[6], AnimTime(e\room\Objects[6]), 526, 530, 0.2)
 								If e\EventState2 > 20*70 Then e\EventState = e\EventState+1
 							Case 3
+								ShowEntity e\room\Objects[1]
+								HideEntity(e\room\Objects[5])
+								HideEntity(e\room\Objects[4])
+								HideEntity(e\room\Objects[3])
 								;laying down
+								ShowEntity(e\room\Objects[6])
 								Animate2(e\room\Objects[6], AnimTime(e\room\Objects[6]), 377, 525, 0.2)
 								If e\EventState2 > 30*70 Then e\EventState = e\EventState+1
 							Case 5
+								ShowEntity e\room\Objects[1]
+								HideEntity(e\room\Objects[5])
+								HideEntity(e\room\Objects[4])
+								HideEntity(e\room\Objects[3])
 								;standing
+								ShowEntity(e\room\Objects[6])
 								Animate2(e\room\Objects[6], AnimTime(e\room\Objects[6]), 228, 376, 0.2)
 								If e\EventState2 > 40*70 Then 
 									e\EventState = e\EventState+1
 									PlaySound2(LoadTempSound("SFX\SCP\205\Horror.ogg"), Camera, e\room\Objects[6], 10, 0.3)
 								EndIf	
 							Case 7
+								ShowEntity e\room\Objects[1]
+								ShowEntity(e\room\Objects[6])
+								HideEntity(e\room\Objects[4])
+								HideEntity(e\room\Objects[3])
 								;first demon appears
 								ShowEntity(e\room\Objects[5])
 								;le sexy demon pose
@@ -5776,6 +5795,10 @@ Function UpdateEvents()
 									PlaySound2(LoadTempSound("SFX\SCP\205\Horror.ogg"), Camera, e\room\Objects[6], 10, 0.5)
 								EndIf
 							Case 9
+								ShowEntity e\room\Objects[1]
+								ShowEntity(e\room\Objects[6])
+								ShowEntity(e\room\Objects[5])
+								HideEntity(e\room\Objects[3])
 								;second demon appears
 								ShowEntity(e\room\Objects[4])
 								;idle
@@ -5789,6 +5812,10 @@ Function UpdateEvents()
 									PlaySound_Strict(LoadTempSound("SFX\SCP\205\Horror.ogg"))
 								EndIf
 							Case 11
+								ShowEntity e\room\Objects[1]
+								ShowEntity(e\room\Objects[6])
+								ShowEntity(e\room\Objects[5])
+								ShowEntity(e\room\Objects[4])
 								;third demon
 								ShowEntity(e\room\Objects[3])
 								;idle
@@ -5800,12 +5827,18 @@ Function UpdateEvents()
 								
 								If e\EventState2 > 85*70 Then e\EventState = e\EventState+1
 							Case 13
+								ShowEntity e\room\Objects[1]
+								ShowEntity(e\room\Objects[6])
+								ShowEntity(e\room\Objects[5])
+								ShowEntity(e\room\Objects[4])
+								ShowEntity(e\room\Objects[3])
 								If (AnimTime(e\room\Objects[6])<>227) Then SetAnimTime(e\room\Objects[6], 227)
-									
+								
 								Animate2(e\room\Objects[3], AnimTime(e\room\Objects[3]), 2, 491, 0.05)
 								Animate2(e\room\Objects[4], AnimTime(e\room\Objects[4]), 197, 433, 0.05)
 								Animate2(e\room\Objects[5], AnimTime(e\room\Objects[5]), 2, 433, 0.05)
 							Case 66
+								ShowEntity e\room\Objects[1]
 								Animate2(e\room\Objects[3], AnimTime(e\room\Objects[3]), 492, 534, 0.1, False)
 								Animate2(e\room\Objects[4], AnimTime(e\room\Objects[4]), 434, 466, 0.1, False)
 								Animate2(e\room\Objects[5], AnimTime(e\room\Objects[5]), 434, 494, 0.1, False)
@@ -5899,12 +5932,14 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 						
-						;the player fell	
-						If EntityY(Collider)<=28.5 Then 
-							Kill() 
-							BlinkTimer=-2
-						ElseIf EntityY(Collider)>EntityY(fr\Forest_Pivot,True)+0.5
-							MoveEntity(Collider, 0, ((EntityY(fr\Forest_Pivot,True)+0.5) - EntityY(Collider))*FPSfactor, 0)
+						;the player fell
+						If (Not NoClip)
+							If EntityY(Collider)<=28.5 Then 
+								Kill() 
+								BlinkTimer=-2
+							ElseIf EntityY(Collider)>EntityY(fr\Forest_Pivot,True)+0.5
+								MoveEntity(Collider, 0, ((EntityY(fr\Forest_Pivot,True)+0.5) - EntityY(Collider))*FPSfactor, 0)
+							EndIf
 						EndIf
 						
 						If e\room\NPC[0]<>Null
@@ -6460,6 +6495,23 @@ Function UpdateEvents()
 							e\EventState = 1
 							EndIf
 						Else
+							If e\room\Objects[2]=0
+								Local Glasstex = LoadTexture_Strict("GFX\map\glass.png",1+2)
+								e\room\Objects[2] = CreateSprite()
+								EntityTexture(e\room\Objects[2],Glasstex)
+								SpriteViewMode(e\room\Objects[2],2)
+								ScaleSprite(e\room\Objects[2],182.0*RoomScale*0.5, 192.0*RoomScale*0.5)
+								pvt% = CreatePivot(e\room\obj)
+								PositionEntity pvt%,-595.0,224.0,-208.0,False
+								;PositionEntity(e\room\Objects[2], e\room\x - 595.0 * RoomScale, 224.0*RoomScale, e\room\z - 208.0 * RoomScale)
+								PositionEntity(e\room\Objects[2], EntityX(pvt,True), EntityY(pvt,True), EntityZ(pvt,True))
+								FreeEntity pvt
+								RotateEntity e\room\Objects[2],0,e\room\angle,0
+								TurnEntity(e\room\Objects[2],0,180,0)
+								EntityParent(e\room\Objects[2], e\room\obj)
+								FreeTexture Glasstex
+							EndIf
+							
 							ShowEntity (e\room\Objects[2])
 							;start a timer for 173 breaking through the window
 							e\EventState = e\EventState + 1
@@ -6477,6 +6529,7 @@ Function UpdateEvents()
 									Else
 										PlaySound2(LoadTempSound("SFX\General\GlassBreak.ogg"), Camera, Curr173\obj) 
 										FreeEntity(e\room\Objects[2])
+										e\room\Objects[2]=0
 										PositionEntity(Curr173\Collider, EntityX(e\room\Objects[1], True), 0.5, EntityZ(e\room\Objects[1], True))
 										ResetEntity(Curr173\Collider)
 										RemoveEvent(e)

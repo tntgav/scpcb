@@ -1857,6 +1857,8 @@ Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
 
 Global IntercomStream,IntercomStreamCHN%,IntercomAnnouncementLoaded%
+
+Global ForestNPC,ForestNPCTex,ForestNPCData#[3]
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -3576,6 +3578,17 @@ Function QuickLoadEvents()
 			;[Block]
 			If e\EventStr = "load0"
 				QuickLoadPercent = 15
+				ForestNPC = CreateSprite()
+				;0.75 = 0.75*(410.0/410.0) - 0.75*(width/height)
+				ScaleSprite ForestNPC,0.75*(140.0/410.0),0.75
+				SpriteViewMode ForestNPC,4
+				EntityFX ForestNPC,1+8
+				ForestNPCTex = LoadAnimTexture("GFX\npcs\AgentIJ.AIJ",1+2,140,410,0,4)
+				ForestNPCData[0] = 0
+				EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
+				ForestNPCData[1]=0
+				ForestNPCData[2]=0
+				HideEntity ForestNPC
 				e\EventStr = "load1"
 			ElseIf e\EventStr = "load1"
 				QuickLoadPercent = 40
@@ -8159,6 +8172,8 @@ Function NullGame()
 	For i = 0 To 6
 		MTFrooms[i]=Null
 	Next
+	ForestNPC = 0
+	ForestNPCTex = 0
 	
 	Local e.Events
 	For e.Events = Each Events
@@ -10857,15 +10872,25 @@ Function UpdateStreamSounds()
 	
 End Function
 
-Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False)
+Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False,pickrange#=2.0,dir%=0)
 	Local pvt,pick
+	;dir = 0 - towards the floor (default)
+	;dir = 1 - towrads the ceiling (mostly for PD decal after leaving dimension)
 	
 	pvt = CreatePivot()
 	PositionEntity(pvt, x,y+0.05,z,isglobal)
-	RotateEntity pvt,90,0,0
-	pick = EntityPick(pvt,7)
+	If dir%=0
+		RotateEntity pvt,90,0,0
+	Else
+		RotateEntity pvt,-90,0,0
+	EndIf
+	pick = EntityPick(pvt,pickrange)
 	If pick<>0
-		PositionEntity(entity, x,PickedY()+customradius#+0.02,z,isglobal)
+		If dir%=0
+			PositionEntity(entity, x,PickedY()+customradius#+0.02,z,isglobal)
+		Else
+			PositionEntity(entity, x,PickedY()+customradius#-0.02,z,isglobal)
+		EndIf
 		DebugLog "Entity teleported successfully"
 	Else
 		PositionEntity(entity,x,y,z,isglobal)
@@ -10873,6 +10898,7 @@ Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False)
 	EndIf
 	FreeEntity pvt
 	ResetEntity entity
+	DebugLog "Teleported entity to: "+EntityX(entity)+"/"+EntityY(entity)+"/"+EntityZ(entity)
 	
 End Function
 

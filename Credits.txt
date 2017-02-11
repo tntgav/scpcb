@@ -192,6 +192,12 @@
 		Orgil Pount ("Destructoid")
 			Guard visor textures.
 
+		Balzac
+			Agent I██ J███ texture.
+
+		Aeldred28
+			New SCP-066 texture.
+
 	Other
 	
 		Dr. Gears

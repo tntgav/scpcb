@@ -1,6 +1,7 @@
 
 Function SaveGame(file$)
 	CatchErrors("Uncaught (SaveGame)")
+	
 	If Not Playable Then Return ;don't save if the player can't move at all
 	
 	If DropSpeed#>0.02*FPSfactor Or DropSpeed#<-0.02*FPSfactor Then Return
@@ -944,6 +945,11 @@ Function LoadGame(file$)
 				Next
 				DebugLog "Reset Eventstate in "+e\EventName
 			EndIf
+		;Reset the forest event to make it loading properly
+		ElseIf e\EventName = "room860"
+			e\EventStr = ""
+		ElseIf e\EventName = "room205"
+			e\EventStr = ""
 		EndIf
 	Next
 	

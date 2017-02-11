@@ -479,7 +479,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, temp, temp, temp		
 			
 			;If BumpEnabled Then 
-			;	diff1 = LoadTexture_Strict("GFX\npcs\scp-066_diffuse01.png")
+			;	diff1 = LoadTexture_Strict("GFX\npcs\scp-066_diffuse01.jpg")
 			;	bump1 = LoadTexture_Strict("GFX\npcs\scp-066_normal.png")
 			;	;TextureBlend bump1, FE_BUMP ;USE DOT3
 			;	EntityTexture n\obj, bump1, 0, 1
@@ -3119,6 +3119,20 @@ Function UpdateNPCs()
 					
 					dist = EntityDistance(Collider,n\Collider)
 					
+					If ForestNPC<>0
+						If ForestNPCData[2]=1
+							ShowEntity ForestNPC
+							If n\State<>1
+								If (BlinkTimer<-8 And BlinkTimer >-12) Or (Not EntityInView(ForestNPC,Camera))
+									ForestNPCData[2]=0
+									HideEntity ForestNPC
+								EndIf
+							EndIf
+						Else
+							HideEntity ForestNPC
+						EndIf
+					EndIf
+					
 					Select n\State
 						Case 0 ;idle (hidden)
 							
@@ -3166,6 +3180,8 @@ Function UpdateNPCs()
 								If EntityY(n\Collider)> -100 Then
 									PlaySound2(Step2SFX(Rand(3,5)), Camera, n\Collider, 15.0, 0.5)
 									
+									If ForestNPCData[2]<>1 Then ForestNPCData[2]=0
+									
 									Select Rand(3)
 										Case 1
 											PointEntity n\Collider, Collider
@@ -3190,6 +3206,54 @@ Function UpdateNPCs()
 								ShowEntity n\Collider
 								
 								PositionEntity n\Collider, EntityX(n\Collider), EntityY(fr\Forest_Pivot,True)+2.3, EntityZ(n\Collider)
+								
+								;[TODO]
+								If ForestNPC<>0
+									If ForestNPCData[2]=0
+										Local docchance% = 0
+										Local docamount% = 0
+										For i = 0 To MaxItemAmount-1
+											If Inventory(i)<>Null
+												Local docname$ = Inventory(i)\itemtemplate\name
+												If docname = "Log #1" Or docname = "Log #2" Or docname = "Log #3"
+													;860,850,830,800
+													docamount% = docamount% + 1
+													docchance = docchance + 10*docamount%
+												EndIf
+											EndIf
+										Next
+										
+										If Rand(1,860-docchance)=1
+											ShowEntity ForestNPC
+											ForestNPCData[2]=1
+											If Rand(2)=1
+												ForestNPCData[0]=0
+											Else
+												ForestNPCData[0]=2
+											EndIf
+											ForestNPCData[1]=0
+											PositionEntity ForestNPC,EntityX(n\Collider),EntityY(n\Collider)+0.5,EntityZ(n\Collider)
+											RotateEntity ForestNPC,0,EntityYaw(n\Collider),0
+											MoveEntity ForestNPC,0.75,0,0
+											RotateEntity ForestNPC,0,0,0
+											EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
+										Else
+											ForestNPCData[2]=2
+										EndIf
+									ElseIf ForestNPCData[2]=1
+										If ForestNPCData[1]=0.0
+											If Rand(200)=1
+												ForestNPCData[1]=FPSfactor
+												EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]+1
+											EndIf
+										ElseIf ForestNPCData[1]>0.0 And ForestNPCData[1]<5.0
+											ForestNPCData[1]=Min(ForestNPCData[1]+FPSfactor,5.0)
+										Else
+											ForestNPCData[1]=0
+											EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
+										EndIf
+									EndIf
+								EndIf
 								
 								If n\State2 = 0 Then ;don't start moving until the player is looking
 									If EntityInView(n\Collider, Camera) Then 
@@ -4686,7 +4750,7 @@ Function UpdateNPCs()
 				If CollidedFloor = True Then
 					n\DropSpeed# = 0
 				Else
-					n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
+					If ShouldEntitiesFall Then n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
 				EndIf
 			Else
 				n\DropSpeed = 0

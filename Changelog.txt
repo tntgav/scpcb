@@ -3,6 +3,8 @@ Saves from version 1.3.4 and onwards are compatible with this version.
 
 - New animations for the SCP-008-1 zombie.
 - Changed the room where the player appears when leaving the pocket dimension.
+- Changed SCP-066's texture.
+- Added Agent I██ J███.
 
 Bug Fixes:
 - Fixed camera fog staying far after restarting the game while having the nvg equipped.
@@ -21,6 +23,8 @@ Bug Fixes:
 - Fixed NPCs and items not getting teleported when travelling with the elevator.
 - The player cannot use ":","/","\" and "." characters for a save file anymore - this should prevent the unable to save bug.
 - Fixed teleportation issues with the elevators.
+- Fixed SCP-173's testroom glass not appearing after quickloading the save when the glass is broken.
+- Fixed SCP-205's event being broken after loading a save file.
 
 ----------------------------------------------------------------------------------
 
