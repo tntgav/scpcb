@@ -25,6 +25,7 @@ Bug Fixes:
 - Fixed teleportation issues with the elevators.
 - Fixed SCP-173's testroom glass not appearing after quickloading the save when the glass is broken.
 - Fixed SCP-205's event being broken after loading a save file.
+- Fixed SCP-895's event to return a Blitz3D error after the player died by the sanity effect.
 
 ----------------------------------------------------------------------------------
 

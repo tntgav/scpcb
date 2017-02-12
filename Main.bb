@@ -3628,10 +3628,10 @@ Function QuickLoadEvents()
 				If e\EventStr = "load0"
 					QuickLoadPercent = 10
 					e\room\Objects[0] = LoadMesh_Strict("GFX\map\dimension1499\1499plane.b3d")
-					Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
-					ScaleTexture planetex%,0.5,0.5
-					EntityTexture e\room\Objects[0],planetex%
-					FreeTexture planetex%
+					;Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
+					;ScaleTexture planetex%,0.5,0.5
+					;EntityTexture e\room\Objects[0],planetex%
+					;FreeTexture planetex%
 					HideEntity e\room\Objects[0]
 					e\EventStr = "load1"
 				ElseIf e\EventStr = "load1"
@@ -10392,7 +10392,7 @@ Function RenderWorld2()
 					ElseIf Inventory(i)\state<=100.0 Then
 						hasBattery = 1
 					EndIf
-					EndIf
+				EndIf
 			EndIf
 		Next
 		

@@ -312,6 +312,8 @@ Function UpdateEvents()
 							
 							FreeEntity e\room\Objects[0]
 							FreeEntity e\room\Objects[1]
+							e\room\Objects[0]=0
+							e\room\Objects[1]=0
 							
 							DebugLog "delete alarm"
 							
@@ -1518,36 +1520,96 @@ Function UpdateEvents()
 							EndIf
 						Next
 						If (CoffinDistance < 4.0) And (hasBatteryFor895) And (Not Wearing714) Then
-							
-							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
-							RestoreSanity = False
-							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
+;							
+;							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
+;							RestoreSanity = False
+;							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
+;							
+;							tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
+;							tempF2# = EntityYaw(Collider)
+;							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
+;							
+;							TurnEntity Collider, 0,tempF3/4,0,True
+;							
+;							tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
+;							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
+;							
+;							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
+;							
+;							If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
+;								EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
+;								PlaySound_Strict(HorrorSFX(1))
+;								e\EventState3 = 10.0
+;								EntityColor(NVOverlay, 255,255,255)
+;							EndIf
+;							If Sanity < (-1000) Then 
+;								If WearingNightVision > 1
+;									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
+;									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
+;								Else
+;									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
+;								EndIf
+;								Kill()
+;							EndIf
 							
 							tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
 							tempF2# = EntityYaw(Collider)
 							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
-							
 							TurnEntity Collider, 0,tempF3/4,0,True
-							
 							tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
 							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
-							
 							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
 							
-							If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
-								EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
-								PlaySound_Strict(HorrorSFX(1))
-								e\EventState3 = 10.0
-								EntityColor(NVOverlay, 255,255,255)
-							EndIf
-							If Sanity < (-1000) Then 
+							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
+							RestoreSanity = False
+							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
+							If Sanity < -1000
 								If WearingNightVision > 1
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
 									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
 								Else
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
 								EndIf
+								EntityTexture(NVOverlay, NVTexture)
 								Kill()
+							ElseIf Sanity < - 800 Then
+								If Rand(3) = 1 Then EntityTexture(NVOverlay, NVTexture)
+								If Rand(6) < 5 Then
+									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
+									For i% = 0 To MaxItemAmount - 1
+										If (Inventory(i) <> Null) Then
+											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+												If Inventory(i)\state2 = 1 Then PlaySound_Strict(HorrorSFX(1))
+												Inventory(i)\state2 = 2
+												Exit
+											EndIf
+										EndIf
+									Next
+								EndIf	
+								BlurTimer = 1000
+							ElseIf Sanity < - 500
+								If Rand(7) = 1 Then EntityTexture(NVOverlay, NVTexture)
+								If Rand(50) = 1 Then
+									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
+									For i% = 0 To MaxItemAmount - 1
+										If (Inventory(i) <> Null) Then
+											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+												If Inventory(i)\state2 = 0 Then PlaySound_Strict(HorrorSFX(0))
+												Inventory(i)\state2 = 1
+												Exit
+											EndIf
+										EndIf
+									Next
+								EndIf
+							Else
+								EntityTexture(NVOverlay, NVTexture)
+								For i% = 0 To MaxItemAmount - 1
+									If (Inventory(i) <> Null) Then
+										If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+											Inventory(i)\state2 = 0
+										EndIf
+									EndIf
+								Next
 							EndIf
 						EndIf
 					EndIf

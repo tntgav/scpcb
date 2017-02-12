@@ -1586,6 +1586,14 @@ Function LoadGameQuick(file$)
 			EndIf
 		Next	
 		e\EventStr = ReadString(f)
+		If e\EventName = "alarm"
+			;A hacky fix for the case that the intro objects aren't loaded when they should
+			;Altough I'm too lazy to add those objects there because at the time where you can save, those objects are already in the ground anyway - ENDSHN
+			If e\room\Objects[0]=0
+				e\room\Objects[0]=CreatePivot()
+				e\room\Objects[1]=CreatePivot()
+			EndIf
+		EndIf
 	Next
 	
 	Local it.Items
@@ -1701,6 +1709,13 @@ Function LoadGameQuick(file$)
 		
 		If closestroom<>Null Then PlayerRoom = closestroom
 	EndIf
+	
+	;This will hopefully fix the 895 crash bug after the player died by it's sanity effect and then quickloaded the game - ENDSHN
+	For sc.SecurityCams = Each SecurityCams
+		sc\PlayerState = 0
+	Next
+	EntityTexture NVOverlay,NVTexture
+	RestoreSanity = True
 	
 	CloseFile f
 	
