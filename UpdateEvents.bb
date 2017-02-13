@@ -6112,6 +6112,15 @@ Function UpdateEvents()
 										
 										e\EventState=1.0
 										
+										;reset monster spawn timer
+										e\EventState3 = 0.0
+										
+										
+										If e\room\NPC[0]<>Null Then
+											;reset monster to the (hidden) idle state
+											e\room\NPC[0]\State = 0
+										EndIf
+										
 										PositionEntity Collider,EntityX(fr\Door[0],True),EntityY(fr\Door[0],True)+EntityY(Collider,True)+0.5,EntityZ(fr\Door[0],True),True
 										
 										RotateEntity Collider, 0.0, EntityYaw(fr\Door[0],True)-180, 0.0, True
@@ -6125,21 +6134,13 @@ Function UpdateEvents()
 										PointEntity pvt, e\room\obj
 										ang# = WrapAngle(EntityYaw(pvt)-EntityYaw(e\room\obj,True))
 										If ang > 90 And ang < 270 Then
-											;TurnEntity Collider,0,180+90,0,True
 											e\EventState2 = 1
 										Else
-;											TurnEntity Collider,0,90,0,True
-;									;RotateEntity Collider,0,EntityYaw(fr\Door[0],True)+EntityYaw(Collider)-EntityYaw(dp\portal,True),0,True
 											e\EventState2 = 0
 										EndIf
 										FreeEntity pvt
 										
 										ResetEntity Collider
-										
-										
-										
-										;RotateEntity e\room\Objects[3], 0, 0.5, 0
-										;RotateEntity e\room\Objects[3], 0, 359.5, 0
 									EndIf
 								EndIf
 							EndIf
