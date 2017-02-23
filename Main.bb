@@ -1579,10 +1579,8 @@ Music(22) = "914"
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
 
-Global CurrMusicStream = FSOUND_Stream_Open("SFX\Music\"+Music(2)+".ogg",Mode,0)
-Global MusicCHN = FSOUND_Stream_Play(FreeChannel,CurrMusicStream)
-FSOUND_SetVolume(MusicCHN,MusicVolume*255.0)
-FSOUND_SetPaused(MusicCHN,False)
+Global CurrMusicStream, MusicCHN
+MusicCHN = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg",MusicVolume,Mode)
 
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
 Global CurrMusic% = 1
@@ -3757,8 +3755,7 @@ Function DrawEnding()
 			;FMOD_Pause(MusicCHN)
 			;FMOD_StopStream(CurrMusicStream)
 			;FMOD_CloseStream(CurrMusicStream)
-			FSOUND_Stream_Stop(CurrMusicStream)
-			FSOUND_Stream_Close(CurrMusicStream)
+			StopStream_Strict(MusicCHN)
 		EndIf
 		
 		If EndingTimer > -700 Then 
@@ -8349,10 +8346,7 @@ Function UpdateMusic()
 				If CurrMusicVolume = 0 Then
 					;If MusicCHN <> 0 Then StopChannel MusicCHN
 					If NowPlaying<66
-						FSOUND_StopSound(MusicCHN)
-						;FSOUND_SetPaused(MusicCHN,False)
-						FSOUND_Stream_Stop(CurrMusicStream)
-						FSOUND_Stream_Close(CurrMusicStream)
+						StopStream_Strict(MusicCHN)
 					EndIf
 					NowPlaying = ShouldPlay
 					MusicCHN = 0
@@ -8364,18 +8358,14 @@ Function UpdateMusic()
 		;EndIf
 		
 			If NowPlaying < 66 Then
-			If CurrMusic = 0
-				;MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,CurrMusicStream,Mode,MusicCHN)
-				CurrMusicStream = FSOUND_Stream_Open("SFX\Music\"+Music(NowPlaying)+".ogg",Mode,0)
-				MusicCHN = FSOUND_Stream_Play(FreeChannel,CurrMusicStream)
+				If CurrMusic = 0
+				MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
 				CurrMusic = 1
 			Else
 				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
 			EndIf
 			
-			;FMOD_SetVolume(CurrMusicVolume*255.0,MusicCHN)
-			FSOUND_SetVolume(MusicCHN,CurrMusicVolume*255.0)
-			FSOUND_SetPaused(MusicCHN,False)
+			SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
 		EndIf
 		
 		;ChannelVolume MusicCHN, CurrMusicVolume
@@ -8395,16 +8385,14 @@ Function PauseSounds()
 			If (Not e\soundchn_isstream)
 				If ChannelPlaying(e\soundchn) Then PauseChannel(e\soundchn)
 			Else
-				;FMOD_Pause(e\soundchn)
-				FSOUND_SetPaused(e\soundchn,True)
+				SetStreamPaused_Strict(e\soundchn,True)
 			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
 			If (Not e\soundchn2_isstream)
 				If ChannelPlaying(e\soundchn2) Then PauseChannel(e\soundchn2)
 			Else
-				;FMOD_Pause(e\soundchn2)
-				FSOUND_SetPaused(e\soundchn2,True)
+				SetStreamPaused_Strict(e\soundchn2,True)
 			EndIf
 		EndIf		
 	Next
@@ -8439,8 +8427,7 @@ Function PauseSounds()
 	EndIf
 	
 	If IntercomAnnouncementLoaded
-		;FMOD_Pause(IntercomStreamCHN)
-		FSOUND_SetPaused(IntercomStreamCHN,True)
+		SetStreamPaused_Strict(IntercomStreamCHN,True)
 	EndIf
 End Function
 
@@ -8450,16 +8437,14 @@ Function ResumeSounds()
 			If (Not e\soundchn_isstream)
 				If ChannelPlaying(e\soundchn) Then ResumeChannel(e\soundchn)
 			Else
-				;FMOD_Resume(e\soundchn)
-				FSOUND_SetPaused(e\soundchn,False)
+				SetStreamPaused_Strict(e\soundchn,False)
 			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
 			If (Not e\soundchn2_isstream)
 				If ChannelPlaying(e\soundchn2) Then ResumeChannel(e\soundchn2)
 			Else
-				;FMOD_Resume(e\soundchn2)
-				FSOUND_SetPaused(e\soundchn2,False)
+				SetStreamPaused_Strict(e\soundchn2,False)
 			EndIf
 		EndIf	
 	Next
@@ -8494,8 +8479,7 @@ Function ResumeSounds()
 	EndIf
 	
 	If IntercomAnnouncementLoaded
-		;FMOD_Resume(IntercomStreamCHN)
-		FSOUND_SetPaused(IntercomStreamCHN,False)
+		SetStreamPaused_Strict(IntercomStreamCHN,False)
 	EndIf
 End Function
 
@@ -10841,18 +10825,10 @@ End Function
 Function PlayAnnouncement(file$) ;This function streams the announcement currently playing
 	
 	If IntercomAnnouncementLoaded
-		FSOUND_StopSound(IntercomStreamCHN)
-		FSOUND_Stream_Stop(IntercomStream)
-		FSOUND_Stream_Close(IntercomStream)
+		StopStream_Strict(IntercomStreamCHN)
 	EndIf
-	;[TODO]
 	
-	;IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,IntercomStream,0)
-	IntercomStream = FSOUND_Stream_Open(file$,0,0)
-	IntercomStreamCHN = FSOUND_Stream_Play(FreeChannel,IntercomStream)
-	FSOUND_SetVolume(IntercomStreamCHN,SFXVolume*255.0)
-	FSOUND_SetPaused(IntercomStreamCHN,False)
-	
+	IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,0)
 	IntercomAnnouncementLoaded = True
 	
 End Function
@@ -10860,57 +10836,38 @@ End Function
 Function UpdateStreamSounds()
 	Local e.Events
 	
-	If IntercomAnnouncementLoaded
-		;FMOD_SetVolume(SFXVolume*255.0,IntercomStream)
-		FSOUND_SetVolume(IntercomStreamCHN,SFXVolume*255.0)
-		FSOUND_SetPaused(IntercomStreamCHN,False)
+	If FPSfactor > 0
+		If IntercomAnnouncementLoaded
+			SetStreamVolume_Strict(IntercomStreamCHN,SFXVolume)
+		EndIf
+		For e = Each Events
+			If e\SoundCHN<>0
+				If e\SoundCHN_isStream
+					SetStreamVolume_Strict(e\SoundCHN,SFXVolume)
+				EndIf
+			EndIf
+			If e\SoundCHN2<>0
+				If e\SoundCHN2_isStream
+					SetStreamVolume_Strict(e\SoundCHN2,SFXVolume)
+				EndIf
+			EndIf
+		Next
 	EndIf
-	For e = Each Events
-		If e\SoundCHN<>0
-			If e\SoundCHN_isStream
-				;FMOD_SetVolume(SFXVolume*255.0,e\Sound)
-				FSOUND_SetVolume(e\SoundCHN,SFXVolume*255.0)
-				FSOUND_SetPaused(e\SoundCHN,False)
-			EndIf
-		EndIf
-		If e\SoundCHN2<>0
-			If e\SoundCHN2_isStream
-				;FMOD_SetVolume(SFXVolume*255.0,e\Sound2)
-				FSOUND_SetVolume(e\SoundCHN2,SFXVolume*255.0)
-				FSOUND_SetPaused(e\SoundCHN2,False)
-			EndIf
-		EndIf
-	Next
 	
 	If (Not PlayerInReachableRoom())
 		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea"
 			If IntercomAnnouncementLoaded
-				;FMOD_Pause(IntercomStreamCHN)
-				;FMOD_StopStream(IntercomStream)
-				;FMOD_CloseStream(IntercomStream)
-				FSOUND_StopSound(IntercomStreamCHN)
-				FSOUND_Stream_Stop(IntercomStream)
-				FSOUND_Stream_Close(IntercomStream)
+				StopStream_Strict(IntercomStreamCHN)
 			EndIf
 			For e = Each Events
 				If e\SoundCHN<>0
 					If e\SoundCHN_isStream
-						;FMOD_Pause(e\SoundCHN)
-						;FMOD_StopStream(e\Sound)
-						;FMOD_CloseStream(e\Sound)
-						FSOUND_StopSound(e\SoundCHN)
-						FSOUND_Stream_Stop(e\Sound)
-						FSOUND_Stream_Close(e\Sound)
+						StopStream_Strict(e\SoundCHN)
 					EndIf
 				EndIf
 				If e\SoundCHN2<>0
 					If e\SoundCHN2_isStream
-						;FMOD_Pause(e\SoundCHN2)
-						;FMOD_StopStream(e\Sound2)
-						;FMOD_CloseStream(e\Sound2)
-						FSOUND_StopSound(e\SoundCHN2)
-						FSOUND_Stream_Stop(e\Sound2)
-						FSOUND_Stream_Close(e\Sound2)
+						StopStream_Strict(e\SoundCHN2)
 					EndIf
 				EndIf
 			Next

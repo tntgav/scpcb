@@ -345,12 +345,8 @@ Function UpdateEvents()
 								
 								CurrMusicVolume = 1.0
 								
-								FSOUND_StopSound(MusicCHN)
-								FSOUND_Stream_Stop(CurrMusicStream)
-								FSOUND_Stream_Close(CurrMusicStream)
-								;MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,CurrMusicStream)
-								CurrMusicStream = FSOUND_Stream_Open("SFX\Music\"+Music(13)+".ogg",Mode,0)
-								MusicCHN = FSOUND_Stream_Play(FreeChannel,CurrMusicStream)
+								StopStream_Strict(MusicCHN)
+								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,Mode)
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
@@ -8355,10 +8351,7 @@ Function UpdateEndings()
 								ElseIf e\EventState > 35.0*70 And e\EventState < 36.5*70	
 									CameraShake = 1.5		
 									If e\EventState-FPSfactor =< 35.0*70 Then
-										e\Sound = FSOUND_Stream_Open("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",0,0)
-										e\SoundCHN = FSOUND_Stream_Play(FreeChannel,e\Sound)
-										FSOUND_SetVolume(e\SoundCHN,SFXVolume*255.0)
-										FSOUND_SetPaused(e\SoundCHN,False)
+										e\SoundCHN = StreamSound_Strict("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",SFXVolume,0)
 										e\SoundCHN_isStream = True
 									EndIf									
 								ElseIf e\EventState > 39.5*70 And e\EventState < 39.8*70		
@@ -8381,22 +8374,15 @@ Function UpdateEndings()
 							If e\EventState => 45.0*70 Then
 								If e\EventState < 75.0*70 Then
 									If e\SoundCHN2=0
-										e\Sound2 = FSOUND_Stream_Open("SFX\Ending\GateB\Siren.ogg",0,0)
-										e\SoundCHN2 = FSOUND_Stream_Play(FreeChannel,e\Sound2)
-										FSOUND_SetVolume(e\SoundCHN2,SFXVolume*255.0)
-										FSOUND_SetPaused(e\SoundCHN2,False)
+										e\SoundCHN2 = StreamSound_Strict("SFX\Ending\GateB\Siren.ogg",SFXVolume,Mode)
 										e\SoundCHN2_isStream = True
 									EndIf
 								Else
 									If SelectedEnding = "" Then
 									    ShouldPlay = 66
 										
-										FSOUND_StopSound(e\SoundCHN2)
-										FSOUND_Stream_Stop(e\Sound2)
-										FSOUND_Stream_Close(e\Sound2)
-										FSOUND_StopSound(e\SoundCHN)
-										FSOUND_Stream_Stop(e\Sound)
-										FSOUND_Stream_Close(e\Sound)
+										StopStream_Strict(e\SoundCHN)
+										StopStream_Strict(e\SoundCHN2)
 										
 										temp = True
 										For e2.Events = Each Events

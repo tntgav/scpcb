@@ -151,6 +151,87 @@ Function FreeSound_Strict(sndHandle%)
 	EndIf
 End Function
 
+Type Stream
+	Field sfx%
+	Field chn%
+End Type
+
+Function StreamSound_Strict(file$,volume#=1.0,custommode=Mode)
+	If FileType(file$)<>1
+		CreateConsoleMsg("Sound " + Chr(34) + file$ + Chr(34) + " not found.")
+		If ConsoleOpening
+			ConsoleOpen = True
+		EndIf
+		Return 0
+	EndIf
+	
+	Local st.Stream = New Stream
+	st\sfx = FSOUND_Stream_Open(file$,custommode,0)
+	
+	If st\sfx = 0
+		CreateConsoleMsg("Failed to stream Sound (returned 0): " + Chr(34) + file$ + Chr(34))
+		If ConsoleOpening
+			ConsoleOpen = True
+		EndIf
+		Return 0
+	EndIf
+	
+	st\chn = FSOUND_Stream_Play(FreeChannel,st\sfx)
+	
+	If st\chn = -1
+		CreateConsoleMsg("Failed to stream Sound (returned -1): " + Chr(34) + file$ + Chr(34))
+		If ConsoleOpening
+			ConsoleOpen = True
+		EndIf
+		Return -1
+	EndIf
+	
+	FSOUND_SetVolume(st\chn,volume*255)
+	FSOUND_SetPaused(st\chn,False)
+	
+	Return Handle(st)
+End Function
+
+Function StopStream_Strict(streamHandle%)
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st\chn=0 Or st\chn=-1
+		CreateConsoleMsg("Failed to stop stream Sound: Return value "+st\chn)
+		Return
+	EndIf
+	
+	FSOUND_StopSound(st\chn)
+	FSOUND_Stream_Stop(st\sfx)
+	FSOUND_Stream_Close(st\sfx)
+	Delete st
+	
+End Function
+
+Function SetStreamVolume_Strict(streamHandle%,volume#)
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st\chn=0 Or st\chn=-1
+		CreateConsoleMsg("Failed to set stream Sound volume: Return value "+st\chn)
+		Return
+	EndIf
+	
+	FSOUND_SetVolume(st\chn,volume*255.0)
+	FSOUND_SetPaused(st\chn,False)
+	
+End Function
+
+Function SetStreamPaused_Strict(streamHandle%,paused%)
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st\chn=0 Or st\chn=-1
+		CreateConsoleMsg("Failed to pause/unpause stream Sound: Return value "+st\chn)
+		Return
+	EndIf
+	
+	FSOUND_SetPaused(st\chn,paused)
+	
+End Function
+
 Function LoadMesh_Strict(File$,parent=0)
 	If FileType(File$) <> 1 Then RuntimeError "3D Mesh " + File$ + " not found."
 	tmp = LoadMesh(File$, parent)
