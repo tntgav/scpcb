@@ -27,6 +27,7 @@ Bug Fixes:
 - Fixed SCP-205's event being broken after loading a save file.
 - Fixed SCP-895's event to return a Blitz3D error after the player died by the sanity effect.
 - Removed "bb_fmod.dll" which seemed to cause the "user lib not found" issue. Instead, only fmod.dll will be used for sound streaming.
+- Fixed SCP-860-2's alert theme not playing when it attacks the player while the player doesn't face it.
 
 ----------------------------------------------------------------------------------
 
