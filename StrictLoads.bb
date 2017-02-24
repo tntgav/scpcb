@@ -151,31 +151,85 @@ Function FreeSound_Strict(sndHandle%)
 	EndIf
 End Function
 
-Function StreamSound_Strict(file$, volume#, stream%, custommode%=Mode)
-	If FileType(file) <> 1 Then
-		CreateConsoleMsg("Sound " + Chr(34) + file + Chr(34) + " not found.")
-		If ConsoleOpening Then
+Type Stream
+	Field sfx%
+	Field chn%
+End Type
+
+Function StreamSound_Strict(file$,volume#=1.0,custommode=Mode)
+	If FileType(file$)<>1
+		CreateConsoleMsg("Sound " + Chr(34) + file$ + Chr(34) + " not found.")
+		If ConsoleOpening
 			ConsoleOpen = True
 		EndIf
-		
 		Return 0
 	EndIf
 	
-	stream% = FMOD_LoadStream(file$, custommode, F_Offset, Lenght)
-	Local chn% = FMOD_PlayStream(stream)
+	Local st.Stream = New Stream
+	st\sfx = FSOUND_Stream_Open(file$,custommode,0)
 	
-	If chn%=0 Then	
-		CreateConsoleMsg("Failed to stream sound " + Chr(34) + file + Chr(34) + ".")
-		If ConsoleOpening Then
+	If st\sfx = 0
+		CreateConsoleMsg("Failed to stream Sound (returned 0): " + Chr(34) + file$ + Chr(34))
+		If ConsoleOpening
 			ConsoleOpen = True
 		EndIf
-		
 		Return 0
 	EndIf
 	
-	FMOD_SetVolume(volume*255.0,chn)
+	st\chn = FSOUND_Stream_Play(FreeChannel,st\sfx)
 	
-	Return chn%
+	If st\chn = -1
+		CreateConsoleMsg("Failed to stream Sound (returned -1): " + Chr(34) + file$ + Chr(34))
+		If ConsoleOpening
+			ConsoleOpen = True
+		EndIf
+		Return -1
+	EndIf
+	
+	FSOUND_SetVolume(st\chn,volume*255)
+	FSOUND_SetPaused(st\chn,False)
+	
+	Return Handle(st)
+End Function
+
+Function StopStream_Strict(streamHandle%)
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st\chn=0 Or st\chn=-1
+		CreateConsoleMsg("Failed to stop stream Sound: Return value "+st\chn)
+		Return
+	EndIf
+	
+	FSOUND_StopSound(st\chn)
+	FSOUND_Stream_Stop(st\sfx)
+	FSOUND_Stream_Close(st\sfx)
+	Delete st
+	
+End Function
+
+Function SetStreamVolume_Strict(streamHandle%,volume#)
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st\chn=0 Or st\chn=-1
+		CreateConsoleMsg("Failed to set stream Sound volume: Return value "+st\chn)
+		Return
+	EndIf
+	
+	FSOUND_SetVolume(st\chn,volume*255.0)
+	FSOUND_SetPaused(st\chn,False)
+	
+End Function
+
+Function SetStreamPaused_Strict(streamHandle%,paused%)
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st\chn=0 Or st\chn=-1
+		CreateConsoleMsg("Failed to pause/unpause stream Sound: Return value "+st\chn)
+		Return
+	EndIf
+	
+	FSOUND_SetPaused(st\chn,paused)
+	
 End Function
 
 Function LoadMesh_Strict(File$,parent=0)

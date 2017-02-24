@@ -345,10 +345,8 @@ Function UpdateEvents()
 								
 								CurrMusicVolume = 1.0
 								
-								FMOD_Pause(MusicCHN)
-								FMOD_StopStream(CurrMusicStream)
-								FMOD_CloseStream(CurrMusicStream)
-								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,CurrMusicStream)
+								StopStream_Strict(MusicCHN)
+								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,Mode)
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
@@ -5987,7 +5985,7 @@ Function UpdateEvents()
 						EndIf
 						
 						If e\room\NPC[0]<>Null Then
-							If e\room\NPC[0]\State2 = 1 And e\room\NPC[0]\State>1 Then ;the monster is chasing the player
+							If (e\room\NPC[0]\State2 = 1 And e\room\NPC[0]\State>1) Or e\room\NPC[0]\State>2 ;the monster is chasing the player
 								ShouldPlay = 12
 							Else
 								ShouldPlay = 9
@@ -8353,7 +8351,7 @@ Function UpdateEndings()
 								ElseIf e\EventState > 35.0*70 And e\EventState < 36.5*70	
 									CameraShake = 1.5		
 									If e\EventState-FPSfactor =< 35.0*70 Then
-										e\SoundCHN = StreamSound_Strict("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",SFXVolume,e\Sound,0)
+										e\SoundCHN = StreamSound_Strict("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",SFXVolume,0)
 										e\SoundCHN_isStream = True
 									EndIf									
 								ElseIf e\EventState > 39.5*70 And e\EventState < 39.8*70		
@@ -8376,19 +8374,15 @@ Function UpdateEndings()
 							If e\EventState => 45.0*70 Then
 								If e\EventState < 75.0*70 Then
 									If e\SoundCHN2=0
-										e\SoundCHN2 = StreamSound_Strict("SFX\Ending\GateB\Siren.ogg",SFXVolume#,e\Sound2)
+										e\SoundCHN2 = StreamSound_Strict("SFX\Ending\GateB\Siren.ogg",SFXVolume,Mode)
 										e\SoundCHN2_isStream = True
 									EndIf
 								Else
 									If SelectedEnding = "" Then
 									    ShouldPlay = 66
 										
-										FMOD_Pause(e\SoundCHN2)
-										FMOD_StopStream(e\Sound2)
-										FMOD_CloseStream(e\Sound2)
-										FMOD_Pause(e\SoundCHN)
-										FMOD_StopStream(e\Sound)
-										FMOD_CloseStream(e\Sound)
+										StopStream_Strict(e\SoundCHN)
+										StopStream_Strict(e\SoundCHN2)
 										
 										temp = True
 										For e2.Events = Each Events
