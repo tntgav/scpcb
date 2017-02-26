@@ -428,8 +428,12 @@ Function SaveGame(file$)
 		WriteByte f, itt\found
 	Next
 	
-	WriteInt f, 994
-	DebugLog 994
+	If UsedConsole
+		WriteInt f, 100
+		DebugLog "CHEATED!"
+	Else
+		WriteInt f, 994
+	EndIf
 	
 	CloseFile f
 	
@@ -1054,6 +1058,11 @@ Function LoadGame(file$)
 	Next
 	
 	;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
+	
+	If ReadInt(f)<>994
+		UsedConsole = True
+		DebugLog "CHEATED!"
+	EndIf
 	
 	CloseFile f
 	
@@ -1695,6 +1704,11 @@ Function LoadGameQuick(file$)
 	Next
 	
 	;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
+	
+	If ReadInt(f)<>994
+		UsedConsole = True
+		DebugLog "CHEATED!"
+	EndIf
 	
 	If 0 Then 
 		closestroom = Null

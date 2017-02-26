@@ -1575,6 +1575,7 @@ Music(19) = "1499Danger"
 Music(20) = "049Chase"
 Music(21) = "..\Ending\MenuBreath"
 Music(22) = "914"
+Music(23) = "Ending"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
@@ -3190,6 +3191,8 @@ Repeat
 		If ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
 		
 		DrawQuickLoading()
+		
+		UpdateAchievementMsg()
 	End If
 	
 	If BorderlessWindowed Then
@@ -3718,8 +3721,8 @@ Function DrawEnding()
 	EndingTimer=EndingTimer-FPSfactor2
 	
 	GiveAchievement(Achv055)
-	If (Not UsedConsole) GiveAchievement(AchvConsole)
-		
+	If (Not UsedConsole) Then GiveAchievement(AchvConsole)
+	If SelectedDifficulty\name = "Keter" Then GiveAchievement(AchvKeter)
 	Local x,y,width,height, temp
 	Local itt.ItemTemplates, r.Rooms
 	
@@ -3740,22 +3743,22 @@ Function DrawEnding()
 			If ChannelPlaying(BreathCHN) Then StopChannel BreathCHN : Stamina = 100
 		EndIf
 		
-		If EndingTimer <-400 Then 
-			ShouldPlay = 13
-		EndIf
+		;If EndingTimer <-400 Then 
+		;	ShouldPlay = 13
+		;EndIf
 		
 		If EndingScreen = 0 Then 
 			EndingScreen = LoadImage_Strict("GFX\endingscreen.pt")
-   			temp = LoadSound_Strict ("SFX\Music\Ending.ogg")
-			PlaySound_Strict temp
-			ShouldPlay = 66
+			
+			ShouldPlay = 23
+			CurrMusicVolume = MusicVolume
+			
+			CurrMusicVolume = MusicVolume
+			StopStream_Strict(MusicCHN)
+			MusicCHN = StreamSound_Strict("SFX\Music\"+Music(23)+".ogg",CurrMusicVolume,0)
+			NowPlaying = ShouldPlay
 			
 			PlaySound_Strict LightSFX
-			
-			;FMOD_Pause(MusicCHN)
-			;FMOD_StopStream(CurrMusicStream)
-			;FMOD_CloseStream(CurrMusicStream)
-			StopStream_Strict(MusicCHN)
 		EndIf
 		
 		If EndingTimer > -700 Then 
@@ -3842,6 +3845,7 @@ Function DrawEnding()
 					
 					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
 						NullGame()
+						StopStream_Strict(MusicCHN)
 						;Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
 						ShouldPlay = 21
 						MenuOpen = False
@@ -3851,9 +3855,8 @@ Function DrawEnding()
 						FlushKeys()
 					EndIf					
 				Else
+					ShouldPlay = 23
 					DrawMenu()
-					ShouldPlay = 21
-
 				EndIf
 				
 			EndIf
@@ -8246,6 +8249,9 @@ Function NullGame()
 	DeafTimer# = 0.0
 	
 	IsZombie% = False
+	
+	Delete Each AchievementMsg
+	CurrAchvMSGID = 0
 	
 	;DeInitExt
 	

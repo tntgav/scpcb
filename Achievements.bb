@@ -1,6 +1,6 @@
 ;achievement menu & messages by InnocentSam
 
-Const MAXACHIEVEMENTS=36
+Const MAXACHIEVEMENTS=37
 Dim Achievements%(MAXACHIEVEMENTS)
 
 Const Achv008%=0, Achv012%=1, Achv035%=2, Achv049%=3, Achv055=4,  Achv079%=5, Achv096%=6, Achv106%=7, Achv148%=8, Achv178=9, Achv205=10
@@ -10,6 +10,8 @@ Const Achv914%=20, Achv939%=21, Achv966%=22, Achv970=23, Achv1025%=24, Achv1048=
 Const AchvMaynard%=27, AchvHarp%=28, AchvSNAV%=29, AchvOmni%=30, AchvConsole%=31, AchvTesla%=32, AchvPD%=33
 
 Const Achv1162% = 34, Achv1499% = 35
+
+Const AchvKeter% = 36
 
 Global UsedConsole
 
@@ -38,8 +40,9 @@ Function GiveAchievement(achvname%, showMessage%=True)
 		If AchvMSGenabled And showMessage Then
 			Local loc2% = GetINISectionLocation("Data\achievementstrings.ini", "s"+achvname)
 			Local AchievementName$ = GetINIString2("Data\achievementstrings.ini", loc2, "string1")
-			Msg = "Achievement Unlocked - "+AchievementName
-			MsgTimer=70*7
+			;Msg = "Achievement Unlocked - "+AchievementName
+			;MsgTimer=70*7
+			CreateAchievementMsg(achvname,AchievementName)
 		EndIf
 	EndIf
 End Function
@@ -98,6 +101,81 @@ Function DrawAchvIMG(x%, y%, achvno%)
 	
 	Rect((x+(row*SeparationConst2)), y, 64*scale, 64*scale, False)
 End Function
+
+Global CurrAchvMSGID% = 0
+
+Type AchievementMsg
+	Field achvID%
+	Field txt$
+	Field msgx#
+	Field msgtime#
+	Field msgID%
+End Type
+
+Function CreateAchievementMsg.AchievementMsg(id%,txt$)
+	Local amsg.AchievementMsg = New AchievementMsg
+	
+	amsg\achvID = id
+	amsg\txt = txt
+	amsg\msgx = 0.0
+	amsg\msgtime = FPSfactor2
+	amsg\msgID = CurrAchvMSGID
+	CurrAchvMSGID = CurrAchvMSGID + 1
+	
+	Return amsg
+End Function
+
+Function UpdateAchievementMsg()
+	Local amsg.AchievementMsg,amsg2.AchievementMsg
+	Local scale# = GraphicHeight/768.0
+	Local width% = 264*scale
+	Local height% = 84*scale
+	Local x%,y%
+	
+	For amsg = Each AchievementMsg
+		If amsg\msgtime <> 0
+			x=GraphicWidth+amsg\msgx
+			y=(GraphicHeight-height)
+			For amsg2 = Each AchievementMsg
+				If amsg2 <> amsg
+					If amsg2\msgID > amsg\msgID
+						y=y-height
+					EndIf
+				EndIf
+			Next
+			DrawFrame(x,y,width,height)
+			Color 0,0,0
+			Rect(x+10*scale,y+10*scale,64*scale,64*scale,True)
+			DrawImage(AchvIMG(amsg\achvID),x+10*scale,y+10*scale)
+			Color 50,50,50
+			Rect(x+10*scale,y+10*scale,64*scale,64*scale,False)
+			Color 255,255,255
+			AASetFont Font1
+			RowText("Achievement Unlocked - "+amsg\txt,x+84*scale,y+10*scale,width-94*scale,y-20*scale)
+			If amsg\msgtime > 0.0 And amsg\msgtime < 70*7
+				amsg\msgtime = amsg\msgtime + FPSfactor2
+				If amsg\msgx > -width%
+					amsg\msgx = Max(amsg\msgx-2*FPSfactor2,-width%)
+				EndIf
+			ElseIf amsg\msgtime >= 70*7
+				amsg\msgtime = -1
+			ElseIf amsg\msgtime = -1
+				If amsg\msgx < 0.0
+					amsg\msgx = Min(amsg\msgx+2*FPSfactor2,0.0)
+				Else
+					amsg\msgtime = 0.0
+				EndIf
+			EndIf
+		Else
+			Delete amsg
+		EndIf
+	Next
+	
+End Function
+
+
+
+
 ;~IDEal Editor Parameters:
-;~F#22#2E#3D
+;~F#31#48
 ;~C#Blitz3D
