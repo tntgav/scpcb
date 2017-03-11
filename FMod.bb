@@ -10,7 +10,8 @@ Const PanLeft	=	0
 Const PanRight	=	255
 Const PanMid	=	-1
 Const AllChannel=	-3
+Const FreeChannel = -1
 
-FMOD_Init(Freq, Channels, Flags)
+FSOUND_Init(Freq, Channels, Flags)
 ;~IDEal Editor Parameters:
 ;~C#Blitz3D

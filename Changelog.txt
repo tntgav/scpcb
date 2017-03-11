@@ -1,29 +1,33 @@
 ﻿v1.3.7
+Saves from version 1.3.4 and onwards are compatible with this version.
 
-- New animations for the SCP-008-1 infected human.
+- New animations for the SCP-008-1 zombie.
 - Changed the room where the player appears when leaving the pocket dimension.
-- Revamped SCP-066's texture.
-- Added █████ █████ █████ event to SCP-860-1.
-- Restricted the ability to use ":", "/", "\" and "." characters in a save file name to prevent file system issues.
+- Changed SCP-066's texture.
+- Added Agent I██ J███.
 
 Bug Fixes:
-- Fixed a bug that caused the camera fog value to remain increased after reloading a save file with the night vision goggles equipped.
+- Fixed camera fog staying far after restarting the game while having the nvg equipped.
 - Fixed transparency effect of the brushes on SCP-939's model.
-- Fixed SCP-714 not halting the effects of SCP-895 and SCP-1025.
-- Fixed SCP-1025 achievement's not being able to be unlocked.
-- Adjusted SCP-895's hidden "sanity meter" so that it will now deplete when not looking at the monitor feed.
-- Attempted to fix a bug that caused SCP-106 to teleport at the same location as the player at Gate A.
+- Fixed a bug that prevented the player to save on a chat screen in Euclid mode
+- Fixed SCP-714 not preventing the effects of SCP-1025 and SCP-895.
+- Fixed SCP-1025 achievement unable to be unlocked.
+- Fixed the sanity system not working properly.
+- Hopefully fixed a bug that caused SCP-106 to teleport at the same location as the player at Gate A.
 - Fixed the explosion effect for SCP-294 drinks.
-- Fixed items falling through the floor in SCP-1499's dimension after exiting and re-entering the area.
-- Fixed SCP-939 instances getting frozen after leaving SCP-1499's dimension.
-- Fixed SCP-173 appearing on the walkway in the starting room after reloading a save.
+- Fixed items falling through SCP-1499's dimension if the player loaded a save file and re-entered it.
+- Fixed SCP-939 instances getting frozen when leaving SCP-1499's dimension.
+- Fixed SCP-173 having the ability to stand on the walkway in the starting room.
 - Fixed the guard and scientist in starting room to appear once you save and load during the breach event.
-- Fixed the blur effect when exiting the pocket dimension.
+- Fixed the blur effect when leaving the pocket dimension.
 - Fixed NPCs and items not getting teleported when travelling with the elevator.
-- Fixed the glass in room2testroom2 not appearing after the game was reloaded to a point before it was broken.
-- Fixed SCP-205's event breaking after reloading a save.
-- Fixed SCP-895's event throwing errors after the player dies to it.
-- Fixed issues relating to teleporting entities and items inside elevators.
+- The player cannot use ":","/","\" and "." characters for a save file anymore - this should prevent the unable to save bug.
+- Fixed teleportation issues with the elevators.
+- Fixed SCP-173's testroom glass not appearing after quickloading the save when the glass is broken.
+- Fixed SCP-205's event being broken after loading a save file.
+- Fixed SCP-895's event to return a Blitz3D error after the player died by the sanity effect.
+- Removed "bb_fmod.dll" which seemed to cause the "user lib not found" issue. Instead, only fmod.dll will be used for sound streaming.
+- Fixed SCP-860-2's alert theme not playing when it attacks the player while the player doesn't face it.
 
 ----------------------------------------------------------------------------------
 
