@@ -59,13 +59,13 @@ Function UpdateEvents()
 						CameraFogRange(Camera, CameraFogNear, CameraFogFar)
 						CameraFogMode(Camera, 1)
 						If SelectedDifficulty\saveType = SAVEANYWHERE Then
-							;Msg = "Press "+KeyName(KEY_SAVE)+" to save."
-							;MsgTimer = 70*4
-							SetSaveMSG("Press "+KeyName(KEY_SAVE)+" to save.")
+							Msg = "Press "+KeyName(KEY_SAVE)+" to save."
+							MsgTimer = 70*4
+							;SetSaveMSG("Press "+KeyName(KEY_SAVE)+" to save.")
 						ElseIf SelectedDifficulty\saveType = SAVEONSCREENS Then
-							;Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
-							;MsgTimer = 70 * 8
-							SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
+							Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
+							MsgTimer = 70 * 8
+							;SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
 						EndIf
 						
 						Curr173\Idle=False

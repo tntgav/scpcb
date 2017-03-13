@@ -3091,38 +3091,38 @@ Repeat
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
 				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
-					;Msg = "You cannot save in this location."
-					;MsgTimer = 70 * 4
-					SetSaveMSG("You cannot save in this location.")
+					Msg = "You cannot save in this location."
+					MsgTimer = 70 * 4
+					;SetSaveMSG("You cannot save in this location.")
 				ElseIf (Not CanSave) Or QuickLoadPercent > -1
-					;Msg = "You cannot save at this moment."
-					;MsgTimer = 70 * 4
-					SetSaveMSG("You cannot save at this moment.")
+					Msg = "You cannot save at this moment."
+					MsgTimer = 70 * 4
+					;SetSaveMSG("You cannot save at this moment.")
 					If QuickLoadPercent > -1
-						;Msg = Msg + " (game is loading)"
-						Save_MSG = Save_MSG + " (game is loading)"
+						Msg = Msg + " (game is loading)"
+						;Save_MSG = Save_MSG + " (game is loading)"
 					EndIf
 				Else
 					SaveGame(SavePath + CurrSave + "\")
 				EndIf
 			ElseIf SelectedDifficulty\saveType = SAVEONSCREENS
 				If SelectedScreen=Null And SelectedMonitor=Null Then
-					;Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
-					;MsgTimer = 70 * 4
-					SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
+					Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
+					MsgTimer = 70 * 4
+					;SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
 					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
-						;Msg = "You cannot save in this location."
-						;MsgTimer = 70 * 4
-						SetSaveMSG("You cannot save in this location.")
+						Msg = "You cannot save in this location."
+						MsgTimer = 70 * 4
+						;SetSaveMSG("You cannot save in this location.")
 					ElseIf (Not CanSave) Or QuickLoadPercent > -1
-						;Msg = "You cannot save at this moment."
-						;MsgTimer = 70 * 4
-						SetSaveMSG("You cannot save at this moment.")
+						Msg = "You cannot save at this moment."
+						MsgTimer = 70 * 4
+						;SetSaveMSG("You cannot save at this moment.")
 						If QuickLoadPercent > -1
-							;Msg = Msg + " (game is loading)"
-							Save_MSG = Save_MSG + " (game is loading)"
+							Msg = Msg + " (game is loading)"
+							;Save_MSG = Save_MSG + " (game is loading)"
 						EndIf
 					Else
 						If SelectedScreen<>Null
@@ -3134,15 +3134,15 @@ Repeat
 					EndIf
 				EndIf
 			Else
-				;Msg = "Quick saving is disabled."
-				;MsgTimer = 70 * 4
-				SetSaveMSG("Quick saving is disabled.")
+				Msg = "Quick saving is disabled."
+				MsgTimer = 70 * 4
+				;SetSaveMSG("Quick saving is disabled.")
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
 			If (Msg<>"Game progress saved." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
-				;Msg = "Press "+KeyName(KEY_SAVE)+" to save."
-				;MsgTimer = 70*4
-				SetSaveMSG("Press "+KeyName(KEY_SAVE)+" to save.")
+				Msg = "Press "+KeyName(KEY_SAVE)+" to save."
+				MsgTimer = 70*4
+				;SetSaveMSG("Press "+KeyName(KEY_SAVE)+" to save.")
 			EndIf
 			
 			If MouseHit2 Then SelectedMonitor = Null
@@ -3208,7 +3208,7 @@ Repeat
 		DrawQuickLoading()
 		
 		UpdateAchievementMsg()
-		UpdateSaveMSG()
+		;UpdateSaveMSG()
 	End If
 	
 	If BorderlessWindowed Then
@@ -3886,46 +3886,46 @@ Function DrawEnding()
 	AASetFont Font1
 End Function
 
-Function SetSaveMSG(txt$)
-	
-	Save_MSG = txt
-	Save_MSG_Timer = 0.0
-	Save_MSG_Y = 0.0
-	
-End Function
-
-Function UpdateSaveMSG()
-	Local scale# = GraphicHeight/768.0
-	;Local width% = 200*scale
-	Local width = AAStringWidth(Save_MSG)+20*scale
-	Local height% = 30*scale
-	Local x% = (GraphicWidth/2)-(width/2)
-	Local y% = (-height)+Save_MSG_Y
-	
-	If Save_MSG <> ""
-		If Save_MSG_Timer < 70*5
-			If Save_MSG_Y < height
-				Save_MSG_Y = Min(Save_MSG_Y+2*FPSfactor2,height)
-			Else
-				Save_MSG_Y = height
-			EndIf
-			Save_MSG_Timer = Save_MSG_Timer + FPSfactor2
-		Else
-			If Save_MSG_Y > 0
-				Save_MSG_Y = Max(Save_MSG_Y-2*FPSfactor2,0)
-			Else
-				Save_MSG = ""
-				Save_MSG_Timer = 0.0
-				Save_MSG_Y = 0.0
-			EndIf
-		EndIf
-		DrawFrame(x,y,width,height)
-		Color 255,255,255
-		AASetFont Font1
-		AAText(GraphicWidth/2,y+(height/2),Save_MSG,True,True)
-	EndIf
-	
-End Function
+;Function SetSaveMSG(txt$)
+;	
+;	Save_MSG = txt
+;	Save_MSG_Timer = 0.0
+;	Save_MSG_Y = 0.0
+;	
+;End Function
+;
+;Function UpdateSaveMSG()
+;	Local scale# = GraphicHeight/768.0
+;	;Local width% = 200*scale
+;	Local width = AAStringWidth(Save_MSG)+20*scale
+;	Local height% = 30*scale
+;	Local x% = (GraphicWidth/2)-(width/2)
+;	Local y% = (-height)+Save_MSG_Y
+;	
+;	If Save_MSG <> ""
+;		If Save_MSG_Timer < 70*5
+;			If Save_MSG_Y < height
+;				Save_MSG_Y = Min(Save_MSG_Y+2*FPSfactor2,height)
+;			Else
+;				Save_MSG_Y = height
+;			EndIf
+;			Save_MSG_Timer = Save_MSG_Timer + FPSfactor2
+;		Else
+;			If Save_MSG_Y > 0
+;				Save_MSG_Y = Max(Save_MSG_Y-2*FPSfactor2,0)
+;			Else
+;				Save_MSG = ""
+;				Save_MSG_Timer = 0.0
+;				Save_MSG_Y = 0.0
+;			EndIf
+;		EndIf
+;		DrawFrame(x,y,width,height)
+;		Color 255,255,255
+;		AASetFont Font1
+;		AAText(GraphicWidth/2,y+(height/2),Save_MSG,True,True)
+;	EndIf
+;	
+;End Function
 
 ;--------------------------------------- player controls -------------------------------------------
 
@@ -8068,6 +8068,9 @@ Function NullGame()
 	Local itt.ItemTemplates, s.Screens, lt.LightTemplates, d.Doors, m.Materials
 	Local wp.WayPoints, twp.TempWayPoints, r.Rooms, it.Items
 	
+	KillSounds()
+	PlaySound_Strict ButtonSFX
+	
 	FreeParticles()
 	
 	ClearTextureCache
@@ -8318,10 +8321,6 @@ Function NullGame()
 	ark_blur_cam = 0
 	InitFastResize()
 	
-	For i=0 To 9
-		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
-	Next
-	
 	CatchErrors("NullGame")
 End Function
 
@@ -8544,6 +8543,69 @@ Function ResumeSounds()
 	If IntercomAnnouncementLoaded
 		SetStreamPaused_Strict(IntercomStreamCHN,False)
 	EndIf
+End Function
+
+Function KillSounds()
+	Local i%,e.Events,n.NPCs,d.Doors,dem.DevilEmitters,snd.Sound
+	
+	For i=0 To 9
+		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
+	Next
+	For e.Events = Each Events
+		If e\SoundCHN <> 0 Then
+			If (Not e\SoundCHN_isStream)
+				If ChannelPlaying(e\SoundCHN) Then StopChannel(e\SoundCHN)
+			Else
+				StopStream_Strict(e\SoundCHN)
+			EndIf
+		EndIf
+		If e\SoundCHN2 <> 0 Then
+			If (Not e\SoundCHN2_isStream)
+				If ChannelPlaying(e\SoundCHN2) Then StopChannel(e\SoundCHN2)
+			Else
+				StopStream_Strict(e\SoundCHN2)
+			EndIf
+		EndIf		
+	Next
+	For n.NPCs = Each NPCs
+		If n\SoundChn <> 0 Then
+			If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
+		EndIf
+		If n\SoundChn2 <> 0 Then
+			If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
+		EndIf
+	Next	
+	For d.Doors = Each Doors
+		If d\SoundCHN <> 0 Then
+			If ChannelPlaying(d\SoundCHN) Then StopChannel(d\SoundCHN)
+		EndIf
+	Next
+	For dem.DevilEmitters = Each DevilEmitters
+		If dem\SoundCHN <> 0 Then
+			If ChannelPlaying(dem\SoundCHN) Then StopChannel(dem\SoundCHN)
+		EndIf
+	Next
+	If AmbientSFXCHN <> 0 Then
+		If ChannelPlaying(AmbientSFXCHN) Then StopChannel(AmbientSFXCHN)
+	EndIf
+	If BreathCHN <> 0 Then
+		If ChannelPlaying(BreathCHN) Then StopChannel(BreathCHN)
+	EndIf
+	If IntercomAnnouncementLoaded
+		StopStream_Strict(IntercomStreamCHN)
+	EndIf
+	If EnableSFXRelease
+		For snd.Sound = Each Sound
+			If snd\internalHandle <> 0 Then
+				FreeSound snd\internalHandle
+				snd\internalHandle = 0
+				snd\releaseTime = 0
+			EndIf
+		Next
+	EndIf
+	
+	DebugLog "Terminated all sounds"
+	
 End Function
 
 Function GetStepSound(entity%)
