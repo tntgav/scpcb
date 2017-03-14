@@ -202,7 +202,9 @@ Function UpdateMainMenu()
 						;FMOD_Pause(MusicCHN)
 						;FMOD_CloseStream(CurrMusicStream)
 						;FMOD_Close()
-						FMOD_StopStream(CurrMusicStream)
+						;FMOD_StopStream(CurrMusicStream)
+						FSOUND_Stream_Stop(CurrMusicStream)
+						;FSOUND_Close()
 						End
 					EndIf
 			End Select
@@ -271,6 +273,10 @@ Function UpdateMainMenu()
 				AAText (x + 20 * MenuScale, y + 20 * MenuScale, "Name:")
 				CurrSave = InputBox(x + 150 * MenuScale, y + 15 * MenuScale, 200 * MenuScale, 30 * MenuScale, CurrSave, 1)
 				CurrSave = Left(CurrSave, 15)
+				CurrSave = Replace(CurrSave,":","")
+				CurrSave = Replace(CurrSave,".","")
+				CurrSave = Replace(CurrSave,"/","")
+				CurrSave = Replace(CurrSave,"\","")
 				
 				Color 255,255,255
 				If SelectedMap = "" Then

@@ -8,7 +8,7 @@
 ;    See Credits.txt for a list of contributors
 
 Local InitErrorStr$ = ""
-If FileSize("bb_fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "bb_fmod.dll"+Chr(13)+Chr(10)
+;If FileSize("bb_fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "bb_fmod.dll"+Chr(13)+Chr(10)
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
 If FileSize("zlibwapi.dll")=0 Then InitErrorStr=InitErrorStr+ "zlibwapi.dll"+Chr(13)+Chr(10)
 
@@ -42,7 +42,7 @@ Global UpdaterFont%
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.6"
+Global VersionNumber$ = "1.3.7"
 Global CompatibleNumber$ = "1.3.4" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 Global MenuWhite%, MenuBlack%
@@ -210,6 +210,8 @@ Global CanSave% = True
 
 AppTitle "SCP - Containment Breach v"+VersionNumber
 
+PlayStartupVideos()
+
 ;---------------------------------------------------------------------------------------------------------------------
 
 ;[Block]
@@ -271,6 +273,7 @@ Global Mesh_MagX#, Mesh_MagY#, Mesh_MagZ#
 ;player stats -------------------------------------------------------------------------------------------------------
 Global KillTimer#, KillAnim%, FallTimer#, DeathTimer#
 Global Sanity#, ForceMove#, ForceAngle#
+Global RestoreSanity%
 
 Global Playable% = True
 
@@ -351,7 +354,7 @@ Dim OldAiPics%(5)
 
 Global PlayTime%
 Global ConsoleFlush%
-Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0
+Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0, ConsoleMusPlay% = 0
 
 Global InfiniteStamina% = False
 Global NVBlink%
@@ -660,7 +663,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("Allows the camera to move in any direction while")
 							CreateConsoleMsg("bypassing collision.")
 							CreateConsoleMsg("******************************")
-						Case "godmode"
+						Case "godmode","god"
 							CreateConsoleMsg("HELP - godmode")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Toggles godmode, unless a valid parameter")
@@ -1004,7 +1007,7 @@ Function UpdateConsole()
 					Next
 					PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
 					;[End Block]
-				Case "godmode"
+				Case "godmode", "god"
 					;[Block]
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
@@ -1131,6 +1134,7 @@ Function UpdateConsole()
 							FreeEntity e\room\Objects[1]
 							PositionEntity Curr173\Collider, 0,0,0
 							ResetEntity Curr173\Collider
+							ShowEntity Curr173\obj
 							RemoveEvent(e)
 							Exit
 						EndIf
@@ -1259,6 +1263,7 @@ Function UpdateConsole()
 					;[End Block]
 				Case "playmusic"
 					;[Block]
+					; I think this might be broken since the FMod library streaming was added. -Mark
 					If Instr(ConsoleInput, " ")<>0 Then
 						StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					Else
@@ -1416,8 +1421,10 @@ Function UpdateConsole()
 					
 					If ConsoleFlushSnd = 0 Then
 						ConsoleFlushSnd = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(83)+Chr(67)+Chr(80)+Chr(92)+Chr(57)+Chr(55)+Chr(48)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
-						If MusicCHN <> 0 Then StopChannel MusicCHN
+						;FMOD_Pause(MusicCHN)
+						;FSOUND_Stream_Stop()
 						ConsoleMusFlush% = LoadSound(Chr(83)+Chr(70)+Chr(88)+Chr(92)+Chr(77)+Chr(117)+Chr(115)+Chr(105)+Chr(99)+Chr(92)+Chr(116)+Chr(104)+Chr(117)+Chr(109)+Chr(98)+Chr(115)+Chr(46)+Chr(100)+Chr(98))
+						ConsoleMusPlay = PlaySound(ConsoleMusFlush)
 						CreateConsoleMsg(Chr(74)+Chr(79)+Chr(82)+Chr(71)+Chr(69)+Chr(32)+Chr(72)+Chr(65)+Chr(83)+Chr(32)+Chr(66)+Chr(69)+Chr(69)+Chr(78)+Chr(32)+Chr(69)+Chr(88)+Chr(80)+Chr(69)+Chr(67)+Chr(84)+Chr(73)+Chr(78)+Chr(71)+Chr(32)+Chr(89)+Chr(79)+Chr(85)+Chr(46))
 					Else
 						CreateConsoleMsg(Chr(74)+Chr(32)+Chr(79)+Chr(32)+Chr(82)+Chr(32)+Chr(71)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(65)+Chr(32)+Chr(78)+Chr(32)+Chr(78)+Chr(32)+Chr(79)+Chr(32)+Chr(84)+Chr(32)+Chr(32)+Chr(66)+Chr(32)+Chr(69)+Chr(32)+Chr(32)+Chr(67)+Chr(32)+Chr(79)+Chr(32)+Chr(78)+Chr(32)+Chr(84)+Chr(32)+Chr(65)+Chr(32)+Chr(73)+Chr(32)+Chr(78)+Chr(32)+Chr(69)+Chr(32)+Chr(68)+Chr(46))
@@ -1570,11 +1577,13 @@ Music(19) = "1499Danger"
 Music(20) = "049Chase"
 Music(21) = "..\Ending\MenuBreath"
 Music(22) = "914"
+Music(23) = "Ending"
 
-Global CurrMusicStream
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
-;Global MusicCHN% = PlaySound_Strict(Music(2))
-Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
+;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
+
+Global CurrMusicStream, MusicCHN
+MusicCHN = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg",MusicVolume,Mode)
 
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
 Global CurrMusic% = 1
@@ -1853,6 +1862,8 @@ Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
 
 Global IntercomStream,IntercomStreamCHN%,IntercomAnnouncementLoaded%
+
+Global ForestNPC,ForestNPCTex,ForestNPCData#[3]
 ;[End Block]
 
 ;-----------------------------------------  Images ----------------------------------------------------------
@@ -2704,6 +2715,11 @@ Global LiquidObj%,MTFObj%,GuardObj%,ClassDObj%
 Global ApacheObj%,ApacheRotorObj%
 
 Global UnableToMove% = False
+Global ShouldEntitiesFall% = True
+
+Global Save_MSG$ = ""
+Global Save_MSG_Timer# = 0.0
+Global Save_MSG_Y# = 0.0
 
 ;---------------------------------------------------------------------------------------------------
 
@@ -2711,6 +2727,19 @@ Include "menu.bb"
 MainMenuOpen = True
 
 ;---------------------------------------------------------------------------------------------------
+
+Type MEMORYSTATUS
+    Field dwLength%
+    Field dwMemoryLoad%
+    Field dwTotalPhys%
+    Field dwAvailPhys%
+    Field dwTotalPageFile%
+    Field dwAvailPageFile%
+    Field dwTotalVirtual%
+    Field dwAvailVirtual%
+End Type
+
+Global m.MEMORYSTATUS = New MEMORYSTATUS
 
 FlushKeys()
 FlushMouse()
@@ -2799,6 +2828,9 @@ Repeat
 		
 		DrawHandIcon = False
 		
+		RestoreSanity = True
+		ShouldEntitiesFall = True
+		
 		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
 		
 		If KeyHit(KEY_INV) And VomitTimer >= 0 Then 
@@ -2883,6 +2915,9 @@ Repeat
 			UpdateDeafPlayer()
 			UpdateEmitters()
 			MouseLook()
+			If PlayerRoom\RoomTemplate\Name = "dimension1499" And QuickLoadPercent > 0 And QuickLoadPercent < 100
+				ShouldEntitiesFall = False
+			EndIf
 			MovePlayer()
 			InFacility = CheckForPlayerInFacility()
 			If PlayerRoom\RoomTemplate\Name = "dimension1499"
@@ -2940,7 +2975,7 @@ Repeat
 		Local darkA# = 0.0
 		If (Not MenuOpen)  Then
 			If Sanity < 0 Then
-				Sanity = Min(Sanity + FPSfactor, 0.0)
+				If RestoreSanity Then Sanity = Min(Sanity + FPSfactor, 0.0)
 				If Sanity < (-200) Then 
 					darkA = Max(Min((-Sanity - 200) / 700.0, 0.6), darkA)
 					If KillTimer => 0 Then 
@@ -2983,7 +3018,7 @@ Repeat
 					End Select 
 					BlinkTimer = BLINKFREQ
 				EndIf
-
+				
 				BlinkTimer = BlinkTimer - FPSfactor
 			Else
 				BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect
@@ -3058,11 +3093,14 @@ Repeat
 				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
 					Msg = "You cannot save in this location."
 					MsgTimer = 70 * 4
+					;SetSaveMSG("You cannot save in this location.")
 				ElseIf (Not CanSave) Or QuickLoadPercent > -1
 					Msg = "You cannot save at this moment."
 					MsgTimer = 70 * 4
+					;SetSaveMSG("You cannot save at this moment.")
 					If QuickLoadPercent > -1
 						Msg = Msg + " (game is loading)"
+						;Save_MSG = Save_MSG + " (game is loading)"
 					EndIf
 				Else
 					SaveGame(SavePath + CurrSave + "\")
@@ -3070,30 +3108,41 @@ Repeat
 			ElseIf SelectedDifficulty\saveType = SAVEONSCREENS
 				If SelectedScreen=Null And SelectedMonitor=Null Then
 					Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
-					MsgTimer = 70 * 4						
+					MsgTimer = 70 * 4
+					;SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
 					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
 						Msg = "You cannot save in this location."
 						MsgTimer = 70 * 4
+						;SetSaveMSG("You cannot save in this location.")
 					ElseIf (Not CanSave) Or QuickLoadPercent > -1
 						Msg = "You cannot save at this moment."
 						MsgTimer = 70 * 4
+						;SetSaveMSG("You cannot save at this moment.")
 						If QuickLoadPercent > -1
 							Msg = Msg + " (game is loading)"
+							;Save_MSG = Save_MSG + " (game is loading)"
 						EndIf
 					Else
+						If SelectedScreen<>Null
+							GameSaved = False
+							Playable = True
+							DropSpeed = 0
+						EndIf
 						SaveGame(SavePath + CurrSave + "\")
 					EndIf
 				EndIf
 			Else
 				Msg = "Quick saving is disabled."
 				MsgTimer = 70 * 4
+				;SetSaveMSG("Quick saving is disabled.")
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
 			If (Msg<>"Game progress saved." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
 				Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 				MsgTimer = 70*4
+				;SetSaveMSG("Press "+KeyName(KEY_SAVE)+" to save.")
 			EndIf
 			
 			If MouseHit2 Then SelectedMonitor = Null
@@ -3157,6 +3206,9 @@ Repeat
 		If ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
 		
 		DrawQuickLoading()
+		
+		UpdateAchievementMsg()
+		;UpdateSaveMSG()
 	End If
 	
 	If BorderlessWindowed Then
@@ -3560,6 +3612,17 @@ Function QuickLoadEvents()
 			;[Block]
 			If e\EventStr = "load0"
 				QuickLoadPercent = 15
+				ForestNPC = CreateSprite()
+				;0.75 = 0.75*(410.0/410.0) - 0.75*(width/height)
+				ScaleSprite ForestNPC,0.75*(140.0/410.0),0.75
+				SpriteViewMode ForestNPC,4
+				EntityFX ForestNPC,1+8
+				ForestNPCTex = LoadAnimTexture("GFX\npcs\AgentIJ.AIJ",1+2,140,410,0,4)
+				ForestNPCData[0] = 0
+				EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
+				ForestNPCData[1]=0
+				ForestNPCData[2]=0
+				HideEntity ForestNPC
 				e\EventStr = "load1"
 			ElseIf e\EventStr = "load1"
 				QuickLoadPercent = 40
@@ -3599,10 +3662,10 @@ Function QuickLoadEvents()
 				If e\EventStr = "load0"
 					QuickLoadPercent = 10
 					e\room\Objects[0] = LoadMesh_Strict("GFX\map\dimension1499\1499plane.b3d")
-					Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
-					ScaleTexture planetex%,0.5,0.5
-					EntityTexture e\room\Objects[0],planetex%
-					FreeTexture planetex%
+					;Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
+					;ScaleTexture planetex%,0.5,0.5
+					;EntityTexture e\room\Objects[0],planetex%
+					;FreeTexture planetex%
 					HideEntity e\room\Objects[0]
 					e\EventStr = "load1"
 				ElseIf e\EventStr = "load1"
@@ -3674,8 +3737,8 @@ Function DrawEnding()
 	EndingTimer=EndingTimer-FPSfactor2
 	
 	GiveAchievement(Achv055)
-	If (Not UsedConsole) GiveAchievement(AchvConsole)
-		
+	If (Not UsedConsole) Then GiveAchievement(AchvConsole)
+	If SelectedDifficulty\name = "Keter" Then GiveAchievement(AchvKeter)
 	Local x,y,width,height, temp
 	Local itt.ItemTemplates, r.Rooms
 	
@@ -3696,21 +3759,22 @@ Function DrawEnding()
 			If ChannelPlaying(BreathCHN) Then StopChannel BreathCHN : Stamina = 100
 		EndIf
 		
-		If EndingTimer <-400 Then 
-			ShouldPlay = 13
-		EndIf
+		;If EndingTimer <-400 Then 
+		;	ShouldPlay = 13
+		;EndIf
 		
 		If EndingScreen = 0 Then 
 			EndingScreen = LoadImage_Strict("GFX\endingscreen.pt")
-   			temp = LoadSound_Strict ("SFX\Music\Ending.ogg")
-			PlaySound_Strict temp
-			ShouldPlay = 66
+			
+			ShouldPlay = 23
+			CurrMusicVolume = MusicVolume
+			
+			CurrMusicVolume = MusicVolume
+			StopStream_Strict(MusicCHN)
+			MusicCHN = StreamSound_Strict("SFX\Music\"+Music(23)+".ogg",CurrMusicVolume,0)
+			NowPlaying = ShouldPlay
 			
 			PlaySound_Strict LightSFX
-			
-			FMOD_Pause(MusicCHN)
-			FMOD_StopStream(CurrMusicStream)
-			FMOD_CloseStream(CurrMusicStream)
 		EndIf
 		
 		If EndingTimer > -700 Then 
@@ -3797,6 +3861,7 @@ Function DrawEnding()
 					
 					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
 						NullGame()
+						StopStream_Strict(MusicCHN)
 						;Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
 						ShouldPlay = 21
 						MenuOpen = False
@@ -3806,9 +3871,8 @@ Function DrawEnding()
 						FlushKeys()
 					EndIf					
 				Else
+					ShouldPlay = 23
 					DrawMenu()
-					ShouldPlay = 21
-
 				EndIf
 				
 			EndIf
@@ -3821,6 +3885,47 @@ Function DrawEnding()
 	
 	AASetFont Font1
 End Function
+
+;Function SetSaveMSG(txt$)
+;	
+;	Save_MSG = txt
+;	Save_MSG_Timer = 0.0
+;	Save_MSG_Y = 0.0
+;	
+;End Function
+;
+;Function UpdateSaveMSG()
+;	Local scale# = GraphicHeight/768.0
+;	;Local width% = 200*scale
+;	Local width = AAStringWidth(Save_MSG)+20*scale
+;	Local height% = 30*scale
+;	Local x% = (GraphicWidth/2)-(width/2)
+;	Local y% = (-height)+Save_MSG_Y
+;	
+;	If Save_MSG <> ""
+;		If Save_MSG_Timer < 70*5
+;			If Save_MSG_Y < height
+;				Save_MSG_Y = Min(Save_MSG_Y+2*FPSfactor2,height)
+;			Else
+;				Save_MSG_Y = height
+;			EndIf
+;			Save_MSG_Timer = Save_MSG_Timer + FPSfactor2
+;		Else
+;			If Save_MSG_Y > 0
+;				Save_MSG_Y = Max(Save_MSG_Y-2*FPSfactor2,0)
+;			Else
+;				Save_MSG = ""
+;				Save_MSG_Timer = 0.0
+;				Save_MSG_Y = 0.0
+;			EndIf
+;		EndIf
+;		DrawFrame(x,y,width,height)
+;		Color 255,255,255
+;		AASetFont Font1
+;		AAText(GraphicWidth/2,y+(height/2),Save_MSG,True,True)
+;	EndIf
+;	
+;End Function
 
 ;--------------------------------------- player controls -------------------------------------------
 
@@ -3885,7 +3990,7 @@ Function MovePlayer()
 		EndIf
 	Next
 	
-	If Wearing714 Then 
+	If Wearing714 Then
 		Stamina = Min(Stamina, 10)
 		Sanity = Max(-850, Sanity)
 	EndIf
@@ -4050,7 +4155,7 @@ Function MovePlayer()
 			DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
 		EndIf	
 		
-		If (Not UnableToMove%) Then TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
+		If (Not UnableToMove%) And ShouldEntitiesFall Then TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
 	EndIf
 	
 	ForceMove = False
@@ -4619,6 +4724,8 @@ Function DrawGUI()
 			Else
 				AAText x + 350, 50, "Current Room Position: ("+PlayerRoom\x+", "+PlayerRoom\y+", "+PlayerRoom\z+")"
 			EndIf
+			GlobalMemoryStatus m.MEMORYSTATUS
+			AAText x + 350, 90, (m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
 			
 			AASetFont Font1
 		EndIf
@@ -5341,22 +5448,6 @@ Function DrawGUI()
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
 					;[End Block]
-				Case "scp1025"
-					;[Block]
-					;Achievements(Achv1025)=True 
-					If SelectedItem\itemtemplate\img = 0 Then
-						SelectedItem\state = Rand(0,5)
-						SelectedItem\itemtemplate\img = LoadImage("GFX\items\1025\1025_"+Int(SelectedItem\state)+".jpg")	
-						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
-						
-						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
-					EndIf
-					
-					;SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])					
-					
-					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
-					
-					;[End Block]
 				Case "ring"
 					;[Block]
 					If Wearing714=2 Then
@@ -5657,7 +5748,7 @@ Function DrawGUI()
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
-					If (Not Wearing714) Then SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])					
+					If (Not Wearing714) Then SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
@@ -6179,7 +6270,11 @@ Function DrawGUI()
 					If WearingGasMask Then
 						Msg = "You removed the gas mask."
 					Else
-						Msg = "You put on the gas mask."
+						If SelectedItem\itemtemplate\tempname = "supergasmask"
+							Msg = "You put on the gas mask and you can breathe easier."
+						Else
+							Msg = "You put on the gas mask."
+						EndIf
 						;Wearing178 = 0
 						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
 						;WearingNightVision = 0
@@ -7243,6 +7338,11 @@ Function LoadEntities()
 		TempSounds[i]=0
 	Next
 	
+	Brightness% = GetINIFloat("options.ini", "options", "brightness")
+	CameraFogNear# = GetINIFloat("options.ini", "options", "camera fog near")
+	CameraFogFar# = GetINIFloat("options.ini", "options", "camera fog far")
+	StoredCameraFogFar# = CameraFogFar
+	
 	;TextureLodBias
 	
 	AmbientLightRoomTex% = CreateTexture(2,2,257)
@@ -7968,6 +8068,9 @@ Function NullGame()
 	Local itt.ItemTemplates, s.Screens, lt.LightTemplates, d.Doors, m.Materials
 	Local wp.WayPoints, twp.TempWayPoints, r.Rooms, it.Items
 	
+	KillSounds()
+	PlaySound_Strict ButtonSFX
+	
 	FreeParticles()
 	
 	ClearTextureCache
@@ -8150,6 +8253,8 @@ Function NullGame()
 	For i = 0 To 6
 		MTFrooms[i]=Null
 	Next
+	ForestNPC = 0
+	ForestNPCTex = 0
 	
 	Local e.Events
 	For e.Events = Each Events
@@ -8205,6 +8310,9 @@ Function NullGame()
 	
 	IsZombie% = False
 	
+	Delete Each AchievementMsg
+	CurrAchvMSGID = 0
+	
 	;DeInitExt
 	
 	ClearWorld
@@ -8212,10 +8320,6 @@ Function NullGame()
 	Camera = 0
 	ark_blur_cam = 0
 	InitFastResize()
-	
-	For i=0 To 9
-		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
-	Next
 	
 	CatchErrors("NullGame")
 End Function
@@ -8296,7 +8400,7 @@ End Function
 Function UpdateMusic()
 	
 	If ConsoleFlush Then
-		If Not ChannelPlaying(MusicCHN) Then MusicCHN = PlaySound(ConsoleMusFlush)
+		If Not ChannelPlaying(ConsoleMusPlay) Then ConsoleMusPlay = PlaySound(ConsoleMusFlush)
 	ElseIf (Not PlayCustomMusic)
 		;If FPSfactor > 0 Or OptionsMenu = 2 Then 
 			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
@@ -8304,33 +8408,26 @@ Function UpdateMusic()
 				If CurrMusicVolume = 0 Then
 					;If MusicCHN <> 0 Then StopChannel MusicCHN
 					If NowPlaying<66
-						;alSourceStop(MusicCHN)
-						;alFreeSource(MusicCHN)
-						FMOD_Pause(MusicCHN)
-						FMOD_StopStream(CurrMusicStream)
-						FMOD_CloseStream(CurrMusicStream)
+						StopStream_Strict(MusicCHN)
 					EndIf
 					NowPlaying = ShouldPlay
 					MusicCHN = 0
 					CurrMusic=0
 				EndIf
 			Else ; playing the right clip
-				CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * 0.1
+				CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * (0.1*FPSfactor)
 			EndIf
 		;EndIf
 		
 			If NowPlaying < 66 Then
-			If CurrMusic = 0
-				MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",MusicVolume,CurrMusicStream)
+				If CurrMusic = 0
+				MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
 				CurrMusic = 1
 			Else
 				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
 			EndIf
 			
-			;If alSourceIsPlaying(MusicCHN) Then
-			;	alSourceSetVolume(MusicCHN, CurrMusicVolume)
-			;EndIf
-			FMOD_SetVolume(CurrMusicVolume*255.0,MusicCHN)
+			SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
 		EndIf
 		
 		;ChannelVolume MusicCHN, CurrMusicVolume
@@ -8350,14 +8447,14 @@ Function PauseSounds()
 			If (Not e\soundchn_isstream)
 				If ChannelPlaying(e\soundchn) Then PauseChannel(e\soundchn)
 			Else
-				FMOD_Pause(e\soundchn)
+				SetStreamPaused_Strict(e\soundchn,True)
 			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
 			If (Not e\soundchn2_isstream)
 				If ChannelPlaying(e\soundchn2) Then PauseChannel(e\soundchn2)
 			Else
-				FMOD_Pause(e\soundchn2)
+				SetStreamPaused_Strict(e\soundchn2,True)
 			EndIf
 		EndIf		
 	Next
@@ -8392,7 +8489,7 @@ Function PauseSounds()
 	EndIf
 	
 	If IntercomAnnouncementLoaded
-		FMOD_Pause(IntercomStreamCHN)
+		SetStreamPaused_Strict(IntercomStreamCHN,True)
 	EndIf
 End Function
 
@@ -8402,14 +8499,14 @@ Function ResumeSounds()
 			If (Not e\soundchn_isstream)
 				If ChannelPlaying(e\soundchn) Then ResumeChannel(e\soundchn)
 			Else
-				FMOD_Resume(e\soundchn)
+				SetStreamPaused_Strict(e\soundchn,False)
 			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
 			If (Not e\soundchn2_isstream)
 				If ChannelPlaying(e\soundchn2) Then ResumeChannel(e\soundchn2)
 			Else
-				FMOD_Resume(e\soundchn2)
+				SetStreamPaused_Strict(e\soundchn2,False)
 			EndIf
 		EndIf	
 	Next
@@ -8444,8 +8541,71 @@ Function ResumeSounds()
 	EndIf
 	
 	If IntercomAnnouncementLoaded
-		FMOD_Resume(IntercomStreamCHN)
+		SetStreamPaused_Strict(IntercomStreamCHN,False)
 	EndIf
+End Function
+
+Function KillSounds()
+	Local i%,e.Events,n.NPCs,d.Doors,dem.DevilEmitters,snd.Sound
+	
+	For i=0 To 9
+		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
+	Next
+	For e.Events = Each Events
+		If e\SoundCHN <> 0 Then
+			If (Not e\SoundCHN_isStream)
+				If ChannelPlaying(e\SoundCHN) Then StopChannel(e\SoundCHN)
+			Else
+				StopStream_Strict(e\SoundCHN)
+			EndIf
+		EndIf
+		If e\SoundCHN2 <> 0 Then
+			If (Not e\SoundCHN2_isStream)
+				If ChannelPlaying(e\SoundCHN2) Then StopChannel(e\SoundCHN2)
+			Else
+				StopStream_Strict(e\SoundCHN2)
+			EndIf
+		EndIf		
+	Next
+	For n.NPCs = Each NPCs
+		If n\SoundChn <> 0 Then
+			If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
+		EndIf
+		If n\SoundChn2 <> 0 Then
+			If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
+		EndIf
+	Next	
+	For d.Doors = Each Doors
+		If d\SoundCHN <> 0 Then
+			If ChannelPlaying(d\SoundCHN) Then StopChannel(d\SoundCHN)
+		EndIf
+	Next
+	For dem.DevilEmitters = Each DevilEmitters
+		If dem\SoundCHN <> 0 Then
+			If ChannelPlaying(dem\SoundCHN) Then StopChannel(dem\SoundCHN)
+		EndIf
+	Next
+	If AmbientSFXCHN <> 0 Then
+		If ChannelPlaying(AmbientSFXCHN) Then StopChannel(AmbientSFXCHN)
+	EndIf
+	If BreathCHN <> 0 Then
+		If ChannelPlaying(BreathCHN) Then StopChannel(BreathCHN)
+	EndIf
+	If IntercomAnnouncementLoaded
+		StopStream_Strict(IntercomStreamCHN)
+	EndIf
+	If EnableSFXRelease
+		For snd.Sound = Each Sound
+			If snd\internalHandle <> 0 Then
+				FreeSound snd\internalHandle
+				snd\internalHandle = 0
+				snd\releaseTime = 0
+			EndIf
+		Next
+	EndIf
+	
+	DebugLog "Terminated all sounds"
+	
 End Function
 
 Function GetStepSound(entity%)
@@ -10368,7 +10528,7 @@ Function RenderWorld2()
 					ElseIf Inventory(i)\state<=100.0 Then
 						hasBattery = 1
 					EndIf
-					EndIf
+				EndIf
 			EndIf
 		Next
 		
@@ -10554,37 +10714,55 @@ End Function
 ;--------------------------------------- Some new 1.3 -functions -------------------------------------------------------
 
 Function UpdateLeave1499()
-	Local r.Rooms, it.Items
+	Local r.Rooms, it.Items,r2.Rooms,i%
+	Local r1499.Rooms
 	
 	If (Not Wearing1499) And PlayerRoom\RoomTemplate\Name$ = "dimension1499"
 		For r.Rooms = Each Rooms
 			If r = NTF_1499PrevRoom
 				BlinkTimer = -1
-				;Msg = "You removed the gas mask and reappeared inside the facility."
-				;MsgTimer = 70 * 5
 				NTF_1499X# = EntityX(Collider)
 				NTF_1499Y# = EntityY(Collider)
 				NTF_1499Z# = EntityZ(Collider)
 				PositionEntity (Collider, NTF_1499PrevX#, NTF_1499PrevY#+0.05, NTF_1499PrevZ#)
 				ResetEntity(Collider)
+				PlayerRoom = r
 				UpdateDoors()
 				UpdateRooms()
+				If PlayerRoom\RoomTemplate\Name = "room3storage"
+					If EntityY(Collider)<-4600*RoomScale
+						For i = 0 To 2
+							PlayerRoom\NPC[i]\State = 2
+							PositionEntity(PlayerRoom\NPC[i]\Collider, EntityX(PlayerRoom\Objects[PlayerRoom\NPC[i]\State2],True),EntityY(PlayerRoom\Objects[PlayerRoom\NPC[i]\State2],True)+0.2,EntityZ(PlayerRoom\Objects[PlayerRoom\NPC[i]\State2],True))
+							ResetEntity PlayerRoom\NPC[i]\Collider
+							PlayerRoom\NPC[i]\State2 = PlayerRoom\NPC[i]\State2 + 1
+							If PlayerRoom\NPC[i]\State2 > PlayerRoom\NPC[i]\PrevState Then PlayerRoom\NPC[i]\State2 = (PlayerRoom\NPC[i]\PrevState-3)
+						Next
+					EndIf
+				EndIf
+				For r2.Rooms = Each Rooms
+					If r2\RoomTemplate\Name = "dimension1499"
+						r1499 = r2
+						Exit
+					EndIf
+				Next
 				For it.Items = Each Items
 					it\disttimer = 0
 					If it\itemtemplate\tempname = "scp1499" Or it\itemtemplate\tempname = "super1499"
-						If EntityY(it\collider) >= EntityY(PlayerRoom\obj)-5
-							PositionEntity it\collider,NTF_1499PrevX#,NTF_1499PrevY#+(EntityY(it\collider)-EntityY(PlayerRoom\obj)),NTF_1499PrevZ#
+						If EntityY(it\collider) >= EntityY(r1499\obj)-5
+							PositionEntity it\collider,NTF_1499PrevX#,NTF_1499PrevY#+(EntityY(it\collider)-EntityY(r1499\obj)),NTF_1499PrevZ#
 							ResetEntity it\collider
+							Exit
 						EndIf
 					EndIf
 				Next
-				PlayerRoom = r
+				r1499 = Null
+				ShouldEntitiesFall = False
 				PlaySound_Strict NTF_1499LeaveSFX%
 				NTF_1499PrevX# = 0.0
 				NTF_1499PrevY# = 0.0
 				NTF_1499PrevZ# = 0.0
 				NTF_1499PrevRoom = Null
-				;Brightness = StoredBrightness
 				Exit
 			EndIf
 		Next
@@ -10772,13 +10950,10 @@ End Function
 Function PlayAnnouncement(file$) ;This function streams the announcement currently playing
 	
 	If IntercomAnnouncementLoaded
-		FMOD_Pause(IntercomStreamCHN)
-		FMOD_StopStream(IntercomStream)
-		FMOD_CloseStream(IntercomStream)
+		StopStream_Strict(IntercomStreamCHN)
 	EndIf
 	
-	IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,IntercomStream,0)
-	
+	IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,0)
 	IntercomAnnouncementLoaded = True
 	
 End Function
@@ -10786,43 +10961,38 @@ End Function
 Function UpdateStreamSounds()
 	Local e.Events
 	
-	If IntercomAnnouncementLoaded
-		FMOD_SetVolume(SFXVolume*255.0,IntercomStream)
+	If FPSfactor > 0
+		If IntercomAnnouncementLoaded
+			SetStreamVolume_Strict(IntercomStreamCHN,SFXVolume)
+		EndIf
+		For e = Each Events
+			If e\SoundCHN<>0
+				If e\SoundCHN_isStream
+					SetStreamVolume_Strict(e\SoundCHN,SFXVolume)
+				EndIf
+			EndIf
+			If e\SoundCHN2<>0
+				If e\SoundCHN2_isStream
+					SetStreamVolume_Strict(e\SoundCHN2,SFXVolume)
+				EndIf
+			EndIf
+		Next
 	EndIf
-	For e = Each Events
-		If e\SoundCHN<>0
-			If e\SoundCHN_isStream
-				FMOD_SetVolume(SFXVolume*255.0,e\Sound)
-			EndIf
-		EndIf
-		If e\SoundCHN2<>0
-			If e\SoundCHN2_isStream
-				FMOD_SetVolume(SFXVolume*255.0,e\Sound2)
-			EndIf
-		EndIf
-	Next
 	
 	If (Not PlayerInReachableRoom())
 		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea"
-			DebugLog "Test"
 			If IntercomAnnouncementLoaded
-				FMOD_Pause(IntercomStreamCHN)
-				FMOD_StopStream(IntercomStream)
-				FMOD_CloseStream(IntercomStream)
+				StopStream_Strict(IntercomStreamCHN)
 			EndIf
 			For e = Each Events
 				If e\SoundCHN<>0
 					If e\SoundCHN_isStream
-						FMOD_Pause(e\SoundCHN)
-						FMOD_StopStream(e\Sound)
-						FMOD_CloseStream(e\Sound)
+						StopStream_Strict(e\SoundCHN)
 					EndIf
 				EndIf
 				If e\SoundCHN2<>0
 					If e\SoundCHN2_isStream
-						FMOD_Pause(e\SoundCHN2)
-						FMOD_StopStream(e\Sound2)
-						FMOD_CloseStream(e\Sound2)
+						StopStream_Strict(e\SoundCHN2)
 					EndIf
 				EndIf
 			Next
@@ -10831,16 +11001,79 @@ Function UpdateStreamSounds()
 	
 End Function
 
+Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False,pickrange#=2.0,dir%=0)
+	Local pvt,pick
+	;dir = 0 - towards the floor (default)
+	;dir = 1 - towrads the ceiling (mostly for PD decal after leaving dimension)
+	
+	pvt = CreatePivot()
+	PositionEntity(pvt, x,y+0.05,z,isglobal)
+	If dir%=0
+		RotateEntity pvt,90,0,0
+	Else
+		RotateEntity pvt,-90,0,0
+	EndIf
+	pick = EntityPick(pvt,pickrange)
+	If pick<>0
+		If dir%=0
+			PositionEntity(entity, x,PickedY()+customradius#+0.02,z,isglobal)
+		Else
+			PositionEntity(entity, x,PickedY()+customradius#-0.02,z,isglobal)
+		EndIf
+		DebugLog "Entity teleported successfully"
+	Else
+		PositionEntity(entity,x,y,z,isglobal)
+		DebugLog "Warning: no ground found when teleporting an entity"
+	EndIf
+	FreeEntity pvt
+	ResetEntity entity
+	DebugLog "Teleported entity to: "+EntityX(entity)+"/"+EntityY(entity)+"/"+EntityZ(entity)
+	
+End Function
+
+Global Startup_Video_Loop = 0
+Global Startup_Video_File = 0
+Global Startup_Video_Audio = 0
+
+Function PlayStartupVideos()
+	
+	If GetINIInt("options.ini","options","play startup video")=0 Then Return
+	Startup_Video_Loop = 1
+	Startup_Video_File = OpenMovie("GFX\menu\startup.avi")
+	FlushKeys()
+	Repeat
+		Cls
+		If MoviePlaying(Startup_Video_File)
+			DrawMovie Startup_Video_File,0,0,GraphicWidth,GraphicHeight
+			If GetKey()
+				Startup_Video_Loop = 2
+			EndIf
+		Else
+			Startup_Video_Loop = 2
+		EndIf
+		Flip
+	Until Startup_Video_Loop=2
+	Startup_Video_Loop = 2
+	CloseMovie Startup_Video_File
+	Cls
+	
+End Function
+
 
 
 
 
 ;~IDEal Editor Parameters:
-;~F#39#D6#23C#2E7#2F0#310#324#329#32F#335#33B#341#346#364#37A#38F#395#39B#3A2#3A9
-;~F#3B2#3B8#3BE#3C4#3CB#3DA#3E3#3EF#401#41A#436#43B#448#45A#474#47B#481#48F#4A2#4AB
-;~F#4B4#4DA#4EC#502#50E#51A#52D#533#539#53D#543#548#567#576#585#592#5EB#6EF#B79#CA5
-;~F#D5E#12AA#1496#14A9#14BC#14CF#14E0#14F0#14FF#151B#151F#1523#152C#1546#1570#15C9#15D2#15DC#15E6#1611
-;~F#1660#166C#1678#168C#17BD#17D7#17E5#17F3#1800#1808#1815#1821#1836#18EF#191C#1932#193E#1955#1960#1A14
-;~F#1A66#1AA1#1AF1#1DAC#1DCB#1EED#2067#2608#2619#29B9
-;~B#11CE#140E#1AD2
+;~F#39#D8#175#17B#18B#23F#2EA#2F3#313#327#32C#332#338#33E#344#349#367#37D#392#398
+;~F#39E#3A5#3AC#3B5#3BB#3C1#3C7#3CE#3DD#3E6#3F2#404#41D#439#43E#44B#45D#478#47F#485
+;~F#493#4A6#4AF#4B8#4DE#507#513#51F#532#538#53E#542#548#54D#56C#57B#599#5F2#6F8#76F
+;~F#790#808#815#8CC#957#96E#97C#9AE#A65#A74#AAA#B9C#CC8#CD9#D92#DBA#DC9#DF1#E1B#E34
+;~F#E4B#E7B#E93#F5B#108A#11AA#1315#1501#1514#1527#153A#154B#155A#1576#157A#157E#1587#15A1#15CB#1624
+;~F#162D#1637#1641#166C#167C#16BB#16C7#16D3#16E7#1818#1832#1840#184E#185B#1863#1870#187C#1895#194E#197B
+;~F#1991#199D#19B4#19BF#19FF#1A73#1AC5#1B00#1B50#1C97#1CA2#1E10#1E2F#1E89#1F24#1F51#1F80#208B#209D#20B9
+;~F#20C3#20D0#20FC#2130#2164#219D#21B1#21C6#21CA#21EA#21F2#221D#2469#251E#255A#25D9#25DF#25E9#25F5#2600
+;~F#2604#263F#2647#264F#2656#265D#266A#2670#267B#26BD#26CC#26EA#2718#271F#2732#274B#2778#2783#2788#27A2
+;~F#27AE#27C9#281B#2829#2831#2839#2864#286D#2896#289B#28A0#28A5#28AF#28C0#2960#296E#299D#29D6#29E8#2A07
+;~F#2A16#2A2D#2A4A#2A4E#2A52#2A69#2A87#2A92#2ABD
+;~B#1227#1469#1B31
 ;~C#Blitz3D
