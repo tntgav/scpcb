@@ -194,7 +194,7 @@ Global Vsync% = GetINIInt(OptionFile, "options", "vsync")
 
 Global Opt_AntiAlias = GetINIInt(OptionFile, "options", "antialias")
 
-Global CurrFrameLimit# = Framelimit%/100.0
+Global CurrFrameLimit# = (Framelimit%-19)/100.0
 
 Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
 ;If Fullscreen Then UpdateScreenGamma()
@@ -1568,7 +1568,7 @@ Music(10) = "106"
 Music(11) = "Menu"
 Music(12) = "8601Cancer"
 Music(13) = "Intro"
-Music(14) = "..\178"
+Music(14) = "178"
 Music(15) = "PDTrench"
 Music(16) = "205"
 Music(17) = "GateA"
@@ -3342,8 +3342,9 @@ Function QuickLoadEvents()
 											HideEntity(sc\Cam)
 											
 											sc\IsRoom2slCam = True
-											sc\Room2slTexs%[0] = CreateTexture(512, 512, 1+256)
+											sc\Room2slTexs%[0] = CreateTexture(256, 256, 1+256)
 											EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
+											sc\RenderInterval = 24
 											
 											pvt% = CreatePivot(e\room\obj)
 											Select r\RoomTemplate\Name$
@@ -3352,6 +3353,8 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
+													sc\Room2slID = 0
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"room2closets"+Chr(34)
 												Case "room1archive" ;ID=1 q
@@ -3359,6 +3362,8 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+													sc\Room2slID = 1
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"room1archive"+Chr(34)
 												Case "room3z3" ;ID=2 q
@@ -3366,6 +3371,8 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+													sc\Room2slID = 2
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"room3z3"+Chr(34)
 												Case "room1lifts" ;ID=3 q
@@ -3373,14 +3380,18 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+													sc\Room2slID = 3
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"room1lifts"+Chr(34)
-													;ID=4 q
+												;ID=4 q (it was room106)
 												Case "checkpoint1" ;ID=5 q
 													PositionEntity pvt%,-207.94,760.0,-60.0686,False
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
+													sc\Room2slID = 5
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"checkpoint1"+Chr(34)
 												Case "room2nuke" ;ID=6 q
@@ -3388,6 +3399,8 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+													sc\Room2slID = 6
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"room2nuke"+Chr(34)
 												Case "008" ;ID=7 q
@@ -3395,6 +3408,8 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 75+e\room\angle, 0)
+													sc\Room2slID = 7
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"008"+Chr(34)
 												Case "room1162" ;ID=8 q
@@ -3402,6 +3417,8 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
+													sc\Room2slID = 8
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"room1162"+Chr(34)
 												Case "room966" ;ID=9 q
@@ -3409,6 +3426,8 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+													sc\Room2slID = 9
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"room966"+Chr(34)
 												Case "room2ccont" ;ID=10 q
@@ -3416,6 +3435,8 @@ Function QuickLoadEvents()
 													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
+													sc\Room2slID = 10
+													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"room2ccont"+Chr(34)
 											End Select
@@ -6815,7 +6836,7 @@ Function DrawMenu()
 						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
 					EndIf
 					
-					y = y + 50*MenuScale
+					;y = y + 50*MenuScale
 					
 					y=y+50*MenuScale
 					
@@ -7043,9 +7064,12 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					If DrawTick(x + 270 * MenuScale, y, CurrFrameLimit > 0.0) Then
-						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+30*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
-						CurrFrameLimit = Max(CurrFrameLimit, 0.1)
-						Framelimit% = CurrFrameLimit#*100.0
+						;CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+30*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
+						;CurrFrameLimit = Max(CurrFrameLimit, 0.1)
+						;Framelimit% = CurrFrameLimit#*100.0
+						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+30*MenuScale, 100*MenuScale, CurrFrameLimit#*99.0)/99.0)
+						CurrFrameLimit# = Max(CurrFrameLimit, 0.01)
+						Framelimit% = 19+(CurrFrameLimit*100.0)
 						Color 255,255,0
 						AAText(x + 5 * MenuScale, y + 25 * MenuScale, Framelimit%+" FPS")
 					Else
@@ -7474,8 +7498,8 @@ Function LoadEntities()
 	LiquidObj = LoadMesh_Strict("GFX\items\cupliquid.x") ;optimized the cups dispensed by 294
 	HideEntity LiquidObj
 	
-	MTFObj = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d") ;optimized MTFs
-	GuardObj = LoadAnimMesh_Strict("GFX\npcs\guard.b3d") ;optimized Guards
+	;MTFObj = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d") ;optimized MTFs
+	;GuardObj = LoadAnimMesh_Strict("GFX\npcs\guard.b3d") ;optimized Guards
 	;GuardTex = LoadTexture_Strict("GFX\npcs\body.jpg") ;optimized the guards even more
 	
 	;If BumpEnabled Then
@@ -7506,8 +7530,8 @@ Function LoadEntities()
 	ApacheObj = LoadAnimMesh_Strict("GFX\apache.b3d") ;optimized Apaches (helicopters)
 	ApacheRotorObj = LoadAnimMesh_Strict("GFX\apacherotor.b3d") ;optimized the Apaches even more
 	
-	HideEntity MTFObj
-	HideEntity GuardObj
+	;HideEntity MTFObj
+	;HideEntity GuardObj
 	HideEntity ClassDObj
 	HideEntity ApacheObj
 	HideEntity ApacheRotorObj
@@ -7728,10 +7752,23 @@ Function LoadEntities()
 	;[Block]
 	NPC049OBJ = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
 	HideEntity NPC049OBJ
-	NPC0492OBJ = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
-	HideEntity NPC0492OBJ
+	;NPC0492OBJ = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+	;HideEntity NPC0492OBJ
 	ClerkOBJ = LoadAnimMesh_Strict("GFX\npcs\clerk.b3d")
 	HideEntity ClerkOBJ
+	
+	NPCMasterMesh(NPCtype966) = LoadAnimMesh_Strict("GFX\npcs\scp-966.b3d")
+	HideEntity NPCMasterMesh(NPCtype966)
+	NPCMasterMesh(NPCtype178) = LoadAnimMesh_Strict("GFX\npcs\npc178.b3d")
+	HideEntity NPCMasterMesh(NPCtype178)
+	NPCMasterMesh(NPCtypeMTF) = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d")
+	HideEntity NPCMasterMesh(NPCtypeMTF)
+	NPCMasterMesh(NPCtypeGuard) = LoadAnimMesh_Strict("GFX\npcs\guard.b3d")
+	HideEntity NPCMasterMesh(NPCtypeGuard)
+	NPCMasterMesh(NPCtypeZombie) = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+	HideEntity NPCMasterMesh(NPCtypeZombie)
+	NPCMasterMesh(NPCtype939) = LoadAnimMesh_Strict("GFX\npcs\scp-939.b3d")
+	HideEntity NPCMasterMesh(NPCtype939)
 	;[End Block]
 	
 	LoadMaterials("DATA\materials.ini")
@@ -7807,6 +7844,12 @@ Function LoadEntities()
 	SetTemplateSizeVel(t0, .01, 1.01)
 	SetTemplateGravity(ParticleEffect[2], 0.005)
 	SetTemplateSubTemplate(ParticleEffect[2], t0)
+	
+	Room2slCam = CreateCamera()
+	CameraViewport(Room2slCam, 0, 0, 256, 256)
+	CameraRange Room2slCam, 0.05, 6.0
+	CameraZoom(Room2slCam, 0.8)
+	HideEntity(Room2slCam)
 	
 	DrawLoading(30)
 	
@@ -8745,7 +8788,9 @@ End Function
 Function SetNPCFrame(n.NPCs, frame#)
 	If (Abs(n\Frame-frame)<0.001) Then Return
 	
-	SetAnimTime n\obj, frame
+	If (Not n\UseMasterMeshSys) Or (n\MasterMeshState=0)
+		SetAnimTime n\obj, frame
+	EndIf
 	
 	n\Frame = frame
 End Function
@@ -10900,17 +10945,34 @@ Function CatchErrors(location$)
 	If Len(errStr)>0 Then
 		If FileType(ErrorFile)=0 Then
 			errF = WriteFile(ErrorFile)
+			WriteLine errF,"An error occured in SCP - Containment Breach!"
+			WriteLine errF,"Version: "+VersionNumber
+			WriteLine errF,"Save compatible version: "+CompatibleNumber
+			WriteLine errF,"Date and time: "+CurrentDate()+" at "+CurrentTime()
+			WriteLine errF,""
+			WriteLine errF,"Error(s):"
 		Else
+			Local canwriteError% = True
 			errF = OpenFile(ErrorFile)
-			SeekFile errF,FileSize(ErrorFile)
+			While (Not Eof(errF))
+				Local l$ = ReadLine(errF)
+				If Left(l,Len(location))=location
+					canwriteError = False
+					Exit
+				EndIf
+			Wend
+			If canwriteError
+				SeekFile errF,FileSize(ErrorFile)
+			EndIf
 		EndIf
-		WriteLine errF,location+" ***************"
-		While Len(errStr)>0
-			WriteLine errF,errStr
-			DebugLog errStr
-			errStr = ErrorLog()
-		Wend
-		
+		If canwriteError
+			WriteLine errF,location+" ***************"
+			While Len(errStr)>0
+				WriteLine errF,errStr
+				DebugLog errStr
+				errStr = ErrorLog()
+			Wend
+		EndIf
 		Msg = "Blitz3D Error! Details in "+Chr(34)+ErrorFile+Chr(34)
 		MsgTimer = 20*70
 		CloseFile errF

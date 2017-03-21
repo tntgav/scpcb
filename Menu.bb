@@ -527,7 +527,7 @@ Function UpdateMainMenu()
 				
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
-					height = 330 * MenuScale
+					height = 290 * MenuScale
 					DrawFrame(x, y, width, height)
 					
 					y=y+20*MenuScale
@@ -583,8 +583,8 @@ Function UpdateMainMenu()
 					;	UpdateScreenGamma()
 					;EndIf
 					
-					y = y + 50*MenuScale
-										
+					;y = y + 50*MenuScale
+					
 					y=y+50*MenuScale
 					
 					Color 255,255,255
@@ -875,9 +875,12 @@ Function UpdateMainMenu()
 					AAText(x + 20 * MenuScale, y, "Framelimit:")
 					Color 255,255,255
 					If DrawTick(x + 310 * MenuScale, y, CurrFrameLimit > 0.0) Then
-						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+30*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
-						CurrFrameLimit = Max(CurrFrameLimit, 0.1)
-						Framelimit% = CurrFrameLimit#*100.0
+						;CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+30*MenuScale, 100*MenuScale, CurrFrameLimit#*50.0)/50.0)
+						;CurrFrameLimit = Max(CurrFrameLimit, 0.1)
+						;Framelimit% = CurrFrameLimit#*100.0
+						CurrFrameLimit# = (SlideBar(x + 150*MenuScale, y+30*MenuScale, 100*MenuScale, CurrFrameLimit#*99.0)/99.0)
+						CurrFrameLimit# = Max(CurrFrameLimit, 0.01)
+						Framelimit% = 19+(CurrFrameLimit*100.0)
 						Color 255,255,0
 						AAText(x + 25 * MenuScale, y + 25 * MenuScale, Framelimit%+" FPS")
 					Else
