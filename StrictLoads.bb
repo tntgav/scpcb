@@ -195,6 +195,10 @@ End Function
 Function StopStream_Strict(streamHandle%)
 	Local st.Stream = Object.Stream(streamHandle)
 	
+	If st = Null
+		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		Return
+	EndIf
 	If st\chn=0 Or st\chn=-1
 		CreateConsoleMsg("Failed to stop stream Sound: Return value "+st\chn)
 		Return
@@ -210,6 +214,10 @@ End Function
 Function SetStreamVolume_Strict(streamHandle%,volume#)
 	Local st.Stream = Object.Stream(streamHandle)
 	
+	If st = Null
+		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		Return
+	EndIf
 	If st\chn=0 Or st\chn=-1
 		CreateConsoleMsg("Failed to set stream Sound volume: Return value "+st\chn)
 		Return
@@ -223,6 +231,10 @@ End Function
 Function SetStreamPaused_Strict(streamHandle%,paused%)
 	Local st.Stream = Object.Stream(streamHandle)
 	
+	If st = Null
+		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		Return
+	EndIf
 	If st\chn=0 Or st\chn=-1
 		CreateConsoleMsg("Failed to pause/unpause stream Sound: Return value "+st\chn)
 		Return

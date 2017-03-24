@@ -26,6 +26,7 @@ Bug Fixes:
 - Fixed issues relating to teleporting entities and items inside elevators.
 - Removed "bb_fmod.dll" which caused "user lib not found" runtime errors.
 - Fixed SCP-860-1's alert theme not triggering when the player is not looking in the direction of the forest monster.
+- Fixed game sounds still playing after quitting an in-game session.
 
 ----------------------------------------------------------------------------------
 

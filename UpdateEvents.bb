@@ -61,9 +61,11 @@ Function UpdateEvents()
 						If SelectedDifficulty\saveType = SAVEANYWHERE Then
 							Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 							MsgTimer = 70*4
+							;SetSaveMSG("Press "+KeyName(KEY_SAVE)+" to save.")
 						ElseIf SelectedDifficulty\saveType = SAVEONSCREENS Then
 							Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
 							MsgTimer = 70 * 8
+							;SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
 						EndIf
 						
 						Curr173\Idle=False
@@ -336,14 +338,14 @@ Function UpdateEvents()
 						;slow the player down to match his speed to the guards
 						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.008/EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
 						
-						If e\EventState3 < 170 Then 
+						If e\EventState3 < 170 Then
 							If e\EventState3 = 1.0 Then
 								PositionEntity Camera, x, y, z
 								HideEntity Collider
-								PositionEntity Collider, x, 0.302, z	
+								PositionEntity Collider, x, 0.302, z
 								RotateEntity Camera, -70, 0, 0
 								
-								CurrMusicVolume = 1.0
+								CurrMusicVolume = MusicVolume
 								
 								StopStream_Strict(MusicCHN)
 								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,Mode)
@@ -5310,9 +5312,6 @@ Function UpdateEvents()
 											e\room\NPC[0]\HideFromNVG = False
 											;EndIf
 										EndIf
-									EndIf
-									If EntityVisible(Collider,e\room\NPC[0]\Collider)
-										GiveAchievement(Achv049)
 									EndIf
 								EndIf
 							EndIf

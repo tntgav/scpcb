@@ -210,6 +210,8 @@ Global CanSave% = True
 
 AppTitle "SCP - Containment Breach v"+VersionNumber
 
+PlayStartupVideos()
+
 ;---------------------------------------------------------------------------------------------------------------------
 
 ;[Block]
@@ -1575,6 +1577,7 @@ Music(19) = "1499Danger"
 Music(20) = "049Chase"
 Music(21) = "..\Ending\MenuBreath"
 Music(22) = "914"
+Music(23) = "Ending"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
@@ -2714,6 +2717,10 @@ Global ApacheObj%,ApacheRotorObj%
 Global UnableToMove% = False
 Global ShouldEntitiesFall% = True
 
+Global Save_MSG$ = ""
+Global Save_MSG_Timer# = 0.0
+Global Save_MSG_Y# = 0.0
+
 ;---------------------------------------------------------------------------------------------------
 
 Include "menu.bb"
@@ -3086,11 +3093,14 @@ Repeat
 				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
 					Msg = "You cannot save in this location."
 					MsgTimer = 70 * 4
+					;SetSaveMSG("You cannot save in this location.")
 				ElseIf (Not CanSave) Or QuickLoadPercent > -1
 					Msg = "You cannot save at this moment."
 					MsgTimer = 70 * 4
+					;SetSaveMSG("You cannot save at this moment.")
 					If QuickLoadPercent > -1
 						Msg = Msg + " (game is loading)"
+						;Save_MSG = Save_MSG + " (game is loading)"
 					EndIf
 				Else
 					SaveGame(SavePath + CurrSave + "\")
@@ -3098,17 +3108,21 @@ Repeat
 			ElseIf SelectedDifficulty\saveType = SAVEONSCREENS
 				If SelectedScreen=Null And SelectedMonitor=Null Then
 					Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
-					MsgTimer = 70 * 4						
+					MsgTimer = 70 * 4
+					;SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
 					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
 						Msg = "You cannot save in this location."
 						MsgTimer = 70 * 4
+						;SetSaveMSG("You cannot save in this location.")
 					ElseIf (Not CanSave) Or QuickLoadPercent > -1
 						Msg = "You cannot save at this moment."
 						MsgTimer = 70 * 4
+						;SetSaveMSG("You cannot save at this moment.")
 						If QuickLoadPercent > -1
 							Msg = Msg + " (game is loading)"
+							;Save_MSG = Save_MSG + " (game is loading)"
 						EndIf
 					Else
 						If SelectedScreen<>Null
@@ -3122,11 +3136,13 @@ Repeat
 			Else
 				Msg = "Quick saving is disabled."
 				MsgTimer = 70 * 4
+				;SetSaveMSG("Quick saving is disabled.")
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Or SelectedMonitor<>Null)
 			If (Msg<>"Game progress saved." And Msg<>"You cannot save in this location."And Msg<>"You cannot save at this moment.") Or MsgTimer<=0 Then
 				Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 				MsgTimer = 70*4
+				;SetSaveMSG("Press "+KeyName(KEY_SAVE)+" to save.")
 			EndIf
 			
 			If MouseHit2 Then SelectedMonitor = Null
@@ -3190,6 +3206,9 @@ Repeat
 		If ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
 		
 		DrawQuickLoading()
+		
+		UpdateAchievementMsg()
+		;UpdateSaveMSG()
 	End If
 	
 	If BorderlessWindowed Then
@@ -3718,8 +3737,8 @@ Function DrawEnding()
 	EndingTimer=EndingTimer-FPSfactor2
 	
 	GiveAchievement(Achv055)
-	If (Not UsedConsole) GiveAchievement(AchvConsole)
-		
+	If (Not UsedConsole) Then GiveAchievement(AchvConsole)
+	If SelectedDifficulty\name = "Keter" Then GiveAchievement(AchvKeter)
 	Local x,y,width,height, temp
 	Local itt.ItemTemplates, r.Rooms
 	
@@ -3740,22 +3759,22 @@ Function DrawEnding()
 			If ChannelPlaying(BreathCHN) Then StopChannel BreathCHN : Stamina = 100
 		EndIf
 		
-		If EndingTimer <-400 Then 
-			ShouldPlay = 13
-		EndIf
+		;If EndingTimer <-400 Then 
+		;	ShouldPlay = 13
+		;EndIf
 		
 		If EndingScreen = 0 Then 
 			EndingScreen = LoadImage_Strict("GFX\endingscreen.pt")
-   			temp = LoadSound_Strict ("SFX\Music\Ending.ogg")
-			PlaySound_Strict temp
-			ShouldPlay = 66
+			
+			ShouldPlay = 23
+			CurrMusicVolume = MusicVolume
+			
+			CurrMusicVolume = MusicVolume
+			StopStream_Strict(MusicCHN)
+			MusicCHN = StreamSound_Strict("SFX\Music\"+Music(23)+".ogg",CurrMusicVolume,0)
+			NowPlaying = ShouldPlay
 			
 			PlaySound_Strict LightSFX
-			
-			;FMOD_Pause(MusicCHN)
-			;FMOD_StopStream(CurrMusicStream)
-			;FMOD_CloseStream(CurrMusicStream)
-			StopStream_Strict(MusicCHN)
 		EndIf
 		
 		If EndingTimer > -700 Then 
@@ -3842,6 +3861,7 @@ Function DrawEnding()
 					
 					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
 						NullGame()
+						StopStream_Strict(MusicCHN)
 						;Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
 						ShouldPlay = 21
 						MenuOpen = False
@@ -3851,9 +3871,8 @@ Function DrawEnding()
 						FlushKeys()
 					EndIf					
 				Else
+					ShouldPlay = 23
 					DrawMenu()
-					ShouldPlay = 21
-
 				EndIf
 				
 			EndIf
@@ -3866,6 +3885,47 @@ Function DrawEnding()
 	
 	AASetFont Font1
 End Function
+
+;Function SetSaveMSG(txt$)
+;	
+;	Save_MSG = txt
+;	Save_MSG_Timer = 0.0
+;	Save_MSG_Y = 0.0
+;	
+;End Function
+;
+;Function UpdateSaveMSG()
+;	Local scale# = GraphicHeight/768.0
+;	;Local width% = 200*scale
+;	Local width = AAStringWidth(Save_MSG)+20*scale
+;	Local height% = 30*scale
+;	Local x% = (GraphicWidth/2)-(width/2)
+;	Local y% = (-height)+Save_MSG_Y
+;	
+;	If Save_MSG <> ""
+;		If Save_MSG_Timer < 70*5
+;			If Save_MSG_Y < height
+;				Save_MSG_Y = Min(Save_MSG_Y+2*FPSfactor2,height)
+;			Else
+;				Save_MSG_Y = height
+;			EndIf
+;			Save_MSG_Timer = Save_MSG_Timer + FPSfactor2
+;		Else
+;			If Save_MSG_Y > 0
+;				Save_MSG_Y = Max(Save_MSG_Y-2*FPSfactor2,0)
+;			Else
+;				Save_MSG = ""
+;				Save_MSG_Timer = 0.0
+;				Save_MSG_Y = 0.0
+;			EndIf
+;		EndIf
+;		DrawFrame(x,y,width,height)
+;		Color 255,255,255
+;		AASetFont Font1
+;		AAText(GraphicWidth/2,y+(height/2),Save_MSG,True,True)
+;	EndIf
+;	
+;End Function
 
 ;--------------------------------------- player controls -------------------------------------------
 
@@ -8008,6 +8068,9 @@ Function NullGame()
 	Local itt.ItemTemplates, s.Screens, lt.LightTemplates, d.Doors, m.Materials
 	Local wp.WayPoints, twp.TempWayPoints, r.Rooms, it.Items
 	
+	KillSounds()
+	PlaySound_Strict ButtonSFX
+	
 	FreeParticles()
 	
 	ClearTextureCache
@@ -8247,6 +8310,9 @@ Function NullGame()
 	
 	IsZombie% = False
 	
+	Delete Each AchievementMsg
+	CurrAchvMSGID = 0
+	
 	;DeInitExt
 	
 	ClearWorld
@@ -8254,10 +8320,6 @@ Function NullGame()
 	Camera = 0
 	ark_blur_cam = 0
 	InitFastResize()
-	
-	For i=0 To 9
-		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
-	Next
 	
 	CatchErrors("NullGame")
 End Function
@@ -8481,6 +8543,69 @@ Function ResumeSounds()
 	If IntercomAnnouncementLoaded
 		SetStreamPaused_Strict(IntercomStreamCHN,False)
 	EndIf
+End Function
+
+Function KillSounds()
+	Local i%,e.Events,n.NPCs,d.Doors,dem.DevilEmitters,snd.Sound
+	
+	For i=0 To 9
+		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
+	Next
+	For e.Events = Each Events
+		If e\SoundCHN <> 0 Then
+			If (Not e\SoundCHN_isStream)
+				If ChannelPlaying(e\SoundCHN) Then StopChannel(e\SoundCHN)
+			Else
+				StopStream_Strict(e\SoundCHN)
+			EndIf
+		EndIf
+		If e\SoundCHN2 <> 0 Then
+			If (Not e\SoundCHN2_isStream)
+				If ChannelPlaying(e\SoundCHN2) Then StopChannel(e\SoundCHN2)
+			Else
+				StopStream_Strict(e\SoundCHN2)
+			EndIf
+		EndIf		
+	Next
+	For n.NPCs = Each NPCs
+		If n\SoundChn <> 0 Then
+			If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
+		EndIf
+		If n\SoundChn2 <> 0 Then
+			If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
+		EndIf
+	Next	
+	For d.Doors = Each Doors
+		If d\SoundCHN <> 0 Then
+			If ChannelPlaying(d\SoundCHN) Then StopChannel(d\SoundCHN)
+		EndIf
+	Next
+	For dem.DevilEmitters = Each DevilEmitters
+		If dem\SoundCHN <> 0 Then
+			If ChannelPlaying(dem\SoundCHN) Then StopChannel(dem\SoundCHN)
+		EndIf
+	Next
+	If AmbientSFXCHN <> 0 Then
+		If ChannelPlaying(AmbientSFXCHN) Then StopChannel(AmbientSFXCHN)
+	EndIf
+	If BreathCHN <> 0 Then
+		If ChannelPlaying(BreathCHN) Then StopChannel(BreathCHN)
+	EndIf
+	If IntercomAnnouncementLoaded
+		StopStream_Strict(IntercomStreamCHN)
+	EndIf
+	If EnableSFXRelease
+		For snd.Sound = Each Sound
+			If snd\internalHandle <> 0 Then
+				FreeSound snd\internalHandle
+				snd\internalHandle = 0
+				snd\releaseTime = 0
+			EndIf
+		Next
+	EndIf
+	
+	DebugLog "Terminated all sounds"
+	
 End Function
 
 Function GetStepSound(entity%)
@@ -10906,22 +11031,49 @@ Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False,pickr
 	
 End Function
 
+Global Startup_Video_Loop = 0
+Global Startup_Video_File = 0
+Global Startup_Video_Audio = 0
+
+Function PlayStartupVideos()
+	
+	If GetINIInt("options.ini","options","play startup video")=0 Then Return
+	Startup_Video_Loop = 1
+	Startup_Video_File = OpenMovie("GFX\menu\startup.avi")
+	FlushKeys()
+	Repeat
+		Cls
+		If MoviePlaying(Startup_Video_File)
+			DrawMovie Startup_Video_File,0,0,GraphicWidth,GraphicHeight
+			If GetKey()
+				Startup_Video_Loop = 2
+			EndIf
+		Else
+			Startup_Video_Loop = 2
+		EndIf
+		Flip
+	Until Startup_Video_Loop=2
+	Startup_Video_Loop = 2
+	CloseMovie Startup_Video_File
+	Cls
+	
+End Function
 
 
 
 
 
 ;~IDEal Editor Parameters:
-;~F#39#D6#173#179#189#23D#2E8#2F1#311#325#32A#330#336#33C#342#347#365#37B#390#396
-;~F#39C#3A3#3AA#3B3#3B9#3BF#3C5#3CC#3DB#3E4#3F0#402#41B#437#43C#449#45B#476#47D#483
-;~F#491#4A4#4AD#4B6#4DC#4EE#505#511#51D#530#536#53C#540#546#54B#56A#579#588#596#6F3
-;~F#768#789#801#80E#8C5#950#967#975#9A7#A5E#A6D#B84#CA4#CB5#D6E#D96#DA5#DCD#DF7#E05
-;~F#E1C#E4C#F02#1031#1151#12BA#14A6#14B9#14CC#14DF#14F0#14FF#151B#151F#1523#152C#1546#1570#15C9#15D2
-;~F#15DC#15E6#1611#1621#1660#166C#1678#168C#17BD#17D7#17E5#17F3#1800#1808#1815#1821#183A#18F3#1920#1936
-;~F#1942#1959#1964#19A4#1A18#1A6A#1AA5#1AF5#1C3C#1DB5#1DD4#1E2E#1EC9#1EF6#1F25#202B#203D#2059#2063#2070
-;~F#20A3#20D7#210B#2144#2158#216D#2171#2191#2199#21C4#2410#24C5#2501#2580#2586#2590#259C#25A7#25AB#25E6
-;~F#25EE#25F6#25FD#2604#2611#2617#2622#2664#2673#2691#26BF#26C6#26D9#26F2#271F#272A#272F#2749#2755#2770
-;~F#27C2#27D0#27D8#27E0#280B#2814#283D#2842#2847#284C#2856#2867#2907#2915#2944#297D#298F#29AE#29BD#29D4
-;~F#29F1#29F5#29F9#2A10#2A2E#2A3C#2A6B
-;~B#11CE#140E#1AD6
+;~F#39#D8#175#17B#18B#23F#2EA#2F3#313#327#32C#332#338#33E#344#349#367#37D#392#398
+;~F#39E#3A5#3AC#3B5#3BB#3C1#3C7#3CE#3DD#3E6#3F2#404#41D#439#43E#44B#45D#478#47F#485
+;~F#493#4A6#4AF#4B8#4DE#507#513#51F#532#538#53E#542#548#54D#56C#57B#599#5F2#6F8#76F
+;~F#790#808#815#8CC#957#96E#97C#9AE#A65#A74#AAA#B9C#CC8#CD9#D92#DBA#DC9#DF1#E1B#E34
+;~F#E4B#E7B#E93#F5B#108A#11AA#1315#1501#1514#1527#153A#154B#155A#1576#157A#157E#1587#15A1#15CB#1624
+;~F#162D#1637#1641#166C#167C#16BB#16C7#16D3#16E7#1818#1832#1840#184E#185B#1863#1870#187C#1895#194E#197B
+;~F#1991#199D#19B4#19BF#19FF#1A73#1AC5#1B00#1B50#1C97#1CA2#1E10#1E2F#1E89#1F24#1F51#1F80#208B#209D#20B9
+;~F#20C3#20D0#20FC#2130#2164#219D#21B1#21C6#21CA#21EA#21F2#221D#2469#251E#255A#25D9#25DF#25E9#25F5#2600
+;~F#2604#263F#2647#264F#2656#265D#266A#2670#267B#26BD#26CC#26EA#2718#271F#2732#274B#2778#2783#2788#27A2
+;~F#27AE#27C9#281B#2829#2831#2839#2864#286D#2896#289B#28A0#28A5#28AF#28C0#2960#296E#299D#29D6#29E8#2A07
+;~F#2A16#2A2D#2A4A#2A4E#2A52#2A69#2A87#2A92#2ABD
+;~B#1227#1469#1B31
 ;~C#Blitz3D
