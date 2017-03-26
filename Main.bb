@@ -2808,8 +2808,8 @@ Repeat
 			EndBreathCHN = PlaySound(EndBreathSFX)
 			ShouldPlay = 66
 		ElseIf ShouldPlay = 66
-			DebugLog((Not ChannelPlaying(EndBreathCHN)))
 			If (Not ChannelPlaying(EndBreathCHN)) Then
+				FreeSound(EndBreathSFX)
 				ShouldPlay = 11
 			EndIf
 		Else
