@@ -527,6 +527,7 @@ Function UpdateMainMenu()
 				
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
+					;height = 380 * MenuScale
 					height = 290 * MenuScale
 					DrawFrame(x, y, width, height)
 					
@@ -615,7 +616,6 @@ Function UpdateMainMenu()
 					If (MouseOn(x+310*MenuScale,y-6*MenuScale,150*MenuScale+14,20) And OnSliderID=0) Or OnSliderID=3
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
-					
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -2092,6 +2092,65 @@ Function Slider3(x%,y%,width%,value%,ID%,val1$,val2$,val3$)
 	
 End Function
 
+Function Slider4(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$)
+	
+	If MouseDown1 Then
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			OnSliderID = ID
+		EndIf
+	EndIf
+	
+	Color 200,200,200
+	Rect(x,y,width+14,10,True)
+	Rect(x,y-8,4,14,True) ;1
+	Rect(x+(width*(1.0/3.0))+(10.0/3.0),y-8,4,14,True) ;2
+	Rect(x+(width*(2.0/3.0))+(20.0/3.0),y-8,4,14,True) ;3
+	Rect(x+width+10,y-8,4,14,True) ;4
+	
+	If ID = OnSliderID
+		If (ScaledMouseX() <= x+8)
+			value = 0
+		ElseIf (ScaledMouseX() >= x+width*(1.0/3.0)) And (ScaledMouseX() <= x+width*(1.0/3.0)+8)
+			value = 1
+		ElseIf (ScaledMouseX() >= x+width*(2.0/3.0)) And (ScaledMouseX() <= x+width*(2.0/3.0)+8)
+			value = 2
+		ElseIf (ScaledMouseX() >= x+width)
+			value = 3
+		EndIf
+		Color 0,255,0
+		Rect(x,y,width+14,10,True)
+	Else
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			Color 0,200,0
+			Rect(x,y,width+14,10,False)
+		EndIf
+	EndIf
+	
+	If value = 0
+		DrawImage(BlinkMeterIMG,x,y-8)
+	ElseIf value = 1
+		DrawImage(BlinkMeterIMG,x+width*(1.0/3.0)+2,y-8)
+	ElseIf value = 2
+		DrawImage(BlinkMeterIMG,x+width*(2.0/3.0)+4,y-8)
+	Else
+		DrawImage(BlinkMeterIMG,x+width+6,y-8)
+	EndIf
+	
+	Color 170,170,170
+	If value = 0
+		AAText(x+2,y+10+MenuScale,val1,True)
+	ElseIf value = 1
+		AAText(x+width*(1.0/3.0)+2+(10.0/3.0),y+10+MenuScale,val2,True)
+	ElseIf value = 2
+		AAText(x+width*(2.0/3.0)+2+((10.0/3.0)*2),y+10+MenuScale,val3,True)
+	Else
+		AAText(x+width+12,y+10+MenuScale,val4,True)
+	EndIf
+	
+	Return value
+	
+End Function
+
 Function Slider5(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$,val5$)
 	
 	If MouseDown1 Then
@@ -2152,6 +2211,86 @@ Function Slider5(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$,val5$)
 		AAText(x+(width*0.75)+9.5,y+10+MenuScale,val4,True)
 	Else
 		AAText(x+width+12,y+10+MenuScale,val5,True)
+	EndIf
+	
+	Return value
+	
+End Function
+
+Function Slider7(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$,val5$,val6$,val7$)
+	
+	If MouseDown1 Then
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			OnSliderID = ID
+		EndIf
+	EndIf
+	
+	Color 200,200,200
+	Rect(x,y,width+14,10,True)
+	Rect(x,y-8,4,14,True) ;1
+	Rect(x+(width*(1.0/6.0))+(10.0/6.0),y-8,4,14,True) ;2
+	Rect(x+(width*(2.0/6.0))+(20.0/6.0),y-8,4,14,True) ;3
+	Rect(x+(width*(3.0/6.0))+(30.0/6.0),y-8,4,14,True) ;4
+	Rect(x+(width*(4.0/6.0))+(40.0/6.0),y-8,4,14,True) ;5
+	Rect(x+(width*(5.0/6.0))+(50.0/6.0),y-8,4,14,True) ;6
+	Rect(x+width+10,y-8,4,14,True) ;7
+	
+	If ID = OnSliderID
+		If (ScaledMouseX() <= x+8)
+			value = 0
+		ElseIf (ScaledMouseX() >= x+(width*(1.0/6.0))) And (ScaledMouseX() <= x+(width*(1.0/6.0))+8)
+			value = 1
+		ElseIf (ScaledMouseX() >= x+(width*(2.0/6.0))) And (ScaledMouseX() <= x+(width*(2.0/6.0))+8)
+			value = 2
+		ElseIf (ScaledMouseX() >= x+(width*(3.0/6.0))) And (ScaledMouseX() <= x+(width*(3.0/6.0))+8)
+			value = 3
+		ElseIf (ScaledMouseX() >= x+(width*(4.0/6.0))) And (ScaledMouseX() <= x+(width*(4.0/6.0))+8)
+			value = 4
+		ElseIf (ScaledMouseX() >= x+(width*(5.0/6.0))) And (ScaledMouseX() <= x+(width*(5.0/6.0))+8)
+			value = 5
+		ElseIf (ScaledMouseX() >= x+width)
+			value = 6
+		EndIf
+		Color 0,255,0
+		Rect(x,y,width+14,10,True)
+	Else
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
+			Color 0,200,0
+			Rect(x,y,width+14,10,False)
+		EndIf
+	EndIf
+	
+	If value = 0
+		DrawImage(BlinkMeterIMG,x,y-8)
+	ElseIf value = 1
+		DrawImage(BlinkMeterIMG,x+(width*(1.0/6.0))+1,y-8)
+	ElseIf value = 2
+		DrawImage(BlinkMeterIMG,x+(width*(2.0/6.0))+2,y-8)
+	ElseIf value = 3
+		DrawImage(BlinkMeterIMG,x+(width*(3.0/6.0))+3,y-8)
+	ElseIf value = 4
+		DrawImage(BlinkMeterIMG,x+(width*(4.0/6.0))+4,y-8)
+	ElseIf value = 5
+		DrawImage(BlinkMeterIMG,x+(width*(5.0/6.0))+5,y-8)
+	Else
+		DrawImage(BlinkMeterIMG,x+width+6,y-8)
+	EndIf
+	
+	Color 170,170,170
+	If value = 0
+		AAText(x+2,y+10+MenuScale,val1,True)
+	ElseIf value = 1
+		AAText(x+(width*(1.0/6.0))+2+(10.0/6.0),y+10+MenuScale,val2,True)
+	ElseIf value = 2
+		AAText(x+(width*(2.0/6.0))+2+((10.0/6.0)*2),y+10+MenuScale,val3,True)
+	ElseIf value = 3
+		AAText(x+(width*(3.0/6.0))+2+((10.0/6.0)*3),y+10+MenuScale,val4,True)
+	ElseIf value = 4
+		AAText(x+(width*(4.0/6.0))+2+((10.0/6.0)*4),y+10+MenuScale,val5,True)
+	ElseIf value = 5
+		AAText(x+(width*(5.0/6.0))+2+((10.0/6.0)*5),y+10+MenuScale,val6,True)
+	Else
+		AAText(x+width+12,y+10+MenuScale,val7,True)
 	EndIf
 	
 	Return value

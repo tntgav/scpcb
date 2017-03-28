@@ -5840,7 +5840,7 @@ Function UpdateSecurityCams()
 			EndIf
 			
 			If close = True Or sc\IsRoom2slCam Or sc\SpecialCam Then
-				If sc\Screen Then 
+				If sc\Screen Then
 					sc\State = sc\State+FPSfactor
 					
 					If sc\InSight And sc\AllowSaving Then 
@@ -5961,7 +5961,7 @@ Function UpdateSecurityCams()
 								HideEntity(Room2slCam)
 								ShowEntity(Camera)
 								
-								CopyRect(0,0,256,256,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
+								CopyRect(0,0,128,128,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
 								
 							EndIf
 						EndIf

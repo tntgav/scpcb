@@ -10,6 +10,9 @@ Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21, NPCtype008% = 22, 
 ;[Block]
 ;Master Mesh System for better hiding/showing mechanics of the mesh
 Dim NPCMasterMesh(64)
+
+;This disables the system, as a request by Regalis (but I'm too lazy to remove all the code I made for it) - ENDSHN
+Global EnableNPCMasterMeshSystem% = False
 ;[End Block]
 
 Type NPCs
@@ -4828,7 +4831,7 @@ Function UpdateNPCs()
 		
 	Next
 	
-	UpdateNPCMasterMesh(Camera)
+	If EnableNPCMasterMeshSystem Then UpdateNPCMasterMesh(Camera)
 	
 End Function
 

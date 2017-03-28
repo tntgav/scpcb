@@ -1130,8 +1130,8 @@ Function UpdateConsole()
 							If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
 							If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
 							
-							FreeEntity e\room\Objects[0]
-							FreeEntity e\room\Objects[1]
+							FreeEntity e\room\Objects[0] : e\room\Objects[0]=0
+							FreeEntity e\room\Objects[1] : e\room\Objects[1]=0
 							PositionEntity Curr173\Collider, 0,0,0
 							ResetEntity Curr173\Collider
 							ShowEntity Curr173\obj
@@ -2750,6 +2750,8 @@ LoopDelay = MilliSecs()
 
 Global UpdateParticles_Time# = 0.0
 
+Global CurrTrisAmount%
+
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------       		MAIN LOOP                 ---------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3342,7 +3344,7 @@ Function QuickLoadEvents()
 											HideEntity(sc\Cam)
 											
 											sc\IsRoom2slCam = True
-											sc\Room2slTexs%[0] = CreateTexture(256, 256, 1+256)
+											sc\Room2slTexs%[0] = CreateTexture(128, 128, 1+256)
 											EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
 											sc\RenderInterval = 24
 											
@@ -4703,7 +4705,7 @@ Function DrawGUI()
 					Exit
 				EndIf
 			Next
-			AAText x - 50, 250, "Room coordinates: (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ")"
+			AAText x - 50, 250, "Room coordinates: (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"
 			AAText x - 50, 280, "Stamina: " + f2s(Stamina, 3)
 			AAText x - 50, 300, "Death timer: " + f2s(KillTimer, 3)               
 			AAText x - 50, 320, "Blink timer: " + f2s(BlinkTimer, 3)
@@ -4747,6 +4749,8 @@ Function DrawGUI()
 			EndIf
 			GlobalMemoryStatus m.MEMORYSTATUS
 			AAText x + 350, 90, (m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
+			AAText x + 350, 110, "Triangles rendered: "+CurrTrisAmount
+			AAText x + 350, 130, "Active textures: "+ActiveTextures()
 			
 			AASetFont Font1
 		EndIf
@@ -7846,7 +7850,7 @@ Function LoadEntities()
 	SetTemplateSubTemplate(ParticleEffect[2], t0)
 	
 	Room2slCam = CreateCamera()
-	CameraViewport(Room2slCam, 0, 0, 256, 256)
+	CameraViewport(Room2slCam, 0, 0, 128, 128)
 	CameraRange Room2slCam, 0.05, 6.0
 	CameraZoom(Room2slCam, 0.8)
 	HideEntity(Room2slCam)
@@ -10583,6 +10587,8 @@ Function RenderWorld2()
 	Else
 		RenderWorld()
 	EndIf
+	
+	CurrTrisAmount = TrisRendered()
 
 	If hasBattery=0 And WearingNightVision<>3
 		IsNVGBlinking% = True
@@ -10949,6 +10955,12 @@ Function CatchErrors(location$)
 			WriteLine errF,"Version: "+VersionNumber
 			WriteLine errF,"Save compatible version: "+CompatibleNumber
 			WriteLine errF,"Date and time: "+CurrentDate()+" at "+CurrentTime()
+			WriteLine errF,"Total video memory (MB): "+TotalVidMem()/1024/1024
+			WriteLine errF,"Available video memory (MB): "+AvailVidMem()/1024/1024
+			GlobalMemoryStatus m.MEMORYSTATUS
+			WriteLine errF,"Global memrory status: "+(m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
+			WriteLine errF,"Triangles rendered: "+CurrTrisAmount
+			WriteLine errF,"Active textures: "+ActiveTextures()
 			WriteLine errF,""
 			WriteLine errF,"Error(s):"
 		Else
