@@ -43,7 +43,7 @@ Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
 Global VersionNumber$ = "1.3.7"
-Global CompatibleNumber$ = "1.3.4" ;Only change this if the version given isn't working with the current build version - ENDSHN
+Global CompatibleNumber$ = "1.3.7" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%
@@ -1628,6 +1628,8 @@ Global TeslaPowerUpSFX = LoadSound_Strict("SFX\Room\Tesla\PowerUp.ogg")
 
 Global MagnetUpSFX% = LoadSound_Strict("SFX\Room\106Chamber\MagnetUp.ogg"), MagnetDownSFX = LoadSound_Strict("SFX\Room\106Chamber\MagnetDown.ogg")
 Global FemurBreakerSFX%
+Global EndBreathCHN%
+Global EndBreathSFX%
 
 Dim DecaySFX%(5)
 For i = 0 To 3
@@ -2803,20 +2805,13 @@ Repeat
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
 	If MainMenuOpen Then
-		If ShouldPlay = 21 Or ShouldPlay = 66 Then
-			If TempSoundCHN = 0 Then
-				For snd.Sound = Each Sound
-					For i = 0 To 31
-						If snd\channels[i]<>0 Then
-							StopChannel snd\channels[i]
-						EndIf
-					Next
-				Next
-			EndIf
-			
+		If ShouldPlay = 21 Then
+			EndBreathSFX = LoadSound("SFX\Ending\MenuBreath.ogg")
+			EndBreathCHN = PlaySound(EndBreathSFX)
 			ShouldPlay = 66
-			MusicCHN = PlaySound_Strict(LoadTempSound("SFX\Ending\MenuBreath.ogg"))
-			If (Not ChannelPlaying(TempSoundCHN))
+		ElseIf ShouldPlay = 66
+			If (Not ChannelPlaying(EndBreathCHN)) Then
+				FreeSound(EndBreathSFX)
 				ShouldPlay = 11
 			EndIf
 		Else
@@ -8468,14 +8463,14 @@ Function UpdateMusic()
 		
 			If NowPlaying < 66 Then
 				If CurrMusic = 0
-				MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
-				CurrMusic = 1
-			Else
+					MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
+					CurrMusic = 1
+				EndIf
+			;Else
 				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
-			EndIf
 			
-			SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
-		EndIf
+				SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
+			EndIf
 		
 		;ChannelVolume MusicCHN, CurrMusicVolume
 	Else
@@ -8650,6 +8645,14 @@ Function KillSounds()
 			EndIf
 		Next
 	EndIf
+	
+	For snd.Sound = Each Sound
+		For i = 0 To 31
+			If snd\channels[i]<>0 Then
+				StopChannel snd\channels[i]
+			EndIf
+		Next
+	Next
 	
 	DebugLog "Terminated all sounds"
 	
