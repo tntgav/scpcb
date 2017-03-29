@@ -61,9 +61,11 @@ Function UpdateEvents()
 						If SelectedDifficulty\saveType = SAVEANYWHERE Then
 							Msg = "Press "+KeyName(KEY_SAVE)+" to save."
 							MsgTimer = 70*4
+							;SetSaveMSG("Press "+KeyName(KEY_SAVE)+" to save.")
 						ElseIf SelectedDifficulty\saveType = SAVEONSCREENS Then
 							Msg = "Saving is only permitted on clickable monitors scattered throughout the facility."
 							MsgTimer = 70 * 8
+							;SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
 						EndIf
 						
 						Curr173\Idle=False
@@ -312,6 +314,8 @@ Function UpdateEvents()
 							
 							FreeEntity e\room\Objects[0]
 							FreeEntity e\room\Objects[1]
+							e\room\Objects[0]=0
+							e\room\Objects[1]=0
 							
 							DebugLog "delete alarm"
 							
@@ -334,19 +338,17 @@ Function UpdateEvents()
 						;slow the player down to match his speed to the guards
 						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.008/EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
 						
-						If e\EventState3 < 170 Then 
+						If e\EventState3 < 170 Then
 							If e\EventState3 = 1.0 Then
 								PositionEntity Camera, x, y, z
 								HideEntity Collider
-								PositionEntity Collider, x, 0.302, z	
+								PositionEntity Collider, x, 0.302, z
 								RotateEntity Camera, -70, 0, 0
 								
-								CurrMusicVolume = 1.0
+								CurrMusicVolume = MusicVolume
 								
-								FMOD_Pause(MusicCHN)
-								FMOD_StopStream(CurrMusicStream)
-								FMOD_CloseStream(CurrMusicStream)
-								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,CurrMusicStream)
+								StopStream_Strict(MusicCHN)
+								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,Mode)
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
@@ -1518,36 +1520,96 @@ Function UpdateEvents()
 							EndIf
 						Next
 						If (CoffinDistance < 4.0) And (hasBatteryFor895) And (Not Wearing714) Then
-							
-							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
-							RestoreSanity = False
-							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
+;							
+;							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
+;							RestoreSanity = False
+;							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
+;							
+;							tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
+;							tempF2# = EntityYaw(Collider)
+;							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
+;							
+;							TurnEntity Collider, 0,tempF3/4,0,True
+;							
+;							tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
+;							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
+;							
+;							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
+;							
+;							If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
+;								EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
+;								PlaySound_Strict(HorrorSFX(1))
+;								e\EventState3 = 10.0
+;								EntityColor(NVOverlay, 255,255,255)
+;							EndIf
+;							If Sanity < (-1000) Then 
+;								If WearingNightVision > 1
+;									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
+;									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
+;								Else
+;									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
+;								EndIf
+;								Kill()
+;							EndIf
 							
 							tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
 							tempF2# = EntityYaw(Collider)
 							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
-							
 							TurnEntity Collider, 0,tempF3/4,0,True
-							
 							tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
 							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
-							
 							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
 							
-							If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
-								EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
-								PlaySound_Strict(HorrorSFX(1))
-								e\EventState3 = 10.0
-								EntityColor(NVOverlay, 255,255,255)
-							EndIf
-							If Sanity < (-1000) Then 
+							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
+							RestoreSanity = False
+							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
+							If Sanity < -1000
 								If WearingNightVision > 1
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
 									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
 								Else
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
 								EndIf
+								EntityTexture(NVOverlay, NVTexture)
 								Kill()
+							ElseIf Sanity < - 800 Then
+								If Rand(3) = 1 Then EntityTexture(NVOverlay, NVTexture)
+								If Rand(6) < 5 Then
+									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
+									For i% = 0 To MaxItemAmount - 1
+										If (Inventory(i) <> Null) Then
+											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+												If Inventory(i)\state2 = 1 Then PlaySound_Strict(HorrorSFX(1))
+												Inventory(i)\state2 = 2
+												Exit
+											EndIf
+										EndIf
+									Next
+								EndIf	
+								BlurTimer = 1000
+							ElseIf Sanity < - 500
+								If Rand(7) = 1 Then EntityTexture(NVOverlay, NVTexture)
+								If Rand(50) = 1 Then
+									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
+									For i% = 0 To MaxItemAmount - 1
+										If (Inventory(i) <> Null) Then
+											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+												If Inventory(i)\state2 = 0 Then PlaySound_Strict(HorrorSFX(0))
+												Inventory(i)\state2 = 1
+												Exit
+											EndIf
+										EndIf
+									Next
+								EndIf
+							Else
+								EntityTexture(NVOverlay, NVTexture)
+								For i% = 0 To MaxItemAmount - 1
+									If (Inventory(i) <> Null) Then
+										If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+											Inventory(i)\state2 = 0
+										EndIf
+									EndIf
+								Next
 							EndIf
 						EndIf
 					EndIf
@@ -2036,31 +2098,23 @@ Function UpdateEvents()
 													BlurTimer = 1500
 													
 													PlayerRoom = r
-													UpdateRooms()
-													UpdateDoors()
 													
 													PlaySound_Strict(LoadTempSound("SFX\Room\PocketDimension\Exit.ogg"))
 													
-													;1560, 250
-													PositionEntity(Collider, EntityX(r\Objects[0],True), 0.4, EntityZ(r\Objects[0],True))
-													ResetEntity Collider
+													TeleportEntity(Collider,EntityX(r\Objects[0],True),0.4,EntityZ(r\Objects[0],True),0.3,True)
+													
+													UpdateRooms()
+													UpdateDoors()
 													Curr106\Idle = False
 													
-													entity% = CreatePivot()
-													PositionEntity entity%,EntityX(Collider),EntityY(Collider),EntityZ(Collider)
-													RotateEntity entity%,-90,0,0
-													pick = EntityPick(entity%,7)
-													If pick<>0
-														;de.Decals = CreateDecal(0, EntityX(r\Objects[0],True), 381*RoomScale, EntityZ(r\Objects[0],True), 270, Rand(360), 0)
-														de.Decals = CreateDecal(0, EntityX(r\Objects[0],True), PickedY()-0.01, EntityZ(r\Objects[0],True), 270, Rand(360), 0)
-														DebugLog "PickedEntity for Decal"
-													EndIf
-													FreeEntity entity%
+													de.decals = CreateDecal(0, EntityX(r\Objects[0],True),EntityY(r\Objects[0],True),EntityZ(r\Objects[0],True), 270, Rand(360), 0)
+													TeleportEntity(de\obj,EntityX(r\Objects[0],True),EntityY(r\Objects[0],True)+0.6,EntityZ(r\Objects[0],True),0.0,True,4,1)
 													
 													For e2.Events = Each Events
 														If e2\EventName = "room2sl"
 															e2\EventState3 = 0
-															RotateEntity e2\room\Levers[0],80,0,0
+															UpdateLever(e2\room\Levers[0])
+															RotateEntity e2\room\Levers[0],0,EntityYaw(e2\room\Levers[0]),0
 															TurnCheckpointMonitorsOff(0)
 															Exit
 														EndIf
@@ -2090,7 +2144,7 @@ Function UpdateEvents()
 										e\EventState = 0
 										e\EventState2 = 0
 										
-										PositionEntity(Collider, EntityX(r\obj,True), 0.4, EntityZ(r\obj,True))
+										TeleportEntity(Collider,EntityX(r\obj,True),0.4,EntityZ(r\obj,True),0.3,True)
 										
 										GiveAchievement(AchvPD)
 										SecondaryLightOn = PrevSecondaryLightOn
@@ -2102,7 +2156,8 @@ Function UpdateEvents()
 										For e2.Events = Each Events
 											If e2\EventName = "room2sl"
 												e2\EventState3 = 0
-												RotateEntity e2\room\Levers[0],80,0,0
+												UpdateLever(e2\room\Levers[0])
+												RotateEntity e2\room\Levers[0],0,EntityYaw(e2\room\Levers[0]),0
 												TurnCheckpointMonitorsOff(0)
 												Exit
 											EndIf
@@ -2182,14 +2237,14 @@ Function UpdateEvents()
 											
 											SecondaryLightOn = PrevSecondaryLightOn
 											PrevSecondaryLightOn = 0.0
-											PositionEntity(Collider, EntityX(r\obj), 0.4, EntityZ(r\obj))
-											ResetEntity Collider
+											TeleportEntity(Collider,EntityX(r\obj,True),0.4,EntityZ(r\obj,True),0.3,True)
 											Curr106\Idle = False
 											
 											For e2.Events = Each Events
 												If e2\EventName = "room2sl"
 													e2\EventState3 = 0
-													RotateEntity e2\room\Levers[0],80,0,0
+													UpdateLever(e2\room\Levers[0])
+													RotateEntity e2\room\Levers[0],0,EntityYaw(e2\room\Levers[0]),0
 													TurnCheckpointMonitorsOff(0)
 													Exit
 												EndIf
@@ -5715,6 +5770,13 @@ Function UpdateEvents()
 							e\EventStr = "load0"
 						EndIf
 						
+						If e\room\Objects[3]<>0
+							HideEntity(e\room\Objects[3])
+							HideEntity(e\room\Objects[4])
+							HideEntity(e\room\Objects[5])
+							HideEntity(e\room\Objects[6])
+						EndIf
+						
 						If e\room\RoomDoors[1]\open = True
 							e\EventState = 1
 							GiveAchievement(Achv205)
@@ -5751,21 +5813,40 @@ Function UpdateEvents()
 						
 						Select e\EventState
 							Case 1
+								ShowEntity e\room\Objects[1]
+								HideEntity(e\room\Objects[5])
+								HideEntity(e\room\Objects[4])
+								HideEntity(e\room\Objects[3])
 								;sitting
+								ShowEntity(e\room\Objects[6])
 								Animate2(e\room\Objects[6], AnimTime(e\room\Objects[6]), 526, 530, 0.2)
 								If e\EventState2 > 20*70 Then e\EventState = e\EventState+1
 							Case 3
+								ShowEntity e\room\Objects[1]
+								HideEntity(e\room\Objects[5])
+								HideEntity(e\room\Objects[4])
+								HideEntity(e\room\Objects[3])
 								;laying down
+								ShowEntity(e\room\Objects[6])
 								Animate2(e\room\Objects[6], AnimTime(e\room\Objects[6]), 377, 525, 0.2)
 								If e\EventState2 > 30*70 Then e\EventState = e\EventState+1
 							Case 5
+								ShowEntity e\room\Objects[1]
+								HideEntity(e\room\Objects[5])
+								HideEntity(e\room\Objects[4])
+								HideEntity(e\room\Objects[3])
 								;standing
+								ShowEntity(e\room\Objects[6])
 								Animate2(e\room\Objects[6], AnimTime(e\room\Objects[6]), 228, 376, 0.2)
 								If e\EventState2 > 40*70 Then 
 									e\EventState = e\EventState+1
 									PlaySound2(LoadTempSound("SFX\SCP\205\Horror.ogg"), Camera, e\room\Objects[6], 10, 0.3)
 								EndIf	
 							Case 7
+								ShowEntity e\room\Objects[1]
+								ShowEntity(e\room\Objects[6])
+								HideEntity(e\room\Objects[4])
+								HideEntity(e\room\Objects[3])
 								;first demon appears
 								ShowEntity(e\room\Objects[5])
 								;le sexy demon pose
@@ -5776,6 +5857,10 @@ Function UpdateEvents()
 									PlaySound2(LoadTempSound("SFX\SCP\205\Horror.ogg"), Camera, e\room\Objects[6], 10, 0.5)
 								EndIf
 							Case 9
+								ShowEntity e\room\Objects[1]
+								ShowEntity(e\room\Objects[6])
+								ShowEntity(e\room\Objects[5])
+								HideEntity(e\room\Objects[3])
 								;second demon appears
 								ShowEntity(e\room\Objects[4])
 								;idle
@@ -5789,6 +5874,10 @@ Function UpdateEvents()
 									PlaySound_Strict(LoadTempSound("SFX\SCP\205\Horror.ogg"))
 								EndIf
 							Case 11
+								ShowEntity e\room\Objects[1]
+								ShowEntity(e\room\Objects[6])
+								ShowEntity(e\room\Objects[5])
+								ShowEntity(e\room\Objects[4])
 								;third demon
 								ShowEntity(e\room\Objects[3])
 								;idle
@@ -5800,12 +5889,18 @@ Function UpdateEvents()
 								
 								If e\EventState2 > 85*70 Then e\EventState = e\EventState+1
 							Case 13
+								ShowEntity e\room\Objects[1]
+								ShowEntity(e\room\Objects[6])
+								ShowEntity(e\room\Objects[5])
+								ShowEntity(e\room\Objects[4])
+								ShowEntity(e\room\Objects[3])
 								If (AnimTime(e\room\Objects[6])<>227) Then SetAnimTime(e\room\Objects[6], 227)
-									
+								
 								Animate2(e\room\Objects[3], AnimTime(e\room\Objects[3]), 2, 491, 0.05)
 								Animate2(e\room\Objects[4], AnimTime(e\room\Objects[4]), 197, 433, 0.05)
 								Animate2(e\room\Objects[5], AnimTime(e\room\Objects[5]), 2, 433, 0.05)
 							Case 66
+								ShowEntity e\room\Objects[1]
 								Animate2(e\room\Objects[3], AnimTime(e\room\Objects[3]), 492, 534, 0.1, False)
 								Animate2(e\room\Objects[4], AnimTime(e\room\Objects[4]), 434, 466, 0.1, False)
 								Animate2(e\room\Objects[5], AnimTime(e\room\Objects[5]), 434, 494, 0.1, False)
@@ -5892,19 +5987,21 @@ Function UpdateEvents()
 						EndIf
 						
 						If e\room\NPC[0]<>Null Then
-							If e\room\NPC[0]\State2 = 1 And e\room\NPC[0]\State>1 Then ;the monster is chasing the player
+							If (e\room\NPC[0]\State2 = 1 And e\room\NPC[0]\State>1) Or e\room\NPC[0]\State>2 ;the monster is chasing the player
 								ShouldPlay = 12
 							Else
 								ShouldPlay = 9
 							EndIf
 						EndIf
 						
-						;the player fell	
-						If EntityY(Collider)<=28.5 Then 
-							Kill() 
-							BlinkTimer=-2
-						ElseIf EntityY(Collider)>EntityY(fr\Forest_Pivot,True)+0.5
-							MoveEntity(Collider, 0, ((EntityY(fr\Forest_Pivot,True)+0.5) - EntityY(Collider))*FPSfactor, 0)
+						;the player fell
+						If (Not NoClip)
+							If EntityY(Collider)<=28.5 Then 
+								Kill() 
+								BlinkTimer=-2
+							ElseIf EntityY(Collider)>EntityY(fr\Forest_Pivot,True)+0.5
+								MoveEntity(Collider, 0, ((EntityY(fr\Forest_Pivot,True)+0.5) - EntityY(Collider))*FPSfactor, 0)
+							EndIf
 						EndIf
 						
 						If e\room\NPC[0]<>Null
@@ -6461,6 +6558,23 @@ Function UpdateEvents()
 							e\EventState = 1
 							EndIf
 						Else
+							If e\room\Objects[2]=0
+								Local Glasstex = LoadTexture_Strict("GFX\map\glass.png",1+2)
+								e\room\Objects[2] = CreateSprite()
+								EntityTexture(e\room\Objects[2],Glasstex)
+								SpriteViewMode(e\room\Objects[2],2)
+								ScaleSprite(e\room\Objects[2],182.0*RoomScale*0.5, 192.0*RoomScale*0.5)
+								pvt% = CreatePivot(e\room\obj)
+								PositionEntity pvt%,-595.0,224.0,-208.0,False
+								;PositionEntity(e\room\Objects[2], e\room\x - 595.0 * RoomScale, 224.0*RoomScale, e\room\z - 208.0 * RoomScale)
+								PositionEntity(e\room\Objects[2], EntityX(pvt,True), EntityY(pvt,True), EntityZ(pvt,True))
+								FreeEntity pvt
+								RotateEntity e\room\Objects[2],0,e\room\angle,0
+								TurnEntity(e\room\Objects[2],0,180,0)
+								EntityParent(e\room\Objects[2], e\room\obj)
+								FreeTexture Glasstex
+							EndIf
+							
 							ShowEntity (e\room\Objects[2])
 							;start a timer for 173 breaking through the window
 							e\EventState = e\EventState + 1
@@ -6478,6 +6592,7 @@ Function UpdateEvents()
 									Else
 										PlaySound2(LoadTempSound("SFX\General\GlassBreak.ogg"), Camera, Curr173\obj) 
 										FreeEntity(e\room\Objects[2])
+										e\room\Objects[2]=0
 										PositionEntity(Curr173\Collider, EntityX(e\room\Objects[1], True), 0.5, EntityZ(e\room\Objects[1], True))
 										ResetEntity(Curr173\Collider)
 										RemoveEvent(e)
@@ -8238,7 +8353,7 @@ Function UpdateEndings()
 								ElseIf e\EventState > 35.0*70 And e\EventState < 36.5*70	
 									CameraShake = 1.5		
 									If e\EventState-FPSfactor =< 35.0*70 Then
-										e\SoundCHN = StreamSound_Strict("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",SFXVolume,e\Sound,0)
+										e\SoundCHN = StreamSound_Strict("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",SFXVolume,0)
 										e\SoundCHN_isStream = True
 									EndIf									
 								ElseIf e\EventState > 39.5*70 And e\EventState < 39.8*70		
@@ -8261,19 +8376,15 @@ Function UpdateEndings()
 							If e\EventState => 45.0*70 Then
 								If e\EventState < 75.0*70 Then
 									If e\SoundCHN2=0
-										e\SoundCHN2 = StreamSound_Strict("SFX\Ending\GateB\Siren.ogg",SFXVolume#,e\Sound2)
+										e\SoundCHN2 = StreamSound_Strict("SFX\Ending\GateB\Siren.ogg",SFXVolume,Mode)
 										e\SoundCHN2_isStream = True
 									EndIf
 								Else
 									If SelectedEnding = "" Then
 									    ShouldPlay = 66
 										
-										FMOD_Pause(e\SoundCHN2)
-										FMOD_StopStream(e\Sound2)
-										FMOD_CloseStream(e\Sound2)
-										FMOD_Pause(e\SoundCHN)
-										FMOD_StopStream(e\Sound)
-										FMOD_CloseStream(e\Sound)
+										StopStream_Strict(e\SoundCHN)
+										StopStream_Strict(e\SoundCHN2)
 										
 										temp = True
 										For e2.Events = Each Events

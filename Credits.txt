@@ -80,12 +80,13 @@
 			SCP-008, SCP-500, skybox code.
 			
 		CommanderMark
-			Bug fixes and grammar.
+			Bug fixes.
 
 	3D Modellers
 
 		Reilly Grindle ("Mirocaine")
 			SCP-035
+			SCP-066
 			SCP-106's animations.
 			SCP-205
 			SCP-939
@@ -191,6 +192,12 @@
 
 		Orgil Pount ("Destructoid")
 			Guard visor textures.
+
+		Balzac
+			Agent Izumi Junko sprites.
+
+		Aeldred28
+			SCP-066 texture.
 
 	Other
 	

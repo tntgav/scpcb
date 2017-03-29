@@ -1,6 +1,7 @@
 
 Function SaveGame(file$)
 	CatchErrors("Uncaught (SaveGame)")
+	
 	If Not Playable Then Return ;don't save if the player can't move at all
 	
 	If DropSpeed#>0.02*FPSfactor Or DropSpeed#<-0.02*FPSfactor Then Return
@@ -427,8 +428,12 @@ Function SaveGame(file$)
 		WriteByte f, itt\found
 	Next
 	
-	WriteInt f, 994
-	DebugLog 994
+	If UsedConsole
+		WriteInt f, 100
+		DebugLog "CHEATED!"
+	Else
+		WriteInt f, 994
+	EndIf
 	
 	CloseFile f
 	
@@ -441,6 +446,7 @@ Function SaveGame(file$)
 		
 		Msg = "Game progress saved."
 		MsgTimer = 70 * 4
+		;SetSaveMSG("Game progress saved.")
 	EndIf
 	
 	CatchErrors("SaveGame")
@@ -944,6 +950,11 @@ Function LoadGame(file$)
 				Next
 				DebugLog "Reset Eventstate in "+e\EventName
 			EndIf
+		;Reset the forest event to make it loading properly
+		ElseIf e\EventName = "room860"
+			e\EventStr = ""
+		ElseIf e\EventName = "room205"
+			e\EventStr = ""
 		EndIf
 	Next
 	
@@ -1048,6 +1059,11 @@ Function LoadGame(file$)
 	Next
 	
 	;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
+	
+	If ReadInt(f)<>994
+		UsedConsole = True
+		DebugLog "CHEATED!"
+	EndIf
 	
 	CloseFile f
 	
@@ -1580,6 +1596,14 @@ Function LoadGameQuick(file$)
 			EndIf
 		Next	
 		e\EventStr = ReadString(f)
+		If e\EventName = "alarm"
+			;A hacky fix for the case that the intro objects aren't loaded when they should
+			;Altough I'm too lazy to add those objects there because at the time where you can save, those objects are already in the ground anyway - ENDSHN
+			If e\room\Objects[0]=0
+				e\room\Objects[0]=CreatePivot()
+				e\room\Objects[1]=CreatePivot()
+			EndIf
+		EndIf
 	Next
 	
 	Local it.Items
@@ -1682,6 +1706,11 @@ Function LoadGameQuick(file$)
 	
 	;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
 	
+	If ReadInt(f)<>994
+		UsedConsole = True
+		DebugLog "CHEATED!"
+	EndIf
+	
 	If 0 Then 
 		closestroom = Null
 		dist = 30
@@ -1695,6 +1724,13 @@ Function LoadGameQuick(file$)
 		
 		If closestroom<>Null Then PlayerRoom = closestroom
 	EndIf
+	
+	;This will hopefully fix the 895 crash bug after the player died by it's sanity effect and then quickloaded the game - ENDSHN
+	For sc.SecurityCams = Each SecurityCams
+		sc\PlayerState = 0
+	Next
+	EntityTexture NVOverlay,NVTexture
+	RestoreSanity = True
 	
 	CloseFile f
 	
