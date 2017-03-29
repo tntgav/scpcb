@@ -104,36 +104,36 @@ Function UpdateEmitters()
 	InSmoke = False
 	For e.emitters = Each Emitters
 		If FPSfactor > 0 And (PlayerRoom = e\room Or e\room\dist < 8) Then
-			If ParticleAmount = 2 Or SmokeDelay#=0.0
-				Local p.Particles = CreateParticle(EntityX(e\obj, True), EntityY(e\obj, True), EntityZ(e\obj, True), Rand(e\minimage, e\maximage), e\size, e\gravity, e\lifetime)
-				p\speed = e\speed
-				RotateEntity(p\pvt, EntityPitch(e\Obj, True), EntityYaw(e\Obj, True), EntityRoll(e\Obj, True), True)
-				TurnEntity(p\pvt, Rnd(-e\RandAngle, e\RandAngle), Rnd(-e\RandAngle, e\RandAngle), 0)
-				
-				TurnEntity p\obj, 0,0,Rnd(360)
-				
-				p\SizeChange = e\SizeChange
-				
-				p\Achange = e\achange
+			;If ParticleAmount = 2 Or SmokeDelay#=0.0
+			Local p.Particles = CreateParticle(EntityX(e\obj, True), EntityY(e\obj, True), EntityZ(e\obj, True), Rand(e\minimage, e\maximage), e\size, e\gravity, e\lifetime)
+			p\speed = e\speed
+			RotateEntity(p\pvt, EntityPitch(e\Obj, True), EntityYaw(e\Obj, True), EntityRoll(e\Obj, True), True)
+			TurnEntity(p\pvt, Rnd(-e\RandAngle, e\RandAngle), Rnd(-e\RandAngle, e\RandAngle), 0)
+			
+			TurnEntity p\obj, 0,0,Rnd(360)
+			
+			p\SizeChange = e\SizeChange
+			
+			p\Achange = e\achange
+			;EndIf
+			e\SoundCHN = LoopSound2(HissSFX, e\SoundCHN, Camera, e\Obj)
+			
+			If InSmoke = False Then
+				If WearingGasMask=0 And WearingHazmat=0 Then
+					Local dist# = Distance(EntityX(Camera, True), EntityZ(Camera, True), EntityX(e\obj, True), EntityZ(e\obj, True))
+					If dist < 0.8 Then
+						If Abs(EntityY(Camera, True)-EntityY(e\obj,True))<5.0 Then InSmoke = True
+					EndIf
+				EndIf					
 			EndIf
-				e\SoundCHN = LoopSound2(HissSFX, e\SoundCHN, Camera, e\Obj)
-				
-				If InSmoke = False Then
-					If WearingGasMask=0 And WearingHazmat=0 Then
-						Local dist# = Distance(EntityX(Camera, True), EntityZ(Camera, True), EntityX(e\obj, True), EntityZ(e\obj, True))
-						If dist < 0.8 Then
-							If Abs(EntityY(Camera, True)-EntityY(e\obj,True))<5.0 Then InSmoke = True
-						EndIf
-					EndIf					
-				EndIf
-			If ParticleAmount <> 2
-				If SmokeDelay#<(10-(5*ParticleAmount))
-					SmokeDelay#=SmokeDelay#+FPSfactor
-				Else
-					SmokeDelay#=0.0
-				EndIf
-			EndIf
-		End If
+			;If ParticleAmount <> 2
+			;	If SmokeDelay#<(10-(5*ParticleAmount))
+			;		SmokeDelay#=SmokeDelay#+FPSfactor
+			;	Else
+			;		SmokeDelay#=0.0
+			;	EndIf
+			;EndIf
+		EndIf
 	Next
 	
 	If InSmoke Then
