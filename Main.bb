@@ -7497,8 +7497,8 @@ Function LoadEntities()
 	LiquidObj = LoadMesh_Strict("GFX\items\cupliquid.x") ;optimized the cups dispensed by 294
 	HideEntity LiquidObj
 	
-	;MTFObj = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d") ;optimized MTFs
-	;GuardObj = LoadAnimMesh_Strict("GFX\npcs\guard.b3d") ;optimized Guards
+	MTFObj = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d") ;optimized MTFs
+	GuardObj = LoadAnimMesh_Strict("GFX\npcs\guard.b3d") ;optimized Guards
 	;GuardTex = LoadTexture_Strict("GFX\npcs\body.jpg") ;optimized the guards even more
 	
 	;If BumpEnabled Then
@@ -7529,8 +7529,8 @@ Function LoadEntities()
 	ApacheObj = LoadAnimMesh_Strict("GFX\apache.b3d") ;optimized Apaches (helicopters)
 	ApacheRotorObj = LoadAnimMesh_Strict("GFX\apacherotor.b3d") ;optimized the Apaches even more
 	
-	;HideEntity MTFObj
-	;HideEntity GuardObj
+	HideEntity MTFObj
+	HideEntity GuardObj
 	HideEntity ClassDObj
 	HideEntity ApacheObj
 	HideEntity ApacheRotorObj
@@ -7751,23 +7751,10 @@ Function LoadEntities()
 	;[Block]
 	NPC049OBJ = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
 	HideEntity NPC049OBJ
-	;NPC0492OBJ = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
-	;HideEntity NPC0492OBJ
+	NPC0492OBJ = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+	HideEntity NPC0492OBJ
 	ClerkOBJ = LoadAnimMesh_Strict("GFX\npcs\clerk.b3d")
 	HideEntity ClerkOBJ
-	
-	NPCMasterMesh(NPCtype966) = LoadAnimMesh_Strict("GFX\npcs\scp-966.b3d")
-	HideEntity NPCMasterMesh(NPCtype966)
-	NPCMasterMesh(NPCtype178) = LoadAnimMesh_Strict("GFX\npcs\npc178.b3d")
-	HideEntity NPCMasterMesh(NPCtype178)
-	NPCMasterMesh(NPCtypeMTF) = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d")
-	HideEntity NPCMasterMesh(NPCtypeMTF)
-	NPCMasterMesh(NPCtypeGuard) = LoadAnimMesh_Strict("GFX\npcs\guard.b3d")
-	HideEntity NPCMasterMesh(NPCtypeGuard)
-	NPCMasterMesh(NPCtypeZombie) = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
-	HideEntity NPCMasterMesh(NPCtypeZombie)
-	NPCMasterMesh(NPCtype939) = LoadAnimMesh_Strict("GFX\npcs\scp-939.b3d")
-	HideEntity NPCMasterMesh(NPCtype939)
 	;[End Block]
 	
 	LoadMaterials("DATA\materials.ini")
@@ -8795,9 +8782,7 @@ End Function
 Function SetNPCFrame(n.NPCs, frame#)
 	If (Abs(n\Frame-frame)<0.001) Then Return
 	
-	If (Not n\UseMasterMeshSys) Or (n\MasterMeshState=0)
-		SetAnimTime n\obj, frame
-	EndIf
+	SetAnimTime n\obj, frame
 	
 	n\Frame = frame
 End Function

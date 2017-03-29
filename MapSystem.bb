@@ -5901,7 +5901,6 @@ Function UpdateSecurityCams()
 											Cls
 											
 											UpdateRoomLights(sc\Cam)
-											UpdateNPCMasterMesh(sc\Cam)
 											
 											SetBuffer BackBuffer()
 											RenderWorld
@@ -5917,7 +5916,6 @@ Function UpdateSecurityCams()
 											Cls
 											
 											UpdateRoomLights(CoffinCam\Cam)
-											UpdateNPCMasterMesh(CoffinCam\Cam)
 											
 											SetBuffer BackBuffer()
 											RenderWorld
@@ -5933,7 +5931,6 @@ Function UpdateSecurityCams()
 										Cls
 										
 										UpdateRoomLights(sc\Cam)
-										UpdateNPCMasterMesh(sc\Cam)
 										
 										RenderWorld
 										
@@ -5953,7 +5950,6 @@ Function UpdateSecurityCams()
 								Cls
 								
 								UpdateRoomLights(Room2slCam)
-								UpdateNPCMasterMesh(Room2slCam)
 								
 								RenderWorld
 								
