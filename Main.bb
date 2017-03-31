@@ -3346,7 +3346,8 @@ Function QuickLoadEvents()
 											sc\IsRoom2slCam = True
 											sc\Room2slTexs%[0] = CreateTexture(128, 128, 1+256)
 											EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
-											sc\RenderInterval = 24
+											sc\RenderInterval = 666
+											sc\turn = 0
 											
 											pvt% = CreatePivot(e\room\obj)
 											Select r\RoomTemplate\Name$
@@ -3393,6 +3394,7 @@ Function QuickLoadEvents()
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
 													sc\Room2slID = 5
+													sc\RenderInterval = 12
 													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"checkpoint1"+Chr(34)
