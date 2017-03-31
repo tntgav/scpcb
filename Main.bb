@@ -9169,6 +9169,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							EndIf
 					End Select
 			End Select
+			
+			RemoveItem(item)
 		Case "Key Card Omni"
 			Select setting
 				Case "rough", "coarse"
