@@ -7,14 +7,6 @@ Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtype178% = 17, NP
 Const NPCtype966% = 19, NPCtype1048a = 20, NPCtype1499% = 21, NPCtype008% = 22, NPCtypeClerk% = 23
 ;[End Block]
 
-;[Block]
-;Master Mesh System for better hiding/showing mechanics of the mesh
-Dim NPCMasterMesh(64)
-
-;This disables the system, as a request by Regalis (but I'm too lazy to remove all the code I made for it) - ENDSHN
-Global EnableNPCMasterMeshSystem% = False
-;[End Block]
-
 Type NPCs
 	Field obj%, obj2%, obj3%, obj4%, Collider%
 	Field NPCtype%, ID%
@@ -74,11 +66,6 @@ Type NPCs
 	Field TextureID%=-1
 	Field CollRadius#
 	Field IdleTimer#
-	Field UseMasterMeshSys%=False
-	Field MasterMeshScale#[3]
-	Field MasterMeshFX%
-	Field MasterMeshState%
-	Field MasterMeshCullBox#[6]
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -153,25 +140,14 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityRadius n\Collider, 0.2
 			;EntityRadius Collider, 0.15, 0.30
 			EntityType n\Collider, HIT_PLAYER
-			;n\obj = CopyEntity(GuardObj) ;LoadAnimMesh_Strict("GFX\npcs\mtf.b3d")
-			n\obj = CopyEntity(NPCMasterMesh(NPCtype))
-			n\UseMasterMeshSys = True
+			n\obj = CopyEntity(GuardObj) ;LoadAnimMesh_Strict("GFX\npcs\mtf.b3d")
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "Guard", "speed") / 100.0)
 			temp# = (GetINIFloat("DATA\NPCs.ini", "Guard", "scale") / 2.5)
-			For i = 0 To 2
-				n\MasterMeshScale[i] = temp
-			Next
+			
 			ScaleEntity n\obj, temp, temp, temp
 			
-			;MeshCullBox (n\obj, -MeshWidth(GuardObj), -MeshHeight(GuardObj), -MeshDepth(GuardObj), MeshWidth(GuardObj)*2, MeshHeight(GuardObj)*2, MeshDepth(GuardObj)*2)
-			n\MasterMeshCullBox[0] = -MeshWidth(NPCMasterMesh(NPCtype))
-			n\MasterMeshCullBox[1] = -MeshHeight(NPCMasterMesh(NPCtype))
-			n\MasterMeshCullBox[2] = -MeshDepth(NPCMasterMesh(NPCtype))
-			n\MasterMeshCullBox[3] = MeshWidth(NPCMasterMesh(NPCtype))*2
-			n\MasterMeshCullBox[4] = MeshHeight(NPCMasterMesh(NPCtype))*2
-			n\MasterMeshCullBox[5] = MeshDepth(NPCMasterMesh(NPCtype))*2
-			MeshCullBox(n\obj, n\MasterMeshCullBox[0], n\MasterMeshCullBox[1], n\MasterMeshCullBox[2], n\MasterMeshCullBox[3], n\MasterMeshCullBox[4], n\MasterMeshCullBox[5])
+			MeshCullBox (n\obj, -MeshWidth(GuardObj), -MeshHeight(GuardObj), -MeshDepth(GuardObj), MeshWidth(GuardObj)*2, MeshHeight(GuardObj)*2, MeshDepth(GuardObj)*2)
 			;[End Block]
 		Case NPCtypeMTF
 			;[Block]
@@ -181,27 +157,15 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;EntityRadius Collider, 0.15, 0.30
 			EntityType n\Collider, HIT_PLAYER
 			;EntityPickMode n\Collider, 1
-			
-			;n\obj = CopyEntity(MTFObj) ;LoadAnimMesh_Strict("GFX\npcs\mtf.b3d")
-			n\obj = CopyEntity(NPCMasterMesh(NPCtype))
-			n\UseMasterMeshSys = True
+			n\obj = CopyEntity(MTFObj) ;LoadAnimMesh_Strict("GFX\npcs\mtf.b3d")
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "MTF", "speed") / 100.0)
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "MTF", "scale") / 2.5)
-			For i = 0 To 2
-				n\MasterMeshScale[i] = temp
-			Next
+			
 			ScaleEntity n\obj, temp, temp, temp
 			
-			;MeshCullBox (n\obj, -MeshWidth(MTFObj), -MeshHeight(MTFObj), -MeshDepth(MTFObj), MeshWidth(MTFObj)*2, MeshHeight(MTFObj)*2, MeshDepth(MTFObj)*2)
-			n\MasterMeshCullBox[0] = -MeshWidth(NPCMasterMesh(NPCtype))
-			n\MasterMeshCullBox[1] = -MeshHeight(NPCMasterMesh(NPCtype))
-			n\MasterMeshCullBox[2] = -MeshDepth(NPCMasterMesh(NPCtype))
-			n\MasterMeshCullBox[3] = MeshWidth(NPCMasterMesh(NPCtype))*2
-			n\MasterMeshCullBox[4] = MeshHeight(NPCMasterMesh(NPCtype))*2
-			n\MasterMeshCullBox[5] = MeshDepth(NPCMasterMesh(NPCtype))*2
-			MeshCullBox(n\obj, n\MasterMeshCullBox[0], n\MasterMeshCullBox[1], n\MasterMeshCullBox[2], n\MasterMeshCullBox[3], n\MasterMeshCullBox[4], n\MasterMeshCullBox[5])
+			MeshCullBox (n\obj, -MeshWidth(MTFObj), -MeshHeight(MTFObj), -MeshDepth(MTFObj), MeshWidth(MTFObj)*2, MeshHeight(MTFObj)*2, MeshDepth(MTFObj)*2) 
 			
 			If MTFSFX(0)=0 Then
 				MTFSFX(0)=LoadSound_Strict("SFX\Character\MTF\ClassD1.ogg")
@@ -326,24 +290,13 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;Next
 			
 			If n\obj = 0 Then 
-				;n\obj = CopyEntity(NPC0492OBJ)
-				n\obj = CopyEntity(NPCMasterMesh(NPCtype))
-				n\UseMasterMeshSys = True
+				;n\obj = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
+				n\obj = CopyEntity(NPC0492OBJ)
 				
 				temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-049-2", "scale") / 2.5)
-				For i = 0 To 2
-					n\MasterMeshScale[i] = temp
-				Next
 				ScaleEntity n\obj, temp, temp, temp
 				
-				;MeshCullBox (n\obj, -MeshWidth(n\obj), -MeshHeight(n\obj), -MeshDepth(n\obj), MeshWidth(n\obj)*2, MeshHeight(n\obj)*2, MeshDepth(n\obj)*2)
-				n\MasterMeshCullBox[0] = -MeshWidth(NPCMasterMesh(NPCtype))
-				n\MasterMeshCullBox[1] = -MeshHeight(NPCMasterMesh(NPCtype))
-				n\MasterMeshCullBox[2] = -MeshDepth(NPCMasterMesh(NPCtype))
-				n\MasterMeshCullBox[3] = MeshWidth(NPCMasterMesh(NPCtype))*2
-				n\MasterMeshCullBox[4] = MeshHeight(NPCMasterMesh(NPCtype))*2
-				n\MasterMeshCullBox[5] = MeshDepth(NPCMasterMesh(NPCtype))*2
-				MeshCullBox(n\obj, n\MasterMeshCullBox[0], n\MasterMeshCullBox[1], n\MasterMeshCullBox[2], n\MasterMeshCullBox[3], n\MasterMeshCullBox[4], n\MasterMeshCullBox[5])
+				MeshCullBox (n\obj, -MeshWidth(n\obj), -MeshHeight(n\obj), -MeshDepth(n\obj), MeshWidth(n\obj)*2, MeshHeight(n\obj)*2, MeshDepth(n\obj)*2)
 			EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-049-2", "speed") / 100.0)
@@ -468,17 +421,15 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.3
 			EntityType n\Collider, HIT_PLAYER
-			;For n2.NPCs = Each NPCs
-			;	If n\NPCtype = n2\NPCtype And n<>n2 Then
-			;		n\obj = CopyEntity (n2\obj)
-			;		Exit
-			;	EndIf
-			;Next
+			For n2.NPCs = Each NPCs
+				If n\NPCtype = n2\NPCtype And n<>n2 Then
+					n\obj = CopyEntity (n2\obj)
+					Exit
+				EndIf
+			Next
 			
 			If n\obj = 0 Then 
-				;n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-939.b3d")
-				n\obj = CopyEntity(NPCMasterMesh(NPCtype))
-				n\UseMasterMeshSys = True
+				n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-939.b3d")
 				
 				;If BumpEnabled Then
 				;	bump1 = LoadTexture_Strict("GFX\npcs\scp-939_licker_normal.png")
@@ -509,9 +460,6 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 				;EndIf
 				
 				temp# = GetINIFloat("DATA\NPCs.ini", "SCP-939", "scale")/2.5
-				For i = 0 To 2
-					n\MasterMeshScale[i] = temp
-				Next
 				ScaleEntity n\obj, temp, temp, temp		
 			EndIf
 			
@@ -549,29 +497,22 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider,0.2
 			
-			;For n2.NPCs = Each NPCs
-			;	If (n\NPCtype = n2\NPCtype) And (n<>n2) Then
-			;		n\obj = CopyEntity (n2\obj)
-			;		Exit
-			;	EndIf
-			;Next
-			;
-			;If n\obj = 0 Then 
-			;	n\obj = LoadAnimMesh_Strict("GFX\npcs\npc178.b3d")
-			;EndIf
+			For n2.NPCs = Each NPCs
+				If (n\NPCtype = n2\NPCtype) And (n<>n2) Then
+					n\obj = CopyEntity (n2\obj)
+					Exit
+				EndIf
+			Next
 			
-			n\obj = CopyEntity(NPCMasterMesh(NPCtype))
-			n\UseMasterMeshSys = True
+			If n\obj = 0 Then 
+				n\obj = LoadAnimMesh_Strict("GFX\npcs\npc178.b3d")
+			EndIf
 			
 			temp# = Rnd(0.09,0.125)
 			
-			n\MasterMeshFX = 1
 			EntityFX n\obj,1
 			
 			temp# = Rnd(0.6,0.8) / MeshWidth(n\obj)
-			For i = 0 To 2
-				n\MasterMeshScale[i] = temp
-			Next
 			ScaleEntity n\obj, temp, temp, temp
 			
 			;EntityColor n\obj,Rnd(0,50),0,Rnd(50,100)
@@ -593,27 +534,20 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider,0.2
 			
-			;For n2.NPCs = Each NPCs
-			;	If (n\NPCtype = n2\NPCtype) And (n<>n2) Then
-			;		n\obj = CopyEntity (n2\obj)
-			;		Exit
-			;	EndIf
-			;Next
-			;
-			;If n\obj = 0 Then 
-			;	n\obj = LoadAnimMesh_Strict("GFX\npcs\scp-966.b3d")
-			;EndIf
+			For n2.NPCs = Each NPCs
+				If (n\NPCtype = n2\NPCtype) And (n<>n2) Then
+					n\obj = CopyEntity (n2\obj)
+					Exit
+				EndIf
+			Next
 			
-			n\obj = CopyEntity(NPCMasterMesh(NPCtype))
-			n\UseMasterMeshSys = True
+			If n\obj = 0 Then 
+				n\obj = LoadAnimMesh_Strict("GFX\npcs\scp-966.b3d")
+			EndIf
 			
-			n\MasterMeshFX = 1
 			EntityFX n\obj,1
 			
 			temp# = GetINIFloat("DATA\NPCs.ini", "SCP-966", "scale")/40.0
-			For i = 0 To 2
-				n\MasterMeshScale[i] = temp
-			Next
 			ScaleEntity n\obj, temp, temp, temp		
 			
 			;EntityColor n\obj,Rnd(0,50),0,Rnd(50,100)
@@ -1670,6 +1604,8 @@ Function UpdateNPCs()
 								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider)
 								PlayerSeeAble% = MeNPCSeesPlayer(n)
 								If PlayerSeeAble%=True Or n\State2>0 ;Player is visible for 049's sight - attacking
+									GiveAchievement(Achv049)
+									
 									;Playing a sound after detecting the player
 									If n\PrevState < 1 And ChannelPlaying(n\SoundChn2)=False
 										If n\Sound2 <> 0 Then FreeSound_Strict(n\Sound2)
@@ -3943,16 +3879,14 @@ Function UpdateNPCs()
 					If n\State<=0 Then
 						;nothing happens here...
 					Else
-						If n\MasterMeshState=0 Then EntityAlpha n\obj,0.0
+						EntityAlpha n\obj,0.0
 						n\State=Max(n\State-FPSfactor,0.0)
 					EndIf
 				Else
-					If n\MasterMeshState=0
-						If n\State3=0.0 Then
-							EntityAlpha n\obj,0.5+(Float(Rand(0,1))/2.0)
-						Else
-							EntityAlpha n\obj,0.5+(Sin(n\Frame*6.0)/2.0)
-						EndIf
+					If n\State3=0.0 Then
+						EntityAlpha n\obj,0.5+(Float(Rand(0,1))/2.0)
+					Else
+						EntityAlpha n\obj,0.5+(Sin(n\Frame*6.0)/2.0)
 					EndIf
 				EndIf
 				
@@ -4830,8 +4764,6 @@ Function UpdateNPCs()
 		CatchErrors(Chr(34)+n\NVName+Chr(34)+" NPC")
 		
 	Next
-	
-	If EnableNPCMasterMeshSystem Then UpdateNPCMasterMesh(Camera)
 	
 End Function
 
@@ -6842,7 +6774,7 @@ Function ManipulateNPCBones()
 	Local pitchoffset#,yawoffset#,rolloffset#
 	
 	For n = Each NPCs
-		If n\ManipulateBone And ((Not n\UseMasterMeshSys) Or n\MasterMeshState=0)
+		If n\ManipulateBone
 			pitchvalue# = 0
 			yawvalue# = 0
 			rollvalue# = 0
@@ -7180,38 +7112,6 @@ Function ChangeNPCTextureID(n.NPCs,textureid%)
 	
 End Function
 
-Function UpdateNPCMasterMesh(cam%)
-	Local n.NPCs
-	
-	For n = Each NPCs
-		If n\UseMasterMeshSys
-			If n\MasterMeshState=0
-				If (Not EntityInView(n\obj,cam))
-					FreeEntity n\obj : n\obj = 0
-					n\obj = CreatePivot()
-					n\MasterMeshState=1
-					;DebugLog "Hide mesh for NPC: "+n\NPCtype
-				EndIf
-			Else
-				If EntityInView(n\obj,cam) Or Abs(DeltaYaw(cam,n\obj))<60.0
-					FreeEntity n\obj : n\obj = 0
-					n\obj = CopyEntity(NPCMasterMesh(n\NPCtype))
-					If n\MasterMeshFX <> 0
-						EntityFX n\obj,n\MasterMeshFX
-					EndIf
-					If n\MasterMeshCullBox[0]<>0
-						MeshCullBox(n\obj,n\MasterMeshCullBox[0],n\MasterMeshCullBox[1],n\MasterMeshCullBox[2],n\MasterMeshCullBox[3],n\MasterMeshCullBox[4],n\MasterMeshCullBox[5])
-					EndIf
-					ScaleEntity n\obj,n\MasterMeshScale[0],n\MasterMeshScale[1],n\MasterMeshScale[2]
-					SetAnimTime n\obj,n\Frame
-					n\MasterMeshState=0
-					;DebugLog "Show mesh for NPC: "+n\NPCtype
-				EndIf
-			EndIf
-		EndIf
-	Next
-	
-End Function
 
 
 

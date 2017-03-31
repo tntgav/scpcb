@@ -5313,9 +5313,6 @@ Function UpdateEvents()
 											;EndIf
 										EndIf
 									EndIf
-									If EntityVisible(Collider,e\room\NPC[0]\Collider)
-										GiveAchievement(Achv049)
-									EndIf
 								EndIf
 							EndIf
 							
