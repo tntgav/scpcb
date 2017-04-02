@@ -10939,7 +10939,7 @@ Function CatchErrors(location$)
 			WriteLine errF,"Total video memory (MB): "+TotalVidMem()/1024/1024
 			WriteLine errF,"Available video memory (MB): "+AvailVidMem()/1024/1024
 			GlobalMemoryStatus m.MEMORYSTATUS
-			WriteLine errF,"Global memrory status: "+(m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
+			WriteLine errF,"Global memory status: "+(m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
 			WriteLine errF,"Triangles rendered: "+CurrTrisAmount
 			WriteLine errF,"Active textures: "+ActiveTextures()
 			WriteLine errF,""
