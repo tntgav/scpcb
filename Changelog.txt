@@ -32,6 +32,7 @@ Bug Fixes:
 - Fixed game sounds still playing after quitting an in-game session.
 - Reduced the amount of lag in the surveilance room.
 - Fixed the MenuBreath sound not playing properly by going back to the menu after the ending screen.
+- Fixed an hitbox error in the Gate-A area.
 
 ----------------------------------------------------------------------------------
 

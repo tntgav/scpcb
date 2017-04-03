@@ -1984,7 +1984,12 @@ Function FillRoom(r.Rooms)
 			;EntityFX(r\Objects[14],1)
 			
 			r\Objects[15]=CreatePivot(r\obj)
-			PositionEntity(r\Objects[15], r\x-3568.0*RoomScale, -1089.0*RoomScale, r\z+4944.0*RoomScale, True)	
+			PositionEntity(r\Objects[15], r\x-3568.0*RoomScale, -1089.0*RoomScale, r\z+4944.0*RoomScale, True)
+			
+			r\Objects[16] = LoadMesh_Strict("GFX\map\gatea_hitbox1.b3d",r\obj)
+			EntityPickMode r\Objects[16],2
+			EntityType r\Objects[16],HIT_MAP
+			EntityAlpha r\Objects[16],0.0
 			
 			;[End Block]
 		Case "gateaentrance"
