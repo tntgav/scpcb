@@ -5,6 +5,9 @@
 - Revamped SCP-066's texture.
 - Added █████ █████ █████ event to SCP-860-1.
 - Restricted the ability to use ":", "/", "\" and "." characters in a save file name to prevent file system issues.
+- Added an UNDERTOW GAMES startup video.
+- Changed the values of the frameimiter to 20-120 FPS.
+- Revamped the SCP-914 key card refinery system.
 
 Bug Fixes:
 - Fixed a bug that caused the camera fog value to remain increased after reloading a save file with the night vision goggles equipped.
@@ -23,10 +26,13 @@ Bug Fixes:
 - Fixed the glass in room2testroom2 not appearing after the game was reloaded to a point before it was broken.
 - Fixed SCP-205's event breaking after reloading a save.
 - Fixed SCP-895's event throwing errors after the player dies to it.
-- Fixed issues relating to teleporting entities and items inside elevators.
+- Fixed issues relating to teleporting entities and items inside elevators (including the player).
 - Removed "bb_fmod.dll" which caused "user lib not found" runtime errors.
 - Fixed SCP-860-1's alert theme not triggering when the player is not looking in the direction of the forest monster.
 - Fixed game sounds still playing after quitting an in-game session.
+- Reduced the amount of lag in the surveilance room.
+- Fixed the MenuBreath sound not playing properly by going back to the menu after the ending screen.
+- Fixed an hitbox error in the Gate-A area.
 
 ----------------------------------------------------------------------------------
 

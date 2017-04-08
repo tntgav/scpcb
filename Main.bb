@@ -3341,7 +3341,8 @@ Function QuickLoadEvents()
 											sc\IsRoom2slCam = True
 											sc\Room2slTexs%[0] = CreateTexture(128, 128, 1+256)
 											EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
-											sc\RenderInterval = 24
+											sc\RenderInterval = 666
+											sc\turn = 0
 											
 											pvt% = CreatePivot(e\room\obj)
 											Select r\RoomTemplate\Name$
@@ -3388,6 +3389,7 @@ Function QuickLoadEvents()
 													EntityParent(sc\ScrObj, e\room\obj)
 													TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
 													sc\Room2slID = 5
+													sc\RenderInterval = 12
 													FreeEntity sc\Cam
 													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
 													DebugLog "Created Monitor for "+Chr(34)+"checkpoint1"+Chr(34)
@@ -9043,7 +9045,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 										Else
 											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 										EndIf
-									 Case HARD
+									Case HARD
 										If Rand(3)=1 Then
 											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 										Else
@@ -9085,7 +9087,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
-									 Case HARD
+									Case HARD
 										If Rand(60)=1 Then
 											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
 										Else
@@ -9106,7 +9108,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
-									 Case HARD
+									Case HARD
 										If Rand(4)=1 Then
 											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
 										Else
@@ -9114,30 +9116,21 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 										EndIf
 								End Select
 							Case "Level 5 Key Card"	
-								Local CurrAchvAmount%=0
-								For i = 0 To MAXACHIEVEMENTS-1
-									If Achievements(i)=True
-										CurrAchvAmount=CurrAchvAmount+1
-									EndIf
-								Next
-								
-								DebugLog CurrAchvAmount
-								
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*5))=0
-											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-										Else
+										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(0,((MAXACHIEVEMENTS-1)*7)-((CurrAchvAmount-1)*5))=0
+										If Rand(3)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf
+										EndIf										
 									Case HARD
-										If Rand(0,((MAXACHIEVEMENTS-1)*10)-((CurrAchvAmount-1)*5))=0
+										If Rand(4)=1 Then
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -9146,7 +9139,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						End Select
 					EndIf
 				Case "very fine"
-					CurrAchvAmount%=0
+					Local CurrAchvAmount%=0
 					For i = 0 To MAXACHIEVEMENTS-1
 						If Achievements(i)=True
 							CurrAchvAmount=CurrAchvAmount+1
@@ -9157,19 +9150,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*5))=0
+							If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case NORMAL
-							If Rand(0,((MAXACHIEVEMENTS-1)*7)-((CurrAchvAmount-1)*5))=0
+							If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
 							EndIf
 						Case HARD
-							If Rand(0,((MAXACHIEVEMENTS-1)*10)-((CurrAchvAmount-1)*5))=0
+							If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 							Else
 								it2 = CreateItem("Mastercard", "misc", x, y, z)
@@ -10946,7 +10939,7 @@ Function CatchErrors(location$)
 			WriteLine errF,"Total video memory (MB): "+TotalVidMem()/1024/1024
 			WriteLine errF,"Available video memory (MB): "+AvailVidMem()/1024/1024
 			GlobalMemoryStatus m.MEMORYSTATUS
-			WriteLine errF,"Global memrory status: "+(m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
+			WriteLine errF,"Global memory status: "+(m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
 			WriteLine errF,"Triangles rendered: "+CurrTrisAmount
 			WriteLine errF,"Active textures: "+ActiveTextures()
 			WriteLine errF,""

@@ -1984,7 +1984,12 @@ Function FillRoom(r.Rooms)
 			;EntityFX(r\Objects[14],1)
 			
 			r\Objects[15]=CreatePivot(r\obj)
-			PositionEntity(r\Objects[15], r\x-3568.0*RoomScale, -1089.0*RoomScale, r\z+4944.0*RoomScale, True)	
+			PositionEntity(r\Objects[15], r\x-3568.0*RoomScale, -1089.0*RoomScale, r\z+4944.0*RoomScale, True)
+			
+			r\Objects[16] = LoadMesh_Strict("GFX\map\gatea_hitbox1.b3d",r\obj)
+			EntityPickMode r\Objects[16],2
+			EntityType r\Objects[16],HIT_MAP
+			EntityAlpha r\Objects[16],0.0
 			
 			;[End Block]
 		Case "gateaentrance"
@@ -5822,11 +5827,11 @@ Function UpdateSecurityCams()
 							MoveEntity(sc\Cam, 0, 0, 0.1)
 						EndIf
 					Else
-						If sc\Room2slID = CurrRoom2slRenderCam
+						;If sc\Room2slID = CurrRoom2slRenderCam
 							PositionEntity(Room2slCam, EntityX(sc\CameraObj, True), EntityY(sc\CameraObj, True), EntityZ(sc\CameraObj, True))
 							RotateEntity(Room2slCam, EntityPitch(sc\CameraObj), EntityYaw(sc\CameraObj), 0)
 							MoveEntity(Room2slCam, 0, 0, 0.1)
-						EndIf
+						;EndIf
 					EndIf
 					
 					If sc<>CoffinCam
@@ -5841,7 +5846,9 @@ Function UpdateSecurityCams()
 			
 			If close = True Or sc\IsRoom2slCam Or sc\SpecialCam Then
 				If sc\Screen Then
-					sc\State = sc\State+FPSfactor
+					If sc\RenderInterval<>666
+						sc\State = sc\State+FPSfactor
+					EndIf
 					
 					If sc\InSight And sc\AllowSaving Then 
 						If SelectedDifficulty\saveType = SAVEONSCREENS And EntityDistance(Camera, sc\ScrObj)<1.0 Then
@@ -5873,9 +5880,10 @@ Function UpdateSecurityCams()
 						EndIf
 					EndIf
 					
-					If sc\State >= sc\RenderInterval And ((Not sc\IsRoom2slCam) Or sc\Room2slID=CurrRoom2slRenderCam) Then
+					;If ((sc\State >= sc\RenderInterval And ((Not sc\IsRoom2slCam) Or sc\Room2slID=CurrRoom2slRenderCam))) Or sc\RenderInterval=666 Then
+					If (sc\State >= sc\RenderInterval) Or sc\RenderInterval=666
 						sc\InSight = False
-						If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) Then
+						If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) And sc\RenderInterval<>667 Then
 							If (Not sc\IsRoom2slCam)
 								If EntityVisible(Camera,sc\ScrObj) Then
 									sc\InSight = True
@@ -5943,6 +5951,10 @@ Function UpdateSecurityCams()
 							Else
 								sc\InSight = True
 								
+								PositionEntity(Room2slCam, EntityX(sc\CameraObj, True), EntityY(sc\CameraObj, True), EntityZ(sc\CameraObj, True))
+								RotateEntity(Room2slCam, EntityPitch(sc\CameraObj), EntityYaw(sc\CameraObj), 0)
+								MoveEntity(Room2slCam, 0, 0, 0.1)
+								
 								HideEntity(Camera)
 								ShowEntity (sc\room\obj)
 								EntityAlpha(GetChild(sc\room\obj,2),1)
@@ -5959,15 +5971,16 @@ Function UpdateSecurityCams()
 								
 								CopyRect(0,0,128,128,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
 								
+								If sc\RenderInterval=666 Then sc\RenderInterval=667
 							EndIf
 						EndIf
 						sc\State = 0
-						If CurrRoom2slRenderCam >= 10
-							CurrRoom2slRenderCam = 0
-						Else
-							CurrRoom2slRenderCam = CurrRoom2slRenderCam + 1
-						EndIf
-					End If
+						;If CurrRoom2slRenderCam >= 10
+						;	CurrRoom2slRenderCam = 0
+						;Else
+						;	CurrRoom2slRenderCam = CurrRoom2slRenderCam + 1
+						;EndIf
+					EndIf
 					
 					If SelectedMonitor = sc Or ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714)) Then
 						If sc\InSight Then
