@@ -6,8 +6,9 @@
 - Added █████ █████ █████ event to SCP-860-1.
 - Restricted the ability to use ":", "/", "\" and "." characters in a save file name to prevent file system issues.
 - Added an UNDERTOW GAMES startup video.
-- Changed the values of the frameimiter to 20-120 FPS.
+- Changed the values of the framelimiter to 20-120 FPS.
 - Revamped the SCP-914 key card refinery system.
+- SCP-079's speech and the sounds for SCP-096 now get streamed using the FMOD library.
 
 Bug Fixes:
 - Fixed a bug that caused the camera fog value to remain increased after reloading a save file with the night vision goggles equipped.
@@ -33,6 +34,7 @@ Bug Fixes:
 - Reduced the amount of lag in the surveilance room.
 - Fixed the MenuBreath sound not playing properly by going back to the menu after the ending screen.
 - Fixed an hitbox error in the Gate-A area.
+- Fixed the head rotation for the MTF units when looking away from SCP-096.
 
 ----------------------------------------------------------------------------------
 

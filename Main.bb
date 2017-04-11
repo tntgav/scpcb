@@ -942,6 +942,10 @@ Function UpdateConsole()
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
 							n\State = 0
+							StopStream_Strict(n\SoundChn) : n\SoundChn=0
+							If n\SoundChn2<>0
+								StopStream_Strict(n\SoundChn2) : n\SoundChn2=0
+							EndIf
 							Exit
 						EndIf
 					Next
@@ -8492,10 +8496,22 @@ Function PauseSounds()
 	
 	For n.npcs = Each NPCs
 		If n\soundchn <> 0 Then
-			If ChannelPlaying(n\soundchn) Then PauseChannel(n\soundchn)
+			If (Not n\soundchn_isstream)
+				If ChannelPlaying(n\soundchn) Then PauseChannel(n\soundchn)
+			Else
+				If n\soundchn_isstream=True
+					SetStreamPaused_Strict(n\soundchn,True)
+				EndIf
+			EndIf
 		EndIf
 		If n\soundchn2 <> 0 Then
-			If ChannelPlaying(n\soundchn2) Then PauseChannel(n\soundchn2)
+			If (Not n\soundchn2_isstream)
+				If ChannelPlaying(n\soundchn2) Then PauseChannel(n\soundchn2)
+			Else
+				If n\soundchn2_isstream=True
+					SetStreamPaused_Strict(n\soundchn2,True)
+				EndIf
+			EndIf
 		EndIf
 	Next	
 	
@@ -8544,10 +8560,22 @@ Function ResumeSounds()
 	
 	For n.npcs = Each NPCs
 		If n\soundchn <> 0 Then
-			If ChannelPlaying(n\soundchn) Then ResumeChannel(n\soundchn)
+			If (Not n\soundchn_isstream)
+				If ChannelPlaying(n\soundchn) Then ResumeChannel(n\soundchn)
+			Else
+				If n\soundchn_isstream=True
+					SetStreamPaused_Strict(n\soundchn,False)
+				EndIf
+			EndIf
 		EndIf
 		If n\soundchn2 <> 0 Then
-			If ChannelPlaying(n\soundchn2) Then ResumeChannel(n\soundchn2)
+			If (Not n\soundchn2_isstream)
+				If ChannelPlaying(n\soundchn2) Then ResumeChannel(n\soundchn2)
+			Else
+				If n\soundchn2_isstream=True
+					SetStreamPaused_Strict(n\soundchn2,False)
+				EndIf
+			EndIf
 		EndIf
 	Next	
 	
@@ -8600,10 +8628,18 @@ Function KillSounds()
 	Next
 	For n.NPCs = Each NPCs
 		If n\SoundChn <> 0 Then
-			If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
+			If (Not n\SoundChn_IsStream)
+				If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
+			Else
+				StopStream_Strict(n\SoundChn)
+			EndIf
 		EndIf
 		If n\SoundChn2 <> 0 Then
-			If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
+			If (Not n\SoundChn2_IsStream)
+				If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
+			Else
+				StopStream_Strict(n\SoundChn2)
+			EndIf
 		EndIf
 	Next	
 	For d.Doors = Each Doors
