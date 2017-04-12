@@ -5477,7 +5477,7 @@ Function UpdateEvents()
 						PositionEntity pvt%,EntityX(e\room\NPC[1]\Collider),EntityY(e\room\NPC[1]\Collider)+0.2,EntityZ(e\room\NPC[1]\Collider)
 						
 						PointEntity Collider, e\room\NPC[1]\Collider
-						PointEntity Camera, pvt%
+						PointEntity Camera, pvt%,EntityRoll(Camera)
 						
 						FreeEntity pvt%
 						

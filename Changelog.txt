@@ -35,6 +35,8 @@ Bug Fixes:
 - Fixed the MenuBreath sound not playing properly by going back to the menu after the ending screen.
 - Fixed an hitbox error in the Gate-A area.
 - Fixed the head rotation for the MTF units when looking away from SCP-096.
+- Fixed a bug that allowed the player to travel to the SCP-1499 dimension while being a zombie.
+- Fixed the player being able to get teleported to the SCP-008 cutscene location when being infected and being in the dimension.
 
 ----------------------------------------------------------------------------------
 
