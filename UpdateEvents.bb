@@ -4824,10 +4824,11 @@ Function UpdateEvents()
 					;eventstate3 = has the player opened the gas valves (0=no, 0<x<35*70 yes, x>35*70 the host has died)
 					
 					If e\EventState = 0 Then
-						If EntityDistance(Collider, e\room\Objects[3])<2 Then 
+						If EntityDistance(Collider, e\room\Objects[3])<2 Then
 							n.NPCs = CreateNPC(NPCtypeD, EntityX(e\room\Objects[4],True),0.5,EntityZ(e\room\Objects[4],True))
 							
 							n\texture = "GFX\NPCs\035victim.jpg"
+							n\Model = "GFX\NPCs\035.b3d"
 							HideEntity n\obj	
 							
 							SetAnimTime(n\obj, 501)
@@ -4847,12 +4848,13 @@ Function UpdateEvents()
 									temp = e\room\NPC[0]\Frame
 									
 									FreeEntity e\room\NPC[0]\obj
-									e\room\NPC[0]\obj = LoadAnimMesh_Strict("GFX\NPCs\035.b3d")									
+									e\room\NPC[0]\obj = LoadAnimMesh_Strict("GFX\NPCs\035.b3d")
 									x = 0.5 / MeshWidth(e\room\NPC[0]\obj)
+									e\room\NPC[0]\ModelScaleX = x
+									e\room\NPC[0]\ModelScaleY = x
+									e\room\NPC[0]\ModelScaleZ = x
 									ScaleEntity e\room\NPC[0]\obj, x,x,x
-									
 									SetAnimTime(e\room\NPC[0]\obj, temp)
-									
 									ShowEntity e\room\NPC[0]\obj
 									
 									RotateEntity n\Collider, 0, e\room\angle+270, 0, True

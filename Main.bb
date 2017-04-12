@@ -11147,30 +11147,17 @@ Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False,pickr
 	
 End Function
 
-Global Startup_Video_Loop = 0
-Global Startup_Video_File = 0
-Global Startup_Video_Audio = 0
-
 Function PlayStartupVideos()
 	
 	If GetINIInt("options.ini","options","play startup video")=0 Then Return
-	Startup_Video_Loop = 1
-	Startup_Video_File = OpenMovie("GFX\menu\startup.avi")
+	Local SplashScreenVideo = OpenMovie("GFX\menu\startup.avi")
 	FlushKeys()
 	Repeat
 		Cls
-		If MoviePlaying(Startup_Video_File)
-			DrawMovie Startup_Video_File,0,0,GraphicWidth,GraphicHeight
-			If GetKey()
-				Startup_Video_Loop = 2
-			EndIf
-		Else
-			Startup_Video_Loop = 2
-		EndIf
+		DrawMovie SplashScreenVideo,0,0,GraphicWidth,GraphicHeight
 		Flip
-	Until Startup_Video_Loop=2
-	Startup_Video_Loop = 2
-	CloseMovie Startup_Video_File
+	Until ((Not MoviePlaying(SplashScreenVideo)) Or GetKey())
+	CloseMovie SplashScreenVideo
 	Cls
 	
 End Function
