@@ -8,6 +8,7 @@
 - Added an Undertow Games startup video.
 - Changed the range of the framelimiter to 20-120 FPS.
 - Revamped the SCP-914 key card refinery system.
+- SCP-079's speech and the sounds for SCP-096 now get streamed using the FMOD library.
 
 Bug Fixes:
 - Fixed a bug that caused the camera fog value to remain increased after reloading a save file with the night vision goggles equipped.
@@ -33,6 +34,9 @@ Bug Fixes:
 - Optimized surveillance room monitors.
 - Fixed the MenuBreath sound not playing when returning the menu after the ending screen.
 - Fixed a hitbox error in the Gate A area.
+- Fixed the head rotation of the MTF units when looking away from SCP-096.
+- Fixed a bug that allowed the player to travel to the SCP-1499 dimension while under the effect of SCP-008.
+- The SCP-008 cutscene won't be played if the player is in the SCP-1499 dimension.
 
 ----------------------------------------------------------------------------------
 
