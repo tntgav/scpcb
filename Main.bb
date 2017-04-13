@@ -9827,8 +9827,7 @@ Function UpdateInfect()
 			Else
 				Kill()
 				BlinkTimer = Max(Min(-10*(Infect-96),BlinkTimer),-10)
-				DeathMSG = "Subject D-9341 found ingesting Dr. [REDACTED] at Sector [REDACTED]. Subject was immediately terminated by Nine-Tailed Fox and sent for autopsy. "
-				DeathMSG = DeathMSG + "SCP-008 infection was confirmed, after which the body was incinerated."
+				DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate repots of a violent attack to a church in the Russian town of [REDACTED]."
 			EndIf
 		EndIf
 		
