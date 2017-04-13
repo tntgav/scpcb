@@ -3669,10 +3669,6 @@ Function QuickLoadEvents()
 						QuickLoadPercent = 50
 						e\EventStr = "load0"
 					ElseIf e\EventStr = "load0"
-						CreateNPC(NPCtype966, EntityX(e\room\Objects[1],True), EntityY(e\room\Objects[1],True), EntityZ(e\room\Objects[1],True))
-						QuickLoadPercent = 70
-						e\EventStr = "load1"
-					ElseIf e\EventStr = "load1"
 						CreateNPC(NPCtype966, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True), EntityZ(e\room\Objects[2],True))
 						QuickLoadPercent = 100
 						e\EventState=2

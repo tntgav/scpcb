@@ -3623,7 +3623,7 @@ Function UpdateEvents()
 								Curr106\PrevY = EntityY(Collider)
 							EndIf
 							
-							For i = 0 To 4
+							For i = 0 To 1
 								Local spawnPoint.WayPoints = Null
 								For x = i*((gridsz*gridsz)/5.0) To (gridsz*gridsz-1)
 									DebugLog("spawn 966 X: "+x)
