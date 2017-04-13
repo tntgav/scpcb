@@ -9,6 +9,8 @@
 - Changed the range of the framelimiter to 20-120 FPS.
 - Revamped the SCP-914 key card refinery system.
 - SCP-079's speech and the sounds for SCP-096 now get streamed using the FMOD library.
+- Decreased Fog value from 8 to 6.
+- Increased SCP-106's speed from 1.0 to 1.2.
 
 Bug Fixes:
 - Fixed a bug that caused the camera fog value to remain increased after reloading a save file with the night vision goggles equipped.
