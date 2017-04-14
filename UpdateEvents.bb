@@ -5384,7 +5384,8 @@ Function UpdateEvents()
 				EndIf 
 				
 				If e\EventState < 0 Then
-					If e\EventState > -70*4 Then 
+					If e\EventState > -70*4 Then
+						Infect = 0
 						If FallTimer => 0 Then 
 							FallTimer = Min(-1, FallTimer)
 							PositionEntity(Head, EntityX(Camera, True), EntityY(Camera, True), EntityZ(Camera, True), True)
@@ -5455,6 +5456,7 @@ Function UpdateEvents()
 						ForceMove = 0.5
 						Injuries = Max(2.0,Injuries)
 						Bloodloss = 0
+						Infect = 0
 						
 						;Msg = ""
 						
