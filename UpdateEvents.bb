@@ -5384,7 +5384,8 @@ Function UpdateEvents()
 				EndIf 
 				
 				If e\EventState < 0 Then
-					If e\EventState > -70*4 Then 
+					If e\EventState > -70*4 Then
+						Infect = 0
 						If FallTimer => 0 Then 
 							FallTimer = Min(-1, FallTimer)
 							PositionEntity(Head, EntityX(Camera, True), EntityY(Camera, True), EntityZ(Camera, True), True)
@@ -5455,6 +5456,7 @@ Function UpdateEvents()
 						ForceMove = 0.5
 						Injuries = Max(2.0,Injuries)
 						Bloodloss = 0
+						Infect = 0
 						
 						;Msg = ""
 						
@@ -6691,7 +6693,7 @@ Function UpdateEvents()
 									
 									If (Not WearingHazmat) Then 
 										Injuries=Injuries+0.1
-										Infect=1
+										If Infect=0 Then Infect=1
 										Msg = "The window shattered and a piece of glass cut your arm."
 										MsgTimer = 70*8
 									EndIf
@@ -6706,9 +6708,17 @@ Function UpdateEvents()
 								If EntityInView(e\room\Objects[0], Camera) Then
 									DrawHandIcon = True
 									
-									If MouseDown1 Then 
+									If MouseDown1 Then
+										DrawArrowIcon(2) = True
 										RotateEntity(e\room\Objects[1], Max(Min(EntityPitch(e\room\Objects[1])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Objects[1]), 0)
 									EndIf
+								EndIf
+							EndIf
+							
+							If (Not WearingHazmat) And Bloodloss>0.0
+								If Infect=0
+									Infect=1
+									DebugLog "Infected player"
 								EndIf
 							EndIf
 						EndIf

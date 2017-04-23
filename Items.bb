@@ -281,7 +281,7 @@ Function InitItemTemplates()
 	
 	it = CreateItemTemplate("Night Vision Goggles", "supernv", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.02) : it\sound = 2
 	it = CreateItemTemplate("Night Vision Goggles", "nvgoggles", "GFX\items\NVG.b3d", "GFX\items\INVnightvision.jpg", "", 0.02) : it\sound = 2
-	it = CreateItemTemplate("Night Vision Goggles", "veryfinenvgoggles", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02) : it\sound = 2
+	it = CreateItemTemplate("Night Vision Goggles", "finenvgoggles", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02) : it\sound = 2
 	
 	it = CreateItemTemplate("Syringe", "syringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005) : it\sound = 2
 	it = CreateItemTemplate("Syringe", "finesyringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005) : it\sound = 2
@@ -678,7 +678,7 @@ Function DropItem(item.Items)
 			If WearingNightVision = 1 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
 		Case "supernv"
 			If WearingNightVision = 2 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
-		Case "veryfinenvgoggles"
+		Case "finenvgoggles"
 			If WearingNightVision = 3 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
 		Case "scp714"
 			Wearing714 = False
