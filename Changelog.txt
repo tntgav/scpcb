@@ -11,6 +11,7 @@
 - SCP-079's speech and the sounds for SCP-096 now get streamed using the FMOD library.
 - Decreased Fog value from 8 to 6.
 - Increased SCP-106's speed from 1.0 to 1.2.
+- Fixed the non-canon number of SCP-966 instances.
 
 Bug Fixes:
 - Fixed a bug that caused the camera fog value to remain increased after reloading a save file with the night vision goggles equipped.
