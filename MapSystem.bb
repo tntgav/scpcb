@@ -2168,6 +2168,10 @@ Function FillRoom(r.Rooms)
 			de\Size = 0.5
 			ScaleSprite(de\obj, de\Size,de\Size)
 			EntityParent de\obj, r\obj
+			
+			it = CreateItem("Level 5 Key Card", "key5", r\x + 644.0 * RoomScale, r\y - 312.0 * RoomScale, r\z + 493.0 * RoomScale)
+			RotateEntity it\collider, 0, Rand(5,65), 0
+			EntityParent(it\collider, r\obj)
 			;[End Block]
 		Case "checkpoint1"
 			;[Block]
