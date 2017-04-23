@@ -1,9 +1,22 @@
-﻿v1.3.7
+﻿v1.3.8
+
+- Added a level 5 key card in SCP-079's chamber.
+- The barrel in SCP-008's chamber now shows an arrow pointing down if you click on it.
+- The player gets infected by SCP-008 if he is coming close to SCP-008's barrel when bleeding and when not wearing the hazmat suit.
+- Swapped the SCP-914 outcomes for the Night Vision Goggles on "Fine" and "Very Fine".
+
+Bug fixes:
+- Fixed a MAV that occured when quick-loading a save file.
+- The SCP-008 cutscene won't play if the player turns into a SCP-049-2 instance after getting killed by SCP-049.
+
+----------------------------------------------------------------------------------
+
+v1.3.7
 
 - New animations for the SCP-008-1 infected human.
 - Changed the room where the player appears when leaving the pocket dimension.
 - Revamped SCP-066's texture.
-- Added █████ █████ █████ event to SCP-860-1.
+- Added [REDACTED] event to SCP-860-1.
 - Restricted the ability to use ":", "/", "\" and "." characters in a save file name to prevent file system issues.
 - Added an Undertow Games startup video.
 - Changed the range of the framelimiter to 20-120 FPS.
@@ -11,7 +24,6 @@
 - SCP-079's speech and the sounds for SCP-096 now get streamed using the FMOD library.
 - Decreased Fog value from 8 to 6.
 - Increased SCP-106's speed from 1.0 to 1.2.
-- Fixed the non-canon number of SCP-966 instances.
 
 Bug Fixes:
 - Fixed a bug that caused the camera fog value to remain increased after reloading a save file with the night vision goggles equipped.
@@ -41,6 +53,7 @@ Bug Fixes:
 - Fixed the head rotation of the MTF units when looking away from SCP-096.
 - Fixed a bug that allowed the player to travel to the SCP-1499 dimension while under the effect of SCP-008.
 - The SCP-008 cutscene won't be played if the player is in the SCP-1499 dimension.
+- Fixed the non-canon number of SCP-966 instances.
 
 ----------------------------------------------------------------------------------
 
