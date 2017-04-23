@@ -5176,7 +5176,7 @@ Function DrawGUI()
 						If Wearing1499=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "super1499"
 						If Wearing1499=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "veryfinenvgoggles"
+					Case "finenvgoggles"
 						If WearingNightVision=3 Then Rect(x - 3, y - 3, width + 6, height + 6)
 				End Select
 			EndIf
@@ -5436,7 +5436,7 @@ Function DrawGUI()
 					SelectedItem = Null	
 					
 					;[End Block]
-				Case "veryfinenvgoggles"
+				Case "finenvgoggles"
 					;[Block]
 					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
 					If WearingNightVision = 3 Then
@@ -8982,10 +8982,11 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					PositionEntity(item\collider, x, y, z)
 					ResetEntity(item\collider)
 				Case "fine"
-					it2 = CreateItem("Night Vision Goggles", "supernv", x, y, z)
+					it2 = CreateItem("Night Vision Goggles", "finenvgoggles", x, y, z)
 					RemoveItem(item)
 				Case "very fine"
-					it2 = CreateItem("Night Vision Goggles", "veryfinenvgoggles", x, y, z)
+					it2 = CreateItem("Night Vision Goggles", "supernv", x, y, z)
+					it2\state = 1000
 					RemoveItem(item)
 			End Select
 		Case "Metal Panel", "SCP-148 Ingot"
