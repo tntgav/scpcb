@@ -3988,17 +3988,25 @@ Function MovePlayer()
 		If StaminaEffect <> 1.0 Then StaminaEffect = 1.0
 	EndIf
 	
+	Local temp#
+	
 	If PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then 
 		If KeyDown(KEY_SPRINT) Then
 			If Stamina < 5 Then
-				If ChannelPlaying(BreathCHN)=False Then BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask>0), 0))
+				temp = 0
+				If WearingGasMask>0 Or Wearing1499>0 Then temp=1
+				If ChannelPlaying(BreathCHN)=False Then BreathCHN = PlaySound_Strict(BreathSFX((temp), 0))
 			ElseIf Stamina < 50
 				If BreathCHN=0 Then
-					BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask>0), Rand(1,3)))
+					temp = 0
+					If WearingGasMask>0 Or Wearing1499>0 Then temp=1
+					BreathCHN = PlaySound_Strict(BreathSFX((temp), Rand(1,3)))
 					ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)*SFXVolume
 				Else
 					If ChannelPlaying(BreathCHN)=False Then
-						BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask>0), Rand(1,3)))
+						temp = 0
+						If WearingGasMask>0 Or Wearing1499>0 Then temp=1
+						BreathCHN = PlaySound_Strict(BreathSFX((temp), Rand(1,3)))
 						ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)*SFXVolume			
 					EndIf
 				EndIf
@@ -4050,7 +4058,8 @@ Function MovePlayer()
 				EndIf
 			EndIf
 			
-			Local temp# = (Shake Mod 360), tempchn%
+			temp# = (Shake Mod 360)
+			Local tempchn%
 			If (Not UnableToMove%) Then Shake# = (Shake + FPSfactor * Min(Sprint, 1.5) * 7) Mod 720
 			If temp < 180 And (Shake Mod 360) >= 180 And KillTimer>=0 Then
 				If CurrStepSFX=0 Then
