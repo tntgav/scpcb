@@ -9,6 +9,7 @@ Bug fixes:
 - Fixed a MAV that occured when quick-loading a save file.
 - The SCP-008 cutscene won't play if the player turns into a SCP-049-2 instance after getting killed by SCP-049.
 - The gas mask breath sounds will now be played if the player equipped SCP-1499.
+- Fixed a bug that prevented to pick up items after consuming another item while the inventory is full.
 
 ----------------------------------------------------------------------------------
 

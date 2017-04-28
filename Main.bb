@@ -5258,10 +5258,10 @@ Function DrawGUI()
 			Else
 				If MouseSlot = 66 Then
 					DropItem(SelectedItem)		
-		
+					
 					SelectedItem = Null		
 					InvOpen = False		
-							
+					
 					MoveMouse viewport_center_x, viewport_center_y
 				Else
 					If Inventory(MouseSlot) = Null Then
@@ -7945,6 +7945,7 @@ Function InitNewGame()
 			HideEntity(it\collider)
 			EntityType (it\collider, HIT_ITEM)
 			EntityParent(it\collider, 0)
+			ItemAmount = ItemAmount + 1
 		ElseIf (r\RoomTemplate\Name = "173" And IntroEnabled) Then
 			PositionEntity (Collider, EntityX(r\obj), 1.0, EntityZ(r\obj))
 			PlayerRoom = r

@@ -995,7 +995,10 @@ Function LoadGame(file$)
 		If nt = True Then SelectedItem = it
 		
 		nt = ReadByte(f)
-		If nt < 66 Then Inventory(nt) = it
+		If nt < 66
+			Inventory(nt) = it
+			ItemAmount = ItemAmount + 1
+		EndIf
 		
 		For itt.ItemTemplates = Each ItemTemplates
 			If (itt\tempname = tempName) And (itt\name = ittName) Then
@@ -1643,7 +1646,10 @@ Function LoadGameQuick(file$)
 		If nt = True Then SelectedItem = it
 		
 		nt = ReadByte(f)
-		If nt < 66 Then Inventory(nt) = it
+		If nt < 66
+			Inventory(nt) = it
+			ItemAmount = ItemAmount + 1
+		EndIf
 		
 		For itt.ItemTemplates = Each ItemTemplates
 			If itt\tempname = tempName Then
