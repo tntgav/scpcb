@@ -6685,22 +6685,24 @@ Function UpdateEvents()
 							
 							If e\EventState2=0 Then
 								ShowEntity e\room\Objects[2]
-								If BlinkTimer<-10 And Curr173\Idle = 0 Then
-									PositionEntity Curr173\Collider, EntityX(e\room\Objects[4],True),0.5,EntityZ(e\room\Objects[4],True),True
-									ResetEntity Curr173\Collider
-									
-									HideEntity e\room\Objects[2]
-									
-									If (Not WearingHazmat) Then 
-										Injuries=Injuries+0.1
-										If Infect=0 Then Infect=1
-										Msg = "The window shattered and a piece of glass cut your arm."
-										MsgTimer = 70*8
+								If EntityDistance(Curr173\Collider,e\room\Objects[4])<3.0
+									If (BlinkTimer<-10 Or (Not EntityInView(Curr173\obj,Camera))) And Curr173\Idle = 0 Then
+										PositionEntity Curr173\Collider, EntityX(e\room\Objects[4],True),0.5,EntityZ(e\room\Objects[4],True),True
+										ResetEntity Curr173\Collider
+										
+										HideEntity e\room\Objects[2]
+										
+										If (Not WearingHazmat) Then
+											Injuries=Injuries+0.1
+											If Infect=0 Then Infect=1
+											Msg = "The window shattered and a piece of glass cut your arm."
+											MsgTimer = 70*8
+										EndIf
+										
+										PlaySound2(LoadTempSound("SFX\General\GlassBreak.ogg"), Camera, e\room\Objects[0]) 
+										
+										e\EventState2=1
 									EndIf
-									
-									PlaySound2(LoadTempSound("SFX\General\GlassBreak.ogg"), Camera, e\room\Objects[0]) 
-									
-									e\EventState2=1
 								EndIf
 							EndIf
 							
