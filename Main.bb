@@ -9706,6 +9706,21 @@ End Function
 Function UpdateInfect()
 	Local temp#, i%, r.Rooms
 	
+	Local teleportForInfect% = True
+	
+	If PlayerRoom\RoomTemplate\Name = "room860"
+		For e.Events = Each Events
+			If e\EventName = "room860"
+				If e\EventState = 1.0
+					teleportForInfect = False
+				EndIf
+				Exit
+			EndIf
+		Next
+	ElseIf PlayerRoom\RoomTemplate\Name = "dimension1499" Or PlayerRoom\RoomTemplate\Name = "pocketdimension"
+		teleportForInfect = False
+	EndIf
+	
 	If Infect>0 Then
 		ShowEntity InfectOverlay
 		
@@ -9741,7 +9756,7 @@ Function UpdateInfect()
 			ElseIf Infect =>91.5
 				BlinkTimer = Max(Min(-10*(Infect-91.5),BlinkTimer),-10)
 				If Infect >= 92.7 And temp < 92.7 Then
-					If PlayerRoom\RoomTemplate\Name <> "dimension1499"
+					If teleportForInfect
 						For r.Rooms = Each Rooms
 							If r\RoomTemplate\Name="008" Then
 								PositionEntity Collider, EntityX(r\Objects[7],True),EntityY(r\Objects[7],True),EntityZ(r\Objects[7],True),True
@@ -9765,7 +9780,7 @@ Function UpdateInfect()
 			temp=Infect
 			Infect = Min(Infect+FPSfactor*0.004,100)
 			
-			If PlayerRoom\RoomTemplate\Name<>"dimension1499"
+			If teleportForInfect
 				If Infect < 94.7 Then
 					EntityAlpha InfectOverlay, 0.5 * (Sin(MilliSecs2()/8.0)+2.0)
 					BlurTimer = 900
@@ -9834,7 +9849,11 @@ Function UpdateInfect()
 			Else
 				Kill()
 				BlinkTimer = Max(Min(-10*(Infect-96),BlinkTimer),-10)
-				DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate repots of a violent attack to a church in the Russian town of [REDACTED]."
+				If PlayerRoom\RoomTemplate\Name = "dimension1499"
+					DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate repots of a violent attack to a church in the Russian town of [REDACTED]."
+				Else
+					DeathMSG = ""
+				EndIf
 			EndIf
 		EndIf
 		
