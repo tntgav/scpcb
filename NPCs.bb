@@ -612,6 +612,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			SetNPCFrame n,11
 			
 			n\Sound = LoadSound_Strict("SFX\SCP\049\0492Breath.ogg")
+			
+			n\HP = 120
 			;[End Block]
 		Case NPCtypeClerk
 			;[Block]
@@ -4773,6 +4775,14 @@ Function UpdateNPCs()
 								EndIf
 							EndIf
 					End Select
+				Else
+					If n\SoundChn <> 0
+						StopChannel n\SoundChn
+						n\SoundChn = 0
+						FreeSound_Strict n\Sound
+						n\Sound = 0
+					EndIf
+					AnimateNPC(n, 344, 363, 0.5, False)
 				EndIf
 				
 				RotateEntity n\obj,0,EntityYaw(n\Collider)-180,0
@@ -5360,6 +5370,26 @@ Function UpdateMTFUnit(n.NPCs)
 								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 								n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_1.ogg")
 								PlayMTFSound(n\Sound, n)
+								Exit
+							EndIf
+						EndIf
+					ElseIf n2\NPCtype = NPCtype008 And n2\IsDead = False
+						If OtherNPCSeesMeNPC(n2,n) Then
+							If EntityVisible(n\Collider,n2\Collider)
+								n\State = 9
+								n\EnemyX = EntityX(n2\Collider,True)
+								n\EnemyY = EntityY(n2\Collider,True)
+								n\EnemyZ = EntityZ(n2\Collider,True)
+								n\State2 = 70*15.0
+								n\State3 = 0.0
+								n\PathTimer = 0.0
+								n\PathStatus = 0
+								n\Target = n2
+								n\Reload = 70*5
+								DebugLog "008 spotted :"+n\State2
+								;If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+								;n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_1.ogg")
+								;PlayMTFSound(n\Sound, n)
 								Exit
 							EndIf
 						EndIf
@@ -6290,7 +6320,7 @@ Function UpdateMTFUnit(n.NPCs)
 					n\State = 0
 				EndIf
 				;[End Block]
-			Case 9 ;SCP-049-2 spotted
+			Case 9 ;SCP-049-2/008 spotted
 				;[Block]
 				If EntityVisible(n\Collider, n\Target\Collider) Then
 					PointEntity n\obj,n\Target\Collider
@@ -6338,8 +6368,12 @@ Function UpdateMTFUnit(n.NPCs)
 							Else
 								If (Not n\Target\IsDead)
 									If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-									n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_2.ogg")
-									PlayMTFSound(n\Sound, n)
+									If n\NPCtype = NPCtypeZombie
+										n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_2.ogg")
+										PlayMTFSound(n\Sound, n)
+									Else
+										;Still needs to be added! (for 008)
+									EndIf
 								EndIf
 								SetNPCFrame(n\Target,133)
 								n\Target\IsDead = True
