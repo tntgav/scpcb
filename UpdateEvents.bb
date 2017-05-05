@@ -101,7 +101,7 @@ Function UpdateEvents()
 							e\room\NPC[3] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[2], True), EntityY(e\room\Objects[2], True), EntityZ(e\room\Objects[2], True))
 							;e\room\NPC[3]\Angle = 180
 							RotateEntity e\room\NPC[3]\Collider,0,90,0
-							SetNPCFrame(e\room\NPC[3], 151) : e\room\NPC[3]\State = 8
+							SetNPCFrame(e\room\NPC[3], 286) : e\room\NPC[3]\State = 8
 							MoveEntity e\room\NPC[3]\Collider,1,0,0
 							
 							e\room\NPC[4] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[3], True), 0.5, EntityZ(e\room\Objects[3], True))
@@ -135,7 +135,7 @@ Function UpdateEvents()
 					EndIf
 				Else
 					
-					If e\room\NPC[0] <> Null Then AnimateNPC(e\room\NPC[0], 113, 151, 0.4, False)
+					If e\room\NPC[0] <> Null Then AnimateNPC(e\room\NPC[0], 249, 286, 0.4, False)
 					
 					CurrTrigger = CheckTriggers()
 					
@@ -169,7 +169,7 @@ Function UpdateEvents()
 								If e\EventState > 900+2.5*70 Then
 									If e\room\NPC[2]\State <> 1
 										e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
-										AnimateNPC(e\room\NPC[2], 895, 843, e\room\NPC[2]\CurrSpeed*50)
+										AnimateNPC(e\room\NPC[2], 39, 76, e\room\NPC[2]\CurrSpeed*50)
 										MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
 										e\room\NPC[2]\State = 8
 										
@@ -219,7 +219,7 @@ Function UpdateEvents()
 								EndIf
 								
 								;If Ulgrin can see the player then start shooting at them.
-								If (CurrTrigger = "173scene_end") And EntityVisible(e\room\NPC[2]\Collider, Collider) And (Not GodMode) Then
+								If (CurrTrigger = "173scene_end") And EntityVisible(e\room\NPC[2]\Collider, Collider) And (Not NoTarget) Then
 									e\room\NPC[2]\State = 1
 									e\room\NPC[2]\State3 = 1
 								ElseIf e\room\NPC[2]\State = 1 And (Not EntityVisible(e\room\NPC[2]\Collider, Collider))
@@ -654,7 +654,7 @@ Function UpdateEvents()
 									If e\room\NPC[4]\SoundChn <> 0 Then
 										If ChannelPlaying(e\room\NPC[4]\SoundChn) Then StopChannel(e\room\NPC[4]\SoundChn)
 									EndIf
-
+									
 									If e\room\NPC[3]\State2 < 2 Then
 										FreeSound_Strict e\room\NPC[3]\Sound
 										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortRefuse"+Rand(1,2)+".ogg")
@@ -1198,7 +1198,7 @@ Function UpdateEvents()
 										e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,20)
 									EndIf
 									If e\EventState > 20105 Then
-										Curr173\Idle = True 
+										Curr173\Idle = True
 										PointEntity(e\room\NPC[0]\Collider, Curr173\obj)
 										PositionEntity(Curr173\Collider, EntityX(e\room\obj) - 608.0 * RoomScale, EntityY(e\room\obj) + 480.0 * RoomScale, EntityZ(e\room\obj) + 1312.0 * RoomScale)
 										ResetEntity(Curr173\Collider)
@@ -3939,12 +3939,12 @@ Function UpdateEvents()
 								EndIf	
 							EndIf
 							
-							e\room\NPC[0]\State=8
-							SetAnimTime e\room\NPC[0]\obj, 115
+							e\room\NPC[0]\State=13
+							;SetAnimTime e\room\NPC[0]\obj, 115
 							PointEntity e\room\NPC[0]\Collider, Curr096\Collider								
 						ElseIf e\EventState-FPSfactor =< 70*15 Then ;walk to the doorway
 							If e\EventState > 70*15 Then
-								e\room\NPC[0]\State=3
+								e\room\NPC[0]\State=14
 								;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0], EntityX(e\room\Objects[8],True),0.5,EntityZ(e\room\Objects[8],True))
 								e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0], EntityX(Curr096\Collider,True),0.4,EntityZ(Curr096\Collider,True))
 								e\room\NPC[0]\PathTimer=300
@@ -3953,7 +3953,7 @@ Function UpdateEvents()
 							If e\room\NPC[0]\PathStatus=0 Then
 								e\room\RoomDoors[2]\open = False
 								
-								e\room\NPC[0]\State=7
+								e\room\NPC[0]\State=13
 								;SetAnimTime e\room\NPC[0]\obj, 115
 								PointEntity e\room\NPC[0]\obj, Curr096\Collider
 								RotateEntity (e\room\NPC[0]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[0]\obj),EntityYaw(e\room\NPC[0]\Collider),30),0)
@@ -3971,8 +3971,8 @@ Function UpdateEvents()
 								Curr096\Target = e\room\NPC[0]
 							Else
 								If e\EventState>70*22 Then Curr096\State = 4
-								If e\room\NPC[0]\State=7 Then
-									e\room\NPC[0]\State=3
+								If e\room\NPC[0]\State=13 Then
+									e\room\NPC[0]\State=14
 									e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0], EntityX(e\room\obj,True),0.4,EntityZ(e\room\obj,True))
 									e\room\NPC[0]\PathTimer=300
 									e\room\NPC[0]\Speed = e\room\NPC[0]\Speed*1.8 ;Making the guard walking a bit faster
@@ -4633,7 +4633,7 @@ Function UpdateEvents()
 					e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True)+0.5, EntityZ(e\room\Objects[0],True))
 					PointEntity e\room\NPC[0]\Collider, e\room\obj
 					RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider)+Rnd(-20,20),0, True
-					SetNPCFrame (e\room\NPC[0], 906)
+					SetNPCFrame (e\room\NPC[0], 288)
 					e\room\NPC[0]\State = 8
 					
 					e\EventState = 1
@@ -5509,7 +5509,7 @@ Function UpdateEvents()
 						PointEntity e\room\NPC[0]\Collider, e\room\obj
 						RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider),0, True
 						;SetAnimTime e\room\NPC[0]\obj, 906
-						SetNPCFrame(e\room\NPC[0], 906)
+						SetNPCFrame(e\room\NPC[0], 288)
 						e\room\NPC[0]\State = 8
 						
 						e\EventState = 1
@@ -6627,7 +6627,7 @@ Function UpdateEvents()
 					PointEntity e\room\NPC[0]\Collider, e\room\obj
 					RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider)-20,0, True
 					
-					SetNPCFrame (e\room\NPC[0], 906)
+					SetNPCFrame (e\room\NPC[0], 288)
 					e\room\NPC[0]\State = 8
 					
 					e\EventState = 2	
@@ -7207,7 +7207,7 @@ Function UpdateEvents()
 						e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True)+0.5, EntityZ(e\room\Objects[2],True))
 						PointEntity e\room\NPC[0]\Collider, e\room\obj
 						RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider),0, True
-						SetNPCFrame(e\room\NPC[0], 906)
+						SetNPCFrame(e\room\NPC[0], 288)
 						e\room\NPC[0]\State = 8
 						
 						e\EventState = 1

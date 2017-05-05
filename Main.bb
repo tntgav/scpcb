@@ -2961,8 +2961,10 @@ Repeat
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		
-		UpdateWorld()
-		ManipulateNPCBones()
+		If FPSfactor>0
+			UpdateWorld()
+			ManipulateNPCBones()
+		EndIf
 		RenderWorld2()
 		
 		BlurVolume = Min(CurveValue(0.0, BlurVolume, 20.0),0.95)
