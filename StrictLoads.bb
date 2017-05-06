@@ -244,6 +244,64 @@ Function SetStreamPaused_Strict(streamHandle%,paused%)
 	
 End Function
 
+Function IsStreamPlaying_Strict(streamHandle%)
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st = Null
+		;CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		Return
+	EndIf
+	If st\chn=0 Or st\chn=-1
+		CreateConsoleMsg("Failed to find stream Sound: Return value "+st\chn)
+		Return
+	EndIf
+	
+	Return FSOUND_IsPlaying(st\chn)
+	
+End Function
+
+Function SetStreamPan_Strict(streamHandle%,pan#)
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st = Null
+		;CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		Return
+	EndIf
+	If st\chn=0 Or st\chn=-1
+		CreateConsoleMsg("Failed to find stream Sound: Return value "+st\chn)
+		Return
+	EndIf
+	
+	;-1 = Left = 0
+	;0 = Middle = 127.5 (127)
+	;1 = Right = 255
+	Local fmod_pan% = 0
+	fmod_pan% = Int((255.0/2.0)+((255.0/2.0)*pan#))
+	FSOUND_SetPan(st\chn,fmod_pan%)
+	
+End Function
+
+Function UpdateStreamSoundOrigin(streamHandle%,cam%,entity%,range#=10,volume#=1.0)
+	;Local st.Stream = Object.Stream(streamHandle)
+	range# = Max(range,1.0)
+	
+	If volume>0 Then
+		
+		Local dist# = EntityDistance(cam, entity) / range#
+		If 1 - dist# > 0 And 1 - dist# < 1 Then
+			
+			Local panvalue# = Sin(-DeltaYaw(cam,entity))
+			
+			SetStreamVolume_Strict(streamHandle,volume#*(1-dist#)*SFXVolume#)
+			SetStreamPan_Strict(streamHandle,panvalue)
+		EndIf
+	Else
+		If streamHandle <> 0 Then
+			SetStreamVolume_Strict(streamHandle,0.0)
+		EndIf 
+	EndIf
+End Function
+
 Function LoadMesh_Strict(File$,parent=0)
 	If FileType(File$) <> 1 Then RuntimeError "3D Mesh " + File$ + " not found."
 	tmp = LoadMesh(File$, parent)

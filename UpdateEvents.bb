@@ -3623,7 +3623,7 @@ Function UpdateEvents()
 								Curr106\PrevY = EntityY(Collider)
 							EndIf
 							
-							For i = 0 To 4
+							For i = 0 To 1
 								Local spawnPoint.WayPoints = Null
 								For x = i*((gridsz*gridsz)/5.0) To (gridsz*gridsz-1)
 									DebugLog("spawn 966 X: "+x)
@@ -4824,10 +4824,11 @@ Function UpdateEvents()
 					;eventstate3 = has the player opened the gas valves (0=no, 0<x<35*70 yes, x>35*70 the host has died)
 					
 					If e\EventState = 0 Then
-						If EntityDistance(Collider, e\room\Objects[3])<2 Then 
+						If EntityDistance(Collider, e\room\Objects[3])<2 Then
 							n.NPCs = CreateNPC(NPCtypeD, EntityX(e\room\Objects[4],True),0.5,EntityZ(e\room\Objects[4],True))
 							
 							n\texture = "GFX\NPCs\035victim.jpg"
+							n\Model = "GFX\NPCs\035.b3d"
 							HideEntity n\obj	
 							
 							SetAnimTime(n\obj, 501)
@@ -4847,12 +4848,13 @@ Function UpdateEvents()
 									temp = e\room\NPC[0]\Frame
 									
 									FreeEntity e\room\NPC[0]\obj
-									e\room\NPC[0]\obj = LoadAnimMesh_Strict("GFX\NPCs\035.b3d")									
+									e\room\NPC[0]\obj = LoadAnimMesh_Strict("GFX\NPCs\035.b3d")
 									x = 0.5 / MeshWidth(e\room\NPC[0]\obj)
+									e\room\NPC[0]\ModelScaleX = x
+									e\room\NPC[0]\ModelScaleY = x
+									e\room\NPC[0]\ModelScaleZ = x
 									ScaleEntity e\room\NPC[0]\obj, x,x,x
-									
 									SetAnimTime(e\room\NPC[0]\obj, temp)
-									
 									ShowEntity e\room\NPC[0]\obj
 									
 									RotateEntity n\Collider, 0, e\room\angle+270, 0, True
@@ -5382,7 +5384,8 @@ Function UpdateEvents()
 				EndIf 
 				
 				If e\EventState < 0 Then
-					If e\EventState > -70*4 Then 
+					If e\EventState > -70*4 Then
+						Infect = 0
 						If FallTimer => 0 Then 
 							FallTimer = Min(-1, FallTimer)
 							PositionEntity(Head, EntityX(Camera, True), EntityY(Camera, True), EntityZ(Camera, True), True)
@@ -5453,6 +5456,7 @@ Function UpdateEvents()
 						ForceMove = 0.5
 						Injuries = Max(2.0,Injuries)
 						Bloodloss = 0
+						Infect = 0
 						
 						;Msg = ""
 						
@@ -5477,7 +5481,7 @@ Function UpdateEvents()
 						PositionEntity pvt%,EntityX(e\room\NPC[1]\Collider),EntityY(e\room\NPC[1]\Collider)+0.2,EntityZ(e\room\NPC[1]\Collider)
 						
 						PointEntity Collider, e\room\NPC[1]\Collider
-						PointEntity Camera, pvt%
+						PointEntity Camera, pvt%,EntityRoll(Camera)
 						
 						FreeEntity pvt%
 						
@@ -5529,12 +5533,15 @@ Function UpdateEvents()
 								e\EventState = 3
 								e\EventState2 = 1
 								;e\Sound = LoadSound_Strict("SFX\SCP\079\Speech.ogg")
-								LoadEventSound(e,"SFX\SCP\079\Speech.ogg")
-								e\SoundCHN = PlaySound_Strict (e\Sound)
+								;LoadEventSound(e,"SFX\SCP\079\Speech.ogg")
+								;e\SoundCHN = PlaySound_Strict (e\Sound)
+								e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Speech.ogg",SFXVolume,0)
+								e\SoundCHN_isStream = True
 							EndIf							
 						ElseIf e\EventState = 3
 							If e\EventState < 3500 Then 
-								If ChannelPlaying(e\SoundCHN) Then 
+								;If ChannelPlaying(e\SoundCHN) Then
+								If IsStreamPlaying_Strict(e\SoundCHN)
 									If Rand(3) = 1 Then
 										EntityTexture(e\room\Objects[1], OldAiPics(0))
 										ShowEntity (e\room\Objects[1])
@@ -5542,7 +5549,10 @@ Function UpdateEvents()
 										HideEntity (e\room\Objects[1])							
 									End If							
 								Else
-									If e\Sound <> 0 Then FreeSound_Strict e\Sound : e\Sound = 0
+									;If e\Sound <> 0 Then FreeSound_Strict e\Sound : e\Sound = 0
+									If e\SoundCHN<>0
+										StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
+									EndIf
 									EntityTexture(e\room\Objects[1], OldAiPics(1))
 									ShowEntity (e\room\Objects[1])
 								EndIf
@@ -5550,8 +5560,12 @@ Function UpdateEvents()
 								If EntityDistance(e\room\Objects[0], Collider)<2.5 Then 
 									e\EventState = 10001
 									;e\Sound = LoadSound_Strict("SFX\SCP\079\Refuse.ogg")
-									LoadEventSound(e,"SFX\SCP\079\Refuse.ogg")
-									e\SoundCHN = PlaySound_Strict (e\Sound)
+									;LoadEventSound(e,"SFX\SCP\079\Refuse.ogg")
+									;e\SoundCHN = PlaySound_Strict (e\Sound)
+									If e\SoundCHN<>0
+										StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
+									EndIf
+									e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Refuse.ogg",SFXVolume,0)
 									EntityTexture(e\room\Objects[1], OldAiPics(1))
 									ShowEntity (e\room\Objects[1])								
 								EndIf
@@ -5566,8 +5580,12 @@ Function UpdateEvents()
 				
 				If e\EventState2 = 1 Then
 					If RemoteDoorOn Then 	
-						LoadEventSound(e,"SFX\SCP\079\GateB.ogg")
-						e\SoundCHN = PlaySound_Strict (e\Sound)						
+						;LoadEventSound(e,"SFX\SCP\079\GateB.ogg")
+						;e\SoundCHN = PlaySound_Strict (e\Sound)
+						If e\SoundCHN<>0
+							StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
+						EndIf
+						e\SoundCHN = StreamSound_Strict("SFX\SCP\079\GateB.ogg",SFXVolume,0)
 						e\EventState2 = 2
 						
 						For e2.Events = Each Events
@@ -6675,7 +6693,7 @@ Function UpdateEvents()
 									
 									If (Not WearingHazmat) Then 
 										Injuries=Injuries+0.1
-										Infect=1
+										If Infect=0 Then Infect=1
 										Msg = "The window shattered and a piece of glass cut your arm."
 										MsgTimer = 70*8
 									EndIf
@@ -6690,9 +6708,17 @@ Function UpdateEvents()
 								If EntityInView(e\room\Objects[0], Camera) Then
 									DrawHandIcon = True
 									
-									If MouseDown1 Then 
+									If MouseDown1 Then
+										DrawArrowIcon(2) = True
 										RotateEntity(e\room\Objects[1], Max(Min(EntityPitch(e\room\Objects[1])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Objects[1]), 0)
 									EndIf
+								EndIf
+							EndIf
+							
+							If (Not WearingHazmat) And Bloodloss>0.0
+								If Infect=0
+									Infect=1
+									DebugLog "Infected player"
 								EndIf
 							EndIf
 						EndIf

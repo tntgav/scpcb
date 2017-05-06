@@ -66,6 +66,7 @@ Type NPCs
 	Field TextureID%=-1
 	Field CollRadius#
 	Field IdleTimer#
+	Field SoundChn_IsStream%,SoundChn2_IsStream%
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -664,12 +665,24 @@ Function RemoveNPC(n.NPCs)
 		n\obj4 = 0
 	EndIf
 	
-	If (n\SoundChn <> 0 And ChannelPlaying(n\SoundChn)) Then
-		StopChannel(n\SoundChn)
+	If (Not n\SoundChn_IsStream)
+		If (n\SoundChn <> 0 And ChannelPlaying(n\SoundChn)) Then
+			StopChannel(n\SoundChn)
+		EndIf
+	Else
+		If (n\SoundChn <> 0)
+			StopStream_Strict(n\SoundChn)
+		EndIf
 	EndIf
 	
-	If n\SoundChn2 <> 0 And ChannelPlaying(n\SoundChn2) Then
-		StopChannel(n\SoundChn2)
+	If (Not n\SoundChn2_IsStream)
+		If (n\SoundChn2 <> 0 And ChannelPlaying(n\SoundChn2)) Then
+			StopChannel(n\SoundChn2)
+		EndIf
+	Else
+		If (n\SoundChn2 <> 0)
+			StopStream_Strict(n\SoundChn2)
+		EndIf
 	EndIf
 	
 	If n\Sound<>0 Then FreeSound_Strict n\Sound
@@ -1207,10 +1220,16 @@ Function UpdateNPCs()
 					Case 0
 						If dist<8.0 Then
 							GiveAchievement(Achv096)
-							If n\Sound = 0 Then
-								n\Sound = LoadSound_Strict("SFX\Music\096.ogg")
+							;If n\Sound = 0 Then
+							;	n\Sound = LoadSound_Strict("SFX\Music\096.ogg")
+							;Else
+							;	n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 8.0, 1.0)
+							;EndIf
+							If n\SoundChn = 0
+								n\SoundChn = StreamSound_Strict("SFX\Music\096.ogg",0)
+								n\SoundChn_IsStream = True
 							Else
-								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 8.0, 1.0)
+								UpdateStreamSoundOrigin(n\SoundChn,Camera,n\Collider,8.0,1.0)
 							EndIf
 							
 							AnimateNPC(n, 1085,1412, 0.1) ;sitting
@@ -1232,8 +1251,9 @@ Function UpdateNPCs()
 													
 													n\Frame = 307
 													;SetAnimTime n\obj, 307
-													StopChannel n\SoundChn
-													FreeSound_Strict n\Sound
+													;StopChannel n\SoundChn
+													;FreeSound_Strict n\Sound
+													StopStream_Strict(n\SoundChn) : n\SoundChn=0
 													n\Sound = 0
 													n\State = 1
 												EndIf
@@ -1249,21 +1269,33 @@ Function UpdateNPCs()
 						CurrCameraZoom = CurveValue(Max(CurrCameraZoom, (Sin(Float(MilliSecs2())/20.0)+1.0) * 10.0),CurrCameraZoom,8.0)
 						
 						If n\Target = Null Then 
-							If n\Sound = 0 Then
-								n\Sound = LoadSound_Strict("SFX\SCP\096\Scream.ogg")
+							;If n\Sound = 0 Then
+							;	n\Sound = LoadSound_Strict("SFX\SCP\096\Scream.ogg")
+							;Else
+							;	n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 7.5, 1.0)
+							;EndIf
+							If n\SoundChn = 0
+								n\SoundChn = StreamSound_Strict("SFX\SCP\096\Scream.ogg",0)
+								n\SoundChn_IsStream = True
 							Else
-								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 7.5, 1.0)
+								UpdateStreamSoundOrigin(n\SoundChn,Camera,n\Collider,7.5,1.0)
 							EndIf
 							
-							If n\Sound2 = 0 Then
-								n\Sound2 = LoadSound_Strict("SFX\Music\096Chase.ogg")
+							;If n\Sound2 = 0 Then
+							;	n\Sound2 = LoadSound_Strict("SFX\Music\096Chase.ogg")
+							;Else
+							;	If n\SoundChn2 = 0 Then
+							;		n\SoundChn2 = PlaySound_Strict (n\Sound2)
+							;	Else
+							;		If (Not ChannelPlaying(n\SoundChn2)) Then n\SoundChn2 = PlaySound_Strict(n\Sound2)
+							;		ChannelVolume(n\SoundChn2, Min(Max(8.0-dist,0.6),1.0)*SFXVolume#)
+							;	EndIf
+							;EndIf
+							If n\SoundChn2 = 0
+								n\SoundChn2 = StreamSound_Strict("SFX\Music\096Chase.ogg",0)
+								n\SoundChn2_IsStream = 2
 							Else
-								If n\SoundChn2 = 0 Then
-									n\SoundChn2 = PlaySound_Strict (n\Sound2)
-								Else
-									If (Not ChannelPlaying(n\SoundChn2)) Then n\SoundChn2 = PlaySound_Strict(n\Sound2)
-									ChannelVolume(n\SoundChn2, Min(Max(8.0-dist,0.6),1.0)*SFXVolume#)
-								EndIf
+								SetStreamVolume_Strict(n\SoundChn2,Min(Max(8.0-dist,0.6),1.0)*SFXVolume#)
 							EndIf
 						EndIf
 						
@@ -1415,10 +1447,16 @@ Function UpdateNPCs()
 						
 						
 					Case 1,2,3
-						If n\Sound = 0 Then
-							n\Sound = LoadSound_Strict("SFX\Music\096Angered.ogg")
+						;If n\Sound = 0 Then
+						;	n\Sound = LoadSound_Strict("SFX\Music\096Angered.ogg")
+						;Else
+						;	n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 10.0, 1.0)
+						;EndIf
+						If n\SoundChn = 0
+							n\SoundChn = StreamSound_Strict("SFX\Music\096Angered.ogg",0)
+							n\SoundChn_IsStream = True
 						Else
-							n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 10.0, 1.0)
+							UpdateStreamSoundOrigin(n\SoundChn,Camera,n\Collider,10.0,1.0)
 						EndIf
 						
 						If n\State=1 Then ; get up
@@ -1448,8 +1486,9 @@ Function UpdateNPCs()
 								;Animate2(n\obj, AnimTime(n\obj),973,1001, 0.5, False)
 								If n\Frame>1000.9 Then 
 									n\State = 4
-									StopChannel n\SoundChn
-									FreeSound_Strict n\Sound : n\Sound = 0
+									;StopChannel n\SoundChn
+									;FreeSound_Strict n\Sound : n\Sound = 0
+									StopStream_Strict(n\SoundChn) : n\SoundChn=0
 								EndIf
 							Else
 								AnimateNPC(n, 892,978, 0.3)
@@ -1463,10 +1502,16 @@ Function UpdateNPCs()
 								GiveAchievement(Achv096)
 							EndIf
 								
-							If n\Sound = 0 Then
-								n\Sound = LoadSound_Strict("SFX\Music\096.ogg")
+							;If n\Sound = 0 Then
+							;	n\Sound = LoadSound_Strict("SFX\Music\096.ogg")
+							;Else
+							;	n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 14.0, 1.0)
+							;EndIf
+							If n\SoundChn = 0
+								n\SoundChn = StreamSound_Strict("SFX\Music\096.ogg",0)
+								n\SoundChn_IsStream = True
 							Else
-								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 14.0, 1.0)
+								UpdateStreamSoundOrigin(n\SoundChn,Camera,n\Collider,14.0,1.0)
 							EndIf
 							
 							n\State2=n\State2+FPSfactor
@@ -1533,8 +1578,9 @@ Function UpdateNPCs()
 													
 													n\Frame = 833
 													;SetAnimTime n\obj, 833
-													StopChannel n\SoundChn
-													FreeSound_Strict n\Sound
+													;StopChannel n\SoundChn
+													;FreeSound_Strict n\Sound
+													StopStream_Strict(n\SoundChn) : n\SoundChn=0
 													n\Sound = 0
 													n\State = 2
 												EndIf
