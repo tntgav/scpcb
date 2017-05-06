@@ -6797,10 +6797,6 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 			n.NPCs = CreateNPC(NPCtypeTentacle, EntityX(Collider), EntityY(Collider), EntityZ(Collider))
 			consoleMSG = "SCP-035 tentacle spawned."
 			
-		Case "clerk"
-			n.NPCs = CreateNPC(NPCtypeClerk, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
-			consoleMSG = "Clerk spawned."
-			
 		Default 
 			CreateConsoleMsg("NPC type not found.", 255, 0, 0) : Return
 	End Select
