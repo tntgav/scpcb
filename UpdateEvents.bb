@@ -169,7 +169,7 @@ Function UpdateEvents()
 								If e\EventState > 900+2.5*70 Then
 									If e\room\NPC[2]\State <> 1
 										e\room\NPC[2]\CurrSpeed = CurveValue(-0.012, e\room\NPC[2]\CurrSpeed, 5.0)
-										AnimateNPC(e\room\NPC[2], 39, 76, e\room\NPC[2]\CurrSpeed*50)
+										AnimateNPC(e\room\NPC[2], 39, 76, e\room\NPC[2]\CurrSpeed*40)
 										MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
 										e\room\NPC[2]\State = 8
 										

@@ -2408,7 +2408,7 @@ Function UpdateNPCs()
 								
 								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
 								
-								AnimateNPC(n,1,38,n\CurrSpeed*30)
+								AnimateNPC(n,1,38,n\CurrSpeed*40)
 								;Animate2(n\obj, AnimTime(n\obj), 1614, 1641, n\CurrSpeed*30)
 								n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 								
@@ -2449,7 +2449,7 @@ Function UpdateNPCs()
 						
 						dist# = Distance(EntityX(n\Collider),EntityZ(n\Collider),n\EnemyX,n\EnemyZ)
 						
-						AnimateNPC(n,1,38,n\CurrSpeed*30)
+						AnimateNPC(n,1,38,n\CurrSpeed*40)
 						
 						If dist > 2.0 Or dist < 1.0  Then
 							n\CurrSpeed = CurveValue(n\Speed*Sgn(dist-1.5)*0.75, n\CurrSpeed, 10.0)
@@ -2476,7 +2476,7 @@ Function UpdateNPCs()
 						;[End Block]
 					Case 10
 						;[Block]
-						AnimateNPC(n, 1, 38, n\CurrSpeed*30)
+						AnimateNPC(n, 1, 38, n\CurrSpeed*40)
 						
 						n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 						
@@ -2551,7 +2551,7 @@ Function UpdateNPCs()
 											n\PathLocation = n\PathLocation + 1
 										EndIf
 									Else
-										AnimateNPC(n,39,76,n\CurrSpeed*30)
+										AnimateNPC(n,39,76,n\CurrSpeed*40)
 										n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 										MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 										
@@ -2589,7 +2589,7 @@ Function UpdateNPCs()
 									EndIf
 									
 									If n\PathTimer = 1
-										AnimateNPC(n,39,76,n\CurrSpeed*30)
+										AnimateNPC(n,39,76,n\CurrSpeed*40)
 										n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 										MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 									EndIf
@@ -2663,7 +2663,7 @@ Function UpdateNPCs()
 								
 								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
 								
-								AnimateNPC(n,39,76,n\CurrSpeed*30)
+								AnimateNPC(n,39,76,n\CurrSpeed*40)
 								n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 								
 								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
