@@ -83,7 +83,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[Block]
 			n\NVName = "SCP-173"
 			n\Collider = CreatePivot()
-			EntityRadius n\Collider, 0.32
+			EntityRadius n\Collider, 0.23, 0.32
 			EntityType n\Collider, HIT_PLAYER
 			n\Gravity = True
 			
