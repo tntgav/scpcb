@@ -49,11 +49,11 @@ Type NPCs
 	Field IgnorePlayer%
 	
 	Field ManipulateBone%
-	Field BoneToManipulate$
-	Field BoneToManipulate2$
 	Field ManipulationType%
-	Field BoneX#,BoneY#,BoneZ#
-	Field BonePitch#,BoneYaw#,BoneRoll#
+	Field BoneToManipulate$
+	Field BonePitch#
+	Field BoneYaw#
+	Field BoneRoll#
 	Field NPCNameInSection$
 	Field InFacility% = True
 	Field CanUseElevator% = False
@@ -83,7 +83,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[Block]
 			n\NVName = "SCP-173"
 			n\Collider = CreatePivot()
-			EntityRadius n\Collider, 0.32
+			EntityRadius n\Collider, 0.23, 0.32
 			EntityType n\Collider, HIT_PLAYER
 			n\Gravity = True
 			
@@ -612,6 +612,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			SetNPCFrame n,11
 			
 			n\Sound = LoadSound_Strict("SFX\SCP\049\0492Breath.ogg")
+			
+			n\HP = 120
 			;[End Block]
 		Case NPCtypeClerk
 			;[Block]
@@ -2279,14 +2281,18 @@ Function UpdateNPCs()
 				prevFrame# = n\Frame
 				
 				n\BoneToManipulate = ""
-				n\BoneToManipulate2 = ""
+				;n\BoneToManipulate2 = ""
 				n\ManipulateBone = False
 				n\ManipulationType = 0
 				n\NPCNameInSection = "Guard"
 				
 				Select n\State
 					Case 1 ;aims and shoots at the player
-						AnimateNPC(n, 1539, 1553, 0.2, False)
+						;[Block]
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
+							AnimateNPC(n,289,301,0.2,False)
+							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						EndIf
 						;Animate2(n\obj, AnimTime(n\obj), 1539, 1553, 0.2, False)
 						
 						If KillTimer => 0 Then
@@ -2316,7 +2322,7 @@ Function UpdateNPCs()
 								PointEntity(pvt, Collider)
 								RotateEntity(pvt, Min(EntityPitch(pvt), 40), EntityYaw(n\Collider), 0)
 								
-								If n\Reload = 0 And n\Frame>1550 Then
+								If n\Reload = 0 ;And n\Frame>1550 Then
 									DebugLog "entitypick"
 									EntityPick(pvt, dist)
 									If PickedEntity() = Collider Or n\State3=1 Then
@@ -2345,27 +2351,38 @@ Function UpdateNPCs()
 									End If
 								EndIf
 								
-								FreeEntity(pvt)									
+								If n\Reload > 0 And n\Reload <= 7
+									AnimateNPC(n,245,248,0.35,True)
+								Else
+									If n\Frame < 289
+										AnimateNPC(n,202,244,0.35,True)
+									EndIf
+								EndIf
+								
+								FreeEntity(pvt)
+							Else
+								AnimateNPC(n,202,244,0.35,True)
 							EndIf
 							
 							n\ManipulateBone = True
 							
 							If n\State2 = 10 Then ;Hacky way of applying spine pitch to specific guards.
-								n\BoneToManipulate = "spine"
+								n\BoneToManipulate = "Chest"
 								n\ManipulationType = 3
 							Else
-								n\BoneToManipulate = "chest"
-								n\BoneToManipulate2 = "head"
-								n\ManipulationType = 1
+								n\BoneToManipulate = "Chest"
+								n\ManipulationType = 0
 							EndIf
 						Else
 							n\State = 0
 						EndIf
+						;[End Block]
 					Case 2 ;shoots
-						AnimateNPC(n, 1539, 1553, 0.35, False)
-						DebugLog "shoot"
+						;[Block]
+						AnimateNPC(n,245,248,0.35,True)
+						;DebugLog "shoot"
 						;Animate2(n\obj, AnimTime(n\obj), 1539, 1553, 0.35, False)
-						If n\Reload = 0 And n\Frame > 1545 Then 
+						If n\Reload = 0 ;And n\Frame > 1545 Then 
 							PlaySound2(GunshotSFX, Camera, n\Collider, 20)
 							p.Particles = CreateParticle(EntityX(n\obj, True), EntityY(n\obj, True), EntityZ(n\obj, True), 1, 0.2, 0.0, 5)
 							PositionEntity(p\pvt, EntityX(n\obj), EntityY(n\obj), EntityZ(n\obj))
@@ -2373,7 +2390,9 @@ Function UpdateNPCs()
 							MoveEntity (p\pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
 							n\Reload = 7
 						End If
+						;[End Block]
 					Case 3 ;follows a path
+						;[Block]
 						If n\PathStatus = 2 Then
 							n\State = 0
 							n\CurrSpeed = 0
@@ -2389,7 +2408,7 @@ Function UpdateNPCs()
 								
 								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
 								
-								AnimateNPC(n, 1614, 1641, n\CurrSpeed*30)
+								AnimateNPC(n,1,38,n\CurrSpeed*40)
 								;Animate2(n\obj, AnimTime(n\obj), 1614, 1641, n\CurrSpeed*30)
 								n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 								
@@ -2403,8 +2422,10 @@ Function UpdateNPCs()
 							n\CurrSpeed = 0
 							n\State = 4
 						EndIf
+						;[End Block]
 					Case 4
-						AnimateNPC(n, 923, 1354, 0.2)
+						;[Block]
+						AnimateNPC(n,77,201,0.2)
 						;Animate2(n\obj, AnimTime(n\obj), 923, 1354, 0.2)
 						
 						If Rand(400) = 1 Then n\Angle = Rnd(-180, 180)
@@ -2420,14 +2441,15 @@ Function UpdateNPCs()
 							
 						EndIf
 						
+						;[End Block]
 					Case 5 ;following a target
+						;[Block]
 						
 						RotateEntity n\Collider, 0, CurveAngle(VectorYaw(n\EnemyX-EntityX(n\Collider), 0, n\EnemyZ-EntityZ(n\Collider))+n\Angle, EntityYaw(n\Collider), 20.0), 0
 						
 						dist# = Distance(EntityX(n\Collider),EntityZ(n\Collider),n\EnemyX,n\EnemyZ)
 						
-						AnimateNPC(n, 1614, 1641, n\CurrSpeed*30)
-						;Animate2(n\obj, AnimTime(n\obj), 1614, 1641, n\CurrSpeed*30)
+						AnimateNPC(n,1,38,n\CurrSpeed*40)
 						
 						If dist > 2.0 Or dist < 1.0  Then
 							n\CurrSpeed = CurveValue(n\Speed*Sgn(dist-1.5)*0.75, n\CurrSpeed, 10.0)
@@ -2436,28 +2458,48 @@ Function UpdateNPCs()
 						EndIf
 						
 						MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+						;[End Block]
 					Case 7
-						AnimateNPC(n, 923, 1354, 0.2)
+						;[Block]
+						AnimateNPC(n,77,201,0.2)
 						;Animate2(n\obj, AnimTime(n\obj), 923, 1354, 0.2)
+						;[End Block]
 					Case 8
 						
 					Case 9
-						AnimateNPC(n, 923, 1071, 0.2)
+						;[Block]
+						AnimateNPC(n,77,201,0.2)
 						n\BoneToManipulate = "head"
 						n\ManipulateBone = True
 						n\ManipulationType = 0
 						n\Angle = EntityYaw(n\Collider)
+						;[End Block]
 					Case 10
-						AnimateNPC(n, 1614, 1641, n\CurrSpeed*30)
+						;[Block]
+						AnimateNPC(n, 1, 38, n\CurrSpeed*40)
 						
 						n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 						
 						MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+						;[End Block]
 					Case 11
+						;[Block]
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
+							AnimateNPC(n,289,301,0.2,False)
+							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						EndIf
+						
 						If KillTimer => 0 Then
 							dist = EntityDistance(n\Collider,Collider)
 							
-							If dist<11.0 And EntityVisible(n\Collider,Collider) Then
+							Local SearchPlayer% = False
+							If dist < 11.0
+								If EntityVisible(n\Collider,Collider)
+									SearchPlayer = True
+								EndIf
+							EndIf
+							
+							If SearchPlayer
 								pvt% = CreatePivot()
 								PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider))
 								PointEntity(pvt, Collider)
@@ -2469,42 +2511,37 @@ Function UpdateNPCs()
 								PointEntity(pvt, Collider)
 								RotateEntity(pvt, Min(EntityPitch(pvt), 40), EntityYaw(n\Collider), 0)
 								
-								If EntityVisible(n\Collider,Collider) Then n\State3=1
-								
-								If n\Reload = 0 And n\Frame>1550 Then
+								If n\Reload = 0
 									DebugLog "entitypick"
 									EntityPick(pvt, dist)
 									If PickedEntity() = Collider Or n\State3=1 Then
-										If Abs(DeltaYaw(n\Collider,Collider))<50
-											DeathMSG = ""
-											
-											PlaySound2(GunshotSFX, Camera, n\Collider, 35)
-											
-											RotateEntity(pvt, EntityPitch(n\Collider), EntityYaw(n\Collider), 0, True)
-											PositionEntity(pvt, EntityX(n\obj), EntityY(n\obj), EntityZ(n\obj))
-											MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
-											
-											PointEntity pvt, Collider
-											Shoot(EntityX(pvt),EntityY(pvt),EntityZ(pvt),0.9, False)
-											n\Reload = 7
-										EndIf
+										instaKillPlayer% = False
+										
+										DeathMSG = ""
+										
+										PlaySound2(GunshotSFX, Camera, n\Collider, 35)
+										
+										RotateEntity(pvt, EntityPitch(n\Collider), EntityYaw(n\Collider), 0, True)
+										PositionEntity(pvt, EntityX(n\obj), EntityY(n\obj), EntityZ(n\obj))
+										MoveEntity (pvt,0.8*0.079, 10.75*0.079, 6.9*0.079)
+										
+										PointEntity pvt, Collider
+										Shoot(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 1.0, False, instaKillPlayer)
+										n\Reload = 7
 									Else
 										n\CurrSpeed = n\Speed
 									End If
 								EndIf
 								
-								FreeEntity(pvt)
-								
-								If n\Frame < 843 Or n\Frame > 895
-									AnimateNPC(n, 1539, 1553, 0.2, False)
+								If n\Reload > 0 And n\Reload <= 7
+									AnimateNPC(n,245,248,0.35,True)
 								Else
-									SetNPCFrame(n, 1553)
+									If n\Frame < 289
+										AnimateNPC(n,202,244,0.35,True)
+									EndIf
 								EndIf
 								
-								n\BoneToManipulate = "chest"
-								n\BoneToManipulate2 = "head"
-								n\ManipulateBone = True
-								n\ManipulationType = 1
+								FreeEntity(pvt)
 							Else
 								If n\PathStatus = 1
 									If n\Path[n\PathLocation]=Null Then 
@@ -2514,7 +2551,7 @@ Function UpdateNPCs()
 											n\PathLocation = n\PathLocation + 1
 										EndIf
 									Else
-										AnimateNPC(n, 843, 895, n\CurrSpeed*36)
+										AnimateNPC(n,39,76,n\CurrSpeed*40)
 										n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 										MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 										
@@ -2552,15 +2589,15 @@ Function UpdateNPCs()
 									EndIf
 									
 									If n\PathTimer = 1
-										AnimateNPC(n, 843, 895, n\CurrSpeed*36)
+										AnimateNPC(n,39,76,n\CurrSpeed*40)
 										n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 										MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 									EndIf
 								EndIf
 								
-								If prevFrame < 893 And n\Frame=>893 Then
+								If prevFrame < 43 And n\Frame=>43 Then
 									PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.5,0.7))						
-								ElseIf prevFrame < 867 And n\Frame=>867
+								ElseIf prevFrame < 61 And n\Frame=>61
 									PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.5,0.7))
 								EndIf
 							EndIf
@@ -2568,8 +2605,16 @@ Function UpdateNPCs()
 						Else
 							n\State = 0
 						EndIf
+						;[End Block]
 					Case 12
-						AnimateNPC(n, 1539, 1553, 0.2, False)
+						;[Block]
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
+							AnimateNPC(n,289,301,0.2,False)
+							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						EndIf
+						If n\Frame < 289
+							AnimateNPC(n,202,244,0.35,True)
+						EndIf
 						
 						pvt% = CreatePivot()
 						PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider))
@@ -2585,6 +2630,9 @@ Function UpdateNPCs()
 						PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider)+0.8, EntityZ(n\Collider))
 						If n\State2 = 1.0
 							PointEntity(pvt, Collider)
+							n\ManipulateBone = True
+							n\BoneToManipulate = "Chest"
+							n\ManipulationType = 0
 						Else
 							RotateEntity pvt,0,n\Angle,0
 						EndIf
@@ -2592,25 +2640,63 @@ Function UpdateNPCs()
 						
 						FreeEntity(pvt)
 						
-						n\ManipulateBone = True
-						n\BoneToManipulate = "chest"
-						n\BoneToManipulate2 = "head"
-						n\ManipulationType = 1
-						
 						UpdateSoundOrigin(n\SoundChn,Camera,n\Collider,20)
+						;[End Block]
+					Case 13
+						;[Block]
+						AnimateNPC(n,202,244,0.35,True)
+						;[End Block]
+					Case 14
+						;[Block]
+						If n\PathStatus = 2 Then
+							n\State = 13
+							n\CurrSpeed = 0
+						ElseIf n\PathStatus = 1
+							If n\Path[n\PathLocation]=Null Then 
+								If n\PathLocation > 19 Then 
+									n\PathLocation = 0 : n\PathStatus = 0
+								Else
+									n\PathLocation = n\PathLocation + 1
+								EndIf
+							Else
+								PointEntity n\obj, n\Path[n\PathLocation]\obj
+								
+								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
+								
+								AnimateNPC(n,39,76,n\CurrSpeed*40)
+								n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
+								
+								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+								
+								If EntityDistance(n\Collider,n\Path[n\PathLocation]\obj) < 0.2 Then
+									n\PathLocation = n\PathLocation + 1
+								EndIf 
+							EndIf
+						Else
+							n\CurrSpeed = 0
+							n\State = 13
+						EndIf
+						
+						If prevFrame < 43 And n\Frame=>43 Then
+							PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.5,0.7))						
+						ElseIf prevFrame < 61 And n\Frame=>61
+							PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.5,0.7))
+						EndIf
+						;[End Block]
 					Default
+						;[Block]
 						If Rand(400) = 1 Then n\PrevState = Rnd(-30, 30)
 						n\PathStatus = 0
-						AnimateNPC(n, 923, 1354, 0.2)
-						;Animate2(n\obj, AnimTime(n\obj), 923, 1354, 0.2)
+						AnimateNPC(n,77,201,0.2)
 						
 						RotateEntity(n\Collider, 0, CurveAngle(n\Angle + n\PrevState + Sin(MilliSecs2() / 50) * 2, EntityYaw(n\Collider), 50), 0, True)
+						;[End Block]
 				End Select
 				
 				If n\CurrSpeed > 0.01 Then
-					If prevFrame > 1638 And n\Frame<1620 Then
+					If prevFrame < 5 And n\Frame>=5
 						PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.5,0.7))						
-					ElseIf prevFrame < 1627 And n\Frame=>1627
+					ElseIf prevFrame < 23 And n\Frame>=23
 						PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.5,0.7))						
 					EndIf
 				EndIf
@@ -2621,7 +2707,7 @@ Function UpdateNPCs()
 				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.2, EntityZ(n\Collider))
 				
 				;RotateEntity n\obj, EntityPitch(n\Collider)-90, EntityYaw(n\Collider), 0
-				RotateEntity n\obj, -90, EntityYaw(n\Collider), 0
+				RotateEntity n\obj, 0, EntityYaw(n\Collider)+180, 0
 				;[End Block]
 			Case NPCtypeMTF ;------------------------------------------------------------------------------------------------------------------
 				;[Block]
@@ -4773,6 +4859,14 @@ Function UpdateNPCs()
 								EndIf
 							EndIf
 					End Select
+				Else
+					If n\SoundChn <> 0
+						StopChannel n\SoundChn
+						n\SoundChn = 0
+						FreeSound_Strict n\Sound
+						n\Sound = 0
+					EndIf
+					AnimateNPC(n, 344, 363, 0.5, False)
 				EndIf
 				
 				RotateEntity n\obj,0,EntityYaw(n\Collider)-180,0
@@ -5002,7 +5096,7 @@ Function UpdateMTFUnit(n.NPCs)
 	Local prevFrame# = n\Frame
 	
 	n\BoneToManipulate = ""
-	n\BoneToManipulate2 = ""
+	;n\BoneToManipulate2 = ""
 	n\ManipulateBone = False
 	n\ManipulationType = 0
 	n\NPCNameInSection = "MTF"
@@ -5360,6 +5454,26 @@ Function UpdateMTFUnit(n.NPCs)
 								If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 								n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_1.ogg")
 								PlayMTFSound(n\Sound, n)
+								Exit
+							EndIf
+						EndIf
+					ElseIf n2\NPCtype = NPCtype008 And n2\IsDead = False
+						If OtherNPCSeesMeNPC(n2,n) Then
+							If EntityVisible(n\Collider,n2\Collider)
+								n\State = 9
+								n\EnemyX = EntityX(n2\Collider,True)
+								n\EnemyY = EntityY(n2\Collider,True)
+								n\EnemyZ = EntityZ(n2\Collider,True)
+								n\State2 = 70*15.0
+								n\State3 = 0.0
+								n\PathTimer = 0.0
+								n\PathStatus = 0
+								n\Target = n2
+								n\Reload = 70*5
+								DebugLog "008 spotted :"+n\State2
+								;If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+								;n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_1.ogg")
+								;PlayMTFSound(n\Sound, n)
 								Exit
 							EndIf
 						EndIf
@@ -6290,7 +6404,7 @@ Function UpdateMTFUnit(n.NPCs)
 					n\State = 0
 				EndIf
 				;[End Block]
-			Case 9 ;SCP-049-2 spotted
+			Case 9 ;SCP-049-2/008 spotted
 				;[Block]
 				If EntityVisible(n\Collider, n\Target\Collider) Then
 					PointEntity n\obj,n\Target\Collider
@@ -6338,8 +6452,12 @@ Function UpdateMTFUnit(n.NPCs)
 							Else
 								If (Not n\Target\IsDead)
 									If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-									n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_2.ogg")
-									PlayMTFSound(n\Sound, n)
+									If n\NPCtype = NPCtypeZombie
+										n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_2.ogg")
+										PlayMTFSound(n\Sound, n)
+									Else
+										;Still needs to be added! (for 008)
+									EndIf
 								EndIf
 								SetNPCFrame(n\Target,133)
 								n\Target\IsDead = True
@@ -6814,129 +6932,54 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 End Function
 
 Function ManipulateNPCBones()
-	Local n.NPCs,bone%,bone2%,pvt%,pitch#,yaw#,roll#
-	Local bonename$,bonename2$
-	Local pitchvalue#,yawvalue#,rollvalue#
-	Local pitchoffset#,yawoffset#,rolloffset#
+	Local n.NPCs,bone%,pvt%,bonename$
+	Local maxvalue#,minvalue#,offset#
+	Local i%
 	
 	For n = Each NPCs
 		If n\ManipulateBone
-			pitchvalue# = 0
-			yawvalue# = 0
-			rollvalue# = 0
-			pitchoffset# = TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"pitchoffset")
-			yawoffset# = TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yawoffset")
-			rolloffset# = TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"rolloffset")
-			pvt% = CreatePivot()
 			bonename$ = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"bonename",0)
-			bone% = FindChild(n\obj,bonename$)
-			If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+bonename$+Chr(34)+" does not exist."
-			If n\BoneToManipulate2<>""
-				bonename2$ = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"navbone",0)
-				bone2% = FindChild(n\obj,n\BoneToManipulate2$)
-				If bone2% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+bonename2$+Chr(34)+" does not exist."
+			If bonename$<>""
+				pvt% = CreatePivot()
+				bone% = FindChild(n\obj,bonename$)
+				If bone% = 0 Then RuntimeError "ERROR: NPC bone "+Chr(34)+bonename$+Chr(34)+" does not exist."
+				PositionEntity pvt%,EntityX(bone%,True),EntityY(bone%,True),EntityZ(bone%,True)
+				Select n\ManipulationType
+					Case 0 ;<--- looking at player
+						For i = 1 To GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controller_max",1)
+							If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i,0) = "pitch"
+								maxvalue# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_max",2)
+								minvalue# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_min",2)
+								offset# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_offset",2)
+								If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_inverse",3)
+									n\BonePitch = CurveAngle(-DeltaPitch(bone,Camera)+offset,n\BonePitch,10.0)
+								Else
+									n\BonePitch = CurveAngle(DeltaPitch(bone,Camera)+offset,n\BonePitch,10.0)
+								EndIf
+								n\BonePitch = ChangeAngleValueForCorrectBoneAssigning(n\BonePitch)
+								n\BonePitch = Max(Min(n\BonePitch,maxvalue),minvalue)
+							ElseIf GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis1",0) = "yaw"
+								maxvalue# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_max",2)
+								minvalue# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_min",2)
+								offset# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_offset",2)
+								If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_inverse",3)
+									n\BoneYaw = CurveAngle(-DeltaYaw(bone,Camera)+offset,n\BoneYaw,10.0)
+								Else
+									n\BoneYaw = CurveAngle(DeltaYaw(bone,Camera)+offset,n\BoneYaw,10.0)
+								EndIf
+								n\BoneYaw = ChangeAngleValueForCorrectBoneAssigning(n\BoneYaw)
+								n\BoneYaw = Max(Min(n\BoneYaw,maxvalue),minvalue)
+							;ElseIf --> (Roll Value)
+							;	
+							EndIf
+						Next
+						
+						RotateEntity bone%,EntityPitch(bone)+n\BonePitch,EntityYaw(bone)+n\BoneYaw,EntityRoll(bone)+n\BoneRoll
+				End Select
+				FreeEntity pvt%
 			EndIf
-			PositionEntity pvt%,EntityX(bone%,True),EntityY(bone%,True),EntityZ(bone%,True)
-			Select n\ManipulationType
-				Case 0 ;<--- looking at player
-					PointEntity bone%,Camera
-					PointEntity pvt%,Camera
-					n\BonePitch# = CurveAngle(EntityPitch(pvt%),n\BonePitch#,10.0)
-					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yaw")
-						Case 0
-							n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
-							pitchvalue# = n\BoneYaw#
-						Case 1
-							n\BoneYaw# = CurveAngle(EntityYaw(bone%),n\BoneYaw#,10.0)
-							yawvalue# = n\BoneYaw#
-						Case 2
-							n\BoneYaw# = CurveAngle(EntityRoll(bone%),n\BoneYaw#,10.0)
-							rollvalue# = n\BoneYaw#
-					End Select
-					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"pitch")
-						Case 0
-							pitchvalue# = n\BonePitch#
-						Case 1
-							yawvalue# = n\BonePitch#
-						Case 2
-							rollvalue# = n\BonePitch#
-					End Select
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
-						pitchvalue# = -pitchvalue#
-					EndIf
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
-						yawvalue# = -yawvalue#
-					EndIf
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
-						rollvalue# = -rollvalue#
-					EndIf
-					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
-				Case 1 ;<--- looking at player #2
-					n\BonePitch# = CurveAngle(DeltaPitch(bone2%,Camera),n\BonePitch#,10.0)
-					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"pitch")
-						Case 0
-							pitchvalue# = n\BonePitch#
-						Case 1
-							yawvalue# = n\BonePitch#
-						Case 2
-							rollvalue# = n\BonePitch#
-					End Select
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
-						pitchvalue# = -pitchvalue#
-					EndIf
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
-						yawvalue# = -yawvalue#
-					EndIf
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
-						rollvalue# = -rollvalue#
-					EndIf
-					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
-				Case 2 ;<--- looking away from SCP-096
-					PointEntity bone%,Curr096\obj
-					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yaw")
-						Case 0
-							n\BoneYaw# = CurveAngle(EntityPitch(bone%),n\BoneYaw#,10.0)
-							pitchvalue# = -n\BoneYaw#
-						Case 1
-							n\BoneYaw# = CurveAngle(EntityYaw(bone%),n\BoneYaw#,10.0)
-							yawvalue# = -n\BoneYaw#
-						Case 2
-							n\BoneYaw# = CurveAngle(EntityRoll(bone%),n\BoneYaw#,10.0)
-							rollvalue# = -n\BoneYaw#
-					End Select
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
-						pitchvalue# = -pitchvalue#
-					EndIf
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
-						yawvalue# = -yawvalue#
-					EndIf
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
-						rollvalue# = -rollvalue#
-					EndIf
-					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
-				Case 3 ;<-- looking and pitching towards the player
-					PointEntity pvt%,Camera
-					n\BoneYaw# = CurveAngle(EntityPitch(pvt%),n\BoneYaw#,10.0)
-					Select TransformNPCManipulationData(n\NPCNameInSection,n\BoneToManipulate,"yaw")
-						Case 0
-							pitchvalue# = n\BoneYaw#
-						Case 1
-							yawvalue# = n\BoneYaw#
-						Case 2
-							rollvalue# = n\BoneYaw#
-					End Select
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"pitchinverse",3)=True
-						pitchvalue# = -pitchvalue#
-					EndIf
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"yawinverse",3)=True
-						yawvalue# = -yawvalue#
-					EndIf
-					If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"rollinverse",3)=True
-						rollvalue# = -rollvalue#
-					EndIf
-					RotateEntity bone%,pitchvalue#+pitchoffset#,yawvalue#+yawoffset#,rollvalue#+rolloffset#
-			End Select
-			FreeEntity pvt%
+		Else
+			
 		EndIf
 	Next
 	
@@ -6967,29 +7010,16 @@ Function GetNPCManipulationValue$(NPC$,bone$,section$,valuetype%=0)
 	
 End Function
 
-Function TransformNPCManipulationData(NPC$,bone$,section$)
-	;If "section$" = "pitch","yaw" or "roll":
-	;	- 0 means "realpitch" value has detected
-	;	- 1 means "realyaw" value has detected
-	;	- 2 means "realroll" value has detected
-	;If "section$" = "pitchoffset","yawoffset","rolloffset":
-	;	- simply return the offset degree value using a "return Float"
+Function ChangeAngleValueForCorrectBoneAssigning(value#)
+	Local numb#
 	
-	Local value$ = GetNPCManipulationValue(NPC$,bone$,section$)
-	Select section$
-		Case "pitch","yaw","roll"
-			Select value$
-				Case "realpitch"
-					Return 0
-				Case "realyaw"
-					Return 1
-				Case "realroll"
-					Return 2
-			End Select
-		Case "pitchoffset","yawoffset","rolloffset"
-			Return Float(value$)
-	End Select
+	If value# <= 180.0
+		numb# = value#
+	Else
+		numb# = -360+value#
+	EndIf
 	
+	Return numb#
 End Function
 
 Function NPCSpeedChange(n.NPCs)

@@ -131,6 +131,9 @@
 		Tom Malinowski
 
 		SaitoFox
+		
+		Apocryphos
+			Guard animations.
 
 	Sound Effects and Music
 
@@ -214,7 +217,7 @@
 			"Airlock.ogg" and "body1.jpg".
 
 		Christian Rieß
-			Version 1.3 quality assurance.
+			Version 1.3.0 quality assurance.
 
 		Agent G
 			Post-1.3.0 quality assurance
