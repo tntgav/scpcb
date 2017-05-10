@@ -2701,6 +2701,9 @@ Function UpdateNPCs()
 					EndIf
 				EndIf
 				
+				If n\Frame > 286.5 And n\Frame < 288.5
+					n\IsDead = True
+				EndIf
 				
 				n\Reload = Max(0, n\Reload - FPSfactor)
 				;RotateEntity(n\Collider, 0, EntityYaw(n\Collider), 0, True)
