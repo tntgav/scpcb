@@ -436,6 +436,7 @@ For rt.RoomTemplates = Each RoomTemplates
 	EndIf
 	RoomTemplateAmount = RoomTemplateAmount + 1
 Next
+DebugLog "Amount of Rooms: "+RoomTemplateAmount
 
 Global TickIMG = LoadImage_Strict("tickimg.png")
 ScaleImage TickIMG,ResFactor,ResFactor
@@ -466,17 +467,20 @@ Repeat
 	height = 768-70
 	TextBox (x,y,width,height,"")
 	
-	Local RA# = Max(RoomTemplateAmount/67.0,1)
+	;Local RA# = Max(RoomTemplateAmount/67.0,1)
+	;y = y-((ScrollMenuY#*RA)*height)
 	
-	y = y-((ScrollMenuY#*RA)*height)
+	Local RF# = RoomTemplateAmount-36-36-5
+	y = y-(ScrollMenuY#)*(height+(RF*18))
+	
 	For rt.RoomTemplates = Each RoomTemplates
 		;DebugLog rt\name
 		If y > 40 And y < 30+height Then 
-			If SelectedRoomTemplate = rt Then 
+			If SelectedRoomTemplate = rt Then
 				Color 170, 170, 170
 				Rect (x+2)*ResFactor,(y+10)*ResFactor,(width-4)*ResFactor,FontHeight()+1*ResFactor
 				Color 0,0,0
-			EndIf			
+			EndIf
 			
 			If MouseY()>(y+9)*ResFactor And MouseY()<(y+9+18)*ResFactor Then
 				If MouseX()>(x+1)*ResFactor And MouseX()<(x+(width-1))*ResFactor Then

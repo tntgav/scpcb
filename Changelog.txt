@@ -16,6 +16,7 @@ Bug fixes:
 - The SCP-008 zombie cutscene won't be played if the player is in SCP-860-1 or in the pocket dimension.
 - Fixed the monitor in SCP-106's containment chamber not rendering at all.
 - Fixed a bug that caused multiple decals to spawn during the suicide guard event in the restrooms.
+- Fixed the slider for the map creator, so that all rooms will be displayed.
 
 ----------------------------------------------------------------------------------
 
