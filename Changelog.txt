@@ -19,6 +19,7 @@ Bug fixes:
 - Fixed the monitor in SCP-106's containment chamber not rendering at all.
 - Fixed a bug that caused multiple decals to spawn during the suicide guard event in the restrooms.
 - Fixed the slider for the map creator, so that all rooms will be displayed.
+- The player can't save anymore while being dead.
 
 ----------------------------------------------------------------------------------
 

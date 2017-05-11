@@ -6,6 +6,8 @@ Function SaveGame(file$)
 	
 	If DropSpeed#>0.02*FPSfactor Or DropSpeed#<-0.02*FPSfactor Then Return
 	
+	If KillTimer < 0 Then Return
+	
 	GameSaved = True
 	
 	Local x%, y%, i%, temp%
