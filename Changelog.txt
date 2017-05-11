@@ -7,6 +7,7 @@
 - MTF Units now kill the SCP-008 zombie if they encounter it.
 - Revamped the guard animations (by Apocryphos).
 - Added custom resolution selection for the map creator.
+- You can't use some items anymore when you wear certain items (for example, you can't drink anything if you wear a gas mask).
 
 Bug fixes:
 - Fixed a MAV that occured when quick-loading a save file.

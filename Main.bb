@@ -5275,6 +5275,7 @@ Function DrawGUI()
 					ElseIf Inventory(MouseSlot) <> SelectedItem
 						Select SelectedItem\itemtemplate\tempname
 							Case "paper","key1","key2","key3","key4","key5","key6","misc","oldpaper","badge","ticket" ;BoH stuff
+								;[Block]
 								If Inventory(MouseSlot)\itemtemplate\tempname = "clipboard" Then
 									;Add an item to clipboard
 									Local added.Items = Null
@@ -5318,7 +5319,9 @@ Function DrawGUI()
 								EndIf
 								SelectedItem = Null
 								
+								;[End Block]
 							Case "battery", "bat"
+								;[Block]
 								Select Inventory(MouseSlot)\itemtemplate\name
 									Case "S-NAV Navigator", "S-NAV 300 Navigator", "S-NAV 310 Navigator"
 										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
@@ -5363,7 +5366,9 @@ Function DrawGUI()
 										Msg = "You cannot combine these two items."
 										MsgTimer = 70 * 5	
 								End Select
+								;[End Block]
 							Case "18vbat"
+								;[Block]
 								Select Inventory(MouseSlot)\itemtemplate\name
 									Case "S-NAV Navigator", "S-NAV 300 Navigator", "S-NAV 310 Navigator"
 										Msg = "The battery does not fit inside this navigator."
@@ -5388,9 +5393,12 @@ Function DrawGUI()
 										Msg = "You cannot combine these two items."
 										MsgTimer = 70 * 5	
 								End Select
+								;[End Block]
 							Default
+								;[Block]
 								Msg = "You cannot combine these two items."
 								MsgTimer = 70 * 5
+								;[End Block]
 						End Select					
 					End If
 					
@@ -5545,29 +5553,30 @@ Function DrawGUI()
 					;[End Block]
 				Case "scp500"
 					;[Block]
-					GiveAchievement(Achv500)
-					
-					If (Injuries > 0 Or Bloodloss > 0) And Infect > 0 Then
-						Msg = "You swallowed the pill. Your wounds are healing rapidly and your nausea is fading."
-					ElseIf Infect > 0 Then
-						Msg = "You swallowed the pill. Your nausea is fading."
-					Else
-						Msg = "You swallowed the pill. Your wounds are healing rapidly."
-					EndIf
-					MsgTimer = 70*7
-					
-					DeathTimer = 0
-					Injuries = 0
-					Bloodloss = 0
-					Infect = 0
-					Stamina = 100
-					For i = 0 To 5
-						SCP1025state[i]=0
-					Next
-					
-					RemoveItem(SelectedItem)
-					SelectedItem = Null
-					
+					If CanUseItem()
+						GiveAchievement(Achv500)
+						
+						If (Injuries > 0 Or Bloodloss > 0) And Infect > 0 Then
+							Msg = "You swallowed the pill. Your wounds are healing rapidly and your nausea is fading."
+						ElseIf Infect > 0 Then
+							Msg = "You swallowed the pill. Your nausea is fading."
+						Else
+							Msg = "You swallowed the pill. Your wounds are healing rapidly."
+						EndIf
+						MsgTimer = 70*7
+						
+						DeathTimer = 0
+						Injuries = 0
+						Bloodloss = 0
+						Infect = 0
+						Stamina = 100
+						For i = 0 To 5
+							SCP1025state[i]=0
+						Next
+						
+						RemoveItem(SelectedItem)
+						SelectedItem = Null
+					EndIf	
 					;[End Block]
 				Case "veryfinefirstaid"
 					;[Block]
@@ -5624,116 +5633,123 @@ Function DrawGUI()
 						MsgTimer = 70*5
 						SelectedItem = Null
 					Else
-						CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-						Crouch = True
-						
-						DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
-						
-						width% = 300
-						height% = 20
-						x% = GraphicWidth / 2 - width / 2
-						y% = GraphicHeight / 2 + 80
-						Rect(x, y, width+4, height, False)
-						For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
-							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
-						Next
-						
-						SelectedItem\state = Min(SelectedItem\state+(FPSfactor/5.0),100)			
-						
-						If SelectedItem\state = 100 Then
-							If SelectedItem\itemtemplate\tempname = "finefirstaid" Then
-								Bloodloss = 0
-								Injuries = Max(0, Injuries - 2.0)
-								If Injuries = 0 Then
-									Msg = "You bandaged the wounds and took a painkiller. You feel fine."
-								ElseIf Injuries > 1.0
-									Msg = "You bandaged the wounds and took a painkiller, but you were not able to stop the bleeding."
-								Else
-									Msg = "You bandaged the wounds and took a painkiller, but you still feel sore."
-								EndIf
-								MsgTimer = 70*5
-								RemoveItem(SelectedItem)
-							Else
-								Bloodloss = Max(0, Bloodloss - Rand(10,20))
-								If Injuries => 2.5 Then
-									Msg = "The wounds were way too severe to staunch the bleeding completely."
-									Injuries = Max(2.5, Injuries-Rnd(0.3,0.7))
-								ElseIf Injuries > 1.0
-									Injuries = Max(0.5, Injuries-Rnd(0.5,1.0))
-									If Injuries > 1.0 Then
-										Msg = "You bandaged the wounds but were unable to staunch the bleeding completely."
+						If CanUseItem(True)
+							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
+							Crouch = True
+							
+							DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+							
+							width% = 300
+							height% = 20
+							x% = GraphicWidth / 2 - width / 2
+							y% = GraphicHeight / 2 + 80
+							Rect(x, y, width+4, height, False)
+							For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+								DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
+							Next
+							
+							SelectedItem\state = Min(SelectedItem\state+(FPSfactor/5.0),100)			
+							
+							If SelectedItem\state = 100 Then
+								If SelectedItem\itemtemplate\tempname = "finefirstaid" Then
+									Bloodloss = 0
+									Injuries = Max(0, Injuries - 2.0)
+									If Injuries = 0 Then
+										Msg = "You bandaged the wounds and took a painkiller. You feel fine."
+									ElseIf Injuries > 1.0
+										Msg = "You bandaged the wounds and took a painkiller, but you were not able to stop the bleeding."
 									Else
-										Msg = "You managed to stop the bleeding."
+										Msg = "You bandaged the wounds and took a painkiller, but you still feel sore."
 									EndIf
+									MsgTimer = 70*5
+									RemoveItem(SelectedItem)
 								Else
-									If Injuries > 0.5 Then
-										Injuries = 0.5
-										Msg = "You took a painkiller, easing the pain slightly."
+									Bloodloss = Max(0, Bloodloss - Rand(10,20))
+									If Injuries => 2.5 Then
+										Msg = "The wounds were way too severe to staunch the bleeding completely."
+										Injuries = Max(2.5, Injuries-Rnd(0.3,0.7))
+									ElseIf Injuries > 1.0
+										Injuries = Max(0.5, Injuries-Rnd(0.5,1.0))
+										If Injuries > 1.0 Then
+											Msg = "You bandaged the wounds but were unable to staunch the bleeding completely."
+										Else
+											Msg = "You managed to stop the bleeding."
+										EndIf
 									Else
-										Injuries = 0.5
-										Msg = "You took a painkiller, but it still hurts to walk."
+										If Injuries > 0.5 Then
+											Injuries = 0.5
+											Msg = "You took a painkiller, easing the pain slightly."
+										Else
+											Injuries = 0.5
+											Msg = "You took a painkiller, but it still hurts to walk."
+										EndIf
 									EndIf
-								EndIf
-								
-								If SelectedItem\itemtemplate\tempname = "firstaid2" Then 
-									Select Rand(6)
-										Case 1
-											SuperMan = True
-											Msg = "You have becomed overwhelmedwithadrenalineholyshitWOOOOOO~!"
-										Case 2
-											InvertMouse = (Not InvertMouse)
-											Msg = "You suddenly find it very difficult to turn your head."
-										Case 3
-											BlurTimer = 5000
-											Msg = "You feel nauseated."
-										Case 4
-											BlinkEffect = 0.6
-											BlinkEffectTimer = Rand(20,30)
-										Case 5
-											Bloodloss = 0
-											Injuries = 0
-											Msg = "You bandaged the wounds. The bleeding stopped completely and you feel fine."
-										Case 6
-											Msg = "You bandaged the wounds and blood started pouring heavily through the bandages."
-											Injuries = 3.5
-									End Select
-								EndIf
-								
-								MsgTimer = 70*5
-								RemoveItem(SelectedItem)
-							EndIf							
+									
+									If SelectedItem\itemtemplate\tempname = "firstaid2" Then 
+										Select Rand(6)
+											Case 1
+												SuperMan = True
+												Msg = "You have becomed overwhelmedwithadrenalineholyshitWOOOOOO~!"
+											Case 2
+												InvertMouse = (Not InvertMouse)
+												Msg = "You suddenly find it very difficult to turn your head."
+											Case 3
+												BlurTimer = 5000
+												Msg = "You feel nauseated."
+											Case 4
+												BlinkEffect = 0.6
+												BlinkEffectTimer = Rand(20,30)
+											Case 5
+												Bloodloss = 0
+												Injuries = 0
+												Msg = "You bandaged the wounds. The bleeding stopped completely and you feel fine."
+											Case 6
+												Msg = "You bandaged the wounds and blood started pouring heavily through the bandages."
+												Injuries = 3.5
+										End Select
+									EndIf
+									
+									MsgTimer = 70*5
+									RemoveItem(SelectedItem)
+								EndIf							
+							EndIf
 						EndIf
-						
 					EndIf
 					;[End Block]
 				Case "eyedrops"
 					;[Block]
-					If (Not (Wearing714=1)) Then
-						BlinkEffect = 0.6
-						BlinkEffectTimer = Rand(20,30)
-						BlurTimer = 200
+					If CanUseItem(False,True)
+						If (Not (Wearing714=1)) Then
+							BlinkEffect = 0.6
+							BlinkEffectTimer = Rand(20,30)
+							BlurTimer = 200
+						EndIf
+						RemoveItem(SelectedItem)
 					EndIf
-					RemoveItem(SelectedItem)
 					;[End Block]
 				Case "fineeyedrops"
 					;[Block]
-					If (Not (Wearing714=1)) Then 
-						BlinkEffect = 0.4
-						BlinkEffectTimer = Rand(30,40)
-						Bloodloss = Max(Bloodloss-1.0, 0)
-						BlurTimer = 200
+					If CanUseItem(False,True)
+						If (Not (Wearing714=1)) Then 
+							BlinkEffect = 0.4
+							BlinkEffectTimer = Rand(30,40)
+							Bloodloss = Max(Bloodloss-1.0, 0)
+							BlurTimer = 200
+						EndIf
+						RemoveItem(SelectedItem)
 					EndIf
-					RemoveItem(SelectedItem)
 					;[End Block]
 				Case "supereyedrops"
 					;[Block]
-					If (Not (Wearing714 = 1)) Then
-						BlinkEffect = 0.0
-						BlinkEffectTimer = 60
-						EyeStuck = 10000
+					If CanUseItem(False,True)
+						If (Not (Wearing714 = 1)) Then
+							BlinkEffect = 0.0
+							BlinkEffectTimer = 60
+							EyeStuck = 10000
+						EndIf
+						BlurTimer = 1000
+						RemoveItem(SelectedItem)
 					EndIf
-					BlurTimer = 1000
-					RemoveItem(SelectedItem)					
 					;[End Block]
 				Case "paper", "ticket"
 					;[Block]
@@ -5796,110 +5812,113 @@ Function DrawGUI()
 					;[End Block]
 				Case "cup"
 					;[Block]
-					
-					SelectedItem\name = Trim(Lower(SelectedItem\name))
-					If Left(SelectedItem\name, Min(6,Len(SelectedItem\name))) = "cup of" Then
-						SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-7)
-					ElseIf Left(SelectedItem\name, Min(8,Len(SelectedItem\name))) = "a cup of" 
-						SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-9)
-					EndIf
-					
-					;the state of refined items is more than 1.0 (fine setting increases it by 1, very fine doubles it)
-					x2 = (SelectedItem\state+1.0)
-					
-					Local iniStr$ = "DATA\SCP-294.ini"
-					
-					Local loc% = GetINISectionLocation(iniStr, SelectedItem\name)
-					
-					;Stop
-					
-					strtemp = GetINIString2(iniStr, loc, "message")
-					If strtemp <> "" Then Msg = strtemp : MsgTimer = 70*6
-					
-					If GetINIInt2(iniStr, loc, "lethal") Or GetINIInt2(iniStr, loc, "deathtimer") Then 
-						DeathMSG = GetINIString2(iniStr, loc, "deathmessage")
-						If GetINIInt2(iniStr, loc, "lethal") Then Kill()
-					EndIf
-					BlurTimer = GetINIInt2(iniStr, loc, "blur")*70;*temp
-					If VomitTimer = 0 Then VomitTimer = GetINIInt2(iniStr, loc, "vomit")
-					CameraShakeTimer = GetINIString2(iniStr, loc, "camerashake")
-					Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
-					Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"),0);*temp
-					strtemp =  GetINIString2(iniStr, loc, "sound")
-					If strtemp<>"" Then
-						PlaySound_Strict LoadTempSound(strtemp)
-					EndIf
-					If GetINIInt2(iniStr, loc, "stomachache") Then SCP1025state[3]=1
-					
-					DeathTimer=GetINIInt2(iniStr, loc, "deathtimer")*70
-					
-					BlinkEffect = Float(GetINIString2(iniStr, loc, "blink effect", 1.0))*x2
-					BlinkEffectTimer = Float(GetINIString2(iniStr, loc, "blink effect timer", 1.0))*x2
-					
-					StaminaEffect = Float(GetINIString2(iniStr, loc, "stamina effect", 1.0))*x2
-					StaminaEffectTimer = Float(GetINIString2(iniStr, loc, "stamina effect timer", 1.0))*x2
-					
-					strtemp = GetINIString2(iniStr, loc, "refusemessage")
-					If strtemp <> "" Then
-						Msg = strtemp 
-						MsgTimer = 70*6		
-					Else
-						it.Items = CreateItem("Empty Cup", "emptycup", 0,0,0)
-						it\Picked = True
-						For i = 0 To MaxItemAmount-1
-							If Inventory(i)=SelectedItem Then Inventory(i) = it : Exit
-						Next					
-						EntityType (it\collider, HIT_ITEM)
+					If CanUseItem()
+						SelectedItem\name = Trim(Lower(SelectedItem\name))
+						If Left(SelectedItem\name, Min(6,Len(SelectedItem\name))) = "cup of" Then
+							SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-7)
+						ElseIf Left(SelectedItem\name, Min(8,Len(SelectedItem\name))) = "a cup of" 
+							SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-9)
+						EndIf
 						
-						RemoveItem(SelectedItem)						
+						;the state of refined items is more than 1.0 (fine setting increases it by 1, very fine doubles it)
+						x2 = (SelectedItem\state+1.0)
+						
+						Local iniStr$ = "DATA\SCP-294.ini"
+						
+						Local loc% = GetINISectionLocation(iniStr, SelectedItem\name)
+						
+						;Stop
+						
+						strtemp = GetINIString2(iniStr, loc, "message")
+						If strtemp <> "" Then Msg = strtemp : MsgTimer = 70*6
+						
+						If GetINIInt2(iniStr, loc, "lethal") Or GetINIInt2(iniStr, loc, "deathtimer") Then 
+							DeathMSG = GetINIString2(iniStr, loc, "deathmessage")
+							If GetINIInt2(iniStr, loc, "lethal") Then Kill()
+						EndIf
+						BlurTimer = GetINIInt2(iniStr, loc, "blur")*70;*temp
+						If VomitTimer = 0 Then VomitTimer = GetINIInt2(iniStr, loc, "vomit")
+						CameraShakeTimer = GetINIString2(iniStr, loc, "camerashake")
+						Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
+						Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"),0);*temp
+						strtemp =  GetINIString2(iniStr, loc, "sound")
+						If strtemp<>"" Then
+							PlaySound_Strict LoadTempSound(strtemp)
+						EndIf
+						If GetINIInt2(iniStr, loc, "stomachache") Then SCP1025state[3]=1
+						
+						DeathTimer=GetINIInt2(iniStr, loc, "deathtimer")*70
+						
+						BlinkEffect = Float(GetINIString2(iniStr, loc, "blink effect", 1.0))*x2
+						BlinkEffectTimer = Float(GetINIString2(iniStr, loc, "blink effect timer", 1.0))*x2
+						
+						StaminaEffect = Float(GetINIString2(iniStr, loc, "stamina effect", 1.0))*x2
+						StaminaEffectTimer = Float(GetINIString2(iniStr, loc, "stamina effect timer", 1.0))*x2
+						
+						strtemp = GetINIString2(iniStr, loc, "refusemessage")
+						If strtemp <> "" Then
+							Msg = strtemp 
+							MsgTimer = 70*6		
+						Else
+							it.Items = CreateItem("Empty Cup", "emptycup", 0,0,0)
+							it\Picked = True
+							For i = 0 To MaxItemAmount-1
+								If Inventory(i)=SelectedItem Then Inventory(i) = it : Exit
+							Next					
+							EntityType (it\collider, HIT_ITEM)
+							
+							RemoveItem(SelectedItem)						
+						EndIf
+						
+						SelectedItem = Null
 					EndIf
-					
-					SelectedItem = Null	
-					
 					;[End Block]
 				Case "syringe"
 					;[Block]
-					HealTimer = 30
-					StaminaEffect = 0.5
-					StaminaEffectTimer = 20
-					
-					Msg = "You injected yourself with the syringe and feel a slight adrenaline rush."
-					MsgTimer = 70 * 8
-					
-					RemoveItem(SelectedItem)
-					
+					If CanUseItem(True)
+						HealTimer = 30
+						StaminaEffect = 0.5
+						StaminaEffectTimer = 20
+						
+						Msg = "You injected yourself with the syringe and feel a slight adrenaline rush."
+						MsgTimer = 70 * 8
+						
+						RemoveItem(SelectedItem)
+					EndIf
 					;[End Block]
 				Case "finesyringe"
 					;[Block]
-					HealTimer = Rnd(20, 40)
-					StaminaEffect = Rnd(0.5, 0.8)
-					StaminaEffectTimer = Rnd(20, 30)
-					
-					Msg = "You injected yourself with the syringe and feel an adrenaline rush."
-					MsgTimer = 70 * 8
-					
-					RemoveItem(SelectedItem)
-					
+					If CanUseItem(True)
+						HealTimer = Rnd(20, 40)
+						StaminaEffect = Rnd(0.5, 0.8)
+						StaminaEffectTimer = Rnd(20, 30)
+						
+						Msg = "You injected yourself with the syringe and feel an adrenaline rush."
+						MsgTimer = 70 * 8
+						
+						RemoveItem(SelectedItem)
+					EndIf
 					;[End Block]
 				Case "veryfinesyringe"
 					;[Block]
-					Select Rand(3)
-						Case 1
-							HealTimer = Rnd(40, 60)
-							StaminaEffect = 0.1
-							StaminaEffectTimer = 30
-							Msg = "You injected yourself with the syringe and feel a huge adrenaline rush."
-						Case 2
-							SuperMan = True
-							Msg = "You injected yourself with the syringe and feel a humongous adrenaline rush."
-						Case 3
-							VomitTimer = 30
-							Msg = "You injected yourself with the syringe and feel a pain in your stomach."
-					End Select
-					
-					MsgTimer = 70 * 8
-					RemoveItem(SelectedItem)
-					
+					If CanUseItem(True)
+						Select Rand(3)
+							Case 1
+								HealTimer = Rnd(40, 60)
+								StaminaEffect = 0.1
+								StaminaEffectTimer = 30
+								Msg = "You injected yourself with the syringe and feel a huge adrenaline rush."
+							Case 2
+								SuperMan = True
+								Msg = "You injected yourself with the syringe and feel a humongous adrenaline rush."
+							Case 3
+								VomitTimer = 30
+								Msg = "You injected yourself with the syringe and feel a pain in your stomach."
+						End Select
+						
+						MsgTimer = 70 * 8
+						RemoveItem(SelectedItem)
+					EndIf
 					;[End Block]
 				Case "radio","18vradio","fineradio","veryfineradio"
 					;[Block]
@@ -6208,57 +6227,63 @@ Function DrawGUI()
 					;[End Block]
 				Case "cigarette"
 					;[Block]
-					If SelectedItem\state = 0 Then
-						Select Rand(6)
-							Case 1
-								Msg = Chr(34)+"I don't have anything to light it with. Umm, what about that... Nevermind."+Chr(34)
-							Case 2
-								Msg = "You are unable to get lit."
-							Case 3
-								Msg = Chr(34)+"I quit that a long time ago."+Chr(34)
-								RemoveItem(SelectedItem)
-							Case 4
-								Msg = Chr(34)+"Even if I wanted one, I have nothing to light it with."+Chr(34)
-							Case 5
-								Msg = Chr(34)+"Could really go for one now... Wish I had a lighter."+Chr(34)
-							Case 6
-								Msg = Chr(34)+"Don't plan on starting, even at a time like this."+Chr(34)
-								RemoveItem(SelectedItem)
-						End Select
-						SelectedItem\state = 1 
-					Else
-						Msg = "You are unable to get lit."
+					If CanUseItem()
+						If SelectedItem\state = 0 Then
+							Select Rand(6)
+								Case 1
+									Msg = Chr(34)+"I don't have anything to light it with. Umm, what about that... Nevermind."+Chr(34)
+								Case 2
+									Msg = "You are unable to get lit."
+								Case 3
+									Msg = Chr(34)+"I quit that a long time ago."+Chr(34)
+									RemoveItem(SelectedItem)
+								Case 4
+									Msg = Chr(34)+"Even if I wanted one, I have nothing to light it with."+Chr(34)
+								Case 5
+									Msg = Chr(34)+"Could really go for one now... Wish I had a lighter."+Chr(34)
+								Case 6
+									Msg = Chr(34)+"Don't plan on starting, even at a time like this."+Chr(34)
+									RemoveItem(SelectedItem)
+							End Select
+							SelectedItem\state = 1 
+						Else
+							Msg = "You are unable to get lit."
+						EndIf
+						
+						MsgTimer = 70 * 5
 					EndIf
-
-					MsgTimer = 70 * 5
 					;[End Block]
 				Case "420"
 					;[Block]
-					If Wearing714=1 Then
-						Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
-					Else
-						Msg = Chr(34) + "MAN DATS SUM GOOD ASS SHIT" + Chr(34)
-						Injuries = Max(Injuries-0.5, 0)
-						BlurTimer = 500
-						GiveAchievement(Achv420)
-						PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
+					If CanUseItem()
+						If Wearing714=1 Then
+							Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
+						Else
+							Msg = Chr(34) + "MAN DATS SUM GOOD ASS SHIT" + Chr(34)
+							Injuries = Max(Injuries-0.5, 0)
+							BlurTimer = 500
+							GiveAchievement(Achv420)
+							PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
+						EndIf
+						MsgTimer = 70 * 5
+						RemoveItem(SelectedItem)
 					EndIf
-					MsgTimer = 70 * 5
-					RemoveItem(SelectedItem)
 					;[End Block]
 				Case "420s"
 					;[Block]
-					If Wearing714=1 Then
-						Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
-					Else
-						DeathMSG = "Subject D-9341 found in a comatose state in [DATA REDACTED]. The subject was holding what appears to be a cigarette while smiling widely. "
-						DeathMSG = DeathMSG+"Chemical analysis of the cigarette has been inconclusive, although it seems to contain a high concentration of an unidentified chemical "
-						DeathMSG = DeathMSG+"whose molecular structure is remarkably similar to that of tetrahydrocannabinol."
-						Msg = Chr(34) + "UH WHERE... WHAT WAS I DOING AGAIN... MAN I NEED TO TAKE A NAP..." + Chr(34)
-						KillTimer = -1						
+					If CanUseItem()
+						If Wearing714=1 Then
+							Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
+						Else
+							DeathMSG = "Subject D-9341 found in a comatose state in [DATA REDACTED]. The subject was holding what appears to be a cigarette while smiling widely. "
+							DeathMSG = DeathMSG+"Chemical analysis of the cigarette has been inconclusive, although it seems to contain a high concentration of an unidentified chemical "
+							DeathMSG = DeathMSG+"whose molecular structure is remarkably similar to that of tetrahydrocannabinol."
+							Msg = Chr(34) + "UH WHERE... WHAT WAS I DOING AGAIN... MAN I NEED TO TAKE A NAP..." + Chr(34)
+							KillTimer = -1						
+						EndIf
+						MsgTimer = 70 * 6
+						RemoveItem(SelectedItem)
 					EndIf
-					MsgTimer = 70 * 6
-					RemoveItem(SelectedItem)
 					;[End Block]
 				Case "scp714"
 					;[Block]
@@ -11189,21 +11214,56 @@ Function PlayStartupVideos()
 	
 End Function
 
+Function CanUseItem(onlyhazmat%=False,eyeitemstoo%=False) ;only use this if you want to make a item not usable when wearing a gasmask/hazmat, etc... - ENDSHN
+	;True - Item can be used
+	;False - Item can't be used
+	;onlyhazmat% - determines if the item is only not usable when wearing a hazmat suit (so that gasmasks don't have an effect)
+	
+	If (Not WearingHazmat)
+		If onlyhazmat
+			Return True
+		Else
+			If WearingGasMask Or Wearing1499
+				Msg = "You can't use that item at the moment."
+				MsgTimer = 70*5
+				Return False
+			Else
+				If eyeitemstoo%
+					If WearingNightVision Or Wearing178
+						Msg = "You can't use that item at the moment."
+						MsgTimer = 70*5
+						Return False
+					Else
+						Return True
+					EndIf
+				Else
+					Return True
+				EndIf
+			EndIf
+		EndIf
+	Else
+		Msg = "You can't use that item at the moment."
+		MsgTimer = 70*5
+		Return False
+	EndIf
+	
+End Function
+
 
 
 
 
 ;~IDEal Editor Parameters:
-;~F#39#D8#175#17B#18B#23F#2EA#2F3#313#327#32C#332#338#33E#344#349#367#37D#392#398
-;~F#39E#3A5#3AC#3B5#3BB#3C1#3C7#3CE#3DD#3E6#3F2#404#41D#439#43E#44B#45D#478#47F#485
-;~F#493#4A6#4AF#4B8#4DE#507#513#51F#532#538#53E#542#548#54D#56C#57B#599#5F2#6F8#76F
-;~F#790#808#815#8CC#957#96E#97C#9AE#A65#A74#AAA#B9C#CC8#CD9#D92#DBA#DC9#DF1#E1B#E34
-;~F#E4B#E7B#E93#F5B#108A#11AA#1315#1501#1514#1527#153A#154B#155A#1576#157A#157E#1587#15A1#15CB#1624
-;~F#162D#1637#1641#166C#167C#16BB#16C7#16D3#16E7#1818#1832#1840#184E#185B#1863#1870#187C#1895#194E#197B
-;~F#1991#199D#19B4#19BF#19FF#1A73#1AC5#1B00#1B50#1C97#1CA2#1E10#1E2F#1E89#1F24#1F51#1F80#208B#209D#20B9
-;~F#20C3#20D0#20FC#2130#2164#219D#21B1#21C6#21CA#21EA#21F2#221D#2469#251E#255A#25D9#25DF#25E9#25F5#2600
-;~F#2604#263F#2647#264F#2656#265D#266A#2670#267B#26BD#26CC#26EA#2718#271F#2732#274B#2778#2783#2788#27A2
-;~F#27AE#27C9#281B#2829#2831#2839#2864#286D#2896#289B#28A0#28A5#28AF#28C0#2960#296E#299D#29D6#29E8#2A07
-;~F#2A16#2A2D#2A4A#2A4E#2A52#2A69#2A87#2A92#2ABD
-;~B#1227#1469#1B31
+;~F#39#D8#175#17B#18B#2EA#313#327#32C#332#338#33E#344#349#367#37D#392#398#39E#3A5
+;~F#3AC#3B9#3BF#3C5#3CB#3D2#3E1#3EA#3F6#408#421#43D#442#44F#461#47C#483#489#4B3#4BC
+;~F#4E2#4F4#50B#517#523#536#53C#542#546#54C#551#570#57F#58E#59D#5F6#6FE#775#796#80E
+;~F#81B#8D2#95D#974#982#9B4#A6B#A7A#AB0#BA1#CCD#CDE#DAE#DD6#DE5#E0D#E37#E50#E63#E93
+;~F#EAB#F73#10AB#1338#149D#14CB#14FA#1515#152C#153F#1552#1565#1576#1585#15A1#15A5#15A9#15B2#15CC#15FC
+;~F#1656#1661#166D#1679#16A4#16B4#16F3#1700#170D#1722#1853#186F#187F#188F#189C#18A4#18B1#18BD#18D6#198F
+;~F#19BC#19D2#19DE#19F5#1A00#1A40#1AB4#1B06#1B41#1B91#1CDB#1CE6#1E54#1E73#1ED3#1F6F#1F9C#1FCB#20D5#20E7
+;~F#2103#210D#211A#2146#2186#21C6#2215#224E#2262#2277#227B#229B#22A3#22CE#2512#25C7#2603#26A5#26AB#26B5
+;~F#26C1#26CC#26D0#270B#2713#271B#2722#2729#2736#273C#2747#2789#2798#27B6#27E4#27EB#27FE#2817#2844#284F
+;~F#2854#286E#287A#2895#28E7#28F5#28FD#2905#2930#2939#2962#2967#296C#2971#297B#298C#2A2E#2A3C#2A6B#2AA4
+;~F#2AB6#2AD5#2AE4#2AFB#2B18#2B1C#2B20#2B4E#2B6C#2B77#2BA2#2BC0
+;~B#1232#1474#1B54
 ;~C#Blitz3D
