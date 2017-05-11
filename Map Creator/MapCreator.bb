@@ -26,10 +26,13 @@ Global Modes = CountGfxModes()
 Dim IsGoodMode(Modes+1)
 Global ValidModes = 0
 Dim HasDepth(3)
+Global CurrLauncherPage = 0
+Global IsCustomRes% = GetINIInt("..\options.INI","map creator","is custom resolution")
+Global AspectRatio# = 4.0/3.0
 
 If ResolutionSelect%
 	For i = 1 To Modes
-		If Float(GfxModeWidth(i))/Float(GfxModeHeight(i)) < 1.34 And Float(GfxModeWidth(i))/Float(GfxModeHeight(i)) > 1.32
+		If Float(GfxModeWidth(i))/Float(GfxModeHeight(i)) < AspectRatio+0.01 And Float(GfxModeWidth(i))/Float(GfxModeHeight(i)) > AspectRatio-0.01
 			IsGoodMode(i)=True
 			ValidModes = i
 		EndIf
@@ -77,49 +80,100 @@ Repeat
 	MouseDown1 = MouseDown(1)
 	MouseHit1 = MouseHit(1)
 	
-	For i = 1 To ValidModes
-		;x2 = (width2/ValidModes) Mod 6
-		If IsGoodMode(i)
-			If Button(x2,y2,width2,height2,GfxModeWidth(i)+"X"+GfxModeHeight(i))
-				ResWidth2 = GfxModeWidth(i)
-				ResHeight2 = GfxModeHeight(i)
+	If CurrLauncherPage=0
+		For i = 1 To ValidModes+1
+			If i < ValidModes+1
+				If IsGoodMode(i)
+					If Button(x2,y2,width2,height2,GfxModeWidth(i)+"X"+GfxModeHeight(i))
+						ResWidth2 = GfxModeWidth(i)
+						ResHeight2 = GfxModeHeight(i)
+						IsCustomRes = 0
+					EndIf
+					x2=x2+width2
+					If x2 > 460
+						x2=0
+						y2=y2+height2
+					EndIf
+				EndIf
+				Color 255,255,255
+				If GfxModeWidth(i)=ResWidth2 And GfxModeHeight(i)=ResHeight2
+					Text 240,240-height2-20,"Selected Resolution: "+GfxModeWidth(i)+"X"+GfxModeHeight(i),1,1
+				Else
+					If IsCustomRes
+						Text 240,240-height2-20,"Selected Resolution: "+ResWidth2+"X"+ResHeight2+" (custom)",1,1
+					EndIf
+				EndIf
+			Else
+				If Button(x2,y2,width2,height2,"Custom")
+					CurrLauncherPage = 1
+				EndIf
 			EndIf
-			x2=x2+width2
-			If x2 > 460
-				x2=0
-				y2=y2+height2
-			EndIf
+		Next
+		
+		If Button(0,240-height2,width2,height2,"QUIT") Then End
+		
+		If Button(480-width2,240-height2,width2,height2,"START") Then
+			PutINIValue("..\options.INI","map creator","width",ResWidth2%)
+			PutINIValue("..\options.INI","map creator","height",ResHeight2%)
+			PutINIValue("..\options.INI","map creator","is custom resolution",IsCustomRes)
+			PutINIValue("..\options.INI","map creator","resolution select",ResolutionSelect2%)
+			ResolutionSelect% = False
 		EndIf
+		
 		Color 255,255,255
-		If GfxModeWidth(i)=ResWidth2 And GfxModeHeight(i)=ResHeight2
-			Text 240,240-height2-20,"Selected Resolution: "+GfxModeWidth(i)+"X"+GfxModeHeight(i),1,1
-		EndIf
-	Next
-	
-	If Button(0,240-height2,width2,height2,"QUIT") Then End
-	
-	If Button(480-width2,240-height2,width2,height2,"START") Then
-		PutINIValue("..\options.INI","map creator","width",ResWidth2%)
-		PutINIValue("..\options.INI","map creator","height",ResHeight2%)
-		PutINIValue("..\options.INI","map creator","resolution select",ResolutionSelect2%)
-		ResolutionSelect% = False
-	EndIf
-	
-	Color 255,255,255
-	Text 150,240-height2,"Resolution"
-	Text 150,255-height2,"Selection:"
-	
-	If ResolutionSelect2
-		Color 0,255,0
-		Text 150,270-height2,"Enabled"
-		If Button(240,240-height2,width2,height2,"Disable")
-			ResolutionSelect2 = False
+		Text 150,240-height2,"Resolution"
+		Text 150,255-height2,"Selection:"
+		
+		If ResolutionSelect2
+			Color 0,255,0
+			Text 150,270-height2,"Enabled"
+			If Button(240,240-height2,width2,height2,"Disable")
+				ResolutionSelect2 = False
+			EndIf
+		Else
+			Color 255,0,0
+			Text 150,270-height2,"Disabled"
+			If Button(240,240-height2,width2,height2,"Enable")
+				ResolutionSelect2 = True
+			EndIf
 		EndIf
 	Else
-		Color 255,0,0
-		Text 150,270-height2,"Disabled"
-		If Button(240,240-height2,width2,height2,"Enable")
-			ResolutionSelect2 = True
+		If Button(0,240-height2,width2,height2,"QUIT") Then End
+		
+		Color 255,255,255
+		Text 10,10,"Width:"
+		ResWidth2 = InputBox(10,30,50,25,ResWidth2,0)
+		Color 255,255,255
+		Text 80,10,"Height:"
+		ResHeight2 = InputBox(80,30,50,25,ResHeight2,1)
+		
+		Color 255,255,255
+		Text 370,10,"Fit resolution to aspect",1
+		Text 370,30,"ratio 4:3 according to:",1
+		If Button(275,50,90,25,"The width")
+			ResHeight2 = ResWidth2/AspectRatio
+		EndIf
+		If Button(375,50,90,25,"The height")
+			ResWidth2 = ResHeight2*AspectRatio
+		EndIf
+		
+		If Button(480-width2,240-height2,width2,height2,"BACK")
+			PutINIValue("..\options.INI","map creator","width",ResWidth2%)
+			PutINIValue("..\options.INI","map creator","height",ResHeight2%)
+			Local notcustom = False
+			For i = 1 To ValidModes
+				If GfxModeWidth(i)=ResWidth2 And GfxModeHeight(i)=ResHeight2
+					notcustom = True
+					Exit
+				EndIf
+			Next
+			If (Not notcustom)
+				IsCustomRes = 1
+			Else
+				IsCustomRes = 0
+			EndIf
+			PutINIValue("..\options.INI","map creator","is custom resolution",IsCustomRes)
+			CurrLauncherPage = 0
 		EndIf
 	EndIf
 	
