@@ -424,7 +424,12 @@ Function RemoveItem(i.Items)
 	FreeEntity(i\model) : FreeEntity(i\collider) : i\collider = 0
 	
 	For n% = 0 To MaxItemAmount - 1
-		If Inventory(n) = i Then Inventory(n) = Null
+		If Inventory(n) = i
+			DebugLog "Removed "+i\itemtemplate\name+" from slot "+n
+			Inventory(n) = Null
+			ItemAmount = ItemAmount-1
+			Exit
+		EndIf
 	Next
 	If SelectedItem = i Then
 		Select SelectedItem\itemtemplate\tempname 
@@ -579,7 +584,7 @@ Function PickItem(item.Items)
 										PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))
 									EndIf
 									e\eventstate = Max(1, e\eventstate)
-
+									
 									Exit
 								EndIf
 							Next
@@ -636,6 +641,7 @@ Function PickItem(item.Items)
 				item\Dropped = -1
 				
 				item\itemtemplate\found=True
+				ItemAmount = ItemAmount + 1
 				
 				Inventory(n) = item
 				HideEntity(item\collider)

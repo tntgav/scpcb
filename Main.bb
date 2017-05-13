@@ -2962,8 +2962,10 @@ Repeat
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		
-		UpdateWorld()
-		ManipulateNPCBones()
+		If FPSfactor>0
+			UpdateWorld()
+			ManipulateNPCBones()
+		EndIf
 		RenderWorld2()
 		
 		BlurVolume = Min(CurveValue(0.0, BlurVolume, 20.0),0.95)
@@ -3989,17 +3991,25 @@ Function MovePlayer()
 		If StaminaEffect <> 1.0 Then StaminaEffect = 1.0
 	EndIf
 	
+	Local temp#
+	
 	If PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then 
 		If KeyDown(KEY_SPRINT) Then
 			If Stamina < 5 Then
-				If ChannelPlaying(BreathCHN)=False Then BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask>0), 0))
+				temp = 0
+				If WearingGasMask>0 Or Wearing1499>0 Then temp=1
+				If ChannelPlaying(BreathCHN)=False Then BreathCHN = PlaySound_Strict(BreathSFX((temp), 0))
 			ElseIf Stamina < 50
 				If BreathCHN=0 Then
-					BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask>0), Rand(1,3)))
+					temp = 0
+					If WearingGasMask>0 Or Wearing1499>0 Then temp=1
+					BreathCHN = PlaySound_Strict(BreathSFX((temp), Rand(1,3)))
 					ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)*SFXVolume
 				Else
 					If ChannelPlaying(BreathCHN)=False Then
-						BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask>0), Rand(1,3)))
+						temp = 0
+						If WearingGasMask>0 Or Wearing1499>0 Then temp=1
+						BreathCHN = PlaySound_Strict(BreathSFX((temp), Rand(1,3)))
 						ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)*SFXVolume			
 					EndIf
 				EndIf
@@ -4051,7 +4061,8 @@ Function MovePlayer()
 				EndIf
 			EndIf
 			
-			Local temp# = (Shake Mod 360), tempchn%
+			temp# = (Shake Mod 360)
+			Local tempchn%
 			If (Not UnableToMove%) Then Shake# = (Shake + FPSfactor * Min(Sprint, 1.5) * 7) Mod 720
 			If temp < 180 And (Shake Mod 360) >= 180 And KillTimer>=0 Then
 				If CurrStepSFX=0 Then
@@ -5250,10 +5261,10 @@ Function DrawGUI()
 			Else
 				If MouseSlot = 66 Then
 					DropItem(SelectedItem)		
-		
+					
 					SelectedItem = Null		
 					InvOpen = False		
-							
+					
 					MoveMouse viewport_center_x, viewport_center_y
 				Else
 					If Inventory(MouseSlot) = Null Then
@@ -7937,6 +7948,7 @@ Function InitNewGame()
 			HideEntity(it\collider)
 			EntityType (it\collider, HIT_ITEM)
 			EntityParent(it\collider, 0)
+			ItemAmount = ItemAmount + 1
 		ElseIf (r\RoomTemplate\Name = "173" And IntroEnabled) Then
 			PositionEntity (Collider, EntityX(r\obj), 1.0, EntityZ(r\obj))
 			PlayerRoom = r
@@ -9725,6 +9737,21 @@ End Function
 Function UpdateInfect()
 	Local temp#, i%, r.Rooms
 	
+	Local teleportForInfect% = True
+	
+	If PlayerRoom\RoomTemplate\Name = "room860"
+		For e.Events = Each Events
+			If e\EventName = "room860"
+				If e\EventState = 1.0
+					teleportForInfect = False
+				EndIf
+				Exit
+			EndIf
+		Next
+	ElseIf PlayerRoom\RoomTemplate\Name = "dimension1499" Or PlayerRoom\RoomTemplate\Name = "pocketdimension"
+		teleportForInfect = False
+	EndIf
+	
 	If Infect>0 Then
 		ShowEntity InfectOverlay
 		
@@ -9760,7 +9787,7 @@ Function UpdateInfect()
 			ElseIf Infect =>91.5
 				BlinkTimer = Max(Min(-10*(Infect-91.5),BlinkTimer),-10)
 				If Infect >= 92.7 And temp < 92.7 Then
-					If PlayerRoom\RoomTemplate\Name <> "dimension1499"
+					If teleportForInfect
 						For r.Rooms = Each Rooms
 							If r\RoomTemplate\Name="008" Then
 								PositionEntity Collider, EntityX(r\Objects[7],True),EntityY(r\Objects[7],True),EntityZ(r\Objects[7],True),True
@@ -9784,7 +9811,7 @@ Function UpdateInfect()
 			temp=Infect
 			Infect = Min(Infect+FPSfactor*0.004,100)
 			
-			If PlayerRoom\RoomTemplate\Name<>"dimension1499"
+			If teleportForInfect
 				If Infect < 94.7 Then
 					EntityAlpha InfectOverlay, 0.5 * (Sin(MilliSecs2()/8.0)+2.0)
 					BlurTimer = 900
@@ -9853,7 +9880,11 @@ Function UpdateInfect()
 			Else
 				Kill()
 				BlinkTimer = Max(Min(-10*(Infect-96),BlinkTimer),-10)
-				DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate repots of a violent attack to a church in the Russian town of [REDACTED]."
+				If PlayerRoom\RoomTemplate\Name = "dimension1499"
+					DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate repots of a violent attack to a church in the Russian town of [REDACTED]."
+				Else
+					DeathMSG = ""
+				EndIf
 			EndIf
 		EndIf
 		
