@@ -2322,6 +2322,7 @@ Function UseDoor(d.Doors, showmsg%=True)
 		If SelectedItem <> Null Then
 			temp = (SelectedItem\itemtemplate\tempname = "hand" And d\KeyCard=-1) Or (SelectedItem\itemtemplate\tempname = "hand2" And d\KeyCard=-2)
 		EndIf
+		SelectedItem = Null
 		If temp <> 0 Then
 			PlaySound_Strict ScannerSFX1
 			Msg = "You place the palm of the hand onto the scanner. The scanner reads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
