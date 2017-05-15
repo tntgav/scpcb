@@ -7,7 +7,7 @@
 - The gas mask breath sounds will now play if the player equipped SCP-1499.
 - MTF units now kill the SCP-008 infected if they encounter it.
 - Updated and added new MTF announcer voice lines.
-- Revamped the guard animations by Apocryphos.
+- Revamped guard animations by Apocryphos.
 
 Bug fixes:
 - Fixed a crash that occured while quick-loading a save file.
