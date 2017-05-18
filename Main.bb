@@ -2758,6 +2758,8 @@ Global UpdateParticles_Time# = 0.0
 
 Global CurrTrisAmount%
 
+Global Input_ResetTime# = 0
+
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------       		MAIN LOOP                 ---------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2790,20 +2792,24 @@ Repeat
 	EndIf
 	ElapsedLoops = ElapsedLoops + 1
 	
-	DoubleClick = False
-	MouseHit1 = MouseHit(1)
-	If MouseHit1 Then
-		If MilliSecs2() - LastMouseHit1 < 800 Then DoubleClick = True
-		LastMouseHit1 = MilliSecs2()
+	If Input_ResetTime<=0.0
+		DoubleClick = False
+		MouseHit1 = MouseHit(1)
+		If MouseHit1 Then
+			If MilliSecs2() - LastMouseHit1 < 800 Then DoubleClick = True
+			LastMouseHit1 = MilliSecs2()
+		EndIf
+		
+		Local prevmousedown1 = MouseDown1
+		MouseDown1 = MouseDown(1)
+		If prevmousedown1 = True And MouseDown1=False Then MouseUp1 = True Else MouseUp1 = False
+		
+		MouseHit2 = MouseHit(2)
+		
+		If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
+	Else
+		Input_ResetTime = Max(Input_ResetTime-FPSfactor,0.0)
 	EndIf
-	
-	Local prevmousedown1 = MouseDown1
-	MouseDown1 = MouseDown(1)
-	If prevmousedown1 = True And MouseDown1=False Then MouseUp1 = True Else MouseUp1 = False
-	
-	MouseHit2 = MouseHit(2)
-	
-	If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
 	
 	UpdateMusic()
 	If EnableSFXRelease Then AutoReleaseSounds()
@@ -7296,6 +7302,8 @@ Function DrawMenu()
 							
 							PrevTime = MilliSecs()
 							FPSfactor = 0
+							
+							ResetInput()
 						EndIf
 					Else
 						DrawFrame(x,y,390*MenuScale, 60*MenuScale)
@@ -7350,6 +7358,8 @@ Function DrawMenu()
 						
 						PrevTime = MilliSecs()
 						FPSfactor = 0
+						
+						ResetInput()
 					EndIf
 				Else
 					DrawButton(x, y, 390*MenuScale, 60*MenuScale, "")
@@ -8135,7 +8145,9 @@ Function InitLoadGame()
 	DrawLoading(100)
 	
 	PrevTime = MilliSecs()
-	FPSfactor = 0	
+	FPSfactor = 0
+	ResetInput()
+	
 End Function
 
 Function NullGame()
@@ -11249,6 +11261,21 @@ Function CanUseItem(onlyhazmat%=False,eyeitemstoo%=False) ;only use this if you 
 	
 End Function
 
+Function ResetInput()
+	
+	FlushKeys()
+	FlushMouse()
+	MouseHit1 = 0
+	MouseHit2 = 0
+	MouseDown1 = 0
+	MouseUp1 = 0
+	MouseHit(1)
+	MouseHit(2)
+	MouseDown(1)
+	GrabbedEntity = 0
+	Input_ResetTime# = 10.0
+	
+End Function
 
 
 
