@@ -1,20 +1,22 @@
 ﻿v1.3.8
 
-- Added a level 5 key card in SCP-079's chamber.
-- The barrel in SCP-008's chamber now shows an arrow pointing down if you click on it.
-- The player gets infected by SCP-008 if he is coming close to SCP-008's barrel when bleeding and when not wearing the hazmat suit.
+- Added a level 5 key card to SCP-079's containment chamber.
+- The barrel in SCP-008's containment chamber now displays an arrow to indicate that the canister needs to be pulled downn.
+- The player now gets infected by SCP-008 if they get close to SCP-008's canister while bleeding and not wearing the hazmat suit.
 - Swapped the SCP-914 outcomes for the Night Vision Goggles on "Fine" and "Very Fine".
-- MTF Units now kill the SCP-008 zombie if they encounter it.
-- Revamped the guard animations (by Apocryphos).
+- The gas mask breath sounds will now play if the player equipped SCP-1499.
+- MTF units now kill the SCP-008 infected if they encounter it.
+- Updated and added new MTF announcer voice lines.
+- Revamped guard animations by Apocryphos.
 
 Bug fixes:
-- Fixed a MAV that occured when quick-loading a save file.
-- The SCP-008 cutscene won't play if the player turns into a SCP-049-2 instance after getting killed by SCP-049.
-- The gas mask breath sounds will now be played if the player equipped SCP-1499.
-- Fixed a bug that prevented to pick up items after consuming another item while the inventory is full.
-- The event where SCP-173 breaks glass in SCP-008's chamber won't be played if SCP-173 is not in this room.
-- The SCP-008 zombie cutscene won't be played if the player is in SCP-860-1 or in the pocket dimension.
-- Fixed the monitor in SCP-106's containment chamber not rendering at all.
+- Fixed a crash that occured while quick-loading a save file.
+- The SCP-008 cutscene no longer triggers if the player turns into a SCP-049-2 instance.
+- The SCP-008 infected cutscene no longer triggers if the player is in SCP-860-1 or the pocket dimension.
+- Fixed a bug that prevented the player from picking up more items after the inventory had previously been full.
+- Fixed a bug that caused SCP-173 to break the glass in SCP-008's chamber when it is not inside the room.
+- Fixed the severed hand remaining selected after using it on a DNA scanner.
+- Fixed the CCTV monitor in SCP-106's containment chamber not rendering at all.
 
 ----------------------------------------------------------------------------------
 

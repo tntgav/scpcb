@@ -2898,7 +2898,7 @@ Function UpdateEvents()
 												
 												;LoadEventSound(e,"SFX\Character\MTF\Tesla1.ogg")
 												;e\SoundCHN = PlaySound_Strict (e\Sound)
-												PlayAnnouncement("SFX\Character\MTF\Tesla1.ogg")
+												PlayAnnouncement("SFX\Character\MTF\Tesla"+Rand(1,3)+".ogg")
 												n\Idle = 70*10
 												e\EventState2 = 70*100
 											EndIf

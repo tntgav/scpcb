@@ -46,7 +46,7 @@
 		SCP-970 is based on "SCP-970 - The Recursive Room" by "Freudian" (http://www.scp-wiki.net/scp-970)		
 		SCP-1025 is based on "SCP-1025 - Encyclopedia of Diseases" by "Lasergoose" (http://www.scp-wiki.net//scp-1025)
 		SCP-1048 is based on "SCP-1048 - Builder Bear" by "Researcher Dios" (http://www.scp-wiki.net/scp-1048)
-		SCP-1074  is based on "SCP-1074 - Stendhal's Nightmare" by "Smapti" (http://www.scp-wiki.net/scp-1074)
+		SCP-1074 is based on "SCP-1074 - Stendhal's Nightmare" by "Smapti" (http://www.scp-wiki.net/scp-1074)
 		SCP-1123 is based on "SCP-1123 - Atrocity Skull" by "sandrewswann" (http://www.scp-wiki.net/scp-1123)
 		SCP-1162 is based on "SCP-1162 - A Hole in the Wall" by "Dedaluminus" (http://www.scp-wiki.net/scp-1162)
 		SCP-1499 is based on "SCP-1499 - The Gas Mask" by "Trasknari" (http://www.scp-wiki.net/scp-1499)
