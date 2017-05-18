@@ -5560,7 +5560,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "scp500"
 					;[Block]
-					If CanUseItem()
+					If CanUseItem(False, False, True)
 						GiveAchievement(Achv500)
 						
 						If (Injuries > 0 Or Bloodloss > 0) And Infect > 0 Then
@@ -5640,7 +5640,7 @@ Function DrawGUI()
 						MsgTimer = 70*5
 						SelectedItem = Null
 					Else
-						If CanUseItem(True)
+						If CanUseItem(False, True, True)
 							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
 							Crouch = True
 							
@@ -5725,8 +5725,8 @@ Function DrawGUI()
 					;[End Block]
 				Case "eyedrops"
 					;[Block]
-					If CanUseItem(False,True)
-						If (Not (Wearing714=1)) Then
+					If CanUseItem(False,False,False)
+						If (Not (Wearing714=1)) Then ;wtf is this
 							BlinkEffect = 0.6
 							BlinkEffectTimer = Rand(20,30)
 							BlurTimer = 200
@@ -5736,7 +5736,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "fineeyedrops"
 					;[Block]
-					If CanUseItem(False,True)
+					If CanUseItem(False,False,False)
 						If (Not (Wearing714=1)) Then 
 							BlinkEffect = 0.4
 							BlinkEffectTimer = Rand(30,40)
@@ -5748,7 +5748,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "supereyedrops"
 					;[Block]
-					If CanUseItem(False,True)
+					If CanUseItem(False,False,False)
 						If (Not (Wearing714 = 1)) Then
 							BlinkEffect = 0.0
 							BlinkEffectTimer = 60
@@ -5819,7 +5819,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "cup"
 					;[Block]
-					If CanUseItem()
+					If CanUseItem(False,False,True)
 						SelectedItem\name = Trim(Lower(SelectedItem\name))
 						If Left(SelectedItem\name, Min(6,Len(SelectedItem\name))) = "cup of" Then
 							SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-7)
@@ -5882,7 +5882,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "syringe"
 					;[Block]
-					If CanUseItem(True)
+					If CanUseItem(False,True,True)
 						HealTimer = 30
 						StaminaEffect = 0.5
 						StaminaEffectTimer = 20
@@ -5895,7 +5895,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "finesyringe"
 					;[Block]
-					If CanUseItem(True)
+					If CanUseItem(False,True,True)
 						HealTimer = Rnd(20, 40)
 						StaminaEffect = Rnd(0.5, 0.8)
 						StaminaEffectTimer = Rnd(20, 30)
@@ -5908,7 +5908,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "veryfinesyringe"
 					;[Block]
-					If CanUseItem(True)
+					If CanUseItem(False,True,True)
 						Select Rand(3)
 							Case 1
 								HealTimer = Rnd(40, 60)
@@ -6234,7 +6234,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "cigarette"
 					;[Block]
-					If CanUseItem()
+					If CanUseItem(False,False,True)
 						If SelectedItem\state = 0 Then
 							Select Rand(6)
 								Case 1
@@ -6262,7 +6262,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "420"
 					;[Block]
-					If CanUseItem()
+					If CanUseItem(False,False,True)
 						If Wearing714=1 Then
 							Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
 						Else
@@ -6278,7 +6278,7 @@ Function DrawGUI()
 					;[End Block]
 				Case "420s"
 					;[Block]
-					If CanUseItem()
+					If CanUseItem(False,False,True)
 						If Wearing714=1 Then
 							Msg = Chr(34) + "DUDE WTF THIS SHIT DOESN'T EVEN WORK" + Chr(34)
 						Else
@@ -11255,39 +11255,20 @@ Function PlayStartupVideos()
 	
 End Function
 
-Function CanUseItem(onlyhazmat%=False,eyeitemstoo%=False) ;only use this if you want to make a item not usable when wearing a gasmask/hazmat, etc... - ENDSHN
-	;True - Item can be used
-	;False - Item can't be used
-	;onlyhazmat% - determines if the item is only not usable when wearing a hazmat suit (so that gasmasks don't have an effect)
-	
-	If (Not WearingHazmat)
-		If onlyhazmat
-			Return True
-		Else
-			If WearingGasMask Or Wearing1499
-				Msg = "You can't use that item at the moment."
-				MsgTimer = 70*5
-				Return False
-			Else
-				If eyeitemstoo%
-					If WearingNightVision Or Wearing178
-						Msg = "You can't use that item at the moment."
-						MsgTimer = 70*5
-						Return False
-					Else
-						Return True
-					EndIf
-				Else
-					Return True
-				EndIf
-			EndIf
-		EndIf
-	Else
-		Msg = "You can't use that item at the moment."
+Function CanUseItem(canUseWithHazmat%, canUseWithGasMask%, canUseWithEyewear%)
+	If (canUseWithHazmat = False And WearingHazmat) Then
+		Msg = "You can't use that item while wearing a hazmat suit."
 		MsgTimer = 70*5
 		Return False
+	Else If (canUseWithGasMask = False And (WearingGasMask Or Wearing1499))
+		Msg = "You can't use that item while wearing a gas mask."
+		MsgTimer = 70*5
+		Return False
+	Else If (canUseWithEyewear = False And (WearingNightVision Or Wearing178))
+		Msg = "You can't use that item while wearing headgear."
 	EndIf
 	
+	Return True
 End Function
 
 Function ResetInput()
