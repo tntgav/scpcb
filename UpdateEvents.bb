@@ -6636,16 +6636,17 @@ Function UpdateEvents()
 					If e\room\dist < 15.0 And e\room\dist >= 4.0 Then 
 						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\NPC[0]\Collider, 15.0)
 						
-					ElseIf e\room\dist<4.0 And PlayerSoundVolume > 1.0 Then
-						de.Decals = CreateDecal(3,  EntityX(e\room\Objects[2],True), 0.01, EntityZ(e\room\Objects[2],True),90,Rnd(360),0)
-						de\Size = 0.3 : ScaleSprite (de\obj, de\size, de\size)
-						
-						de.Decals = CreateDecal(17,  EntityX(e\room\Objects[2],True), 0.01, EntityZ(e\room\Objects[2],True),90,Rnd(360),0)
-						de\Size = 0.1 : de\maxsize = 0.45 : de\sizechange = 0.0002 : UpdateDecals()
-						
-						;FreeSound e\Sound
-						;StopChannel e\SoundCHN
-						;LoadEventSound(e,"SFX\Character\Guard\SuicideGuard2.ogg",1)
+					ElseIf e\room\dist<4.0 And PlayerSoundVolume > 1.0
+						If e\EventState2=0
+							;Y=0.01
+							de.Decals = CreateDecal(3,  EntityX(e\room\Objects[2],True), 0.015, EntityZ(e\room\Objects[2],True),90,Rnd(360),0)
+							de\Size = 0.3 : ScaleSprite (de\obj, de\size, de\size)
+							
+							de.Decals = CreateDecal(17,  EntityX(e\room\Objects[2],True), 0.01, EntityZ(e\room\Objects[2],True),90,Rnd(360),0)
+							de\Size = 0.1 : de\maxsize = 0.45 : de\sizechange = 0.0002 : UpdateDecals()
+							
+							e\EventState2 = 1
+						EndIf
 						If e\SoundCHN2 = 0
 							StopChannel(e\SoundCHN)
 							FreeSound_Strict(e\Sound)

@@ -4,10 +4,6 @@
 - The barrel in SCP-008's containment chamber now displays an arrow to indicate that the canister needs to be pulled downn.
 - The player now gets infected by SCP-008 if they get close to SCP-008's canister while bleeding and not wearing the hazmat suit.
 - Swapped the SCP-914 outcomes for the Night Vision Goggles on "Fine" and "Very Fine".
-- The gas mask breath sounds will now play if the player equipped SCP-1499.
-- MTF units now kill the SCP-008 infected if they encounter it.
-- Updated and added new MTF announcer voice lines.
-- Revamped guard animations by Apocryphos.
 
 Bug fixes:
 - Fixed a crash that occured while quick-loading a save file.
@@ -17,6 +13,10 @@ Bug fixes:
 - Fixed a bug that caused SCP-173 to break the glass in SCP-008's chamber when it is not inside the room.
 - Fixed the severed hand remaining selected after using it on a DNA scanner.
 - Fixed the CCTV monitor in SCP-106's containment chamber not rendering at all.
+- Fixed a bug that caused multiple decals to spawn during the suicide guard event in the restrooms.
+- Fixed the slider for the map creator, so that all rooms will be displayed.
+- The player can't save when dead.
+- Closing the loading screen by left clicking doesn't open/close nearby doors anymore.
 
 ----------------------------------------------------------------------------------
 
