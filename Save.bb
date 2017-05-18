@@ -432,7 +432,7 @@ Function SaveGame(file$)
 	
 	If UsedConsole
 		WriteInt f, 100
-		DebugLog "CHEATED!"
+		DebugLog "Used Console"
 	Else
 		WriteInt f, 994
 	EndIf
@@ -1067,7 +1067,7 @@ Function LoadGame(file$)
 	
 	If ReadInt(f)<>994
 		UsedConsole = True
-		DebugLog "CHEATED!"
+		DebugLog "Used Console"
 	EndIf
 	
 	CloseFile f
@@ -1716,7 +1716,7 @@ Function LoadGameQuick(file$)
 	
 	If ReadInt(f)<>994
 		UsedConsole = True
-		DebugLog "CHEATED!"
+		DebugLog "Used Console"
 	EndIf
 	
 	If 0 Then 
