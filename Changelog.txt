@@ -4,6 +4,10 @@
 - The barrel in SCP-008's containment chamber now displays an arrow to indicate that the canister needs to be pulled downn.
 - The player now gets infected by SCP-008 if they get close to SCP-008's canister while bleeding and not wearing the hazmat suit.
 - Swapped the SCP-914 outcomes for the Night Vision Goggles on "Fine" and "Very Fine".
+- MTF Units now kill the SCP-008 zombie if they encounter it.
+- Revamped the guard animations (by Apocryphos).
+- Added custom resolution selection for the map creator.
+- You can't use some items anymore when you wear certain items (for example, you can't drink anything if you wear a gas mask).
 
 Bug fixes:
 - Fixed a crash that occured while quick-loading a save file.
