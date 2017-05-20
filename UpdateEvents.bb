@@ -2898,7 +2898,7 @@ Function UpdateEvents()
 												
 												;LoadEventSound(e,"SFX\Character\MTF\Tesla1.ogg")
 												;e\SoundCHN = PlaySound_Strict (e\Sound)
-												PlayAnnouncement("SFX\Character\MTF\Tesla"+Rand(1,3)+".ogg")
+												;PlayAnnouncement("SFX\Character\MTF\Tesla"+Rand(1,3)+".ogg")
 												n\Idle = 70*10
 												e\EventState2 = 70*100
 											EndIf
@@ -2912,6 +2912,10 @@ Function UpdateEvents()
 							e\EventState3=e\EventState3-FPSfactor
 						EndIf
 					Else
+						If e\EventState2 => 70*92 And e\EventState2-FPSfactor < 70*92
+							PlayAnnouncement("SFX\Character\MTF\Tesla"+Rand(1,3)+".ogg")
+						EndIf
+						
 						e\EventState2 = Max(e\EventState2-FPSfactor,0)
 					EndIf					
 				EndIf
@@ -5586,6 +5590,7 @@ Function UpdateEvents()
 							StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
 						EndIf
 						e\SoundCHN = StreamSound_Strict("SFX\SCP\079\GateB.ogg",SFXVolume,0)
+						e\SoundCHN_isStream = True
 						e\EventState2 = 2
 						
 						For e2.Events = Each Events

@@ -17,6 +17,8 @@ Bug fixes:
 - Fixed the slider for the map creator, so that all rooms will be displayed.
 - The player can't save when dead.
 - Closing the loading screen by left clicking doesn't open/close nearby doors anymore.
+- SCP-173's collision radius has been decreased.
+- Fixed a crash that occured when opening your inventory.
 
 ----------------------------------------------------------------------------------
 
