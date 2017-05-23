@@ -11243,15 +11243,91 @@ End Function
 Function PlayStartupVideos()
 	
 	If GetINIInt("options.ini","options","play startup video")=0 Then Return
-	Local SplashScreenVideo = OpenMovie("GFX\menu\startup.avi")
-	FlushKeys()
+	
+	Local Cam = CreateCamera() 
+	CameraClsMode Cam, 0, 1
+	Local Quad = CreateQuad()
+	Local Texture = CreateTexture(2048, 2048, 256 Or 16 Or 32)
+	EntityTexture Quad, Texture
+	EntityFX Quad, 1
+	CameraRange Cam, 0.01, 100
+	TranslateEntity Cam, 1.0 / 2048 ,-1.0 / 2048 ,-1.0
+	EntityParent Quad, Cam, 1
+	
+	Local moviefile$ = "GFX\menu\startup"
+	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
+	Local moview = BlitzMovie_GetWidth()
+	Local movieh = BlitzMovie_GetHeight()
+	BlitzMovie_Close()
+	
+	Local ScaledGraphicHeight%
+	Local Ratio# = Float(RealGraphicWidth)/Float(RealGraphicHeight)
+	If Ratio>1.76 And Ratio<1.78
+		ScaledGraphicHeight = RealGraphicHeight
+		DebugLog "Not Scaled"
+	Else
+		ScaledGraphicHeight% = RealGraphicWidth/Ratio
+		DebugLog "Scaled: "+ScaledGraphicHeight
+	EndIf
+	
+	Local image = CreateImage(moview, movieh)
+	Local SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
+	SplashScreenVideo = BlitzMovie_Play()
+	Local SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
+	
 	Repeat
 		Cls
-		DrawMovie SplashScreenVideo,0,0,GraphicWidth,GraphicHeight
+		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
 		Flip
-	Until ((Not MoviePlaying(SplashScreenVideo)) Or GetKey())
-	CloseMovie SplashScreenVideo
+	Until (GetKey() Or (Not IsStreamPlaying_Strict(SplashScreenAudio)))
+	StopStream_Strict(SplashScreenAudio)
+	BlitzMovie_Stop()
+	BlitzMovie_Close()
+	FreeTexture Texture
+	FreeEntity Quad
+	FreeEntity Cam
 	Cls
+	Flip
+	
+End Function
+
+Function ProjectImage(img, w#, h#, Quad%, Texture%)
+	
+	Local img_w# = ImageWidth(img)
+	Local img_h# = ImageHeight(img)
+	If img_w > 2048 Then img_w = 2048
+	If img_h > 2048 Then img_h = 2048
+	If img_w < 1 Then img_w = 1
+	If img_h < 1 Then img_h = 1
+	
+	If w > 2048 Then w = 2048
+	If h > 2048 Then h = 2048
+	If w < 1 Then w = 1
+	If h < 1 Then h = 1
+	
+	Local w_rel# = w# / img_w#
+	Local h_rel# = h# / img_h#
+	Local g_rel# = 2048.0 / Float(RealGraphicWidth)
+	Local dst_x = 1024 - (img_w / 2.0)
+	Local dst_y = 1024 - (img_h / 2.0)
+	CopyRect 0, 0, img_w, img_h, dst_x, dst_y, ImageBuffer(img), TextureBuffer(Texture)
+	ScaleEntity Quad, w_rel * g_rel, h_rel * g_rel, 0.0001
+	RenderWorld()
+	
+End Function
+
+Function CreateQuad()
+	
+	mesh = CreateMesh()
+	surf = CreateSurface(mesh)
+	v0 = AddVertex(surf,-1.0, 1.0, 0, 0, 0)
+	v1 = AddVertex(surf, 1.0, 1.0, 0, 1, 0)
+	v2 = AddVertex(surf, 1.0,-1.0, 0, 1, 1)
+	v3 = AddVertex(surf,-1.0,-1.0, 0, 0, 1)
+	AddTriangle(surf, v0, v1, v2)
+	AddTriangle(surf, v0, v2, v3)
+	UpdateNormals mesh
+	Return mesh
 	
 End Function
 
