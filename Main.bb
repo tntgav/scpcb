@@ -5587,51 +5587,53 @@ Function DrawGUI()
 					;[End Block]
 				Case "veryfinefirstaid"
 					;[Block]
-					Select Rand(5)
-						Case 1
-							Injuries = 3.5
-							Msg = "You started bleeding heavily."
-							MsgTimer = 70*7
-						Case 2
-							Injuries = 0
-							Bloodloss = 0
-							Msg = "Your wounds are healing up rapidly."
-							MsgTimer = 70*7
-						Case 3
-							Injuries = Max(0, Injuries - Rnd(0.5,3.5))
-							Bloodloss = Max(0, Bloodloss - Rnd(10,100))
-							Msg = "You feel much better."
-							MsgTimer = 70*7
-						Case 4
-							BlurTimer = 10000
-							Bloodloss = 0
-							Msg = "You feel nauseated."
-							MsgTimer = 70*7
-						Case 5
-							BlinkTimer = -10
-							If PlayerRoom\RoomTemplate\Name <> "dimension1499"
-								For r.Rooms = Each Rooms
-									If r\RoomTemplate\Name = "pocketdimension" Then
-										PositionEntity(Collider, EntityX(r\obj),0.8,EntityZ(r\obj))		
-										ResetEntity Collider									
-										UpdateDoors()
-										UpdateRooms()
-										PlaySound_Strict(Use914SFX)
-										DropSpeed = 0
-										Curr106\State = -2500
-										Exit
-									EndIf
-								Next
-								Msg = "For some inexplicable reason. You find yourself inside the pocket dimension."
-								MsgTimer = 70*8
-							Else ;Cheap little fix for the strange bottle usage in dimension1499 (player was able to get teleported to pocket dimension)
-								Injuries = 2.5
+					If CanUseItem(False, False, True)
+						Select Rand(5)
+							Case 1
+								Injuries = 3.5
 								Msg = "You started bleeding heavily."
 								MsgTimer = 70*7
-							EndIf
-					End Select
-					
-					RemoveItem(SelectedItem)
+							Case 2
+								Injuries = 0
+								Bloodloss = 0
+								Msg = "Your wounds are healing up rapidly."
+								MsgTimer = 70*7
+							Case 3
+								Injuries = Max(0, Injuries - Rnd(0.5,3.5))
+								Bloodloss = Max(0, Bloodloss - Rnd(10,100))
+								Msg = "You feel much better."
+								MsgTimer = 70*7
+							Case 4
+								BlurTimer = 10000
+								Bloodloss = 0
+								Msg = "You feel nauseated."
+								MsgTimer = 70*7
+							Case 5
+								BlinkTimer = -10
+								If PlayerRoom\RoomTemplate\Name <> "dimension1499"
+									For r.Rooms = Each Rooms
+										If r\RoomTemplate\Name = "pocketdimension" Then
+											PositionEntity(Collider, EntityX(r\obj),0.8,EntityZ(r\obj))		
+											ResetEntity Collider									
+											UpdateDoors()
+											UpdateRooms()
+											PlaySound_Strict(Use914SFX)
+											DropSpeed = 0
+											Curr106\State = -2500
+											Exit
+										EndIf
+									Next
+									Msg = "For some inexplicable reason. You find yourself inside the pocket dimension."
+									MsgTimer = 70*8
+								Else ;Cheap little fix for the strange bottle usage in dimension1499 (player was able to get teleported to pocket dimension)
+									Injuries = 2.5
+									Msg = "You started bleeding heavily."
+									MsgTimer = 70*7
+								EndIf
+						End Select
+						
+						RemoveItem(SelectedItem)
+					EndIf
 					;[End Block]
 				Case "firstaid", "finefirstaid", "firstaid2"
 					;[Block]
