@@ -11286,6 +11286,7 @@ Function PlayStartupVideos()
 	FreeTexture Texture
 	FreeEntity Quad
 	FreeEntity Cam
+	FreeImage image
 	Cls
 	Flip
 	
