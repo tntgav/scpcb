@@ -11266,7 +11266,7 @@ Function PlayStartupVideos()
 		ScaledGraphicHeight = RealGraphicHeight
 		DebugLog "Not Scaled"
 	Else
-		ScaledGraphicHeight% = RealGraphicWidth/Ratio
+		ScaledGraphicHeight% = Float(RealGraphicWidth)/(16.0/9.0)
 		DebugLog "Scaled: "+ScaledGraphicHeight
 	EndIf
 	
