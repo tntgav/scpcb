@@ -9,6 +9,7 @@
 - Added custom resolution selection for the map creator.
 - You can't use some items anymore when you wear certain items (for example, you can't drink anything if you wear a gas mask).
 - The startup video will now be played using a library called BlitzMovie rather than DirectMovie.
+- You can now save at the Gate-B entrance.
 
 Bug fixes:
 - Fixed a crash that occured while quick-loading a save file.

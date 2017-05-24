@@ -3102,7 +3102,7 @@ Repeat
 		If KeyHit(KEY_SAVE) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
+				If RN$ = "173" Or (RN$ = "exit1" And EntityY(Collider)>1040.0*RoomScale) Or RN$ = "gatea"
 					Msg = "You cannot save in this location."
 					MsgTimer = 70 * 4
 					;SetSaveMSG("You cannot save in this location.")
@@ -3124,7 +3124,7 @@ Repeat
 					;SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
-					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
+					If RN$ = "173" Or (RN$ = "exit1" And EntityY(Collider)>1040.0*RoomScale) Or RN$ = "gatea"
 						Msg = "You cannot save in this location."
 						MsgTimer = 70 * 4
 						;SetSaveMSG("You cannot save in this location.")
