@@ -26,6 +26,8 @@ Bug fixes:
 - SCP-173's collision radius has been decreased.
 - Fixed a crash that occured when opening your inventory.
 - The fog doesn't turn white anymore if you go to the pocket dimension by leaving SCP-1499.
+- Fixed items falling through the floor if the room is not rendered.
+- Fixed the item dropspeed increasing each time an item has been picked up.
 
 ----------------------------------------------------------------------------------
 

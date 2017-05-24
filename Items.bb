@@ -501,9 +501,21 @@ Function UpdateItems()
 					i\zspeed = 0.0
 				Else
 					If ShouldEntitiesFall
-						i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
-						TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
-						If i\WontColl Then ResetEntity(i\collider)
+						Local pickpivot = CreatePivot()
+						PositionEntity pickpivot,EntityX(i\collider),EntityY(i\collider),EntityZ(i\collider)
+						RotateEntity pickpivot,-90,0,0
+						Local pick = EntityPick(pickpivot,20)
+						If pick
+							i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
+							TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
+							If i\WontColl Then ResetEntity(i\collider)
+						Else
+							i\DropSpeed = 0
+							i\xspeed = 0.0
+							i\zspeed = 0.0
+						EndIf
+						
+						FreeEntity pickpivot
 					EndIf
 				EndIf
 				
@@ -538,6 +550,10 @@ Function UpdateItems()
 			Else
 				HideEntity i\collider
 			EndIf
+		Else
+			i\DropSpeed = 0
+			i\xspeed = 0.0
+			i\zspeed = 0.0
 		EndIf
 		
 		If Not deletedItem Then
