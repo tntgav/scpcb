@@ -503,8 +503,8 @@ Function UpdateItems()
 					If ShouldEntitiesFall
 						Local pickpivot = CreatePivot()
 						PositionEntity pickpivot,EntityX(i\collider),EntityY(i\collider),EntityZ(i\collider)
-						RotateEntity pickpivot,-90,0,0
-						Local pick = EntityPick(pickpivot,20)
+						RotateEntity pickpivot,90,0,0
+						Local pick = EntityPick(pickpivot,10)
 						If pick
 							i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
 							TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
@@ -516,6 +516,10 @@ Function UpdateItems()
 						EndIf
 						
 						FreeEntity pickpivot
+					Else
+						i\DropSpeed = 0
+						i\xspeed = 0.0
+						i\zspeed = 0.0
 					EndIf
 				EndIf
 				
