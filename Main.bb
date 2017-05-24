@@ -5610,7 +5610,12 @@ Function DrawGUI()
 								MsgTimer = 70*7
 							Case 5
 								BlinkTimer = -10
-								If PlayerRoom\RoomTemplate\Name <> "dimension1499"
+								Local roomname$ = PlayerRoom\RoomTemplate\Name
+								If roomname = "dimension1499" Or roomname = "gatea" Or (roomname="exit1" And EntityY(Collider)>1040.0*RoomScale)
+									Injuries = 2.5
+									Msg = "You started bleeding heavily."
+									MsgTimer = 70*7
+								Else
 									For r.Rooms = Each Rooms
 										If r\RoomTemplate\Name = "pocketdimension" Then
 											PositionEntity(Collider, EntityX(r\obj),0.8,EntityZ(r\obj))		
@@ -5625,10 +5630,6 @@ Function DrawGUI()
 									Next
 									Msg = "For some inexplicable reason. You find yourself inside the pocket dimension."
 									MsgTimer = 70*8
-								Else ;Cheap little fix for the strange bottle usage in dimension1499 (player was able to get teleported to pocket dimension)
-									Injuries = 2.5
-									Msg = "You started bleeding heavily."
-									MsgTimer = 70*7
 								EndIf
 						End Select
 						
