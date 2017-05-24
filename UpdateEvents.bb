@@ -1992,6 +1992,8 @@ Function UpdateEvents()
 									PositionEntity(Collider, EntityX(e\room\Objects[8],True)-400*RoomScale, -304*RoomScale, EntityZ(e\room\Objects[8],True))
 									ResetEntity Collider
 									
+									CameraFogColor Camera, 0,0,0
+									CameraClsColor Camera, 0,0,0
 								EndIf
 								
 							Else

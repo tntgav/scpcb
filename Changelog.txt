@@ -25,6 +25,7 @@ Bug fixes:
 - Closing the loading screen by left clicking doesn't open/close nearby doors anymore.
 - SCP-173's collision radius has been decreased.
 - Fixed a crash that occured when opening your inventory.
+- The fog doesn't turn white anymore if you go to the pocket dimension by leaving SCP-1499.
 
 ----------------------------------------------------------------------------------
 

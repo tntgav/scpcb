@@ -10928,6 +10928,9 @@ Function UpdateLeave1499()
 							If PlayerRoom\NPC[i]\State2 > PlayerRoom\NPC[i]\PrevState Then PlayerRoom\NPC[i]\State2 = (PlayerRoom\NPC[i]\PrevState-3)
 						Next
 					EndIf
+				ElseIf PlayerRoom\RoomTemplate\Name = "pocketdimension"
+					CameraFogColor Camera, 0,0,0
+					CameraClsColor Camera, 0,0,0
 				EndIf
 				For r2.Rooms = Each Rooms
 					If r2\RoomTemplate\Name = "dimension1499"
