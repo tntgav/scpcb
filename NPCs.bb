@@ -2613,7 +2613,11 @@ Function UpdateNPCs()
 							If n\Frame >= 301 Then SetNPCFrame(n,202)
 						EndIf
 						If n\Frame < 289
-							AnimateNPC(n,202,244,0.35,True)
+							;AnimateNPC(n,202,244,0.35,True)
+							
+							;This needs to be like that, otherwise the bone manipulation doesn't work properly (because it needs at least 2 frames of animation to work if you use AnimateNPC) - ENDSHN
+							SetAnimTime(n\obj,245)
+							n\Frame = 245
 						EndIf
 						
 						pvt% = CreatePivot()
