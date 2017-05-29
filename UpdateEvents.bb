@@ -1834,6 +1834,8 @@ Function UpdateEvents()
 				If PlayerRoom = e\room Then
 					ShowEntity e\room\obj
 					
+					PlayerFallingPickRadius = 0.0
+					
 					Injuries = Injuries+FPSfactor*0.00005
 					PrevSecondaryLightOn = SecondaryLightOn : SecondaryLightOn = True
 					
@@ -4615,6 +4617,8 @@ Function UpdateEvents()
 								UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[4]\obj,400)
 							EndIf
 							
+							PlayerFallingPickRadius = 0.0
+							
 							If EntityY(Collider)<-6400*RoomScale And KillTimer=>0 Then
 								DeathMSG=""
 								PlaySound_Strict LoadTempSound("SFX\Room\PocketDimension\Impact.ogg")
@@ -7253,6 +7257,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 					EndIf
+					PlayerFallingPickRadius = 30.0
 					;PositionEntity e\room\Objects[0],0,800,0
 					CameraFogRange Camera,40,80
 					CameraFogColor Camera,96,97,104

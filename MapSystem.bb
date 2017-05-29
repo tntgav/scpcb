@@ -4406,7 +4406,8 @@ Function FillRoom(r.Rooms)
 			For i = 8 To 11
 				ScaleEntity (r\Objects[i],RoomScale,RoomScale,RoomScale)
 				EntityType r\Objects[i], HIT_MAP
-				EntityPickMode r\Objects[i], 3
+				;EntityPickMode r\Objects[i], 3
+				EntityPickMode r\Objects[i], 2
 				PositionEntity(r\Objects[i],r\x,r\y,r\z+32.0,True)
 			Next
 			
@@ -4436,7 +4437,8 @@ Function FillRoom(r.Rooms)
 				angle# = (i-1) * (360.0/8.0)
 				
 				EntityType r\Objects[i-1], HIT_MAP
-				EntityPickMode r\Objects[i-1], 3		
+				;EntityPickMode r\Objects[i-1], 3
+				EntityPickMode r\Objects[i-1], 2
 				
 				RotateEntity(r\Objects[i-1],0,angle-90,0)
 				PositionEntity(r\Objects[i-1],r\x+Cos(angle)*(512.0*RoomScale),0.0,r\z+Sin(angle)*(512.0*RoomScale))
