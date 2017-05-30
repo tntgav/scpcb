@@ -2289,9 +2289,9 @@ Function UpdateNPCs()
 				Select n\State
 					Case 1 ;aims and shoots at the player
 						;[Block]
-						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
-							AnimateNPC(n,289,301,0.2,False)
-							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 245) Or (n\Frame > 248 And n\Frame < 302) Or n\Frame > 344
+							AnimateNPC(n,345,357,0.2,False)
+							If n\Frame >= 356 Then SetNPCFrame(n,302)
 						EndIf
 						;Animate2(n\obj, AnimTime(n\obj), 1539, 1553, 0.2, False)
 						
@@ -2354,14 +2354,14 @@ Function UpdateNPCs()
 								If n\Reload > 0 And n\Reload <= 7
 									AnimateNPC(n,245,248,0.35,True)
 								Else
-									If n\Frame < 289
-										AnimateNPC(n,202,244,0.35,True)
+									If n\Frame < 302
+										AnimateNPC(n,302,344,0.35,True)
 									EndIf
 								EndIf
 								
 								FreeEntity(pvt)
 							Else
-								AnimateNPC(n,202,244,0.35,True)
+								AnimateNPC(n,302,344,0.35,True)
 							EndIf
 							
 							n\ManipulateBone = True
@@ -2484,9 +2484,9 @@ Function UpdateNPCs()
 						;[End Block]
 					Case 11
 						;[Block]
-						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
-							AnimateNPC(n,289,301,0.2,False)
-							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 245) Or (n\Frame > 248 And n\Frame < 302) Or n\Frame > 344
+							AnimateNPC(n,345,357,0.2,False)
+							If n\Frame >= 356 Then SetNPCFrame(n,302)
 						EndIf
 						
 						If KillTimer => 0 Then
@@ -2536,8 +2536,8 @@ Function UpdateNPCs()
 								If n\Reload > 0 And n\Reload <= 7
 									AnimateNPC(n,245,248,0.35,True)
 								Else
-									If n\Frame < 289
-										AnimateNPC(n,202,244,0.35,True)
+									If n\Frame < 302
+										AnimateNPC(n,302,344,0.35,True)
 									EndIf
 								EndIf
 								
@@ -2608,16 +2608,12 @@ Function UpdateNPCs()
 						;[End Block]
 					Case 12
 						;[Block]
-						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
-							AnimateNPC(n,289,301,0.2,False)
-							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 245) Or (n\Frame > 248 And n\Frame < 302) Or n\Frame > 344
+							AnimateNPC(n,345,357,0.2,False)
+							If n\Frame >= 356 Then SetNPCFrame(n,302)
 						EndIf
-						If n\Frame < 289
-							;AnimateNPC(n,202,244,0.35,True)
-							
-							;This needs to be like that, otherwise the bone manipulation doesn't work properly (because it needs at least 2 frames of animation to work if you use AnimateNPC) - ENDSHN
-							SetAnimTime(n\obj,245)
-							n\Frame = 245
+						If n\Frame < 345
+							AnimateNPC(n,302,344,0.35,True)
 						EndIf
 						
 						pvt% = CreatePivot()
@@ -6991,8 +6987,9 @@ End Function
 
 Function ManipulateNPCBones()
 	Local n.NPCs,bone%,pvt%,bonename$
-	Local maxvalue#,minvalue#,offset#
+	Local maxvalue#,minvalue#,offset#,smooth#
 	Local i%
+	Local tovalue#
 	
 	For n = Each NPCs
 		If n\ManipulateBone
@@ -7010,9 +7007,16 @@ Function ManipulateNPCBones()
 								minvalue# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_min",2)
 								offset# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_offset",2)
 								If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_inverse",3)
-									n\BonePitch = CurveAngle(-DeltaPitch(bone,Camera)+offset,n\BonePitch,10.0)
+									tovalue = -DeltaPitch(bone,Camera)+offset
 								Else
-									n\BonePitch = CurveAngle(DeltaPitch(bone,Camera)+offset,n\BonePitch,10.0)
+									tovalue = DeltaPitch(bone,Camera)+offset
+								EndIf
+								;n\BonePitch = CurveAngle(tovalue,n\BonePitch,20.0)
+								smooth# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_smoothing",2)
+								If smooth>0.0
+									n\BonePitch = CurveAngle(tovalue,n\BonePitch,smooth)
+								Else
+									n\BonePitch = tovalue
 								EndIf
 								n\BonePitch = ChangeAngleValueForCorrectBoneAssigning(n\BonePitch)
 								n\BonePitch = Max(Min(n\BonePitch,maxvalue),minvalue)
@@ -7021,9 +7025,16 @@ Function ManipulateNPCBones()
 								minvalue# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_min",2)
 								offset# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_offset",2)
 								If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_inverse",3)
-									n\BoneYaw = CurveAngle(-DeltaYaw(bone,Camera)+offset,n\BoneYaw,10.0)
+									tovalue = -DeltaYaw(bone,Camera)+offset
 								Else
-									n\BoneYaw = CurveAngle(DeltaYaw(bone,Camera)+offset,n\BoneYaw,10.0)
+									tovalue = DeltaYaw(bone,Camera)+offset
+								EndIf
+								;n\BoneYaw = CurveAngle(tovalue,n\BoneYaw,20.0)
+								smooth# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_smoothing",2)
+								If smooth>0.0
+									n\BoneYaw = CurveAngle(tovalue,n\BoneYaw,smooth)
+								Else
+									n\BoneYaw = tovalue
 								EndIf
 								n\BoneYaw = ChangeAngleValueForCorrectBoneAssigning(n\BoneYaw)
 								n\BoneYaw = Max(Min(n\BoneYaw,maxvalue),minvalue)
