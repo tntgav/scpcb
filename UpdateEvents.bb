@@ -2740,6 +2740,8 @@ Function UpdateEvents()
 									PointEntity e\room\NPC[0]\Collider,e\room\Objects[2]
 									e\room\NPC[0]\State = 2
 									e\EventStr = "step1"
+									e\EventState2 = 0
+									e\EventState3 = 0
 								EndIf
 							EndIf
 						Else
@@ -2844,13 +2846,11 @@ Function UpdateEvents()
 						If e\EventState = 0
 							For i = 0 To 2
 								If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 400.0*RoomScale
-									If KillTimer => 0 Then 
-										StopChannel(e\SoundCHN)
-										e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
-										HideEntity e\room\Objects[4]
-										e\EventState = 1
-										Exit
-									EndIf
+									StopChannel(e\SoundCHN)
+									e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
+									HideEntity e\room\Objects[4]
+									e\EventState = 1
+									Exit
 								EndIf
 							Next
 						EndIf
