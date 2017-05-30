@@ -2723,7 +2723,7 @@ Global ApacheObj%,ApacheRotorObj%
 
 Global UnableToMove% = False
 Global ShouldEntitiesFall% = True
-Global PlayerFallingPickRadius# = 10.0
+Global PlayerFallingPickDistance# = 10.0
 
 Global Save_MSG$ = ""
 Global Save_MSG_Timer# = 0.0
@@ -4194,22 +4194,18 @@ Function MovePlayer()
 			DropSpeed# = 0
 		Else
 			;DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
-			If PlayerFallingPickRadius#<>0.0
-				Local pickpivot = CreatePivot()
-				PositionEntity pickpivot,EntityX(Collider),EntityY(Collider),EntityZ(Collider)
-				RotateEntity pickpivot,90,0,0
-				Local pick = EntityPick(pickpivot,PlayerFallingPickRadius#)
+			If PlayerFallingPickDistance#<>0.0
+				Local pick = LinePick(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,-PlayerFallingPickDistance,0)
 				If pick
 					DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
 				Else
 					DropSpeed# = 0
 				EndIf
-				FreeEntity pickpivot
 			Else
 				DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
 			EndIf
 		EndIf
-		PlayerFallingPickRadius# = 10.0
+		PlayerFallingPickDistance# = 10.0
 		
 		If (Not UnableToMove%) And ShouldEntitiesFall Then TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
 	EndIf
