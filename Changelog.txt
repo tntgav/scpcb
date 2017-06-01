@@ -12,6 +12,7 @@
 - You can now save at the Gate-B entrance.
 - Removed unused animation from SCP-966's model.
 - Optimized SCP-966's animation key frames.
+- Tweaked SCP-914 key card refinery system again.
 
 Bug fixes:
 - Fixed a crash that occured while quick-loading a save file.

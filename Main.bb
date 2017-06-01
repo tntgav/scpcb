@@ -9146,106 +9146,107 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 									Case EASY
 										it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 									Case NORMAL
-										If Rand(3)=1 Then
+										If Rand(5)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										Else
 											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(3)=1 Then
-											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-										Else
+										If Rand(4)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 										EndIf
 								End Select
 							Case "Level 2 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(6)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-										EndIf
+										it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 									Case NORMAL
-										If Rand(3)=1 Then
-											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-										Else
+										If Rand(4)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(5)=1 Then
-											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-										Else
+										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										EndIf
 								End Select
 			     			Case "Level 3 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
+										If Rand(10)=1 Then
+											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+										Else
+											it2 = CreateItem("Playing Card", "misc", x, y, z)	
+										EndIf
+									Case NORMAL
+										If Rand(15)=1 Then
+											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+										Else
+											it2 = CreateItem("Playing Card", "misc", x, y, z)	
+										EndIf
+									Case HARD
 										If Rand(20)=1 Then
 											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
 										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf
-									Case NORMAL
-										If Rand(40)=1 Then
-											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf
-									Case HARD
-										If Rand(60)=1 Then
-											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
+											it2 = CreateItem("Playing Card", "misc", x, y, z)	
 										EndIf
 								End Select
 							Case "Level 4 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(3)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-										EndIf
+										it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
 									Case NORMAL
-										If Rand(3)=1 Then
-											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-										Else
+										If Rand(4)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(4)=1 Then
-											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-										Else
+										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
 										EndIf
 								End Select
 							Case "Level 5 Key Card"	
+								Local CurrAchvAmount%=0
+								For i = 0 To MAXACHIEVEMENTS-1
+									If Achievements(i)=True
+										CurrAchvAmount=CurrAchvAmount+1
+									EndIf
+								Next
+								
+								DebugLog CurrAchvAmount
+								
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(3)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
+										If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(3)=1 Then
-											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf										
-									Case HARD
-										If Rand(4)=1 Then
+										If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
-								End Select
+									Case HARD
+										If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
+											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+								End Select		
 						End Select
 					EndIf
 				Case "very fine"
-					Local CurrAchvAmount%=0
+					CurrAchvAmount%=0
 					For i = 0 To MAXACHIEVEMENTS-1
 						If Achievements(i)=True
 							CurrAchvAmount=CurrAchvAmount+1
