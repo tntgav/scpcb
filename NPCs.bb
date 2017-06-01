@@ -4933,17 +4933,12 @@ Function UpdateNPCs()
 					n\DropSpeed# = 0
 				Else
 					If ShouldEntitiesFall
-						Local pickpivot = CreatePivot()
-						PositionEntity pickpivot,EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider)
-						RotateEntity pickpivot,90,0,0
-						Local pick = EntityPick(pickpivot,10)
+						Local pick = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-10,0)
 						If pick
 							n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
 						Else
-							n\DropSpeed# = 0.0
+							n\DropSpeed# = 0
 						EndIf
-						
-						FreeEntity pickpivot
 					Else
 						n\DropSpeed# = 0.0
 					EndIf
