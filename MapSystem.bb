@@ -8275,7 +8275,7 @@ Function CheckRoomOverlap2(r.Rooms)
 					x2 = r2\x/8.0
 					y2 = r2\z/8.0
 					rot2 = r2\angle
-					If r\roomtype = r2\roomtype And r\zone = r2\zone
+					If r\roomtype = r2\roomtype And r\zone = r2\zone And (r2\RoomTemplate\Name <> "checkpoint1" And r2\RoomTemplate\Name <> "checkpoint2")
 						isIntersecting = False
 						FreeEntity r\overlapcheckbox
 						r\x = x2*8.0
