@@ -1,6 +1,5 @@
 ﻿v1.3.8
 
-- Added a level 5 key card to SCP-079's containment chamber.
 - The barrel in SCP-008's containment chamber now displays an arrow to indicate that the canister needs to be pulled down.
 - The player now gets infected by SCP-008 if they get close to SCP-008's canister while bleeding and not wearing the hazmat suit.
 - Swapped the SCP-914 outcomes for the Night Vision Goggles on "Fine" and "Very Fine".
