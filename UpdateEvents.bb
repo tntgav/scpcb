@@ -541,6 +541,17 @@ Function UpdateEvents()
 							;e\room\NPC[3]\EnemyX = EntityX(Collider)
 							;e\room\NPC[3]\EnemyY = EntityY(Collider)
 							;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
+							
+							If e\room\NPC[5]\State <> 11
+								If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0 And EntityDistance(e\room\NPC[4]\Collider,e\room\NPC[5]\Collider)
+									If EntityDistance(e\room\NPC[5]\Collider,Collider)<3.5
+										e\room\NPC[5]\State = 11
+										e\room\NPC[5]\State3 = 1
+										e\room\NPC[5]\SoundChn2 = PlaySound2(e\room\NPC[5]\Sound2,Camera,e\room\NPC[5]\Collider)
+										e\room\NPC[5]\Reload = 70*3
+									EndIf
+								EndIf
+							EndIf
 						ElseIf e\EventState3 < 900
 							e\room\NPC[4]\Angle = 0
 							
@@ -683,7 +694,7 @@ Function UpdateEvents()
 									EndIf
 								EndIf
 								If e\room\NPC[5]\State <> 11
-									If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0
+									If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0 And EntityDistance(e\room\NPC[4]\Collider,e\room\NPC[5]\Collider)
 										If EntityDistance(e\room\NPC[5]\Collider,Collider)<3.5
 											e\room\NPC[5]\State = 11
 											e\room\NPC[5]\State3 = 1
