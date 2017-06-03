@@ -2289,9 +2289,9 @@ Function UpdateNPCs()
 				Select n\State
 					Case 1 ;aims and shoots at the player
 						;[Block]
-						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
-							AnimateNPC(n,289,301,0.2,False)
-							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 245) Or (n\Frame > 248 And n\Frame < 302) Or n\Frame > 344
+							AnimateNPC(n,345,357,0.2,False)
+							If n\Frame >= 356 Then SetNPCFrame(n,302)
 						EndIf
 						;Animate2(n\obj, AnimTime(n\obj), 1539, 1553, 0.2, False)
 						
@@ -2354,14 +2354,14 @@ Function UpdateNPCs()
 								If n\Reload > 0 And n\Reload <= 7
 									AnimateNPC(n,245,248,0.35,True)
 								Else
-									If n\Frame < 289
-										AnimateNPC(n,202,244,0.35,True)
+									If n\Frame < 302
+										AnimateNPC(n,302,344,0.35,True)
 									EndIf
 								EndIf
 								
 								FreeEntity(pvt)
 							Else
-								AnimateNPC(n,202,244,0.35,True)
+								AnimateNPC(n,302,344,0.35,True)
 							EndIf
 							
 							n\ManipulateBone = True
@@ -2484,9 +2484,9 @@ Function UpdateNPCs()
 						;[End Block]
 					Case 11
 						;[Block]
-						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
-							AnimateNPC(n,289,301,0.2,False)
-							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 245) Or (n\Frame > 248 And n\Frame < 302) Or n\Frame > 344
+							AnimateNPC(n,345,357,0.2,False)
+							If n\Frame >= 356 Then SetNPCFrame(n,302)
 						EndIf
 						
 						If KillTimer => 0 Then
@@ -2536,8 +2536,8 @@ Function UpdateNPCs()
 								If n\Reload > 0 And n\Reload <= 7
 									AnimateNPC(n,245,248,0.35,True)
 								Else
-									If n\Frame < 289
-										AnimateNPC(n,202,244,0.35,True)
+									If n\Frame < 302
+										AnimateNPC(n,302,344,0.35,True)
 									EndIf
 								EndIf
 								
@@ -2608,12 +2608,12 @@ Function UpdateNPCs()
 						;[End Block]
 					Case 12
 						;[Block]
-						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 202) Or n\Frame > 288
-							AnimateNPC(n,289,301,0.2,False)
-							If n\Frame >= 301 Then SetNPCFrame(n,202)
+						If n\Frame < 39 Or (n\Frame > 76 And n\Frame < 245) Or (n\Frame > 248 And n\Frame < 302) Or n\Frame > 344
+							AnimateNPC(n,345,357,0.2,False)
+							If n\Frame >= 356 Then SetNPCFrame(n,302)
 						EndIf
-						If n\Frame < 289
-							AnimateNPC(n,202,244,0.35,True)
+						If n\Frame < 345
+							AnimateNPC(n,302,344,0.35,True)
 						EndIf
 						
 						pvt% = CreatePivot()
@@ -4164,14 +4164,14 @@ Function UpdateNPCs()
 				
 				If (dist<HideDistance) Then
 					
-				;n\state = the "general" state (idle/wander/attack/echo etc)
-				;n\state2 = timer for doing raycasts
+					;n\state = the "general" state (idle/wander/attack/echo etc)
+					;n\state2 = timer for doing raycasts
 					
 					prevFrame = n\Frame
 					
 					If n\Sound > 0 Then
 						temp = 0.5
-					;the ambient sound gets louder when the npcs are attacking
+						;the ambient sound gets louder when the npcs are attacking
 						If n\State > 0 Then temp = 1.0	
 						
 						n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, Camera, 10.0,temp)
@@ -4208,7 +4208,7 @@ Function UpdateNPCs()
 					EndIf
 					
 					If n\State3>5*70 Then
-					;n\State = 1
+						;n\State = 1
 						If n\State3<1000.0 Then
 							For n2.NPCs = Each NPCs	
 								If n2\NPCtype = n\NPCtype Then n2\State3=1000.0 
@@ -4232,14 +4232,19 @@ Function UpdateNPCs()
 					
 					Select n\State
 						Case 0 ;idle, standing
-							If n\Frame>2300.0 Then
-								AnimateNPC(n, 2391, 2416, 1.0, False)	
-								If n\Frame>2415.0 Then SetNPCFrame(n, 201)
+							;If n\Frame>2300.0 Then
+							If n\Frame>556.0
+								;AnimateNPC(n, 2391, 2416, 1.0, False)	
+								;If n\Frame>2415.0 Then SetNPCFrame(n, 201)
+								AnimateNPC(n, 628, 652, 0.25, False)
+								If n\Frame>651.0 Then SetNPCFrame(n, 2)
 							Else
-								AnimateNPC(n, 201, 1015, 1.0, False)
+								;AnimateNPC(n, 201, 1015, 1.0, False)
+								AnimateNPC(n, 2, 214, 0.25, False)
 								
-							;echo/stare/walk around periodically
-								If n\Frame>1014.0 Then 
+								;echo/stare/walk around periodically
+								;If n\Frame>1014.0 Then
+								If n\Frame>213.0
 									If Rand(3)=1 And dist<4 Then
 										n\State = Rand(1,4)
 									Else
@@ -4247,7 +4252,7 @@ Function UpdateNPCs()
 									EndIf
 								EndIf
 								
-							;echo if player gets close
+								;echo if player gets close
 								If dist<2.0 Then 
 									n\State=Rand(1,4)
 								EndIf 							
@@ -4258,15 +4263,18 @@ Function UpdateNPCs()
 							MoveEntity n\Collider,0,0,n\CurrSpeed
 							
 						Case 1,2 ;echo
-							If n\State=1 Then
-								AnimateNPC(n, 1015, 1180, 1.0, False)
-								If n\Frame > 1179.0 Then n\State = 0
-							Else
-								AnimateNPC(n, 1180, 1379, 1.0, False)
-								If n\Frame > 1378.0 Then n\State = 0
-							EndIf
+;							If n\State=1 Then
+;								AnimateNPC(n, 1015, 1180, 1.0, False)
+;								If n\Frame > 1179.0 Then n\State = 0
+;							Else
+;								AnimateNPC(n, 1180, 1379, 1.0, False)
+;								If n\Frame > 1378.0 Then n\State = 0
+;							EndIf
+							AnimateNPC(n, 214, 257, 0.25, False)
+							If n\Frame > 256.0 Then n\State = 0
 							
-							If n\Frame>1029.0 And prevFrame<=1029.0 Or n\Frame>1203.0 And prevFrame<=1203.0 Then
+							;If n\Frame>1029.0 And prevFrame<=1029.0 Or n\Frame>1203.0 And prevFrame<=1203.0 Then
+							If n\Frame>228.0 And prevFrame<=228.0
 								PlaySound2(LoadTempSound("SFX\SCP\966\Echo"+Rand(1,3)+".ogg"), Camera, n\Collider)
 							EndIf
 							
@@ -4296,36 +4304,47 @@ Function UpdateNPCs()
 											Case 4
 												Msg = "You feel restless."
 										End Select
-
+										
 										MsgTimer = 7*70
 									EndIf
 								EndIf							
 							EndIf
 							
 						Case 3,4 ;stare at player
-							If n\State=3 Then
-								AnimateNPC(n, 1379.0, 1692.0, 1.0, False)
-								
-								If n\Frame>1691.0 Then n\State = 0
+;							If n\State=3 Then
+;								AnimateNPC(n, 1379.0, 1692.0, 1.0, False)
+;								
+;								If n\Frame>1691.0 Then n\State = 0
+;							Else
+;								AnimateNPC(n, 1692.0, 2156.0, 1.0, False)
+;								
+;								If n\Frame>2155.0 Then n\State = 0
+;							EndIf
+							If n\State=3
+								AnimateNPC(n, 257, 332, 0.25, False)
+								If n\Frame > 331.0 Then n\State = 0
 							Else
-								AnimateNPC(n, 1692.0, 2156.0, 1.0, False)
-								
-								If n\Frame>2155.0 Then n\State = 0
+								AnimateNPC(n, 332, 457, 0.25, False)
+								If n\Frame > 456.0 Then n\State = 0
 							EndIf
 							
-							If n\Frame>1393.0 And prevFrame<=1393.0 Or n\Frame>1589.0 And prevFrame<=1589.0 Or n\Frame>2000.0 And prevFrame<=2000.0 Then
+							;If n\Frame>1393.0 And prevFrame<=1393.0 Or n\Frame>1589.0 And prevFrame<=1589.0 Or n\Frame>2000.0 And prevFrame<=2000.0 Then
+							If n\Frame>271.0 And prevFrame<=271.0 Or n\Frame>354 Or n\Frame>314.0 And prevFrame<=314.0 Or n\Frame>301.0 And prevFrame<=301.0
 								PlaySound2(LoadTempSound("SFX\SCP\966\Idle"+Rand(1,3)+".ogg"), Camera, n\Collider)
 							EndIf
 							
 							angle = VectorYaw(EntityX(Collider)-EntityX(n\Collider),0,EntityZ(Collider)-EntityZ(n\Collider))
 							RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),20.0),0.0
 						Case 5,6,8 ;walking or chasing
-							If n\Frame<2343.0 Then ;start walking
-								AnimateNPC(n, 2319, 2343, 0.5, False)
+							;If n\Frame<2343.0 Then
+							If n\Frame<580.0 ;start walking
+								;AnimateNPC(n, 2319, 2343, 0.5, False)
+								AnimateNPC(n, 556, 580, 0.25, False)
 							Else
-								AnimateNPC(n, 2343, 2391, n\CurrSpeed*25.0)
+								;AnimateNPC(n, 2343, 2391, n\CurrSpeed*25.0)
+								AnimateNPC(n, 580, 628, n\CurrSpeed*25.0)
 								
-							;chasing the player
+								;chasing the player
 								If n\State = 8 And dist<32 Then
 									If n\PathTimer <= 0 Then
 										n\PathStatus = FindPath (n, EntityX(Collider,True), EntityY(Collider,True), EntityZ(Collider,True))
@@ -4337,8 +4356,8 @@ Function UpdateNPCs()
 									If (Not EntityVisible(n\Collider,Collider)) Then
 										If n\PathStatus = 2 Then
 											n\CurrSpeed = 0
-											SetNPCFrame(n,201)
-										;SetAnimTime n\obj,15
+											;SetNPCFrame(n,201)
+											SetNPCFrame(n,2)
 										ElseIf n\PathStatus = 1
 											If n\Path[n\PathLocation]=Null Then 
 												If n\PathLocation > 19 Then 
@@ -4348,7 +4367,7 @@ Function UpdateNPCs()
 												EndIf
 											Else
 												n\Angle = VectorYaw(EntityX(n\Path[n\PathLocation]\obj,True)-EntityX(n\Collider),0,EntityZ(n\Path[n\PathLocation]\obj,True)-EntityZ(n\Collider))
-								;RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),10.0),0.0
+												;RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),10.0),0.0
 												
 												dist2 = EntityDistance(n\Collider,n\Path[n\PathLocation]\obj)
 												
@@ -4399,34 +4418,52 @@ Function UpdateNPCs()
 								n\LastSeen = 1
 							EndIf
 							
-							If n\Frame>2300.0 Then
-								AnimateNPC(n, 2391, 2416, 1.0, False)	
-								If n\Frame>2415.0 Then 
+							;If n\Frame>2300.0 Then
+							If n\Frame>557.0
+								;AnimateNPC(n, 2391, 2416, 1.0, False
+								AnimateNPC(n, 628, 652, 0.25, False)
+								;If n\Frame>2415.0 Then
+								If n\Frame>651.0
 									Select Rand(3)
 										Case 1
-											SetNPCFrame(n, 2160)
+											;SetNPCFrame(n, 2160)
+											SetNPCFrame(n, 458)
 										Case 2
-											SetNPCFrame(n, 2192)
+											;SetNPCFrame(n, 2192)
+											SetNPCFrame(n, 488)
 										Case 3
-											SetNPCFrame(n, 2221)
+											;SetNPCFrame(n, 2221)
+											SetNPCFrame(n, 518)
 									End Select
 									
 								EndIf
 							Else
-								If n\Frame <= 2191 Then
-									AnimateNPC(n, 2160, 2191, 0.3, False)
-									If n\Frame > 2190 Then n\State = 8
-								ElseIf n\Frame <= 2220
-									AnimateNPC(n, 2192, 2220, 0.3, False)
-									If n\Frame > 2219 Then n\State = 8
-								ElseIf n\Frame <= 2260
-									AnimateNPC(n, 2221, 2260, 0.3, False)
-									If n\Frame > 2259 Then n\State = 8
+;								If n\Frame <= 2191 Then
+;									AnimateNPC(n, 2160, 2191, 0.3, False)
+;									If n\Frame > 2190 Then n\State = 8
+;								ElseIf n\Frame <= 2220
+;									AnimateNPC(n, 2192, 2220, 0.3, False)
+;									If n\Frame > 2219 Then n\State = 8
+;								ElseIf n\Frame <= 2260
+;									AnimateNPC(n, 2221, 2260, 0.3, False)
+;									If n\Frame > 2259 Then n\State = 8
+;								EndIf
+								
+								If n\Frame <= 487
+									AnimateNPC(n, 458, 487, 0.3, False)
+									If n\Frame > 486.0 Then n\State = 8
+								ElseIf n\Frame <= 517
+									AnimateNPC(n, 488, 517, 0.3, False)
+									If n\Frame > 516.0 Then n\State = 8
+								ElseIf n\Frame <= 557
+									AnimateNPC(n, 518, 557, 0.3, False)
+									If n\Frame > 556.0 Then n\State = 8
 								EndIf
 							EndIf
 							
 							If dist<1.0 Then
-								If n\Frame>2173.0 And prevFrame<=2173.0 Or n\Frame>2203.0 And prevFrame<=2203.0 Or n\Frame>2227.0 And prevFrame<=2227.0 Then
+								;If n\Frame>2173.0 And prevFrame<=2173.0 Or n\Frame>2203.0 And prevFrame<=2203.0 Or n\Frame>2227.0 And prevFrame<=2227.0 Then
+								If n\Frame>470.0 And prevFrame<=470.0 Or n\Frame>500.0 And prevFrame<=500.0 Or n\Frame>527.0 And prevFrame<=527.0
 									PlaySound2(LoadTempSound("SFX\General\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
 									Injuries = Injuries + Rnd(0.5,1.0)								
 								EndIf	
@@ -4895,7 +4932,16 @@ Function UpdateNPCs()
 				If CollidedFloor = True Then
 					n\DropSpeed# = 0
 				Else
-					If ShouldEntitiesFall Then n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
+					If ShouldEntitiesFall
+						Local pick = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-10,0)
+						If pick
+							n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
+						Else
+							n\DropSpeed# = 0
+						EndIf
+					Else
+						n\DropSpeed# = 0.0
+					EndIf
 				EndIf
 			Else
 				n\DropSpeed = 0
@@ -6589,7 +6635,7 @@ End Function
 Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False)
 	
 	;muzzle flash
-	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
+	Local p.particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
 	TurnEntity p\obj, 0,0,Rnd(360)
 	p\Achange = -0.15
 	
@@ -6936,8 +6982,9 @@ End Function
 
 Function ManipulateNPCBones()
 	Local n.NPCs,bone%,pvt%,bonename$
-	Local maxvalue#,minvalue#,offset#
+	Local maxvalue#,minvalue#,offset#,smooth#
 	Local i%
+	Local tovalue#
 	
 	For n = Each NPCs
 		If n\ManipulateBone
@@ -6955,9 +7002,16 @@ Function ManipulateNPCBones()
 								minvalue# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_min",2)
 								offset# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_offset",2)
 								If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_inverse",3)
-									n\BonePitch = CurveAngle(-DeltaPitch(bone,Camera)+offset,n\BonePitch,10.0)
+									tovalue = -DeltaPitch(bone,Camera)+offset
 								Else
-									n\BonePitch = CurveAngle(DeltaPitch(bone,Camera)+offset,n\BonePitch,10.0)
+									tovalue = DeltaPitch(bone,Camera)+offset
+								EndIf
+								;n\BonePitch = CurveAngle(tovalue,n\BonePitch,20.0)
+								smooth# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_smoothing",2)
+								If smooth>0.0
+									n\BonePitch = CurveAngle(tovalue,n\BonePitch,smooth)
+								Else
+									n\BonePitch = tovalue
 								EndIf
 								n\BonePitch = ChangeAngleValueForCorrectBoneAssigning(n\BonePitch)
 								n\BonePitch = Max(Min(n\BonePitch,maxvalue),minvalue)
@@ -6966,9 +7020,16 @@ Function ManipulateNPCBones()
 								minvalue# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_min",2)
 								offset# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_offset",2)
 								If GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_inverse",3)
-									n\BoneYaw = CurveAngle(-DeltaYaw(bone,Camera)+offset,n\BoneYaw,10.0)
+									tovalue = -DeltaYaw(bone,Camera)+offset
 								Else
-									n\BoneYaw = CurveAngle(DeltaYaw(bone,Camera)+offset,n\BoneYaw,10.0)
+									tovalue = DeltaYaw(bone,Camera)+offset
+								EndIf
+								;n\BoneYaw = CurveAngle(tovalue,n\BoneYaw,20.0)
+								smooth# = GetNPCManipulationValue(n\NPCNameInSection,n\BoneToManipulate,"controlleraxis"+i+"_smoothing",2)
+								If smooth>0.0
+									n\BoneYaw = CurveAngle(tovalue,n\BoneYaw,smooth)
+								Else
+									n\BoneYaw = tovalue
 								EndIf
 								n\BoneYaw = ChangeAngleValueForCorrectBoneAssigning(n\BoneYaw)
 								n\BoneYaw = Max(Min(n\BoneYaw,maxvalue),minvalue)

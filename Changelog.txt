@@ -1,9 +1,17 @@
 ﻿v1.3.8
 
-- Added a level 5 key card to SCP-079's containment chamber.
-- The barrel in SCP-008's containment chamber now displays an arrow to indicate that the canister needs to be pulled downn.
+- The barrel in SCP-008's containment chamber now displays an arrow to indicate that the canister needs to be pulled down.
 - The player now gets infected by SCP-008 if they get close to SCP-008's canister while bleeding and not wearing the hazmat suit.
 - Swapped the SCP-914 outcomes for the Night Vision Goggles on "Fine" and "Very Fine".
+- MTF Units now kill the SCP-008 zombie if they encounter it.
+- Revamped the guard animations (by Apocryphos).
+- Added custom resolution selection for the map creator.
+- You can't use some items anymore when you wear certain items (for example, you can't drink anything if you wear a gas mask).
+- The startup video will now be played using a library called BlitzMovie rather than DirectMovie.
+- You can now save at the Gate-B entrance.
+- Removed unused animation from SCP-966's model.
+- Optimized SCP-966's animation key frames.
+- Tweaked SCP-914 key card refinery system again.
 
 Bug fixes:
 - Fixed a crash that occured while quick-loading a save file.
@@ -17,6 +25,12 @@ Bug fixes:
 - Fixed the slider for the map creator, so that all rooms will be displayed.
 - The player can't save when dead.
 - Closing the loading screen by left clicking doesn't open/close nearby doors anymore.
+- SCP-173's collision radius has been decreased.
+- Fixed a crash that occured when opening your inventory.
+- The fog doesn't turn white anymore if you go to the pocket dimension by leaving SCP-1499.
+- Fixed items,npcs and the player not falling through the floor anymore if the room is not rendered.
+- Fixed the item dropspeed increasing each time an item has been picked up.
+- Another attempt of fixing room overlapping issues.
 
 ----------------------------------------------------------------------------------
 

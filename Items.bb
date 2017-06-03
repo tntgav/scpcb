@@ -501,9 +501,20 @@ Function UpdateItems()
 					i\zspeed = 0.0
 				Else
 					If ShouldEntitiesFall
-						i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
-						TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
-						If i\WontColl Then ResetEntity(i\collider)
+						Local pick = LinePick(EntityX(i\collider),EntityY(i\collider),EntityZ(i\collider),0,-10,0)
+						If pick
+							i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
+							TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
+							If i\WontColl Then ResetEntity(i\collider)
+						Else
+							i\DropSpeed = 0
+							i\xspeed = 0.0
+							i\zspeed = 0.0
+						EndIf
+					Else
+						i\DropSpeed = 0
+						i\xspeed = 0.0
+						i\zspeed = 0.0
 					EndIf
 				EndIf
 				
@@ -538,6 +549,10 @@ Function UpdateItems()
 			Else
 				HideEntity i\collider
 			EndIf
+		Else
+			i\DropSpeed = 0
+			i\xspeed = 0.0
+			i\zspeed = 0.0
 		EndIf
 		
 		If Not deletedItem Then

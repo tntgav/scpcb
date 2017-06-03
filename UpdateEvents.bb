@@ -1834,6 +1834,8 @@ Function UpdateEvents()
 				If PlayerRoom = e\room Then
 					ShowEntity e\room\obj
 					
+					PlayerFallingPickDistance = 0.0
+					
 					Injuries = Injuries+FPSfactor*0.00005
 					PrevSecondaryLightOn = SecondaryLightOn : SecondaryLightOn = True
 					
@@ -1992,6 +1994,8 @@ Function UpdateEvents()
 									PositionEntity(Collider, EntityX(e\room\Objects[8],True)-400*RoomScale, -304*RoomScale, EntityZ(e\room\Objects[8],True))
 									ResetEntity Collider
 									
+									CameraFogColor Camera, 0,0,0
+									CameraClsColor Camera, 0,0,0
 								EndIf
 								
 							Else
@@ -2736,6 +2740,8 @@ Function UpdateEvents()
 									PointEntity e\room\NPC[0]\Collider,e\room\Objects[2]
 									e\room\NPC[0]\State = 2
 									e\EventStr = "step1"
+									e\EventState2 = 0
+									e\EventState3 = 0
 								EndIf
 							EndIf
 						Else
@@ -2840,13 +2846,11 @@ Function UpdateEvents()
 						If e\EventState = 0
 							For i = 0 To 2
 								If Distance(EntityX(e\room\NPC[0]\Collider),EntityZ(e\room\NPC[0]\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 400.0*RoomScale
-									If KillTimer => 0 Then 
-										StopChannel(e\SoundCHN)
-										e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
-										HideEntity e\room\Objects[4]
-										e\EventState = 1
-										Exit
-									EndIf
+									StopChannel(e\SoundCHN)
+									e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, e\room\Objects[3],4.0,0.5)
+									HideEntity e\room\Objects[4]
+									e\EventState = 1
+									Exit
 								EndIf
 							Next
 						EndIf
@@ -2898,7 +2902,7 @@ Function UpdateEvents()
 												
 												;LoadEventSound(e,"SFX\Character\MTF\Tesla1.ogg")
 												;e\SoundCHN = PlaySound_Strict (e\Sound)
-												PlayAnnouncement("SFX\Character\MTF\Tesla"+Rand(1,3)+".ogg")
+												;PlayAnnouncement("SFX\Character\MTF\Tesla"+Rand(1,3)+".ogg")
 												n\Idle = 70*10
 												e\EventState2 = 70*100
 											EndIf
@@ -2912,6 +2916,10 @@ Function UpdateEvents()
 							e\EventState3=e\EventState3-FPSfactor
 						EndIf
 					Else
+						If e\EventState2 => 70*92 And e\EventState2-FPSfactor < 70*92
+							PlayAnnouncement("SFX\Character\MTF\Tesla"+Rand(1,3)+".ogg")
+						EndIf
+						
 						e\EventState2 = Max(e\EventState2-FPSfactor,0)
 					EndIf					
 				EndIf
@@ -4609,6 +4617,8 @@ Function UpdateEvents()
 								UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[4]\obj,400)
 							EndIf
 							
+							PlayerFallingPickDistance = 0.0
+							
 							If EntityY(Collider)<-6400*RoomScale And KillTimer=>0 Then
 								DeathMSG=""
 								PlaySound_Strict LoadTempSound("SFX\Room\PocketDimension\Impact.ogg")
@@ -5586,6 +5596,7 @@ Function UpdateEvents()
 							StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
 						EndIf
 						e\SoundCHN = StreamSound_Strict("SFX\SCP\079\GateB.ogg",SFXVolume,0)
+						e\SoundCHN_isStream = True
 						e\EventState2 = 2
 						
 						For e2.Events = Each Events
@@ -7246,6 +7257,7 @@ Function UpdateEvents()
 							EndIf
 						Next
 					EndIf
+					PlayerFallingPickDistance = 30.0
 					;PositionEntity e\room\Objects[0],0,800,0
 					CameraFogRange Camera,40,80
 					CameraFogColor Camera,96,97,104

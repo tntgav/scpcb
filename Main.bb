@@ -2723,6 +2723,7 @@ Global ApacheObj%,ApacheRotorObj%
 
 Global UnableToMove% = False
 Global ShouldEntitiesFall% = True
+Global PlayerFallingPickDistance# = 10.0
 
 Global Save_MSG$ = ""
 Global Save_MSG_Timer# = 0.0
@@ -3102,7 +3103,7 @@ Repeat
 		If KeyHit(KEY_SAVE) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
+				If RN$ = "173" Or (RN$ = "exit1" And EntityY(Collider)>1040.0*RoomScale) Or RN$ = "gatea"
 					Msg = "You cannot save in this location."
 					MsgTimer = 70 * 4
 					;SetSaveMSG("You cannot save in this location.")
@@ -3124,7 +3125,7 @@ Repeat
 					;SetSaveMSG("Saving is only permitted on clickable monitors scattered throughout the facility.")
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
-					If RN$ = "173" Or RN$ = "exit1" Or RN$ = "gatea"
+					If RN$ = "173" Or (RN$ = "exit1" And EntityY(Collider)>1040.0*RoomScale) Or RN$ = "gatea"
 						Msg = "You cannot save in this location."
 						MsgTimer = 70 * 4
 						;SetSaveMSG("You cannot save in this location.")
@@ -4192,8 +4193,19 @@ Function MovePlayer()
 			EndIf
 			DropSpeed# = 0
 		Else
-			DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
-		EndIf	
+			;DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
+			If PlayerFallingPickDistance#<>0.0
+				Local pick = LinePick(EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,-PlayerFallingPickDistance,0)
+				If pick
+					DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
+				Else
+					DropSpeed# = 0
+				EndIf
+			Else
+				DropSpeed# = Min(Max(DropSpeed - 0.006 * FPSfactor, -2.0), 0.0)
+			EndIf
+		EndIf
+		PlayerFallingPickDistance# = 10.0
 		
 		If (Not UnableToMove%) And ShouldEntitiesFall Then TranslateEntity Collider, 0, DropSpeed * FPSfactor, 0
 	EndIf
@@ -5587,51 +5599,54 @@ Function DrawGUI()
 					;[End Block]
 				Case "veryfinefirstaid"
 					;[Block]
-					Select Rand(5)
-						Case 1
-							Injuries = 3.5
-							Msg = "You started bleeding heavily."
-							MsgTimer = 70*7
-						Case 2
-							Injuries = 0
-							Bloodloss = 0
-							Msg = "Your wounds are healing up rapidly."
-							MsgTimer = 70*7
-						Case 3
-							Injuries = Max(0, Injuries - Rnd(0.5,3.5))
-							Bloodloss = Max(0, Bloodloss - Rnd(10,100))
-							Msg = "You feel much better."
-							MsgTimer = 70*7
-						Case 4
-							BlurTimer = 10000
-							Bloodloss = 0
-							Msg = "You feel nauseated."
-							MsgTimer = 70*7
-						Case 5
-							BlinkTimer = -10
-							If PlayerRoom\RoomTemplate\Name <> "dimension1499"
-								For r.Rooms = Each Rooms
-									If r\RoomTemplate\Name = "pocketdimension" Then
-										PositionEntity(Collider, EntityX(r\obj),0.8,EntityZ(r\obj))		
-										ResetEntity Collider									
-										UpdateDoors()
-										UpdateRooms()
-										PlaySound_Strict(Use914SFX)
-										DropSpeed = 0
-										Curr106\State = -2500
-										Exit
-									EndIf
-								Next
-								Msg = "For some inexplicable reason. You find yourself inside the pocket dimension."
-								MsgTimer = 70*8
-							Else ;Cheap little fix for the strange bottle usage in dimension1499 (player was able to get teleported to pocket dimension)
-								Injuries = 2.5
+					If CanUseItem(False, False, True)
+						Select Rand(5)
+							Case 1
+								Injuries = 3.5
 								Msg = "You started bleeding heavily."
 								MsgTimer = 70*7
-							EndIf
-					End Select
-					
-					RemoveItem(SelectedItem)
+							Case 2
+								Injuries = 0
+								Bloodloss = 0
+								Msg = "Your wounds are healing up rapidly."
+								MsgTimer = 70*7
+							Case 3
+								Injuries = Max(0, Injuries - Rnd(0.5,3.5))
+								Bloodloss = Max(0, Bloodloss - Rnd(10,100))
+								Msg = "You feel much better."
+								MsgTimer = 70*7
+							Case 4
+								BlurTimer = 10000
+								Bloodloss = 0
+								Msg = "You feel nauseated."
+								MsgTimer = 70*7
+							Case 5
+								BlinkTimer = -10
+								Local roomname$ = PlayerRoom\RoomTemplate\Name
+								If roomname = "dimension1499" Or roomname = "gatea" Or (roomname="exit1" And EntityY(Collider)>1040.0*RoomScale)
+									Injuries = 2.5
+									Msg = "You started bleeding heavily."
+									MsgTimer = 70*7
+								Else
+									For r.Rooms = Each Rooms
+										If r\RoomTemplate\Name = "pocketdimension" Then
+											PositionEntity(Collider, EntityX(r\obj),0.8,EntityZ(r\obj))		
+											ResetEntity Collider									
+											UpdateDoors()
+											UpdateRooms()
+											PlaySound_Strict(Use914SFX)
+											DropSpeed = 0
+											Curr106\State = -2500
+											Exit
+										EndIf
+									Next
+									Msg = "For some inexplicable reason. You find yourself inside the pocket dimension."
+									MsgTimer = 70*8
+								EndIf
+						End Select
+						
+						RemoveItem(SelectedItem)
+					EndIf
 					;[End Block]
 				Case "firstaid", "finefirstaid", "firstaid2"
 					;[Block]
@@ -9131,106 +9146,107 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 									Case EASY
 										it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 									Case NORMAL
-										If Rand(3)=1 Then
+										If Rand(5)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										Else
 											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(3)=1 Then
-											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-										Else
+										If Rand(4)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
 										EndIf
 								End Select
 							Case "Level 2 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(6)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-										EndIf
+										it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 									Case NORMAL
-										If Rand(3)=1 Then
-											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-										Else
+										If Rand(4)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(5)=1 Then
-											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-										Else
+										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
 										EndIf
 								End Select
 			     			Case "Level 3 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
+										If Rand(10)=1 Then
+											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+										Else
+											it2 = CreateItem("Playing Card", "misc", x, y, z)	
+										EndIf
+									Case NORMAL
+										If Rand(15)=1 Then
+											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+										Else
+											it2 = CreateItem("Playing Card", "misc", x, y, z)	
+										EndIf
+									Case HARD
 										If Rand(20)=1 Then
 											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
 										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf
-									Case NORMAL
-										If Rand(40)=1 Then
-											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf
-									Case HARD
-										If Rand(60)=1 Then
-											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
+											it2 = CreateItem("Playing Card", "misc", x, y, z)	
 										EndIf
 								End Select
 							Case "Level 4 Key Card"
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(3)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-										EndIf
+										it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
 									Case NORMAL
-										If Rand(3)=1 Then
-											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-										Else
+										If Rand(4)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
 										EndIf
 									Case HARD
-										If Rand(4)=1 Then
-											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-										Else
+										If Rand(3)=1 Then
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										Else
+											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
 										EndIf
 								End Select
 							Case "Level 5 Key Card"	
+								Local CurrAchvAmount%=0
+								For i = 0 To MAXACHIEVEMENTS-1
+									If Achievements(i)=True
+										CurrAchvAmount=CurrAchvAmount+1
+									EndIf
+								Next
+								
+								DebugLog CurrAchvAmount
+								
 								Select SelectedDifficulty\otherFactors
 									Case EASY
-										If Rand(3)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
+										If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
 									Case NORMAL
-										If Rand(3)=1 Then
-											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf										
-									Case HARD
-										If Rand(4)=1 Then
+										If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
 											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
 										Else
 											it2 = CreateItem("Mastercard", "misc", x, y, z)
 										EndIf
-								End Select
+									Case HARD
+										If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
+											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+										Else
+											it2 = CreateItem("Mastercard", "misc", x, y, z)
+										EndIf
+								End Select		
 						End Select
 					EndIf
 				Case "very fine"
-					Local CurrAchvAmount%=0
+					CurrAchvAmount%=0
 					For i = 0 To MAXACHIEVEMENTS-1
 						If Achievements(i)=True
 							CurrAchvAmount=CurrAchvAmount+1
@@ -10925,6 +10941,9 @@ Function UpdateLeave1499()
 							If PlayerRoom\NPC[i]\State2 > PlayerRoom\NPC[i]\PrevState Then PlayerRoom\NPC[i]\State2 = (PlayerRoom\NPC[i]\PrevState-3)
 						Next
 					EndIf
+				ElseIf PlayerRoom\RoomTemplate\Name = "pocketdimension"
+					CameraFogColor Camera, 0,0,0
+					CameraClsColor Camera, 0,0,0
 				EndIf
 				For r2.Rooms = Each Rooms
 					If r2\RoomTemplate\Name = "dimension1499"
@@ -11243,15 +11262,92 @@ End Function
 Function PlayStartupVideos()
 	
 	If GetINIInt("options.ini","options","play startup video")=0 Then Return
-	Local SplashScreenVideo = OpenMovie("GFX\menu\startup.avi")
-	FlushKeys()
+	
+	Local Cam = CreateCamera() 
+	CameraClsMode Cam, 0, 1
+	Local Quad = CreateQuad()
+	Local Texture = CreateTexture(2048, 2048, 256 Or 16 Or 32)
+	EntityTexture Quad, Texture
+	EntityFX Quad, 1
+	CameraRange Cam, 0.01, 100
+	TranslateEntity Cam, 1.0 / 2048 ,-1.0 / 2048 ,-1.0
+	EntityParent Quad, Cam, 1
+	
+	Local moviefile$ = "GFX\menu\startup"
+	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
+	Local moview = BlitzMovie_GetWidth()
+	Local movieh = BlitzMovie_GetHeight()
+	BlitzMovie_Close()
+	
+	Local ScaledGraphicHeight%
+	Local Ratio# = Float(RealGraphicWidth)/Float(RealGraphicHeight)
+	If Ratio>1.76 And Ratio<1.78
+		ScaledGraphicHeight = RealGraphicHeight
+		DebugLog "Not Scaled"
+	Else
+		ScaledGraphicHeight% = Float(RealGraphicWidth)/(16.0/9.0)
+		DebugLog "Scaled: "+ScaledGraphicHeight
+	EndIf
+	
+	Local image = CreateImage(moview, movieh)
+	Local SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
+	SplashScreenVideo = BlitzMovie_Play()
+	Local SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
+	
 	Repeat
 		Cls
-		DrawMovie SplashScreenVideo,0,0,GraphicWidth,GraphicHeight
+		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
 		Flip
-	Until ((Not MoviePlaying(SplashScreenVideo)) Or GetKey())
-	CloseMovie SplashScreenVideo
+	Until (GetKey() Or (Not IsStreamPlaying_Strict(SplashScreenAudio)))
+	StopStream_Strict(SplashScreenAudio)
+	BlitzMovie_Stop()
+	BlitzMovie_Close()
+	FreeTexture Texture
+	FreeEntity Quad
+	FreeEntity Cam
+	FreeImage image
 	Cls
+	Flip
+	
+End Function
+
+Function ProjectImage(img, w#, h#, Quad%, Texture%)
+	
+	Local img_w# = ImageWidth(img)
+	Local img_h# = ImageHeight(img)
+	If img_w > 2048 Then img_w = 2048
+	If img_h > 2048 Then img_h = 2048
+	If img_w < 1 Then img_w = 1
+	If img_h < 1 Then img_h = 1
+	
+	If w > 2048 Then w = 2048
+	If h > 2048 Then h = 2048
+	If w < 1 Then w = 1
+	If h < 1 Then h = 1
+	
+	Local w_rel# = w# / img_w#
+	Local h_rel# = h# / img_h#
+	Local g_rel# = 2048.0 / Float(RealGraphicWidth)
+	Local dst_x = 1024 - (img_w / 2.0)
+	Local dst_y = 1024 - (img_h / 2.0)
+	CopyRect 0, 0, img_w, img_h, dst_x, dst_y, ImageBuffer(img), TextureBuffer(Texture)
+	ScaleEntity Quad, w_rel * g_rel, h_rel * g_rel, 0.0001
+	RenderWorld()
+	
+End Function
+
+Function CreateQuad()
+	
+	mesh = CreateMesh()
+	surf = CreateSurface(mesh)
+	v0 = AddVertex(surf,-1.0, 1.0, 0, 0, 0)
+	v1 = AddVertex(surf, 1.0, 1.0, 0, 1, 0)
+	v2 = AddVertex(surf, 1.0,-1.0, 0, 1, 1)
+	v3 = AddVertex(surf,-1.0,-1.0, 0, 0, 1)
+	AddTriangle(surf, v0, v1, v2)
+	AddTriangle(surf, v0, v2, v3)
+	UpdateNormals mesh
+	Return mesh
 	
 End Function
 
