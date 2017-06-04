@@ -1398,6 +1398,11 @@ Type RoomTemplates
 	Field TempTriggerboxName$[128]
 	
 	Field UseLightCones%
+	
+	Field DisableOverlapCheck% = True
+	
+	Field MinX#, MinY#, MinZ#
+	Field MaxX#, MaxY#, MaxZ#
 End Type 	
 
 Function CreateRoomTemplate.RoomTemplates(meshpath$)
@@ -1452,7 +1457,7 @@ Function LoadRoomTemplates(file$)
 			rt\Large = GetINIInt(file, TemporaryString, "large")
 			rt\DisableDecals = GetINIInt(file, TemporaryString, "disabledecals")
 			rt\UseLightCones = GetINIInt(file, TemporaryString, "usevolumelighting")
-			
+			rt\DisableOverlapCheck = GetINIInt(file, TemporaryString, "disableoverlapcheck")
 		EndIf
 	Wend
 	
@@ -1480,6 +1485,8 @@ Function LoadRoomMesh(rt.RoomTemplates)
 	EndIf
 	
 	If (Not rt\obj) Then RuntimeError "Failed to load map file "+Chr(34)+mapfile+Chr(34)+"."
+	
+	CalculateRoomTemplateExtents(rt)
 	
 	HideEntity(rt\obj)
 	
@@ -1564,7 +1571,6 @@ Type Rooms
 	Field NonFreeAble%[10]
 	Field Textures%[10]
 	
-	;New Room Variables in SCP:CB 1.3 - ENDSHN
 	Field MaxLights% = 0
 	Field LightSpriteHidden%[MaxRoomLights]
 	Field LightSpritesPivot%[MaxRoomLights]
@@ -1581,9 +1587,9 @@ Type Rooms
 	Field LightCone%[MaxRoomLights]
 	Field LightConeSpark%[MaxRoomLights]
 	Field LightConeSparkTimer#[MaxRoomLights]
-	;New variables for the new room-overlap-checking
-	Field overlapcheckbox%
-	Field roomtype%
+	
+	Field MinX#, MinY#, MinZ#
+	Field MaxX#, MaxY#, MaxZ#
 End Type 
 
 Const gridsz%=20
@@ -1623,8 +1629,6 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 	
 	r\zone = zone
 	
-	r\roomtype = roomshape
-	
 	r\x = x : r\y = y : r\z = z
 	
 	If name <> "" Then
@@ -1647,6 +1651,7 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 					AddLightCones(r)
 				EndIf
 				
+				CalculateRoomExtents(r)
 				Return r
 			EndIf
 		Next
@@ -1686,11 +1691,11 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 						AddLightCones(r)
 					EndIf
 					
+					CalculateRoomExtents(r)
 					Return r	
 				End If
 			EndIf
 		Next
-		
 	Next
 	
 	CatchErrors("CreateRoom")
@@ -7092,7 +7097,6 @@ Function CreateMap()
 				Else ;If zone = 3
 					r = CreateRoom(zone, ROOM2, x * 8, 0, y * 8, "checkpoint2")
 				EndIf
-				CreateOverLapBox(r)
 			ElseIf MapTemp(x, y) > 0
 				
 				temp = Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1) + Min(MapTemp(x, y + 1),1) + Min(MapTemp(x, y - 1),1)
@@ -7100,14 +7104,7 @@ Function CreateMap()
 				Select temp ;viereisiss� ruuduissa olevien huoneiden m��r�
 					Case 1
 						If MapRoomID(ROOM1) < MaxRooms And MapName(x,y) = "" Then
-							If CheckRoomOverlap(MapRoom(ROOM1, MapRoomID(ROOM1)), x, y) Then
-								For i = MapRoomID(ROOM1)+1 To MaxRooms
-									If MapRoom(ROOM1, i)="" Then MapRoom(ROOM1, i)=MapRoom(ROOM1, MapRoomID(ROOM1)) : Exit
-								Next
-								MapRoom(ROOM1, MapRoomID(ROOM1))=""
-							Else
-								If MapRoom(ROOM1, MapRoomID(ROOM1)) <> "" Then MapName(x, y) = MapRoom(ROOM1, MapRoomID(ROOM1))	
-							EndIf
+							If MapRoom(ROOM1, MapRoomID(ROOM1)) <> "" Then MapName(x, y) = MapRoom(ROOM1, MapRoomID(ROOM1))	
 						EndIf
 						
 						r = CreateRoom(zone, ROOM1, x * 8, 0, y * 8, MapName(x, y))
@@ -7123,51 +7120,27 @@ Function CreateMap()
 						Else 
 							r\angle = 0
 						End If
-						CreateOverLapBox(r)
 						MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
 					Case 2
 						If MapTemp(x - 1, y)>0 And MapTemp(x + 1, y)>0 Then
 							If MapRoomID(ROOM2) < MaxRooms And MapName(x,y) = ""  Then
-								If CheckRoomOverlap(MapRoom(ROOM2, MapRoomID(ROOM2)), x, y) Then
-									For i = MapRoomID(ROOM2)+1 To MaxRooms
-										If MapRoom(ROOM2, i)="" Then MapRoom(ROOM2, i)=MapRoom(ROOM2, MapRoomID(ROOM2)) : Exit
-									Next
-									MapRoom(ROOM2, MapRoomID(ROOM2))=""
-								Else
-									If MapRoom(ROOM2, MapRoomID(ROOM2)) <> "" Then MapName(x, y) = MapRoom(ROOM2, MapRoomID(ROOM2))	
-								EndIf
+								If MapRoom(ROOM2, MapRoomID(ROOM2)) <> "" Then MapName(x, y) = MapRoom(ROOM2, MapRoomID(ROOM2))	
 							EndIf
 							r = CreateRoom(zone, ROOM2, x * 8, 0, y * 8, MapName(x, y))
 							If Rand(2) = 1 Then r\angle = 90 Else r\angle = 270
 							TurnEntity(r\obj, 0, r\angle, 0)
-							CreateOverLapBox(r)
 							MapRoomID(ROOM2)=MapRoomID(ROOM2)+1
 						ElseIf MapTemp(x, y - 1)>0 And MapTemp(x, y + 1)>0
 							If MapRoomID(ROOM2) < MaxRooms And MapName(x,y) = ""  Then
-								If CheckRoomOverlap(MapRoom(ROOM2, MapRoomID(ROOM2)), x, y) Then
-									For i = MapRoomID(ROOM2)+1 To MaxRooms
-										If MapRoom(ROOM2, i)="" Then MapRoom(ROOM2, i)=MapRoom(ROOM2, MapRoomID(ROOM2)) : Exit
-									Next
-									MapRoom(ROOM2, MapRoomID(ROOM2))=""
-								Else
-									If MapRoom(ROOM2, MapRoomID(ROOM2)) <> "" Then MapName(x, y) = MapRoom(ROOM2, MapRoomID(ROOM2))	
-								EndIf
+								If MapRoom(ROOM2, MapRoomID(ROOM2)) <> "" Then MapName(x, y) = MapRoom(ROOM2, MapRoomID(ROOM2))	
 							EndIf
 							r = CreateRoom(zone, ROOM2, x * 8, 0, y * 8, MapName(x, y))
 							If Rand(2) = 1 Then r\angle = 180 Else r\angle = 0
 							TurnEntity(r\obj, 0, r\angle, 0)
-							CreateOverLapBox(r)
 							MapRoomID(ROOM2)=MapRoomID(ROOM2)+1
 						Else
 							If MapRoomID(ROOM2C) < MaxRooms And MapName(x,y) = ""  Then
-								If CheckRoomOverlap(MapRoom(ROOM2C, MapRoomID(ROOM2C)), x, y) Then
-									For i = MapRoomID(ROOM2C)+1 To MaxRooms
-										If MapRoom(ROOM2C, i)="" Then MapRoom(ROOM2C, i)=MapRoom(ROOM2C, MapRoomID(ROOM2C)) : Exit
-									Next
-									MapRoom(ROOM2C, MapRoomID(ROOM2C))=""
-								Else
-									If MapRoom(ROOM2C, MapRoomID(ROOM2C)) <> "" Then MapName(x, y) = MapRoom(ROOM2C, MapRoomID(ROOM2C))	
-								EndIf
+								If MapRoom(ROOM2C, MapRoomID(ROOM2C)) <> "" Then MapName(x, y) = MapRoom(ROOM2C, MapRoomID(ROOM2C))	
 							EndIf
 							
 							If MapTemp(x - 1, y)>0 And MapTemp(x, y + 1)>0 Then
@@ -7185,19 +7158,11 @@ Function CreateMap()
 							Else
 								r = CreateRoom(zone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
 							EndIf
-							CreateOverLapBox(r)
 							MapRoomID(ROOM2C)=MapRoomID(ROOM2C)+1
 						EndIf
 					Case 3
 						If MapRoomID(ROOM3) < MaxRooms And MapName(x,y) = ""  Then
-							If CheckRoomOverlap(MapRoom(ROOM3, MapRoomID(ROOM3)), x, y) Then
-								For i = MapRoomID(ROOM3)+1 To MaxRooms
-									If MapRoom(ROOM3, i)="" Then MapRoom(ROOM3, i)=MapRoom(ROOM3, MapRoomID(ROOM3)) : Exit
-								Next
-								MapRoom(ROOM3, MapRoomID(ROOM3))=""
-							Else
-								If MapRoom(ROOM3, MapRoomID(ROOM3)) <> "" Then MapName(x, y) = MapRoom(ROOM3, MapRoomID(ROOM3))	
-							EndIf
+							If MapRoom(ROOM3, MapRoomID(ROOM3)) <> "" Then MapName(x, y) = MapRoom(ROOM3, MapRoomID(ROOM3))	
 						EndIf
 						
 						r = CreateRoom(zone, ROOM3, x * 8, 0, y * 8, MapName(x, y))
@@ -7211,22 +7176,13 @@ Function CreateMap()
 							TurnEntity(r\obj, 0, -90, 0)
 							r\angle = 270
 						End If
-						CreateOverLapBox(r)
 						MapRoomID(ROOM3)=MapRoomID(ROOM3)+1
 					Case 4
 						If MapRoomID(ROOM4) < MaxRooms And MapName(x,y) = ""  Then
-							If CheckRoomOverlap(MapRoom(ROOM4, MapRoomID(ROOM4)), x, y) Then
-								For i = MapRoomID(ROOM4)+1 To MaxRooms
-									If MapRoom(ROOM4, i)="" Then MapRoom(ROOM4, i)=MapRoom(ROOM4, MapRoomID(ROOM4)) : Exit
-								Next
-								MapRoom(ROOM4, MapRoomID(ROOM4))=""
-							Else
-								If MapRoom(ROOM4, MapRoomID(ROOM4)) <> "" Then MapName(x, y) = MapRoom(ROOM4, MapRoomID(ROOM4))	
-							EndIf
+							If MapRoom(ROOM4, MapRoomID(ROOM4)) <> "" Then MapName(x, y) = MapRoom(ROOM4, MapRoomID(ROOM4))	
 						EndIf
 						
 						r = CreateRoom(zone, ROOM4, x * 8, 0, y * 8, MapName(x, y))
-						CreateOverLapBox(r)
 						MapRoomID(ROOM4)=MapRoomID(ROOM4)+1
 				End Select
 				
@@ -7250,7 +7206,7 @@ Function CreateMap()
 	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
 	
 	For r.Rooms = Each Rooms
-		CheckRoomOverlap2(r)
+		PreventRoomOverlap(r)
 	Next
 	
 	If 0 Then 
@@ -7343,10 +7299,6 @@ Function CreateMap()
 	Next
 	
 	For r.Rooms = Each Rooms
-		If r\overlapcheckbox<>0
-			FreeEntity r\overlapcheckbox
-			r\overlapcheckbox = 0
-		EndIf
 		r\Adjacent[0]=Null
 		r\Adjacent[1]=Null
 		r\Adjacent[2]=Null
@@ -7375,30 +7327,6 @@ Function CreateMap()
 		Next
 	Next
 	
-End Function
-
-
-Function CheckRoomOverlap(roomname$, x%, y%)
-	Return False
-	
-	roomname = Lower(roomname)
-	
-	Local rt.RoomTemplates
-	For rt.RoomTemplates = Each RoomTemplates
-		If rt\Name = roomname Then
-			If (Not rt\Large) Then Return False
-			
-			For x2= Max(0,x-1) To Min(MapWidth-1,x+1)
-				For y2= Max(0,y-1) To Min(MapHeight-1,y+1)
-					If x2<>x And y2<>y Then
-						If MapTemp(x2,y2)>1 Then Return True
-					EndIf
-				Next
-			Next
-			
-			Return False
-		EndIf
-	Next
 End Function
 
 Function SetRoom(room_name$,room_type%,pos%,min_pos%,max_pos%) ;place a room without overwriting others
@@ -8117,93 +8045,62 @@ Function AddLightCones(room.Rooms)
 	
 End Function
 
-;New Room Overlap-Checking functions
-Function GetMeshExtents2(mesh) ; A better variant than the GetMeshExtents, as this also works for models that are rotated
-	Local xmax#=-1000000
-	Local xmin#= 1000000
-	Local ymax#=-1000000
-	Local ymin#= 1000000
-	Local zmax#=-1000000
-	Local zmin#= 1000000
-	Local su,s,i,x#,y#,z#
-	For su=1 To CountSurfaces(mesh)
-		s=GetSurface(mesh,su)
-		For i=0 To CountVertices(s)-1
-			x#=VertexX(s,i)
-			y#=VertexY(s,i)
-			z#=VertexZ(s,i)
-			TFormPoint x,y,z,mesh,0
-			x=TFormedX()
-			y=TFormedY()
-			z=TFormedZ()
-			If x>xmax Then xmax=x
-			If x<xmin Then xmin=x
-			If y>ymax Then ymax=y
-			If y<ymin Then ymin=y
-			If z>zmax Then zmax=z
-			If z<zmin Then zmin=z
-		Next
-	Next
+Function CalculateRoomTemplateExtents(r.RoomTemplates)
+	If r\DisableOverlapCheck Then Return
 	
-	Mesh_MinX = xmin
-	Mesh_MinY = ymin
-	Mesh_MinZ = zmin
-	Mesh_MaxX = xmax
-	Mesh_MaxY = ymax
-	Mesh_MaxZ = zmax
-	Mesh_MagX = xmax-xmin
-	Mesh_MagY = ymax-ymin
-	Mesh_MagZ = zmax-zmin
+	GetMeshExtents(GetChild(r\obj,2))
+	r\MinX = Mesh_MinX
+	r\MinY = Mesh_MinY
+	r\MinZ = Mesh_MinZ
+	r\MaxX = Mesh_MaxX
+	r\MaxY = Mesh_MaxY
+	r\MaxZ = Mesh_MaxZ
 	
+	DebugLog("roomtemplateextents: "+r\minx+", "+r\miny	+", "+r\minz	+", "+r\maxx	+", "+r\maxy+", "+r\maxz)
 End Function
 
-Function CreateOverLapBox(r.Rooms)
-	Local s
-	Local sizeadd# = 0.02
+Function CalculateRoomExtents(r.Rooms)
+	If r\RoomTemplate\DisableOverlapCheck Then Return
 	
-	If r\RoomTemplate\Name = "exit1" Then Return
-	If r\RoomTemplate\Name = "gatea" Then Return
-	If r\RoomTemplate\Name = "room049" Then Return
-	If r\RoomTemplate\Name = "room3storage" Then Return
-	If r\RoomTemplate\Name = "room966" Then Return
-	If r\RoomTemplate\Name = "gateaentrance" Then Return
-	If r\RoomTemplate\Name = "start" Then Return
+	;shrink the extents slightly - we don't care if the overlap is smaller than the thickness of the walls
+	Local shrinkAmount# = 0.05
 	
-	r\overlapcheckbox = CreateMesh()
-	GetMeshExtents2(GetChild(r\obj,2))
-	s = CreateSurface(r\overlapcheckbox)
-	AddVertex(s,Mesh_MinX+sizeadd,Mesh_MaxY-sizeadd,Mesh_MinZ+sizeadd)
-	AddVertex(s,Mesh_MaxX-sizeadd,Mesh_MaxY-sizeadd,Mesh_MinZ+sizeadd)
-	AddVertex(s,Mesh_MaxX-sizeadd,Mesh_MinY+sizeadd,Mesh_MinZ+sizeadd)
-	AddVertex(s,Mesh_MinX+sizeadd,Mesh_MinY+sizeadd,Mesh_MinZ+sizeadd)
-	AddTriangle s,0,1,2
-	AddTriangle s,0,2,3
-	s = CreateSurface(r\overlapcheckbox)
-	AddVertex(s,Mesh_MaxX-sizeadd,Mesh_MaxY-sizeadd,Mesh_MinZ+sizeadd)
-	AddVertex(s,Mesh_MaxX-sizeadd,Mesh_MaxY-sizeadd,Mesh_MaxZ-sizeadd)
-	AddVertex(s,Mesh_MaxX-sizeadd,Mesh_MinY+sizeadd,Mesh_MaxZ-sizeadd)
-	AddVertex(s,Mesh_MaxX-sizeadd,Mesh_MinY+sizeadd,Mesh_MinZ+sizeadd)
-	AddTriangle s,0,1,2
-	AddTriangle s,0,2,3
-	s = CreateSurface(r\overlapcheckbox)
-	AddVertex(s,Mesh_MaxX-sizeadd,Mesh_MaxY-sizeadd,Mesh_MaxZ-sizeadd)
-	AddVertex(s,Mesh_MinX+sizeadd,Mesh_MaxY-sizeadd,Mesh_MaxZ-sizeadd)
-	AddVertex(s,Mesh_MinX+sizeadd,Mesh_MinY+sizeadd,Mesh_MaxZ-sizeadd)
-	AddVertex(s,Mesh_MaxX-sizeadd,Mesh_MinY+sizeadd,Mesh_MaxZ-sizeadd)
-	AddTriangle s,0,1,2
-	AddTriangle s,0,2,3
-	s = CreateSurface(r\overlapcheckbox)
-	AddVertex(s,Mesh_MinX+sizeadd,Mesh_MaxY-sizeadd,Mesh_MaxZ-sizeadd)
-	AddVertex(s,Mesh_MinX+sizeadd,Mesh_MaxY-sizeadd,Mesh_MinZ+sizeadd)
-	AddVertex(s,Mesh_MinX+sizeadd,Mesh_MinY+sizeadd,Mesh_MinZ+sizeadd)
-	AddVertex(s,Mesh_MinX+sizeadd,Mesh_MinY+sizeadd,Mesh_MaxZ-sizeadd)
-	AddTriangle s,0,1,2
-	AddTriangle s,0,2,3
-	EntityAlpha r\overlapcheckbox,0.5
+	;convert from the rooms local space to world space
+	TFormVector(r\RoomTemplate\MinX, r\RoomTemplate\MinY, r\RoomTemplate\MinZ, r\obj, 0)
+	r\MinX = TFormedX() + shrinkAmount + r\x
+	r\MinY = TFormedY() + shrinkAmount
+	r\MinZ = TFormedZ() + shrinkAmount + r\z
 	
+	;convert from the rooms local space to world space
+	TFormVector(r\RoomTemplate\MaxX, r\RoomTemplate\MaxY, r\RoomTemplate\MaxZ, r\obj, 0)
+	r\MaxX = TFormedX() - shrinkAmount + r\x
+	r\MaxY = TFormedY() - shrinkAmount
+	r\MaxZ = TFormedZ() - shrinkAmount + r\z
+	
+	If (r\MinX > r\MaxX) Then
+		Local tempX# = r\MaxX
+		r\MaxX = r\MinX
+		r\MinX = tempX
+	EndIf
+	If (r\MinZ > r\MaxZ) Then
+		Local tempZ# = r\MaxZ
+		r\MaxZ = r\MinZ
+		r\MinZ = tempZ
+	EndIf
+	
+	DebugLog("roomextents: "+r\MinX+", "+r\MinY	+", "+r\MinZ	+", "+r\MaxX	+", "+r\MaxY+", "+r\MaxZ)
 End Function
 
-Function CheckRoomOverlap2(r.Rooms)
+Function CheckRoomOverlap(r1.Rooms, r2.Rooms)
+	If (r1\MaxX	<= r2\MinX Or r1\MaxY <= r2\MinY Or r1\MaxZ <= r2\MinZ) Then Return False
+	If (r1\MinX	>= r2\MaxX Or r1\MinY >= r2\MaxY Or r1\MinZ >= r2\MaxZ) Then Return False
+	
+	Return True
+End Function
+
+Function PreventRoomOverlap(r.Rooms)
+	If r\RoomTemplate\DisableOverlapCheck Then Return
+	
 	Local r2.Rooms,r3.Rooms
 	
 	Local isIntersecting% = False
@@ -8213,12 +8110,10 @@ Function CheckRoomOverlap2(r.Rooms)
 	
 	;First, check if the room is actually intersecting at all
 	For r2 = Each Rooms
-		If r2 <> r
-			If r\overlapcheckbox<>0 And r2\overlapcheckbox<>0
-				If MeshesIntersect(r\overlapcheckbox,r2\overlapcheckbox)
-					isIntersecting = True
-					Exit
-				EndIf
+		If r2 <> r And (Not r2\RoomTemplate\DisableOverlapCheck) Then
+			If CheckRoomOverlap(r, r2) Then
+				isIntersecting = True
+				Exit
 			EndIf
 		EndIf
 	Next
@@ -8232,23 +8127,21 @@ Function CheckRoomOverlap2(r.Rooms)
 	isIntersecting = False
 	Local x% = r\x/8.0
 	Local y% = r\z/8.0
-	If r\roomtype = ROOM2
+	If r\RoomTemplate\Shape = ROOM2 Then
 		;Room is a ROOM2, let's check if turning it 180 degrees fixes the overlapping issue
+		r\angle = r\angle + 180
+		RotateEntity r\obj,0,r\angle,0
+		CalculateRoomExtents(r)
+		
 		For r2 = Each Rooms
-			If r2 <> r
-				If r\overlapcheckbox<>0 And r2\overlapcheckbox<>0
-					FreeEntity r\overlapcheckbox
-					r\angle = r\angle + 180
+			If r2 <> r And (Not r2\RoomTemplate\DisableOverlapCheck) Then
+				If CheckRoomOverlap(r, r2) Then
+					;didn't work -> rotate the room back and move to the next step
+					isIntersecting = True
+					r\angle = r\angle - 180
 					RotateEntity r\obj,0,r\angle,0
-					CreateOverLapBox(r)
-					If MeshesIntersect(r\overlapcheckbox,r2\overlapcheckbox)
-						isIntersecting = True
-						FreeEntity r\overlapcheckbox
-						r\angle = r\angle - 180
-						RotateEntity r\obj,0,r\angle,0
-						CreateOverLapBox(r)
-						Exit
-					EndIf
+					CalculateRoomExtents(r)
+					Exit
 				EndIf
 			EndIf
 		Next
@@ -8266,74 +8159,70 @@ Function CheckRoomOverlap2(r.Rooms)
 	isIntersecting = True
 	Local temp2,x2%,y2%,rot%,rot2%
 	For r2 = Each Rooms
-		If r2 <> r
-			If r\overlapcheckbox<>0 And r2\overlapcheckbox<>0
-				If isIntersecting
-					x = r\x/8.0
-					y = r\z/8.0
-					rot = r\angle
-					x2 = r2\x/8.0
-					y2 = r2\z/8.0
-					rot2 = r2\angle
-					If r\roomtype = r2\roomtype And r\zone = r2\zone And (r2\RoomTemplate\Name <> "checkpoint1" And r2\RoomTemplate\Name <> "checkpoint2")
-						isIntersecting = False
-						FreeEntity r\overlapcheckbox
-						r\x = x2*8.0
-						r\z = y2*8.0
-						r\angle = rot2
-						PositionEntity r\obj,r\x,r\y,r\z
-						RotateEntity r\obj,0,r\angle,0
-						CreateOverLapBox(r)
-						FreeEntity r2\overlapcheckbox
-						r2\x = x*8.0
-						r2\z = y*8.0
-						r2\angle = rot
-						PositionEntity r2\obj,r2\x,r2\y,r2\z
-						RotateEntity r2\obj,0,r2\angle,0
-						CreateOverLapBox(r2)
-						For r3 = Each Rooms
-							If r3 <> r
-								If r\overlapcheckbox<>0 And r3\overlapcheckbox<>0
-									If MeshesIntersect(r\overlapcheckbox,r3\overlapcheckbox)
-										isIntersecting = True
-										Exit
-									EndIf
-								EndIf
+		If r2 <> r And (Not r2\RoomTemplate\DisableOverlapCheck)  Then
+			If r\RoomTemplate\Shape = r2\RoomTemplate\Shape And r\zone = r2\zone And (r2\RoomTemplate\Name <> "checkpoint1" And r2\RoomTemplate\Name <> "checkpoint2") Then
+				x = r\x/8.0
+				y = r\z/8.0
+				rot = r\angle
+				
+				x2 = r2\x/8.0
+				y2 = r2\z/8.0
+				rot2 = r2\angle
+				
+				isIntersecting = False
+				
+				r\x = x2*8.0
+				r\z = y2*8.0
+				r\angle = rot2
+				PositionEntity r\obj,r\x,r\y,r\z
+				RotateEntity r\obj,0,r\angle,0
+				CalculateRoomExtents(r)
+				
+				r2\x = x*8.0
+				r2\z = y*8.0
+				r2\angle = rot
+				PositionEntity r2\obj,r2\x,r2\y,r2\z
+				RotateEntity r2\obj,0,r2\angle,0
+				CalculateRoomExtents(r2)
+				
+				;make sure neither room overlaps with anything after the swap
+				For r3 = Each Rooms
+					If (Not r3\RoomTemplate\DisableOverlapCheck) Then
+						If r3 <> r Then
+							If CheckRoomOverlap(r, r3) Then
+								isIntersecting = True
+								Exit
 							EndIf
-						Next
-						;If the r-Object is not intersecting in it's new location, then it also needs to check if the r2-Object doesn't intersect
-						If (Not isIntersecting)
-							For r3 = Each Rooms
-								If r3 <> r2
-									If r2\overlapcheckbox<>0 And r3\overlapcheckbox<>0
-										If MeshesIntersect(r2\overlapcheckbox,r3\overlapcheckbox)
-											isIntersecting = True
-											Exit
-										EndIf
-									EndIf
-								EndIf
-							Next
 						EndIf
-						;Either the original room or the "reposition" room is intersecting, resetting the position of each room to their original one
-						If isIntersecting
-							FreeEntity r\overlapcheckbox
-							r\x = x*8.0
-							r\z = y*8.0
-							r\angle = rot
-							PositionEntity r\obj,r\x,r\y,r\z
-							RotateEntity r\obj,0,r\angle,0
-							CreateOverLapBox(r)
-							FreeEntity r2\overlapcheckbox
-							r2\x = x2*8.0
-							r2\z = y2*8.0
-							r2\angle = rot2
-							PositionEntity r2\obj,r2\x,r2\y,r2\z
-							RotateEntity r2\obj,0,r2\angle,0
-							CreateOverLapBox(r2)
-						EndIf
+						If r3 <> r2 Then
+							If CheckRoomOverlap(r2, r3) Then
+								isIntersecting = True
+								Exit
+							EndIf
+						EndIf	
 					EndIf
+				Next
+				
+				;Either the original room or the "reposition" room is intersecting, reset the position of each room to their original one
+				If isIntersecting Then
+					r\x = x*8.0
+					r\z = y*8.0
+					r\angle = rot
+					PositionEntity r\obj,r\x,r\y,r\z
+					RotateEntity r\obj,0,r\angle,0
+					CalculateRoomExtents(r)
+					
+					r2\x = x2*8.0
+					r2\z = y2*8.0
+					r2\angle = rot2
+					PositionEntity r2\obj,r2\x,r2\y,r2\z
+					RotateEntity r2\obj,0,r2\angle,0
+					CalculateRoomExtents(r2)
+					
+					isIntersecting = False
 				EndIf
 			EndIf
+					
 		EndIf
 	Next
 	
@@ -8345,7 +8234,6 @@ Function CheckRoomOverlap2(r.Rooms)
 	
 	DebugLog "Couldn't fix overlap issue for room "+r\RoomTemplate\Name
 	Return False
-	
 End Function
 
 
@@ -8355,9 +8243,14 @@ End Function
 
 
 
+
+
+
 ;~IDEal Editor Parameters:
-;~F#2#A
-;~B#122B
+;~F#2#A#35#102#111#118#11F#126#13F#147#14F#2F4#304#315#33D#34B#35B#360#36B#413
+;~F#51E#53F#563#57F#58A#5C6#5D6#5FF#63B#643#658#6A7#6B1#136A#13EC#13F8#143D#1448#1459#145E
+;~F#146D#1484#1505#150E#15D0#15ED#15F4#15FA#1608#162B#1650#1683#17CA#1803#1818#190C#19E1#19E6#19F6#1CA3
+;~F#1CC2#1CC9#1D2A#1DA6#1DD1#1DF2#1E05#1E1C#1E2F#1E36#1E6A#1E75#1E9D#1EFA#1F06#1F11#1F17#1F21#1F27#1F3D
+;~F#1F51#1F6F
+;~B#1230
 ;~C#Blitz3D
-
-
