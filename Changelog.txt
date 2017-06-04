@@ -31,6 +31,7 @@ Bug fixes:
 - Fixed items,npcs and the player not falling through the floor anymore if the room is not rendered.
 - Fixed the item dropspeed increasing each time an item has been picked up.
 - Another attempt of fixing room overlapping issues.
+- Fixed Ulgrin's path during the breach event.
 
 ----------------------------------------------------------------------------------
 

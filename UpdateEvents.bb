@@ -92,7 +92,8 @@ Function UpdateEvents()
 						If e\room\NPC[2] = Null Then
 							e\room\NPC[2] = CreateNPC(NPCtypeGuard, 0,0,0)
 						EndIf
-						PositionEntity e\room\NPC[2]\Collider, e\room\x-240*RoomScale, 0.5, e\room\z+528*RoomScale, True
+						;x-240
+						PositionEntity e\room\NPC[2]\Collider, e\room\x, 0.5, e\room\z+528*RoomScale, True
 						ResetEntity e\room\NPC[2]\Collider
 						e\room\NPC[2]\State = 7
 						PointEntity e\room\NPC[2]\Collider,e\room\NPC[1]\Collider
@@ -173,7 +174,8 @@ Function UpdateEvents()
 										MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
 										e\room\NPC[2]\State = 8
 										
-										If EntityZ(e\room\NPC[2]\Collider) < e\room\z-512*RoomScale Then
+										;z-512
+										If EntityZ(e\room\NPC[2]\Collider) < e\room\z Then
 											PointEntity(e\room\NPC[2]\obj, e\room\NPC[1]\Collider)
 											RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj)-180,EntityYaw(e\room\NPC[2]\Collider),15.0), 0
 										Else
