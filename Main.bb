@@ -2842,20 +2842,6 @@ Repeat
 		
 		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
 		
-		If KeyHit(KEY_INV) And VomitTimer >= 0
-			If (Not UnableToMove) And (Not IsZombie)
-				If InvOpen Then
-					ResumeSounds()
-					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
-				Else
-					PauseSounds()
-				EndIf
-				InvOpen = Not InvOpen
-				If OtherOpen<>Null Then OtherOpen=Null
-				SelectedItem = Null
-			EndIf
-		EndIf
-		
 		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "exit1" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then 
 			
 			If Rand(1500) = 1 Then
@@ -2969,7 +2955,9 @@ Repeat
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		
-		If FPSfactor>0
+		If FPSfactor=0
+			UpdateWorld(0)
+		Else
 			UpdateWorld()
 			ManipulateNPCBones()
 		EndIf
@@ -3099,6 +3087,20 @@ Repeat
 		EntityColor Light,255,255,255
 		
 		;[End block]
+		
+		If KeyHit(KEY_INV) And VomitTimer >= 0
+			If (Not UnableToMove) And (Not IsZombie)
+				If InvOpen Then
+					ResumeSounds()
+					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+				Else
+					PauseSounds()
+				EndIf
+				InvOpen = Not InvOpen
+				If OtherOpen<>Null Then OtherOpen=Null
+				SelectedItem = Null
+			EndIf
+		EndIf
 		
 		If KeyHit(KEY_SAVE) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
