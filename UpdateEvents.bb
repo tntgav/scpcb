@@ -5990,6 +5990,10 @@ Function UpdateEvents()
 			Case "room860"
 				;[Block]
 				
+				;e\EventState = is the player in the forest
+				;e\EventState2 = which side of the door did the player enter from
+				;e\EventState3 = monster spawn timer
+				
 				Local fr.Forest=e\room\fr
 				
 				If PlayerRoom = e\room And fr<>Null Then 
@@ -6061,7 +6065,7 @@ Function UpdateEvents()
 								If EntityInView(fr\Door[i], Camera) Then
 									DrawHandIcon = True
 									If MouseHit1 Then
-										If i=1 Then
+										If i=e\EventState2 Then
 											BlinkTimer = -10
 											
 											PlaySound_Strict(LoadTempSound("SFX\Door\WoodenDoorOpen.ogg"))
@@ -6141,16 +6145,10 @@ Function UpdateEvents()
 										;reset monster spawn timer
 										e\EventState3 = 0.0
 										
-										
 										If e\room\NPC[0]<>Null Then
 											;reset monster to the (hidden) idle state
 											e\room\NPC[0]\State = 0
 										EndIf
-										
-										PositionEntity Collider,EntityX(fr\Door[0],True),EntityY(fr\Door[0],True)+EntityY(Collider,True)+0.5,EntityZ(fr\Door[0],True),True
-										
-										RotateEntity Collider, 0.0, EntityYaw(fr\Door[0],True)-180, 0.0, True
-										MoveEntity Collider, -0.5,0.0,0.5
 										
 										PrevSecondaryLightOn = SecondaryLightOn
 										SecondaryLightOn = True
@@ -6160,8 +6158,14 @@ Function UpdateEvents()
 										PointEntity pvt, e\room\obj
 										ang# = WrapAngle(EntityYaw(pvt)-EntityYaw(e\room\obj,True))
 										If ang > 90 And ang < 270 Then
+											PositionEntity Collider,EntityX(fr\Door[0],True),EntityY(fr\Door[0],True)+EntityY(Collider,True)+0.5,EntityZ(fr\Door[0],True),True
+											RotateEntity Collider, 0.0, EntityYaw(fr\Door[0],True)-180, 0.0, True
+											MoveEntity Collider, -0.5,0.0,0.5
 											e\EventState2 = 1
 										Else
+											PositionEntity Collider,EntityX(fr\Door[1],True),EntityY(fr\Door[1],True)+EntityY(Collider,True)+0.5,EntityZ(fr\Door[1],True),True
+											RotateEntity Collider, 0.0, EntityYaw(fr\Door[1],True)-180, 0.0, True
+											MoveEntity Collider, -0.5,0.0,0.5
 											e\EventState2 = 0
 										EndIf
 										FreeEntity pvt
