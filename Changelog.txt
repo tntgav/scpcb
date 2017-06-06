@@ -12,6 +12,7 @@
 - Removed unused animation from SCP-966's model.
 - Optimized SCP-966's animation key frames.
 - Tweaked SCP-914 key card refinery system again.
+- Added Third Subvision Studio startup screen.
 
 Bug fixes:
 - Fixed a crash that occured while quick-loading a save file.
@@ -32,6 +33,7 @@ Bug fixes:
 - Fixed the item dropspeed increasing each time an item has been picked up.
 - Another attempt of fixing room overlapping issues.
 - Fixed Ulgrin's path during the breach event.
+- Fixed the levers in the electrical center: Now they can't be flipped into the control panel anymore.
 
 ----------------------------------------------------------------------------------
 

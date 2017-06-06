@@ -7273,7 +7273,7 @@ Function CreateMap()
 		spacing = 8.0
 		If MapTemp(x, y)>0 Then
 			If (Floor((x + y) / 2.0) = Ceil((x + y) / 2.0)) Then
-				If zone = 2 Then temp = 2 Else temp=0
+				If r\zone = 2 Then temp = 2 Else temp=0
 				
 				If MapTemp(x + 1, y) Then
 					d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), temp)
