@@ -12,7 +12,12 @@
 - Removed unused animation from SCP-966's model.
 - Optimized SCP-966's animation key frames.
 - Tweaked SCP-914 key card refinery system again.
-- Added Third Subvision Studio startup screen.
+   - Upgrading a level 1 card in SCP-914 has a 100/80/75% chance of giving a level 2 card (instead of 100/66.7/33.3%);
+   - Upgrading a level 2 card in SCP-914 has a 100/75/66.7% chance of giving a level 3 card (instead of 83.3/33.3/20%);
+   - Upgrading a level 3 card in SCP-914 has a 10/6.7/5% chance of giving a level 4 card (instead of 5/2.5/1.7%);
+   - Upgrading a level 4 card in SCP-914 has a 100/75/66.7% chance of giving a level 5 card (instead of 66.7/33.3/25%);
+   - Upgrading a level 5 card in SCP-914 to an Omni key card depends on the amount of achievements the player has.
+- Added a Third Subvision Studio startup video.
 
 Bug fixes:
 - Fixed a crash that occured while quick-loading a save file.
@@ -27,11 +32,11 @@ Bug fixes:
 - The player can't save when dead.
 - Closing the loading screen by left clicking doesn't open/close nearby doors anymore.
 - SCP-173's collision radius has been decreased.
-- Fixed a crash that occured when opening your inventory.
-- The fog doesn't turn white anymore if you go to the pocket dimension by leaving SCP-1499.
-- Fixed items,npcs and the player falling through the floor if the room is not rendered.
-- Fixed the item dropspeed increasing each time an item has been picked up.
-- Another attempt of fixing room overlapping issues.
+- Fixed a crash that occured when opening the inventory.
+- The fog doesn't turn white anymore if the player enters the pocket dimension by leaving SCP-1499.
+- Fixed items, npcs and the player falling through the floor if the room is not rendered.
+- Fixed item dropspeed increasing each time an item has been picked up.
+- Another attempt to fix room overlapping issues.
 - Fixed Ulgrin's path during the breach event.
 - Fixed the levers in the electrical center: Now they can't be flipped into the control panel anymore.
 
