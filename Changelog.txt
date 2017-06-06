@@ -33,6 +33,7 @@ Bug fixes:
 - Fixed the item dropspeed increasing each time an item has been picked up.
 - Another attempt of fixing room overlapping issues.
 - Fixed Ulgrin's path during the breach event.
+- Fixed the levers in the electrical center: Now they can't be flipped into the control panel anymore.
 
 ----------------------------------------------------------------------------------
 
