@@ -92,7 +92,8 @@ Function UpdateEvents()
 						If e\room\NPC[2] = Null Then
 							e\room\NPC[2] = CreateNPC(NPCtypeGuard, 0,0,0)
 						EndIf
-						PositionEntity e\room\NPC[2]\Collider, e\room\x-240*RoomScale, 0.5, e\room\z+528*RoomScale, True
+						;x-240
+						PositionEntity e\room\NPC[2]\Collider, e\room\x, 0.5, e\room\z+528*RoomScale, True
 						ResetEntity e\room\NPC[2]\Collider
 						e\room\NPC[2]\State = 7
 						PointEntity e\room\NPC[2]\Collider,e\room\NPC[1]\Collider
@@ -173,7 +174,8 @@ Function UpdateEvents()
 										MoveEntity e\room\NPC[2]\Collider, 0,0,e\room\NPC[2]\CurrSpeed*FPSfactor
 										e\room\NPC[2]\State = 8
 										
-										If EntityZ(e\room\NPC[2]\Collider) < e\room\z-512*RoomScale Then
+										;z-512
+										If EntityZ(e\room\NPC[2]\Collider) < e\room\z Then
 											PointEntity(e\room\NPC[2]\obj, e\room\NPC[1]\Collider)
 											RotateEntity e\room\NPC[2]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[2]\obj)-180,EntityYaw(e\room\NPC[2]\Collider),15.0), 0
 										Else
@@ -541,6 +543,17 @@ Function UpdateEvents()
 							;e\room\NPC[3]\EnemyX = EntityX(Collider)
 							;e\room\NPC[3]\EnemyY = EntityY(Collider)
 							;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
+							
+							If e\room\NPC[5]\State <> 11
+								If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0 And EntityDistance(e\room\NPC[4]\Collider,e\room\NPC[5]\Collider)
+									If EntityDistance(e\room\NPC[5]\Collider,Collider)<3.5
+										e\room\NPC[5]\State = 11
+										e\room\NPC[5]\State3 = 1
+										e\room\NPC[5]\SoundChn2 = PlaySound2(e\room\NPC[5]\Sound2,Camera,e\room\NPC[5]\Collider)
+										e\room\NPC[5]\Reload = 70*3
+									EndIf
+								EndIf
+							EndIf
 						ElseIf e\EventState3 < 900
 							e\room\NPC[4]\Angle = 0
 							
@@ -683,7 +696,7 @@ Function UpdateEvents()
 									EndIf
 								EndIf
 								If e\room\NPC[5]\State <> 11
-									If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0
+									If EntityDistance(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>5.0 And EntityDistance(e\room\NPC[4]\Collider,e\room\NPC[5]\Collider)
 										If EntityDistance(e\room\NPC[5]\Collider,Collider)<3.5
 											e\room\NPC[5]\State = 11
 											e\room\NPC[5]\State3 = 1
@@ -2393,76 +2406,29 @@ Function UpdateEvents()
 					
 					EntityPick(Camera, 1.5)
 					
-					For i = 1 To 5 Step 2
-						If PickedEntity() = e\room\Objects[i] Then
-							DrawHandIcon = True
-							If MouseHit1 Then GrabbedEntity = e\room\Objects[i]
-							
-							If e\EventState = 0 Then 
-								If i = 3 Then 
-									e\EventState = Max(e\EventState,1)
-									PlaySound_Strict HorrorSFX(7)
-									PlaySound_Strict LeverSFX
-								EndIf
-							EndIf 
-						End If
-						
-						Local prevpitch# = EntityPitch(e\room\Objects[i])
-						
-						If MouseDown1 Or MouseHit1 Then
-							If GrabbedEntity <> 0 Then
-								If GrabbedEntity = e\room\Objects[i] Then
-									DrawHandIcon = True
-									TurnEntity(e\room\Objects[i], mouse_y_speed_1 * 2.5, 0, 0)
-									RotateEntity(GrabbedEntity, Max(Min(EntityPitch(e\room\Objects[i]), 85), -85), EntityYaw(e\room\Objects[i]), 0)
-									
-									DrawArrowIcon(0) = True
-									DrawArrowIcon(2) = True
-									
-								EndIf
-							EndIf
-						Else
-							If EntityPitch(e\room\Objects[i]) > 0 Then
-								RotateEntity(e\room\Objects[i], CurveValue(85, EntityPitch(e\room\Objects[i]), 10), EntityYaw(e\room\Objects[i]), 0)
-							Else
-								RotateEntity(e\room\Objects[i], CurveValue(-85, EntityPitch(e\room\Objects[i]), 10), EntityYaw(e\room\Objects[i]), 0)
-							EndIf
-							GrabbedEntity = 0
-						End If
-						
-						If EntityPitch(e\room\Objects[i]) > 83 Then
-							If prevpitch =< 83 Then PlaySound2(LeverSFX, Camera, e\room\Objects[i])
-							If i = 3 Then 
-								SecondaryLightOn = CurveValue(1.0, SecondaryLightOn, 10.0)
-								If prevpitch =< 83 Then
-									PlaySound2(LightSFX, Camera, e\room\Objects[i])
-									;For r.Rooms = Each Rooms
-									;	For z = 0 To MaxRoomLights-1
-									;		If r\LightSprites[z] <> 0 Then ShowEntity r\LightSprites[z]
-									;	Next 
-									;Next 
-								EndIf		
-							Else
-								RemoteDoorOn = True
-							EndIf
-						ElseIf EntityPitch(e\room\Objects[i]) < -83
-							
-							If prevpitch => -83 Then PlaySound2(LeverSFX, Camera, e\room\Objects[i])
-							If i = 3 Then 
-								If prevpitch => -83 Then
-									PlaySound2(LightSFX, Camera, e\room\Objects[i])
-									;For r.Rooms = Each Rooms
-									;	For z = 0 To MaxRoomLights-1
-									;		If r\LightSprites[z] <> 0 Then HideEntity r\LightSprites[z]
-									;	Next 
-									;Next 
-								EndIf 
-								SecondaryLightOn = CurveValue(0.0, SecondaryLightOn, 10.0)
-							Else
-								RemoteDoorOn = False
-							EndIf						
-						EndIf
-					Next
+					If PickedEntity() = e\room\Objects[3]
+						If e\EventState = 0
+							e\EventState = Max(e\EventState,1)
+							PlaySound_Strict HorrorSFX(7)
+							PlaySound_Strict LeverSFX
+						EndIf 
+					EndIf
+					
+					;Primary Lighting
+					UpdateLever(e\room\Objects[1])
+					
+					;Secondary Lighting
+					Local prevstate2 = e\EventState2
+					e\EventState2 = UpdateLever(e\room\Objects[3])
+					If (prevstate2 <> e\EventState2) And e\EventState>0 Then PlaySound2(LightSFX, Camera, e\room\Objects[3])
+					If e\EventState2
+						SecondaryLightOn = CurveValue(1.0, SecondaryLightOn, 10.0)
+					Else
+						SecondaryLightOn = CurveValue(0.0, SecondaryLightOn, 10.0)
+					EndIf
+					
+					;Remote Door Control
+					RemoteDoorOn = UpdateLever(e\room\Objects[5])
 					
 					If e\EventState > 0 And e\EventState < 200 Then
 						e\EventState = e\EventState + FPSfactor

@@ -2842,20 +2842,6 @@ Repeat
 		
 		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
 		
-		If KeyHit(KEY_INV) And VomitTimer >= 0
-			If (Not UnableToMove) And (Not IsZombie)
-				If InvOpen Then
-					ResumeSounds()
-					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
-				Else
-					PauseSounds()
-				EndIf
-				InvOpen = Not InvOpen
-				If OtherOpen<>Null Then OtherOpen=Null
-				SelectedItem = Null
-			EndIf
-		EndIf
-		
 		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "exit1" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then 
 			
 			If Rand(1500) = 1 Then
@@ -2969,7 +2955,9 @@ Repeat
 		
 		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
 		
-		If FPSfactor>0
+		If FPSfactor=0
+			UpdateWorld(0)
+		Else
 			UpdateWorld()
 			ManipulateNPCBones()
 		EndIf
@@ -3099,6 +3087,20 @@ Repeat
 		EntityColor Light,255,255,255
 		
 		;[End block]
+		
+		If KeyHit(KEY_INV) And VomitTimer >= 0
+			If (Not UnableToMove) And (Not IsZombie)
+				If InvOpen Then
+					ResumeSounds()
+					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+				Else
+					PauseSounds()
+				EndIf
+				InvOpen = Not InvOpen
+				If OtherOpen<>Null Then OtherOpen=Null
+				SelectedItem = Null
+			EndIf
+		EndIf
 		
 		If KeyHit(KEY_SAVE) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
@@ -11275,12 +11277,6 @@ Function PlayStartupVideos()
 	TranslateEntity Cam, 1.0 / 2048 ,-1.0 / 2048 ,-1.0
 	EntityParent Quad, Cam, 1
 	
-	Local moviefile$ = "GFX\menu\startup"
-	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
-	Local moview = BlitzMovie_GetWidth()
-	Local movieh = BlitzMovie_GetHeight()
-	BlitzMovie_Close()
-	
 	Local ScaledGraphicHeight%
 	Local Ratio# = Float(RealGraphicWidth)/Float(RealGraphicHeight)
 	If Ratio>1.76 And Ratio<1.78
@@ -11291,11 +11287,15 @@ Function PlayStartupVideos()
 		DebugLog "Scaled: "+ScaledGraphicHeight
 	EndIf
 	
+	Local moviefile$ = "GFX\menu\startup_Undertow"
+	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
+	Local moview = BlitzMovie_GetWidth()
+	Local movieh = BlitzMovie_GetHeight()
+	BlitzMovie_Close()
 	Local image = CreateImage(moview, movieh)
 	Local SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
 	SplashScreenVideo = BlitzMovie_Play()
 	Local SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
-	
 	Repeat
 		Cls
 		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
@@ -11304,6 +11304,29 @@ Function PlayStartupVideos()
 	StopStream_Strict(SplashScreenAudio)
 	BlitzMovie_Stop()
 	BlitzMovie_Close()
+	FreeImage image
+	
+	Cls
+	Flip
+	
+	moviefile$ = "GFX\menu\startup_TSS"
+	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
+	moview = BlitzMovie_GetWidth()
+	movieh = BlitzMovie_GetHeight()
+	BlitzMovie_Close()
+	image = CreateImage(moview, movieh)
+	SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
+	SplashScreenVideo = BlitzMovie_Play()
+	SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
+	Repeat
+		Cls
+		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
+		Flip
+	Until (GetKey() Or (Not IsStreamPlaying_Strict(SplashScreenAudio)))
+	StopStream_Strict(SplashScreenAudio)
+	BlitzMovie_Stop()
+	BlitzMovie_Close()
+	
 	FreeTexture Texture
 	FreeEntity Quad
 	FreeEntity Cam
