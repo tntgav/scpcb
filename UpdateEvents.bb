@@ -6755,6 +6755,7 @@ Function UpdateEvents()
 								PlaySound2(DecaySFX(2), Camera, e\room\NPC[0]\Collider, 15.0)
 							EndIf
 							
+							e\room\NPC[0]\FallingPickDistance = 20.0
 							EntityType e\room\NPC[0]\Collider,HIT_PLAYER
 							If EntityY(e\room\NPC[0]\Collider)>0.35 Then
 								AnimateNPC(e\room\NPC[0], 1, 10, 0.12, False)

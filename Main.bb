@@ -42,7 +42,7 @@ Global UpdaterFont%
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.8"
+Global VersionNumber$ = "1.3.9"
 Global CompatibleNumber$ = "1.3.8" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 Global MenuWhite%, MenuBlack%

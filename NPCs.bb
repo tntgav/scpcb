@@ -67,6 +67,7 @@ Type NPCs
 	Field CollRadius#
 	Field IdleTimer#
 	Field SoundChn_IsStream%,SoundChn2_IsStream%
+	Field FallingPickDistance#
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -78,6 +79,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 	n\GravityMult = 1.0
 	n\MaxGravity = 0.2
 	n\CollRadius = 0.2
+	n\FallingPickDistance = 10
 	Select NPCtype
 		Case NPCtype173
 			;[Block]
@@ -4933,7 +4935,7 @@ Function UpdateNPCs()
 					n\DropSpeed# = 0
 				Else
 					If ShouldEntitiesFall
-						Local pick = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-10,0)
+						Local pick = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-n\FallingPickDistance,0)
 						If pick
 							n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
 						Else

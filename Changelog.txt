@@ -1,4 +1,11 @@
-﻿v1.3.8
+﻿v1.3.9
+
+Bug fixes:
+- The SCP-106 victim doesn't float on top of the ceiling anymore.
+
+----------------------------------------------------------------------------------
+
+v1.3.8
 
 - The barrel in SCP-008's containment chamber now displays an arrow to indicate that the canister needs to be pulled down.
 - The player now gets infected by SCP-008 if they get close to SCP-008's canister while bleeding and not wearing the hazmat suit.
