@@ -1867,7 +1867,7 @@ Global DTextures[MaxDTextures]
 Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
 
-Global IntercomStream,IntercomStreamCHN%,IntercomAnnouncementLoaded%
+Global IntercomStreamCHN%
 
 Global ForestNPC,ForestNPCTex,ForestNPCData#[3]
 ;[End Block]
@@ -8606,7 +8606,7 @@ Function PauseSounds()
 		If ChannelPlaying(BreathCHN) Then PauseChannel(BreathCHN)
 	EndIf
 	
-	If IntercomAnnouncementLoaded
+	If IntercomStreamCHN <> 0
 		SetStreamPaused_Strict(IntercomStreamCHN,True)
 	EndIf
 End Function
@@ -8670,7 +8670,7 @@ Function ResumeSounds()
 		If ChannelPlaying(BreathCHN) Then ResumeChannel(BreathCHN)
 	EndIf
 	
-	If IntercomAnnouncementLoaded
+	If IntercomStreamCHN <> 0
 		SetStreamPaused_Strict(IntercomStreamCHN,False)
 	EndIf
 End Function
@@ -8729,8 +8729,9 @@ Function KillSounds()
 	If BreathCHN <> 0 Then
 		If ChannelPlaying(BreathCHN) Then StopChannel(BreathCHN)
 	EndIf
-	If IntercomAnnouncementLoaded
+	If IntercomStreamCHN <> 0
 		StopStream_Strict(IntercomStreamCHN)
+		IntercomStreamCHN = 0
 	EndIf
 	If EnableSFXRelease
 		For snd.Sound = Each Sound
@@ -11179,12 +11180,12 @@ End Function
 
 Function PlayAnnouncement(file$) ;This function streams the announcement currently playing
 	
-	If IntercomAnnouncementLoaded
+	If IntercomStreamCHN <> 0 Then
 		StopStream_Strict(IntercomStreamCHN)
+		IntercomStreamCHN = 0
 	EndIf
 	
 	IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,0)
-	IntercomAnnouncementLoaded = True
 	
 End Function
 
@@ -11192,7 +11193,7 @@ Function UpdateStreamSounds()
 	Local e.Events
 	
 	If FPSfactor > 0
-		If IntercomAnnouncementLoaded
+		If IntercomStreamCHN <> 0
 			SetStreamVolume_Strict(IntercomStreamCHN,SFXVolume)
 		EndIf
 		For e = Each Events
@@ -11211,19 +11212,20 @@ Function UpdateStreamSounds()
 	
 	If (Not PlayerInReachableRoom())
 		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea"
-			If IntercomAnnouncementLoaded
+			If IntercomStreamCHN <> 0
 				StopStream_Strict(IntercomStreamCHN)
+				IntercomStreamCHN = 0
 			EndIf
 			For e = Each Events
-				If e\SoundCHN<>0
-					If e\SoundCHN_isStream
-						StopStream_Strict(e\SoundCHN)
-					EndIf
+				If e\SoundCHN<>0 And e\SoundCHN_isStream
+					StopStream_Strict(e\SoundCHN)
+					e\SoundCHN = 0
+					e\SoundCHN_isStream = 0
 				EndIf
-				If e\SoundCHN2<>0
-					If e\SoundCHN2_isStream
-						StopStream_Strict(e\SoundCHN2)
-					EndIf
+				If e\SoundCHN2<>0 And e\SoundCHN2_isStream
+					StopStream_Strict(e\SoundCHN2)
+					e\SoundCHN = 0
+					e\SoundCHN_isStream = 0
 				EndIf
 			Next
 		EndIf

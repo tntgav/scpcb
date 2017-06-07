@@ -8106,7 +8106,7 @@ Function PreventRoomOverlap(r.Rooms)
 	Local isIntersecting% = False
 	
 	;Just skip it when it would try to check for the checkpoints
-	If r\RoomTemplate\Name = "checkpoint1" Or r\RoomTemplate\Name = "checkpoint2" Then Return True
+	If r\RoomTemplate\Name = "checkpoint1" Or r\RoomTemplate\Name = "checkpoint2" Or r\RoomTemplate\Name = "start" Then Return True
 	
 	;First, check if the room is actually intersecting at all
 	For r2 = Each Rooms
@@ -8160,7 +8160,7 @@ Function PreventRoomOverlap(r.Rooms)
 	Local temp2,x2%,y2%,rot%,rot2%
 	For r2 = Each Rooms
 		If r2 <> r And (Not r2\RoomTemplate\DisableOverlapCheck)  Then
-			If r\RoomTemplate\Shape = r2\RoomTemplate\Shape And r\zone = r2\zone And (r2\RoomTemplate\Name <> "checkpoint1" And r2\RoomTemplate\Name <> "checkpoint2") Then
+			If r\RoomTemplate\Shape = r2\RoomTemplate\Shape And r\zone = r2\zone And (r2\RoomTemplate\Name <> "checkpoint1" And r2\RoomTemplate\Name <> "checkpoint2" And r2\RoomTemplate\Name <> "start") Then
 				x = r\x/8.0
 				y = r\z/8.0
 				rot = r\angle
