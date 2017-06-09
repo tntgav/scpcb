@@ -1261,6 +1261,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 					EntityType tile_entity,HIT_MAP
 					EntityFX tile_entity,1
 					EntityParent tile_entity,fr\Forest_Pivot
+					EntityPickMode tile_entity,2
 					
 					If it<>Null Then EntityParent it\collider,0
 					
@@ -1296,6 +1297,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 				
 				EntityType fr\DetailEntities[i],HIT_MAP
 				;EntityParent frame,fr\DetailEntities[i]
+				EntityPickMode fr\DetailEntities[i],2
 				
 				PositionEntity fr\DetailEntities[i],x+(tx*tile_size),y,z+(ty*tile_size)+(tile_size/2)-(tile_size*i),True
 				RotateEntity fr\DetailEntities[i],0,180*i,0
