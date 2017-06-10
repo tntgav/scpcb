@@ -1,6 +1,7 @@
 ﻿v1.3.9
 
 - Moved the buttons for the entrance doors in SCP-012's chamber and in the server room in the entrance zone.
+- Revamped Class-D dead body texture.
 
 Bug fixes:
 - The SCP-106 victim doesn't float on top of the ceiling anymore.
