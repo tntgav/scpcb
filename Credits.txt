@@ -230,6 +230,9 @@
 		
 		Meow :3
 			Third Subvision Studio startup screen.
+		
+		Shadowscale48
+			S-Nav navigator model fix.
 
 		/v/ and everyone in the SCP-CB forum
 			Ideas & support.
