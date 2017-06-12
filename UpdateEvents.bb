@@ -5514,41 +5514,54 @@ Function UpdateEvents()
 								e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Speech.ogg",SFXVolume,0)
 								e\SoundCHN_isStream = True
 							EndIf							
-						ElseIf e\EventState = 3
-							If e\EventState < 3500 Then 
-								;If ChannelPlaying(e\SoundCHN) Then
-								If IsStreamPlaying_Strict(e\SoundCHN)
-									If Rand(3) = 1 Then
-										EntityTexture(e\room\Objects[1], OldAiPics(0))
-										ShowEntity (e\room\Objects[1])
-									ElseIf Rand(10) = 1 
-										HideEntity (e\room\Objects[1])							
-									End If							
-								Else
-									;If e\Sound <> 0 Then FreeSound_Strict e\Sound : e\Sound = 0
-									If e\SoundCHN<>0
-										StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
-									EndIf
-									EntityTexture(e\room\Objects[1], OldAiPics(1))
+						;ElseIf e\EventState = 3
+						ElseIf e\EventState < 2000 Then ;3500
+							;If ChannelPlaying(e\SoundCHN) Then
+							If IsStreamPlaying_Strict(e\SoundCHN)
+								If Rand(3) = 1 Then
+									EntityTexture(e\room\Objects[1], OldAiPics(0))
 									ShowEntity (e\room\Objects[1])
-								EndIf
+								ElseIf Rand(10) = 1 
+									HideEntity (e\room\Objects[1])							
+								EndIf							
 							Else
-								If EntityDistance(e\room\Objects[0], Collider)<2.5 Then 
-									e\EventState = 10001
-									;e\Sound = LoadSound_Strict("SFX\SCP\079\Refuse.ogg")
-									;LoadEventSound(e,"SFX\SCP\079\Refuse.ogg")
-									;e\SoundCHN = PlaySound_Strict (e\Sound)
-									If e\SoundCHN<>0
-										StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
-									EndIf
-									e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Refuse.ogg",SFXVolume,0)
-									EntityTexture(e\room\Objects[1], OldAiPics(1))
-									ShowEntity (e\room\Objects[1])								
+								;If e\Sound <> 0 Then FreeSound_Strict e\Sound : e\Sound = 0
+								If e\SoundCHN<>0
+									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
+								EndIf
+								EntityTexture(e\room\Objects[1], OldAiPics(1))
+								ShowEntity (e\room\Objects[1])
+								e\EventState = e\EventState + FPSfactor
+							EndIf
+						Else
+							If EntityDistance(e\room\Objects[0], Collider)<2.5 Then 
+								e\EventState = 10001
+								;e\Sound = LoadSound_Strict("SFX\SCP\079\Refuse.ogg")
+								;LoadEventSound(e,"SFX\SCP\079\Refuse.ogg")
+								;e\SoundCHN = PlaySound_Strict (e\Sound)
+								If e\SoundCHN<>0
+									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
+								EndIf
+								e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Refuse.ogg",SFXVolume,0)
+								;EntityTexture(e\room\Objects[1], OldAiPics(1))
+								;ShowEntity (e\room\Objects[1])
+							EndIf
+						EndIf
+					Else
+						If e\SoundCHN<>0
+							If (Not IsStreamPlaying_Strict(e\SoundCHN))
+								e\SoundCHN = 0
+								EntityTexture(e\room\Objects[1], OldAiPics(1))
+								ShowEntity (e\room\Objects[1])
+							Else
+								If Rand(3) = 1 Then
+									EntityTexture(e\room\Objects[1], OldAiPics(0))
+									ShowEntity (e\room\Objects[1])
+								ElseIf Rand(10) = 1 
+									HideEntity (e\room\Objects[1])							
 								EndIf
 							EndIf
-							
 						EndIf
-						
 					EndIf
 					
 				EndIf
