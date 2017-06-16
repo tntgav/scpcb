@@ -8,6 +8,7 @@ Bug fixes:
 - Fixed the broken gravity system for SCP-860-1.
 - The texture of the S-Nav naviagtor's model isn't flipped anymore.
 - Fixed the refuse event of SCP-079 not playing.
+- The SCP-1025 shouldn't take too long to load anymore.
 
 ----------------------------------------------------------------------------------
 
