@@ -1384,7 +1384,7 @@ Function UpdateNPCs()
 								EndIf
 								
 								RotateEntity n\Collider, 0, EntityYaw(n\Collider), 0, True
-								MoveEntity n\Collider, 0,0,n\CurrSpeed
+								MoveEntity n\Collider, 0,0,n\CurrSpeed*FPSfactor
 								
 							Else
 								If n\PathStatus = 1 Then
@@ -1401,7 +1401,7 @@ Function UpdateNPCs()
 										RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 5.0), 0
 										
 										If n\Frame>1000 Then n\CurrSpeed = CurveValue(n\Speed*1.5,n\CurrSpeed,15.0)
-										MoveEntity n\Collider, 0,0,n\CurrSpeed
+										MoveEntity n\Collider, 0,0,n\CurrSpeed*FPSfactor
 										
 										If n\Frame<1058 Then
 											AnimateNPC(n, 892,1058, n\Speed*8, False)
@@ -1595,7 +1595,7 @@ Function UpdateNPCs()
 								EndIf
 							EndIf
 							
-							MoveEntity n\Collider, 0,0,n\CurrSpeed
+							MoveEntity n\Collider,0,0,n\CurrSpeed*FPSfactor
 						EndIf
 				End Select
 				
@@ -4935,15 +4935,61 @@ Function UpdateNPCs()
 					n\DropSpeed# = 0
 				Else
 					If ShouldEntitiesFall
-						If n\FallingPickDistance>0
-							Local pick = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-n\FallingPickDistance,0)
-							If pick
-								n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
-							Else
-								n\DropSpeed# = 0
-							EndIf
+;						If n\FallingPickDistance>0
+;							Local pick = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-n\FallingPickDistance,0)
+;							If pick
+;								n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
+;							Else
+;								n\DropSpeed# = 0
+;							EndIf
+;						Else
+;							n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
+;						EndIf
+						Local UpdateGravity% = False
+						Local MaxX#,MinX#,MaxZ#,MinZ#
+						If n\InFacility=1
+							For r.Rooms = Each Rooms
+								If r\MaxX<>0 Or r\MinX<>0 Or r\MaxZ<>0 Or r\MinZ<>0
+									MaxX# = r\MaxX
+									MinX# = r\MinX
+									MaxZ# = r\MaxZ
+									MinZ# = r\MinZ
+								Else
+									MaxX# = 4.0
+									MinX# = 0.0
+									MaxZ# = 4.0
+									MinZ# = 0.0
+								EndIf
+								If Abs(EntityX(n\Collider)-EntityX(r\obj))<=Abs(MaxX-MinX)
+									If Abs(EntityZ(n\Collider)-EntityZ(r\obj))<=Abs(MaxZ-MinZ)
+										If r=PlayerRoom
+											UpdateGravity = True
+											Exit
+										EndIf
+										If IsRoomAdjacent(PlayerRoom,r)
+											UpdateGravity = True
+											Exit
+										EndIf
+										For i=0 To 3
+											If (IsRoomAdjacent(PlayerRoom\Adjacent[i],r))
+												UpdateGravity = True
+												Exit
+											EndIf
+										Next
+									EndIf
+								EndIf
+							Next
 						Else
+							UpdateGravity = True
+						EndIf
+						If UpdateGravity
 							n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
+						Else
+							If n\FallingPickDistance>0
+								n\DropSpeed = 0.0
+							Else
+								n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
+							EndIf
 						EndIf
 					Else
 						n\DropSpeed# = 0.0
