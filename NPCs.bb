@@ -4948,37 +4948,51 @@ Function UpdateNPCs()
 						Local UpdateGravity% = False
 						Local MaxX#,MinX#,MaxZ#,MinZ#
 						If n\InFacility=1
-							For r.Rooms = Each Rooms
-								If r\MaxX<>0 Or r\MinX<>0 Or r\MaxZ<>0 Or r\MinZ<>0
-									MaxX# = r\MaxX
-									MinX# = r\MinX
-									MaxZ# = r\MaxZ
-									MinZ# = r\MinZ
-								Else
-									MaxX# = 4.0
-									MinX# = 0.0
-									MaxZ# = 4.0
-									MinZ# = 0.0
-								EndIf
-								If Abs(EntityX(n\Collider)-EntityX(r\obj))<=Abs(MaxX-MinX)
-									If Abs(EntityZ(n\Collider)-EntityZ(r\obj))<=Abs(MaxZ-MinZ)
-										If r=PlayerRoom
+							If PlayerRoom\RoomTemplate\Name$ <> "173"
+								For e.Events = Each Events
+									If e\EventName = "room860"
+										If e\EventState = 1.0
 											UpdateGravity = True
 											Exit
 										EndIf
-										If IsRoomAdjacent(PlayerRoom,r)
-											UpdateGravity = True
-											Exit
-										EndIf
-										For i=0 To 3
-											If (IsRoomAdjacent(PlayerRoom\Adjacent[i],r))
+									EndIf
+								Next
+							Else
+								UpdateGravity = True
+							EndIf
+							If (Not UpdateGravity)
+								For r.Rooms = Each Rooms
+									If r\MaxX<>0 Or r\MinX<>0 Or r\MaxZ<>0 Or r\MinZ<>0
+										MaxX# = r\MaxX
+										MinX# = r\MinX
+										MaxZ# = r\MaxZ
+										MinZ# = r\MinZ
+									Else
+										MaxX# = 4.0
+										MinX# = 0.0
+										MaxZ# = 4.0
+										MinZ# = 0.0
+									EndIf
+									If Abs(EntityX(n\Collider)-EntityX(r\obj))<=Abs(MaxX-MinX)
+										If Abs(EntityZ(n\Collider)-EntityZ(r\obj))<=Abs(MaxZ-MinZ)
+											If r=PlayerRoom
 												UpdateGravity = True
 												Exit
 											EndIf
-										Next
+											If IsRoomAdjacent(PlayerRoom,r)
+												UpdateGravity = True
+												Exit
+											EndIf
+											For i=0 To 3
+												If (IsRoomAdjacent(PlayerRoom\Adjacent[i],r))
+													UpdateGravity = True
+													Exit
+												EndIf
+											Next
+										EndIf
 									EndIf
-								EndIf
-							Next
+								Next
+							EndIf
 						Else
 							UpdateGravity = True
 						EndIf

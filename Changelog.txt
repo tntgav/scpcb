@@ -17,7 +17,7 @@ Bug fixes:
 - Fixed the lighting glitch that occured after the maintenance tunnels have been generated.
 - SCP-049 will not reset after loading a save file and re-entering the surveillance room.
 - The fog should now properly reset to it's normal after equipping the night vision goggles and loading a save file.
-- Fixed the SCP-970 duplicate glitch.
+- Fixed SCP-970 item duplication glitch.
 - Fixed player's path when he is affected by SCP-012.
 
 ----------------------------------------------------------------------------------

@@ -80,10 +80,12 @@ Function UpdateEvents()
 						
 						If e\room\NPC[1] = Null Then
 							e\room\NPC[1] = CreateNPC(NPCtypeD, 0,0,0)
-							tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
+							ChangeNPCTextureID(e\room\NPC[1],3)
+							;tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
 							e\room\NPC[1]\texture = "GFX\npcs\scientist2.jpg"
-							EntityTexture e\room\NPC[1]\obj, tex
-							FreeTexture tex
+							;EntityTexture e\room\NPC[1]\obj, tex
+							;FreeTexture tex
+							ChangeNPCTextureID(e\room\NPC[1],3)
 						EndIf
 						PositionEntity e\room\NPC[1]\Collider, e\room\x, 0.5, e\room\z-1.0, True
 						ResetEntity e\room\NPC[1]\Collider
@@ -112,13 +114,16 @@ Function UpdateEvents()
 							MoveEntity e\room\NPC[4]\Collider,0,0,2.65
 							
 							e\room\NPC[5] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[4], True), 0.5, EntityZ(e\room\Objects[4], True))
+							ChangeNPCTextureID(e\room\NPC[5],6)
 							;PointEntity(e\room\NPC[5]\Collider, e\room\Objects[7])
 							SetNPCFrame(e\room\NPC[5], 19) : e\room\NPC[5]\State = 3
 							RotateEntity e\room\NPC[5]\Collider,0,270,0
-							tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
-							e\room\NPC[5]\texture = "GFX\npcs\classd2.jpg"
-							EntityTexture e\room\NPC[5]\obj, tex
-							FreeTexture tex
+							;tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
+							
+						;	e\room\NPC[5]\texture = "GFX\npcs\classd2.jpg"
+							;EntityTexture e\room\NPC[5]\obj, tex
+							;FreeTexture tex
+							
 							MoveEntity e\room\NPC[5]\Collider,0.25,0,3.0
 							RotateEntity e\room\NPC[5]\Collider,0,0,0
 							
@@ -345,8 +350,8 @@ Function UpdateEvents()
 								PositionEntity Camera, x, y, z
 								HideEntity Collider
 								PositionEntity Collider, x, 0.302, z
-								RotateEntity Camera, -70, 0, 0
-								CameraRange(Camera, 0.05, Min(CameraFogFar*LightVolume*1.1,27))
+								RotateEntity Camera, -70, 0, 0								
+								
 								CurrMusicVolume = MusicVolume
 								
 								StopStream_Strict(MusicCHN)
@@ -777,22 +782,10 @@ Function UpdateEvents()
 								
 								e\room\NPC[2] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[2], True), 0.5, EntityZ(e\room\Objects[2], True))
 								PointEntity(e\room\NPC[2]\Collider, e\room\Objects[5])
-								tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
-								EntityTexture e\room\NPC[2]\obj, tex
-								FreeTexture tex
-								e\room\NPC[3]\State = 9
-								
-								;FreeEntity(e\room\Objects[9])
-								;e\room\Objects[9]=0
-								;FreeEntity(e\room\Objects[10])
-								;e\room\Objects[10]=0
-								
-								;FreeEntity(e\room\NPC[5]\obj)
-								;FreeEntity(e\room\NPC[7]\obj)
-								;FreeEntity(e\room\NPC[8]\obj)
-								;FreeEntity(e\room\NPC[9]\obj)
-								;FreeEntity(e\room\NPC[10]\obj)
-								
+								ChangeNPCTextureID(e\room\NPC[2],6)
+								;EntityTexture e\room\NPC[2]\obj, DTextures[7]
+								;FreeTexture DTextures[7]
+								e\room\NPC[3]\State = 9								
 								
 								If e\room\NPC[7]\SoundChn<>0 Then
 									If ChannelPlaying(e\room\NPC[7]\SoundChn) Then
@@ -845,9 +838,7 @@ Function UpdateEvents()
 							e\room\NPC[4]\State = 9
 							;PointEntity e\room\NPC[4]\obj, Collider
 							;RotateEntity e\room\NPC[4]\Collider,0,CurveAngle(EntityYaw(e\room\NPC[4]\obj),EntityYaw(e\room\NPC[4]\Collider),20.0),0,True
-							
 							If Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\obj), EntityZ(e\room\obj)) < 4.0 Then
-								CameraRange(Camera, 0.05, 6)
 								e\room\RoomDoors[2]\locked = False
 								UseDoor(e\room\RoomDoors[2],False)
 								e\room\RoomDoors[2]\locked = True
@@ -923,16 +914,16 @@ Function UpdateEvents()
 								e\room\NPC[5]\State = 7
 								e\room\NPC[5]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\PlayerEscape.ogg")
 								e\room\NPC[6] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
-								tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
-								EntityTexture e\room\NPC[6]\obj, tex
-								FreeTexture tex
-								
+								;tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
+								;EntityTexture e\room\NPC[6]\obj, DTextures[4]
+								;FreeTexture tex
+								ChangeNPCTextureID(e\room\NPC[6],3)
 								e\room\NPC[7] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
-								tex = LoadTexture_Strict("GFX\npcs\scientist.jpg")
+								;tex = LoadTexture_Strict("GFX\npcs\scientist.jpg")
 								e\room\NPC[7]\Sound = LoadSound_Strict("SFX\Room\Intro\Scientist\Conversation.ogg")
-								EntityTexture e\room\NPC[7]\obj, tex
-								FreeTexture tex
-								
+								;EntityTexture e\room\NPC[7]\obj, DTextures[3]
+								;FreeTexture tex
+								ChangeNPCTextureID(e\room\NPC[7],2)
 								pvt = CreatePivot()
 								RotateEntity pvt,90,0,0
 								
@@ -1074,7 +1065,7 @@ Function UpdateEvents()
 							ElseIf e\EventState => 11145 And e\EventState - FPSfactor < 11145;"I don't like this"
 								e\SoundCHN = PlaySound_Strict(IntroSFX(10))
 								e\room\NPC[1]\Sound = LoadSound_Strict("SFX\Room\Intro\ClassD\DontLikeThis.ogg")
-								PlaySound2(e\room\NPC[1]\Sound, Camera, e\room\NPC[1]\Collider)
+								PlaySound2(e\room\NPC[1]\Sound, Camera, e\room\NPC[2]\Collider)
 							ElseIf e\EventState => 11561 And e\EventState - FPSfactor < 11561 ;lights go out
 								e\EventState = 14000
 								PlaySound_Strict IntroSFX(16)
@@ -1369,12 +1360,17 @@ Function UpdateEvents()
 				EndIf
 				
 				If PlayerRoom = e\room Then
-					;CameraFogMode(Camera, 0)
-					AmbientLight (140, 140, 140)
-					HideEntity(Fog)
+					If e\EventState >= 10 Then
+						CameraRange(Camera, 0.05, 15)
+					Else															
+						CameraRange(Camera, 0.05, 40)
+					EndIf	
+					CameraFogMode(Camera, 0)
+	 	                	AmbientLight (140, 140, 140)
+	   				HideEntity(Fog)
 					
 					LightVolume = 4.0
-					TempLightVolume = 4.0
+					TempLightVolume = 4.0			
 				Else
 					DebugLog "delete intro event"
 					RemoveEvent(e)		

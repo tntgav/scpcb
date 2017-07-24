@@ -1861,7 +1861,7 @@ Global LightConeModel
 
 Global ParticleEffect[10]
 
-Const MaxDTextures=6
+Const MaxDTextures=7
 Global DTextures[MaxDTextures]
 
 Global NPC049OBJ, NPC0492OBJ
@@ -7827,8 +7827,13 @@ Function LoadEntities()
 	tex = LoadTexture("GFX\npcs\janitor.jpg")
 	EntityTexture DTextures[5],tex
 	FreeTexture tex
+	
 	tex = LoadTexture("GFX\npcs\106victim.jpg")
 	EntityTexture DTextures[6],tex
+	FreeTexture tex
+	
+	tex = LoadTexture("GFX\npcs\classd2.jpg")
+	EntityTexture DTextures[7],tex
 	FreeTexture tex
 	;[End Block]
 	
