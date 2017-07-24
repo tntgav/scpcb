@@ -804,7 +804,7 @@ Function UpdateEvents()
 									RemoveNPC(e\room\NPC[5])
 								EndIf
 								
-								For i = 7 To 10
+								For i = 8 To 10
 									If e\room\NPC[i]<>Null Then
 										RemoveNPC(e\room\NPC[i])
 									EndIf
@@ -1362,11 +1362,14 @@ Function UpdateEvents()
 				If PlayerRoom = e\room Then
 					If e\EventState >= 10 Then
 						CameraRange(Camera, 0.05, 15)
+						If e\room\NPC[7]<>Null Then
+							RemoveNPC(e\room\NPC[7])
+						EndIf
 					Else															
 						CameraRange(Camera, 0.05, 40)
 					EndIf	
 					CameraFogMode(Camera, 0)
-	 	                	AmbientLight (140, 140, 140)
+	 	            AmbientLight (140, 140, 140)
 	   				HideEntity(Fog)
 					
 					LightVolume = 4.0
