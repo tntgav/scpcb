@@ -2,6 +2,7 @@
 
 - Moved the buttons for the entrance doors in SCP-012's chamber and in the server room in the entrance zone.
 - Revamped Class-D dead body texture.
+- Some objects in certain areas will not render anymore if the player is outside of their specific rooms.
 
 Bug fixes:
 - The SCP-106 victim doesn't float on top of the ceiling anymore.
@@ -12,6 +13,10 @@ Bug fixes:
 - Fixed certain waypoints not connecting in SCP-106's containment chamber.
 - Fixed a bug that caused SCP-096's speed to depend on the amount of FPS.
 - Fixed the gravity system for all NPCs.
+- Fixed MTF unit's shooting timer being too high causing the MTF units not to shoot at the player for a long period of time.
+- Fixed the lighting glitch that occured after the maintenance tunnels have been generated.
+- SCP-049 will not reset after loading a save file and re-entering the surveillance room.
+- The fog should now properly reset to it's normal after equipping the night vision goggles and loading a save file.
 
 ----------------------------------------------------------------------------------
 

@@ -436,7 +436,8 @@ Function SaveGame(file$)
 	Else
 		WriteInt f, 994
 	EndIf
-	
+	WriteFloat f, CameraFogFar
+	WriteFloat f, StoredCameraFogFar
 	CloseFile f
 	
 	If Not MenuOpen Then
@@ -1069,6 +1070,12 @@ Function LoadGame(file$)
 		UsedConsole = True
 		DebugLog "Used Console"
 	EndIf
+	
+	CameraFogFar = ReadFloat(f)
+    StoredCameraFogFar = ReadFloat(f)
+	If CameraFogFar = 0 Then
+		CameraFogFar = 6
+	EndIf	
 	
 	CloseFile f
 	
@@ -1740,6 +1747,11 @@ Function LoadGameQuick(file$)
 	EntityTexture NVOverlay,NVTexture
 	RestoreSanity = True
 	
+	CameraFogFar = ReadFloat(f)
+    StoredCameraFogFar = ReadFloat(f)
+	If CameraFogFar = 0 Then
+		CameraFogFar = 6
+	EndIf	
 	CloseFile f
 	
 	CatchErrors("LoadGameQuick")

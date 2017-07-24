@@ -8058,7 +8058,7 @@ Function CalculateRoomTemplateExtents(r.RoomTemplates)
 	r\MaxY = Mesh_MaxY
 	r\MaxZ = Mesh_MaxZ
 	
-	DebugLog("roomtemplateextents: "+r\minx+", "+r\miny	+", "+r\minz	+", "+r\maxx	+", "+r\maxy+", "+r\maxz)
+	DebugLog("roomtemplateextents: "+r\MinX+", "+r\MinY	+", "+r\MinZ	+", "+r\MaxX	+", "+r\MaxY+", "+r\MaxZ)
 End Function
 
 Function CalculateRoomExtents(r.Rooms)

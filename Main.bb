@@ -3477,30 +3477,41 @@ Function QuickLoadEvents()
 					EndIf
 				ElseIf e\EventStr = "load2"
 					;For SCP-049
+					Local skip = False
 					If e\room\NPC[0]=Null Then
 						For n.NPCs = Each NPCs
 							If n\NPCtype = NPCtype049
-								e\room\NPC[0] = n
+								;e\room\NPC[0] = n
+								skip = True
 								Exit
 							EndIf
 						Next
 						
-						If e\room\NPC[0]=Null Then
+						If (Not skip)
 							e\room\NPC[0] = CreateNPC(NPCtype049,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True))
+							e\room\NPC[0]\HideFromNVG = True
+							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
+							ResetEntity e\room\NPC[0]\Collider
+							RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
+							e\room\NPC[0]\State = 0
+							e\room\NPC[0]\PrevState = 2
+							
+							DebugLog(EntityX(e\room\Objects[7],True)+", "+EntityY(e\room\Objects[7],True)+", "+EntityZ(e\room\Objects[7],True))
+						Else
+							DebugLog "Skipped 049 spawning in room2sl"
 						EndIf
-						e\room\NPC[0]\HideFromNVG = True
 					EndIf
 					QuickLoadPercent = 80
 					e\EventStr = "load3"
 				ElseIf e\EventStr = "load3"
-					PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
-					ResetEntity e\room\NPC[0]\Collider
-					RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
+					;PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
+					;ResetEntity e\room\NPC[0]\Collider
+					;RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
 					
-					DebugLog(EntityX(e\room\Objects[7],True)+", "+EntityY(e\room\Objects[7],True)+", "+EntityZ(e\room\Objects[7],True))
+					;DebugLog(EntityX(e\room\Objects[7],True)+", "+EntityY(e\room\Objects[7],True)+", "+EntityZ(e\room\Objects[7],True))
 					
-					e\room\NPC[0]\State = 0
-					e\room\NPC[0]\PrevState = 2
+					;e\room\NPC[0]\State = 0
+					;e\room\NPC[0]\PrevState = 2
 					
 					e\EventState = 1
 					If e\EventState2 = 0 Then e\EventState2 = -(70*5)

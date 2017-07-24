@@ -2938,6 +2938,7 @@ Function UpdateEvents()
 				
 				If PlayerRoom = e\room Then
 					
+					;[Block]
 					Local Meshes%[7]
 					Local tempStr$
 					
@@ -3219,9 +3220,9 @@ Function UpdateEvents()
 									
 									Select e\room\grid\grid[ix+(iy*gridsz)]
 										Case 1;,5,6
-											AddLight%(Null, e\room\x+ix*2.0, 8.0+(368.0*RoomScale), e\room\z+iy*2.0, 2, 500.0, 255, 255, 255)
+											AddLight%(Null, e\room\x+ix*2.0, 8.0+(368.0*RoomScale), e\room\z+iy*2.0, 2, 500.0 * RoomScale, 255, 255, 255)
 										Case 3,4
-											AddLight%(Null, e\room\x+ix*2.0, 8.0+(412.0*RoomScale), e\room\z+iy*2.0, 2, 500.0, 255, 255, 255)
+											AddLight%(Null, e\room\x+ix*2.0, 8.0+(412.0*RoomScale), e\room\z+iy*2.0, 2, 500.0 * RoomScale, 255, 255, 255)
 										Case 7
 											AddLight%(Null, e\room\x+ix*2.0-(Sin(EntityYaw(tempInt,True))*504.0*RoomScale)+(Cos(EntityYaw(tempInt,True))*16.0*RoomScale), 8.0+(396.0*RoomScale), e\room\z+iy*2.0+(Cos(EntityYaw(tempInt,True))*504.0*RoomScale)+(Sin(EntityYaw(tempInt,True))*16.0*RoomScale), 2, 500.0 * RoomScale, 255, 200, 200)
 											it = CreateItem("SCP-500-01","scp500",e\room\x+ix*2.0+(Cos(EntityYaw(tempInt,True))*(-208.0)*RoomScale)-(Sin(EntityYaw(tempInt,True))*1226.0*RoomScale),8.0+(80.0*RoomScale),e\room\z+iy*2.0+(Sin(EntityYaw(tempInt,True))*(-208.0)*RoomScale)+(Cos(EntityYaw(tempInt,True))*1226.0*RoomScale))
@@ -3573,8 +3574,23 @@ Function UpdateEvents()
 						Next
 						
 					EndIf
+					;[End Block]
 					
 					If EntityY(Collider,True)>4.0 Then
+						For iy=0 To gridsz-1
+							For ix=0 To gridsz-1
+								If e\room\grid\Entities[ix+(iy*gridsz)]<>0
+									ShowEntity e\room\grid\Entities[ix+(iy*gridsz)]
+								EndIf
+							Next
+						Next
+						
+						For r.Rooms = Each Rooms
+							If r <> e\room
+								HideEntity r\obj
+							EndIf
+						Next
+						EntityAlpha(GetChild(e\room\obj,2),0)
 						
 						ShouldPlay = 7
 						
@@ -3590,7 +3606,7 @@ Function UpdateEvents()
 								de.Decals = CreateDecal(0, EntityX(e\room\Objects[temp],True), EntityY(e\room\Objects[temp],True)+0.05, EntityZ(e\room\Objects[temp],True), 90, Rand(360), 0)
 								de\Size = 0.05 : de\SizeChange = 0.001 : EntityAlpha(de\obj, 0.8) : UpdateDecals
 								
-								DebugLog "updateevents collidey: "+EntityY(Collider,True)
+								DebugLog "updateevents collider: "+EntityY(Collider,True)
 								PositionEntity Curr106\Collider, EntityX(e\room\Objects[temp],True), EntityY(Collider,True)-3.0, EntityZ(e\room\Objects[temp],True)
 								SetAnimTime Curr106\obj, 110
 								Curr106\State = -0.1	
@@ -3611,11 +3627,30 @@ Function UpdateEvents()
 								EndIf
 							Next
 						EndIf
+					Else
+						For iy=0 To gridsz-1
+							For ix=0 To gridsz-1
+								If e\room\grid\Entities[ix+(iy*gridsz)]<>0
+									HideEntity e\room\grid\Entities[ix+(iy*gridsz)]
+								EndIf
+							Next
+						Next
 					EndIf ;entityy(collider) >4
 					
 					e\EventState2 = UpdateElevators2(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1],e\room\Objects[2],e\room\Objects[3], e)
 					e\EventState3 = UpdateElevators2(e\EventState3, e\room\RoomDoors[2], e\room\RoomDoors[3],e\room\Objects[4],e\room\Objects[5], e)
-					
+				Else
+					If e\room\grid <> Null
+						If e\room\grid\Meshes[0]<>0
+							For iy=0 To gridsz-1
+								For ix=0 To gridsz-1
+									If e\room\grid\Entities[ix+(iy*gridsz)]<>0
+										HideEntity e\room\grid\Entities[ix+(iy*gridsz)]
+									EndIf
+								Next
+							Next
+						EndIf
+					EndIf
 				EndIf 
 				;[End Block]
 			Case "room2pipes106"
@@ -7917,6 +7952,57 @@ Function UpdateEvents()
 					Else
 						TurnCheckpointMonitorsOff(0)
 					EndIf
+				EndIf
+				
+				;Checking if the monitors and such should be rendered or not
+				If PlayerRoom = e\room And Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(Collider))>1.0
+					For i = 0 To 14
+						If e\room\Objects[i]<>0
+							ShowEntity e\room\Objects[i]
+						EndIf
+					Next
+					For sc.SecurityCams = Each SecurityCams
+						If sc\IsRoom2slCam
+							If sc\ScrObj<>0
+								ShowEntity sc\ScrObj
+							EndIf
+							If sc\ScrOverlay<>0
+								ShowEntity sc\ScrOverlay
+							EndIf
+						EndIf
+						If sc\room = e\room
+							If sc\ScrObj<>0
+								ShowEntity sc\ScrObj
+							EndIf
+							If sc\ScrOverlay<>0
+								ShowEntity sc\ScrOverlay
+							EndIf
+						EndIf
+					Next
+				Else
+					For i = 0 To 14
+						If e\room\Objects[i]<>0
+							HideEntity e\room\Objects[i]
+						EndIf
+					Next
+					For sc.SecurityCams = Each SecurityCams
+						If sc\IsRoom2slCam
+							If sc\ScrObj<>0
+								HideEntity sc\ScrObj
+							EndIf
+							If sc\ScrOverlay<>0
+								HideEntity sc\ScrOverlay
+							EndIf
+						EndIf
+						If sc\room = e\room
+							If sc\ScrObj<>0
+								HideEntity sc\ScrObj
+							EndIf
+							If sc\ScrOverlay<>0
+								HideEntity sc\ScrOverlay
+							EndIf
+						EndIf
+					Next
 				EndIf
 				
 				;[End Block]

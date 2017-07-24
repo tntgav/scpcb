@@ -5683,7 +5683,10 @@ Function UpdateMTFUnit(n.NPCs)
                 Else
 					n\LastSeen = n\LastSeen - FPSfactor
 					
-					n\Reload = 200-(100*SelectedDifficulty\aggressiveNPCs)
+					;n\Reload = 200-(100*SelectedDifficulty\aggressiveNPCs)
+					If n\Reload <= 7
+						n\Reload = 7
+					EndIf
 					
 					If n\PathTimer<=0.0 Then ;update path
 						n\PathStatus = FindPath(n,n\EnemyX,n\EnemyY+0.1,n\EnemyZ)
