@@ -346,7 +346,7 @@ Function UpdateEvents()
 								HideEntity Collider
 								PositionEntity Collider, x, 0.302, z
 								RotateEntity Camera, -70, 0, 0
-								
+								CameraRange(Camera, 0.05, Min(CameraFogFar*LightVolume*1.1,27))
 								CurrMusicVolume = MusicVolume
 								
 								StopStream_Strict(MusicCHN)
@@ -424,7 +424,7 @@ Function UpdateEvents()
 									e\EventState3 = 40
 									Exit
 								EndIf
-							ElseIf e\EventState > 45 And e\EventState3 < 45
+							Else;If e\EventState > 45 And e\EventState3 < 45
 								If InvOpen Then
 									Msg = "Double click on the document to view it."
 									MsgTimer=70*4
@@ -769,8 +769,30 @@ Function UpdateEvents()
 							dist = Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\RoomDoors[2]\frameobj,True), EntityZ(e\room\RoomDoors[2]\frameobj,True))
 							
 							If Distance(EntityX(e\room\NPC[3]\Collider), EntityZ(e\room\NPC[3]\Collider), EntityX(e\room\RoomDoors[2]\frameobj,True), EntityZ(e\room\RoomDoors[2]\frameobj,True)) < 4.5 And dist < 5.0 Then
+								e\room\NPC[0] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[0], True), EntityY(e\room\Objects[0], True), EntityZ(e\room\Objects[0], True))
+								e\room\NPC[0]\Angle = 180
 								
+								e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1], True), 0.5, EntityZ(e\room\Objects[1], True))
+								PointEntity(e\room\NPC[1]\Collider, e\room\Objects[5])
+								
+								e\room\NPC[2] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[2], True), 0.5, EntityZ(e\room\Objects[2], True))
+								PointEntity(e\room\NPC[2]\Collider, e\room\Objects[5])
+								tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
+								EntityTexture e\room\NPC[2]\obj, tex
+								FreeTexture tex
 								e\room\NPC[3]\State = 9
+								
+								;FreeEntity(e\room\Objects[9])
+								;e\room\Objects[9]=0
+								;FreeEntity(e\room\Objects[10])
+								;e\room\Objects[10]=0
+								
+								;FreeEntity(e\room\NPC[5]\obj)
+								;FreeEntity(e\room\NPC[7]\obj)
+								;FreeEntity(e\room\NPC[8]\obj)
+								;FreeEntity(e\room\NPC[9]\obj)
+								;FreeEntity(e\room\NPC[10]\obj)
+								
 								
 								If e\room\NPC[7]\SoundChn<>0 Then
 									If ChannelPlaying(e\room\NPC[7]\SoundChn) Then
@@ -779,6 +801,22 @@ Function UpdateEvents()
 										e\room\NPC[7]\Sound=0											
 									EndIf
 								EndIf
+								
+								FreeEntity(e\room\Objects[9])
+								e\room\Objects[9]=0
+								FreeEntity(e\room\Objects[10])
+								e\room\Objects[10]=0
+								
+								If e\room\NPC[5]<>Null Then
+									RemoveNPC(e\room\NPC[5])
+								EndIf
+								
+								For i = 7 To 10
+									If e\room\NPC[i]<>Null Then
+										RemoveNPC(e\room\NPC[i])
+									EndIf
+								Next		
+								
 								
 								FreeSound_Strict e\room\NPC[3]\Sound
 								e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortDone"+Rand(1,5)+".ogg")
@@ -809,13 +847,14 @@ Function UpdateEvents()
 							;RotateEntity e\room\NPC[4]\Collider,0,CurveAngle(EntityYaw(e\room\NPC[4]\obj),EntityYaw(e\room\NPC[4]\Collider),20.0),0,True
 							
 							If Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\obj), EntityZ(e\room\obj)) < 4.0 Then
+								CameraRange(Camera, 0.05, 6)
 								e\room\RoomDoors[2]\locked = False
 								UseDoor(e\room\RoomDoors[2],False)
 								e\room\RoomDoors[2]\locked = True
 								e\EventState3 = 0
 								e\room\NPC[3]\State = 0
 								e\room\NPC[4]\State = 0
-								e\room\NPC[5]\State = 0
+								;e\room\NPC[5]\State = 0
 								
 								UseDoor(e\room\RoomDoors[1],False)
 							EndIf	
@@ -870,18 +909,6 @@ Function UpdateEvents()
 								IntroSFX(18) = LoadSound_Strict("SFX\Room\Intro\173Chamber.ogg")
 								
 								Curr173\Idle = True
-								
-								e\room\NPC[0] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[0], True), EntityY(e\room\Objects[0], True), EntityZ(e\room\Objects[0], True))
-								e\room\NPC[0]\Angle = 180
-								
-								e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1], True), 0.5, EntityZ(e\room\Objects[1], True))
-								PointEntity(e\room\NPC[1]\Collider, e\room\Objects[5])
-								
-								e\room\NPC[2] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[2], True), 0.5, EntityZ(e\room\Objects[2], True))
-								PointEntity(e\room\NPC[2]\Collider, e\room\Objects[5])
-								tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
-								EntityTexture e\room\NPC[2]\obj, tex
-								FreeTexture tex
 								
 								e\room\NPC[3] = CreateNPC(NPCtypeGuard, e\room\x-4096*RoomScale+Rnd(-0.3,0.3), 0.3, e\room\z+Rand(860,896)*RoomScale)
 								RotateEntity e\room\NPC[3]\Collider,0,e\room\angle+180,0
@@ -1287,11 +1314,11 @@ Function UpdateEvents()
 													EndIf
 												Next
 												
-												For i = 3 To 5
+												For i = 3 To 4
 													RemoveNPC(e\room\NPC[i])
 												Next
 												r\NPC[1]=e\room\NPC[6]
-												RemoveNPC(e\room\NPC[7])
+												;RemoveNPC(e\room\NPC[7])
 												
 												FreeEntity e\room\obj
 												Delete e\room
@@ -1342,7 +1369,7 @@ Function UpdateEvents()
 				EndIf
 				
 				If PlayerRoom = e\room Then
-					CameraFogMode(Camera, 0)
+					;CameraFogMode(Camera, 0)
 					AmbientLight (140, 140, 140)
 					HideEntity(Fog)
 					
@@ -4713,31 +4740,13 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 						
-						If Wearing714=False And WearingGasMask<3 And WearingHazmat<3 And WearingNightVision=0 Then
-							temp = False
-							If EntityVisible(e\room\Objects[2],Camera) Then temp = True
-							
-							;012 not visible, walk to the door
-							If temp=False Then
-								If EntityVisible(e\room\RoomDoors[0]\frameobj,Camera) Then
-									pvt% = CreatePivot()
-									PositionEntity pvt, EntityX(Camera), EntityY(Collider), EntityZ(Camera)
-									PointEntity(pvt, e\room\RoomDoors[0]\frameobj)
-									;TurnEntity(pvt, 90, 0, 0)
-									user_camera_pitch = CurveAngle(90, user_camera_pitch+90, 100)
-									user_camera_pitch=user_camera_pitch-90
-									RotateEntity(Collider, EntityPitch(Collider), CurveAngle(EntityYaw(pvt), EntityYaw(Collider), 150), 0)
-									
-									angle = WrapAngle(EntityYaw(pvt)-EntityYaw(Collider))
-									If angle<40.0 Then
-										ForceMove = (40.0-angle)*0.008
-									ElseIf angle > 310.0
-										ForceMove = (40.0-Abs(360.0-angle))*0.008
-									EndIf
-									
-									FreeEntity pvt										
-								EndIf
-							Else
+						If Wearing714=False And WearingGasMask<3 And WearingHazmat<3 Then
+							;temp = False
+							If EntityVisible(e\room\Objects[2],Camera) Then 							
+							;012 not visible, walk to the door														
+								
+								
+							;DebugLog "WHERE IS IT?!"	
 								e\SoundCHN2 = LoopSound2(e\Sound2, e\SoundCHN2, Camera, e\room\Objects[3], 10, e\EventState3/(86.0*70.0))
 								
 								pvt% = CreatePivot()
@@ -4821,6 +4830,29 @@ Function UpdateEvents()
 								EndIf								
 								
 								FreeEntity pvt								
+							Else
+								
+							;	If EntityY(Collider)=-768.0*RoomScale Then
+								If (Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\RoomDoors[0]\frameobj), EntityZ(e\room\RoomDoors[0]\frameobj))<4.5) And  EntityY(Collider)<-2.5 Then
+									pvt% = CreatePivot()
+									PositionEntity pvt, EntityX(Camera), EntityY(Collider), EntityZ(Camera)
+									PointEntity(pvt, e\room\RoomDoors[0]\frameobj)
+									;TurnEntity(pvt, 90, 0, 0)
+									user_camera_pitch = CurveAngle(90, user_camera_pitch+90, 100)
+									user_camera_pitch=user_camera_pitch-90
+									RotateEntity(Collider, EntityPitch(Collider), CurveAngle(EntityYaw(pvt), EntityYaw(Collider), 150), 0)
+									
+									angle = WrapAngle(EntityYaw(pvt)-EntityYaw(Collider))
+									If angle<40.0 Then
+										ForceMove = (40.0-angle)*0.008
+									ElseIf angle > 310.0
+										ForceMove = (40.0-Abs(360.0-angle))*0.008
+									EndIf
+									FreeEntity pvt	
+									
+								EndIf
+								DebugLog Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\RoomDoors[0]\frameobj), EntityZ(e\room\RoomDoors[0]\frameobj))
+								DebugLog EntityY(Collider)
 							EndIf
 							
 						EndIf

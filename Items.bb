@@ -529,17 +529,18 @@ Function UpdateItems()
 							ed# = (xtemp*xtemp+ztemp*ztemp)
 							If ed<0.07 And Abs(ytemp)<0.25 Then
 								;items are too close together, push away
-								
-								xtemp = xtemp*(0.07-ed)
-								ztemp = ztemp*(0.07-ed)
-								
-								While Abs(xtemp)+Abs(ztemp)<0.001
-									xtemp = xtemp+Rnd(-0.002,0.002)
-									ztemp = ztemp+Rnd(-0.002,0.002)
-								Wend
-								
-								TranslateEntity i2\collider,xtemp,0,ztemp
-								TranslateEntity i\collider,-xtemp,0,-ztemp
+								If PlayerRoom\RoomTemplate\Name	<> "room2storage" Then
+									xtemp = xtemp*(0.07-ed)
+									ztemp = ztemp*(0.07-ed)
+									
+									While Abs(xtemp)+Abs(ztemp)<0.001
+										xtemp = xtemp+Rnd(-0.002,0.002)
+										ztemp = ztemp+Rnd(-0.002,0.002)
+									Wend
+									
+									TranslateEntity i2\collider,xtemp,0,ztemp
+									TranslateEntity i\collider,-xtemp,0,-ztemp
+								EndIf	
 							EndIf
 						EndIf
 					Next
