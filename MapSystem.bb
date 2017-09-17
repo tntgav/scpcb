@@ -2342,12 +2342,12 @@ Function FillRoom(r.Rooms)
 			EntityParent(r\Objects[0], r\obj)
 			
 			r\Objects[1] = CreatePivot()
-			;r\x + 1312.0*RoomScale, 0.5, r\z+448.0*RoomScale
-			PositionEntity(r\Objects[1], r\x + 1270.0*RoomScale, 0.5, r\z+570.0*RoomScale)
-			EntityParent(r\Objects[1], r\obj)			
+			;PositionEntity(r\Objects[1], r\x + 1270.0*RoomScale, 0.5, r\z+570.0*RoomScale)
+			PositionEntity(r\Objects[1], r\x + 1530.0*RoomScale, 0.5, r\z+512.0*RoomScale)
+			EntityParent(r\Objects[1], r\obj)
 			
 			r\Objects[2] = CreatePivot()
-			PositionEntity(r\Objects[2], r\x + 1248.0*RoomScale, 0.01, r\z+384.0*RoomScale)
+			PositionEntity(r\Objects[2], r\x + 1535.0*RoomScale, r\y+150.0*RoomScale, r\z+512.0*RoomScale)
 			EntityParent(r\Objects[2], r\obj)
 			;[End Block]
 		Case "room2storage"
@@ -3280,8 +3280,10 @@ Function FillRoom(r.Rooms)
 			RotateEntity(r\Objects[4+1], -81, -180, 0)
 			
 			;096 spawnpoint
+;			r\Objects[6]=CreatePivot(r\obj)
+;			PositionEntity(r\Objects[6], r\x - 848*RoomScale, 0.5, r\z-576*RoomScale, True)
 			r\Objects[6]=CreatePivot(r\obj)
-			PositionEntity(r\Objects[6], r\x - 848*RoomScale, 0.5, r\z-576*RoomScale, True)
+			PositionEntity(r\Objects[6],r\x-320*RoomScale,0.5,r\z,True)
 			;guard spawnpoint
 			r\Objects[7]=CreatePivot(r\obj)
 			PositionEntity(r\Objects[7], r\x - 1328.0 * RoomScale, 0.5, r\z + 528*RoomScale, True)
