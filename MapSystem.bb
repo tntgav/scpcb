@@ -189,13 +189,7 @@ Function LoadWorld(file$, rt.RoomTemplates)
 			Case "field_hit"
 				EntityParent node,collisionbrushes
 				EntityType node,HIT_MAP
-				If DebugHud Then
-					EntityColor node,0,0,255
-					;EntityFX node,1
-					EntityAlpha node,0.2
- 				Else
-					EntityAlpha node,0
-				EndIf	
+				EntityAlpha node,0
 				c=c-1
 				
 			;===============================================================================
@@ -4959,14 +4953,6 @@ Function FillRoom(r.Rooms)
 		r\TriggerboxAmount = r\RoomTemplate\TempTriggerboxAmount
 		For i = 0 To r\TriggerboxAmount-1
 			r\Triggerbox[i] = CopyEntity(r\RoomTemplate\TempTriggerbox[i],r\obj)
-			If DebugHud Then
-				EntityColor r\Triggerbox[i],255,255,0
-				;EntityFX r\Triggerbox[i],1
-				EntityAlpha r\Triggerbox[i],0.2
- 			Else
-	
-				EntityAlpha r\Triggerbox[i],0.0
-			EndIf	
 			r\TriggerboxName[i] = r\RoomTemplate\TempTriggerboxName[i]
 			DebugLog "Triggerbox found: "+i
 			DebugLog "Triggerbox "+i+" name: "+r\TriggerboxName[i]
@@ -5081,6 +5067,21 @@ Function UpdateRooms()
 					Exit
 				EndIf
 			Next
+			If DebugHUD
+				If r\TriggerboxAmount>0
+					For i=0 To r\TriggerboxAmount-1
+						EntityColor r\Triggerbox[i],255,255,0
+						EntityAlpha r\Triggerbox[i],0.2
+					Next
+				EndIf
+			Else
+				If r\TriggerboxAmount>0
+					For i=0 To r\TriggerboxAmount-1
+						EntityColor r\Triggerbox[i],255,255,255
+						EntityAlpha r\Triggerbox[i],0.0
+					Next
+				EndIf
+ 			EndIf
 		EndIf
 	Next
 	
@@ -5097,8 +5098,6 @@ Function UpdateRooms()
 				z = Abs(EntityZ(Collider,True)-EntityZ(PlayerRoom\AdjDoor[i]\frameobj,True))
 				If PlayerRoom\AdjDoor[i]\openstate = 0 Then
 					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-				;ElseIf Abs(DeltaYaw(Camera,PlayerRoom\Adjacent[i]\obj))>90+(((8.0-Max(x,z))/8.0)*90.0) Then
-				;	EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
 				ElseIf (Not EntityInView(PlayerRoom\AdjDoor[i]\frameobj,Camera))
 					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
 				Else

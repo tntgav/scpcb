@@ -10658,7 +10658,6 @@ Function Graphics3DExt%(width%,height%,depth%=32,mode%=2)
 	Graphics3D width,height,depth,mode
 	InitFastResize()
 	;InitExt()
-	WBuffer False
 	AntiAlias GetINIInt(OptionFile,"options","antialias")
 	;TextureAnisotropy% (GetINIInt(OptionFile,"options","anisotropy"),-1)
 End Function
@@ -11063,7 +11062,21 @@ Function CheckTriggers$()
 			sy# = Max(EntityScaleY(PlayerRoom\Triggerbox[i], 1), 0.001)
 			sz# = EntityScaleZ(PlayerRoom\Triggerbox[i], 1)
 			GetMeshExtents(PlayerRoom\Triggerbox[i])
-			EntityAlpha PlayerRoom\Triggerbox[i],0.0
+			If DebugHUD
+				If PlayerRoom\TriggerboxAmount>0
+					For i=0 To PlayerRoom\TriggerboxAmount-1
+						EntityColor PlayerRoom\Triggerbox[i],255,255,0
+						EntityAlpha PlayerRoom\Triggerbox[i],0.2
+					Next
+				EndIf
+			Else
+				If PlayerRoom\TriggerboxAmount>0
+					For i=0 To PlayerRoom\TriggerboxAmount-1
+						EntityColor PlayerRoom\Triggerbox[i],255,255,255
+						EntityAlpha PlayerRoom\Triggerbox[i],0.0
+					Next
+				EndIf
+ 			EndIf
 			If EntityX(Collider)>((sx#*Mesh_MinX)+PlayerRoom\x) And EntityX(Collider)<((sx#*Mesh_MaxX)+PlayerRoom\x)
 				If EntityY(Collider)>((sy#*Mesh_MinY)+PlayerRoom\y) And EntityY(Collider)<((sy#*Mesh_MaxY)+PlayerRoom\y)
 					If EntityZ(Collider)>((sz#*Mesh_MinZ)+PlayerRoom\z) And EntityZ(Collider)<((sz#*Mesh_MaxZ)+PlayerRoom\z)
