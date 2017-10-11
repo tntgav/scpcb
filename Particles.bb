@@ -162,6 +162,7 @@ Function CreateEmitter.Emitters(x#, y#, z#, emittertype%)
 	Local e.Emitters = New Emitters
 		
 	e\Obj = CreatePivot()
+	NameEntity e\Obj,"Emitter1"
 	PositionEntity(e\Obj, x, y, z, True)
 		
 	Select emittertype
@@ -210,6 +211,7 @@ Function CreateDevilEmitter.DevilEmitters(x#, y#, z#, room.Rooms, particleID%, m
 	Local dem.DevilEmitters = New DevilEmitters
 	
 	dem\obj = CreatePivot()
+	NameEntity dem\obj,"Emitter2"
 	PositionEntity dem\obj,x#,y#,z#,True
 	EntityParent dem\obj,room\obj
 	dem\room = room

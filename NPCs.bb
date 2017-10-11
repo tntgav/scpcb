@@ -1585,8 +1585,8 @@ Function UpdateNPCs()
 									;1638
 									If n\Frame>472 Then ;walk to idle
 										n\CurrSpeed = CurveValue(n\Speed*0.05,n\CurrSpeed,8.0)
-										AnimateNPC(n,1383,1470,n\CurrSpeed*45,False)
-										If n\Frame=>1469.9 Then n\Frame=423
+										AnimateNPC(n,1383,1469,n\CurrSpeed*45,False)
+										If n\Frame=>1468.9 Then n\Frame=423
 										;AnimateNPC(n, 1652, 1638, -n\CurrSpeed*45,False)
 									Else ;idle
 										n\CurrSpeed = CurveValue(0,n\CurrSpeed,4.0)	
@@ -5064,6 +5064,25 @@ Function UpdateNPCs()
 		
 	Next
 	
+	If MTF_CameraCheckTimer>0.0 And MTF_CameraCheckTimer<70*90
+		MTF_CameraCheckTimer=MTF_CameraCheckTimer+FPSfactor
+	ElseIf MTF_CameraCheckTimer>=70*90
+		MTF_CameraCheckTimer=0.0
+		If (Not PlayerDetected)
+			If MTF_CameraCheckDetected
+				PlayAnnouncement("SFX\Character\MTF\AnnouncCameraFound"+Rand(1,2)+".ogg")
+				PlayerDetected=True
+				MTF_CameraCheckTimer=70*60
+			Else
+				PlayAnnouncement("SFX\Character\MTF\AnnouncCameraNoFound.ogg")
+			EndIf
+		EndIf
+		MTF_CameraCheckDetected=False
+		If MTF_CameraCheckTimer=0.0
+			PlayerDetected=False
+		EndIf
+	EndIf
+	
 End Function
 
 Function TeleportCloser(n.NPCs)
@@ -5858,6 +5877,12 @@ Function UpdateMTFUnit(n.NPCs)
 					If n\MTFLeader = Null Then
 						DebugLog "targetlost: "+n\State2
 						PlayMTFSound(LoadTempSound("SFX\Character\MTF\Targetlost"+Rand(1,3)+".ogg"),n)
+						If MTF_CameraCheckTimer=0.0
+							If Rand(15-(7*SelectedDifficulty\aggressiveNPCs))=1 ;Maybe change this to another chance - ENDSHN
+								PlayAnnouncement("SFX\Character\MTF\AnnouncCameraCheck.ogg")
+								MTF_CameraCheckTimer = FPSfactor
+							EndIf
+						EndIf
 					EndIf
 					n\State = 0
                 EndIf

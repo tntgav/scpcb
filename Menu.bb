@@ -365,11 +365,8 @@ Function UpdateMainMenu()
 					If RandomSeed = "" Then
 						RandomSeed = Abs(MilliSecs())
 					EndIf
-					Local strtemp$ = ""
-					For i = 1 To Len(RandomSeed)
-						strtemp = strtemp+Asc(Mid(RandomSeed,i,1))
-					Next
-					SeedRnd Abs(Int(strtemp))
+					
+					SeedRnd GenerateSeedNumber(RandomSeed)
 					
 					Local SameFound% = False
 					
@@ -380,6 +377,7 @@ Function UpdateMainMenu()
 					If SameFound > 0 Then CurrSave = CurrSave + " (" + (SameFound + 1) + ")"
 					
 					LoadEntities()
+					LoadAllSounds()
 					InitNewGame()
 					MainMenuOpen = False
 					FlushKeys()
@@ -431,6 +429,7 @@ Function UpdateMainMenu()
 						If SaveMSG = "" Then
 							If DrawButton(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Load", False) Then
 								LoadEntities()
+								LoadAllSounds()
 								LoadGame(SavePath + SaveGames(i - 1) + "\")
 								CurrSave = SaveGames(i - 1)
 								InitLoadGame()
@@ -992,8 +991,8 @@ Function UpdateMainMenu()
 	
 	Color 255,255,255
 	AASetFont ConsoleFont
-	AAText 20,GraphicHeight-30,"v"+VersionNumber
-	
+	AAText 20,GraphicHeight-30,"v"+VersionNumber+" (build 06102017 CBT VRAM ON!)"
+		
 	;DrawTiledImageRect(MenuBack, 985 * MenuScale, 860 * MenuScale, 200 * MenuScale, 20 * MenuScale, 1200 * MenuScale, 866 * MenuScale, 300, 20 * MenuScale)
 	
 	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
@@ -1431,7 +1430,7 @@ Function DrawLoading(percent%, shortloading=False)
 		AAText(GraphicWidth / 2, GraphicHeight / 2 - 100, "LOADING - " + percent + " %", True, True)
 		
 		If percent = 100 Then 
-			If firstloop And SelectedLoadingScreen\title <> "CWM" Then PlaySound_Strict HorrorSFX(8)
+			If firstloop And SelectedLoadingScreen\title <> "CWM" Then PlaySound_Strict LoadTempSound(("SFX\Horror\Horror8.ogg"))
 			AAText(GraphicWidth / 2, GraphicHeight - 50, "PRESS ANY KEY TO CONTINUE", True, True)
 		Else
 			FlushKeys()

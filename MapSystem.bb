@@ -189,7 +189,13 @@ Function LoadWorld(file$, rt.RoomTemplates)
 			Case "field_hit"
 				EntityParent node,collisionbrushes
 				EntityType node,HIT_MAP
-				EntityAlpha node,0
+				If DebugHud Then
+					EntityColor node,0,0,255
+					;EntityFX node,1
+					EntityAlpha node,0.2
+ 				Else
+					EntityAlpha node,0
+				EndIf	
 				c=c-1
 				
 			;===============================================================================
@@ -1988,11 +1994,13 @@ Function FillRoom(r.Rooms)
 			r\Objects[13]=LoadMesh_Strict("GFX\map\gateawall1.b3d",r\obj)
 			PositionEntity(r\Objects[13], r\x-4308.0*RoomScale, -1045.0*RoomScale, r\z+544.0*RoomScale, True)
 			EntityColor r\Objects[13], 25,25,25
+			EntityType r\Objects[13],HIT_MAP
 			;EntityFX(r\Objects[13],1)
 			
 			r\Objects[14]=LoadMesh_Strict("GFX\map\gateawall2.b3d",r\obj)
 			PositionEntity(r\Objects[14], r\x-3820.0*RoomScale, -1045.0*RoomScale, r\z+544.0*RoomScale, True)	
 			EntityColor r\Objects[14], 25,25,25
+			EntityType r\Objects[14],HIT_MAP
 			;EntityFX(r\Objects[14],1)
 			
 			r\Objects[15]=CreatePivot(r\obj)
@@ -4951,7 +4959,14 @@ Function FillRoom(r.Rooms)
 		r\TriggerboxAmount = r\RoomTemplate\TempTriggerboxAmount
 		For i = 0 To r\TriggerboxAmount-1
 			r\Triggerbox[i] = CopyEntity(r\RoomTemplate\TempTriggerbox[i],r\obj)
-			EntityAlpha r\Triggerbox[i],0.0
+			If DebugHud Then
+				EntityColor r\Triggerbox[i],255,255,0
+				;EntityFX r\Triggerbox[i],1
+				EntityAlpha r\Triggerbox[i],0.2
+ 			Else
+	
+				EntityAlpha r\Triggerbox[i],0.0
+			EndIf	
 			r\TriggerboxName[i] = r\RoomTemplate\TempTriggerboxName[i]
 			DebugLog "Triggerbox found: "+i
 			DebugLog "Triggerbox "+i+" name: "+r\TriggerboxName[i]
@@ -5769,8 +5784,6 @@ Function UpdateSecurityCams()
 	CatchErrors("Uncaught (UpdateSecurityCams)")
 	Local sc.SecurityCams
 	
-	PlayerDetected = False
-	
 	;coffineffect = 0, not affected by 895
 	;coffineffect = 1, constantly affected by 895
 	;coffineffect = 2, 079 can broadcast 895 feed on this screen
@@ -5801,7 +5814,9 @@ Function UpdateSecurityCams()
 				If sc\FollowPlayer Then
 					If sc<>CoffinCam
 						If EntityVisible(sc\CameraObj,Camera)
-							PlayerDetected = True
+							If MTF_CameraCheckTimer>0.0
+								MTF_CameraCheckDetected=True
+							EndIf
 						EndIf
 					EndIf
 					PointEntity(sc\CameraObj, Camera)
@@ -5846,7 +5861,9 @@ Function UpdateSecurityCams()
 					If sc<>CoffinCam
 						If (Abs(DeltaYaw(sc\CameraObj,Camera))<60.0)
 							If EntityVisible(sc\CameraObj,Camera)
-								PlayerDetected = True
+								If MTF_CameraCheckTimer>0.0
+									MTF_CameraCheckDetected=True
+								EndIf
 							EndIf
 						EndIf
 					EndIf
@@ -6658,11 +6675,7 @@ Function CreateMap()
 	
 	Local zone%
 	
-	Local strtemp$ = ""
-	For i = 1 To Len(RandomSeed)
-		strtemp = strtemp+Asc(Mid(RandomSeed,i,1))
-	Next
-	SeedRnd Abs(Int(strtemp))
+	SeedRnd GenerateSeedNumber(RandomSeed)
 	
 	Dim MapName$(MapWidth, MapHeight)
 	
@@ -7303,6 +7316,9 @@ Function CreateMap()
 	Next
 	
 	For r.Rooms = Each Rooms
+		If r\angle >= 360
+            r\angle = r\angle-360
+        EndIf
 		r\Adjacent[0]=Null
 		r\Adjacent[1]=Null
 		r\Adjacent[2]=Null
@@ -7712,12 +7728,8 @@ Dim CHUNKDATA(64,64)
 
 Function SetChunkDataValues()
 	Local StrTemp$,i%,j%
-	
 	StrTemp$ = ""
-	For i = 1 To Len(RandomSeed)
-		StrTemp = StrTemp+Asc(Mid(RandomSeed,i,1))
-	Next
-	SeedRnd Abs(Int(StrTemp))
+	SeedRnd GenerateSeedNumber(RandomSeed)
 	
 	For i = 0 To 63
 		For j = 0 To 63
@@ -7742,12 +7754,8 @@ Function CreateChunkParts(r.Rooms)
 	Local i%,StrTemp$,j%
 	Local chp.ChunkPart,chp2.ChunkPart
 	Local obj%
-	
 	StrTemp$ = ""
-	For i = 1 To Len(RandomSeed)
-		StrTemp = StrTemp+Asc(Mid(RandomSeed,i,1))
-	Next
-	SeedRnd Abs(Int(StrTemp))
+	SeedRnd GenerateSeedNumber(RandomSeed)
 	
 	For i = 0 To ChunkAmount%
 		Local loc% = GetINISectionLocation(File$,"chunk"+i)

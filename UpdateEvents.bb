@@ -160,7 +160,7 @@ Function UpdateEvents()
 						e\EventState = e\EventState+FPSfactor
 						
 						If e\EventState2 = 0 Then
-							CanSave = False
+							;CanSave = False
 							ShowEntity Curr173\obj
 							If e\EventState > 900 And e\room\RoomDoors[5]\open Then
 								If e\EventState - FPSfactor <= 900 Then 
@@ -2979,11 +2979,7 @@ Function UpdateEvents()
 						e\room\grid = New Grids
 						
 						oldSeed% = RndSeed()
-						Local seedDec$ = ""
-						For i = 1 To Len(RandomSeed)
-							seedDec = seedDec+Asc(Mid(RandomSeed,i,1))
-						Next
-						SeedRnd Abs(Int(seedDec))
+						SeedRnd GenerateSeedNumber(RandomSeed)
 						
 						Local dir%
 						
@@ -3115,24 +3111,26 @@ Function UpdateEvents()
 						
 						;place the tunnels
 						
-						For i=0 To 4
-							Select True
-								Case i=2
-									tempStr="2c"
-								Case i>2
-									tempStr=Str(i)
-								Default
-									tempStr=Str(i+1)
-							End Select
-							Meshes[i]=LoadRMesh("GFX\map\mt"+tempStr+".rmesh",Null)
+						For i=0 To 6
+					;		Select True
+					;			Case i=2
+					;				tempStr="2c"
+					;			Case i>2
+					;				tempStr=Str(i)
+					;			Default
+					;				tempStr=Str(i+1)
+					;		End Select
+							Meshes[i]=CopyEntity(OBJTunnel(i))
+							;Meshes[i]=LoadRMesh("GFX\map\mt"+tempStr+".rmesh",Null)
 							DebugLog i
 							HideEntity Meshes[i]
 						Next
-						
-						Meshes[5]=LoadRMesh("GFX\map\mt_elevator.rmesh",Null)
-						HideEntity Meshes[5]
-						Meshes[6]=LoadRMesh("GFX\map\mt_generator.rmesh",Null)
-						HideEntity Meshes[6]
+					;	Meshes[5]=CopyEntity(OBJTunnel(5))
+					;	Meshes[5]=LoadRMesh("GFX\map\mt_elevator.rmesh",Null)
+					;	HideEntity Meshes[5]
+					;	Meshes[6]=CopyEntity(OBJTunnel(6))
+					;	Meshes[6]=LoadRMesh("GFX\map\mt_generator.rmesh",Null)
+					;	HideEntity Meshes[6]
 						
 						FreeTextureCache
 						
@@ -3390,25 +3388,42 @@ Function UpdateEvents()
 					Else If e\room\grid\Meshes[0]=0 Then
 						
 						;place the tunnels
-						
-						For i=0 To 4
-							Select True
-								Case i=2
-									tempStr="2c"
-								Case i>2
-									tempStr=Str(i)
-								Default
-									tempStr=Str(i+1)
-							End Select
-							Meshes[i]=LoadRMesh("GFX\map\mt"+tempStr+".rmesh",Null)
+						For i=0 To 6
+					;		Select True
+					;			Case i=2
+					;				tempStr="2c"
+					;			Case i>2
+					;				tempStr=Str(i)
+					;			Default
+					;				tempStr=Str(i+1)
+					;		End Select
+							Meshes[i]=CopyEntity(OBJTunnel(i))
 							DebugLog i
 							HideEntity Meshes[i]
 						Next
+					;	Meshes[5]=CopyEntity(OBJTunnel(5))
+					;	HideEntity Meshes[5]
+					;	Meshes[6]=CopyEntity(OBJTunnel(6))
+					;	HideEntity Meshes[6]
 						
-						Meshes[5]=LoadRMesh("GFX\map\mt_elevator.rmesh",Null)
-						HideEntity Meshes[5]
-						Meshes[6]=LoadRMesh("GFX\map\mt_generator.rmesh",Null)
-						HideEntity Meshes[6]
+					;	For i=0 To 4
+					;		Select True
+					;			Case i=2
+					;				tempStr="2c"
+					;			Case i>2
+					;				tempStr=Str(i)
+					;			Default
+					;				tempStr=Str(i+1)
+					;		End Select
+					;		Meshes[i]=LoadRMesh("GFX\map\mt"+tempStr+".rmesh",Null)
+					;		DebugLog i
+					;		HideEntity Meshes[i]
+					;	Next
+					;	
+					;	Meshes[5]=LoadRMesh("GFX\map\mt_elevator.rmesh",Null)
+					;	HideEntity Meshes[5]
+					;	Meshes[6]=LoadRMesh("GFX\map\mt_generator.rmesh",Null)
+					;	HideEntity Meshes[6]
 						
 						FreeTextureCache
 						
@@ -7378,75 +7393,6 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				;[End Block]
-			Case "dimension1499"
-				;[Block]
-				;e\EventState: If player entered dimension (will be resetted after the player leaves it)
-					;0: The player never entered SCP-1499
-					;1: The player had already entered the dimension at least once
-					;2: The player is in dimension
-				If PlayerRoom = e\room Then
-					If e\EventState < 2.0
-						;1499 random generator
-						;[Block]
-						If e\EventState = 0.0
-							If e\EventStr = "" And QuickLoadPercent = -1
-								QuickLoadPercent = 0
-								QuickLoad_CurrEvent = e
-								e\EventStr = "load0"
-							EndIf
-						Else
-							e\EventState = 2.0
-						EndIf
-						;[End Block]
-						For n.NPCs = Each NPCs
-							If n\NPCtype = NPCtype1499
-								n\Idle = False
-								n\State = 0
-								;If Rand(2)=1 Then n\State2 = 500*3
-								n\Angle = Rnd(360)
-								PositionEntity n\Collider,EntityX(n\Collider)+Rnd(-60.0,60.0),EntityY(n\Collider)+0.05,EntityZ(n\Collider)+Rnd(-60.0,60.0)
-								ResetEntity n\Collider
-							EndIf
-						Next
-					EndIf
-					PlayerFallingPickDistance = 30.0
-					;PositionEntity e\room\Objects[0],0,800,0
-					CameraFogRange Camera,40,80
-					CameraFogColor Camera,96,97,104
-					CameraClsColor Camera,96,97,104
-					CameraRange Camera,0.05,90
-					
-					For r.Rooms = Each Rooms
-						HideEntity r\obj
-					Next
-					ShowEntity e\room\obj
-					If QuickLoadPercent = 100 Or QuickLoadPercent = -1
-						UpdateChunks(e\room,15)
-						ShowEntity NTF_1499Sky
-						Update1499Sky()
-						ShouldPlay = 18
-						If EntityY(Collider)<799.8
-							PositionEntity Collider,EntityX(Collider),800.5,EntityZ(Collider),True
-							ResetEntity Collider
-						EndIf
-					Else
-						DropSpeed = 0
-					EndIf
-					CurrStepSFX=3
-				Else
-					If e\EventState = 2.0
-						HideEntity NTF_1499Sky
-						HideChunks()
-						For n.NPCs = Each NPCs
-							If n\NPCtype = NPCtype1499
-								;RemoveNPC(n)
-								n\Idle = True
-							EndIf
-						Next
-						e\EventState = 1.0
-					EndIf
-				EndIf
-				;[End Block]
 			Case "room2scps2"
 				;[Block]
 				;If PlayerRoom = e\room
@@ -8062,7 +8008,7 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 							
-							If e\EventState2 > 0 Then CanSave% = False
+							;If e\EventState2 > 0 Then CanSave% = False
 						Else
 							If e\room\RoomDoors[0]\open = False
 								e\room\RoomDoors[0]\fastopen = 0
@@ -8307,6 +8253,28 @@ Function UpdateEvents()
 					If e\room\NPC[0]\State = 0
 						e\room\NPC[0]\State = 2
 					EndIf
+				EndIf
+				;[End Block]
+			Case "dimension1499"
+				;[Block]
+				;Hopefully this fixes the issue with the dimension1499 buildings appearing inside the facility
+				If PlayerRoom<>e\room
+					If e\room\Objects[0]<>0
+						For i = 1 To 15
+							HideEntity e\room\Objects[i]
+						Next
+					EndIf
+				EndIf
+				If e\EventState = 2.0
+					HideEntity NTF_1499Sky
+					HideChunks()
+					For n.NPCs = Each NPCs
+						If n\NPCtype = NPCtype1499
+							RemoveNPC(n)
+							;n\Idle = True
+						EndIf
+					Next
+					e\EventState = 1.0
 				EndIf
 				;[End Block]
 		End Select
@@ -9261,8 +9229,8 @@ Function UpdateEndings()
 									;tunneli menee umpeen
 									If e\EventState3>50 And e\EventState3<230 Then
 										CameraShake = Sin(e\EventState3-50)*3
-										TurnEntity e\room\Objects[13], 0, Sin(e\EventState3-50)*-0.85, 0, True
-										TurnEntity e\room\Objects[14], 0, Sin(e\EventState3-50)*0.85, 0, True
+										TurnEntity e\room\Objects[13], 0, (Sin(e\EventState3-50)*-0.85)*FPSfactor, 0, True
+										TurnEntity e\room\Objects[14], 0, (Sin(e\EventState3-50)*0.85)*FPSfactor, 0, True
 										
 										For i = 5 To 8
 											PositionEntity (e\room\NPC[i]\Collider, CurveValue(EntityX(e\room\RoomDoors[2]\frameobj,True), EntityX(e\room\NPC[i]\Collider,True),50.0),EntityY(e\room\NPC[i]\Collider,True),CurveValue(EntityZ(e\room\RoomDoors[2]\frameobj,True), EntityZ(e\room\NPC[i]\Collider,True),50.0),True)

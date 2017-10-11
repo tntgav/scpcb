@@ -246,7 +246,7 @@ Function SaveGame(file$)
 		
 		For i=0 To 10
 			If r\Levers[i]<>0 Then
-				If EntityPitch(r\Levers[i],True) > 0 Then ;p��ll�
+				If EntityPitch(r\Levers[i],True) > 0 Then ;p??????ll???
 					WriteByte(f,1)
 				Else
 					WriteByte(f,0)
@@ -709,6 +709,10 @@ Function LoadGame(file$)
 		level = ReadInt(f)
 		
 		temp2 = ReadByte(f)		
+		
+		If angle >= 360
+            angle = angle-360
+        EndIf
 		
 		For rt.roomtemplates = Each RoomTemplates
 			If rt\id = roomtemplateID Then
@@ -1419,6 +1423,10 @@ Function LoadGameQuick(file$)
 		level = ReadInt(f)
 		
 		temp2 = ReadByte(f)	
+		
+		If angle >= 360
+            angle = angle-360
+        EndIf
 		
 		For r.Rooms = Each Rooms
 			If r\x = x And r\z = z Then
