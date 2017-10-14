@@ -1171,6 +1171,20 @@ Function UpdateNPCs()
 								n\State = 250 ;make 106 idle for a while
 							EndIf
 							
+							If dist > 10 And (Not EntityInView(n\obj,Camera)) And PlayerRoom\RoomTemplate\Name <> "pocketdimension" And n\State <-5 Then
+                                TurnEntity Collider,0,180,0
+                                Local pick = EntityPick(Collider,5)
+                                TurnEntity Collider,0,180,0
+                                If pick<>0
+									TeleportEntity(n\Collider,PickedX(),PickedY(),PickedZ(),n\CollRadius)
+                                    PointEntity(n\Collider,Collider)
+                                    RotateEntity(n\Collider,0,EntityYaw(n\Collider),0)
+                                    MoveEntity(n\Collider,0,0,-2)
+                                    PlaySound2(OldManSFX(3),Camera,n\Collider)
+                                    DebugLog "COBY!"
+                                EndIf
+                            EndIf    
+							
 						Else ;idling outside the map
 							n\CurrSpeed = 0
 							MoveEntity n\Collider, 0, ((EntityY(Collider) - 30) - EntityY(n\Collider)) / 200.0, 0
