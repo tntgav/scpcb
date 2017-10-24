@@ -186,6 +186,9 @@ For i = 0 To 7
 		StepSFX(2, 0, i) = LoadSound_Strict("SFX\Character\MTF\Step" + (i + 1) + ".ogg")
 		StepSFX(3, 0, i) = LoadSound_Strict("SFX\SCP\049\Step"+ (i + 1) + ".ogg")
 	EndIf
+	If i < 4
+        StepSFX(4, 0, i) = LoadSound_Strict("SFX\Step\SCP\StepSCP" + (i + 1) + ".ogg");new one 1.3.9
+    EndIf
 Next
 
 ;Dim Step2SFX(6)
@@ -193,4 +196,17 @@ For i = 0 To 2
 	Step2SFX(i) = LoadSound_Strict("SFX\Step\StepPD" + (i + 1) + ".ogg")
 	Step2SFX(i+3) = LoadSound_Strict("SFX\Step\StepForest" + (i + 1) + ".ogg")
 Next 
-End Function 
+End Function
+
+
+
+
+
+
+
+
+
+
+;~IDEal Editor Parameters:
+;~F#0
+;~C#Blitz3D

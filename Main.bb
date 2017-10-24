@@ -1675,7 +1675,7 @@ Global CoughCHN%, VomitCHN%
 Global MachineSFX% 
 Global ApacheSFX
 Global CurrStepSFX
-Dim StepSFX%(4, 2, 8) ;(normal/metal, walk/run, id)
+Dim StepSFX%(5, 2, 8) ;(normal/metal, walk/run, id)
 
 Dim Step2SFX(6)
 

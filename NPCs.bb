@@ -3709,7 +3709,7 @@ Function UpdateNPCs()
 							;Animate2(n\obj,AnimTime(n\obj),644,683,28*n\CurrSpeed) ;walk
 							
 							If (prevFrame<664 And n\Frame=>664) Or (prevFrame>673 And n\Frame<654) Then
-								PlaySound2(StepSFX(1, 0, Rand(0,3)), Camera, n\Collider, 12.0)
+								PlaySound2(StepSFX(4, 0, Rand(0,3)), Camera, n\Collider, 12.0)
 								If Rand(10)=1 Then
 									temp = False
 									If n\SoundChn = 0 Then 
@@ -3785,7 +3785,7 @@ Function UpdateNPCs()
 										;Animate2(n\obj,AnimTime(n\obj),449,464,6*n\CurrSpeed) ;run
 										
 										If (prevFrame<452 And n\Frame=>452) Or (prevFrame<459 And n\Frame=>459) Then
-											PlaySound2(StepSFX(1, 1, Rand(0,3)), Camera, n\Collider, 12.0)
+											PlaySound2(StepSFX(1, 1, Rand(0,7)), Camera, n\Collider, 12.0)
 										EndIf										
 										
 										If Distance(n\EnemyX, n\EnemyZ, EntityX(n\Collider), EntityZ(n\Collider))<1.1 Then ;player is visible
@@ -4476,9 +4476,13 @@ Function UpdateNPCs()
 									
 								EndIf
 								
+								If (prevFrame < 604 And n\Frame=>604) Or (prevFrame < 627 And n\Frame=>627) Then
+                                    PlaySound2(StepSFX(4,0,Rand(0,3)),Camera, n\Collider, 7.0, Rnd(0.5,0.7))
+                                EndIf
+								
 								RotateEntity n\Collider, 0, CurveAngle(n\Angle,EntityYaw(n\Collider),30.0),0
 								
-								MoveEntity n\Collider,0,0,n\CurrSpeed
+								MoveEntity n\Collider,0,0,n\CurrSpeed*FPSfactor
 							EndIf
 						Case 10 ;attack
 							If n\LastSeen=0
