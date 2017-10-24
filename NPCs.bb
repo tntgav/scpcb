@@ -1171,19 +1171,27 @@ Function UpdateNPCs()
 								n\State = 250 ;make 106 idle for a while
 							EndIf
 							
-							If dist > 10 And (Not EntityInView(n\obj,Camera)) And PlayerRoom\RoomTemplate\Name <> "pocketdimension" And n\State <-5 Then
-                                TurnEntity Collider,0,180,0
-                                Local pick = EntityPick(Collider,5)
-                                TurnEntity Collider,0,180,0
-                                If pick<>0
-									TeleportEntity(n\Collider,PickedX(),PickedY(),PickedZ(),n\CollRadius)
-                                    PointEntity(n\Collider,Collider)
-                                    RotateEntity(n\Collider,0,EntityYaw(n\Collider),0)
-                                    MoveEntity(n\Collider,0,0,-2)
-                                    PlaySound2(OldManSFX(3),Camera,n\Collider)
-                                    DebugLog "COBY!"
+							If n\Reload = 0 Then
+                                If dist > 10 And PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And n\State <-5 Then ;timer idea by Juanjpro
+                                    If (Not EntityInView(n\obj,Camera))
+                                        TurnEntity Collider,0,180,0
+                                        pick = EntityPick(Collider,5)
+                                        TurnEntity Collider,0,180,0
+                                        If pick<>0
+											TeleportEntity(n\Collider,PickedX(),PickedY(),PickedZ(),n\CollRadius)
+                                            PointEntity(n\Collider,Collider)
+                                            RotateEntity(n\Collider,0,EntityYaw(n\Collider),0)
+                                            MoveEntity(n\Collider,0,0,-2)
+                                            PlaySound2(OldManSFX(3),Camera,n\Collider)
+                                            n\PathTimer = 0
+                                            n\Reload = (70*10.0)/(SelectedDifficulty\otherFactors+1)
+                                            DebugLog "COBY!"
+                                        EndIf
+                                    EndIf
                                 EndIf
-                            EndIf    
+                            EndIf
+                            n\Reload = Max(0, n\Reload - FPSfactor)
+                            DebugLog "106 in... "+n\Reload 
 							
 						Else ;idling outside the map
 							n\CurrSpeed = 0
