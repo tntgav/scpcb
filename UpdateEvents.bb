@@ -3766,27 +3766,29 @@ Function UpdateEvents()
 				EndIf
 				;[End Block]
 			Case "room2pit106"
-				;[Block]
-				If (Not Contained106) Then 
-					If e\EventState = 0 Then
-						If PlayerRoom = e\room Then e\EventState = 1
-					Else
-						e\EventState = e\EventState + 1
-						PositionEntity(Curr106\Collider, EntityX(e\room\Objects[7], True), EntityY(e\room\Objects[7], True), EntityZ(e\room\Objects[7], True))
-						ResetEntity(Curr106\Collider)
-						
-						PointEntity(Curr106\Collider, Camera)
-						TurnEntity(Curr106\Collider, 0, Sin(MilliSecs2() / 20) * 6.0, 0, True)
-						MoveEntity(Curr106\Collider, 0, 0, Sin(MilliSecs2() / 15) * 0.06)
-						
-						Curr106\Idle = True
-						
-						If e\EventState > 800 Then
-							If BlinkTimer < - 5 Then Curr106\Idle = False : RemoveEvent(e)
-						EndIf
-					EndIf
-				End If
-				;[End Block]
+                ;[Block]
+                If (Not Contained106) And Curr106\State>0 Then 
+                    If e\EventState = 0 Then
+                        If PlayerRoom = e\room Then e\EventState = 1
+                    Else
+                        e\EventState = e\EventState + 1
+                        PositionEntity(Curr106\Collider, EntityX(e\room\Objects[7], True), EntityY(e\room\Objects[7], True), EntityZ(e\room\Objects[7], True))
+                        ResetEntity(Curr106\Collider)
+                        
+                        PointEntity(Curr106\Collider, Camera)
+                        TurnEntity(Curr106\Collider, 0, Sin(MilliSecs2() / 20) * 6.0, 0, True)
+                        MoveEntity(Curr106\Collider, 0, 0, Sin(MilliSecs2() / 15) * 0.06)
+                        PositionEntity(Curr106\obj, EntityX(Curr106\Collider), EntityY(Curr106\Collider) - 0.15, EntityZ(Curr106\Collider))
+                        
+                        RotateEntity Curr106\obj, 0, EntityYaw(Curr106\Collider), 0
+                        Curr106\Idle = True
+                        AnimateNPC(Curr106, 334, 494, 0.3)
+                        If e\EventState > 800 Then
+                            If BlinkTimer < - 5 Then Curr106\Idle = False : RemoveEvent(e)
+                        EndIf
+                    EndIf
+                End If
+                ;[End Block]
 			Case "room2pit"
 				;[Block]
 				If Curr173\Idle = 0 Then 
