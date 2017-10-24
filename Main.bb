@@ -3901,7 +3901,11 @@ Function MovePlayer()
 		Kill()
 	EndIf
 	
-	Stamina = Min(Stamina + 0.15 * FPSfactor, 100.0)
+	If CurrSpeed > 0 Then
+        Stamina = Min(Stamina + 0.15 * FPSfactor/1.25, 100.0)
+    Else
+        Stamina = Min(Stamina + 0.15 * FPSfactor*1.25, 100.0)
+    EndIf
 	
 	If StaminaEffectTimer > 0 Then
 		StaminaEffectTimer = StaminaEffectTimer - (FPSfactor/70)
@@ -3955,11 +3959,11 @@ Function MovePlayer()
 	EndIf
 	
 	If (Not NoClip) Then 
-		If ((KeyDown(KEY_DOWN) Xor KeyDown(KEY_UP)) Or (KeyDown(KEY_RIGHT) Xor KeyDown(KEY_LEFT)) And Playable) Or ForceMove>0 Then
+		If ((KeyDown(KEY_DOWN) Or KeyDown(KEY_UP)) Or (KeyDown(KEY_RIGHT) Or KeyDown(KEY_LEFT)) And Playable) Or ForceMove>0 Then
 			
 			If Crouch = 0 And (KeyDown(KEY_SPRINT)) And Stamina > 0.0 And (Not IsZombie) Then
 				Sprint = 2.5
-				Stamina = Stamina - FPSfactor * 0.5 * StaminaEffect
+				Stamina = Stamina - FPSfactor * 0.4 * StaminaEffect
 				If Stamina <= 0 Then Stamina = -20.0
 			End If
 			
