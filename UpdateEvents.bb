@@ -4990,7 +4990,7 @@ Function UpdateEvents()
 							
 							n\texture = "GFX\NPCs\035victim.jpg"
 							n\Model = "GFX\NPCs\035.b3d"
-							HideEntity n\obj	
+							HideEntity n\obj
 							
 							SetAnimTime(n\obj, 501)
 							n\Frame = 501
@@ -8277,6 +8277,47 @@ Function UpdateEvents()
 						EndIf
 					Next
 					e\EventState = 1.0
+				EndIf
+				;[End Block]
+			Case "room2offices035"
+				;[Block]
+				Local is035released = False
+				
+				For e2.Events = Each Events
+					If e2<>e And e2\EventName="room035"
+						If e2\EventState<0.0
+							is035released=True
+							Exit
+						EndIf
+					EndIf
+				Next
+				
+				If is035released
+					If e\room\dist < 8
+						If e\room\NPC[0]=Null
+							e\room\NPC[0]=CreateNPC(NPCtypeD,e\room\x,0.5,e\room\z)
+							RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
+							MoveEntity e\room\NPC[0]\Collider,0,0,-0.5
+							e\room\NPC[0]\State = 3
+							e\room\NPC[0]\texture = "GFX\npcs\035victim.jpg"
+							ChangeNPCTextureID(e\room\NPC[0],7)
+							SetNPCFrame(e\room\NPC[0],19)
+						EndIf
+						If e\room\NPC[1]=Null
+							If EntityDistance(e\room\NPC[0]\Collider,Collider)<2.5
+								e\room\NPC[1]=CreateNPC(NPCtypeTentacle,EntityX(e\room\NPC[0]\Collider),0.0,EntityZ(e\room\NPC[0]\Collider))
+								RotateEntity e\room\NPC[1]\Collider,0,e\room\angle,0
+								MoveEntity e\room\NPC[1]\Collider,0,0,0.6
+							EndIf
+						EndIf
+					Else
+						If e\room\dist>HideDistance
+							If e\room\NPC[1]<>Null
+								RemoveNPC(e\room\NPC[1])
+								e\room\NPC[1]=Null
+							EndIf
+						EndIf
+					EndIf
 				EndIf
 				;[End Block]
 		End Select

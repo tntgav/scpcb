@@ -3213,7 +3213,7 @@ Function UpdateNPCs()
 				;[Block]
 				dist = EntityDistance(n\Collider,Collider)
 				
-				If dist < 8.0 Then 
+				If dist < HideDistance
 					
 					Select n\State 
 						Case 0 ;spawn
@@ -3308,14 +3308,14 @@ Function UpdateNPCs()
 							
 					End Select
 					
-					PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider))
-					RotateEntity n\obj, EntityPitch(n\Collider)-90, EntityYaw(n\Collider)-180, EntityRoll(n\Collider), True
-					
-					n\DropSpeed = 0
-					
-					ResetEntity n\Collider
-					
 				EndIf
+				
+				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider))
+				RotateEntity n\obj, EntityPitch(n\Collider)-90, EntityYaw(n\Collider)-180, EntityRoll(n\Collider), True
+				
+				n\DropSpeed = 0
+				
+				ResetEntity n\Collider
 				;[End Block]
 			Case NPCtype860
 				;[Block]

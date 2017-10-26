@@ -1757,7 +1757,7 @@ Global LightConeModel
 
 Global ParticleEffect[10]
 
-Const MaxDTextures=7
+Const MaxDTextures=8
 Global DTextures[MaxDTextures]
 
 Global NPC049OBJ, NPC0492OBJ
@@ -2450,7 +2450,8 @@ Function InitEvents()
 			Case 2
 				CreateEvent("682roar", "room3pit", Rand(0,2), 0)		
 			Case 3
-				CreateEvent("682roar", "room2offices", 0, 0)	
+				;CreateEvent("682roar", "room2offices", 0, 0)
+				CreateEvent("682roar", "room2z3", 0, 0)
 		End Select 
 	EndIf 
 	
@@ -2554,6 +2555,8 @@ Function InitEvents()
 	CreateEvent("096spawn","room3z2",0,0.7+(0.2*SelectedDifficulty\aggressiveNPCs))
 	
 	CreateEvent("room2pit","room2_4",0,0.4 + (0.4*SelectedDifficulty\aggressiveNPCs))
+	
+	CreateEvent("room2offices035","room2offices",0)
 	
 	CreateEvent("room2pit106", "room2pit", 0, 0.07 + (0.1*SelectedDifficulty\aggressiveNPCs))
 	
@@ -7787,14 +7790,19 @@ Function LoadEntities()
 	tex = LoadTexture_Strict("GFX\npcs\janitor.jpg")
 	EntityTexture DTextures[5],tex
 	FreeTexture tex
-	
+	;106 Victim
 	tex = LoadTexture_Strict("GFX\npcs\106victim.jpg")
 	EntityTexture DTextures[6],tex
 	FreeTexture tex
-	
+	;2nd ClassD
 	tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
 	EntityTexture DTextures[7],tex
 	FreeTexture tex
+	;035 victim
+	tex = LoadTexture_Strict("GFX\npcs\035victim.jpg")
+	EntityTexture DTextures[8],tex
+	FreeTexture tex
+	
 	;[End Block]
 	
 	LoadMaterials("DATA\materials.ini")
@@ -9618,7 +9626,9 @@ Function Use294()
 					Input294 = Right(Input294, Len(Input294)-9)
 				EndIf
 				
-				Local loc% = GetINISectionLocation("DATA\SCP-294.ini",Input294)
+				If Input294<>""
+					Local loc% = GetINISectionLocation("DATA\SCP-294.ini",Input294)
+				EndIf
 				
 				If loc > 0 Then
 					strtemp$ = GetINIString2("DATA\SCP-294.ini", loc, "dispensesound")
@@ -11069,19 +11079,11 @@ Function CheckTriggers$()
 			sz# = EntityScaleZ(PlayerRoom\Triggerbox[i], 1)
 			GetMeshExtents(PlayerRoom\Triggerbox[i])
 			If DebugHUD
-				If PlayerRoom\TriggerboxAmount>0
-					For i=0 To PlayerRoom\TriggerboxAmount-1
-						EntityColor PlayerRoom\Triggerbox[i],255,255,0
-						EntityAlpha PlayerRoom\Triggerbox[i],0.2
-					Next
-				EndIf
+				EntityColor PlayerRoom\Triggerbox[i],255,255,0
+				EntityAlpha PlayerRoom\Triggerbox[i],0.2
 			Else
-				If PlayerRoom\TriggerboxAmount>0
-					For i=0 To PlayerRoom\TriggerboxAmount-1
-						EntityColor PlayerRoom\Triggerbox[i],255,255,255
-						EntityAlpha PlayerRoom\Triggerbox[i],0.0
-					Next
-				EndIf
+				EntityColor PlayerRoom\Triggerbox[i],255,255,255
+				EntityAlpha PlayerRoom\Triggerbox[i],0.0
  			EndIf
 			If EntityX(Collider)>((sx#*Mesh_MinX)+PlayerRoom\x) And EntityX(Collider)<((sx#*Mesh_MaxX)+PlayerRoom\x)
 				If EntityY(Collider)>((sy#*Mesh_MinY)+PlayerRoom\y) And EntityY(Collider)<((sy#*Mesh_MaxY)+PlayerRoom\y)
