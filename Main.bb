@@ -9651,9 +9651,9 @@ Function Use294()
 					g% = Trim(Mid(strtemp, sep1+1, sep2-sep1-1))
 					b% = Trim(Right(strtemp, Len(strtemp)-sep2))
 					
-					alpha# = Float(GetINIString2("DATA\SCP-294.ini", loc, "alpha"))
+					alpha# = Float(GetINIString2("DATA\SCP-294.ini", loc, "alpha",1.0))
 					glow = GetINIInt2("DATA\SCP-294.ini", loc, "glow")
-					If alpha = 0 Then alpha = 1.0
+					;If alpha = 0 Then alpha = 1.0
 					If glow Then alpha = -alpha
 					
 					it.items = CreateItem("Cup", "cup", EntityX(PlayerRoom\Objects[1],True),EntityY(PlayerRoom\Objects[1],True),EntityZ(PlayerRoom\Objects[1],True), r,g,b,alpha)
