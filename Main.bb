@@ -233,8 +233,6 @@ Font3% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(22 * (GraphicHeight /
 Font4% = AALoadFont("GFX\font\DS-DIGI\DS-Digital.ttf", Int(60 * (GraphicHeight / 1024.0)), 0,0,0)
 Font5% = AALoadFont("GFX\font\Journal\Journal.ttf", Int(58 * (GraphicHeight / 1024.0)), 0,0,0)
 
-Global CreditsFont%,CreditsFont2%
-
 ConsoleFont% = AALoadFont("Blitz", Int(20 * (GraphicHeight / 1024.0)), 0,0,0,1)
 
 AASetFont Font2
@@ -1559,7 +1557,6 @@ Music(20) = "049Chase"
 Music(21) = "..\Ending\MenuBreath"
 Music(22) = "914"
 Music(23) = "Ending"
-Music(24) = "Credits"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
@@ -3683,12 +3680,7 @@ Function DrawEnding()
 	ShowPointer()
 	
 	FPSfactor = 0
-	;EndingTimer=EndingTimer-FPSfactor2
-	If EndingTimer>-2000
-		EndingTimer=Max(EndingTimer-FPSfactor2,-1111)
-	Else
-		EndingTimer=EndingTimer-FPSfactor2
-	EndIf
+	EndingTimer=EndingTimer-FPSfactor2
 	
 	GiveAchievement(Achv055)
 	If (Not UsedConsole) Then GiveAchievement(AchvConsole)
@@ -3756,7 +3748,7 @@ Function DrawEnding()
 			
 			DrawImage EndingScreen, GraphicWidth/2-400, GraphicHeight/2-400
 			
-			If EndingTimer < -1000 And EndingTimer > -2000
+			If EndingTimer < -1000 Then 
 				
 				width = ImageWidth(PauseMenuIMG)
 				height = ImageHeight(PauseMenuIMG)
@@ -3813,39 +3805,22 @@ Function DrawEnding()
 						AchievementsMenu = 1
 					EndIf
 					
-;					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
-;						NullGame()
-;						StopStream_Strict(MusicCHN)
-;						;Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
-;						ShouldPlay = 21
-;						MenuOpen = False
-;						MainMenuOpen = True
-;						MainMenuTab = 0
-;						CurrSave = ""
-;						FlushKeys()
-;					EndIf
-					
-					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True)
-						ShouldPlay = 24
-						NowPlaying = ShouldPlay
-						For i=0 To 9
-							If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
-						Next
+					If DrawButton(x-145*MenuScale,y-100*MenuScale,390*MenuScale,60*MenuScale,"MAIN MENU", True) Then
+						NullGame()
 						StopStream_Strict(MusicCHN)
-						MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
-						SetStreamVolume_Strict(MusicCHN,1.0*MusicVolume)
+						;Music(21) = LoadSound_Strict("SFX\Ending\MenuBreath.ogg")
+						ShouldPlay = 21
+						MenuOpen = False
+						MainMenuOpen = True
+						MainMenuTab = 0
+						CurrSave = ""
 						FlushKeys()
-						EndingTimer=-2000
-						InitCredits()
-					EndIf
+					EndIf					
 				Else
 					ShouldPlay = 23
 					DrawMenu()
 				EndIf
-			;Credits
-			ElseIf EndingTimer<=-2000
-				ShouldPlay = 24
-				DrawCredits()
+				
 			EndIf
 			
 		EndIf
@@ -3857,117 +3832,6 @@ Function DrawEnding()
 	AASetFont Font1
 End Function
 
-Type CreditsLine
-	Field txt$
-	Field id%
-	Field stay%
-End Type
-
-Global CreditsTimer# = 0.0
-
-Function InitCredits()
-	Local cl.CreditsLine
-	Local file% = OpenFile("Credits.txt")
-	Local l$
-	
-	CreditsFont% = LoadFont_Strict("GFX\font\cour\Courier New.ttf", Int(21 * (GraphicHeight / 1024.0)), 0,0,0)
-	CreditsFont2% = LoadFont_Strict("GFX\font\courbd\Courier New.ttf", Int(35 * (GraphicHeight / 1024.0)), 0,0,0)
-	
-	Repeat
-		l = ReadLine(file)
-		cl = New CreditsLine
-		cl\txt = l
-	Until Eof(file)
-	
-	Delete First CreditsLine
-	CreditsTimer = 0
-	
-End Function
-
-Function DrawCredits()
-    Local credits_Y# = (EndingTimer+2000)/2+(GraphicHeight+10)
-    Local cl.CreditsLine
-    Local id%
-    Local endlinesamount%
-	Local LastCreditLine.CreditsLine
-	
-    Cls
-	
-	id = 0
-	endlinesamount = 0
-	LastCreditLine = Null
-	Color 255,255,255
-	For cl = Each CreditsLine
-		cl\id = id
-		If Left(cl\txt,1)="*"
-			SetFont CreditsFont2
-			If cl\stay=False
-				Text GraphicWidth/2,credits_Y+(24*cl\id*MenuScale),Right(cl\txt,Len(cl\txt)-1),True
-			EndIf
-		ElseIf Left(cl\txt,1)="/"
-			LastCreditLine = Before(cl)
-		Else
-			SetFont CreditsFont
-			If cl\stay=False
-				Text GraphicWidth/2,credits_Y+(24*cl\id*MenuScale),cl\txt,True
-			EndIf
-		EndIf
-		If LastCreditLine<>Null
-			If cl\id>LastCreditLine\id
-				cl\stay = True
-			EndIf
-		EndIf
-		If cl\stay
-			endlinesamount=endlinesamount+1
-		EndIf
-		id=id+1
-	Next
-	If (credits_Y+(24*LastCreditLine\id*MenuScale))<-StringHeight(LastCreditLine\txt)
-		CreditsTimer=CreditsTimer+(0.5*FPSfactor2)
-		If CreditsTimer>=0.0 And CreditsTimer<255.0
-			Color Max(Min(CreditsTimer,255),0),Max(Min(CreditsTimer,255),0),Max(Min(CreditsTimer,255),0)
-		ElseIf CreditsTimer>=255.0
-			Color 255,255,255
-			If CreditsTimer>500.0
-				CreditsTimer=-255.0
-			EndIf
-		Else
-			Color Max(Min(-CreditsTimer,255),0),Max(Min(-CreditsTimer,255),0),Max(Min(-CreditsTimer,255),0)
-			If CreditsTimer>=-1.0
-				CreditsTimer=-1.0
-			EndIf
-		EndIf
-		DebugLog CreditsTimer
-	EndIf
-	If CreditsTimer<>0.0
-		For cl = Each CreditsLine
-			If cl\stay
-				SetFont CreditsFont
-				If Left(cl\txt,1)="/"
-					Text GraphicWidth/2,(GraphicHeight/2)+(endlinesamount/2)+(24*cl\id*MenuScale),Right(cl\txt,Len(cl\txt)-1),True
-				Else
-					Text GraphicWidth/2,(GraphicHeight/2)+(24*(cl\id-LastCreditLine\id)*MenuScale)-((endlinesamount/2)*24*MenuScale),cl\txt,True
-				EndIf
-			EndIf
-		Next
-	EndIf
-	If CreditsTimer=-1
-		FreeFont CreditsFont
-		FreeFont CreditsFont2
-		Delete Each CreditsLine
-        NullGame(False)
-        StopStream_Strict(MusicCHN)
-        ShouldPlay = 21
-        MenuOpen = False
-        MainMenuOpen = True
-        MainMenuTab = 0
-        CurrSave = ""
-        FlushKeys()
-	EndIf
-    
-End Function
-
-;[Block]
 ;Function SetSaveMSG(txt$)
 ;	
 ;	Save_MSG = txt
@@ -4008,7 +3872,6 @@ End Function
 ;	EndIf
 ;	
 ;End Function
-;[End Block]
 
 ;--------------------------------------- player controls -------------------------------------------
 
@@ -8294,14 +8157,14 @@ Function InitLoadGame()
 	
 End Function
 
-Function NullGame(playbuttonsfx%=True)
+Function NullGame()
 	CatchErrors("Uncaught (NullGame)")
 	Local i%, x%, y%, lvl
 	Local itt.ItemTemplates, s.Screens, lt.LightTemplates, d.Doors, m.Materials
 	Local wp.WayPoints, twp.TempWayPoints, r.Rooms, it.Items
 	
 	KillSounds()
-	If playbuttonsfx Then PlaySound_Strict ButtonSFX
+	PlaySound_Strict ButtonSFX
 	
 	FreeParticles()
 	
@@ -8634,27 +8497,35 @@ Function UpdateMusic()
 	If ConsoleFlush Then
 		If Not ChannelPlaying(ConsoleMusPlay) Then ConsoleMusPlay = PlaySound(ConsoleMusFlush)
 	ElseIf (Not PlayCustomMusic)
-		If NowPlaying <> ShouldPlay ; playing the wrong clip, fade out
-			CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
-			If CurrMusicVolume = 0
-				If NowPlaying<66
-					StopStream_Strict(MusicCHN)
+		;If FPSfactor > 0 Or OptionsMenu = 2 Then 
+			If NowPlaying <> ShouldPlay Then ; playing the wrong clip, fade out
+				CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
+				If CurrMusicVolume = 0 Then
+					;If MusicCHN <> 0 Then StopChannel MusicCHN
+					If NowPlaying<66
+						StopStream_Strict(MusicCHN)
+					EndIf
+					NowPlaying = ShouldPlay
+					MusicCHN = 0
+					CurrMusic=0
 				EndIf
-				NowPlaying = ShouldPlay
-				MusicCHN = 0
-				CurrMusic=0
+			Else ; playing the right clip
+				CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * (0.1*FPSfactor)
 			EndIf
-		Else ; playing the right clip
-			CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * (0.1*FPSfactor)
-		EndIf
+		;EndIf
 		
-		If NowPlaying < 66
-			If CurrMusic = 0
-				MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
-				CurrMusic = 1
+			If NowPlaying < 66 Then
+				If CurrMusic = 0
+					MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
+					CurrMusic = 1
+				EndIf
+			;Else
+				;If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(Music(NowPlaying))
+			
+				SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
 			EndIf
-			SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
-		EndIf
+		
+		;ChannelVolume MusicCHN, CurrMusicVolume
 	Else
 		If FPSfactor > 0 Or OptionsMenu = 2 Then
 			;CurrMusicVolume = 1.0
