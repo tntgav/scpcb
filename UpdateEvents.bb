@@ -6375,7 +6375,9 @@ Function UpdateEvents()
 				;[Block]
 				If PlayerRoom = e\room Then
 					;the event is started when the player picks up SCP-1123 (in Items.bb/UpdateItems())
-					
+					If e\EventState>0 And e\EventState<7 Then
+						CanSave = False
+					EndIf
 					If e\EventState = 1 Then
 						;If e\SoundCHN = 0 Then
 						;	e\SoundCHN = 
@@ -6404,7 +6406,6 @@ Function UpdateEvents()
 						;ScaleEntity e\room\NPC[1]\obj, scale, scale, scale
 						
 						FreeEntity nazi
-						
 						PositionEntity Collider, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True),True
 						ResetEntity Collider
 						;PlaySound_Strict(HorrorSFX(9))
@@ -6424,20 +6425,19 @@ Function UpdateEvents()
 							e\SoundCHN = PlaySound_Strict(e\Sound)
 						EndIf
 						
-						
 						If e\EventState2 > 1000 Then
 							If e\Sound2=0 Then
 								e\Sound2 = LoadSound_Strict("SFX\Door\1123DoorOpen.ogg")
 								e\SoundCHN2 = PlaySound_Strict(e\Sound2)
 							EndIf
-							RotateEntity e\room\Objects[11], 0, CurveAngle(10, EntityYaw(e\room\Objects[11],0), 40), 0
-							
+							RotateEntity e\room\Objects[11], 0, CurveAngle(10, EntityYaw(e\room\Objects[11],0), 40), 0,False
 							If e\EventState2=>1040 And e\EventState2-FPSfactor<1040 Then 
 								PlaySound2(LoadTempSound("SFX\SCP\1123\Officer1.ogg"), Camera, e\room\NPC[0]\obj)
 							ElseIf e\EventState2=>1400 And e\EventState2-FPSfactor<1400 Then 
 								PlaySound2(LoadTempSound("SFX\SCP\1123\Officer2.ogg"), Camera, e\room\NPC[0]\obj)
 							EndIf
-							
+							e\room\NPC[0]\State = 3
+							AnimateNPC(e\room\NPC[0],3,26,0.2,True)
 							;Animate2(e\room\Objects[4], AnimTime(e\room\Objects[4]), 0, 8, 0.1, False)
 							If EntityDistance(Collider, e\room\Objects[4])>392*RoomScale Then
 								BlinkTimer = -10
@@ -6475,6 +6475,7 @@ Function UpdateEvents()
 								DrawHandIcon = True
 								If MouseHit1 Then
 									RotateEntity e\room\Objects[13], 0, 1, 0, False
+									RotateEntity e\room\Objects[11], 0, 90, 0, False
 									PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Horror.ogg"))
 								EndIf
 							EndIf							
@@ -6484,8 +6485,8 @@ Function UpdateEvents()
 							If EntityYaw(e\room\Objects[13], False)>30 Then
 								e\room\NPC[0]\State = 3
 								PointEntity e\room\NPC[0]\Collider, Collider
-								AnimateNPC(e\room\NPC[0], 570, 596, 0.5, False)
-								If e\room\NPC[0]\Frame => 596 Then
+								AnimateNPC(e\room\NPC[0], 27, 54, 0.5, False)
+								If e\room\NPC[0]\Frame => 54 Then
 									e\EventState = 5
 									e\EventState2 = 0
 									PositionEntity Collider, EntityX(e\room\obj,True),0.3,EntityZ(e\room\obj,True),True
@@ -6535,7 +6536,7 @@ Function UpdateEvents()
 						EndIf
 					ElseIf e\EventState = 6
 						PointEntity e\room\NPC[0]\Collider, Collider
-						
+						AnimateNPC(e\room\NPC[0], 75, 128, 0.04, True)	
 						If e\room\NPC[0]\Sound<>0 Then 
 							If e\room\NPC[0]\SoundChn<>0 Then
 								If (Not ChannelPlaying(e\room\NPC[0]\SoundChn)) Then 
@@ -6556,12 +6557,13 @@ Function UpdateEvents()
 						Injuries = PrevInjuries
 						Bloodloss = PrevBloodloss
 						SecondaryLightOn = PrevSecondaryLightOn
+						RotateEntity e\room\Objects[9],0,0,0,False
 						
 						PrevInjuries = 0
 						PrevBloodloss = 0
 						PrevSecondaryLightOn = 0.0
 						Crouch = False
-						
+						CanSave = True
 						For i = 0 To MaxItemAmount-1
 							If Inventory(i) <> Null Then
 								If Inventory(i)\itemtemplate\name = "Leaflet"
@@ -6578,6 +6580,7 @@ Function UpdateEvents()
 					End If
 				EndIf
 				;[End Block]
+				
 				
 				
 			Case "testroom"
