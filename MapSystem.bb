@@ -5094,14 +5094,16 @@ Function UpdateRooms()
 		EntityAlpha(GetChild(PlayerRoom\obj,2),1)
 		For i=0 To 3
 			If PlayerRoom\Adjacent[i]<>Null Then
-				x = Abs(EntityX(Collider,True)-EntityX(PlayerRoom\AdjDoor[i]\frameobj,True))
-				z = Abs(EntityZ(Collider,True)-EntityZ(PlayerRoom\AdjDoor[i]\frameobj,True))
-				If PlayerRoom\AdjDoor[i]\openstate = 0 Then
-					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-				ElseIf (Not EntityInView(PlayerRoom\AdjDoor[i]\frameobj,Camera))
-					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-				Else
-					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),1)
+				If PlayerRoom\AdjDoor[i]<>Null
+					x = Abs(EntityX(Collider,True)-EntityX(PlayerRoom\AdjDoor[i]\frameobj,True))
+					z = Abs(EntityZ(Collider,True)-EntityZ(PlayerRoom\AdjDoor[i]\frameobj,True))
+					If PlayerRoom\AdjDoor[i]\openstate = 0 Then
+						EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
+					ElseIf (Not EntityInView(PlayerRoom\AdjDoor[i]\frameobj,Camera))
+						EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
+					Else
+						EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),1)
+					EndIf
 				EndIf
 				
 				For j=0 To 3
