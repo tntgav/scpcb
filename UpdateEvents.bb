@@ -1689,7 +1689,7 @@ Function UpdateEvents()
 				;[End Block]
 			Case "endroom106"
 				;[Block]
-				If Contained106 Then
+				If (Not Contained106) Then
 					If e\EventState = 0 Then
 						If e\room\dist < 8 And e\room\dist > 0 Then
 							If Curr106\State < 0 Then 
@@ -1763,8 +1763,8 @@ Function UpdateEvents()
 						Else
 							AnimateNPC(Curr106, 112,206, 1.5, False)
 						EndIf
-						
-						If e\EventState > 35 Then
+						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.15/EntityDistance(e\room\NPC[0]\Collider, Collider)) * FPSfactor), CurrSpeed)
+						If e\EventState > 100 Then
 							;PlaySound2(OldManSFX(Rand(1,2)), Camera, e\room\NPC[0]\Collider)
 							
 							PositionEntity(Curr106\obj, EntityX(Curr106\Collider), -100.0, EntityZ(Curr106\Collider), True)
