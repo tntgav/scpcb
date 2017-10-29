@@ -306,7 +306,7 @@ Function UpdateMainMenu()
 				AAText (x + 20 * MenuScale, y + 150 * MenuScale, "Difficulty:")				
 				For i = SAFE To CUSTOM
 					If DrawTick(x + 20 * MenuScale, y + (180+30*i) * MenuScale, (SelectedDifficulty = difficulties(i))) Then SelectedDifficulty = difficulties(i)
-					
+					Color(difficulties(i)\r,difficulties(i)\g,difficulties(i)\b)
 					AAText(x + 60 * MenuScale, y + (180+30*i) * MenuScale, difficulties(i)\name)
 				Next
 				
