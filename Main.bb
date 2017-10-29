@@ -3717,7 +3717,7 @@ Function DrawEnding()
 		;	ShouldPlay = 13
 		;EndIf
 		
-		If EndingScreen = 0 Then 
+		If EndingScreen = 0 Then
 			EndingScreen = LoadImage_Strict("GFX\endingscreen.pt")
 			
 			ShouldPlay = 23
@@ -3864,6 +3864,7 @@ Type CreditsLine
 End Type
 
 Global CreditsTimer# = 0.0
+Global CreditsScreen%
 
 Function InitCredits()
 	Local cl.CreditsLine
@@ -3872,6 +3873,10 @@ Function InitCredits()
 	
 	CreditsFont% = LoadFont_Strict("GFX\font\cour\Courier New.ttf", Int(21 * (GraphicHeight / 1024.0)), 0,0,0)
 	CreditsFont2% = LoadFont_Strict("GFX\font\courbd\Courier New.ttf", Int(35 * (GraphicHeight / 1024.0)), 0,0,0)
+	
+	If CreditsScreen = 0
+		CreditsScreen = LoadImage_Strict("GFX\creditsscreen.pt")
+	EndIf
 	
 	Repeat
 		l = ReadLine(file)
@@ -3892,6 +3897,10 @@ Function DrawCredits()
 	Local LastCreditLine.CreditsLine
 	
     Cls
+	
+	If Rand(1,300)>1
+		DrawImage CreditsScreen, GraphicWidth/2-400, GraphicHeight/2-400
+	EndIf
 	
 	id = 0
 	endlinesamount = 0
@@ -3951,9 +3960,16 @@ Function DrawCredits()
 			EndIf
 		Next
 	EndIf
+	
+	If GetKey() Then CreditsTimer=-1
+	
 	If CreditsTimer=-1
 		FreeFont CreditsFont
 		FreeFont CreditsFont2
+		FreeImage CreditsScreen
+		CreditsScreen = 0
+		FreeImage EndingScreen
+		EndingScreen = 0
 		Delete Each CreditsLine
         NullGame(False)
         StopStream_Strict(MusicCHN)
