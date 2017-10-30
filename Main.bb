@@ -6670,6 +6670,11 @@ Function DrawGUI()
 								NTF_1499X# = 0.0
 								NTF_1499Y# = 0.0
 								NTF_1499Z# = 0.0
+								If Curr096<>Null
+									If Curr096\SoundChn<>0
+										SetStreamVolume_Strict(Curr096\SoundChn,0.0)
+									EndIf
+								EndIf
 								Exit
 							EndIf
 						Next

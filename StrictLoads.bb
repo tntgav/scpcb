@@ -284,6 +284,8 @@ Function UpdateStreamSoundOrigin(streamHandle%,cam%,entity%,range#=10,volume#=1.
 			
 			SetStreamVolume_Strict(streamHandle,volume#*(1-dist#)*SFXVolume#)
 			SetStreamPan_Strict(streamHandle,panvalue)
+		Else
+			SetStreamVolume_Strict(streamHandle,0.0)
 		EndIf
 	Else
 		If streamHandle <> 0 Then

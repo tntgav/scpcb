@@ -40,6 +40,7 @@ Bug fixes:
 - Fixed the doors in SCP-1123's event not being rotated correctly after reloading the save file.
 - Fixed guard's position in room2restroom.
 - Improved map generation algorithm.
+- Fixed SCP-096's scream still playing when the player teleports to the SCP-1499 dimension.
 
 ----------------------------------------------------------------------------------
 
