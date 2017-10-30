@@ -2,45 +2,46 @@
 
 - New Map Creator.
 - Added a credits screen after the ending screen.
-- Added own step sounds for SCP-939 and SCP-966.
-- The scientist possessed by SCP-035 can now be encountered after it's released from the chamber.
+- Added new step sounds for SCP-939 and SCP-966.
+- The scientist possessed by SCP-035 can now be encountered after he's released from the containment chamber.
 - MTF Units now inform the control if they want to scan the cameras.
 - New radio voice lines for the MTF-units.
 
-- The player can now run a bit more than before (by 10%).
+- The player can now run slightly longer than before (10 %).
 - The stamina will increase faster if the player is not walking and slower if the player walks.
 - Made SCP-106 slightly harder to shake off when it's chasing the player.
 
 - Moved the buttons for the entrance doors in SCP-012's chamber and in the server room in the entrance zone.
-- Revamped Class-D dead body texture.
+- Revamped dead Class D texture.
 - Some objects in certain areas will not render anymore if the player is outside of their specific rooms.
 - Removed the ability to use "<" and ">" characters in the save name as this caused a crash when trying to save the game.
-- Minor improvements in Server Room (room2servers) event.
+- Minor improvements in the Server Room (room2servers) event.
 - Improvements in SCP-1123 event:
-    - Optimized the Nazi model.
-    - The Nazi soldier now has a reload animation.
-- Optimized SCP-513-1's and SCP-096's model.
+    - Optimized Nazi officer model.
+    - The officer now has a reload animation.
+- Optimized SCP-513-1's and SCP-096's models.
 
 Bug fixes:
 - The SCP-106 victim doesn't float on top of the ceiling anymore.
 - Fixed the broken gravity system for SCP-860-1.
-- The texture of the S-Nav naviagtor's model isn't flipped anymore.
+- The texture of the S-Nav navigator's model isn't flipped anymore.
 - Fixed the refuse event of SCP-079 not playing.
-- SCP-1025 pages shouldn't take too long to load anymore.
-- Fixed certain waypoints not connecting in SCP-106's containment chamber.
-- Fixed a bug that caused SCP-096's speed to depend on the amount of FPS.
+- Reduced the loading times of the SCP-1025 pages.
+- Fixed certain disconnected waypoints in SCP-106's containment chamber.
+- Fixed a bug that caused SCP-096's speed to depend on the framerate.
 - Fixed the gravity system for all NPCs.
-- Fixed MTF unit's shooting timer being too high causing the MTF units not to shoot at the player for a long period of time.
-- Fixed the lighting glitch that occured after the maintenance tunnels have been generated.
+- Fixed MTF unit's shooting timer being too high, causing the MTF units not to shoot at the player for a long period of time.
+- Fixed a lighting glitch that occured after the maintenance tunnels have been generated.
 - SCP-049 will not reset after loading a save file and re-entering the surveillance room.
 - The fog should now properly reset to it's normal value after equipping the night vision goggles and loading a save file.
 - Fixed SCP-970 item duplication glitch.
 - Fixed player's path when he is affected by SCP-012.
-- Fixed SCP-294 crashing the game if the player just typed spacebars into the input.
+- Fixed SCP-294 crashing the game if uses a single whitespace as the input.
 - Fixed SCP-294's drinks not being transparent if their alpha value is set to 0.
 - Fixed the doors in SCP-1123's event not being rotated correctly after reloading the save file.
 - Fixed guard's position in room2restroom.
-- Improved map generation algorithm.
+- Fixed a map generation bug that occasionally caused rooms to be rotated to an invalid angle.
+- Fixed a bug that caused the RNG to break when using specific map seeds.
 - Fixed SCP-096's scream still playing when the player teleports to the SCP-1499 dimension.
 
 ----------------------------------------------------------------------------------
