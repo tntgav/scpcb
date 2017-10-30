@@ -533,7 +533,7 @@ Function UpdateMainMenu()
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
 					;height = 380 * MenuScale
-					height = 290 * MenuScale
+					height = 330 * MenuScale
 					DrawFrame(x, y, width, height)
 					
 					y=y+20*MenuScale
@@ -621,6 +621,16 @@ Function UpdateMainMenu()
 					If (MouseOn(x+310*MenuScale,y-6*MenuScale,150*MenuScale+14,20) And OnSliderID=0) Or OnSliderID=3
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
+					
+					y=y+50*MenuScale
+					
+					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Save textures in the VRAM:")
+					EnableVRam = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableVRam)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"vram")
+					EndIf
+					
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -1945,6 +1955,10 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 					G = 255
 					txt2 = "All particles are rendered."
 			End Select
+		Case "vram"
+			txt = "Textures that are stored in the Video-RAM will load faster, but this also has negative effects on the texture quality as well."
+			txt2 = "This option cannot be changed in-game."
+			R = 255
 			;[End Block]
 		;Sound options
 			;[Block]
