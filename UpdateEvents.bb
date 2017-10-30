@@ -6363,9 +6363,9 @@ Function UpdateEvents()
 						Case 0
 							;a dirty workaround to hide the pause when loading 966 model
 							If QuickLoadPercent = -1
-								LightBlink = 5.0
+								;LightBlink = 5.0
 								e\EventState = 1
-								PlaySound_Strict LightSFX
+								;PlaySound_Strict LightSFX
 								QuickLoadPercent = 0
 								QuickLoad_CurrEvent = e
 							EndIf
