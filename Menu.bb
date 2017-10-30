@@ -993,8 +993,8 @@ Function UpdateMainMenu()
 	
 	Color 255,255,255
 	AASetFont ConsoleFont
-	AAText 20,GraphicHeight-30,"v"+VersionNumber+" (build 06102017 CBT VRAM ON!)"
-		
+	AAText 20,GraphicHeight-30,"v"+VersionNumber
+	
 	;DrawTiledImageRect(MenuBack, 985 * MenuScale, 860 * MenuScale, 200 * MenuScale, 20 * MenuScale, 1200 * MenuScale, 866 * MenuScale, 300, 20 * MenuScale)
 	
 	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
