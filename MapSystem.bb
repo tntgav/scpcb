@@ -1261,6 +1261,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 					EntityType tile_entity,HIT_MAP
 					EntityFX tile_entity,1
 					EntityParent tile_entity,fr\Forest_Pivot
+					EntityPickMode tile_entity,2
 					
 					If it<>Null Then EntityParent it\collider,0
 					
@@ -1296,6 +1297,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 				
 				EntityType fr\DetailEntities[i],HIT_MAP
 				;EntityParent frame,fr\DetailEntities[i]
+				EntityPickMode fr\DetailEntities[i],2
 				
 				PositionEntity fr\DetailEntities[i],x+(tx*tile_size),y,z+(ty*tile_size)+(tile_size/2)-(tile_size*i),True
 				RotateEntity fr\DetailEntities[i],0,180*i,0
@@ -1986,11 +1988,13 @@ Function FillRoom(r.Rooms)
 			r\Objects[13]=LoadMesh_Strict("GFX\map\gateawall1.b3d",r\obj)
 			PositionEntity(r\Objects[13], r\x-4308.0*RoomScale, -1045.0*RoomScale, r\z+544.0*RoomScale, True)
 			EntityColor r\Objects[13], 25,25,25
+			EntityType r\Objects[13],HIT_MAP
 			;EntityFX(r\Objects[13],1)
 			
 			r\Objects[14]=LoadMesh_Strict("GFX\map\gateawall2.b3d",r\obj)
 			PositionEntity(r\Objects[14], r\x-3820.0*RoomScale, -1045.0*RoomScale, r\z+544.0*RoomScale, True)	
 			EntityColor r\Objects[14], 25,25,25
+			EntityType r\Objects[14],HIT_MAP
 			;EntityFX(r\Objects[14],1)
 			
 			r\Objects[15]=CreatePivot(r\obj)
@@ -2340,12 +2344,12 @@ Function FillRoom(r.Rooms)
 			EntityParent(r\Objects[0], r\obj)
 			
 			r\Objects[1] = CreatePivot()
-			;r\x + 1312.0*RoomScale, 0.5, r\z+448.0*RoomScale
-			PositionEntity(r\Objects[1], r\x + 1270.0*RoomScale, 0.5, r\z+570.0*RoomScale)
-			EntityParent(r\Objects[1], r\obj)			
+			;PositionEntity(r\Objects[1], r\x + 1270.0*RoomScale, 0.5, r\z+570.0*RoomScale)
+			PositionEntity(r\Objects[1], r\x + 1530.0*RoomScale, 0.5, r\z+512.0*RoomScale)
+			EntityParent(r\Objects[1], r\obj)
 			
 			r\Objects[2] = CreatePivot()
-			PositionEntity(r\Objects[2], r\x + 1248.0*RoomScale, 0.01, r\z+384.0*RoomScale)
+			PositionEntity(r\Objects[2], r\x + 1535.0*RoomScale, r\y+150.0*RoomScale, r\z+512.0*RoomScale)
 			EntityParent(r\Objects[2], r\obj)
 			;[End Block]
 		Case "room2storage"
@@ -2815,7 +2819,7 @@ Function FillRoom(r.Rooms)
 			;[Block]
 			d = CreateDoor(r\zone, r\x - 400.0 * RoomScale, 0, r\z, -90, r, False, False, 3)
 			d = CreateDoor(r\zone, r\x, 0, r\z - 480.0 * RoomScale, 180, r, False, False, 3)
-			 ;: d\buttons[0] = False
+			;: d\buttons[0] = False
 			;PositionEntity (d\buttons[0], EntityX(d\buttons[0],True), EntityY(d\buttons[0],True), r\z + 288.0 * RoomScale, True)
 			;PositionEntity (d\buttons[1], EntityX(d\buttons[1],True), EntityY(d\buttons[1],True), r\z + 320.0 * RoomScale, True)
 			
@@ -2833,7 +2837,7 @@ Function FillRoom(r.Rooms)
 			PositionEntity(r\Objects[1], r\x + 64.0 * RoomScale, 0.5, r\z - 640.0 * RoomScale, True)
 			
 			r\Objects[2] = CreatePivot(r\obj)
-			PositionEntity(r\Objects[2], r\x - 608.0 * RoomScale, 0.5, r\z, True)
+			PositionEntity(r\Objects[2], r\x, 0.5, r\z, True)
 			
 			r\Objects[3] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[3], r\x + 320.0 * RoomScale, 0.5, r\z + 704.0 * RoomScale, True)
@@ -3130,8 +3134,8 @@ Function FillRoom(r.Rooms)
 		Case "room012"
 			;[Block]
 			d.Doors = CreateDoor(r\zone, r\x + 264.0 * RoomScale, 0.0, r\z + 672.0 * RoomScale, 270, r, False, False, 3)
-			PositionEntity(d\buttons[0], r\x + 224.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 880.0 * RoomScale, True)
-			PositionEntity(d\buttons[1], r\x + 304.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 840.0 * RoomScale, True)	
+			PositionEntity(d\buttons[0], r\x + 224.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 540.0 * RoomScale, True)
+			PositionEntity(d\buttons[1], r\x + 304.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 840.0 * RoomScale, True)
 			TurnEntity d\buttons[1],0,0,0,True
 			
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x -512.0 * RoomScale, -768.0*RoomScale, r\z -336.0 * RoomScale, 0, r, False, False)
@@ -3278,8 +3282,10 @@ Function FillRoom(r.Rooms)
 			RotateEntity(r\Objects[4+1], -81, -180, 0)
 			
 			;096 spawnpoint
+;			r\Objects[6]=CreatePivot(r\obj)
+;			PositionEntity(r\Objects[6], r\x - 848*RoomScale, 0.5, r\z-576*RoomScale, True)
 			r\Objects[6]=CreatePivot(r\obj)
-			PositionEntity(r\Objects[6], r\x - 848*RoomScale, 0.5, r\z-576*RoomScale, True)
+			PositionEntity(r\Objects[6],r\x-320*RoomScale,0.5,r\z,True)
 			;guard spawnpoint
 			r\Objects[7]=CreatePivot(r\obj)
 			PositionEntity(r\Objects[7], r\x - 1328.0 * RoomScale, 0.5, r\z + 528*RoomScale, True)
@@ -4532,7 +4538,7 @@ Function FillRoom(r.Rooms)
 		Case "room2servers2"
 			;[Block]
 			d.Doors = CreateDoor(r\zone, r\x + 264.0 * RoomScale, 0.0, r\z + 672.0 * RoomScale, 270, r, False, False, 3)
-			PositionEntity(d\buttons[0], r\x + 224.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 880.0 * RoomScale, True)
+			PositionEntity(d\buttons[0], r\x + 224.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 510.0 * RoomScale, True)
 			PositionEntity(d\buttons[1], r\x + 304.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 840.0 * RoomScale, True)	
 			TurnEntity d\buttons[1],0,0,0,True
 			d.Doors = CreateDoor(r\zone, r\x -512.0 * RoomScale, -768.0*RoomScale, r\z -336.0 * RoomScale, 0, r, False, False, 3)
@@ -4947,7 +4953,6 @@ Function FillRoom(r.Rooms)
 		r\TriggerboxAmount = r\RoomTemplate\TempTriggerboxAmount
 		For i = 0 To r\TriggerboxAmount-1
 			r\Triggerbox[i] = CopyEntity(r\RoomTemplate\TempTriggerbox[i],r\obj)
-			EntityAlpha r\Triggerbox[i],0.0
 			r\TriggerboxName[i] = r\RoomTemplate\TempTriggerboxName[i]
 			DebugLog "Triggerbox found: "+i
 			DebugLog "Triggerbox "+i+" name: "+r\TriggerboxName[i]
@@ -5062,6 +5067,21 @@ Function UpdateRooms()
 					Exit
 				EndIf
 			Next
+			If DebugHUD
+				If r\TriggerboxAmount>0
+					For i=0 To r\TriggerboxAmount-1
+						EntityColor r\Triggerbox[i],255,255,0
+						EntityAlpha r\Triggerbox[i],0.2
+					Next
+				EndIf
+			Else
+				If r\TriggerboxAmount>0
+					For i=0 To r\TriggerboxAmount-1
+						EntityColor r\Triggerbox[i],255,255,255
+						EntityAlpha r\Triggerbox[i],0.0
+					Next
+				EndIf
+ 			EndIf
 		EndIf
 	Next
 	
@@ -5074,16 +5094,16 @@ Function UpdateRooms()
 		EntityAlpha(GetChild(PlayerRoom\obj,2),1)
 		For i=0 To 3
 			If PlayerRoom\Adjacent[i]<>Null Then
-				x = Abs(EntityX(Collider,True)-EntityX(PlayerRoom\AdjDoor[i]\frameobj,True))
-				z = Abs(EntityZ(Collider,True)-EntityZ(PlayerRoom\AdjDoor[i]\frameobj,True))
-				If PlayerRoom\AdjDoor[i]\openstate = 0 Then
-					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-				;ElseIf Abs(DeltaYaw(Camera,PlayerRoom\Adjacent[i]\obj))>90+(((8.0-Max(x,z))/8.0)*90.0) Then
-				;	EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-				ElseIf (Not EntityInView(PlayerRoom\AdjDoor[i]\frameobj,Camera))
-					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-				Else
-					EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),1)
+				If PlayerRoom\AdjDoor[i]<>Null
+					x = Abs(EntityX(Collider,True)-EntityX(PlayerRoom\AdjDoor[i]\frameobj,True))
+					z = Abs(EntityZ(Collider,True)-EntityZ(PlayerRoom\AdjDoor[i]\frameobj,True))
+					If PlayerRoom\AdjDoor[i]\openstate = 0 Then
+						EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
+					ElseIf (Not EntityInView(PlayerRoom\AdjDoor[i]\frameobj,Camera))
+						EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
+					Else
+						EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),1)
+					EndIf
 				EndIf
 				
 				For j=0 To 3
@@ -5765,8 +5785,6 @@ Function UpdateSecurityCams()
 	CatchErrors("Uncaught (UpdateSecurityCams)")
 	Local sc.SecurityCams
 	
-	PlayerDetected = False
-	
 	;coffineffect = 0, not affected by 895
 	;coffineffect = 1, constantly affected by 895
 	;coffineffect = 2, 079 can broadcast 895 feed on this screen
@@ -5797,7 +5815,9 @@ Function UpdateSecurityCams()
 				If sc\FollowPlayer Then
 					If sc<>CoffinCam
 						If EntityVisible(sc\CameraObj,Camera)
-							PlayerDetected = True
+							If MTF_CameraCheckTimer>0.0
+								MTF_CameraCheckDetected=True
+							EndIf
 						EndIf
 					EndIf
 					PointEntity(sc\CameraObj, Camera)
@@ -5842,7 +5862,9 @@ Function UpdateSecurityCams()
 					If sc<>CoffinCam
 						If (Abs(DeltaYaw(sc\CameraObj,Camera))<60.0)
 							If EntityVisible(sc\CameraObj,Camera)
-								PlayerDetected = True
+								If MTF_CameraCheckTimer>0.0
+									MTF_CameraCheckDetected=True
+								EndIf
 							EndIf
 						EndIf
 					EndIf
@@ -6654,11 +6676,7 @@ Function CreateMap()
 	
 	Local zone%
 	
-	Local strtemp$ = ""
-	For i = 1 To Len(RandomSeed)
-		strtemp = strtemp+Asc(Mid(RandomSeed,i,1))
-	Next
-	SeedRnd Abs(Int(strtemp))
+	SeedRnd GenerateSeedNumber(RandomSeed)
 	
 	Dim MapName$(MapWidth, MapHeight)
 	
@@ -7299,6 +7317,9 @@ Function CreateMap()
 	Next
 	
 	For r.Rooms = Each Rooms
+		If r\angle >= 360
+            r\angle = r\angle-360
+        EndIf
 		r\Adjacent[0]=Null
 		r\Adjacent[1]=Null
 		r\Adjacent[2]=Null
@@ -7708,12 +7729,8 @@ Dim CHUNKDATA(64,64)
 
 Function SetChunkDataValues()
 	Local StrTemp$,i%,j%
-	
 	StrTemp$ = ""
-	For i = 1 To Len(RandomSeed)
-		StrTemp = StrTemp+Asc(Mid(RandomSeed,i,1))
-	Next
-	SeedRnd Abs(Int(StrTemp))
+	SeedRnd GenerateSeedNumber(RandomSeed)
 	
 	For i = 0 To 63
 		For j = 0 To 63
@@ -7738,12 +7755,8 @@ Function CreateChunkParts(r.Rooms)
 	Local i%,StrTemp$,j%
 	Local chp.ChunkPart,chp2.ChunkPart
 	Local obj%
-	
 	StrTemp$ = ""
-	For i = 1 To Len(RandomSeed)
-		StrTemp = StrTemp+Asc(Mid(RandomSeed,i,1))
-	Next
-	SeedRnd Abs(Int(StrTemp))
+	SeedRnd GenerateSeedNumber(RandomSeed)
 	
 	For i = 0 To ChunkAmount%
 		Local loc% = GetINISectionLocation(File$,"chunk"+i)
@@ -8056,7 +8069,7 @@ Function CalculateRoomTemplateExtents(r.RoomTemplates)
 	r\MaxY = Mesh_MaxY
 	r\MaxZ = Mesh_MaxZ
 	
-	DebugLog("roomtemplateextents: "+r\minx+", "+r\miny	+", "+r\minz	+", "+r\maxx	+", "+r\maxy+", "+r\maxz)
+	DebugLog("roomtemplateextents: "+r\MinX+", "+r\MinY	+", "+r\MinZ	+", "+r\MaxX	+", "+r\MaxY+", "+r\MaxZ)
 End Function
 
 Function CalculateRoomExtents(r.Rooms)

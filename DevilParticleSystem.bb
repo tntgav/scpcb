@@ -246,6 +246,7 @@ Else
 	e\owner = owner
 EndIf
 e\ent = CreateMesh()
+NameEntity(e\ent,"Emitter3")
 e\surf = CreateSurface(e\ent)
 e\tmp = Object.Template(template)
 e\max_time = e\tmp\emitter_max_time

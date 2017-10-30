@@ -16,21 +16,11 @@
 Function LoadImage_Strict(file$)
 	If FileType(file$)<>1 Then RuntimeError "Image " + Chr(34) + file$ + Chr(34) + " missing. "
 	tmp = LoadImage(file$)
-	
-	;attempt to load the image again
-	If tmp = 0 Then LoadImage(file)
-	
-	If tmp = 0 Then
-		;if loading failed again, add an error message to the console and return a black image
-		CreateConsoleMsg("Loading image " + Chr(34) + file$ + Chr(34) + " failed.")
-		If ConsoleOpening Then
-			ConsoleOpen = True
-		EndIf
-		
-		Return MenuBlack
-	EndIf
-	
 	Return tmp
+	;attempt to load the image again
+	If tmp = 0 Then tmp2 = LoadImage(file)
+	DebugLog "Attempting to load again: "+file
+	Return tmp2
 End Function
 
 
@@ -294,6 +284,8 @@ Function UpdateStreamSoundOrigin(streamHandle%,cam%,entity%,range#=10,volume#=1.
 			
 			SetStreamVolume_Strict(streamHandle,volume#*(1-dist#)*SFXVolume#)
 			SetStreamPan_Strict(streamHandle,panvalue)
+		Else
+			SetStreamVolume_Strict(streamHandle,0.0)
 		EndIf
 	Else
 		If streamHandle <> 0 Then
@@ -320,7 +312,7 @@ End Function
 ;don't use in LoadRMesh, as Reg does this manually there. If you wanna fuck around with the logic in that function, be my guest 
 Function LoadTexture_Strict(File$,flags=1)
 	If FileType(File$) <> 1 Then RuntimeError "Texture " + File$ + " not found."
-	tmp = LoadTexture(File$, flags)
+	tmp = LoadTexture(File$, flags+(256*(EnableVRam=True)))
 	If tmp = 0 Then RuntimeError "Failed to load Texture: " + File$ 
 	Return tmp 
 End Function   

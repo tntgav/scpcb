@@ -277,6 +277,8 @@ Function UpdateMainMenu()
 				CurrSave = Replace(CurrSave,".","")
 				CurrSave = Replace(CurrSave,"/","")
 				CurrSave = Replace(CurrSave,"\","")
+				CurrSave = Replace(CurrSave,"<","")
+				CurrSave = Replace(CurrSave,">","")
 				
 				Color 255,255,255
 				If SelectedMap = "" Then
@@ -304,7 +306,7 @@ Function UpdateMainMenu()
 				AAText (x + 20 * MenuScale, y + 150 * MenuScale, "Difficulty:")				
 				For i = SAFE To CUSTOM
 					If DrawTick(x + 20 * MenuScale, y + (180+30*i) * MenuScale, (SelectedDifficulty = difficulties(i))) Then SelectedDifficulty = difficulties(i)
-					
+					Color(difficulties(i)\r,difficulties(i)\g,difficulties(i)\b)
 					AAText(x + 60 * MenuScale, y + (180+30*i) * MenuScale, difficulties(i)\name)
 				Next
 				
@@ -365,11 +367,8 @@ Function UpdateMainMenu()
 					If RandomSeed = "" Then
 						RandomSeed = Abs(MilliSecs())
 					EndIf
-					Local strtemp$ = ""
-					For i = 1 To Len(RandomSeed)
-						strtemp = strtemp+Asc(Mid(RandomSeed,i,1))
-					Next
-					SeedRnd Abs(Int(strtemp))
+					
+					SeedRnd GenerateSeedNumber(RandomSeed)
 					
 					Local SameFound% = False
 					
@@ -380,6 +379,7 @@ Function UpdateMainMenu()
 					If SameFound > 0 Then CurrSave = CurrSave + " (" + (SameFound + 1) + ")"
 					
 					LoadEntities()
+					LoadAllSounds()
 					InitNewGame()
 					MainMenuOpen = False
 					FlushKeys()
@@ -431,6 +431,7 @@ Function UpdateMainMenu()
 						If SaveMSG = "" Then
 							If DrawButton(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Load", False) Then
 								LoadEntities()
+								LoadAllSounds()
 								LoadGame(SavePath + SaveGames(i - 1) + "\")
 								CurrSave = SaveGames(i - 1)
 								InitLoadGame()
@@ -496,20 +497,24 @@ Function UpdateMainMenu()
 				width = 580 * MenuScale
 				height = 60 * MenuScale
 				DrawFrame(x, y, width, height)
+				
+				Color 0,255,0
+				If MainMenuTab = 3
+					Rect(x+15*MenuScale,y+10*MenuScale,(width/5)+10*MenuScale,(height/2)+10*MenuScale,True)
+				ElseIf MainMenuTab = 5
+					Rect(x+155*MenuScale,y+10*MenuScale,(width/5)+10*MenuScale,(height/2)+10*MenuScale,True)
+				ElseIf MainMenuTab = 6
+					Rect(x+295*MenuScale,y+10*MenuScale,(width/5)+10*MenuScale,(height/2)+10*MenuScale,True)
+				ElseIf MainMenuTab = 7
+					Rect(x+435*MenuScale,y+10*MenuScale,(width/5)+10*MenuScale,(height/2)+10*MenuScale,True)
+				EndIf
+				
+				Color 255,255,255
 				If DrawButton(x+20*MenuScale,y+15*MenuScale,width/5,height/2, "GRAPHICS", False) Then MainMenuTab = 3
 				If DrawButton(x+160*MenuScale,y+15*MenuScale,width/5,height/2, "AUDIO", False) Then MainMenuTab = 5
 				If DrawButton(x+300*MenuScale,y+15*MenuScale,width/5,height/2, "CONTROLS", False) Then MainMenuTab = 6
 				If DrawButton(x+440*MenuScale,y+15*MenuScale,width/5,height/2, "ADVANCED", False) Then MainMenuTab = 7
-				Color 0,255,0
-				If MainMenuTab = 3
-					Rect x+20*MenuScale,y+15*MenuScale,width/5,height/2,False
-				ElseIf MainMenuTab = 5
-					Rect x+160*MenuScale,y+15*MenuScale,width/5,height/2,False
-				ElseIf MainMenuTab = 6
-					Rect x+300*MenuScale,y+15*MenuScale,width/5,height/2,False
-				ElseIf MainMenuTab = 7
-					Rect x+440*MenuScale,y+15*MenuScale,width/5,height/2,False
-				EndIf
+				
 				AASetFont Font1
 				y = y + 70 * MenuScale
 				
@@ -528,7 +533,7 @@ Function UpdateMainMenu()
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
 					;height = 380 * MenuScale
-					height = 290 * MenuScale
+					height = 330 * MenuScale
 					DrawFrame(x, y, width, height)
 					
 					y=y+20*MenuScale
@@ -616,6 +621,16 @@ Function UpdateMainMenu()
 					If (MouseOn(x+310*MenuScale,y-6*MenuScale,150*MenuScale+14,20) And OnSliderID=0) Or OnSliderID=3
 						DrawOptionsTooltip(tx,ty,tw,th+100*MenuScale,"texquality")
 					EndIf
+					
+					y=y+50*MenuScale
+					
+					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Save textures in the VRAM:")
+					EnableVRam = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableVRam)
+					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"vram")
+					EndIf
+					
 					;[End Block]
 				ElseIf MainMenuTab = 5 ;Audio
 					;[Block]
@@ -985,6 +1000,10 @@ Function UpdateMainMenu()
 		End Select
 		
 	End If
+	
+	Color 255,255,255
+	AASetFont ConsoleFont
+	AAText 20,GraphicHeight-30,"v"+VersionNumber
 	
 	;DrawTiledImageRect(MenuBack, 985 * MenuScale, 860 * MenuScale, 200 * MenuScale, 20 * MenuScale, 1200 * MenuScale, 866 * MenuScale, 300, 20 * MenuScale)
 	
@@ -1423,7 +1442,7 @@ Function DrawLoading(percent%, shortloading=False)
 		AAText(GraphicWidth / 2, GraphicHeight / 2 - 100, "LOADING - " + percent + " %", True, True)
 		
 		If percent = 100 Then 
-			If firstloop And SelectedLoadingScreen\title <> "CWM" Then PlaySound_Strict HorrorSFX(8)
+			If firstloop And SelectedLoadingScreen\title <> "CWM" Then PlaySound_Strict LoadTempSound(("SFX\Horror\Horror8.ogg"))
 			AAText(GraphicWidth / 2, GraphicHeight - 50, "PRESS ANY KEY TO CONTINUE", True, True)
 		Else
 			FlushKeys()
@@ -1936,6 +1955,10 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 					G = 255
 					txt2 = "All particles are rendered."
 			End Select
+		Case "vram"
+			txt = "Textures that are stored in the Video-RAM will load faster, but this also has negative effects on the texture quality as well."
+			txt2 = "This option cannot be changed in-game."
+			R = 255
 			;[End Block]
 		;Sound options
 			;[Block]

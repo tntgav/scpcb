@@ -246,7 +246,7 @@ Function SaveGame(file$)
 		
 		For i=0 To 10
 			If r\Levers[i]<>0 Then
-				If EntityPitch(r\Levers[i],True) > 0 Then ;p��ll�
+				If EntityPitch(r\Levers[i],True) > 0 Then ;p??????ll???
 					WriteByte(f,1)
 				Else
 					WriteByte(f,0)
@@ -436,7 +436,8 @@ Function SaveGame(file$)
 	Else
 		WriteInt f, 994
 	EndIf
-	
+	WriteFloat f, CameraFogFar
+	WriteFloat f, StoredCameraFogFar
 	CloseFile f
 	
 	If Not MenuOpen Then
@@ -708,6 +709,10 @@ Function LoadGame(file$)
 		level = ReadInt(f)
 		
 		temp2 = ReadByte(f)		
+		
+		If angle >= 360
+            angle = angle-360
+        EndIf
 		
 		For rt.roomtemplates = Each RoomTemplates
 			If rt\id = roomtemplateID Then
@@ -1070,6 +1075,12 @@ Function LoadGame(file$)
 		DebugLog "Used Console"
 	EndIf
 	
+	CameraFogFar = ReadFloat(f)
+    StoredCameraFogFar = ReadFloat(f)
+	If CameraFogFar = 0 Then
+		CameraFogFar = 6
+	EndIf	
+	
 	CloseFile f
 	
 	For r.Rooms = Each Rooms
@@ -1413,6 +1424,10 @@ Function LoadGameQuick(file$)
 		
 		temp2 = ReadByte(f)	
 		
+		If angle >= 360
+            angle = angle-360
+        EndIf
+		
 		For r.Rooms = Each Rooms
 			If r\x = x And r\z = z Then
 				Exit
@@ -1740,6 +1755,11 @@ Function LoadGameQuick(file$)
 	EntityTexture NVOverlay,NVTexture
 	RestoreSanity = True
 	
+	CameraFogFar = ReadFloat(f)
+    StoredCameraFogFar = ReadFloat(f)
+	If CameraFogFar = 0 Then
+		CameraFogFar = 6
+	EndIf	
 	CloseFile f
 	
 	CatchErrors("LoadGameQuick")
@@ -1848,15 +1868,18 @@ Function LoadMap(file$)
 		For rt.RoomTemplates=Each RoomTemplates
 			If Lower(rt\Name) = name Then
                 
-                r.Rooms = CreateRoom(0, rt\Shape, x * 8.0, 0, y * 8.0, name)
+                r.Rooms = CreateRoom(0, rt\Shape, (MapWidth-x) * 8.0, 0, y * 8.0, name)
 				DebugLog "createroom"
 				
                 r\angle = angle
-                If rt\Shape = ROOM2C Then r\angle = r\angle+90 Else r\angle = r\angle-180
+                If r\angle<>90 And r\angle<>270
+					r\angle = r\angle + 180
+				EndIf
+				r\angle = WrapAngle(r\angle)
                 
                 TurnEntity(r\obj, 0, r\angle, 0)
                 
-                MapTemp(x,y)=1
+                MapTemp(MapWidth-x,y)=1
                 
                 Exit
 			EndIf
@@ -1866,10 +1889,12 @@ Function LoadMap(file$)
 		prob# = ReadFloat(f)
 		
 		If r<>Null Then
-			If Rnd(0.0,1.0)<prob Or prob=0 Then
-                e.Events = New Events
-                e\EventName = name
-                e\room = r   
+			If prob>0.0
+				If Rnd(0.0,1.0)<=prob
+					e.Events = New Events
+					e\EventName = name
+					e\room = r   
+				EndIf
 			EndIf
 		EndIf
 		
@@ -1877,9 +1902,11 @@ Function LoadMap(file$)
 	
 	CloseFile f
 	
-	temp = 0
+	Local temp = 0, zone
 	Local spacing# = 8.0
-	For y = MapHeight - 1 To 1 Step - 1
+	Local shouldSpawnDoor% = False
+	;For y = MapHeight - 1 To 1 Step - 1
+	For y = MapHeight To 0 Step -1
 		
 		If y < MapHeight/3+1 Then
 			zone=3
@@ -1889,20 +1916,71 @@ Function LoadMap(file$)
 			zone=1
 		EndIf
 		
-		For x = 1 To MapWidth - 2
+		;For x = 1 To MapWidth - 2
+		For x = MapWidth To 0 Step -1
 			If MapTemp(x,y) > 0 Then
-                If zone = 2 Then temp = 2 Else temp=0
+				If zone = 2 Then temp=2 Else temp=0
                 
                 For r.Rooms = Each Rooms
 					If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
-						If MapTemp(x + 1, y) > 0 Then
-							d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), temp)
-							r\AdjDoor[0] = d
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=90 Or r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=0 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=0 Or r\angle=180 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (x+1)<(MapWidth+1)
+								If MapTemp(x + 1, y) > 0 Then
+									d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), temp)
+									r\AdjDoor[0] = d
+								EndIf
+							EndIf
 						EndIf
 						
-						If MapTemp(x, y + 1) > 0 Then
-							d.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), temp)
-							r\AdjDoor[3] = d
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=0 Or r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=180 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=180 Or r\angle=90 Or r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (y+1)<(MapHeight+1)
+								If MapTemp(x, y + 1) > 0 Then
+									d.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), temp)
+									r\AdjDoor[3] = d
+								EndIf
+							EndIf
 						EndIf
 						
 						Exit
@@ -1912,15 +1990,20 @@ Function LoadMap(file$)
 			End If
 			
 		Next
-	Next   
+	Next
 	
-	r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "173")
-	r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, (MapHeight-1) * 8, "pocketdimension")
-	r = CreateRoom(0, ROOM1, 0, 0, 8, "gatea")
+	;r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "173")
+	;r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, (MapHeight-1) * 8, "pocketdimension")
+	;r = CreateRoom(0, ROOM1, 0, 0, 8, "gatea")
+	If IntroEnabled Then r = CreateRoom(0, ROOM1, 8, 0, (MapHeight+2) * 8, "173")
+	r = CreateRoom(0, ROOM1, (MapWidth+2) * 8, 0, (MapHeight+2) * 8, "pocketdimension")
+	r = CreateRoom(0, ROOM1, 0, 0, -16, "gatea")
+	r = CreateRoom(0, ROOM1, -16, 800, 0, "dimension1499")
 	
 	CreateEvent("173", "173", 0)
 	CreateEvent("pocketdimension", "pocketdimension", 0)   
 	CreateEvent("gatea", "gatea", 0)
+	CreateEvent("dimension1499", "dimension1499", 0)
 	
 	For r.Rooms = Each Rooms
 		r\Adjacent[0]=Null
