@@ -217,7 +217,11 @@ Function UpdateEvents()
 											PlaySound_Strict(IntroSFX(11))
 											BlinkTimer = -10
 											PlaySound2 (StoneDragSFX, Camera, Curr173\Collider)
-											PositionEntity Curr173\Collider, 0,0,0
+											If EntityDistance(Curr173\Collider,Collider)<2.5 And Abs(EntityY(Collider)-EntityY(Curr173\Collider))<1.0 Then
+                                                PositionEntity Curr173\Collider, EntityX(Collider),EntityY(Collider),EntityZ(Collider)
+                                            Else
+                                                PositionEntity Curr173\Collider, 0,0,0
+                                            EndIf
 											ResetEntity Curr173\Collider
 											Msg = "Hold "+KeyName(KEY_SPRINT)+" to run."
 											MsgTimer = 70*8
