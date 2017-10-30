@@ -5,6 +5,7 @@
 - Added own step sounds for SCP-939 and SCP-966.
 - The scientist possessed by SCP-035 can now be encountered after it's released from the chamber.
 - MTF Units now inform the control if they want to scan the cameras.
+- New radio voice lines for the MTF-units.
 
 - The player can now run a bit more than before (by 10%).
 - The stamina will increase faster if the player is not walking and slower if the player walks.

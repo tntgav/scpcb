@@ -348,7 +348,7 @@ Include "Difficulty.bb"
 Global MTFtimer#, MTFrooms.Rooms[10], MTFroomState%[10]
 
 Dim RadioState#(10)
-Dim RadioState3%(3)
+Dim RadioState3%(10)
 Dim RadioState4%(9)
 Dim RadioCHN%(8)
 
@@ -6162,7 +6162,25 @@ Function DrawGUI()
 													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random4.ogg"))	
 													RadioState(3) = RadioState(3)+1	
 													RadioState3(3) = True
-												EndIf		
+												EndIf
+											Case 1600
+												If Not RadioState3(4) Then
+													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random5.ogg"))	
+													RadioState(3) = RadioState(3)+1
+													RadioState3(4) = True
+												EndIf
+											Case 2000
+												If Not RadioState3(5) Then
+													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random6.ogg"))	
+													RadioState(3) = RadioState(3)+1
+													RadioState3(5) = True
+												EndIf
+											Case 2400
+												If Not RadioState3(6) Then
+													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random7.ogg"))	
+													RadioState(3) = RadioState(3)+1
+													RadioState3(6) = True
+												EndIf
 										End Select
 									EndIf
 								Case 4
@@ -6179,11 +6197,13 @@ Function DrawGUI()
 											
 											Select RadioState(4)
 												Case 10
-													If Not RadioState4(0) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\OhGod.ogg"))
-														RadioState(4) = RadioState(4)+1
-														RadioState4(0) = True
-													EndIf													
+													If (Not Contained106)
+														If Not RadioState4(0) Then
+															RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\OhGod.ogg"))
+															RadioState(4) = RadioState(4)+1
+															RadioState4(0) = True
+														EndIf
+													EndIf
 												Case 100
 													If Not RadioState4(1) Then
 														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter2.ogg"))
