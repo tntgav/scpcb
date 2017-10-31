@@ -7,9 +7,7 @@
 ***********************************************************************************
 
 				 www.scpcbgame.com
-
-				   VERSION 1.3.8
-								
+							
 
 
 The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
