@@ -1,19 +1,17 @@
-﻿v1.3.9
+v1.3.9
 
-- New Map Creator.
-- Added a credits screen after the ending screen.
+- Revamped Map Creator.
+- Added credits after the endings.
 - Added new step sounds for SCP-939 and SCP-966.
-- The scientist possessed by SCP-035 can now be encountered after he's released from the containment chamber.
-- MTF Units now inform the control if they want to scan the cameras.
-- New radio voice lines for the MTF-units.
-
-- The player can now run slightly longer than before (10 %).
-- The stamina will increase faster if the player is not walking and slower if the player walks.
-- Made SCP-106 slightly harder to shake off when it's chasing the player.
-
-- Moved the buttons for the entrance doors in SCP-012's chamber and in the server room in the entrance zone.
+- The scientist possessed by SCP-035 can now be encountered after he's released from SCP-035's containment chamber.
+- MTF Units now inform command that they want to scan the cameras.
+- New radio voice lines for the Mobile Task Force units.
+- The player can now run slightly longer than before (10%).
+- Stamina will increase faster if the player is not walking and slower if the player walks.
+- Made SCP-106 slightly harder to escape when chasing the player.
+- Moved the buttons for the doors in SCP-012's chamber, and in the Entrance Zone's server room.
 - Revamped dead Class D texture.
-- Some objects in certain areas will not render anymore if the player is outside of their specific rooms.
+- Some objects in certain areas will not render anymore if the player is outside of view distance.
 - Removed the ability to use "<" and ">" characters in the save name as this caused a crash when trying to save the game.
 - Minor improvements in the Server Room (room2servers) event.
 - Improvements in SCP-1123 event:
