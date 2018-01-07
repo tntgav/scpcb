@@ -2565,6 +2565,8 @@ Function InitEvents()
 	
 	CreateEvent("room2pit106", "room2pit", 0, 0.07 + (0.1*SelectedDifficulty\aggressiveNPCs))
 	
+	CreateEvent("room1archive", "room1archive", 0, 1.0)
+	
 End Function
 
 Include "UpdateEvents.bb"
