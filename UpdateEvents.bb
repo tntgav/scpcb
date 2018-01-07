@@ -2687,6 +2687,7 @@ Function UpdateEvents()
 					
 					If e\EventState = 0 Then
 						If e\room\dist < 8 Then
+							HideEntity e\room\Objects[3]
 							If (MilliSecs2() Mod 1500) < 800 Then
 								ShowEntity e\room\Objects[4]
 							Else
