@@ -6844,7 +6844,11 @@ Function DrawMenu()
 	CatchErrors("Uncaught (DrawMenu)")
 	
 	Local x%, y%, width%, height%
-	
+	If api_GetFocus() = 0 Then ;Game is out of focus -> pause the game
+        MenuOpen = True
+        PauseSounds()
+        Delay 1000 ;Reduce the CPU take while game is not in focus
+    EndIf
 	If MenuOpen Then
 		
 		;DebugLog AchievementsMenu+"|"+OptionsMenu+"|"+QuitMSG
