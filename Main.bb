@@ -10958,10 +10958,13 @@ Function RenderWorld2()
 			
 			AASetFont Font3
 			
-			AAText GraphicWidth/2,20*MenuScale,"REFRESHING DATA IN",True,False
+			Local plusY% = 0
+			If hasBattery=1 Then plusY% = 40
 			
-			AAText GraphicWidth/2,60*MenuScale,Max(f2s(NVTimer/60.0,1),0.0),True,False
-			AAText GraphicWidth/2,100*MenuScale,"SECONDS",True,False
+			AAText GraphicWidth/2,(20+plusY)*MenuScale,"REFRESHING DATA IN",True,False
+			
+			AAText GraphicWidth/2,(60+plusY)*MenuScale,Max(f2s(NVTimer/60.0,1),0.0),True,False
+			AAText GraphicWidth/2,(100+plusY)*MenuScale,"SECONDS",True,False
 			
 			temp% = CreatePivot() : temp2% = CreatePivot()
 			PositionEntity temp, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
