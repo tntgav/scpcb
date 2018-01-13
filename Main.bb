@@ -10020,6 +10020,8 @@ Function UpdateInfect()
 				MsgTimer = 70*6
 			ElseIf Infect =>91.5
 				BlinkTimer = Max(Min(-10*(Infect-91.5),BlinkTimer),-10)
+				IsZombie = True
+				UnableToMove = True
 				If Infect >= 92.7 And temp < 92.7 Then
 					If teleportForInfect
 						For r.Rooms = Each Rooms
@@ -10034,6 +10036,7 @@ Function UpdateInfect()
 								FreeTexture tex
 								r\NPC[0]\State=6
 								PlayerRoom = r
+								UnableToMove = False
 								Exit
 							EndIf
 						Next
@@ -10054,10 +10057,10 @@ Function UpdateInfect()
 					PointEntity Collider, PlayerRoom\NPC[0]\Collider
 					PointEntity PlayerRoom\NPC[0]\Collider, Collider
 					PointEntity Camera, PlayerRoom\NPC[0]\Collider,EntityRoll(Camera)
-					ForceMove = 0.7
+					ForceMove = 0.75
 					Injuries = 2.5
 					Bloodloss = 0
-					IsZombie = True
+					UnableToMove = False
 					
 					Animate2(PlayerRoom\NPC[0]\obj, AnimTime(PlayerRoom\NPC[0]\obj), 357, 381, 0.3)
 				ElseIf Infect < 98.5
@@ -10067,7 +10070,6 @@ Function UpdateInfect()
 					
 					ForceMove = 0.0
 					UnableToMove = True
-					IsZombie = False
 					PointEntity Camera, PlayerRoom\NPC[0]\Collider
 					
 					If temp < 94.7 Then 
