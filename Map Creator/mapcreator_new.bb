@@ -131,7 +131,7 @@ options=CreateMenu("Options",0,menu)
 event_default = CreateMenu("Set the event for the rooms by default",15,options)
 
 CreateMenu "",1000,options
-adjdoor_place = CreateMenu("Place adjacent doors in 3D view",16,options)
+Global adjdoor_place = CreateMenu("Place adjacent doors in 3D view",16,options)
 CreateMenu "",1000,options
 CreateMenu "Edit Camera",17,options
 
@@ -178,26 +178,26 @@ labelcursorR=CreateLabel("R "+GetINIInt("options.INI","3d scene","cursor color R
 labelcursorG=CreateLabel("G "+GetINIInt("options.INI","3d scene","cursor color G"),225,90,40,15, optionwin)
 labelcursorB=CreateLabel("B "+GetINIInt("options.INI","3d scene","cursor color B"),225,105,40,15, optionwin)
 
-redfog = GetINIInt("options.INI","3d scene","bg color R")
-greenfog = GetINIInt("options.INI","3d scene","bg color G")
-bluefog = GetINIInt("options.INI","3d scene","bg color B")
+Global redfog = GetINIInt("options.INI","3d scene","bg color R")
+Global greenfog = GetINIInt("options.INI","3d scene","bg color G")
+Global bluefog = GetINIInt("options.INI","3d scene","bg color B")
 
-redcursor = GetINIInt("options.INI","3d scene","cursor color R")
-greencursor = GetINIInt("options.INI","3d scene","cursor color G")
-bluecursor = GetINIInt("options.INI","3d scene","cursor color B")
+Global redcursor = GetINIInt("options.INI","3d scene","cursor color R")
+Global greencursor = GetINIInt("options.INI","3d scene","cursor color G")
+Global bluecursor = GetINIInt("options.INI","3d scene","cursor color B")
 
 labelrange=CreateLabel("Culling Range",10,170,80,20, optionwin)
-camerarange = CreateTextField(25, 150, 40, 20, optionwin)
+Global camerarange = CreateTextField(25, 150, 40, 20, optionwin)
 SetGadgetText camerarange, GetINIInt("options.INI","3d scene","camera range")
 
 ;labelrange=CreateLabel("Camera Range",10,140,80,20, optionwin)
 ;camerarange = CreateTextField(25, 145, 40, 20, optionwin)
 ;SetGadgetText camerarange, GetINIInt("options.INI","3d scene","camera range")
 
-vsync = CreateButton("Vsync", 123, 145, 50, 30, optionwin, 2)
+Global vsync = CreateButton("Vsync", 123, 145, 50, 30, optionwin, 2)
 SetButtonState vsync, GetINIInt("options.INI","3d scene","vsync")
 
-showfps = CreateButton("Show FPS", 210, 145, 70, 30, optionwin, 2)
+Global showfps = CreateButton("Show FPS", 210, 145, 70, 30, optionwin, 2)
 SetButtonState showfps, GetINIInt("options.INI","3d scene","show fps")
 
 cancelopt_button=CreateButton("Cancel",10,210,100,30,optionwin)
@@ -570,6 +570,7 @@ Repeat
 			If value=1 Then UncheckMenu(adjdoor_place)
 			UpdateWindowMenu winhandle
 			PutINIValue("options.INI","3d scene","adjdoors_place",Not value)
+			WriteOptions()
 		EndIf
 		If EID=10001 Then End
 	EndIf
@@ -657,18 +658,7 @@ Repeat
 			PutINIValue("options.INI","3d scene","camera range",TextFieldText$(camerarange))
 			PutINIValue("options.INI","3d scene","vsync",ButtonState(vsync))
 			PutINIValue("options.INI","3d scene","show fps",ButtonState(showfps))
-			f = WriteFile("CONFIG_OPTINIT.SI")
-			WriteInt f,redfog
-			WriteInt f,greenfog
-			WriteInt f,bluefog
-			WriteInt f,redcursor
-			WriteInt f,greencursor
-			WriteInt f,bluecursor
-			WriteInt f,TextFieldText$(camerarange)
-			WriteByte f,ButtonState(vsync)
-			WriteByte f,ButtonState(showfps)
-			WriteByte f,MenuChecked(adjdoor_place)
-			CloseFile f
+			WriteOptions()
 		EndIf
 		If EventSource()=ok Then ; when ok is pressed
 			;Notify ""+Chr$(13)+TextFieldText$(txtbox); <---TO GET ;text FROM ;textFIELD
@@ -1216,3 +1206,21 @@ Function MilliSecs2()
 	If retVal < 0 Then retVal = retVal + 2147483648
 	Return retVal
 End Function
+
+Function WriteOptions()
+	
+	f = WriteFile("CONFIG_OPTINIT.SI")
+	WriteInt f,redfog
+	WriteInt f,greenfog
+	WriteInt f,bluefog
+	WriteInt f,redcursor
+	WriteInt f,greencursor
+	WriteInt f,bluecursor
+	WriteInt f,TextFieldText$(camerarange)
+	WriteByte f,ButtonState(vsync)
+	WriteByte f,ButtonState(showfps)
+	WriteByte f,MenuChecked(adjdoor_place)
+	CloseFile f
+	
+End Function
+

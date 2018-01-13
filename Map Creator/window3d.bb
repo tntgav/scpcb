@@ -144,6 +144,7 @@ Repeat
 	PrevTime = MilliSecs2()
 	
 	Local f%
+	Local prevAdjDoorPlace = AdjDoorPlace
 	If FileType("CONFIG_OPTINIT.SI")=1
 		f = ReadFile("CONFIG_OPTINIT.SI")
 		
@@ -167,11 +168,26 @@ Repeat
 		DeleteFile("CONFIG_OPTINIT.SI")
 	EndIf
 	
+	Local d.Doors
+	If prevAdjDoorPlace<>AdjDoorPlace
+		If AdjDoorPlace
+			PlaceAdjacentDoors()
+		Else
+			For d.Doors = Each Doors
+				FreeEntity d\frameobj
+				FreeEntity d\buttons[0]
+				FreeEntity d\buttons[1]
+				FreeEntity d\obj
+				FreeEntity d\obj2
+				Delete d
+			Next
+		EndIf
+	EndIf
+	
 	Local x,y
 	Local r.Rooms,rt.RoomTemplates
 	Local name$,angle
 	Local ename$,eprob#
-	Local d.Doors
 	If FileType("CONFIG_MAPINIT.SI")=1
 		ClearTextureCache
 		For r.Rooms = Each Rooms
@@ -242,141 +258,8 @@ Repeat
 		CloseFile f
 		
 		If AdjDoorPlace
-			Local temp = 0, zone
-			Local spacing# = 8.0
-			Local shouldSpawnDoor% = False
-			For y = MapHeight To 0 Step -1
-				
-				If y < MapHeight/3+1 Then
-					zone=3
-				ElseIf y < MapHeight*(2.0/3.0)-1
-					zone=2
-				Else
-					zone=1
-				EndIf
-				
-				For x = MapWidth To 0 Step -1
-					If MapTemp(x,y) > 0 Then
-						If zone = 2 Then temp=2 Else temp=0
-						
-						For r.Rooms = Each Rooms
-							If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
-								shouldSpawnDoor = False
-								Select r\RoomTemplate\Shape
-									Case ROOM1
-										If r\angle=90
-											shouldSpawnDoor = True
-										EndIf
-									Case ROOM2
-										If r\angle=90 Or r\angle=270
-											shouldSpawnDoor = True
-										EndIf
-									Case ROOM2C
-										If r\angle=0 Or r\angle=90
-											shouldSpawnDoor = True
-										EndIf
-									Case ROOM3
-										If r\angle=0 Or r\angle=180 Or r\angle=90
-											shouldSpawnDoor = True
-										EndIf
-									Default
-										shouldSpawnDoor = True
-								End Select
-								If shouldSpawnDoor
-									If (x+1)<(MapWidth+1)
-										If MapTemp(x + 1, y) > 0 Then
-											;d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), temp)
-											;r\AdjDoor[0] = d
-											d.Doors = CreateDoor(Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, temp)
-											r\AdjDoor[0] = d
-										EndIf
-									EndIf
-								EndIf
-								
-								shouldSpawnDoor = False
-								Select r\RoomTemplate\Shape
-									Case ROOM1
-										If r\angle=180
-											shouldSpawnDoor = True
-										EndIf
-									Case ROOM2
-										If r\angle=0 Or r\angle=180
-											shouldSpawnDoor = True
-										EndIf
-									Case ROOM2C
-										If r\angle=180 Or r\angle=90
-											shouldSpawnDoor = True
-										EndIf
-									Case ROOM3
-										If r\angle=180 Or r\angle=90 Or r\angle=270
-											shouldSpawnDoor = True
-										EndIf
-									Default
-										shouldSpawnDoor = True
-								End Select
-								If shouldSpawnDoor
-									If (y+1)<(MapHeight+1)
-										If MapTemp(x, y + 1) > 0 Then
-											;d.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), temp)
-											;r\AdjDoor[3] = d
-											d.Doors = CreateDoor(Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, temp)
-											r\AdjDoor[3] = d
-										EndIf
-									EndIf
-								EndIf
-								
-								Exit
-							EndIf
-						Next
-						
-					End If
-					
-				Next
-			Next
+			PlaceAdjacentDoors()
 		EndIf
-		
-		Local r2.Rooms
-		For r.Rooms = Each Rooms
-			r\Adjacent[0]=Null
-			r\Adjacent[1]=Null
-			r\Adjacent[2]=Null
-			r\Adjacent[3]=Null
-			For r2.Rooms = Each Rooms
-				If r<>r2 Then
-					If r2\z=r\z Then
-						If (r2\x)=(r\x+8.0) Then
-							r\Adjacent[0]=r2
-							If r\AdjDoor[0] = Null Then r\AdjDoor[0] = r2\AdjDoor[2]
-						ElseIf (r2\x)=(r\x-8.0)
-							r\Adjacent[2]=r2
-							If r\AdjDoor[2] = Null Then r\AdjDoor[2] = r2\AdjDoor[0]
-						EndIf
-					ElseIf r2\x=r\x Then
-						If (r2\z)=(r\z-8.0) Then
-							r\Adjacent[1]=r2
-							If r\AdjDoor[1] = Null Then r\AdjDoor[1] = r2\AdjDoor[3]
-						ElseIf (r2\z)=(r\z+8.0)
-							r\Adjacent[3]=r2
-							If r\AdjDoor[3] = Null Then r\AdjDoor[3] = r2\AdjDoor[1]
-						EndIf
-					EndIf
-				EndIf
-				If (r\Adjacent[0]<>Null) And (r\Adjacent[1]<>Null) And (r\Adjacent[2]<>Null) And (r\Adjacent[3]<>Null) Then Exit
-			Next
-		Next
-		
-		For d.Doors = Each Doors
-			EntityParent(d\obj, 0)
-			If d\obj2 > 0 Then EntityParent(d\obj2, 0)
-			If d\frameobj > 0 Then EntityParent(d\frameobj, 0)
-			If d\buttons[0] > 0 Then EntityParent(d\buttons[0], 0)
-			If d\buttons[1] > 0 Then EntityParent(d\buttons[1], 0)
-			
-			If d\obj2 <> 0 And d\dir = 0 Then
-				MoveEntity(d\obj, 0, 0, 8.0 * RoomScale)
-				MoveEntity(d\obj2, 0, 0, 8.0 * RoomScale)
-			EndIf	
-		Next
 		
 		DeleteFile("CONFIG_MAPINIT.SI")
 	EndIf
@@ -1679,13 +1562,124 @@ Function CreateDoor.Doors(x#, y#, z#, angle#, room.Rooms, big% = False)
 	
 End Function
 
+Function PlaceAdjacentDoors()
+	Local temp = 0, zone
+	Local spacing# = 8.0
+	Local shouldSpawnDoor% = False
+	Local x,y
+	Local r.Rooms,d.Doors
+	
+	For y = MapHeight To 0 Step -1
+		
+		If y < MapHeight/3+1 Then
+			zone=3
+		ElseIf y < MapHeight*(2.0/3.0)-1
+			zone=2
+		Else
+			zone=1
+		EndIf
+		
+		For x = MapWidth To 0 Step -1
+			If MapTemp(x,y) > 0 Then
+				If zone = 2 Then temp=2 Else temp=0
+				
+				For r.Rooms = Each Rooms
+					If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=90 Or r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=0 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=0 Or r\angle=180 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (x+1)<(MapWidth+1)
+								If MapTemp(x + 1, y) > 0 Then
+									;d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), temp)
+									;r\AdjDoor[0] = d
+									d.Doors = CreateDoor(Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, temp)
+									r\AdjDoor[0] = d
+								EndIf
+							EndIf
+						EndIf
+						
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=0 Or r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=180 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=180 Or r\angle=90 Or r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (y+1)<(MapHeight+1)
+								If MapTemp(x, y + 1) > 0 Then
+									;d.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), temp)
+									;r\AdjDoor[3] = d
+									d.Doors = CreateDoor(Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, temp)
+									r\AdjDoor[3] = d
+								EndIf
+							EndIf
+						EndIf
+						
+						Exit
+					EndIf
+				Next
+				
+			End If
+			
+		Next
+	Next
+	
+	For d.Doors = Each Doors
+		EntityParent(d\obj, 0)
+		If d\obj2 > 0 Then EntityParent(d\obj2, 0)
+		If d\frameobj > 0 Then EntityParent(d\frameobj, 0)
+		If d\buttons[0] > 0 Then EntityParent(d\buttons[0], 0)
+		If d\buttons[1] > 0 Then EntityParent(d\buttons[1], 0)
+		
+		If d\obj2 <> 0 And d\dir = 0 Then
+			MoveEntity(d\obj, 0, 0, 8.0 * RoomScale)
+			MoveEntity(d\obj2, 0, 0, 8.0 * RoomScale)
+		EndIf	
+	Next
+	
+End Function
+
 
 
 
 
 
 ;~IDEal Editor Parameters:
-;~F#1FD#208#213#24A#255#267#28E#2AD#2B1#2B6#2C4#2DD#302#32F#33D#34C#354#37C#383#38A
-;~F#391#3AA#3B2#3BA#507#517#528#53E#553#561#565#5B5#5C3#5CB#5D2#5D6#5DA#608#61F#632
-;~F#63E#644#64F#655
+;~F#188#193#19E#1D5#1E0#1F2#219#238#23C#241#24F#268#28D#2BA#2C8#2D7#2DF#307#30E#315
+;~F#31C#335#33D#345#492#4A2#4B3#4C9#4DE#4EC#4F0#540#54E#556#55D#561#565#593#5AA#5BD
+;~F#5C9#5CF#5DA#5E0#61C
 ;~C#Blitz3D
