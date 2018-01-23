@@ -1,6 +1,6 @@
 Global ResWidth% = 910
 Global ResHeight% = 660
-Global versionnumber$ = "2.0"
+Global versionnumber$ = "2.1"
 
 Loadingwindow=CreateWindow("", GraphicsWidth()/2-160,GraphicsHeight()/2-120,320,260,winhandle,8)
 panelloading = CreatePanel(0,0,320,260,Loadingwindow,0)
@@ -24,6 +24,7 @@ Next
 SetGadgetLayout listbox, 3,3,2,2
 
 InitEvents("..\Data\events.ini")
+AddEvents()
 ;room_desc = CreateLabel("Room description:",5,40+ResHeight/2,ResWidth/4,ResHeight/8.05,WinHandle,3)
 Global room_desc = CreateLabel("Room description:",5,40+ResHeight/2,ResWidth/4,ResHeight/11.8,WinHandle,3)
 SetGadgetLayout room_desc , 3,3,2,2
@@ -127,11 +128,11 @@ CreateMenu "",1000,file ; Use an empty string to generate separator bars
 CreateMenu "Quit",10001,file ; another child menu
 
 options=CreateMenu("Options",0,menu)
-event_default = CreateMenu("Set the Event for the Rooms by Default",15,options)
+event_default = CreateMenu("Set the event for the rooms by default",15,options)
 
 CreateMenu "",1000,options
-;CreateMenu "Change Paths",1000,options
-;CreateMenu "",1000,options
+Global adjdoor_place = CreateMenu("Place adjacent doors in 3D view",16,options)
+CreateMenu "",1000,options
 CreateMenu "Edit Camera",17,options
 
 Local option_event = GetINIInt("options.INI","general","events_default")
@@ -140,7 +141,13 @@ If (Not option_event)
 Else
 	CheckMenu event_default
 EndIf
- 
+Local option_adjdoors = GetINIInt("options.INI","3d scene","adjdoors_place")
+If (Not option_adjdoors)
+	UncheckMenu adjdoor_place
+Else
+	CheckMenu adjdoor_place
+EndIf
+
 ; Now the Edit menu
 edit=CreateMenu("&Help",0,menu) ; Main menu with Alt Shortcut - Use & to specify the shortcut key
 CreateMenu "Manual"+Chr$(8)+"F1",6,edit ; Another Child menu with Alt Shortcut
@@ -171,26 +178,26 @@ labelcursorR=CreateLabel("R "+GetINIInt("options.INI","3d scene","cursor color R
 labelcursorG=CreateLabel("G "+GetINIInt("options.INI","3d scene","cursor color G"),225,90,40,15, optionwin)
 labelcursorB=CreateLabel("B "+GetINIInt("options.INI","3d scene","cursor color B"),225,105,40,15, optionwin)
 
-redfog = GetINIInt("options.INI","3d scene","bg color R")
-greenfog = GetINIInt("options.INI","3d scene","bg color G")
-bluefog = GetINIInt("options.INI","3d scene","bg color B")
+Global redfog = GetINIInt("options.INI","3d scene","bg color R")
+Global greenfog = GetINIInt("options.INI","3d scene","bg color G")
+Global bluefog = GetINIInt("options.INI","3d scene","bg color B")
 
-redcursor = GetINIInt("options.INI","3d scene","cursor color R")
-greencursor = GetINIInt("options.INI","3d scene","cursor color G")
-bluecursor = GetINIInt("options.INI","3d scene","cursor color B")
+Global redcursor = GetINIInt("options.INI","3d scene","cursor color R")
+Global greencursor = GetINIInt("options.INI","3d scene","cursor color G")
+Global bluecursor = GetINIInt("options.INI","3d scene","cursor color B")
 
 labelrange=CreateLabel("Culling Range",10,170,80,20, optionwin)
-camerarange = CreateTextField(25, 150, 40, 20, optionwin)
+Global camerarange = CreateTextField(25, 150, 40, 20, optionwin)
 SetGadgetText camerarange, GetINIInt("options.INI","3d scene","camera range")
 
 ;labelrange=CreateLabel("Camera Range",10,140,80,20, optionwin)
 ;camerarange = CreateTextField(25, 145, 40, 20, optionwin)
 ;SetGadgetText camerarange, GetINIInt("options.INI","3d scene","camera range")
 
-vsync = CreateButton("Vsync", 123, 145, 50, 30, optionwin, 2)
+Global vsync = CreateButton("Vsync", 123, 145, 50, 30, optionwin, 2)
 SetButtonState vsync, GetINIInt("options.INI","3d scene","vsync")
 
-showfps = CreateButton("Show FPS", 210, 145, 70, 30, optionwin, 2)
+Global showfps = CreateButton("Show FPS", 210, 145, 70, 30, optionwin, 2)
 SetButtonState showfps, GetINIInt("options.INI","3d scene","show fps")
 
 cancelopt_button=CreateButton("Cancel",10,210,100,30,optionwin)
@@ -520,7 +527,7 @@ Repeat
 			EndIf
 		EndIf
 		If EID=1 Then
-			filename$ = RequestFile("Save map","cbmap",False,"") 
+			filename$ = RequestFile("Open Map","cbmap",False,"") 
 			If filename<>""
 				LoadMap(filename$)
 			Else
@@ -529,7 +536,7 @@ Repeat
 		EndIf
 		If EID=2 Then
 			If FileType(filename) <>1
-  			   filename$ = RequestFile("Save map","cbmap",True,"")
+  			   filename$ = RequestFile("Save Map","cbmap",True,"")
 			EndIf
 			If filename<>""
 				SaveMap(filename$)
@@ -538,7 +545,7 @@ Repeat
 			EndIf
 		EndIf	
 		If EID=3 Then
-			filename$ = RequestFile("Open map","cbmap",True,"")
+			filename$ = RequestFile("Save Map","cbmap",True,"")
 			If filename<>""
 				SaveMap(filename$)
 			Else
@@ -556,6 +563,14 @@ Repeat
 			If value=1 Then UncheckMenu(event_default)
 			UpdateWindowMenu winhandle
 			PutINIValue("options.INI","general","events_default",Not value)
+		EndIf
+		If EID=16
+			value=MenuChecked(adjdoor_place)
+			If value=0 Then CheckMenu(adjdoor_place)
+			If value=1 Then UncheckMenu(adjdoor_place)
+			UpdateWindowMenu winhandle
+			PutINIValue("options.INI","3d scene","adjdoors_place",Not value)
+			WriteOptions()
 		EndIf
 		If EID=10001 Then End
 	EndIf
@@ -643,17 +658,7 @@ Repeat
 			PutINIValue("options.INI","3d scene","camera range",TextFieldText$(camerarange))
 			PutINIValue("options.INI","3d scene","vsync",ButtonState(vsync))
 			PutINIValue("options.INI","3d scene","show fps",ButtonState(showfps))
-			f = WriteFile("CONFIG_OPTINIT.SI")
-			WriteInt f,redfog
-			WriteInt f,greenfog
-			WriteInt f,bluefog
-			WriteInt f,redcursor
-			WriteInt f,greencursor
-			WriteInt f,bluecursor
-			WriteInt f,TextFieldText$(camerarange)
-			WriteByte f,ButtonState(vsync)
-			WriteByte f,ButtonState(showfps)
-			CloseFile f
+			WriteOptions()
 		EndIf
 		If EventSource()=ok Then ; when ok is pressed
 			;Notify ""+Chr$(13)+TextFieldText$(txtbox); <---TO GET ;text FROM ;textFIELD
@@ -1061,6 +1066,13 @@ Function InitEvents(file$)
 		EndIf
 	Wend
 	
+	CloseFile f
+	
+End Function
+
+Function AddEvents()
+	Local rt.RoomTemplates,e.Event
+	
 	For rt.RoomTemplates = Each RoomTemplates
 		For e = Each Event
 			For i = 1 To MaxEvents
@@ -1070,8 +1082,6 @@ Function InitEvents(file$)
 			Next
 		Next
 	Next
-	
-	CloseFile f
 	
 End Function
 
@@ -1195,5 +1205,22 @@ Function MilliSecs2()
 	Local retVal% = MilliSecs()
 	If retVal < 0 Then retVal = retVal + 2147483648
 	Return retVal
+End Function
+
+Function WriteOptions()
+	
+	f = WriteFile("CONFIG_OPTINIT.SI")
+	WriteInt f,redfog
+	WriteInt f,greenfog
+	WriteInt f,bluefog
+	WriteInt f,redcursor
+	WriteInt f,greencursor
+	WriteInt f,bluecursor
+	WriteInt f,TextFieldText$(camerarange)
+	WriteByte f,ButtonState(vsync)
+	WriteByte f,ButtonState(showfps)
+	WriteByte f,MenuChecked(adjdoor_place)
+	CloseFile f
+	
 End Function
 

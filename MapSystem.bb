@@ -4135,8 +4135,6 @@ Function FillRoom(r.Rooms)
 			;[End Block]
 		Case "room1archive"
 			;[Block]
-			temp% = Rand(1,3)
-		
 			For xtemp = 0 To 1
 				For ytemp = 0 To 2
 					For ztemp = 0 To 2
@@ -4200,14 +4198,14 @@ Function FillRoom(r.Rooms)
 						x# = (-672.0 + 864.0 * xtemp)* RoomScale
 						y# = (96.0  + 96.0 * ytemp) * RoomScale
 						z# = (480.0 - 352.0*ztemp + Rnd(-96.0,96.0)) * RoomScale
-
+						
 						it = CreateItem(tempstr,tempstr2,r\x+x,y,r\z+z)
 						EntityParent it\collider,r\obj							
 					Next
 				Next
 			Next
-				
-			r\RoomDoors[0] = CreateDoor(r\zone,r\x,r\y,r\z - 528.0 * RoomScale,0,r,False,False,temp)
+			
+			r\RoomDoors[0] = CreateDoor(r\zone,r\x,r\y,r\z - 528.0 * RoomScale,0,r,False,False,6)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x-256.0*RoomScale, r\y+384.0*RoomScale, r\z+640.0*RoomScale, r)
 			sc\angle = 180
@@ -4560,6 +4558,12 @@ Function FillRoom(r.Rooms)
 				de\Size = 0.5
 				ScaleSprite(de\obj, de\Size,de\Size)
 				EntityParent de\obj, r\obj
+				
+				;260 300 -350
+				;WIP
+				r\Objects[0] = CreatePivot()
+				PositionEntity r\Objects[0],r\x+280.0*RoomScale,r\y+345.0*RoomScale,r\z-340.0*RoomScale,True
+				EntityParent r\Objects[0],r\obj
 			EndIf
 			
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, 0.0, r\z - 382.0 * RoomScale, 0, r, False, False)

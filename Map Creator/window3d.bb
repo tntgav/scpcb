@@ -3,7 +3,7 @@ Const C_WS_POPUP = $80000000
 Const C_HWND_TOP = 0
 Const C_SWP_SHOWWINDOW = $0040
 
-Global versionnumber$ = "2.0"
+Global versionnumber$ = "2.1"
 
 Const ClrR = 50, ClrG = 50, ClrB = 50
 
@@ -46,11 +46,22 @@ TextureBlend AmbientLightRoomTex,5
 SetBuffer(TextureBuffer(AmbientLightRoomTex))
 ClsColor 0,0,0
 Cls
-
 SetBuffer BackBuffer()
 
+;Loading door-relevant meshes (for adjacent doors)
+Global Door_LCZ = LoadMesh("..\GFX\map\Door01.x")
+HideEntity Door_LCZ
+Global Door_HCZ_1 = LoadMesh("..\GFX\map\heavydoor1.x")
+HideEntity Door_HCZ_1
+Global Door_HCZ_2 = LoadMesh("..\GFX\map\heavydoor2.x")
+HideEntity Door_HCZ_2
+Global Door_Frame = LoadMesh("..\GFX\map\DoorFrame.x")
+HideEntity Door_Frame
+Global Door_Button = LoadMesh("..\GFX\map\Button.x")
+HideEntity Door_Button
+
 Global MenuOpen% = True
-Global RandomSeed$ = "testseed"
+;Global RandomSeed$ = "testseed"
 
 Const ROOM1% = 1, ROOM2% = 2, ROOM2C% = 3, ROOM3% = 4, ROOM4% = 5
 
@@ -62,9 +73,9 @@ Global FileLocation$ = "..\Data\rooms.ini"
 LoadRoomTemplates(FileLocation)
 LoadMaterials("..\Data\materials.ini")
 
-If RandomSeed = "" Then
-	RandomSeed = Abs(MilliSecs())
-EndIf
+;If RandomSeed = "" Then
+;	RandomSeed = Abs(MilliSecs())
+;EndIf
 ;Local strtemp$ = ""
 ;For i = 1 To Len(RandomSeed)
 ;	strtemp = strtemp+Asc(Mid(RandomSeed,i,1))
@@ -97,6 +108,7 @@ ChangeDir "Map Creator"
 Global ShowFPS% = GetINIInt("options.ini", "3d scene", "show fps")
 Global CheckFPS%, ElapsedLoops%, FPS%
 Global VSync% = GetINIInt("options.ini", "3d scene", "vsync")
+Global AdjDoorPlace% = GetINIInt("options.ini", "3d scene", "adjdoors_place")
 
 Global MXS#=0.0,MYS#=0.0
 MoveMouse GraphicsWidth()/2,GraphicsHeight()/2
@@ -132,6 +144,7 @@ Repeat
 	PrevTime = MilliSecs2()
 	
 	Local f%
+	Local prevAdjDoorPlace = AdjDoorPlace
 	If FileType("CONFIG_OPTINIT.SI")=1
 		f = ReadFile("CONFIG_OPTINIT.SI")
 		
@@ -144,6 +157,7 @@ Repeat
 		CamRange = ReadInt(f)
 		VSync = ReadByte(f)
 		ShowFPS = ReadByte(f)
+		AdjDoorPlace = ReadByte(f)
 		
 		CamRange = Max(CamRange,20)
 		
@@ -152,6 +166,22 @@ Repeat
 		
 		CloseFile f
 		DeleteFile("CONFIG_OPTINIT.SI")
+	EndIf
+	
+	Local d.Doors
+	If prevAdjDoorPlace<>AdjDoorPlace
+		If AdjDoorPlace
+			PlaceAdjacentDoors()
+		Else
+			For d.Doors = Each Doors
+				FreeEntity d\frameobj
+				FreeEntity d\buttons[0]
+				FreeEntity d\buttons[1]
+				FreeEntity d\obj
+				FreeEntity d\obj2
+				Delete d
+			Next
+		EndIf
 	EndIf
 	
 	Local x,y
@@ -164,6 +194,19 @@ Repeat
 			FreeEntity r\obj
 			FreeTexture r\overlaytex
 			Delete r
+		Next
+		For d.Doors = Each Doors
+			FreeEntity d\frameobj
+			FreeEntity d\buttons[0]
+			FreeEntity d\buttons[1]
+			FreeEntity d\obj
+			FreeEntity d\obj2
+			Delete d
+		Next
+		For x = 0 To MapWidth
+			For y = 0 To MapHeight
+				MapTemp(x, y) = 0
+			Next
 		Next
 		
 		f = ReadFile("CONFIG_MAPINIT.SI")
@@ -180,11 +223,21 @@ Repeat
 			
 			For rt.RoomTemplates=Each RoomTemplates
 				If Lower(rt\Name) = name
-					If angle<>90 And angle<>270
-						angle = angle - 180
-					EndIf
+					;If angle<>90 And angle<>270
+					;	angle = angle - 180
+					;EndIf
 					
-					PlaceRoom(name,MapWidth-x,y,angle,GetZone(y),rt\Shape,ename,eprob)
+					r = PlaceRoom(name,MapWidth-x,y,GetZone(y),rt\Shape,ename,eprob)
+					
+					r\angle = angle
+					If r\angle<>90 And r\angle<>270
+						r\angle = r\angle + 180
+					EndIf
+					r\angle = WrapAngle(r\angle)
+					
+					TurnEntity(r\obj, 0, r\angle, 0)
+					
+					MapTemp(MapWidth-x,y)=1
 					
 					Exit
 				EndIf
@@ -203,6 +256,11 @@ Repeat
 		FreeTextureCache
 		
 		CloseFile f
+		
+		If AdjDoorPlace
+			PlaceAdjacentDoors()
+		EndIf
+		
 		DeleteFile("CONFIG_MAPINIT.SI")
 	EndIf
 	
@@ -420,13 +478,12 @@ Function LoadRoomTemplateMeshes()
 	
 End Function
 
-Function PlaceRoom(name$,x%,z%,angle%,zone%,shape%,event$="",eventchance#=1.0)
+Function PlaceRoom.Rooms(name$,x%,z%,zone%,shape%,event$="",eventchance#=1.0)
 	Local rt.RoomTemplates,r.Rooms
 	
 	For rt = Each RoomTemplates
 		If rt\Name = name$
 			r = CreateRoom(zone,shape,x*8.0,0.0,z*8.0,name)
-			RotateEntity(r\obj,0,angle,0)
 			Exit
 		EndIf
 	Next
@@ -434,6 +491,7 @@ Function PlaceRoom(name$,x%,z%,angle%,zone%,shape%,event$="",eventchance#=1.0)
 	r\event = event
 	If r\event<>"" Then r\eventchance=eventchance
 	
+	Return r
 End Function
 
 Global Mesh_MinX#,Mesh_MinY#,Mesh_MinZ#,Mesh_MaxX#,Mesh_MaxY#,Mesh_MaxZ#,Mesh_MagX#,Mesh_MagY#,Mesh_MagZ#
@@ -551,6 +609,9 @@ Type Rooms
 	
 	Field event$
 	Field eventchance#
+	
+	Field Adjacent.Rooms[4]
+	Field AdjDoor.Doors[4]
 End Type 
 
 Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
@@ -1424,13 +1485,201 @@ Function MilliSecs2()
 	Return retVal
 End Function
 
+Function WrapAngle#(angle#)
+	;If angle = INFINITY Then Return 0.0
+	While angle < 0
+		angle = angle + 360
+	Wend 
+	While angle >= 360
+		angle = angle - 360
+	Wend
+	Return angle
+End Function
+
+Type Doors
+	Field obj%, obj2%, frameobj%, buttons%[2]
+	Field dir%
+	Field angle%
+End Type
+
+Function CreateDoor.Doors(x#, y#, z#, angle#, room.Rooms, big% = False)
+	Local d.Doors, i%
+	Local parent%
+	If room <> Null Then parent = room\obj
+	
+	d.Doors = New Doors
+	If big=2
+		d\obj = CopyEntity(Door_HCZ_1)
+		ScaleEntity(d\obj, RoomScale, RoomScale, RoomScale)
+		d\obj2 = CopyEntity(Door_HCZ_2)
+		ScaleEntity(d\obj2, RoomScale, RoomScale, RoomScale)
+		
+		d\frameobj = CopyEntity(Door_Frame)
+	Else
+		d\obj = CopyEntity(Door_LCZ)
+		ScaleEntity(d\obj, (204.0 * RoomScale) / MeshWidth(d\obj), 312.0 * RoomScale / MeshHeight(d\obj), 16.0 * RoomScale / MeshDepth(d\obj))
+		
+		d\frameobj = CopyEntity(Door_Frame)
+		d\obj2 = CopyEntity(Door_LCZ)
+		
+		ScaleEntity(d\obj2, (204.0 * RoomScale) / MeshWidth(d\obj), 312.0 * RoomScale / MeshHeight(d\obj), 16.0 * RoomScale / MeshDepth(d\obj))
+	EndIf
+	
+	PositionEntity d\frameobj, x, y, z
+	ScaleEntity(d\frameobj, (8.0 / 2048.0), (8.0 / 2048.0), (8.0 / 2048.0))
+	
+	For i% = 0 To 1
+		d\buttons[i] = CopyEntity(Door_Button)
+		
+		ScaleEntity(d\buttons[i], 0.03, 0.03, 0.03)
+	Next
+	
+	PositionEntity d\buttons[0], x + 0.6, y + 0.7, z - 0.1
+	PositionEntity d\buttons[1], x - 0.6, y + 0.7, z + 0.1
+	RotateEntity d\buttons[1], 0, 180, 0
+	EntityParent(d\buttons[0], d\frameobj)
+	EntityParent(d\buttons[1], d\frameobj)
+	
+	PositionEntity d\obj, x, y, z
+	
+	RotateEntity d\obj, 0, angle, 0
+	RotateEntity d\frameobj, 0, angle, 0
+	
+	If d\obj2 <> 0 Then
+		PositionEntity d\obj2, x, y, z
+		RotateEntity(d\obj2, 0, angle + 180, 0)
+		;EntityParent(d\obj2, parent)
+	EndIf
+	
+	;EntityParent(d\frameobj, parent)
+	;EntityParent(d\obj, parent)
+	
+	d\angle = angle
+	
+	d\dir=big
+	
+	Return d
+	
+End Function
+
+Function PlaceAdjacentDoors()
+	Local temp = 0, zone
+	Local spacing# = 8.0
+	Local shouldSpawnDoor% = False
+	Local x,y
+	Local r.Rooms,d.Doors
+	
+	For y = MapHeight To 0 Step -1
+		
+		If y < MapHeight/3+1 Then
+			zone=3
+		ElseIf y < MapHeight*(2.0/3.0)-1
+			zone=2
+		Else
+			zone=1
+		EndIf
+		
+		For x = MapWidth To 0 Step -1
+			If MapTemp(x,y) > 0 Then
+				If zone = 2 Then temp=2 Else temp=0
+				
+				For r.Rooms = Each Rooms
+					If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=90 Or r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=0 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=0 Or r\angle=180 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (x+1)<(MapWidth+1)
+								If MapTemp(x + 1, y) > 0 Then
+									;d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), temp)
+									;r\AdjDoor[0] = d
+									d.Doors = CreateDoor(Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, temp)
+									r\AdjDoor[0] = d
+								EndIf
+							EndIf
+						EndIf
+						
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=0 Or r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=180 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=180 Or r\angle=90 Or r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (y+1)<(MapHeight+1)
+								If MapTemp(x, y + 1) > 0 Then
+									;d.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), temp)
+									;r\AdjDoor[3] = d
+									d.Doors = CreateDoor(Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, temp)
+									r\AdjDoor[3] = d
+								EndIf
+							EndIf
+						EndIf
+						
+						Exit
+					EndIf
+				Next
+				
+			End If
+			
+		Next
+	Next
+	
+	For d.Doors = Each Doors
+		EntityParent(d\obj, 0)
+		If d\obj2 > 0 Then EntityParent(d\obj2, 0)
+		If d\frameobj > 0 Then EntityParent(d\frameobj, 0)
+		If d\buttons[0] > 0 Then EntityParent(d\buttons[0], 0)
+		If d\buttons[1] > 0 Then EntityParent(d\buttons[1], 0)
+		
+		If d\obj2 <> 0 And d\dir = 0 Then
+			MoveEntity(d\obj, 0, 0, 8.0 * RoomScale)
+			MoveEntity(d\obj2, 0, 0, 8.0 * RoomScale)
+		EndIf	
+	Next
+	
+End Function
+
 
 
 
 
 
 ;~IDEal Editor Parameters:
-;~F#14E#159#164#19B#1A6#1B8#1DF#1FE#202#207#215#22B#250#27D#28B#29A#2A2#2CA#2D1#2D8
-;~F#2DF#2F8#300#308#455#465#476#48C#4A1#4AF#4B3#503#511#519#520#524#528#556#56D#580
-;~F#58C
+;~F#188#193#19E#1D5#1E0#1F2#219#238#23C#241#24F#268#28D#2BA#2C8#2D7#2DF#307#30E#315
+;~F#31C#335#33D#345#492#4A2#4B3#4C9#4DE#4EC#4F0#540#54E#556#55D#561#565#593#5AA#5BD
+;~F#5C9#5CF#5DA#5E0#61C
 ;~C#Blitz3D

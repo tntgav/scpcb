@@ -222,7 +222,7 @@ Function SetStreamPaused_Strict(streamHandle%,paused%)
 	Local st.Stream = Object.Stream(streamHandle)
 	
 	If st = Null
-		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		CreateConsoleMsg("Failed to pause/unpause stream Sound: Unknown Stream")
 		Return
 	EndIf
 	If st\chn=0 Or st\chn=-1

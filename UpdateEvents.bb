@@ -2008,7 +2008,7 @@ Function UpdateEvents()
 								ElseIf dist < 8.0
 									e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\Objects[20], 8.0)
 									EntityTexture e\room\Objects[20], e\room\Objects[19]
-									Injuries=Injuries+(8.0-dist)*FPSfactor*0.001
+									Injuries=Injuries+(8.0-dist)*FPSfactor*0.0005
 									
 									If dist<7.0 Then 
 										pvt% = CreatePivot()
@@ -2687,6 +2687,7 @@ Function UpdateEvents()
 					
 					If e\EventState = 0 Then
 						If e\room\dist < 8 Then
+							HideEntity e\room\Objects[3]
 							If (MilliSecs2() Mod 1500) < 800 Then
 								ShowEntity e\room\Objects[4]
 							Else
@@ -7400,6 +7401,15 @@ Function UpdateEvents()
 						
 						e\EventState = 1
 					EndIf
+					
+					;WIP
+					p.Particles = CreateParticle(EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True), 6, 0.2, 0, 10)
+					p\speed = 0.01
+					RotateEntity(p\pvt, -60, e\room\angle-90, 0)
+					
+					p\Achange = -0.02
+					
+					e\SoundCHN = LoopSound2(AlarmSFX(3),e\SoundCHN,Camera,e\room\Objects[3],5)
 				EndIf
 				;[End Block]
 			Case "room2scps2"
@@ -7702,6 +7712,7 @@ Function UpdateEvents()
 							e\room\RoomDoors[1]\locked = False
 							UseDoor(e\room\RoomDoors[0])
 							UseDoor(e\room\RoomDoors[1])
+							PlaySound_Strict(AlarmSFX(4))
 						ElseIf EntityDistance(e\room\Objects[0],Collider)>2.4
 							e\EventState3 = 0.0
 						EndIf
@@ -7737,7 +7748,7 @@ Function UpdateEvents()
 									
 									FreeEntity pvt
 								EndIf
-									
+								
 							ElseIf e\EventState2 > 70*3 And e\EventState < 70*5.5
 								pvt% = CreatePivot(e\room\obj)								
 								For i = 0 To 1
@@ -8325,6 +8336,14 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 					EndIf
+				EndIf
+				;[End Block]
+			Case "room1archive"
+				;[Block]
+				If e\EventState = 0
+					e\EventState = Rand(1,3)
+				Else
+					e\room\RoomDoors[0]\KeyCard = e\EventState
 				EndIf
 				;[End Block]
 		End Select

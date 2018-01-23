@@ -42,7 +42,7 @@ Global UpdaterFont%
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.9"
+Global VersionNumber$ = "1.3.10"
 Global CompatibleNumber$ = "1.3.9" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 Global MenuWhite%, MenuBlack%
@@ -2069,16 +2069,16 @@ Function UpdateDoors()
 					If d\obj2 <> 0 Then ResetEntity(d\obj2)
 					If d\timerstate > 0 Then
 						d\timerstate = Max(0, d\timerstate - FPSfactor)
-						If d\timerstate + FPSfactor > 110 And d\timerstate <= 110 Then PlaySound2(CautionSFX, Camera, d\obj)
+						If d\timerstate + FPSfactor > 110 And d\timerstate <= 110 Then d\SoundCHN = PlaySound2(CautionSFX, Camera, d\obj)
 						;If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(Min(d\dir,1),Rand(0, 2)), Camera, d\obj)
 						Local sound%
 						If d\dir = 1 Then sound% = Rand(0, 1) Else sound% = Rand(0, 2)
-						If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
+						If d\timerstate = 0 Then d\open = (Not d\open) : d\SoundCHN = PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
 					EndIf
 					If d\AutoClose And RemoteDoorOn = True Then
 						If EntityDistance(Camera, d\obj) < 2.1 Then
 							If (Not Wearing714) Then PlaySound_Strict HorrorSFX(7)
-							d\open = False : PlaySound2(CloseDoorSFX(Min(d\dir,1), Rand(0, 2)), Camera, d\obj) : d\AutoClose = False
+							d\open = False : d\SoundCHN = PlaySound2(CloseDoorSFX(Min(d\dir,1), Rand(0, 2)), Camera, d\obj) : d\AutoClose = False
 						EndIf
 					End If				
 				End If
@@ -2150,7 +2150,7 @@ Function UpdateDoors()
 			End If
 			
 		EndIf
-		
+		UpdateSoundOrigin(d\SoundCHN,Camera,d\frameobj)
 	Next
 End Function
 
@@ -2289,8 +2289,8 @@ Function UseDoor(d.Doors, showmsg%=True)
 		d\SoundCHN = PlaySound2 (OpenDoorSFX(d\dir, sound), Camera, d\obj)
 	Else
 		d\SoundCHN = PlaySound2 (CloseDoorSFX(d\dir, sound), Camera, d\obj)
-	End If
-		
+	EndIf
+	UpdateSoundOrigin(d\SoundCHN,Camera,d\obj)
 	
 End Function
 
@@ -2565,6 +2565,8 @@ Function InitEvents()
 	
 	CreateEvent("room2pit106", "room2pit", 0, 0.07 + (0.1*SelectedDifficulty\aggressiveNPCs))
 	
+	CreateEvent("room1archive", "room1archive", 0, 1.0)
+	
 End Function
 
 Include "UpdateEvents.bb"
@@ -2791,6 +2793,7 @@ Repeat
 				
 				AmbientSFXCHN = PlaySound2(AmbientSFX(PlayerZone,CurrAmbientSFX), Camera, SoundEmitter)
 			EndIf
+			UpdateSoundOrigin(AmbientSFXCHN,Camera, SoundEmitter)
 			
 			If Rand(50000) = 3 Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
@@ -6843,7 +6846,11 @@ Function DrawMenu()
 	CatchErrors("Uncaught (DrawMenu)")
 	
 	Local x%, y%, width%, height%
-	
+	If api_GetFocus() = 0 Then ;Game is out of focus -> pause the game
+        MenuOpen = True
+        PauseSounds()
+        Delay 1000 ;Reduce the CPU take while game is not in focus
+    EndIf
 	If MenuOpen Then
 		
 		;DebugLog AchievementsMenu+"|"+OptionsMenu+"|"+QuitMSG
@@ -7652,7 +7659,7 @@ Function LoadEntities()
 	
 	DrawLoading(5)
 	
-	DarkTexture = CreateTexture(1024, 1024, 1 + 2+256)
+	DarkTexture = CreateTexture(1024, 1024, 1 + 2)
 	SetBuffer TextureBuffer(DarkTexture)
 	Cls
 	SetBuffer BackBuffer()
@@ -10013,6 +10020,8 @@ Function UpdateInfect()
 				MsgTimer = 70*6
 			ElseIf Infect =>91.5
 				BlinkTimer = Max(Min(-10*(Infect-91.5),BlinkTimer),-10)
+				IsZombie = True
+				UnableToMove = True
 				If Infect >= 92.7 And temp < 92.7 Then
 					If teleportForInfect
 						For r.Rooms = Each Rooms
@@ -10027,6 +10036,7 @@ Function UpdateInfect()
 								FreeTexture tex
 								r\NPC[0]\State=6
 								PlayerRoom = r
+								UnableToMove = False
 								Exit
 							EndIf
 						Next
@@ -10047,10 +10057,10 @@ Function UpdateInfect()
 					PointEntity Collider, PlayerRoom\NPC[0]\Collider
 					PointEntity PlayerRoom\NPC[0]\Collider, Collider
 					PointEntity Camera, PlayerRoom\NPC[0]\Collider,EntityRoll(Camera)
-					ForceMove = 0.7
+					ForceMove = 0.75
 					Injuries = 2.5
 					Bloodloss = 0
-					IsZombie = True
+					UnableToMove = False
 					
 					Animate2(PlayerRoom\NPC[0]\obj, AnimTime(PlayerRoom\NPC[0]\obj), 357, 381, 0.3)
 				ElseIf Infect < 98.5
@@ -10060,7 +10070,6 @@ Function UpdateInfect()
 					
 					ForceMove = 0.0
 					UnableToMove = True
-					IsZombie = False
 					PointEntity Camera, PlayerRoom\NPC[0]\Collider
 					
 					If temp < 94.7 Then 
@@ -10951,10 +10960,13 @@ Function RenderWorld2()
 			
 			AASetFont Font3
 			
-			AAText GraphicWidth/2,20*MenuScale,"REFRESHING DATA IN",True,False
+			Local plusY% = 0
+			If hasBattery=1 Then plusY% = 40
 			
-			AAText GraphicWidth/2,60*MenuScale,Max(f2s(NVTimer/60.0,1),0.0),True,False
-			AAText GraphicWidth/2,100*MenuScale,"SECONDS",True,False
+			AAText GraphicWidth/2,(20+plusY)*MenuScale,"REFRESHING DATA IN",True,False
+			
+			AAText GraphicWidth/2,(60+plusY)*MenuScale,Max(f2s(NVTimer/60.0,1),0.0),True,False
+			AAText GraphicWidth/2,(100+plusY)*MenuScale,"SECONDS",True,False
 			
 			temp% = CreatePivot() : temp2% = CreatePivot()
 			PositionEntity temp, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
