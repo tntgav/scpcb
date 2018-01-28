@@ -6675,31 +6675,32 @@ Function UpdateEvents()
 								LightBlink = Rnd(0.0,1.0)*(e\EventState/200)
 								e\EventState = 1
 							End If
-						ElseIf e\EventState < 200
-							
-							BlinkTimer = -10
-							If e\EventState > 30 Then 
-								LightBlink = 1.0 
-								If e\EventState-FPSfactor =< 30 Then 
-									PlaySound_Strict LoadTempSound("SFX\ambient\general\ambient3.ogg")
-								EndIf
-							EndIf
-							If e\EventState-FPSfactor =< 100 And e\EventState > 100 Then
-								PlaySound_Strict LoadTempSound("SFX\ambient\general\ambient6.ogg")
-								PositionEntity(Curr173\Collider, EntityX(e\room\obj), 0.6, EntityZ(e\room\obj))
-								ResetEntity(Curr173\Collider)					
-								Curr173\Idle = True		
-							EndIf
-							LightBlink = 1.0
-							e\EventState = e\EventState + FPSfactor
-						Else
-							BlinkTimer = BLINKFREQ
-							
-							Curr173\Idle = False
-							RemoveEvent(e)
 						End If	
 					EndIf
-				EndIf					
+				EndIf
+				
+				If e\EventState > 0 And e\EventState < 200 Then
+					BlinkTimer = -10
+					If e\EventState > 30 Then 
+						LightBlink = 1.0 
+						If e\EventState-FPSfactor =< 30 Then 
+							PlaySound_Strict LoadTempSound("SFX\ambient\general\ambient3.ogg")
+						EndIf
+					EndIf
+					If e\EventState-FPSfactor =< 100 And e\EventState > 100 Then
+						PlaySound_Strict LoadTempSound("SFX\ambient\general\ambient6.ogg")
+						PositionEntity(Curr173\Collider, EntityX(e\room\obj), 0.6, EntityZ(e\room\obj))
+						ResetEntity(Curr173\Collider)					
+						Curr173\Idle = True		
+					EndIf
+					LightBlink = 1.0
+					e\EventState = e\EventState + FPSfactor
+				ElseIf e\EventState <> 0 Then
+					BlinkTimer = BLINKFREQ
+					
+					Curr173\Idle = False
+					RemoveEvent(e)
+				EndIf
 				;[End Block]
 			Case "tunnel106"
 				;[Block]
