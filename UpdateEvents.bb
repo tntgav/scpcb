@@ -9029,6 +9029,8 @@ Function UpdateEndings()
 						ResetEntity Collider
 						e\EventState = 1.0
 						
+						RotateEntity Collider,0,EntityYaw(Collider)+(e\room\angle+180),0
+						
 						If (Not Contained106) Then PlaySound_Strict LoadTempSound("SFX\Ending\GateA\106Escape.ogg") 
 						
 						DrawLoading(100)

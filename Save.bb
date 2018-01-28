@@ -1507,6 +1507,9 @@ Function LoadGameQuick(file$)
 			NTF_1499PrevRoom = r
 			Exit
 		EndIf
+		If r\RoomTemplate\Name = "gatea" Then
+			PositionEntity r\obj,EntityX(r\obj),r\y,EntityZ(r\obj)
+		EndIf
 	Next
 	
 	;InitWayPoints()
