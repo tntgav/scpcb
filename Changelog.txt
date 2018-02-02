@@ -17,9 +17,11 @@ Bug fixes:
     - The keycard slot level for the archive rooms will now be saved instead of being generated newly each time.
     - The "Battery low" text won't overlap with the "Scanning" text while wearing the blue night vision goggles anymore.
     - The event where SCP-173 appears when entering the tunnel room won't pause anymore if you enter it and then leave the room afterwards.
+    - SCP-173 won't appear in the tunnel room when being contained.
     - Added "dplayx.dll" which should prevent the "DirectPlay not enabled" error message from appearing.
     - Gate A won't go any higher anymore if you quick-loaded the game.
     - Fixed player's rotation when the elevator arrives at Gate A.
+    - The ending screen won't appear anymore when you go to Gate A or B, load the game and die afterwards.
 ----------------------------------------------------------------------------------
 
 v1.3.9

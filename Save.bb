@@ -1146,6 +1146,7 @@ Function LoadGameQuick(file$)
 	DeafTimer# = 0.0
 	UnableToMove% = False
 	Msg = ""
+	SelectedEnding = ""
 	
 	PositionEntity Collider,0,1000.0,0,True
 	ResetEntity Collider
