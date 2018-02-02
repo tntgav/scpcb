@@ -975,11 +975,27 @@ Function UpdateNPCs()
 					dist = EntityDistance(n\Collider, Collider)
 					
 					Local spawn106% = True
+					;checking if 106 is allowed to spawn
 					If PlayerRoom\RoomTemplate\Name$ = "dimension1499" Then spawn106% = False
 					For e.Events = Each Events
 						If e\EventName = "room860"
 							If e\EventState = 1
 								spawn106% = False
+							EndIf
+							Exit
+						EndIf
+					Next
+					;GateA event has been triggered - don't make 106 disapper!
+					;The reason why this is a seperate For loop is because we need to make sure that room860 would not be able to overwrite the "spawn106%" variable
+					For e.events = Each Events
+						If e\EventName = "gatea"
+							If e\EventState <> 0
+								spawn106% = True
+								If PlayerRoom\RoomTemplate\Name$ = "dimension1499" Then
+									n\Idle = True
+								Else
+									n\Idle = False
+								EndIf
 							EndIf
 							Exit
 						EndIf

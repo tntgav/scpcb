@@ -22,6 +22,7 @@ Bug fixes:
     - Gate A won't go any higher anymore if you quick-loaded the game.
     - Fixed player's rotation when the elevator arrives at Gate A.
     - The ending screen won't appear anymore when you go to Gate A or B, load the game and die afterwards.
+    - SCP-106 won't disappear from Gate A anymore if you use SCP-1499.
 ----------------------------------------------------------------------------------
 
 v1.3.9
