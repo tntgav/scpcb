@@ -1826,7 +1826,7 @@ Function UpdateEvents()
 			Case "lockroom173"
 				;[Block]
 				If e\room\dist < 6.0  And e\room\dist > 0 Then
-					If Curr173\Idle = 2 Then
+					If Curr173\Idle > 1 Then
 						RemoveEvent(e)
 					Else
 						If (Not EntityInView(Curr173\Collider, Camera)) Or EntityDistance(Curr173\Collider, Collider)>15.0 Then 
@@ -6665,8 +6665,9 @@ Function UpdateEvents()
 			Case "tunnel2"
 				;[Block]
 				If PlayerRoom = e\room Then
-					If Curr173\Idle = 2 Then
+					If Curr173\Idle > 1 Then
 						RemoveEvent(e)
+						Exit
 					Else		
 						If e\EventState = 0 Then
 							If Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\obj), EntityZ(e\room\obj)) < 3.5 Then
