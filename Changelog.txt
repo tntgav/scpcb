@@ -10,6 +10,7 @@
 - Added an alarm sound for each gateway room.
 - Changed the texture of the checkpoint lockdown screens slightly.
 - Improved SCP-914's document texture.
+- Optimized the room light rendering.
 
 Bug fixes:
     - The inventory cannot be opened while the SCP-008 zombie cutscene plays.
