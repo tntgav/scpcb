@@ -6276,10 +6276,12 @@ Function UpdateEvents()
 							x = 2.0
 						EndIf
 						
-						CameraClsColor Camera,98*x,133*x,162*x
-						CameraRange Camera,RoomScale,8.5
-						CameraFogRange Camera,0.5,8.0
-						CameraFogColor Camera,98*x,133*x,162*x
+						If (Not DebugHUD)
+							CameraClsColor Camera,98*x,133*x,162*x
+							CameraRange Camera,RoomScale,8.5
+							CameraFogRange Camera,0.5,8.0
+							CameraFogColor Camera,98*x,133*x,162*x
+						EndIf
 						
 					Else
 						

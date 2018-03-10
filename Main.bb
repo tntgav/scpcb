@@ -11464,74 +11464,76 @@ End Function
 
 Function PlayStartupVideos()
 	
+	Return
+	
 	If GetINIInt("options.ini","options","play startup video")=0 Then Return
 	
-	Local Cam = CreateCamera() 
-	CameraClsMode Cam, 0, 1
-	Local Quad = CreateQuad()
-	Local Texture = CreateTexture(2048, 2048, 256 Or 16 Or 32)
-	EntityTexture Quad, Texture
-	EntityFX Quad, 1
-	CameraRange Cam, 0.01, 100
-	TranslateEntity Cam, 1.0 / 2048 ,-1.0 / 2048 ,-1.0
-	EntityParent Quad, Cam, 1
-	
-	Local ScaledGraphicHeight%
-	Local Ratio# = Float(RealGraphicWidth)/Float(RealGraphicHeight)
-	If Ratio>1.76 And Ratio<1.78
-		ScaledGraphicHeight = RealGraphicHeight
-		DebugLog "Not Scaled"
-	Else
-		ScaledGraphicHeight% = Float(RealGraphicWidth)/(16.0/9.0)
-		DebugLog "Scaled: "+ScaledGraphicHeight
-	EndIf
-	
-	Local moviefile$ = "GFX\menu\startup_Undertow"
-	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
-	Local moview = BlitzMovie_GetWidth()
-	Local movieh = BlitzMovie_GetHeight()
-	BlitzMovie_Close()
-	Local image = CreateImage(moview, movieh)
-	Local SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
-	SplashScreenVideo = BlitzMovie_Play()
-	Local SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
-	Repeat
-		Cls
-		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
-		Flip
-	Until (GetKey() Or (Not IsStreamPlaying_Strict(SplashScreenAudio)))
-	StopStream_Strict(SplashScreenAudio)
-	BlitzMovie_Stop()
-	BlitzMovie_Close()
-	FreeImage image
-	
-	Cls
-	Flip
-	
-	moviefile$ = "GFX\menu\startup_TSS"
-	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
-	moview = BlitzMovie_GetWidth()
-	movieh = BlitzMovie_GetHeight()
-	BlitzMovie_Close()
-	image = CreateImage(moview, movieh)
-	SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
-	SplashScreenVideo = BlitzMovie_Play()
-	SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
-	Repeat
-		Cls
-		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
-		Flip
-	Until (GetKey() Or (Not IsStreamPlaying_Strict(SplashScreenAudio)))
-	StopStream_Strict(SplashScreenAudio)
-	BlitzMovie_Stop()
-	BlitzMovie_Close()
-	
-	FreeTexture Texture
-	FreeEntity Quad
-	FreeEntity Cam
-	FreeImage image
-	Cls
-	Flip
+;	Local Cam = CreateCamera() 
+;	CameraClsMode Cam, 0, 1
+;	Local Quad = CreateQuad()
+;	Local Texture = CreateTexture(2048, 2048, 256 Or 16 Or 32)
+;	EntityTexture Quad, Texture
+;	EntityFX Quad, 1
+;	CameraRange Cam, 0.01, 100
+;	TranslateEntity Cam, 1.0 / 2048 ,-1.0 / 2048 ,-1.0
+;	EntityParent Quad, Cam, 1
+;	
+;	Local ScaledGraphicHeight%
+;	Local Ratio# = Float(RealGraphicWidth)/Float(RealGraphicHeight)
+;	If Ratio>1.76 And Ratio<1.78
+;		ScaledGraphicHeight = RealGraphicHeight
+;		DebugLog "Not Scaled"
+;	Else
+;		ScaledGraphicHeight% = Float(RealGraphicWidth)/(16.0/9.0)
+;		DebugLog "Scaled: "+ScaledGraphicHeight
+;	EndIf
+;	
+;	Local moviefile$ = "GFX\menu\startup_Undertow"
+;	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
+;	Local moview = BlitzMovie_GetWidth()
+;	Local movieh = BlitzMovie_GetHeight()
+;	BlitzMovie_Close()
+;	Local image = CreateImage(moview, movieh)
+;	Local SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
+;	SplashScreenVideo = BlitzMovie_Play()
+;	Local SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
+;	Repeat
+;		Cls
+;		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
+;		Flip
+;	Until (GetKey() Or (Not IsStreamPlaying_Strict(SplashScreenAudio)))
+;	StopStream_Strict(SplashScreenAudio)
+;	BlitzMovie_Stop()
+;	BlitzMovie_Close()
+;	FreeImage image
+;	
+;	Cls
+;	Flip
+;	
+;	moviefile$ = "GFX\menu\startup_TSS"
+;	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
+;	moview = BlitzMovie_GetWidth()
+;	movieh = BlitzMovie_GetHeight()
+;	BlitzMovie_Close()
+;	image = CreateImage(moview, movieh)
+;	SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
+;	SplashScreenVideo = BlitzMovie_Play()
+;	SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
+;	Repeat
+;		Cls
+;		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
+;		Flip
+;	Until (GetKey() Or (Not IsStreamPlaying_Strict(SplashScreenAudio)))
+;	StopStream_Strict(SplashScreenAudio)
+;	BlitzMovie_Stop()
+;	BlitzMovie_Close()
+;	
+;	FreeTexture Texture
+;	FreeEntity Quad
+;	FreeEntity Cam
+;	FreeImage image
+;	Cls
+;	Flip
 	
 End Function
 

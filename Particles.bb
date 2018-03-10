@@ -155,8 +155,7 @@ Function UpdateEmitters()
 		
 		EyeIrritation=EyeIrritation+FPSfactor * 4
 	EndIf	
-End Function 
-
+End Function
 	
 Function CreateEmitter.Emitters(x#, y#, z#, emittertype%) 
 	Local e.Emitters = New Emitters

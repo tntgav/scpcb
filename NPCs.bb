@@ -6815,7 +6815,7 @@ End Function
 Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False)
 	
 	;muzzle flash
-	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
+	Local p.particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
 	TurnEntity p\obj, 0,0,Rnd(360)
 	p\Achange = -0.15
 	
