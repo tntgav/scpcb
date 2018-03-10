@@ -2008,7 +2008,7 @@ Function UpdateEvents()
 								ElseIf dist < 8.0
 									e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\Objects[20], 8.0)
 									EntityTexture e\room\Objects[20], e\room\Objects[19]
-									Injuries=Injuries+(8.0-dist)*FPSfactor*0.0005
+									Injuries=Injuries+(8.0-dist)*FPSfactor*0.0003
 									
 									If dist<7.0 Then 
 										pvt% = CreatePivot()
