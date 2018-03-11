@@ -943,11 +943,13 @@ Function LoadGame(file$)
 			e\EventState = 0.0
 			e\EventStr = ""
 			DebugLog "Reset Eventstate in "+e\EventName
-		;Only reset if the dimension has already been generated and the player wasn't saving in it
+		;Reset dimension1499
 		ElseIf e\EventName = "dimension1499"
-			If e\EventState = 1.0
+			If e\EventState > 0.0
 				e\EventState = 0.0
 				e\EventStr = ""
+				HideChunks()
+				DeleteChunks()
 				For n.NPCs = Each NPCs
 					If n\NPCtype = NPCtype1499
 						If n\InFacility = 0
@@ -1130,6 +1132,17 @@ Function LoadGame(file$)
 		Next
 	Next
 	
+	If PlayerRoom\RoomTemplate\Name = "dimension1499"
+		BlinkTimer = -1
+		ShouldEntitiesFall = False
+		PlayerRoom = NTF_1499PrevRoom
+		UpdateDoors()
+		UpdateRooms()
+		For it.Items = Each Items
+			it\disttimer = 0
+		Next
+	EndIf
+	
 	CatchErrors("LoadGame")
 End Function
 
@@ -1146,6 +1159,7 @@ Function LoadGameQuick(file$)
 	DeafTimer# = 0.0
 	UnableToMove% = False
 	Msg = ""
+	SelectedEnding = ""
 	
 	PositionEntity Collider,0,1000.0,0,True
 	ResetEntity Collider
@@ -1506,6 +1520,9 @@ Function LoadGameQuick(file$)
 		If r\x = r1499_x# And r\z = r1499_z#
 			NTF_1499PrevRoom = r
 			Exit
+		EndIf
+		If r\RoomTemplate\Name = "gatea" Then
+			PositionEntity r\obj,EntityX(r\obj),r\y,EntityZ(r\obj)
 		EndIf
 	Next
 	

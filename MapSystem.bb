@@ -5939,7 +5939,7 @@ Function UpdateSecurityCams()
 											ShowEntity(sc\Cam)
 											Cls
 											
-											UpdateRoomLights(sc\Cam)
+											;UpdateRoomLights(sc\Cam)
 											
 											SetBuffer BackBuffer()
 											RenderWorld
@@ -5954,7 +5954,7 @@ Function UpdateSecurityCams()
 											ShowEntity(CoffinCam\Cam)
 											Cls
 											
-											UpdateRoomLights(CoffinCam\Cam)
+											;UpdateRoomLights(CoffinCam\Cam)
 											
 											SetBuffer BackBuffer()
 											RenderWorld
@@ -5969,7 +5969,7 @@ Function UpdateSecurityCams()
 										ShowEntity(sc\Cam)
 										Cls
 										
-										UpdateRoomLights(sc\Cam)
+										;UpdateRoomLights(sc\Cam)
 										
 										RenderWorld
 										
@@ -5992,7 +5992,7 @@ Function UpdateSecurityCams()
 								ShowEntity(Room2slCam)
 								Cls
 								
-								UpdateRoomLights(Room2slCam)
+								;UpdateRoomLights(Room2slCam)
 								
 								RenderWorld
 								
@@ -7488,6 +7488,7 @@ End Function
 
 Include "Skybox.bb"
 
+Global UpdateRoomLightsTimer# = 0.0
 
 Function UpdateRoomLights(cam%)
 	
@@ -7498,38 +7499,99 @@ Function UpdateRoomLights(cam%)
 			For i = 0 To r\MaxLights%
 				If r\Lights%[i]<>0
 					If EnableRoomLights% And (SecondaryLightOn>0.5)
-						ShowEntity r\LightSprites[i]
-						
-						If EntityDistance(cam%,r\Lights%[i])<8.5
-							If r\LightHidden[i]
-								ShowEntity r\Lights%[i]
-								r\LightHidden[i] = False
+						If UpdateRoomLightsTimer=0.0
+							ShowEntity r\LightSprites[i]
+							
+							If EntityDistance(cam%,r\Lights%[i])<8.5
+								If r\LightHidden[i]
+									ShowEntity r\Lights%[i]
+									r\LightHidden[i] = False
+								EndIf
+							Else
+								If (Not r\LightHidden[i])
+									HideEntity r\Lights%[i]
+									r\LightHidden[i] = True
+								EndIf
+							EndIf
+							
+							If r\LightCone[i]<>0 Then ShowEntity r\LightCone[i]
+							;[TODO]
+							If r\LightConeSpark[i]<>0 
+								If r\LightConeSparkTimer[i]>0 And r\LightConeSparkTimer[i]<10 ;Needs testing
+									ShowEntity r\LightConeSpark[i]
+									r\LightConeSparkTimer[i]=r\LightConeSparkTimer[i]+FPSfactor
+								Else
+									HideEntity r\LightConeSpark[i]
+									r\LightConeSparkTimer[i]=0
+								EndIf
+							EndIf
+							
+							If (EntityDistance(cam%,r\LightSprites2[i])<8.5 Or r\RoomTemplate\UseLightCones)
+								If EntityVisible(cam%,r\LightSpritesPivot[i]) Or r\RoomTemplate\UseLightCones
+									If r\LightSpriteHidden%[i]
+										ShowEntity r\LightSprites2%[i]
+										r\LightSpriteHidden%[i] = False
+									EndIf
+									If PlayerRoom\RoomTemplate\Name$ = "173"
+										random# = Rnd(0.38,0.42)
+									Else
+										If r\LightFlicker%[i]<5
+											random# = Rnd(0.38,0.42)
+										ElseIf r\LightFlicker%[i]>4 And r\LightFlicker%[i]<10
+											random# = Rnd(0.35,0.45)
+										Else
+											random# = Rnd(0.3,0.5)
+										EndIf
+									EndIf
+									ScaleSprite r\LightSprites2[i],random#,random#
+									If r\LightCone[i]<>0
+										;ScaleEntity r\LightCone[i],0.01+((-0.4+random#)*0.025),0.01+((-0.4+random#)*0.025),0.01+((-0.4+random#)*0.025)
+										ScaleEntity r\LightCone[i],0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025)
+										If r\LightFlicker%[i]>4
+											If Rand(400)=1
+												SetEmitter(r\LightSpritesPivot[i],ParticleEffect[0])
+												PlaySound2(IntroSFX(Rand(10,12)),cam,r\LightSpritesPivot[i])
+												ShowEntity r\LightConeSpark[i]
+												r\LightConeSparkTimer[i] = FPSfactor
+											EndIf
+										EndIf
+									EndIf
+									dist# = (EntityDistance(cam%,r\LightSpritesPivot[i])+0.5)/7.5
+									dist# = Max(Min(dist#,1.0),0.0)
+									alpha# = Float(Inverse(dist#))
+									
+									If alpha# > 0.0
+										EntityAlpha r\LightSprites2[i],Max(3*(Brightness/255)*(r\LightIntensity[i]/2),1)*alpha#
+									Else
+										;Instead of rendering the sprite invisible, just hiding it if the player is far away from it
+										If (Not r\LightSpriteHidden%[i])
+											HideEntity r\LightSprites2[i]
+											r\LightSpriteHidden%[i]=True
+										EndIf
+									EndIf
+									
+									If r\RoomTemplate\UseLightCones
+										If EntityDistance(cam%,r\LightSprites2[i])>=8.5 Or (Not EntityVisible(cam%,r\LightSpritesPivot[i]))
+											HideEntity r\LightSprites2%[i]
+											r\LightSpriteHidden%[i] = True
+										EndIf
+									EndIf
+								Else
+									If (Not r\LightSpriteHidden%[i])
+										HideEntity r\LightSprites2%[i]
+										r\LightSpriteHidden%[i] = True
+									EndIf
+								EndIf
+							Else
+								If (Not r\LightSpriteHidden%[i])
+									HideEntity r\LightSprites2%[i]
+									r\LightSpriteHidden%[i] = True
+									If r\LightCone[i]<>0 Then HideEntity r\LightCone[i]
+									If r\LightConeSpark[i]<>0 HideEntity r\LightConeSpark[i]
+								EndIf
 							EndIf
 						Else
-							If (Not r\LightHidden[i])
-								HideEntity r\Lights%[i]
-								r\LightHidden[i] = True
-							EndIf
-						EndIf
-						
-						If r\LightCone[i]<>0 Then ShowEntity r\LightCone[i]
-						;[TODO]
-						If r\LightConeSpark[i]<>0 
-							If r\LightConeSparkTimer[i]>0 And r\LightConeSparkTimer[i]<10 ;Needs testing
-								ShowEntity r\LightConeSpark[i]
-								r\LightConeSparkTimer[i]=r\LightConeSparkTimer[i]+FPSfactor
-							Else
-								HideEntity r\LightConeSpark[i]
-								r\LightConeSparkTimer[i]=0
-							EndIf
-						EndIf
-						
-						If (EntityDistance(cam%,r\LightSprites2[i])<8.5 Or r\RoomTemplate\UseLightCones)
-							If EntityVisible(cam%,r\LightSpritesPivot[i]) Or r\RoomTemplate\UseLightCones
-								If r\LightSpriteHidden%[i]
-									ShowEntity r\LightSprites2%[i]
-									r\LightSpriteHidden%[i] = False
-								EndIf
+							If (Not r\LightSpriteHidden[i])
 								If PlayerRoom\RoomTemplate\Name$ = "173"
 									random# = Rnd(0.38,0.42)
 								Else
@@ -7542,51 +7604,11 @@ Function UpdateRoomLights(cam%)
 									EndIf
 								EndIf
 								ScaleSprite r\LightSprites2[i],random#,random#
-								If r\LightCone[i]<>0
-									;ScaleEntity r\LightCone[i],0.01+((-0.4+random#)*0.025),0.01+((-0.4+random#)*0.025),0.01+((-0.4+random#)*0.025)
-									ScaleEntity r\LightCone[i],0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025)
-									If r\LightFlicker%[i]>4
-										If Rand(400)=1
-											SetEmitter(r\LightSpritesPivot[i],ParticleEffect[0])
-											PlaySound2(IntroSFX(Rand(10,12)),cam,r\LightSpritesPivot[i])
-											ShowEntity r\LightConeSpark[i]
-											r\LightConeSparkTimer[i] = FPSfactor
-										EndIf
-									EndIf
-								EndIf
-								dist# = (EntityDistance(cam%,r\LightSpritesPivot[i])+0.5)/7.5
-								dist# = Max(Min(dist#,1.0),0.0)
-								alpha# = Float(Inverse(dist#))
-								
-								If alpha# > 0.0
-									EntityAlpha r\LightSprites2[i],Max(3*(Brightness/255)*(r\LightIntensity[i]/2),1)*alpha#
-								Else
-									;Instead of rendering the sprite invisible, just hiding it if the player is far away from it
-									If (Not r\LightSpriteHidden%[i])
-										HideEntity r\LightSprites2[i]
-										r\LightSpriteHidden%[i]=True
-									EndIf
-								EndIf
-								
-								If r\RoomTemplate\UseLightCones
-									If EntityDistance(cam%,r\LightSprites2[i])>=8.5 Or (Not EntityVisible(cam%,r\LightSpritesPivot[i]))
-										HideEntity r\LightSprites2%[i]
-										r\LightSpriteHidden%[i] = True
-									EndIf
-								EndIf
-							Else
-								If (Not r\LightSpriteHidden%[i])
-									HideEntity r\LightSprites2%[i]
-									r\LightSpriteHidden%[i] = True
-								EndIf
 							EndIf
-						Else
-							If (Not r\LightSpriteHidden%[i])
-								HideEntity r\LightSprites2%[i]
-								r\LightSpriteHidden%[i] = True
-								If r\LightCone[i]<>0 Then HideEntity r\LightCone[i]
-								If r\LightConeSpark[i]<>0 HideEntity r\LightConeSpark[i]
-							EndIf
+						EndIf
+						UpdateRoomLightsTimer = UpdateRoomLightsTimer + FPSfactor
+						If UpdateRoomLightsTimer >= 8
+							UpdateRoomLightsTimer = 0.0
 						EndIf
 					Else
 						If SecondaryLightOn<=0.5

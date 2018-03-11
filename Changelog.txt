@@ -1,3 +1,35 @@
+﻿v1.3.10
+
+- Updated the Map Creator (version 2.1)
+    - Added an option to enable/disable adjacent door spawning in the 3d viewer.
+    - Revamped the design for the 2d grid a bit.
+    - Added the ability to scale each zone (by adjusting the checkpoint lines for them).
+    - Fixed a bug that caused the event chance to be 0% when you select an event of a room while "Set the event for the rooms by default" is disabled.
+    - Fixed a little visual glitch in which the selected room stats showed an empty event and the event chance when you moved the slider.
+    - Swapped the "Open map" and "Save map" texts when opening/saving a map (they were incorrectly named).
+- Added an alarm sound for each gateway room.
+- Changed the texture of the checkpoint lockdown screens slightly.
+- Improved SCP-914's document texture.
+- Optimized the room light rendering.
+- Removed lightmaps from the SCP-1499 dimension buildings, so now the game loads less textures when loading the dimension.
+
+Bug fixes:
+    - The inventory cannot be opened while the SCP-008 zombie cutscene plays.
+    - Removed the "room2doors" event from events.ini as the actual event used in the game is called "room2doors173"
+    - The keycard slot level for the archive rooms will now be saved instead of being generated newly each time.
+    - The "Battery low" text won't overlap with the "Scanning" text while wearing the blue night vision goggles anymore.
+    - The event where SCP-173 appears when entering the tunnel room won't pause anymore if you enter it and then leave the room afterwards.
+    - SCP-173 won't appear in the tunnel room when being contained.
+    - Added "dplayx.dll" which should prevent the "DirectPlay not enabled" error message from appearing.
+    - Gate A won't go any higher anymore if you quick-loaded the game.
+    - Fixed player's rotation when the elevator arrives at Gate A.
+    - The ending screen won't appear anymore when you go to Gate A or B, load the game and die afterwards.
+    - SCP-106 won't disappear from Gate A anymore if you use SCP-1499.
+    - The SCP-1499 dimension won't lag anymore if you saved in it and load the save file from the main menu.
+    - The player cannot fly in the SCP-1499 dimension anymore.
+
+----------------------------------------------------------------------------------
+
 v1.3.9
 
 - Revamped Map Creator.
