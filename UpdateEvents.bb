@@ -8281,12 +8281,14 @@ Function UpdateEvents()
 				;[End Block]
 			Case "dimension1499"
 				;[Block]
-				;Hopefully this fixes the issue with the dimension1499 buildings appearing inside the facility
 				If PlayerRoom<>e\room
 					If e\room\Objects[0]<>0
 						For i = 1 To 15
 							HideEntity e\room\Objects[i]
 						Next
+					EndIf
+					If EntityY(Collider)>EntityY(e\room\obj)-0.5
+						PlayerRoom = e\room
 					EndIf
 				EndIf
 				If e\EventState = 2.0
@@ -8471,6 +8473,7 @@ Function UpdateDimension1499()
 					DropSpeed = 0
 				EndIf
 				CurrStepSFX=3
+				PlayerFallingPickDistance = 0.0
 			Else
 				If e\EventState = 2.0
 					HideEntity NTF_1499Sky

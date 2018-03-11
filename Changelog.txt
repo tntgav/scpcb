@@ -11,6 +11,7 @@
 - Changed the texture of the checkpoint lockdown screens slightly.
 - Improved SCP-914's document texture.
 - Optimized the room light rendering.
+- Removed lightmaps from the SCP-1499 dimension buildings, so now the game loads less textures when loading the dimension.
 
 Bug fixes:
     - The inventory cannot be opened while the SCP-008 zombie cutscene plays.
@@ -24,6 +25,9 @@ Bug fixes:
     - Fixed player's rotation when the elevator arrives at Gate A.
     - The ending screen won't appear anymore when you go to Gate A or B, load the game and die afterwards.
     - SCP-106 won't disappear from Gate A anymore if you use SCP-1499.
+    - The SCP-1499 dimension won't lag anymore if you saved in it and load the save file from the main menu.
+    - The player cannot fly in the SCP-1499 dimension anymore.
+
 ----------------------------------------------------------------------------------
 
 v1.3.9
