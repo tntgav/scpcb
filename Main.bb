@@ -2999,15 +2999,23 @@ Repeat
 		
 		If KeyHit(KEY_INV) And VomitTimer >= 0
 			If (Not UnableToMove) And (Not IsZombie)
-				If InvOpen Then
-					ResumeSounds()
-					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
-				Else
-					PauseSounds()
+				Local W$ = ""
+				Local V# = 0
+				If SelectedItem<>Null
+					W$ = SelectedItem\itemtemplate\tempname
+					V# = SelectedItem\state
 				EndIf
-				InvOpen = Not InvOpen
-				If OtherOpen<>Null Then OtherOpen=Null
-				SelectedItem = Null
+				If (W<>"vest" And W<>"finevest" And W<>"hazmatsuit" And W<>"hazmatsuit2" And W<>"hazmatsuit3") Or V=0 Or V=100
+					If InvOpen Then
+						ResumeSounds()
+						MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
+					Else
+						PauseSounds()
+					EndIf
+					InvOpen = Not InvOpen
+					If OtherOpen<>Null Then OtherOpen=Null
+					SelectedItem = Null
+				EndIf
 			EndIf
 		EndIf
 		
@@ -5354,10 +5362,24 @@ Function DrawGUI()
 				EndIf
 			Else
 				If MouseSlot = 66 Then
-					DropItem(SelectedItem)		
-					
-					SelectedItem = Null		
-					InvOpen = False		
+					Select SelectedItem\itemtemplate\tempname
+						Case "vest","finevest","hazmatsuit","hazmatsuit2","hazmatsuit3"
+							Msg = "Double click on this item to take it off."
+							MsgTimer = 70*5
+						Case "scp1499","super1499"
+							If Wearing1499>0 Then
+								Msg = "Double click on this item to take it off."
+								MsgTimer = 70*5
+							Else
+								DropItem(SelectedItem)
+								SelectedItem = Null
+								InvOpen = False
+							EndIf
+						Default
+							DropItem(SelectedItem)
+							SelectedItem = Null
+							InvOpen = False
+					End Select
 					
 					MoveMouse viewport_center_x, viewport_center_y
 				Else
@@ -6418,36 +6440,83 @@ Function DrawGUI()
 					;[End Block]
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
 					;[Block]
-					Msg = "You removed the hazmat suit."
-					WearingHazmat = 0
-					MsgTimer = 70 * 5
-					DropItem(SelectedItem)
-					SelectedItem = Null	
-					;[End Block]
-				Case "vest"
-					;[Block]
-					If WearingVest Then
-						Msg = "You removed the vest."
-						WearingVest = False
-					Else
-						Msg = "You put on the vest and feel slightly encumbered."
-						WearingVest = True
-						TakeOffStuff(2)
+					CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
+					
+					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					
+					width% = 300
+					height% = 20
+					x% = GraphicWidth / 2 - width / 2
+					y% = GraphicHeight / 2 + 80
+					Rect(x, y, width+4, height, False)
+					For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+						DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
+					Next
+					
+					SelectedItem\state = Min(SelectedItem\state+(FPSfactor/4.0),100)
+					
+					If SelectedItem\state=100 Then
+						If WearingHazmat>0 Then
+							Msg = "You removed the hazmat suit."
+							WearingHazmat = False
+							DropItem(SelectedItem)
+						Else
+							If SelectedItem\itemtemplate\tempname="hazmatsuit" Then
+								;Msg = "Hazmat1."
+								WearingHazmat = 1
+							ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2" Then
+								;Msg = "Hazmat2."
+								WearingHazmat = 2
+							Else
+								;Msg = "Hazmat3."
+								WearingHazmat = 3
+							EndIf
+							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+							Msg = "You put on the hazmat suit."
+							TakeOffStuff(1+16)
+						EndIf
+						SelectedItem\state=0
+						MsgTimer = 70 * 5
+						SelectedItem = Null
 					EndIf
-					MsgTimer = 70 * 7
-					SelectedItem = Null
 					;[End Block]
-				Case "finevest"
+				Case "vest","finevest"
 					;[Block]
-					If WearingVest Then
-						Msg = "You removed the vest."
-						WearingVest = False						
-					Else
-						Msg = "You put on the vest and feel heavily encumbered."
-						WearingVest = 2
-						TakeOffStuff(2)
+					CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
+					
+					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					
+					width% = 300
+					height% = 20
+					x% = GraphicWidth / 2 - width / 2
+					y% = GraphicHeight / 2 + 80
+					Rect(x, y, width+4, height, False)
+					For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+						DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
+					Next
+					
+					SelectedItem\state = Min(SelectedItem\state+(FPSfactor/(2.0+(0.5*(SelectedItem\itemtemplate\tempname="finevest")))),100)
+					
+					If SelectedItem\state=100 Then
+						If WearingVest>0 Then
+							Msg = "You removed the vest."
+							WearingVest = False
+							DropItem(SelectedItem)
+						Else
+							If SelectedItem\itemtemplate\tempname="vest" Then
+								Msg = "You put on the vest and feel slightly encumbered."
+								WearingVest = 1
+							Else
+								Msg = "You put on the vest and feel heavily encumbered."
+								WearingVest = 2
+							EndIf
+							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+							TakeOffStuff(2)
+						EndIf
+						SelectedItem\state=0
+						MsgTimer = 70 * 5
+						SelectedItem = Null
 					EndIf
-					SelectedItem = Null	
 					;[End Block]
 				Case "gasmask", "supergasmask", "gasmask3"
 					;[Block]
@@ -6661,53 +6730,83 @@ Function DrawGUI()
 				;new Items in SCP:CB 1.3
 				Case "scp1499","super1499"
 					;[Block]
-					If (Not Wearing1499%) Then
-						GiveAchievement(Achv1499)
-						
-						;Wearing178 = 0
-						;WearingGasMask = 0
-						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-						;WearingNightVision = 0
-						TakeOffStuff(1+2+8+32)
-						For r.Rooms = Each Rooms
-							If r\RoomTemplate\Name = "dimension1499" Then
-								BlinkTimer = -1
-								NTF_1499PrevRoom = PlayerRoom
-								NTF_1499PrevX# = EntityX(Collider)
-								NTF_1499PrevY# = EntityY(Collider)
-								NTF_1499PrevZ# = EntityZ(Collider)
-								
-								If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0
-									PositionEntity (Collider, r\x+676.0*RoomScale, r\y+314.0*RoomScale, r\z-2080.0*RoomScale)
-								Else
-									PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
-								EndIf
-								ResetEntity(Collider)
-								UpdateDoors()
-								UpdateRooms()
-								For it.Items = Each Items
-									it\disttimer = 0
-								Next
-								PlayerRoom = r
-								PlaySound_Strict (LoadTempSound("SFX\SCP\1499\Enter.ogg"))
-								NTF_1499X# = 0.0
-								NTF_1499Y# = 0.0
-								NTF_1499Z# = 0.0
-								If Curr096<>Null
-									If Curr096\SoundChn<>0
-										SetStreamVolume_Strict(Curr096\SoundChn,0.0)
-									EndIf
-								EndIf
-								Exit
+					If WearingHazmat>0
+						Msg = "You are not able to wear SCP-1499 and a hazmat suit at the same time."
+						MsgTimer = 70 * 5
+						SelectedItem=Null
+						Return
+					EndIf
+					
+					CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
+					
+					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					
+					width% = 300
+					height% = 20
+					x% = GraphicWidth / 2 - width / 2
+					y% = GraphicHeight / 2 + 80
+					Rect(x, y, width+4, height, False)
+					For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+						DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
+					Next
+					
+					SelectedItem\state = Min(SelectedItem\state+(FPSfactor),100)
+					
+					If SelectedItem\state=100 Then
+						If Wearing1499>0 Then
+							;Msg = "1499remove."
+							Wearing1499 = False
+							;DropItem(SelectedItem)
+							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+						Else
+							If SelectedItem\itemtemplate\tempname="scp1499" Then
+								;Msg = "scp1499."
+								Wearing1499 = 1
+							Else
+								;Msg = "super1499."
+								Wearing1499 = 2
 							EndIf
-						Next
+							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+							GiveAchievement(Achv1499)
+							If WearingNightVision Then CameraFogFar = StoredCameraFogFar
+							TakeOffStuff(1+2+8+32)
+							For r.Rooms = Each Rooms
+								If r\RoomTemplate\Name = "dimension1499" Then
+									BlinkTimer = -1
+									NTF_1499PrevRoom = PlayerRoom
+									NTF_1499PrevX# = EntityX(Collider)
+									NTF_1499PrevY# = EntityY(Collider)
+									NTF_1499PrevZ# = EntityZ(Collider)
+									
+									If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0
+										PositionEntity (Collider, r\x+676.0*RoomScale, r\y+314.0*RoomScale, r\z-2080.0*RoomScale)
+									Else
+										PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
+									EndIf
+									ResetEntity(Collider)
+									UpdateDoors()
+									UpdateRooms()
+									For it.Items = Each Items
+										it\disttimer = 0
+									Next
+									PlayerRoom = r
+									PlaySound_Strict (LoadTempSound("SFX\SCP\1499\Enter.ogg"))
+									NTF_1499X# = 0.0
+									NTF_1499Y# = 0.0
+									NTF_1499Z# = 0.0
+									If Curr096<>Null
+										If Curr096\SoundChn<>0
+											SetStreamVolume_Strict(Curr096\SoundChn,0.0)
+										EndIf
+									EndIf
+									Exit
+								EndIf
+							Next
+						EndIf
+						SelectedItem\state=0
+						;MsgTimer = 70 * 5
+						SelectedItem = Null
 					EndIf
-					If SelectedItem\itemtemplate\tempname="super1499"
-						If Wearing1499%=0 Then Wearing1499% = 2 Else Wearing1499%=0
-					Else
-						Wearing1499% = (Not Wearing1499%)
-					EndIf
-					SelectedItem = Null
 					;[End Block]
 				Case "badge"
 					;[Block]
@@ -6822,6 +6921,21 @@ Function DrawGUI()
 					SelectedItem\itemtemplate\img=0
 				ElseIf IN$ = "firstaid" Or IN$="finefirstaid" Or IN$="firstaid2" Then
 					SelectedItem\state = 0
+				ElseIf IN$ = "vest" Or IN$="finevest"
+					SelectedItem\state = 0
+					If (Not WearingVest)
+						DropItem(SelectedItem,False)
+					EndIf
+				ElseIf IN$="hazmatsuit" Or IN$="hazmatsuit2" Or IN$="hazmatsuit3"
+					SelectedItem\state = 0
+					If (Not WearingHazmat)
+						DropItem(SelectedItem,False)
+					EndIf
+				ElseIf IN$="scp1499" Or IN$="super1499"
+					SelectedItem\state = 0
+					;If (Not Wearing1499)
+					;	DropItem(SelectedItem,False)
+					;EndIf
 				EndIf
 				
 				If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
@@ -6841,7 +6955,7 @@ Function DrawGUI()
 	For it.Items = Each Items
 		If it<>SelectedItem
 			Select it\itemtemplate\tempname
-				Case "firstaid","finefirstaid","firstaid2"
+				Case "firstaid","finefirstaid","firstaid2","vest","finevest","hazmatsuit","hazmatsuit2","hazmatsuit3","scp1499","super1499"
 					it\state = 0
 			End Select
 		EndIf

@@ -12,6 +12,7 @@
 - Improved SCP-914's document texture.
 - Optimized the room light rendering.
 - Removed lightmaps from the SCP-1499 dimension buildings, so now the game loads less textures when loading the dimension.
+- Changed the mechanics on how the wearing of the hazmat suit, the ballistic vest and SCP-1499 works.
 
 Bug fixes:
     - The inventory cannot be opened while the SCP-008 zombie cutscene plays.

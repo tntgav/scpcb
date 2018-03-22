@@ -572,6 +572,7 @@ End Function
 
 Function PickItem(item.Items)
 	Local n% = 0
+	Local canpickitem = True
 	
 	CatchErrors("Uncaught (PickItem)")
 	If ItemAmount < MaxItemAmount Then
@@ -631,25 +632,57 @@ Function PickItem(item.Items)
 					Case "navigator", "nav"
 						If item\itemtemplate\name = "S-NAV Navigator Ultimate" Then GiveAchievement(AchvSNAV)
 					Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
-						Msg = "You put on the hazmat suit."
-						TakeOffStuff(1+16)
-						MsgTimer = 70 * 5
-						If item\itemtemplate\tempname="hazmatsuit3" Then
-							WearingHazmat = 3
-						ElseIf item\itemtemplate\tempname="hazmatsuit2"
-							WearingHazmat = 2
-						Else
-							WearingHazmat = 1
-						EndIf
-						
+						canpickitem = True
 						For z% = 0 To MaxItemAmount - 1
 							If Inventory(z) <> Null Then
 								If Inventory(z)\itemtemplate\tempname="hazmatsuit" Or Inventory(z)\itemtemplate\tempname="hazmatsuit2" Or Inventory(z)\itemtemplate\tempname="hazmatsuit3" Then
-									DropItem(Inventory(z))
+									canpickitem% = False
+									Exit
+								ElseIf Inventory(z)\itemtemplate\tempname="vest" Or Inventory(z)\itemtemplate\tempname="finevest" Then
+									canpickitem% = 2
+									Exit
 								EndIf
 							EndIf
 						Next
 						
+						If canpickitem=False Then
+							Msg = "You are not able to wear two hazmat suits at the same time."
+							MsgTimer = 70 * 5
+							Return
+						ElseIf canpickitem=2 Then
+							Msg = "You are not able to wear a vest and a hazmat suit at the same time."
+							MsgTimer = 70 * 5
+							Return
+						Else
+							;TakeOffStuff(1+16)
+							SelectedItem = item
+						EndIf
+					Case "vest","finevest"
+						canpickitem = True
+						For z% = 0 To MaxItemAmount - 1
+							If Inventory(z) <> Null Then
+								If Inventory(z)\itemtemplate\tempname="vest" Or Inventory(z)\itemtemplate\tempname="finevest" Then
+									canpickitem% = False
+									Exit
+								ElseIf Inventory(z)\itemtemplate\tempname="hazmatsuit" Or Inventory(z)\itemtemplate\tempname="hazmatsuit2" Or Inventory(z)\itemtemplate\tempname="hazmatsuit3" Then
+									canpickitem% = 2
+									Exit
+								EndIf
+							EndIf
+						Next
+						
+						If canpickitem=False Then
+							Msg = "You are not able to wear two vests at the same time."
+							MsgTimer = 70 * 5
+							Return
+						ElseIf canpickitem=2 Then
+							Msg = "You are not able to wear a vest and a hazmat suit at the same time."
+							MsgTimer = 70 * 5
+							Return
+						Else
+							;TakeOffStuff(2)
+							SelectedItem = item
+						EndIf
 				End Select
 				
 				If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
@@ -671,9 +704,11 @@ Function PickItem(item.Items)
 	CatchErrors("PickItem")
 End Function
 
-Function DropItem(item.Items)
+Function DropItem(item.Items,playdropsound%=True)
 	CatchErrors("Uncaught (DropItem)")
-	If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
+	If playdropsound Then
+		If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
+	EndIf
 	
 	item\Dropped = 1
 	
