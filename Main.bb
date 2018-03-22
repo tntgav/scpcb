@@ -6817,10 +6817,11 @@ Function DrawGUI()
 				EntityAlpha Dark, 0.0
 				
 				IN$ = SelectedItem\itemtemplate\tempname
-				;If IN$ = "paper" Or IN$ = "scp1025" Or IN$ = "badge" Or IN$ = "oldpaper" Then
 				If IN$ = "scp1025" Then
 					If SelectedItem\itemtemplate\img<>0 Then FreeImage(SelectedItem\itemtemplate\img)
 					SelectedItem\itemtemplate\img=0
+				ElseIf IN$ = "firstaid" Or IN$="finefirstaid" Or IN$="firstaid2" Then
+					SelectedItem\state = 0
 				EndIf
 				
 				If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
@@ -6835,7 +6836,16 @@ Function DrawGUI()
 				If ChannelPlaying(RadioCHN(i)) Then PauseChannel(RadioCHN(i))
 			EndIf
 		Next
-	EndIf 
+	EndIf
+	
+	For it.Items = Each Items
+		If it<>SelectedItem
+			Select it\itemtemplate\tempname
+				Case "firstaid","finefirstaid","firstaid2"
+					it\state = 0
+			End Select
+		EndIf
+	Next
 	
 	If PrevInvOpen And (Not InvOpen) Then MoveMouse viewport_center_x, viewport_center_y
 	

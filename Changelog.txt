@@ -27,6 +27,7 @@ Bug fixes:
     - SCP-106 won't disappear from Gate A anymore if you use SCP-1499.
     - The SCP-1499 dimension won't lag anymore if you saved in it and load the save file from the main menu.
     - The player cannot fly in the SCP-1499 dimension anymore.
+    - The progress bar of the first aid kit won't stay at it's current value if the item has been deselected.
 
 ----------------------------------------------------------------------------------
 
