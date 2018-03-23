@@ -302,6 +302,8 @@ Function InitItemTemplates()
 	
 	CreateItemTemplate("Old Badge", "badge", "GFX\items\badge.x", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, "GFX\items\badge2_tex.png","",0,1+2+8)
 	
+	it = CreateItemTemplate("50 cent coin","50ct", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","",0,1+2+8) : it\sound = 3
+	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
 			If (it\texpath<>"") Then

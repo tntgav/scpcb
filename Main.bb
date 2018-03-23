@@ -5655,7 +5655,7 @@ Function DrawGUI()
 					;[Block]
 					;InvOpen = True
 					;[End Block]
-				Case "key1", "key2", "key3", "key4", "key5", "key6", "keyomni", "scp860", "hand", "hand2"
+				Case "key1", "key2", "key3", "key4", "key5", "key6", "keyomni", "scp860", "hand", "hand2", "50ct"
 					;[Block]
 					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 					;[End Block]
@@ -9994,6 +9994,13 @@ Function Use294()
 			If Input294 <> "OUT OF RANGE" Then
 				HidePointer()
 				Using294 = False
+				Local e.Events
+				For e.Events = Each Events
+					If e\room = PlayerRoom
+						e\EventState2 = 0
+						Exit
+					EndIf
+				Next
 			EndIf
 			Input294=""
 			PlayerRoom\SoundCHN=0

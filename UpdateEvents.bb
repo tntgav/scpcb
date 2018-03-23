@@ -2417,8 +2417,21 @@ Function UpdateEvents()
 											EndIf
 										EndIf
 									Next
-									Using294=temp
-									If Using294 Then MouseHit1=False
+									If SelectedItem<>Null Then
+										If SelectedItem\itemtemplate\tempname="50ct" Then
+											RemoveItem(SelectedItem)
+											SelectedItem=Null
+											e\EventState2 = 1
+										EndIf
+									EndIf
+									If e\EventState2 = 1 Then
+										Using294=temp
+										If Using294 Then MouseHit1=False
+									Else
+										Using294=False
+										Msg = "You need to insert a 50 cent coin in order to use this machine."
+										MsgTimer = 70*5
+									EndIf
 								EndIf
 							EndIf
 						EndIf
