@@ -573,9 +573,17 @@ End Function
 Function PickItem(item.Items)
 	Local n% = 0
 	Local canpickitem = True
+	Local fullINV% = True
+	
+	For n% = 0 To MaxItemAmount - 1
+		If Inventory(n)=Null
+			fullINV = False
+			Exit
+		EndIf
+	Next
 	
 	CatchErrors("Uncaught (PickItem)")
-	If ItemAmount < MaxItemAmount Then
+	If (Not fullINV) Then
 		For n% = 0 To MaxItemAmount - 1
 			If Inventory(n) = Null Then
 				Select item\itemtemplate\tempname
