@@ -14,6 +14,7 @@
 - Removed lightmaps from the SCP-1499 dimension buildings, so now the game loads less textures when loading the dimension.
 - Changed the mechanics on how the wearing of the hazmat suit, the ballistic vest and SCP-1499 works.
 - Added 50 cent coins in the game. Those are required to use SCP-294.
+- The message "You pushed the button but nothing happened." appears when you try to use a locked door that is opened.
 
 Bug fixes:
     - The inventory cannot be opened while the SCP-008 zombie cutscene plays.
@@ -30,6 +31,8 @@ Bug fixes:
     - The SCP-1499 dimension won't lag anymore if you saved in it and load the save file from the main menu.
     - The player cannot fly in the SCP-1499 dimension anymore.
     - The progress bar of the first aid kit won't stay at it's current value if the item has been deselected.
+    - The inventory and the main menu can not be opened anymore while using SCP-294.
+    - The camera won't turn rapidly anymore when leaving SCP-294.
 
 ----------------------------------------------------------------------------------
 

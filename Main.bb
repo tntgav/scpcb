@@ -2239,10 +2239,14 @@ Function UseDoor(d.Doors, showmsg%=True)
 				If Not (d\IsElevatorDoor>0) Then
 					PlaySound_Strict ButtonSFX2
 					If PlayerRoom\RoomTemplate\Name <> "room2elevator" Then
-						Msg = "The door appears to be locked."
-					Else
-						Msg = "The elevator appears to be broken."
-					EndIf
+                        If d\open Then
+                            Msg = "You pushed the button but nothing happened."
+                        Else    
+                            Msg = "The door appears to be locked."
+                        EndIf    
+                    Else
+                        Msg = "The elevator appears to be broken."
+                    EndIf
 					MsgTimer = 70 * 5
 				Else
 					If d\IsElevatorDoor = 1 Then
@@ -2997,8 +3001,8 @@ Repeat
 		
 		;[End block]
 		
-		If KeyHit(KEY_INV) And VomitTimer >= 0
-			If (Not UnableToMove) And (Not IsZombie)
+		If KeyHit(KEY_INV) And VomitTimer >= 0 Then
+			If (Not UnableToMove) And (Not IsZombie) And (Not Using294) Then
 				Local W$ = ""
 				Local V# = 0
 				If SelectedItem<>Null
@@ -4990,7 +4994,7 @@ Function DrawGUI()
 		KeypadMSG = ""
 	EndIf
 	
-	If KeyHit(1) And EndingTimer = 0 Then 
+	If KeyHit(1) And EndingTimer=0 And (Not Using294) Then
 		If MenuOpen Or InvOpen Then
 			ResumeSounds()
 			If OptionsMenu <> 0 Then SaveOptionsINI()
@@ -6971,8 +6975,10 @@ Function DrawMenu()
 	
 	Local x%, y%, width%, height%
 	If api_GetFocus() = 0 Then ;Game is out of focus -> pause the game
-        MenuOpen = True
-        PauseSounds()
+		If (Not Using294) Then
+			MenuOpen = True
+			PauseSounds()
+		EndIf
         Delay 1000 ;Reduce the CPU take while game is not in focus
     EndIf
 	If MenuOpen Then
@@ -9985,6 +9991,7 @@ Function Use294()
 			HidePointer()
 			Using294 = False
 			Input294 = ""
+			MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 		EndIf
 		
 	Else ;playing a dispensing sound
@@ -9994,6 +10001,7 @@ Function Use294()
 			If Input294 <> "OUT OF RANGE" Then
 				HidePointer()
 				Using294 = False
+				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 				Local e.Events
 				For e.Events = Each Events
 					If e\room = PlayerRoom
