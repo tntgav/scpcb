@@ -302,7 +302,9 @@ Function InitItemTemplates()
 	
 	CreateItemTemplate("Old Badge", "badge", "GFX\items\badge.x", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, "GFX\items\badge2_tex.png","",0,1+2+8)
 	
-	it = CreateItemTemplate("50 cent coin","50ct", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","",0,1+2+8) : it\sound = 3
+	it = CreateItemTemplate("50 Cent Coin","50ct", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","",0,1+2+8) : it\sound = 3
+	
+	it = CreateItemTemplate("Wallet","wallet", "GFX\items\wallet.b3d", "GFX\items\INVwallet.jpg", "", 0.0005,"","",1) : it\sound = 2
 	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -409,6 +411,9 @@ Function CreateItem.Items(name$, tempname$, x#, y#, z#, r%=0,g%=0,b%=0,a#=1.0,in
 		invSlots = 10
 		SetAnimTime i\model,17.0
 		i\invimg = i\itemtemplate\invimg2
+	ElseIf (tempname="wallet") And (invSlots=0) Then
+		invSlots = 10
+		SetAnimTime i\model,0.0
 	EndIf
 	
 	i\invSlots=invSlots

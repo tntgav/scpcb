@@ -15,6 +15,7 @@
 - Changed the mechanics on how the wearing of the hazmat suit, the ballistic vest and SCP-1499 works.
 - Added 50 cent coins in the game. Those are required to use SCP-294.
 - The message "You pushed the button but nothing happened." appears when you try to use a locked door that is opened.
+- Added wallets which you can use to store the 50 cent coins.
 
 Bug fixes:
     - The inventory cannot be opened while the SCP-008 zombie cutscene plays.

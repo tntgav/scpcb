@@ -5174,16 +5174,33 @@ Function DrawGUI()
 					Next
 					
 					isEmpty=True
-					
-					For z% = 0 To OtherSize - 1
-						If OtherOpen\SecondInv[z]<>Null Then isEmpty=False : Exit
-					Next
+					If OtherOpen\itemtemplate\tempname = "wallet" Then
+						If (Not isEmpty) Then
+							For z% = 0 To OtherSize - 1
+								If OtherOpen\SecondInv[z]<>Null
+									If OtherOpen\SecondInv[z]\itemtemplate\tempname<>"50ct" And OtherOpen\SecondInv[z]\itemtemplate\tempname<>"coin" Then
+										isEmpty=False
+										Exit
+									EndIf
+								EndIf
+							Next
+						EndIf
+					Else
+						For z% = 0 To OtherSize - 1
+							If OtherOpen\SecondInv[z]<>Null
+								isEmpty = False
+								Exit
+							EndIf
+						Next
+					EndIf
 					
 					If isEmpty Then
 						Select OtherOpen\itemtemplate\tempname
 							Case "clipboard"
 								OtherOpen\invimg = OtherOpen\itemtemplate\invimg2
 								SetAnimTime OtherOpen\model,17.0
+							Case "wallet"
+								SetAnimTime OtherOpen\model,0.0
 						End Select
 					EndIf
 					
@@ -5395,12 +5412,13 @@ Function DrawGUI()
 						SelectedItem = Null
 					ElseIf Inventory(MouseSlot) <> SelectedItem
 						Select SelectedItem\itemtemplate\tempname
-							Case "paper","key1","key2","key3","key4","key5","key6","misc","oldpaper","badge","ticket" ;BoH stuff
+							Case "paper","key1","key2","key3","key4","key5","key6","misc","oldpaper","badge","ticket","50ct","coin"
 								;[Block]
 								If Inventory(MouseSlot)\itemtemplate\tempname = "clipboard" Then
 									;Add an item to clipboard
 									Local added.Items = Null
-									If SelectedItem\itemtemplate\tempname<>"misc" Or (SelectedItem\itemtemplate\name="Playing Card" Or SelectedItem\itemtemplate\name="Mastercard") Then
+									Local b$ = SelectedItem\itemtemplate\tempname
+									If (b<>"misc" And b<>"50ct" And b<>"coin") Or (SelectedItem\itemtemplate\name="Playing Card" Or SelectedItem\itemtemplate\name="Mastercard") Then
 										For c% = 0 To Inventory(MouseSlot)\invSlots-1
 											If (Inventory(MouseSlot)\SecondInv[c] = Null)
 												If SelectedItem <> Null Then
@@ -5437,6 +5455,46 @@ Function DrawGUI()
 										Msg = "You cannot combine these two items."
 										MsgTimer = 70 * 5
 									EndIf
+								ElseIf Inventory(MouseSlot)\itemtemplate\tempname = "wallet" Then
+									;Add an item to clipboard
+									added.Items = Null
+									b$ = SelectedItem\itemtemplate\tempname
+									If (b<>"misc" And b<>"paper" And b<>"oldpaper") Or (SelectedItem\itemtemplate\name="Playing Card" Or SelectedItem\itemtemplate\name="Mastercard") Then
+										For c% = 0 To Inventory(MouseSlot)\invSlots-1
+											If (Inventory(MouseSlot)\SecondInv[c] = Null)
+												If SelectedItem <> Null Then
+													Inventory(MouseSlot)\SecondInv[c] = SelectedItem
+													Inventory(MouseSlot)\state = 1.0
+													If b<>"50ct" And b<>"coin"
+														SetAnimTime Inventory(MouseSlot)\model,3.0
+													EndIf
+													Inventory(MouseSlot)\invimg = Inventory(MouseSlot)\itemtemplate\invimg
+													
+													For ri% = 0 To MaxItemAmount - 1
+														If Inventory(ri) = SelectedItem Then
+															Inventory(ri) = Null
+															PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+														EndIf
+													Next
+													added = SelectedItem
+													SelectedItem = Null : Exit
+												EndIf
+											EndIf
+										Next
+										If SelectedItem <> Null Then
+											Msg = "The wallet is full."
+										Else
+											Msg = "You put "+added\itemtemplate\name+" into the wallet."
+										EndIf
+										
+										MsgTimer = 70 * 5
+									Else
+										Msg = "You cannot combine these two items."
+										MsgTimer = 70 * 5
+									EndIf
+								Else
+									Msg = "You cannot combine these two items."
+									MsgTimer = 70 * 5
 								EndIf
 								SelectedItem = Null
 								
@@ -9603,11 +9661,31 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 			End Select			
 			
 			RemoveItem(item)
-		Case "Playing Card", "Mastercard", "Coin"
+		Case "Playing Card", "Coin", "50 Cent Coin"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					it2 = CreateItem("Level 1 Key Card", "key1", x, y, z)	
+			    Case "fine", "very fine"
+					it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+			End Select
+			RemoveItem(item)
+		Case "Mastercard"
+			Select setting
+				Case "rough"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "coarse"
+					it2 = CreateItem("50 Cent Coin", "50ct", x, y, z)
+					Local it3.Items,it4.Items,it5.Items
+					it3 = CreateItem("50 Cent Coin", "50ct", x, y, z)
+					it4 = CreateItem("50 Cent Coin", "50ct", x, y, z)
+					it5 = CreateItem("50 Cent Coin", "50ct", x, y, z)
+					EntityType (it3\collider, HIT_ITEM)
+					EntityType (it4\collider, HIT_ITEM)
+					EntityType (it5\collider, HIT_ITEM)
 				Case "1:1"
 					it2 = CreateItem("Level 1 Key Card", "key1", x, y, z)	
 			    Case "fine", "very fine"
