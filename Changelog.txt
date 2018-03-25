@@ -20,6 +20,7 @@
 - Added a death message when the player gets killed by the SCP-035 tentacle in the office room.
 - The SCP-035 tentacles now play their idle sound.
 - Added the missing containment door inside of SCP-372's chamber.
+- Improved the SCP-1499 texture.
 
 Bug fixes:
     - Fixed an exploit that caused the blinking sprite to be rendered invisible after alt-tabbing the game.
@@ -41,6 +42,7 @@ Bug fixes:
     - The camera won't turn rapidly anymore when leaving SCP-294.
     - The maximum amount of achievements displayed at the ending screen is now correct.
     - The correct damage sounds will now be played when the player gets attacked by the SCP-035 tentacles.
+    - The Debug HUD won't be enabled anymore if you start a new game after you have quit a game where it has been activated before.
 
 ----------------------------------------------------------------------------------
 

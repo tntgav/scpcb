@@ -8556,6 +8556,8 @@ Function NullGame(playbuttonsfx%=True)
 	
 	ClearTextureCache
 	
+	DebugHUD = False
+	
 	UnableToMove% = False
 	
 	QuickLoadPercent = -1
