@@ -16,6 +16,7 @@
 - Added 50 cent coins in the game. Those are required to use SCP-294.
 - The message "You pushed the button but nothing happened." appears when you try to use a locked door that is opened.
 - Added wallets which you can use to store the 50 cent coins.
+- Added battery power to the night vision goggles that can be found in the facility.
 
 Bug fixes:
     - The inventory cannot be opened while the SCP-008 zombie cutscene plays.
