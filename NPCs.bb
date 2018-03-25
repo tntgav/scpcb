@@ -3244,7 +3244,10 @@ Function UpdateNPCs()
 								AnimateNPC(n, 283, 389, 0.3, False)
 								;Animate2(n\obj, AnimTime(n\obj), 283, 389, 0.3, False)
 								
-								If n\Frame>388 Then n\State = 1
+								If n\Frame>388 Then
+									n\State = 1
+									FreeSound_Strict n\Sound2 : n\Sound2 = 0
+								EndIf
 							Else
 								If dist < 2.5 Then 
 									SetNPCFrame(n, 284)
@@ -3256,12 +3259,17 @@ Function UpdateNPCs()
 							;attack 2, 32
 							;idle 33, 174
 						Case 1 ;idle
+							If n\Sound2=0 Then
+								FreeSound_Strict n\Sound2 : n\Sound2=0
+								n\Sound2 = LoadSound_Strict("SFX\Room\035Chamber\TentacleIdle.ogg")
+							EndIf
+							n\SoundChn2 = LoopSound2(n\Sound2,n\SoundChn2,Camera,n\Collider)
+							
 							If dist < 1.8 Then 
 								If Abs(DeltaYaw(n\Collider, Collider))<20 Then 
 									n\State = 2
 									If n\Sound<>0 Then FreeSound_Strict n\Sound : n\Sound = 0 
-									If n\Sound2<>0 Then FreeSound_Strict n\Sound2 : n\Sound2 = 0 
-									
+									;If n\Sound2<>0 Then FreeSound_Strict n\Sound2 : n\Sound2 = 0
 								EndIf
 							EndIf
 							
@@ -3282,6 +3290,7 @@ Function UpdateNPCs()
 								
 								If n\Frame>33 Then 
 									;SetAnimTime(n\obj,2)
+									If n\Sound2<>0 Then FreeSound_Strict n\Sound2 : n\Sound2 = 0
 									n\Frame = 2
 									n\Sound = LoadSound_Strict("SFX\Room\035Chamber\TentacleAttack"+Rand(1,2)+".ogg")
 									PlaySound_Strict(n\Sound)
@@ -3298,14 +3307,21 @@ Function UpdateNPCs()
 											Else
 												BlurTimer = 100
 												Injuries = Injuries+Rnd(1.0,1.5)
-												PlaySound_Strict DamageSFX(Rand(3,4))
+												PlaySound_Strict DamageSFX(Rand(2,3))
 												
-												If Injuries > 3.0 Then 
-													DeathMSG = Chr(34)+"We will need more than the regular cleaning team to care of this. "
-													DeathMSG = DeathMSG + "Two large and highly active tentacle-like appendages seem "
-													DeathMSG = DeathMSG + "to have formed inside the chamber. Their level of aggression is "
-													DeathMSG = DeathMSG + "unlike anything we've seen before - it looks like they have "
-													DeathMSG = DeathMSG + "beaten some unfortunate Class D to death at some point during the breach."+Chr(34)
+												If Injuries > 3.0 Then
+													If PlayerRoom\RoomTemplate\Name = "room2offices" Then
+														DeathMSG = Chr(34)+"One large and highly active tentacle-like appendage seems "
+														DeathMSG = DeathMSG + "to have grown outside the dead body of a scientist within office area [REDACTED]. Its level of aggression is "
+														DeathMSG = DeathMSG + "unlike anything we've seen before - it looks like it has "
+														DeathMSG = DeathMSG + "beaten some unfortunate Class D to death at some point during the breach."+Chr(34)
+													Else
+														DeathMSG = Chr(34)+"We will need more than the regular cleaning team to take care of this. "
+														DeathMSG = DeathMSG + "Two large and highly active tentacle-like appendages seem "
+														DeathMSG = DeathMSG + "to have formed inside the chamber. Their level of aggression is "
+														DeathMSG = DeathMSG + "unlike anything we've seen before - it looks like they have "
+														DeathMSG = DeathMSG + "beaten some unfortunate Class D to death at some point during the breach."+Chr(34)
+													EndIf
 													Kill()
 												EndIf
 											EndIf

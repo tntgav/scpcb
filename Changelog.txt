@@ -17,8 +17,12 @@
 - The message "You pushed the button but nothing happened." appears when you try to use a locked door that is opened.
 - Added wallets which you can use to store the 50 cent coins.
 - Added battery power to the night vision goggles that can be found in the facility.
+- Added a death message when the player gets killed by the SCP-035 tentacle in the office room.
+- The SCP-035 tentacles now play their idle sound.
+- Added the missing containment door inside of SCP-372's chamber.
 
 Bug fixes:
+    - Fixed an exploit that caused the blinking sprite to be rendered invisible after alt-tabbing the game.
     - The inventory cannot be opened while the SCP-008 zombie cutscene plays.
     - Removed the "room2doors" event from events.ini as the actual event used in the game is called "room2doors173"
     - The keycard slot level for the archive rooms will now be saved instead of being generated newly each time.
@@ -35,6 +39,8 @@ Bug fixes:
     - The progress bar of the first aid kit won't stay at it's current value if the item has been deselected.
     - The inventory and the main menu can not be opened anymore while using SCP-294.
     - The camera won't turn rapidly anymore when leaving SCP-294.
+    - The maximum amount of achievements displayed at the ending screen is now correct.
+    - The correct damage sounds will now be played when the player gets attacked by the SCP-035 tentacles.
 
 ----------------------------------------------------------------------------------
 

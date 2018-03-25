@@ -2140,6 +2140,11 @@ Function FillRoom(r.Rooms)
 			EntityPickMode r\Objects[3],2
 			EntityType r\Objects[3],HIT_MAP
 			EntityAlpha r\Objects[3],0.0
+			
+			d = CreateDoor(r\zone,r\x,r\y,r\z-368.0*RoomScale,0,r,True,True,2)
+			d\AutoClose = False
+			PositionEntity (d\buttons[0], r\x - 496.0 * RoomScale, 0.7, r\z - 272.0 * RoomScale, True)
+			TurnEntity(d\buttons[0], 0, 90, 0)
 			;[End Block]
 		Case "room079"
 			;[Block]

@@ -3816,7 +3816,7 @@ Function DrawEnding()
 					Next
 					
 					AAText x, y, "SCPs encountered: " +scpsEncountered
-					AAText x, y+20*MenuScale, "Achievements unlocked: " + achievementsUnlocked+"/"+(MAXACHIEVEMENTS-1)
+					AAText x, y+20*MenuScale, "Achievements unlocked: " + achievementsUnlocked+"/"+(MAXACHIEVEMENTS)
 					AAText x, y+40*MenuScale, "Rooms found: " + roomsfound+"/"+roomamount
 					AAText x, y+60*MenuScale, "Documents discovered: " +docsfound+"/"+docamount
 					AAText x, y+80*MenuScale, "Items refined in SCP-914: " +RefinedItems			
@@ -4306,7 +4306,7 @@ Function MovePlayer()
 		Bloodloss = Min(Bloodloss + (Min(Injuries,3.5)/300.0)*FPSfactor,100)
 		
 		If temp2 <= 60 And Bloodloss > 60 Then
-			Msg = "You are feeling faint from the amount of blood you loss."
+			Msg = "You are feeling faint from the amount of blood you have lost."
 			MsgTimer = 70*4
 		EndIf
 	EndIf
@@ -5178,7 +5178,8 @@ Function DrawGUI()
 						If (Not isEmpty) Then
 							For z% = 0 To OtherSize - 1
 								If OtherOpen\SecondInv[z]<>Null
-									If OtherOpen\SecondInv[z]\itemtemplate\tempname<>"50ct" And OtherOpen\SecondInv[z]\itemtemplate\tempname<>"coin" Then
+									Local name$=OtherOpen\SecondInv[z]\itemtemplate\tempname
+									If name$<>"50ct" And name$<>"coin" And name$<>"key" And name$<>"scp860" And name$<>"scp714" Then
 										isEmpty=False
 										Exit
 									EndIf
@@ -5412,13 +5413,14 @@ Function DrawGUI()
 						SelectedItem = Null
 					ElseIf Inventory(MouseSlot) <> SelectedItem
 						Select SelectedItem\itemtemplate\tempname
-							Case "paper","key1","key2","key3","key4","key5","key6","misc","oldpaper","badge","ticket","50ct","coin"
+							Case "paper","key1","key2","key3","key4","key5","key6","misc","oldpaper","badge","ticket","50ct","coin","key","scp860","scp714"
 								;[Block]
 								If Inventory(MouseSlot)\itemtemplate\tempname = "clipboard" Then
 									;Add an item to clipboard
 									Local added.Items = Null
 									Local b$ = SelectedItem\itemtemplate\tempname
-									If (b<>"misc" And b<>"50ct" And b<>"coin") Or (SelectedItem\itemtemplate\name="Playing Card" Or SelectedItem\itemtemplate\name="Mastercard") Then
+									Local b2$ = SelectedItem\itemtemplate\name
+									If (b<>"misc" And b<>"50ct" And b<>"coin" And b<>"key" And b<>"scp860" And b<>"scp714") Or (b2="Playing Card" Or b2="Mastercard") Then
 										For c% = 0 To Inventory(MouseSlot)\invSlots-1
 											If (Inventory(MouseSlot)\SecondInv[c] = Null)
 												If SelectedItem <> Null Then
@@ -5459,13 +5461,14 @@ Function DrawGUI()
 									;Add an item to clipboard
 									added.Items = Null
 									b$ = SelectedItem\itemtemplate\tempname
-									If (b<>"misc" And b<>"paper" And b<>"oldpaper") Or (SelectedItem\itemtemplate\name="Playing Card" Or SelectedItem\itemtemplate\name="Mastercard") Then
+									b2$ = SelectedItem\itemtemplate\name
+									If (b<>"misc" And b<>"paper" And b<>"oldpaper") Or (b2="Playing Card" Or b2="Mastercard") Then
 										For c% = 0 To Inventory(MouseSlot)\invSlots-1
 											If (Inventory(MouseSlot)\SecondInv[c] = Null)
 												If SelectedItem <> Null Then
 													Inventory(MouseSlot)\SecondInv[c] = SelectedItem
 													Inventory(MouseSlot)\state = 1.0
-													If b<>"50ct" And b<>"coin"
+													If b<>"50ct" And b<>"coin" And b<>"key" And b<>"scp860" And b<>"scp714"
 														SetAnimTime Inventory(MouseSlot)\model,3.0
 													EndIf
 													Inventory(MouseSlot)\invimg = Inventory(MouseSlot)\itemtemplate\invimg
