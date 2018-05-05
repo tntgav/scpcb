@@ -2844,7 +2844,7 @@ Function UpdateNPCs()
 				RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider)-180.0, 0
 				;[End Block]
 			Case NPCtype5131
-				;[Block}
+				;[Block]
 				;If KeyHit(48) Then n\Idle = True : n\State2 = 0
 				
 				If PlayerRoom\RoomTemplate\Name <> "pocketdimension" Then 
@@ -4598,109 +4598,265 @@ Function UpdateNPCs()
 				;[Block]
 				;n\State: Current State of the NPC
 				;n\State2: A second state variable (dependend on the current NPC's n\State)
+				;n\State3: Determines if the NPC will always be aggressive against the player
+				;n\PrevState: Determines the type/behaviour of the NPC
+				;	0 = Normal / Citizen
+				;	1 = Stair guard / Guard next to king
+				;	2 = King
+				;	3 = Front guard
 				
 				prevFrame# = n\Frame
 				
-				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*3
-					If n\State = 0 Or n\State = 2
-						For n2.NPCs = Each NPCs
-							If n2\NPCtype = n\NPCtype And n2 <> n
-								If n2\State <> 0 And n2\State <> 2
-									n\State = 1
-									n\State2 = 0
-									Exit
+				If (Not n\Idle) And EntityDistance(n\Collider,Collider)<HideDistance*3 Then
+					If n\PrevState = 0 Then
+						If n\State = 0 Or n\State = 2 Then
+							For n2.NPCs = Each NPCs
+								If n2\NPCtype = n\NPCtype And n2 <> n Then
+									If n2\State <> 0 And n2\State <> 2 Then
+										If n2\PrevState = 0 Then
+											n\State = 1
+											n\State2 = 0
+											Exit
+										EndIf
+									EndIf
 								EndIf
-							EndIf
-						Next
+							Next
+						EndIf
 					EndIf
 					
 					Select n\State
 						Case 0
-							If n\CurrSpeed = 0.0
-								If n\State2 < 500.0*Rnd(1,3)
-									n\CurrSpeed = 0.0
-									n\State2 = n\State2 + FPSfactor
+							;[Block]
+							If n\PrevState=0 Then
+								If n\CurrSpeed = 0.0 Then
+									If n\Reload=0 Then
+										If n\State2 < 500.0*Rnd(1,3) Then
+											n\CurrSpeed = 0.0
+											n\State2 = n\State2 + FPSfactor
+										Else
+											If n\CurrSpeed = 0.0 Then n\CurrSpeed = n\CurrSpeed + 0.0001
+										EndIf
+									Else
+										If n\State2 < 1500 Then
+											n\CurrSpeed = 0.0
+											n\State2 = n\State2 + FPSfactor
+										Else
+											If n\Target <> Null Then
+												If n\Target\Target <> Null Then
+													n\Target\Target = Null
+												EndIf
+												n\Target\Reload = 0
+												n\Target\Angle = n\Target\Angle+Rnd(-45,45)
+												n\Target = Null
+												n\Reload = 0
+												n\Angle = n\Angle+Rnd(-45,45)
+											EndIf
+											If n\CurrSpeed = 0.0 Then n\CurrSpeed = n\CurrSpeed + 0.0001
+										EndIf
+									EndIf
 								Else
-									If n\CurrSpeed = 0.0 Then n\CurrSpeed = n\CurrSpeed + 0.0001
+									If n\Target<>Null Then
+										n\State2 = 0.0
+									EndIf
+									
+									If n\State2 < 10000.0*Rnd(1,3)
+										n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
+										n\State2 = n\State2 + FPSfactor
+									Else
+										n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,50.0)
+									EndIf
+									
+									RotateEntity n\Collider,0,CurveAngle(n\Angle,EntityYaw(n\Collider),10.0),0
+									
+									If n\Target=Null Then
+										If Rand(200) = 1 Then n\Angle = n\Angle + Rnd(-45,45)
+										
+										HideEntity n\Collider
+										EntityPick(n\Collider, 1.5)
+										If PickedEntity() <> 0 Then
+											n\Angle = EntityYaw(n\Collider)+Rnd(80,110)
+										EndIf
+										ShowEntity n\Collider
+									Else
+										n\Angle = EntityYaw(n\Collider) + DeltaYaw(n\Collider,n\Target\Collider)
+										If EntityDistance(n\Collider,n\Target\Collider)<1.5 Then
+											n\CurrSpeed = 0.0
+											n\Target\CurrSpeed = 0.0
+											n\Reload = 1
+											n\Target\Reload = 1
+											temp = Rand(0,2)
+											If temp=0 Then
+												SetNPCFrame(n,296)
+											ElseIf temp=1 Then
+												SetNPCFrame(n,856)
+											Else
+												SetNPCFrame(n,905)
+											EndIf
+											temp = Rand(0,2)
+											If temp=0 Then
+												SetNPCFrame(n\Target,296)
+											ElseIf temp=1 Then
+												SetNPCFrame(n\Target,856)
+											Else
+												SetNPCFrame(n\Target,905)
+											EndIf
+										EndIf
+									EndIf
 								EndIf
 							Else
-								If n\State2 < 10000.0*Rnd(1,3)
-									n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
-									n\State2 = n\State2 + FPSfactor
-								Else
-									n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,50.0)
-								EndIf
-								
 								RotateEntity n\Collider,0,CurveAngle(n\Angle,EntityYaw(n\Collider),10.0),0
-								
-								If Rand(200) = 1 Then n\Angle = n\Angle + Rnd(-45,45)
-								
-								HideEntity n\Collider
-								EntityPick(n\Collider, 1.5)
-								If PickedEntity() <> 0 Then
-									n\Angle = EntityYaw(n\Collider)+Rnd(80,110)
-								EndIf
-								ShowEntity n\Collider
 							EndIf
 							
 							If n\CurrSpeed = 0.0
-								AnimateNPC(n,296,317,0.2)
+								If n\Reload = 0 And n\PrevState<>2 Then
+									AnimateNPC(n,296,320,0.2)
+								ElseIf n\Reload = 0 And n\PrevState=2 Then
+									;509-533
+									;534-601
+									If n\Frame <= 532.5 Then
+										AnimateNPC(n,509,533,0.2,False)
+									ElseIf n\Frame > 533.5 And n\Frame <= 600.5 Then
+										AnimateNPC(n,534,601,0.2,False)
+									Else
+										temp = Rand(0,1)
+										If temp=0 Then
+											SetNPCFrame(n,509)
+										Else
+											SetNPCFrame(n,534)
+										EndIf
+									EndIf
+									;SetNPCFrame(n,855)
+								Else
+									If n\PrevState=2 Then
+										AnimateNPC(n,713,855,0.2,False)
+										If n\Frame > 833.5 Then
+											PointEntity n\obj,Collider
+											RotateEntity n\Collider,0,CurveAngle(n\Angle,EntityYaw(n\Collider),10.0),0
+										EndIf
+									ElseIf n\PrevState=1 Then
+										AnimateNPC(n,602,712,0.2,False)
+										If n\Frame > 711.5 Then
+											n\Reload = 0
+										EndIf
+									Else
+										If n\Frame <= 319.5 Then
+											AnimateNPC(n,296,320,0.2,False)
+										;856-904
+										ElseIf n\Frame > 320.5 And  n\Frame < 903.5 Then
+											AnimateNPC(n,856,904,0.2,False)
+										;905-953
+										ElseIf n\Frame > 904.5 And n\Frame < 952.5 Then
+											AnimateNPC(n,905,953,0.2,False)
+										Else
+											temp = Rand(0,2)
+											If temp=0 Then
+												SetNPCFrame(n,296)
+											ElseIf temp=1 Then
+												SetNPCFrame(n,856)
+											Else
+												SetNPCFrame(n,905)
+											EndIf
+										EndIf
+									EndIf
+								EndIf
 							Else
 								If (n\ID Mod 2 = 0) Then
 									AnimateNPC(n,1,62,(n\CurrSpeed*28))
 								Else
 									AnimateNPC(n,100,167,(n\CurrSpeed*28))
 								EndIf
-							EndIf
-							
-							;randomly play the "screaming animation" and revert back to state 0
-							If (Rand(5000)=1) Then
-								n\State = 2
-								n\State2 = 0
-								
-								If Not ChannelPlaying(n\SoundChn) Then
-									dist = EntityDistance(n\Collider,Collider)
-									If (dist < 20.0) Then
-										If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-										n\Sound = LoadSound_Strict("SFX\SCP\1499\Idle"+Rand(1,4)+".ogg")
-										n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider, 20.0)
+								If n\PrevState = 0 Then
+									If n\Target = Null Then
+										If Rand(1,1200)=1 Then
+											For n2.NPCs = Each NPCs
+												If n2<>n Then
+													If n2\NPCtype=n\NPCtype Then
+														If n2\Target = Null
+															If n2\PrevState=0 Then
+																If EntityDistance(n\Collider,n2\Collider)<20.0 Then
+																	n\Target = n2
+																	n2\Target = n
+																	n\Target\CurrSpeed = n\Target\CurrSpeed + 0.0001
+																	Exit
+																EndIf
+															EndIf
+														EndIf
+													EndIf
+												EndIf
+											Next
+										EndIf
 									EndIf
 								EndIf
 							EndIf
 							
-							If (n\ID Mod 2 = 0) And (Not NoTarget) Then
+							;randomly play the "screaming animation" and revert back to state 0
+							If n\Target=Null And n\PrevState=0 Then
+								If (Rand(5000)=1) Then
+									n\State = 2
+									n\State2 = 0
+									
+									If Not ChannelPlaying(n\SoundChn) Then
+										dist = EntityDistance(n\Collider,Collider)
+										If (dist < 20.0) Then
+											If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+											n\Sound = LoadSound_Strict("SFX\SCP\1499\Idle"+Rand(1,4)+".ogg")
+											n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider, 20.0)
+										EndIf
+									EndIf
+								EndIf
+								
+								If (n\ID Mod 2 = 0) And (Not NoTarget) Then
+									dist = EntityDistance(n\Collider,Collider)
+									If dist < 10.0 Then
+										If EntityVisible(n\Collider,Collider) Then
+											;play the "screaming animation"
+											n\State = 2
+											If dist < 5.0 Then
+												If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+												n\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
+												n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
+												
+												n\State2 = 1 ;if player is too close, switch to attack after screaming
+												
+												For n2.NPCs = Each NPCs
+													;If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
+													If n2\NPCtype = n\NPCtype And n2 <> n
+														If n2\PrevState = 0 Then
+															n2\State = 1
+															n2\State2 = 0
+														EndIf
+													EndIf
+												Next
+											Else
+												n\State2 = 0 ;otherwise keep idling
+											EndIf
+											
+											n\Frame = 203
+										EndIf
+									EndIf
+								EndIf
+							ElseIf n\PrevState=1 Then
 								dist = EntityDistance(n\Collider,Collider)
-								If dist < 10.0 Then
-									If EntityVisible(n\Collider,Collider) Then
-										;play the "screaming animation"
-										n\State = 2
-										If dist < 5.0 Then
+								If (Not NoTarget) Then
+									If dist < 4.0 Then
+										If EntityVisible(n\Collider,Collider) Then
 											If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 											n\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
 											n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
 											
-											n\State2 = 1 ;if player is too close, switch to attack after screaming
+											n\State = 1
 											
-											For n2.NPCs = Each NPCs
-												;If n2\NPCtype = n\NPCtype And n2 <> n And (n\ID Mod 2 = 0) Then
-												If n2\NPCtype = n\NPCtype And n2 <> n
-													n2\State = 1
-													n2\State2 = 0
-												EndIf
-											Next
-										Else
-											n\State2 = 0 ;otherwise keep idling
+											n\Frame = 203
 										EndIf
-										
-										n\Frame = 203
 									EndIf
 								EndIf
 							EndIf
+							;[End Block]
 						Case 1 ;attacking the player
+							;[Block]
 							If NoTarget Then n\State = 0
 							
-							If PlayerRoom\RoomTemplate\Name = "dimension1499"
-								If Music(19)=0 Then Music(19) = LoadSound_Strict("SFX\Music\1499Danger.ogg")
+							If PlayerRoom\RoomTemplate\Name = "dimension1499" And n\PrevState=0 Then
 								ShouldPlay = 19
 							EndIf
 							
@@ -4710,7 +4866,14 @@ Function UpdateNPCs()
 							dist = EntityDistance(n\Collider,Collider)
 							
 							If n\State2 = 0.0
-								n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
+								If n\PrevState=1 Then
+									n\CurrSpeed = CurveValue(n\Speed*2.0,n\CurrSpeed,10.0)
+									If n\Target<>Null Then
+										n\Target\State = 1
+									EndIf
+								Else
+									n\CurrSpeed = CurveValue(n\Speed*1.75,n\CurrSpeed,10.0)
+								EndIf
 								
 								If (n\ID Mod 2 = 0) Then
 									AnimateNPC(n,1,62,(n\CurrSpeed*28))
@@ -4720,7 +4883,7 @@ Function UpdateNPCs()
 							EndIf
 							
 							If dist < 0.75
-								If (n\ID Mod 2 = 0) Or n\State3 = 1
+								If (n\ID Mod 2 = 0) Or n\State3 = 1 Or n\PrevState=1 Or n\PrevState=3 Or n\PrevState=4 Then
 									n\State2 = Rand(1,2)
 									n\State = 3
 									If n\State2 = 1
@@ -4732,14 +4895,18 @@ Function UpdateNPCs()
 									n\State = 4
 								EndIf
 							EndIf
+							;[End Block]
 						Case 2 ;play the "screaming animation" and switch to n\state2 after it's finished
+							;[Block]
 							n\CurrSpeed = 0.0
 							AnimateNPC(n,203,295,0.1,False)
 							
 							If n\Frame > 294.0 Then
 								n\State = n\State2
 							EndIf
+							;[End Block]
 						Case 3 ;slashing at the player
+							;[Block]
 							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
 							dist = EntityDistance(n\Collider,Collider)
 							If n\State2 = 1
@@ -4793,10 +4960,12 @@ Function UpdateNPCs()
 									n\State = 1
 								EndIf
 							EndIf
+							;[End Block]
 						Case 4 ;standing in front of the player
+							;[Block]
 							dist = EntityDistance(n\Collider,Collider)
 							n\CurrSpeed = CurveValue(0.0,n\CurrSpeed,5.0)
-							AnimateNPC(n,296,317,0.2)
+							AnimateNPC(n,296,320,0.2)
 							
 							PointEntity n\obj,Collider
 							RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
@@ -4804,6 +4973,7 @@ Function UpdateNPCs()
 							If dist > 0.85
 								n\State = 1
 							EndIf
+							;[End Block]
 					End Select
 					
 					If n\SoundChn <> 0 And ChannelPlaying(n\SoundChn) Then

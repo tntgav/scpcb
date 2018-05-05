@@ -4935,6 +4935,16 @@ Function FillRoom(r.Rooms)
 			;PositionEntity r\Objects[3],r\x-926.891*RoomScale,r\y,r\z-318.399*RoomScale,True
 			PositionEntity r\Objects[3],r\x-820.0*RoomScale,r\y,r\z-318.399*RoomScale,True
 			;[End Block]
+		Case "dimension1499"
+			;[Block]
+			ent = LoadMesh_Strict("GFX\map\dimension1499\1499object0_cull.b3d",r\obj)
+			EntityType ent,HIT_MAP
+			EntityAlpha ent,0
+			
+			r\Levers[0] = CreatePivot()
+			PositionEntity r\Levers[0],r\x+205.0*RoomScale,r\y+400.0*RoomScale,r\z+2287.0*RoomScale
+			EntityParent r\Levers[0],r\obj
+			;[End Block]
 	End Select
 	
 	For lt.lighttemplates = Each LightTemplates
@@ -7837,8 +7847,8 @@ Type Chunk
 	Field Amount%
 	Field IsSpawnChunk%
 	Field ChunkPivot%
-	Field ChunkPivotDebug%
-	Field ChunkDebugObj%
+	;Field ChunkPivotDebug%
+	;Field ChunkDebugObj%
 	Field PlatForm%
 End Type
 
@@ -7854,15 +7864,15 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#,isSpawnChunk%=False)
 	
 	ch\IsSpawnChunk = isSpawnChunk
 	
-	ch\ChunkPivotDebug% = CreateSphere(8,ch\ChunkPivot)
-	EntityColor ch\ChunkPivotDebug,255*(Not isSpawnChunk),255*(isSpawnChunk),0
-	EntityFX ch\ChunkPivotDebug,1
+	;ch\ChunkPivotDebug% = CreateSphere(8,ch\ChunkPivot)
+	;EntityColor ch\ChunkPivotDebug,255*(Not isSpawnChunk),255*(isSpawnChunk),0
+	;EntityFX ch\ChunkPivotDebug,1
 	
-	ch\ChunkDebugObj = CreateCube(ch\ChunkPivotDebug)
-	ScaleEntity ch\ChunkDebugObj,20,0.1,20
-	EntityColor ch\ChunkDebugObj,Rand(255),Rand(255),Rand(255)
-	EntityFX ch\ChunkDebugObj,1
-	EntityAlpha ch\ChunkDebugObj,0.2
+	;ch\ChunkDebugObj = CreateCube(ch\ChunkPivotDebug)
+	;ScaleEntity ch\ChunkDebugObj,20,0.1,20
+	;EntityColor ch\ChunkDebugObj,Rand(255),Rand(255),Rand(255)
+	;EntityFX ch\ChunkDebugObj,1
+	;EntityAlpha ch\ChunkDebugObj,0.2
 	
 	If obj% > -1
 		ch\Amount% = GetINIInt("Data\1499chunks.INI","chunk"+obj,"count")
@@ -7919,11 +7929,11 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 	Until z# > (ChunkMaxDistance#+(ChunkZ*40))
 	
 	For ch = Each Chunk
-		If DebugHUD
-			ShowEntity ch\ChunkPivotDebug
-		Else
-			HideEntity ch\ChunkPivotDebug
-		EndIf
+;		If DebugHUD
+;			ShowEntity ch\ChunkPivotDebug
+;		Else
+;			HideEntity ch\ChunkPivotDebug
+;		EndIf
 		If (Not ch\IsSpawnChunk)
 			If Distance(EntityX(Collider),EntityZ(Collider),EntityX(ch\ChunkPivot),EntityZ(ch\ChunkPivot))>ChunkMaxDistance
 				FreeEntity ch\ChunkPivot
@@ -7964,10 +7974,12 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 		n\Angle = Rnd(360)
 	Else
 		For n = Each NPCs
-			If n\NPCtype = NPCtype1499
-				If EntityDistance(n\Collider,Collider)>ChunkMaxDistance Or EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5
-					;This will be updated like this so that new NPCs can spawn for the player
-					RemoveNPC(n)
+			If n\NPCtype = NPCtype1499 Then
+				If n\PrevState=0 Then
+					If EntityDistance(n\Collider,Collider)>ChunkMaxDistance Or EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5 Then
+						;This will be updated like this so that new NPCs can spawn for the player
+						RemoveNPC(n)
+					EndIf
 				EndIf
 			EndIf
 		Next
@@ -7993,6 +8005,11 @@ Function DeleteChunks()
 	Delete Each ChunkPart
 	
 End Function
+
+Type Dummy1499
+	Field anim%
+	Field obj%
+End Type
 
 ;#########################################################################
 ;END CHUNKS

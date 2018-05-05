@@ -6843,8 +6843,8 @@ Function DrawGUI()
 									NTF_1499PrevY# = EntityY(Collider)
 									NTF_1499PrevZ# = EntityZ(Collider)
 									
-									If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0
-										PositionEntity (Collider, r\x+676.0*RoomScale, r\y+314.0*RoomScale, r\z-2080.0*RoomScale)
+									If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0 Then
+										PositionEntity (Collider, r\x+3319.0*RoomScale, r\y+304.0*RoomScale, r\z-2044.0*RoomScale)
 									Else
 										PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
 									EndIf
@@ -6859,11 +6859,21 @@ Function DrawGUI()
 									NTF_1499X# = 0.0
 									NTF_1499Y# = 0.0
 									NTF_1499Z# = 0.0
-									If Curr096<>Null
-										If Curr096\SoundChn<>0
+									If Curr096<>Null Then
+										If Curr096\SoundChn<>0 Then
 											SetStreamVolume_Strict(Curr096\SoundChn,0.0)
 										EndIf
 									EndIf
+									For e.Events = Each Events
+										If e\EventName = "dimension1499" Then
+											If EntityDistance(e\room\obj,Collider)>8300.0*RoomScale Then
+												If e\EventState2 < 5 Then
+													e\EventState2 = e\EventState2 + 1
+												EndIf
+											EndIf
+											Exit
+										EndIf
+									Next
 									Exit
 								EndIf
 							Next
@@ -11613,17 +11623,17 @@ End Function
 Function UpdateStreamSounds()
 	Local e.Events
 	
-	If FPSfactor > 0
-		If IntercomStreamCHN <> 0
+	If FPSfactor > 0 Then
+		If IntercomStreamCHN <> 0 Then
 			SetStreamVolume_Strict(IntercomStreamCHN,SFXVolume)
 		EndIf
 		For e = Each Events
-			If e\SoundCHN<>0
+			If e\SoundCHN<>0 Then
 				If e\SoundCHN_isStream
 					SetStreamVolume_Strict(e\SoundCHN,SFXVolume)
 				EndIf
 			EndIf
-			If e\SoundCHN2<>0
+			If e\SoundCHN2<>0 Then
 				If e\SoundCHN2_isStream
 					SetStreamVolume_Strict(e\SoundCHN2,SFXVolume)
 				EndIf
@@ -11631,24 +11641,26 @@ Function UpdateStreamSounds()
 		Next
 	EndIf
 	
-	If (Not PlayerInReachableRoom())
-		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea"
-			If IntercomStreamCHN <> 0
+	If (Not PlayerInReachableRoom()) Then
+		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea" Then
+			If IntercomStreamCHN <> 0 Then
 				StopStream_Strict(IntercomStreamCHN)
 				IntercomStreamCHN = 0
 			EndIf
-			For e = Each Events
-				If e\SoundCHN<>0 And e\SoundCHN_isStream
-					StopStream_Strict(e\SoundCHN)
-					e\SoundCHN = 0
-					e\SoundCHN_isStream = 0
-				EndIf
-				If e\SoundCHN2<>0 And e\SoundCHN2_isStream
-					StopStream_Strict(e\SoundCHN2)
-					e\SoundCHN = 0
-					e\SoundCHN_isStream = 0
-				EndIf
-			Next
+			If PlayerRoom\RoomTemplate\Name$ <> "dimension1499" Then
+				For e = Each Events
+					If e\SoundCHN<>0 And e\SoundCHN_isStream Then
+						StopStream_Strict(e\SoundCHN)
+						e\SoundCHN = 0
+						e\SoundCHN_isStream = 0
+					EndIf
+					If e\SoundCHN2<>0 And e\SoundCHN2_isStream Then
+						StopStream_Strict(e\SoundCHN2)
+						e\SoundCHN = 0
+						e\SoundCHN_isStream = 0
+					EndIf
+				Next
+			EndIf
 		EndIf
 	EndIf
 	

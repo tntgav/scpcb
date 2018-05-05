@@ -205,7 +205,7 @@ Function SetStreamVolume_Strict(streamHandle%,volume#)
 	Local st.Stream = Object.Stream(streamHandle)
 	
 	If st = Null
-		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		CreateConsoleMsg("Failed to set stream Sound volume: Unknown Stream")
 		Return
 	EndIf
 	If st\chn=0 Or st\chn=-1
@@ -238,7 +238,7 @@ Function IsStreamPlaying_Strict(streamHandle%)
 	Local st.Stream = Object.Stream(streamHandle)
 	
 	If st = Null
-		;CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		CreateConsoleMsg("Failed to find stream Sound: Unknown Stream")
 		Return
 	EndIf
 	If st\chn=0 Or st\chn=-1
@@ -254,7 +254,7 @@ Function SetStreamPan_Strict(streamHandle%,pan#)
 	Local st.Stream = Object.Stream(streamHandle)
 	
 	If st = Null
-		;CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		CreateConsoleMsg("Failed to find stream Sound: Unknown Stream")
 		Return
 	EndIf
 	If st\chn=0 Or st\chn=-1
