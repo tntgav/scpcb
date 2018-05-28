@@ -438,6 +438,8 @@ Function SaveGame(file$)
 	EndIf
 	WriteFloat f, CameraFogFar
 	WriteFloat f, StoredCameraFogFar
+	WriteByte f, I_427\Using
+	WriteFloat f, I_427\Timer
 	CloseFile f
 	
 	If Not MenuOpen Then
@@ -1081,7 +1083,9 @@ Function LoadGame(file$)
     StoredCameraFogFar = ReadFloat(f)
 	If CameraFogFar = 0 Then
 		CameraFogFar = 6
-	EndIf	
+	EndIf
+	I_427\Using = ReadByte(f)
+	I_427\Timer = ReadFloat(f)
 	
 	CloseFile f
 	
@@ -1776,7 +1780,9 @@ Function LoadGameQuick(file$)
     StoredCameraFogFar = ReadFloat(f)
 	If CameraFogFar = 0 Then
 		CameraFogFar = 6
-	EndIf	
+	EndIf
+	I_427\Using = ReadByte(f)
+	I_427\Timer = ReadFloat(f)
 	CloseFile f
 	
 	CatchErrors("LoadGameQuick")

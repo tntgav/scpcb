@@ -1421,6 +1421,12 @@ Function UpdateConsole()
 						CreateConsoleMsg("Achievement with ID "+Int(StrTemp)+" doesn't exist.",255,150,0)
 					EndIf
 					;[End Block]
+				Case "427state"
+					;[Block]
+					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					
+					I_427\Timer = Float(StrTemp)*70.0
+					;[End Block]
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
 					;[Block]
 					ConsoleFlush = True 
@@ -2674,6 +2680,15 @@ Global CurrTrisAmount%
 
 Global Input_ResetTime# = 0
 
+Type SCP427
+	Field Using%
+	Field Timer#
+	Field Sound[1]
+	Field SoundCHN[1]
+End Type
+
+Global I_427.SCP427 = New SCP427
+
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------       		MAIN LOOP                 ---------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2857,6 +2872,7 @@ Repeat
 			UpdateNPCs()
 			UpdateItems()
 			UpdateParticles()
+			Use427()
 			;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
 			UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
 			If UpdateParticles_Time#=1
@@ -4868,6 +4884,7 @@ Function DrawGUI()
 			AAText x + 350, 90, (m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
 			AAText x + 350, 110, "Triangles rendered: "+CurrTrisAmount
 			AAText x + 350, 130, "Active textures: "+ActiveTextures()
+			AAText x + 350, 150, "SCP-427 state (secs): "+Int(I_427\Timer/70.0)
 			
 			AASetFont Font1
 		EndIf
@@ -5314,6 +5331,8 @@ Function DrawGUI()
 						If Wearing1499=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "finenvgoggles"
 						If WearingNightVision=3 Then Rect(x - 3, y - 3, width + 6, height + 6)
+					Case "scp427"
+						If I_427\Using=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 				End Select
 			EndIf
 			
@@ -6951,6 +6970,43 @@ Function DrawGUI()
 					SelectedItem\state = 1
 					SelectedItem = Null
 					;[End Block]
+				Case "scp427"
+					;[Block]
+					If I_427\Using=1 Then
+						Msg = "You closed the locket."
+						I_427\Using = False
+					Else
+						GiveAchievement(Achv427)
+						Msg = "You opened the locket."
+						I_427\Using = True
+					EndIf
+					MsgTimer = 70 * 5
+					SelectedItem = Null
+					;[End Block]
+				Case "pill"
+					;[Block]
+					If CanUseItem(False, False, True)
+						Msg = "You swallowed the pill."
+						MsgTimer = 70*7
+						
+						RemoveItem(SelectedItem)
+						SelectedItem = Null
+					EndIf	
+					;[End Block]
+				Case "scp500death"
+					;[Block]
+					If CanUseItem(False, False, True)
+						Msg = "You swallowed the pill."
+						MsgTimer = 70*7
+						
+						If I_427\Timer < 70*360 Then
+							I_427\Timer = 70*360
+						EndIf
+						
+						RemoveItem(SelectedItem)
+						SelectedItem = Null
+					EndIf
+					;[End Block]
 				Default
 					;[Block]
 					;check if the item is an inventory-type object
@@ -8062,6 +8118,7 @@ Function LoadEntities()
 	DecalTextures(17) = LoadTexture_Strict("GFX\decal8.png", 1 + 2)	
 	DecalTextures(18) = LoadTexture_Strict("GFX\decalpd6.dc", 1 + 2)	
 	DecalTextures(19) = LoadTexture_Strict("GFX\decal19.png", 1 + 2)
+	DecalTextures(20) = LoadTexture_Strict("GFX\decal427.png", 1 + 2)
 	
 	DrawLoading(25)
 	
@@ -8642,6 +8699,8 @@ Function NullGame(playbuttonsfx%=True)
 		CameraFogFar = StoredCameraFogFar
 		WearingNightVision = 0
 	EndIf
+	I_427\Using = 0
+	I_427\Timer = 0.0
 	
 	ForceMove = 0.0
 	ForceAngle = 0.0	
@@ -9838,7 +9897,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						Case "fine", "very fine"
 							it2 = CreateItem("Syringe", "veryfinesyringe", x, y, z)
 					End Select
-				
+					
 				Case "veryfinesyringe"
 					Select setting
 						Case "rough", "coarse", "1:1", "fine"
@@ -9850,6 +9909,22 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 			End Select
 			
 			RemoveItem(item)
+			
+		Case "SCP-500-01", "Upgraded pill", "Pill"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					it2 = CreateItem("Pill", "pill", x, y, z)
+					RemoveItem(item)
+				Case "fine"
+					it2 = CreateItem("SCP-427", "scp427", x, y, z)
+					RemoveItem(item)
+				Case "very fine"
+					it2 = CreateItem("Upgraded pill", "scp500death", x, y, z)
+					RemoveItem(item)
+			End Select
 			
 		Default
 			
@@ -10110,6 +10185,77 @@ Function Use294()
 	
 End Function
 
+Function Use427()
+	Local i%,pvt%,de.Decals,tempchn%
+	
+	If I_427\Timer < 70*360
+		If I_427\Using=True Then
+			Local prev427Timer# = I_427\Timer
+			I_427\Timer = I_427\Timer + FPSfactor
+			If Injuries > 0.0 Then
+				Injuries = Max(Injuries - 0.0005 * FPSfactor,0.0)
+			EndIf
+			If Bloodloss > 0.0 Then
+				Bloodloss = Max(Bloodloss - 0.001 * FPSfactor,0.0)
+			EndIf
+			If I_427\Sound[0]=0 Then
+				I_427\Sound[0] = LoadSound_Strict("SFX\SCP\427\Effect.ogg")
+			EndIf
+			If (Not ChannelPlaying(I_427\SoundCHN[0])) Then
+				I_427\SoundCHN[0] = PlaySound_Strict(I_427\Sound[0])
+			EndIf
+			If I_427\Timer => 70*180 Then
+				If I_427\Sound[1]=0 Then
+					I_427\Sound[1] = LoadSound_Strict("SFX\SCP\427\Transform.ogg")
+				EndIf
+				If (Not ChannelPlaying(I_427\SoundCHN[1])) Then
+					I_427\SoundCHN[1] = PlaySound_Strict(I_427\Sound[1])
+				EndIf
+			EndIf
+		Else
+			For i = 0 To 1
+				If I_427\SoundCHN[i]<>0 Then
+					If ChannelPlaying(I_427\SoundCHN[i]) Then
+						StopChannel(I_427\SoundCHN[i])
+					EndIf
+				EndIf
+			Next
+		EndIf
+	Else
+		I_427\Timer = I_427\Timer + FPSfactor
+		If I_427\Sound[0]=0 Then
+			I_427\Sound[0] = LoadSound_Strict("SFX\SCP\427\Effect.ogg")
+		EndIf
+		If I_427\Sound[1]=0 Then
+			I_427\Sound[1] = LoadSound_Strict("SFX\SCP\427\Transform.ogg")
+		EndIf
+		For i = 0 To 1
+			If (Not ChannelPlaying(I_427\SoundCHN[i])) Then
+				I_427\SoundCHN[i] = PlaySound_Strict(I_427\Sound[i])
+			EndIf
+		Next
+		If Rnd(200)<2.0 Then
+			pvt = CreatePivot()
+			PositionEntity pvt, EntityX(Collider)+Rnd(-0.05,0.05),EntityY(Collider)-0.05,EntityZ(Collider)+Rnd(-0.05,0.05)
+			TurnEntity pvt, 90, 0, 0
+			EntityPick(pvt,0.3)
+			de.Decals = CreateDecal(20, PickedX(), PickedY()+0.005, PickedZ(), 90, Rand(360), 0)
+			de\Size = Rnd(0.03,0.08)*2.0 : EntityAlpha(de\obj, 1.0) : ScaleSprite de\obj, de\Size, de\Size
+			tempchn% = PlaySound_Strict (DripSFX(Rand(0,2)))
+			ChannelVolume tempchn, Rnd(0.0,0.8)*SFXVolume
+			ChannelPitch tempchn, Rand(20000,30000)
+			FreeEntity pvt
+			BlurTimer = 800
+		EndIf
+		If I_427\Timer >= 70*420 Then
+			Kill()
+			DeathMSG = "LOL"
+		ElseIf I_427\Timer >= 70*390 Then
+			Crouch = True
+		EndIf
+	EndIf
+	
+End Function
 
 
 Function UpdateMTF%()

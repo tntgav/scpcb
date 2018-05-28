@@ -4771,7 +4771,7 @@ Function UpdateNPCs()
 											For n2.NPCs = Each NPCs
 												If n2<>n Then
 													If n2\NPCtype=n\NPCtype Then
-														If n2\Target = Null
+														If n2\Target = Null Then
 															If n2\PrevState=0 Then
 																If EntityDistance(n\Collider,n2\Collider)<20.0 Then
 																	n\Target = n2
