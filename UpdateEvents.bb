@@ -2086,11 +2086,13 @@ Function UpdateEvents()
 								temp = EntityDistance(Collider, e\room\Objects[17])
 								If temp < 2000*RoomScale Then
 									Injuries = Injuries + (FPSfactor/4000)
+									e\EventStr = Float(e\EventStr)+(FPSfactor/1000.0)
 									
-									If Injuries > 1.0 Then
-										If Injuries - (FPSfactor/4000)=< 1.0 Then
-											PlaySound_Strict LoadTempSound("SFX\Room\PocketDimension\Kneel.ogg")
-										EndIf
+									;If Injuries > 1.0 Then
+									If Float(e\EventStr) > 1.0 And Float(e\EventStr) < 1000.0 Then
+										PlaySound_Strict LoadTempSound("SFX\Room\PocketDimension\Kneel.ogg")
+										LoadEventSound(e,"SFX\Room\PocketDimension\Screech.ogg")
+										e\EventStr = Float(1000.0)
 									EndIf
 									
 									Sanity = Max(Sanity - FPSfactor / temp / 8,-1000)
@@ -2119,6 +2121,7 @@ Function UpdateEvents()
 										LoadEventSound(e,"SFX\Room\PocketDimension\TrenchPlane.ogg",1)
 										PositionEntity e\room\Objects[20], EntityX(e\room\Objects[8],True)-1000,0,0,True
 										
+										e\EventStr = Float(0)
 									EndIf
 								ElseIf EntityY(Collider)<-180*RoomScale ;the "exit room"
 									temp = Distance(EntityX(Collider),EntityZ(Collider),EntityX(e\room\Objects[8],True)+1024*RoomScale,EntityZ(e\room\Objects[8],True))
@@ -2395,6 +2398,7 @@ Function UpdateEvents()
 					e\EventState = 0
 					e\EventState2 = 0
 					e\EventState3 = 0
+					e\EventStr = Float(0)
 				EndIf
 				;[End Block]
 			Case "room2cafeteria"

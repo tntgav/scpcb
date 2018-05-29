@@ -4693,21 +4693,51 @@ Function DrawGUI()
 	
 	If PlayerRoom\RoomTemplate\Name = "pocketdimension" Then
 		For e.Events = Each Events
-			If e\room = PlayerRoom And e\EventState > 600 Then
-				If BlinkTimer < -3 And BlinkTimer > -11 Then
-					If e\img = 0 Then
-						If BlinkTimer > -5 And Rand(30)=1 Then
-							If Rand(5)<5 Then PlaySound_Strict DripSFX(0)
-							If e\img = 0 Then e\img = LoadImage_Strict("GFX\npcs\106face.jpg")
+			If e\room = PlayerRoom Then
+				If Float(e\EventStr)<1000.0 Then
+					If e\EventState > 600 Then
+						If BlinkTimer < -3 And BlinkTimer > -10 Then
+							If e\img = 0 Then
+								If BlinkTimer > -5 And Rand(30)=1 Then
+									PlaySound_Strict DripSFX(0)
+									If e\img = 0 Then e\img = LoadImage_Strict("GFX\npcs\106face.jpg")
+								EndIf
+							Else
+								DrawImage e\img, GraphicWidth/2-Rand(390,310), GraphicHeight/2-Rand(290,310)
+							EndIf
+						Else
+							If e\img <> 0 Then FreeImage e\img : e\img = 0
 						EndIf
-					Else
-						DrawImage e\img, GraphicWidth/2-Rand(390,310), GraphicHeight/2-Rand(290,310)
+							
+						Exit
 					EndIf
 				Else
-					If e\img <> 0 Then FreeImage e\img : e\img = 0
-				EndIf
+					If BlinkTimer < -3 And BlinkTimer > -10 Then
+						If e\img = 0 Then
+							If BlinkTimer > -5 Then
+								If e\img = 0 Then e\img = LoadImage_Strict("GFX\kneelmortal.pd")
+							EndIf
+						Else
+							DrawImage e\img, GraphicWidth/2-Rand(390,310), GraphicHeight/2-Rand(290,310)
+						EndIf
+						If (Not ChannelPlaying(e\SoundCHN)) Then
+							e\SoundCHN = PlaySound_Strict(e\Sound)
+						EndIf
+					Else
+						If e\img <> 0 Then FreeImage e\img : e\img = 0
+						If BlinkTimer < -3 Then
+							If (Not ChannelPlaying(e\SoundCHN)) Then
+								e\SoundCHN = PlaySound_Strict(e\Sound)
+							EndIf
+						Else
+							If (ChannelPlaying(e\SoundCHN)) Then
+								StopChannel(e\SoundCHN)
+							EndIf
+						EndIf
+					EndIf
 					
-				Exit
+					Exit
+				EndIf
 			EndIf
 		Next
 	EndIf
@@ -4835,38 +4865,39 @@ Function DrawGUI()
 					AAText x - 50, 190, "state: " + ev\EventState
 					AAText x - 50, 210, "state2: " + ev\EventState2   
 					AAText x - 50, 230, "state3: " + ev\EventState3
+					AAText x - 50, 250, "str: "+ ev\EventStr
 					Exit
 				EndIf
 			Next
-			AAText x - 50, 250, "Room coordinates: (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"
-			AAText x - 50, 280, "Stamina: " + f2s(Stamina, 3)
-			AAText x - 50, 300, "Death timer: " + f2s(KillTimer, 3)               
-			AAText x - 50, 320, "Blink timer: " + f2s(BlinkTimer, 3)
-			AAText x - 50, 340, "Injuries: " + Injuries
-			AAText x - 50, 360, "Bloodloss: " + Bloodloss
+			AAText x - 50, 280, "Room coordinates: (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"
+			AAText x - 50, 300, "Stamina: " + f2s(Stamina, 3)
+			AAText x - 50, 320, "Death timer: " + f2s(KillTimer, 3)               
+			AAText x - 50, 340, "Blink timer: " + f2s(BlinkTimer, 3)
+			AAText x - 50, 360, "Injuries: " + Injuries
+			AAText x - 50, 380, "Bloodloss: " + Bloodloss
 			If Curr173 <> Null
-				AAText x - 50, 390, "SCP - 173 Position (collider): (" + f2s(EntityX(Curr173\Collider), 3) + ", " + f2s(EntityY(Curr173\Collider), 3) + ", " + f2s(EntityZ(Curr173\Collider), 3) + ")"
-				AAText x - 50, 410, "SCP - 173 Position (obj): (" + f2s(EntityX(Curr173\obj), 3) + ", " + f2s(EntityY(Curr173\obj), 3) + ", " + f2s(EntityZ(Curr173\obj), 3) + ")"
+				AAText x - 50, 410, "SCP - 173 Position (collider): (" + f2s(EntityX(Curr173\Collider), 3) + ", " + f2s(EntityY(Curr173\Collider), 3) + ", " + f2s(EntityZ(Curr173\Collider), 3) + ")"
+				AAText x - 50, 430, "SCP - 173 Position (obj): (" + f2s(EntityX(Curr173\obj), 3) + ", " + f2s(EntityY(Curr173\obj), 3) + ", " + f2s(EntityZ(Curr173\obj), 3) + ")"
 				;Text x - 50, 410, "SCP - 173 Idle: " + Curr173\Idle
-				AAText x - 50, 430, "SCP - 173 State: " + Curr173\State
+				AAText x - 50, 450, "SCP - 173 State: " + Curr173\State
 			EndIf
 			If Curr106 <> Null
-				AAText x - 50, 450, "SCP - 106 Position: (" + f2s(EntityX(Curr106\obj), 3) + ", " + f2s(EntityY(Curr106\obj), 3) + ", " + f2s(EntityZ(Curr106\obj), 3) + ")"
-				AAText x - 50, 470, "SCP - 106 Idle: " + Curr106\Idle
-				AAText x - 50, 490, "SCP - 106 State: " + Curr106\State
+				AAText x - 50, 470, "SCP - 106 Position: (" + f2s(EntityX(Curr106\obj), 3) + ", " + f2s(EntityY(Curr106\obj), 3) + ", " + f2s(EntityZ(Curr106\obj), 3) + ")"
+				AAText x - 50, 490, "SCP - 106 Idle: " + Curr106\Idle
+				AAText x - 50, 510, "SCP - 106 State: " + Curr106\State
 			EndIf
 			offset% = 0
 			For npc.NPCs = Each NPCs
 				If npc\NPCtype = NPCtype096 Then
-					AAText x - 50, 510, "SCP - 096 Position: (" + f2s(EntityX(npc\obj), 3) + ", " + f2s(EntityY(npc\obj), 3) + ", " + f2s(EntityZ(npc\obj), 3) + ")"
-					AAText x - 50, 530, "SCP - 096 Idle: " + npc\Idle
-					AAText x - 50, 550, "SCP - 096 State: " + npc\State
-					AAText x - 50, 570, "SCP - 096 Speed: " + f2s(npc\currspeed, 5)
+					AAText x - 50, 530, "SCP - 096 Position: (" + f2s(EntityX(npc\obj), 3) + ", " + f2s(EntityY(npc\obj), 3) + ", " + f2s(EntityZ(npc\obj), 3) + ")"
+					AAText x - 50, 550, "SCP - 096 Idle: " + npc\Idle
+					AAText x - 50, 570, "SCP - 096 State: " + npc\State
+					AAText x - 50, 590, "SCP - 096 Speed: " + f2s(npc\currspeed, 5)
 				EndIf
 				If npc\NPCtype = NPCtypeMTF Then
-					AAText x - 50, 600 + 60 * offset, "MTF " + offset + " Position: (" + f2s(EntityX(npc\obj), 3) + ", " + f2s(EntityY(npc\obj), 3) + ", " + f2s(EntityZ(npc\obj), 3) + ")"
+					AAText x - 50, 620 + 60 * offset, "MTF " + offset + " Position: (" + f2s(EntityX(npc\obj), 3) + ", " + f2s(EntityY(npc\obj), 3) + ", " + f2s(EntityZ(npc\obj), 3) + ")"
 					AAText x - 50, 640 + 60 * offset, "MTF " + offset + " State: " + npc\State
-					AAText x - 50, 620 + 60 * offset, "MTF " + offset + " LastSeen: " + npc\lastseen					
+					AAText x - 50, 660 + 60 * offset, "MTF " + offset + " LastSeen: " + npc\lastseen					
 					offset = offset + 1
 				EndIf
 			Next
