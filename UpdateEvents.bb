@@ -32,7 +32,11 @@ Function UpdateEvents()
 				Else
 					e\room\RoomDoors[4]\locked=False
 					
-					e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1], e\room\Objects[8], e\room\Objects[9], e)
+					If Curr096\State = 0 Or Curr096\State = 5 Then
+						e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1], e\room\Objects[8], e\room\Objects[9], e)
+					Else
+						e\EventState2 = Update096ElevatorEvent(e,e\EventState2,e\room\RoomDoors[0],e\room\Objects[8])
+					EndIf
 					
 					EntityAlpha Fog, 1.0						
 				EndIf
@@ -1808,7 +1812,11 @@ Function UpdateEvents()
 							EndIf
 						Next
 						
-						e\EventState = UpdateElevators(e\EventState, e\room\RoomDoors[0], gatea\RoomDoors[1], e\room\Objects[0], e\room\Objects[1], e)
+						If Curr096\State = 0 Or Curr096\State = 5 Then
+							e\EventState = UpdateElevators(e\EventState, e\room\RoomDoors[0], gatea\RoomDoors[1], e\room\Objects[0], e\room\Objects[1], e)
+						Else
+							e\EventState = Update096ElevatorEvent(e,e\EventState,e\room\RoomDoors[0],e\room\Objects[0])
+						EndIf
 						If Contained106 = False Then 
 							If e\EventState < -1.5 And e\EventState+FPSfactor=> -1.5 Then
 								PlaySound_Strict(OldManSFX(3))

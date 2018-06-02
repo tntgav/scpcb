@@ -12020,6 +12020,62 @@ Function ResetInput()
 	
 End Function
 
+Function Update096ElevatorEvent#(e.Events,EventState#,d.Doors,elevatorobj%)
+	Local prevEventState# = EventState#
+	
+	If d\openstate = 0 And d\open = False Then
+		If Abs(EntityX(Collider)-EntityX(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
+			If Abs(EntityZ(Collider)-EntityZ(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
+				If Abs(EntityY(Collider)-EntityY(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
+					d\locked = True
+					If EventState = 0 Then
+						TeleportEntity(Curr096\Collider,EntityX(d\frameobj),EntityY(d\frameobj)+1.0,EntityZ(d\frameobj),Curr096\CollRadius)
+						PointEntity Curr096\Collider,elevatorobj
+						RotateEntity Curr096\Collider,0,EntityYaw(Curr096\Collider),0
+						MoveEntity Curr096\Collider,0,0,-0.5
+						ResetEntity Curr096\Collider
+						Curr096\State = 6
+						SetNPCFrame(Curr096,0)
+						e\Sound = LoadSound_Strict("SFX\SCP\096\ElevatorSlam.ogg")
+						EventState = EventState + FPSfactor * 1.4
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	EndIf
+	
+	If EventState > 0 Then
+		If prevEventState = 0 Then
+			e\SoundCHN = PlaySound_Strict(e\Sound)
+		EndIf
+		
+		If EventState > 70*1.9 And EventState < 70*2+FPSfactor
+			CameraShake = 7
+		ElseIf EventState > 70*4.2 And EventState < 70*4.25+FPSfactor
+			CameraShake = 1
+		ElseIf EventState > 70*5.9 And EventState < 70*5.95+FPSfactor
+			CameraShake = 1
+		ElseIf EventState > 70*7.25 And EventState < 70*7.3+FPSfactor
+			CameraShake = 1
+			d\fastopen = True
+			d\open = True
+		ElseIf EventState > 70*8.1 And EventState < 70*8.15+FPSfactor
+			CameraShake = 1
+		EndIf
+		
+		If EventState <= 70*8.1 Then
+			d\openstate = Min(d\openstate,10)
+		Else
+			Curr096\State = 4
+			Curr096\LastSeen = 1
+		EndIf
+		EventState = EventState + FPSfactor * 1.4
+	EndIf
+	Return EventState
+	
+End Function
+
+
 
 
 
