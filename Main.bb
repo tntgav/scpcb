@@ -8902,6 +8902,7 @@ Function NullGame(playbuttonsfx%=True)
 	ReloadAAFont()
 	Camera = 0
 	ark_blur_cam = 0
+	Collider = 0
 	InitFastResize()
 	
 	CatchErrors("NullGame")

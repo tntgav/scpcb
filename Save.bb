@@ -1147,6 +1147,17 @@ Function LoadGame(file$)
 		Next
 	EndIf
 	
+	If Collider <> 0 Then
+		If PlayerRoom<>Null Then
+			ShowEntity PlayerRoom\obj
+		EndIf
+		ShowEntity Collider
+		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider))
+		If PlayerRoom<>Null Then
+			HideEntity PlayerRoom\obj
+		EndIf
+	EndIf
+	
 	CatchErrors("LoadGame")
 End Function
 
@@ -1784,6 +1795,17 @@ Function LoadGameQuick(file$)
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
 	CloseFile f
+	
+	If Collider <> 0 Then
+		If PlayerRoom<>Null Then
+			ShowEntity PlayerRoom\obj
+		EndIf
+		ShowEntity Collider
+		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider))
+		If PlayerRoom<>Null Then
+			HideEntity PlayerRoom\obj
+		EndIf
+	EndIf
 	
 	CatchErrors("LoadGameQuick")
 End Function
