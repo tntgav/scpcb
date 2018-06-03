@@ -245,7 +245,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[Block]
 			n\NVName = "SCP-096"
 			n\Collider = CreatePivot()
-			EntityRadius n\Collider, 0.3
+			EntityRadius n\Collider, 0.26
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\scp096.b3d")
 			
@@ -256,7 +256,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			MeshCullBox (n\obj, -MeshWidth(n\obj)*2, -MeshHeight(n\obj)*2, -MeshDepth(n\obj)*2, MeshWidth(n\obj)*2, MeshHeight(n\obj)*4, MeshDepth(n\obj)*4)
 			
-			n\CollRadius = 0.3
+			n\CollRadius = 0.26
 			;[End Block]
 		Case NPCtype049
 			;[Block]
@@ -1470,7 +1470,7 @@ Function UpdateNPCs()
 										EndIf
 										
 										dist2# = EntityDistance(n\Collider,n\Path[n\PathLocation]\obj)
-										If dist2 < 0.4 Then
+										If dist2 < 0.8 Then ;0.4
 											If n\Path[n\PathLocation]\door <> Null Then
 												If n\Path[n\PathLocation]\door\open = False Then
 													n\Path[n\PathLocation]\door\open = True
@@ -1478,7 +1478,7 @@ Function UpdateNPCs()
 													PlaySound2(OpenDoorFastSFX, Camera, n\Path[n\PathLocation]\door\obj)
 												EndIf
 											EndIf							
-											If dist2 < 0.2 Then n\PathLocation = n\PathLocation + 1
+											If dist2 < 0.7 Then n\PathLocation = n\PathLocation + 1 ;0.2
 										EndIf 
 									EndIf
 									
@@ -1669,7 +1669,7 @@ Function UpdateNPCs()
 				End Select
 				
 				;ResetEntity(n\Collider)
-				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider)-0.07, EntityZ(n\Collider))
+				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider)-0.03, EntityZ(n\Collider)) ;-0.07
 				
 				RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider), 0
 				;[End Block]
