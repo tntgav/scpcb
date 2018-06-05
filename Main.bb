@@ -4319,7 +4319,9 @@ Function MovePlayer()
 	If Injuries > 1.0 Then
 		temp2 = Bloodloss
 		BlurTimer = Max(Max(Sin(MilliSecs2()/100.0)*Bloodloss*30.0,Bloodloss*2*(2.0-CrouchState)),BlurTimer)
-		Bloodloss = Min(Bloodloss + (Min(Injuries,3.5)/300.0)*FPSfactor,100)
+		If (Not I_427\Using And I_427\Timer < 70*360) Then
+			Bloodloss = Min(Bloodloss + (Min(Injuries,3.5)/300.0)*FPSfactor,100)
+		EndIf
 		
 		If temp2 <= 60 And Bloodloss > 60 Then
 			Msg = "You are feeling faint from the amount of blood you have lost."
@@ -10219,15 +10221,15 @@ End Function
 
 Function Use427()
 	Local i%,pvt%,de.Decals,tempchn%
+	Local prevI427Timer# = I_427\Timer
 	
 	If I_427\Timer < 70*360
 		If I_427\Using=True Then
-			Local prev427Timer# = I_427\Timer
 			I_427\Timer = I_427\Timer + FPSfactor
 			If Injuries > 0.0 Then
 				Injuries = Max(Injuries - 0.0005 * FPSfactor,0.0)
 			EndIf
-			If Bloodloss > 0.0 Then
+			If Bloodloss > 0.0 And Injuries <= 1.0 Then
 				Bloodloss = Max(Bloodloss - 0.001 * FPSfactor,0.0)
 			EndIf
 			If I_427\Sound[0]=0 Then
@@ -10244,6 +10246,13 @@ Function Use427()
 					I_427\SoundCHN[1] = PlaySound_Strict(I_427\Sound[1])
 				EndIf
 			EndIf
+			If prevI427Timer < 70*60 And I_427\Timer => 70*60 Then
+				Msg = "You feel refreshed and energetic."
+				MsgTimer = 70*5
+			ElseIf prevI427Timer < 70*180 And I_427\Timer => 70*180 Then
+				Msg = "You feel gentle muscle spasms all over your body."
+				MsgTimer = 70*5
+			EndIf
 		Else
 			For i = 0 To 1
 				If I_427\SoundCHN[i]<>0 Then
@@ -10254,6 +10263,13 @@ Function Use427()
 			Next
 		EndIf
 	Else
+		If prevI427Timer-FPSfactor < 70*360 And I_427\Timer => 70*360 Then
+			Msg = "Your muscles are swelling. You feel more powerful than ever."
+			MsgTimer = 70*5
+		ElseIf prevI427Timer-FPSfactor < 70*390 And I_427\Timer => 70*390 Then
+			Msg = "You can't feel your legs. But you don't need legs anymore."
+			MsgTimer = 70*5
+		EndIf
 		I_427\Timer = I_427\Timer + FPSfactor
 		If I_427\Sound[0]=0 Then
 			I_427\Sound[0] = LoadSound_Strict("SFX\SCP\427\Effect.ogg")
@@ -10281,7 +10297,7 @@ Function Use427()
 		EndIf
 		If I_427\Timer >= 70*420 Then
 			Kill()
-			DeathMSG = "LOL"
+			DeathMSG = "Requesting support from MTF Nu-7. We need more firepower to take this thing down."
 		ElseIf I_427\Timer >= 70*390 Then
 			Crouch = True
 		EndIf
