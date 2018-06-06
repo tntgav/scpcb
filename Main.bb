@@ -1839,12 +1839,14 @@ Type Doors
 	
 	Field MTFClose% = True
 	Field NPCCalledElevator% = False
+	
+	Field DoorHitOBJ%
 End Type 
 
 Dim BigDoorOBJ(2), HeavyDoorObj(2)
 Dim OBJTunnel(7)
 
-Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  big% = False, keycard% = False, code$="")
+Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  big% = False, keycard% = False, code$="", useCollisionMesh% = False)
 	Local d.Doors, parent, i%
 	If room <> Null Then parent = room\obj
 	
@@ -1959,6 +1961,29 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	d\room=room
 	
 	d\MTFClose = True
+	
+	Local d2.Doors
+	If useCollisionMesh Then
+		For d2.Doors = Each Doors
+			If d2 <> d Then
+				If d2\DoorHitOBJ <> 0 Then
+					d\DoorHitOBJ = CopyEntity(d2\DoorHitOBJ,d\frameobj)
+					EntityAlpha d\DoorHitOBJ,0.0
+					EntityFX d\DoorHitOBJ,1
+					EntityType d\DoorHitOBJ,HIT_MAP
+					EntityColor d\DoorHitOBJ,255,0,0
+					Exit
+				EndIf
+			EndIf
+		Next
+		If d\DoorHitOBJ=0 Then
+			d\DoorHitOBJ = LoadMesh_Strict("GFX\doorhit.b3d",d\frameobj)
+			EntityAlpha d\DoorHitOBJ,0.0
+			EntityFX d\DoorHitOBJ,1
+			EntityType d\DoorHitOBJ,HIT_MAP
+			EntityColor d\DoorHitOBJ,255,0,0
+		EndIf
+	EndIf
 	
 	Return d
 	
@@ -2086,8 +2111,8 @@ Function UpdateDoors()
 							If (Not Wearing714) Then PlaySound_Strict HorrorSFX(7)
 							d\open = False : d\SoundCHN = PlaySound2(CloseDoorSFX(Min(d\dir,1), Rand(0, 2)), Camera, d\obj) : d\AutoClose = False
 						EndIf
-					End If				
-				End If
+					EndIf				
+				EndIf
 			Else
 				If d\openstate > 0 Then
 					Select d\dir
@@ -2144,6 +2169,9 @@ Function UpdateDoors()
 						EndIf
 					EndIf
 					
+					If d\DoorHitOBJ <> 0 Then
+						ShowEntity d\DoorHitOBJ
+					EndIf
 				Else
 					d\fastopen = 0
 					PositionEntity(d\obj, EntityX(d\frameobj, True), EntityY(d\frameobj, True), EntityZ(d\frameobj, True))
@@ -2151,12 +2179,23 @@ Function UpdateDoors()
 					If d\obj2 <> 0 And d\dir = 0 Then
 						MoveEntity(d\obj, 0, 0, 8.0 * RoomScale)
 						MoveEntity(d\obj2, 0, 0, 8.0 * RoomScale)
-					EndIf	
-				End If
-			End If
+					EndIf
+					If d\DoorHitOBJ <> 0 Then
+						HideEntity d\DoorHitOBJ
+					EndIf
+				EndIf
+			EndIf
 			
 		EndIf
 		UpdateSoundOrigin(d\SoundCHN,Camera,d\frameobj)
+		
+		If d\DoorHitOBJ<>0 Then
+			If DebugHUD Then
+				EntityAlpha d\DoorHitOBJ,0.5
+			Else
+				EntityAlpha d\DoorHitOBJ,0.0
+			EndIf
+		EndIf
 	Next
 End Function
 
