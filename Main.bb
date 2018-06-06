@@ -2353,6 +2353,8 @@ Function RemoveDoor(d.Doors)
 	If d\buttons[0] <> 0 Then FreeEntity d\buttons[0]
 	If d\buttons[1] <> 0 Then FreeEntity d\buttons[1]	
 	
+	If d\DoorHitOBJ <> 0 Then FreeEntity d\DoorHitOBJ
+	
 	Delete d
 End Function
 
