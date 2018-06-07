@@ -1066,7 +1066,7 @@ Function UpdateNPCs()
 								End If
 								
 								If dist > 0.8 Then
-									If (dist > 25.0 Or PlayerRoom\RoomTemplate\Name = "pocketdimension" Or Visible Or n\PathStatus = 2) And PlayerRoom\RoomTemplate\Name <> "gatea" Then 
+									If (dist > 25.0 Or PlayerRoom\RoomTemplate\Name = "pocketdimension" Or Visible Or n\PathStatus <> 1) And PlayerRoom\RoomTemplate\Name <> "gatea" Then 
 										
 										If (dist > 40 Or PlayerRoom\RoomTemplate\Name = "pocketdimension") Then
 											TranslateEntity n\Collider, 0, ((EntityY(Collider) - 0.14) - EntityY(n\Collider)) / 50.0, 0
@@ -1092,9 +1092,11 @@ Function UpdateNPCs()
 										EndIf
 										
 										n\PathTimer = Max(n\PathTimer-FPSfactor,0)
-										If n\PathTimer =< 0 Then n\PathStatus = 0
+										If n\PathTimer =< 0 Then
+											n\PathStatus = FindPath (n, EntityX(Collider,True), EntityY(Collider,True), EntityZ(Collider,True))
+											n\PathTimer = 70*10
+										EndIf
 									Else 
-										
 										If n\PathTimer <= 0 Then
 											n\PathStatus = FindPath (n, EntityX(Collider,True), EntityY(Collider,True), EntityZ(Collider,True))
 											n\PathTimer = 70*10
@@ -1105,13 +1107,16 @@ Function UpdateNPCs()
 											If n\PathStatus = 2 Then
 												n\CurrSpeed = 0
 											ElseIf n\PathStatus = 1
-												If n\Path[n\PathLocation]=Null Then 
+												While n\Path[n\PathLocation]=Null
 													If n\PathLocation > 19 Then 
 														n\PathLocation = 0 : n\PathStatus = 0
+														Exit
 													Else
 														n\PathLocation = n\PathLocation + 1
 													EndIf
-												Else
+												Wend
+												
+												If n\Path[n\PathLocation]<>Null Then 
 													TranslateEntity n\Collider, 0, ((EntityY(n\Path[n\PathLocation]\obj,True) - 0.11) - EntityY(n\Collider)) / 50.0, 0
 													
 													PointEntity n\obj, n\Path[n\PathLocation]\obj
@@ -1201,7 +1206,7 @@ Function UpdateNPCs()
                                             PlaySound2(OldManSFX(3),Camera,n\Collider)
                                             n\PathTimer = 0
                                             n\Reload = (70*10.0)/(SelectedDifficulty\otherFactors+1)
-                                            DebugLog "COBY!"
+                                            DebugLog "Teleported 106 (Distance: "+EntityDistance(n\Collider,Collider)+")"
                                         EndIf
                                     EndIf
                                 EndIf
