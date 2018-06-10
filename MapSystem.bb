@@ -7837,6 +7837,7 @@ Function CreateChunkParts(r.Rooms)
 				ScaleEntity chp\obj[j],RoomScale,RoomScale,RoomScale
 				EntityType chp\obj[j],HIT_MAP
 				EntityPickMode chp\obj[j],2
+				HideEntity chp\obj[j]
 				;EntityParent chp\obj[j],r\obj
 			Next
 			chp2 = Before(chp)
@@ -8003,6 +8004,10 @@ Function HideChunks()
 	
 	For ch = Each Chunk
 		If (Not ch\IsSpawnChunk)
+			For i = 0 To ch\Amount
+				FreeEntity ch\obj[i]
+			Next
+			FreeEntity ch\PlatForm
 			FreeEntity ch\ChunkPivot
 			Delete ch
 		EndIf
