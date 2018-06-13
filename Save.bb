@@ -92,7 +92,6 @@ Function SaveGame(file$)
 	WriteByte f, WearingVest
 	WriteByte f, WearingHazmat
 	
-	WriteByte f, Wearing178
 	WriteByte f, WearingNightVision
 	WriteByte f, Wearing1499
 	WriteFloat f,NTF_1499PrevX#
@@ -548,7 +547,6 @@ Function LoadGame(file$)
 	WearingVest = ReadByte(f)	
 	WearingHazmat = ReadByte(f)
 	
-	Wearing178 = ReadByte(f)
 	WearingNightVision = ReadByte(f)
 	Wearing1499 = ReadByte(f)
 	NTF_1499PrevX# = ReadFloat(f)
@@ -1285,7 +1283,6 @@ Function LoadGameQuick(file$)
 	WearingVest = ReadByte(f)	
 	WearingHazmat = ReadByte(f)
 	
-	Wearing178 = ReadByte(f)
 	WearingNightVision = ReadByte(f)
 	Wearing1499 = ReadByte(f)
 	NTF_1499PrevX# = ReadFloat(f)

@@ -290,7 +290,7 @@ Global SCP1025state#[6]
 
 Global HeartBeatRate#, HeartBeatTimer#, HeartBeatVolume#
 
-Global WearingGasMask%, WearingHazmat%, WearingVest%, Wearing714%, WearingNightVision%, Wearing178%
+Global WearingGasMask%, WearingHazmat%, WearingVest%, Wearing714%, WearingNightVision%
 Global NVTimer#
 
 Global SuperMan%, SuperManTimer#
@@ -2653,8 +2653,6 @@ Global InfectTexture%, InfectOverlay%
 Global DarkTexture%, Dark%
 Global Collider%, Head%
 
-Global GlassesTexture%, GlassesOverlay%
-
 Global FogNVTexture%
 Global NVTexture%, NVOverlay%
 
@@ -4590,61 +4588,6 @@ Function MouseLook()
 		EntityTexture(Fog, FogTexture)
 	EndIf
 	
-	If Wearing178>0 Then
-		ShouldPlay = 14
-		ShowEntity(GlassesOverlay)
-	Else
-		HideEntity(GlassesOverlay)
-	EndIf
-	
-	canSpawn178%=0
-	
-	If Wearing178<>1 Then
-		For n.NPCs = Each NPCs
-			If (n\NPCtype = NPCtype178) Then
-				If n\State3>0 Then canSpawn178=1
-				If (n\State<=0) And (n\State3=0) Then
-					RemoveNPC(n)
-				Else If EntityDistance(Collider,n\Collider)>HideDistance*1.5 Then
-					RemoveNPC(n)
-				EndIf
-			EndIf
-		Next
-	EndIf
-	
-	If (canSpawn178=1) Or (Wearing178=1) Then
-		tempint%=0
-		For n.NPCs = Each NPCs
-			If (n\NPCtype = NPCtype178) Then
-				tempint=tempint+1
-				If EntityDistance(Collider,n\Collider)>HideDistance*1.5 Then
-					RemoveNPC(n)
-				EndIf
-				;If n\State<=0 Then RemoveNPC(n)
-			EndIf
-		Next
-		If tempint<10 Then ;create the npcs
-			For w.WayPoints = Each WayPoints
-				Local dist#
-				dist=EntityDistance(Collider,w\obj)
-				If (dist<HideDistance*1.5) And (dist>1.2) And (w\door = Null) And (Rand(0,1)=1) Then
-					tempint2=True
-					For n.NPCs = Each NPCs
-						If n\NPCtype=NPCtype178 Then
-							If EntityDistance(n\Collider,w\obj)<0.5
-								tempint2=False
-								Exit
-							EndIf
-						EndIf
-					Next
-					If tempint2 Then
-						CreateNPC(NPCtype178, EntityX(w\obj,True),EntityY(w\obj,True)+0.15,EntityZ(w\obj,True))
-					EndIf	
-				EndIf
-			Next
-		EndIf
-	EndIf
-	
 	For i = 0 To 5
 		If SCP1025state[i]>0 Then
 			Select i
@@ -5392,9 +5335,6 @@ Function DrawGUI()
 					;	If Wearing178=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					;Case "glasses"
 					;	If Wearing178=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-						
-					Case "scp178"
-						If Wearing178=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "nvgoggles"
 						If WearingNightVision=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "supernv"
@@ -5748,23 +5688,6 @@ Function DrawGUI()
 					WearingNightVision = (Not WearingNightVision) * 3
 					SelectedItem = Null	
 					
-					;[End Block]
-				Case "scp178"
-					;[Block]
-					If Wearing178=1 Then
-						Msg = "You removed the glasses."
-						Wearing178 = 0
-					Else
-						GiveAchievement(Achv178)
-						Msg = "You put on the glasses."
-						Wearing178 = 1
-						;WearingGasMask = 0
-						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-						;WearingNightVision = 0
-						TakeOffStuff(1+2+32+64)
-					EndIf
-					MsgTimer = 70 * 5
-					SelectedItem = Null	
 					;[End Block]
 				Case "ring"
 					;[Block]
@@ -7976,16 +7899,6 @@ Function LoadEntities()
 	MoveEntity(NVBlink, 0, 0, 1.0)
 	HideEntity(NVBlink)
 	
-	GlassesTexture = LoadTexture_Strict("GFX\GlassesOverlay.jpg",1)
-	GlassesOverlay = CreateSprite(ark_blur_cam)
-	ScaleSprite(GlassesOverlay, Max(GraphicWidth / 1024.0, 1.0), Max(GraphicHeight / 1024.0 * 0.8, 0.8))
-	EntityTexture(GlassesOverlay, GlassesTexture)
-	EntityBlend (GlassesOverlay, 2)
-	EntityFX(GlassesOverlay, 1)
-	EntityOrder GlassesOverlay, -1003
-	MoveEntity(GlassesOverlay, 0, 0, 1.0)
-	HideEntity(GlassesOverlay)
-	
 	FogNVTexture = LoadTexture_Strict("GFX\fogNV.jpg", 1)
 	
 	DrawLoading(5)
@@ -8768,7 +8681,6 @@ Function NullGame(playbuttonsfx%=True)
 	WearingHazmat = 0
 	WearingVest = 0
 	Wearing714 = 0
-	Wearing178 = 0
 	If WearingNightVision Then
 		CameraFogFar = StoredCameraFogFar
 		WearingNightVision = 0
@@ -9507,19 +9419,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					it2 = CreateItem("Bulky Ballistic Vest", "veryfinevest", x, y, z)
 					RemoveItem(item)
-			End Select
-		Case "3-D Glasses"
-			Select setting
-				Case "rough,coarse"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
-					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
-					For n.NPCs = Each NPCs
-						If n\NPCtype = NPCtype178 Then RemoveNPC(n)
-					Next
-				Case "1:1","fine","very fine"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
 			End Select
 		Case "Clipboard"
 			Select setting
@@ -10808,10 +10707,7 @@ Function TakeOffStuff(flag%=0)
 		EndIf
 	EndIf
 	If Len(numb_flag%)>3
-		If Mid(numb_flag%,Len(numb_flag%)-3,1) = 1
-			Wearing178 = False
-			DebugLog "SCP-178 Off"
-		EndIf
+		
 	EndIf
 	If Len(numb_flag%)>4
 		If Mid(numb_flag%,Len(numb_flag%)-4,1) = 1
@@ -12055,7 +11951,7 @@ Function CanUseItem(canUseWithHazmat%, canUseWithGasMask%, canUseWithEyewear%)
 		Msg = "You can't use that item while wearing a gas mask."
 		MsgTimer = 70*5
 		Return False
-	Else If (canUseWithEyewear = False And (WearingNightVision Or Wearing178))
+	Else If (canUseWithEyewear = False And (WearingNightVision))
 		Msg = "You can't use that item while wearing headgear."
 	EndIf
 	

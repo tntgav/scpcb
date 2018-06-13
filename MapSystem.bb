@@ -4359,15 +4359,6 @@ Function FillRoom(r.Rooms)
 			EntityType r\Objects[14],HIT_MAP
 			EntityAlpha r\Objects[14],0.0
 			;[End Block]
-		Case "room178"
-			;[Block]
-			r\RoomDoors[0] = CreateDoor(r\zone,r\x,r\y,r\z - 672.0*RoomScale,0,r,False,False,3)
-			
-			it = CreateItem("SCP-178","scp178",r\x,200.0 * RoomScale,r\z - 80.0 * RoomScale)
-			RotateEntity it\collider,0,0,0
-			EntityParent it\collider,r\obj
-			SetAnimTime it\model,0.0
-			;[End Block]	
 		Case "pocketdimension"
 			;[Block]
 			Local hallway = LoadMesh_Strict("GFX\map\pocketdimension2.b3d") ;the tunnels in the first room
@@ -7048,7 +7039,6 @@ Function CreateMap()
 	SetRoom("914", ROOM1, Floor(0.3*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("room1archive",ROOM1,Floor(0.5*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("room205", ROOM1, Floor(0.6*Float(Room1Amount[0])),min_pos,max_pos)
-	SetRoom("room178",ROOM1,Floor(0.7*Float(Room1Amount[0])),min_pos,max_pos)
 	
 	MapRoom(ROOM2C, 0) = "lockroom"
 	
