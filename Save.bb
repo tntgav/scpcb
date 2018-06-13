@@ -1849,11 +1849,23 @@ Function LoadSaveGames()
 	
 	Dim SaveGameTime$(SaveGameAmount + 1)
 	Dim SaveGameDate$(SaveGameAmount + 1)
+	Dim SaveGameVersion$(SaveGameAmount + 1)
 	For i = 1 To SaveGameAmount
 		DebugLog (SavePath + SaveGames(i - 1) + "\save.txt")
 		Local f% = ReadFile(SavePath + SaveGames(i - 1) + "\save.txt")
 		SaveGameTime(i - 1) = ReadString(f)
 		SaveGameDate(i - 1) = ReadString(f)
+		;Skip all data until the CompatibleVersion number
+		ReadInt(f)
+		For j = 0 To 5
+			ReadFloat(f)
+		Next
+		ReadString(f)
+		ReadFloat(f)
+		ReadFloat(f)
+		;End Skip
+		SaveGameVersion(i - 1) = ReadString(f)
+		
 		CloseFile f
 	Next
 	
