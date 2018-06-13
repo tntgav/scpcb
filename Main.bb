@@ -10237,7 +10237,7 @@ Function Use427()
 		EndIf
 		If I_427\Timer >= 70*420 Then
 			Kill()
-			DeathMSG = "Requesting support from MTF Nu-7. We need more firepower to take this thing down."
+			DeathMSG = Chr(34)+"Requesting support from MTF Nu-7. We need more firepower to take this thing down."+Chr(34)
 		ElseIf I_427\Timer >= 70*390 Then
 			Crouch = True
 		EndIf
