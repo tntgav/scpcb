@@ -12,8 +12,18 @@
 - Improved SCP-914's document texture.
 - Optimized the room light rendering.
 - Removed lightmaps from the SCP-1499 dimension buildings, so now the game loads less textures when loading the dimension.
+- Changed the mechanics on how the wearing of the hazmat suit, the ballistic vest and SCP-1499 works.
+- Added 50 cent coins in the game. Those are required to use SCP-294.
+- The message "You pushed the button but nothing happened." appears when you try to use a locked door that is opened.
+- Added wallets which you can use to store the 50 cent coins.
+- Added battery power to the night vision goggles that can be found in the facility.
+- Added a death message when the player gets killed by the SCP-035 tentacle in the office room.
+- The SCP-035 tentacles now play their idle sound.
+- Added the missing containment door inside of SCP-372's chamber.
+- Improved the SCP-1499 texture.
 
 Bug fixes:
+    - Fixed an exploit that caused the blinking sprite to be rendered invisible after alt-tabbing the game.
     - The inventory cannot be opened while the SCP-008 zombie cutscene plays.
     - Removed the "room2doors" event from events.ini as the actual event used in the game is called "room2doors173"
     - The keycard slot level for the archive rooms will now be saved instead of being generated newly each time.
@@ -27,6 +37,12 @@ Bug fixes:
     - SCP-106 won't disappear from Gate A anymore if you use SCP-1499.
     - The SCP-1499 dimension won't lag anymore if you saved in it and load the save file from the main menu.
     - The player cannot fly in the SCP-1499 dimension anymore.
+    - The progress bar of the first aid kit won't stay at it's current value if the item has been deselected.
+    - The inventory and the main menu can not be opened anymore while using SCP-294.
+    - The camera won't turn rapidly anymore when leaving SCP-294.
+    - The maximum amount of achievements displayed at the ending screen is now correct.
+    - The correct damage sounds will now be played when the player gets attacked by the SCP-035 tentacles.
+    - The Debug HUD won't be enabled anymore if you start a new game after you have quit a game where it has been activated before.
 
 ----------------------------------------------------------------------------------
 

@@ -92,7 +92,6 @@ Function SaveGame(file$)
 	WriteByte f, WearingVest
 	WriteByte f, WearingHazmat
 	
-	WriteByte f, Wearing178
 	WriteByte f, WearingNightVision
 	WriteByte f, Wearing1499
 	WriteFloat f,NTF_1499PrevX#
@@ -438,6 +437,8 @@ Function SaveGame(file$)
 	EndIf
 	WriteFloat f, CameraFogFar
 	WriteFloat f, StoredCameraFogFar
+	WriteByte f, I_427\Using
+	WriteFloat f, I_427\Timer
 	CloseFile f
 	
 	If Not MenuOpen Then
@@ -546,7 +547,6 @@ Function LoadGame(file$)
 	WearingVest = ReadByte(f)	
 	WearingHazmat = ReadByte(f)
 	
-	Wearing178 = ReadByte(f)
 	WearingNightVision = ReadByte(f)
 	Wearing1499 = ReadByte(f)
 	NTF_1499PrevX# = ReadFloat(f)
@@ -1081,7 +1081,9 @@ Function LoadGame(file$)
     StoredCameraFogFar = ReadFloat(f)
 	If CameraFogFar = 0 Then
 		CameraFogFar = 6
-	EndIf	
+	EndIf
+	I_427\Using = ReadByte(f)
+	I_427\Timer = ReadFloat(f)
 	
 	CloseFile f
 	
@@ -1141,6 +1143,17 @@ Function LoadGame(file$)
 		For it.Items = Each Items
 			it\disttimer = 0
 		Next
+	EndIf
+	
+	If Collider <> 0 Then
+		If PlayerRoom<>Null Then
+			ShowEntity PlayerRoom\obj
+		EndIf
+		ShowEntity Collider
+		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider))
+		If PlayerRoom<>Null Then
+			HideEntity PlayerRoom\obj
+		EndIf
 	EndIf
 	
 	CatchErrors("LoadGame")
@@ -1270,7 +1283,6 @@ Function LoadGameQuick(file$)
 	WearingVest = ReadByte(f)	
 	WearingHazmat = ReadByte(f)
 	
-	Wearing178 = ReadByte(f)
 	WearingNightVision = ReadByte(f)
 	Wearing1499 = ReadByte(f)
 	NTF_1499PrevX# = ReadFloat(f)
@@ -1776,8 +1788,21 @@ Function LoadGameQuick(file$)
     StoredCameraFogFar = ReadFloat(f)
 	If CameraFogFar = 0 Then
 		CameraFogFar = 6
-	EndIf	
+	EndIf
+	I_427\Using = ReadByte(f)
+	I_427\Timer = ReadFloat(f)
 	CloseFile f
+	
+	If Collider <> 0 Then
+		If PlayerRoom<>Null Then
+			ShowEntity PlayerRoom\obj
+		EndIf
+		ShowEntity Collider
+		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider))
+		If PlayerRoom<>Null Then
+			HideEntity PlayerRoom\obj
+		EndIf
+	EndIf
 	
 	CatchErrors("LoadGameQuick")
 End Function
@@ -1821,11 +1846,23 @@ Function LoadSaveGames()
 	
 	Dim SaveGameTime$(SaveGameAmount + 1)
 	Dim SaveGameDate$(SaveGameAmount + 1)
+	Dim SaveGameVersion$(SaveGameAmount + 1)
 	For i = 1 To SaveGameAmount
 		DebugLog (SavePath + SaveGames(i - 1) + "\save.txt")
 		Local f% = ReadFile(SavePath + SaveGames(i - 1) + "\save.txt")
 		SaveGameTime(i - 1) = ReadString(f)
 		SaveGameDate(i - 1) = ReadString(f)
+		;Skip all data until the CompatibleVersion number
+		ReadInt(f)
+		For j = 0 To 5
+			ReadFloat(f)
+		Next
+		ReadString(f)
+		ReadFloat(f)
+		ReadFloat(f)
+		;End Skip
+		SaveGameVersion(i - 1) = ReadString(f)
+		
 		CloseFile f
 	Next
 	

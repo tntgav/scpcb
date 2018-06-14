@@ -32,7 +32,11 @@ Function UpdateEvents()
 				Else
 					e\room\RoomDoors[4]\locked=False
 					
-					e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1], e\room\Objects[8], e\room\Objects[9], e)
+					If Curr096\State = 0 Or Curr096\State = 5 Then
+						e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1], e\room\Objects[8], e\room\Objects[9], e)
+					Else
+						e\EventState2 = Update096ElevatorEvent(e,e\EventState2,e\room\RoomDoors[0],e\room\Objects[8])
+					EndIf
 					
 					EntityAlpha Fog, 1.0						
 				EndIf
@@ -1808,7 +1812,11 @@ Function UpdateEvents()
 							EndIf
 						Next
 						
-						e\EventState = UpdateElevators(e\EventState, e\room\RoomDoors[0], gatea\RoomDoors[1], e\room\Objects[0], e\room\Objects[1], e)
+						If Curr096\State = 0 Or Curr096\State = 5 Then
+							e\EventState = UpdateElevators(e\EventState, e\room\RoomDoors[0], gatea\RoomDoors[1], e\room\Objects[0], e\room\Objects[1], e)
+						Else
+							e\EventState = Update096ElevatorEvent(e,e\EventState,e\room\RoomDoors[0],e\room\Objects[0])
+						EndIf
 						If Contained106 = False Then 
 							If e\EventState < -1.5 And e\EventState+FPSfactor=> -1.5 Then
 								PlaySound_Strict(OldManSFX(3))
@@ -2086,11 +2094,13 @@ Function UpdateEvents()
 								temp = EntityDistance(Collider, e\room\Objects[17])
 								If temp < 2000*RoomScale Then
 									Injuries = Injuries + (FPSfactor/4000)
+									e\EventStr = Float(e\EventStr)+(FPSfactor/1000.0)
 									
-									If Injuries > 1.0 Then
-										If Injuries - (FPSfactor/4000)=< 1.0 Then
-											PlaySound_Strict LoadTempSound("SFX\Room\PocketDimension\Kneel.ogg")
-										EndIf
+									;If Injuries > 1.0 Then
+									If Float(e\EventStr) > 1.0 And Float(e\EventStr) < 1000.0 Then
+										PlaySound_Strict LoadTempSound("SFX\Room\PocketDimension\Kneel.ogg")
+										LoadEventSound(e,"SFX\Room\PocketDimension\Screech.ogg")
+										e\EventStr = Float(1000.0)
 									EndIf
 									
 									Sanity = Max(Sanity - FPSfactor / temp / 8,-1000)
@@ -2119,6 +2129,7 @@ Function UpdateEvents()
 										LoadEventSound(e,"SFX\Room\PocketDimension\TrenchPlane.ogg",1)
 										PositionEntity e\room\Objects[20], EntityX(e\room\Objects[8],True)-1000,0,0,True
 										
+										e\EventStr = Float(0)
 									EndIf
 								ElseIf EntityY(Collider)<-180*RoomScale ;the "exit room"
 									temp = Distance(EntityX(Collider),EntityZ(Collider),EntityX(e\room\Objects[8],True)+1024*RoomScale,EntityZ(e\room\Objects[8],True))
@@ -2395,6 +2406,7 @@ Function UpdateEvents()
 					e\EventState = 0
 					e\EventState2 = 0
 					e\EventState3 = 0
+					e\EventStr = Float(0)
 				EndIf
 				;[End Block]
 			Case "room2cafeteria"
@@ -2417,8 +2429,21 @@ Function UpdateEvents()
 											EndIf
 										EndIf
 									Next
-									Using294=temp
-									If Using294 Then MouseHit1=False
+									If SelectedItem<>Null Then
+										If SelectedItem\itemtemplate\tempname="50ct" Then
+											RemoveItem(SelectedItem)
+											SelectedItem=Null
+											e\EventState2 = 1
+										EndIf
+									EndIf
+									If e\EventState2 = 1 Then
+										Using294=temp
+										If Using294 Then MouseHit1=False
+									Else
+										Using294=False
+										Msg = "You need to insert a 50 cent coin in order to use this machine."
+										MsgTimer = 70*5
+									EndIf
 								EndIf
 							EndIf
 						EndIf
@@ -8300,6 +8325,10 @@ Function UpdateEvents()
 							;n\Idle = True
 						EndIf
 					Next
+					For du.Dummy1499 = Each Dummy1499
+						FreeEntity(du\obj)
+						Delete du
+					Next
 					e\EventState = 1.0
 				EndIf
 				;[End Block]
@@ -8400,7 +8429,7 @@ Function UpdateEvents()
 End Function
 
 Function UpdateDimension1499()
-	Local e.Events,n.NPCs,r.Rooms,it.Items
+	Local e.Events,n.NPCs,n2.NPCs,r.Rooms,it.Items,i%,j%,du.Dummy1499,du2.Dummy1499,temp%,scale#,x%,y%
 	
 	For e.Events = Each Events
 		If e\EventName = "dimension1499"
@@ -8409,6 +8438,8 @@ Function UpdateDimension1499()
 				;0: The player never entered SCP-1499
 				;1: The player had already entered the dimension at least once
 				;2: The player is in dimension
+			;e\EventState2: Used to count the amount of times the player has entered the 1499 dimension (for a little spawning event)
+			;e\EventState3: Variable used for the 1499 church event
 			If PlayerRoom = e\room Then
 				If e\EventState < 2.0
 					;1499 random generator
@@ -8433,7 +8464,119 @@ Function UpdateDimension1499()
 					;		ResetEntity n\Collider
 					;	EndIf
 					;Next
+					Local value% = Rand(2,3)
+					If e\EventState2 = value% Or e\EventState2=4 Then
+						For i = -1 To 1
+							For j = -1 To 1
+								If i<>0 And j<>0 Then
+									n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+(0.75*i),EntityY(Collider)+0.05,EntityZ(Collider)+(0.75*j))
+									PointEntity n\Collider,Collider
+									RotateEntity n\Collider,0,EntityYaw(n\Collider),0
+									n\State = 2
+								ElseIf i<>0 Or j<>0 Then
+									n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+i,EntityY(Collider)+0.05,EntityZ(Collider)+j)
+									PointEntity n\Collider,Collider
+									RotateEntity n\Collider,0,EntityYaw(n\Collider),0
+									n\State = 2
+								EndIf
+							Next
+						Next
+						e\EventState2 = 5
+					EndIf
+					;Guards at the entrance to church
+					n.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+1884.0*RoomScale)
+					n\PrevState = 3
+					n\Angle = 270
+					RotateEntity n\Collider,0,n\Angle,0
+					n2.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+2876.0*RoomScale)
+					n2\PrevState = 3
+					n2\Angle = 270
+					RotateEntity n2\Collider,0,n2\Angle,0
+					n\Target = n2
+					n2\Target = n
+					e\room\NPC[2] = n
+					e\room\NPC[3] = n2
+					;Guard at stairs
+					n.NPCs = CreateNPC(NPCtype1499,e\room\x-2761.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+3204.0*RoomScale)
+					n\PrevState = 1
+					n\Angle = 180
+					RotateEntity n\Collider,0,n\Angle,0
+					;King
+					n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2308.0*RoomScale)
+					n\PrevState = 2
+					n\Angle = 270
+					RotateEntity n\Collider,0,n\Angle,0
+					tex = LoadTexture_Strict("GFX\npcs\1499_King.jpg")
+					EntityTexture n\obj,tex
+					FreeTexture tex
+					e\room\NPC[0] = n
+					;Guard next to king
+					n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2052.0*RoomScale)
+					n\PrevState = 1
+					n\Angle = 270
+					RotateEntity n\Collider,0,n\Angle,0
+					e\room\NPC[1] = n
+					;1499-1 instances praying in church
+					;Zone 1
+					For x=0 To 7
+						For y=0 To 2
+							du = New Dummy1499
+							For n.NPCs = Each NPCs
+								If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
+									du\obj = CopyEntity(n\obj)
+									Exit
+								EndIf
+							Next
+							scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
+							ScaleEntity du\obj, scale#,scale#,scale#
+							EntityFX du\obj,1
+							du\anim = Rand(0,1)
+							;2560=x		768=z
+							;1687.0
+							PositionEntity du\obj,Max(Min((e\room\x+(1887.0-((2560.0/7.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1887.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(1796.0-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+1796.0*RoomScale),e\room\z+1028.0*RoomScale)
+							RotateEntity du\obj,0,270,0
+						Next
+					Next
+					;Zone 2
+					For x=0 To 6
+						For y=0 To 2
+							du = New Dummy1499
+							For n.NPCs = Each NPCs
+								If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
+									du\obj = CopyEntity(n\obj)
+									Exit
+								EndIf
+							Next
+							scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
+							ScaleEntity du\obj, scale#,scale#,scale#
+							EntityFX du\obj,1
+							du\anim = Rand(0,1)
+							;2048=x		768=z
+							;1175.0
+							PositionEntity du\obj,Max(Min((e\room\x+(1375.0-((2048.0/6.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1375.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(3588-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+3588.0*RoomScale),e\room\z+2820.0*RoomScale)
+							RotateEntity du\obj,0,270,0
+						Next
+					Next
 				EndIf
+				;4055, 240, 2084
+				;4055, 240, 3076
+				;-2761, 240, 3204 for stairs guard
+				;-1449, 240, 1092
+				;-1449, 240, 3524
+				;-1917, 1904, 2052 - guard
+				;-1917, 1904, 2308 - king
+				
+				;1687, 240, 1028
+				;1687, 240, 1796
+				;-873, 240, 1796
+				;-873, 240, 1028
+				;that's the First zone
+				;1175, 240, 2820
+				;1175, 240, 3588
+				;-873, 240, 3588
+				;-873, 240, 2820
+				;that's For second zone
+				
 				;PositionEntity e\room\Objects[0],0,800,0
 				If (Not DebugHUD)
 					CameraFogRange Camera,40,80
@@ -8469,6 +8612,95 @@ Function UpdateDimension1499()
 							EndIf
 						EndIf
 					Next
+					For du = Each Dummy1499
+						If du\anim=0 Then
+							;321-361
+							If AnimTime(du\obj)<=360.5 Then
+								Animate2(du\obj,AnimTime(du\obj),321,361,0.2,False)
+							;362-402
+							ElseIf AnimTime(du\obj)>361.5 And AnimTime(du\obj)<=401.5 Then
+								Animate2(du\obj,AnimTime(du\obj),362,402,0.2,False)
+							Else
+								temp = Rand(0,1)
+								If temp=0 Then
+									SetAnimTime(du\obj,321)
+								Else
+									SetAnimTime(du\obj,362)
+								EndIf
+							EndIf
+						Else
+							;413-453
+							If AnimTime(du\obj)<=452.5 Then
+								Animate2(du\obj,AnimTime(du\obj),413,453,0.2,False)
+							;454-498
+							ElseIf AnimTime(du\obj)>453.5 And AnimTime(du\obj)<=497.5 Then
+								Animate2(du\obj,AnimTime(du\obj),454,498,0.2,False)
+							Else
+								temp = Rand(0,1)
+								If temp=0 Then
+									SetAnimTime(du\obj,413)
+								Else
+									SetAnimTime(du\obj,454)
+								EndIf
+							EndIf
+						EndIf
+					Next
+					;-56,0,2287
+					;X distance: 2160
+					;Z distance: 1408
+					
+					;Player is inside the church
+					If e\EventState3 < 70*10 Then
+						If Abs(EntityX(Collider)-(e\room\x-56.0*RoomScale))<2160.0*RoomScale Then
+							If Abs(EntityZ(Collider)-(e\room\z+2287.0*RoomScale))<1408.0*RoomScale Then
+								e\EventState3 = e\EventState3 + FPSfactor
+								;CurrMusicVolume = 1.0
+							EndIf
+						EndIf
+					ElseIf e\EventState3 >= 70*10 And e\EventState3 < 70*20 Then
+						For i = 0 To 1
+							e\room\NPC[i]\Reload = 1
+						Next
+						e\EventState3 = 70*20
+					ElseIf e\EventState3 = 70*20
+						If e\room\NPC[0]\Frame > 854.5 Then
+							For i = 2 To 3
+								If i = 2
+									If e\room\NPC[i]\Sound <> 0 Then FreeSound_Strict e\room\NPC[i]\Sound : e\room\NPC[i]\Sound = 0
+									e\room\NPC[i]\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
+									e\room\NPC[i]\SoundChn = PlaySound2(e\room\NPC[i]\Sound, Camera, e\room\NPC[i]\Collider,20.0)
+								EndIf
+								e\room\NPC[i]\State = 1
+								e\room\NPC[i]\Frame = 203
+							Next
+							e\EventState3 = 70*30
+						EndIf
+					EndIf
+					
+					If Abs(EntityX(Collider)-(e\room\x-56.0*RoomScale))<2160.0*RoomScale Then
+						If Abs(EntityZ(Collider)-(e\room\z+2287.0*RoomScale))<1408.0*RoomScale Then
+							ShouldPlay = 66
+						EndIf
+					EndIf
+					
+					If NowPlaying<>66 Then
+						If e\SoundCHN<>0 Then
+							StopStream_Strict(e\SoundCHN)
+							StopStream_Strict(e\SoundCHN2)
+							e\SoundCHN = 0
+							e\SoundCHN2 = 0
+						EndIf
+					Else
+						If e\SoundCHN = 0 Then
+							e\SoundCHN = StreamSound_Strict("SFX\Music\HaveMercyOnMe(NoChoir).ogg",MusicVolume)
+							e\SoundCHN2 = StreamSound_Strict("SFX\Music\HaveMercyOnMe(Choir).ogg",0.0)
+							e\SoundCHN_isStream = True
+							e\SoundCHN2_isStream = True
+						EndIf
+						If e\SoundCHN2<>0 Then
+							UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
+						EndIf
+					EndIf
 				Else
 					DropSpeed = 0
 				EndIf
@@ -8484,6 +8716,11 @@ Function UpdateDimension1499()
 							;n\Idle = True
 						EndIf
 					Next
+					For du.Dummy1499 = Each Dummy1499
+						FreeEntity du\obj
+						Delete du
+					Next
+					e\EventState3 = 0.0
 					e\EventState = 1.0
 				EndIf
 			EndIf

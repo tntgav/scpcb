@@ -42,12 +42,15 @@ Global SaveGameAmount%
 Dim SaveGames$(SaveGameAmount+1) 
 Dim SaveGameTime$(SaveGameAmount + 1)
 Dim SaveGameDate$(SaveGameAmount + 1)
+Dim SaveGameVersion$(SaveGameAmount + 1)
 
 Const MAXSAVEDMAPS = 20
 Dim SavedMaps$(MAXSAVEDMAPS)
 Global SelectedMap$
 
 LoadSaveGames()
+
+Global CurrLoadGamePage% = 0
 
 Function UpdateMainMenu()
 	Local x%, y%, width%, height%, temp%
@@ -231,6 +234,9 @@ Function UpdateMainMenu()
 				Case 1
 					PutINIValue(OptionFile, "options", "intro enabled", IntroEnabled%)
 					MainMenuTab = 0
+				Case 2
+					CurrLoadGamePage = 0
+					MainMenuTab = 0
 				Case 3,5,6,7 ;save the options
 					SaveOptionsINI()
 					
@@ -395,7 +401,8 @@ Function UpdateMainMenu()
 				
 				y = y + height + 20 * MenuScale
 				width = 580 * MenuScale
-				height = 300 * MenuScale
+				;height = 300 * MenuScale
+				height = 510 * MenuScale
 				
 				DrawFrame(x, y, width, height)
 				
@@ -414,48 +421,99 @@ Function UpdateMainMenu()
 				width = 580 * MenuScale
 				height = 296 * MenuScale
 				
-				AASetFont Font1	
+				;AASetFont Font1	
+				
+				AASetFont Font2
+				
+				If CurrLoadGamePage < Ceil(Float(SaveGameAmount)/6.0)-1 And SaveMSG = "" Then 
+					If DrawButton(x+530*MenuScale, y + 510*MenuScale, 50*MenuScale, 55*MenuScale, ">") Then
+						CurrLoadGamePage = CurrLoadGamePage+1
+					EndIf
+				Else
+					DrawFrame(x+530*MenuScale, y + 510*MenuScale, 50*MenuScale, 55*MenuScale)
+					Color(100, 100, 100)
+					AAText(x+555*MenuScale, y + 537.5*MenuScale, ">", True, True)
+				EndIf
+				If CurrLoadGamePage > 0 And SaveMSG = "" Then
+					If DrawButton(x, y + 510*MenuScale, 50*MenuScale, 55*MenuScale, "<") Then
+						CurrLoadGamePage = CurrLoadGamePage-1
+					EndIf
+				Else
+					DrawFrame(x, y + 510*MenuScale, 50*MenuScale, 55*MenuScale)
+					Color(100, 100, 100)
+					AAText(x+25*MenuScale, y + 537.5*MenuScale, "<", True, True)
+				EndIf
+				
+				DrawFrame(x+50*MenuScale,y+510*MenuScale,width-100*MenuScale,55*MenuScale)
+				
+				AAText(x+(width/2.0),y+536*MenuScale,"Page "+Int(Max((CurrLoadGamePage+1),1))+"/"+Int(Max((Int(Ceil(Float(SaveGameAmount)/6.0))),1)),True,True)
+				
+				AASetFont Font1
+				
+				If CurrLoadGamePage > Ceil(Float(SaveGameAmount)/6.0)-1 Then
+					CurrLoadGamePage = CurrLoadGamePage - 1
+				EndIf
 				
 				If SaveGameAmount = 0 Then
 					AAText (x + 20 * MenuScale, y + 20 * MenuScale, "No saved games.")
 				Else
 					x = x + 20 * MenuScale
 					y = y + 20 * MenuScale
-					For i% = 1 To SaveGameAmount
-						DrawFrame(x,y,540* MenuScale, 70* MenuScale)
-						
-						AAText(x + 20 * MenuScale, y + 10 * MenuScale, SaveGames(i - 1))
-						AAText(x + 20 * MenuScale, y + (10+23) * MenuScale, SaveGameTime(i - 1))
-						AAText(x + 120 * MenuScale, y + (10+23) * MenuScale, SaveGameDate(i - 1))
-						
-						If SaveMSG = "" Then
-							If DrawButton(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Load", False) Then
-								LoadEntities()
-								LoadAllSounds()
-								LoadGame(SavePath + SaveGames(i - 1) + "\")
-								CurrSave = SaveGames(i - 1)
-								InitLoadGame()
-								MainMenuOpen = False
+					
+					For i% = (1+(6*CurrLoadGamePage)) To 6+(6*CurrLoadGamePage)
+						If i <= SaveGameAmount Then
+							DrawFrame(x,y,540* MenuScale, 70* MenuScale)
+							
+							If SaveGameVersion(i - 1) <> CompatibleNumber Then
+								Color 255,0,0
+							Else
+								Color 255,255,255
 							EndIf
 							
-							If DrawButton(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Delete", False) Then
-								SaveMSG = SaveGames(i - 1)
-								DebugLog SaveMSG
-								Exit
+							AAText(x + 20 * MenuScale, y + 10 * MenuScale, SaveGames(i - 1))
+							AAText(x + 20 * MenuScale, y + (10+18) * MenuScale, SaveGameTime(i - 1)) ;y + (10+23) * MenuScale
+							AAText(x + 120 * MenuScale, y + (10+18) * MenuScale, SaveGameDate(i - 1))
+							AAText(x + 20 * MenuScale, y + (10+36) * MenuScale, SaveGameVersion(i - 1))
+							
+							If SaveMSG = "" Then
+								If SaveGameVersion(i - 1) <> CompatibleNumber Then
+									DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
+									Color(255, 0, 0)
+									AAText(x + 330 * MenuScale, y + 34 * MenuScale, "Load", True, True)
+								Else
+									If DrawButton(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Load", False) Then
+										LoadEntities()
+										LoadAllSounds()
+										LoadGame(SavePath + SaveGames(i - 1) + "\")
+										CurrSave = SaveGames(i - 1)
+										InitLoadGame()
+										MainMenuOpen = False
+									EndIf
+								EndIf
+								
+								If DrawButton(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Delete", False) Then
+									SaveMSG = SaveGames(i - 1)
+									DebugLog SaveMSG
+									Exit
+								EndIf
+							Else
+								DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
+								If SaveGameVersion(i - 1) <> CompatibleNumber Then
+									Color(255, 0, 0)
+								Else
+									Color(100, 100, 100)
+								EndIf
+								AAText(x + 330 * MenuScale, y + 34 * MenuScale, "Load", True, True)
+								
+								DrawFrame(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
+								Color(100, 100, 100)
+								AAText(x + 450 * MenuScale, y + 34 * MenuScale, "Delete", True, True)
 							EndIf
 							
+							y = y + 80 * MenuScale
 						Else
-							DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
-							Color(100, 100, 100)
-							AAText(x + 330 * MenuScale, y + 34 * MenuScale, "Load", True, True)
-							
-							DrawFrame(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
-							Color(100, 100, 100)
-							AAText(x + 450 * MenuScale, y + 34 * MenuScale, "Delete", True, True)
+							Exit
 						EndIf
-						
-						y = y + 80 * MenuScale
-						
 					Next
 					
 					If SaveMSG <> ""

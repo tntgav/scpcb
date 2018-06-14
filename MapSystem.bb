@@ -2140,6 +2140,11 @@ Function FillRoom(r.Rooms)
 			EntityPickMode r\Objects[3],2
 			EntityType r\Objects[3],HIT_MAP
 			EntityAlpha r\Objects[3],0.0
+			
+			d = CreateDoor(r\zone,r\x,r\y,r\z-368.0*RoomScale,0,r,True,True,2)
+			d\AutoClose = False
+			PositionEntity (d\buttons[0], r\x - 496.0 * RoomScale, 0.7, r\z - 272.0 * RoomScale, True)
+			TurnEntity(d\buttons[0], 0, 90, 0)
 			;[End Block]
 		Case "room079"
 			;[Block]
@@ -2433,7 +2438,6 @@ Function FillRoom(r.Rooms)
 			r\Objects[0] = CreatePivot(r\obj)
 			PositionEntity r\Objects[0],r\x+1560.0*RoomScale,r\y,r\z+250.0*RoomScale,True
 			;[End Block]
-			
 		Case "room2poffices"
 			;[Block]
 			d = CreateDoor(r\zone, r\x + 240.0 * RoomScale, 0.0, r\z + 448.0 * RoomScale, 90, r, False, False, 0, Str(AccessCode))
@@ -2844,6 +2848,7 @@ Function FillRoom(r.Rooms)
 			
 			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x + 320.0 * RoomScale, 0.5, r\z + 704.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
+			it\state = 300
 			
 			;[End Block]
 		Case "room3storage"
@@ -2958,6 +2963,7 @@ Function FillRoom(r.Rooms)
 			
 			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x + 1936.0 * RoomScale, r\y - 5496.0 * RoomScale, r\z - 944.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
+			it\state = 450
 			
 			de.Decals = CreateDecal(3,  r\x + x*RoomScale, -5632.0*RoomScale+0.01, r\z+z*RoomScale,90,Rnd(360),0)
 			de\Size = 0.5
@@ -3239,9 +3245,9 @@ Function FillRoom(r.Rooms)
 			d.Doors = CreateDoor(0, r\x,0,r\z, 0, r, False, 2, False)
 			d\locked = True
 			
-			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 208.0 * RoomScale, 0.0, r\z - 736.0 * RoomScale, 90, r, True, False)
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 208.0 * RoomScale, 0.0, r\z - 736.0 * RoomScale, 90, r, True, False, False, "", True)
 			r\RoomDoors[0]\AutoClose=False
-			r\RoomDoors[1] = CreateDoor(r\zone, r\x - 208.0 * RoomScale, 0.0, r\z + 736.0 * RoomScale, 90, r, True, False)
+			r\RoomDoors[1] = CreateDoor(r\zone, r\x - 208.0 * RoomScale, 0.0, r\z + 736.0 * RoomScale, 90, r, True, False, False, "", True)
 			r\RoomDoors[1]\AutoClose=False
 			
 			r\RoomDoors[2] = CreateDoor(r\zone, r\x - 672.0 * RoomScale, 0.0, r\z - 1024.0 * RoomScale, 0, r, False, False, False, "GEAR")
@@ -3598,12 +3604,12 @@ Function FillRoom(r.Rooms)
 			PositionEntity(d\buttons[0], r\x + 320.0 * RoomScale, EntityY(d\buttons[0],True), EntityZ(d\buttons[0],True), True)
 			PositionEntity(d\buttons[1], r\x + 224.0 * RoomScale, EntityY(d\buttons[1],True), EntityZ(d\buttons[1],True), True)
 			
-			d.Doors = CreateDoor(r\zone, r\x - 264.0 * RoomScale, 0, r\z+32*RoomScale, 270, r, True, False, 3)
+			d.Doors = CreateDoor(r\zone, r\x - 264.0 * RoomScale, 0, r\z, 270, r, True, False, 3)
 			d\AutoClose = False : d\open = False
 			PositionEntity(d\buttons[0], r\x - 320.0 * RoomScale, EntityY(d\buttons[0],True), EntityZ(d\buttons[0],True), True)
 			PositionEntity(d\buttons[1], r\x - 224.0 * RoomScale, EntityY(d\buttons[1],True), EntityZ(d\buttons[1],True), True)
 			
-			r\RoomDoors[1] = CreateDoor(r\zone, r\x-560.0 * RoomScale, 0, r\z - 240.0 * RoomScale, 0, r, True, False, 3)
+			r\RoomDoors[1] = CreateDoor(r\zone, r\x-560.0 * RoomScale, 0, r\z - 272.0 * RoomScale, 0, r, True, False, 3)
 			r\RoomDoors[1]\AutoClose = False : r\RoomDoors[1]\open = False
 			
 			r\RoomDoors[2] = CreateDoor(r\zone, r\x + 560.0 * RoomScale, 0, r\z - 272.0 * RoomScale, 180, r, True, False, 3)
@@ -3612,7 +3618,10 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[3] = CreateDoor(r\zone, r\x + 560.0 * RoomScale, 0, r\z + 272.0 * RoomScale, 180, r, True, False, 3)
 			r\RoomDoors[3]\AutoClose = False : r\RoomDoors[3]\open = False
 			
-			it = CreateItem("SCP-714", "scp714", r\x - 552.0 * RoomScale, r\y + 220.0 * RoomScale, r\z - 728.0 * RoomScale)
+			r\RoomDoors[4] = CreateDoor(r\zone, r\x-560.0 * RoomScale, 0, r\z + 272.0 * RoomScale, 0, r, True, False, 3)
+            r\RoomDoors[4]\AutoClose = False : r\RoomDoors[4]\open = False
+			
+			it = CreateItem("SCP-714", "scp714", r\x - 552.0 * RoomScale, r\y + 220.0 * RoomScale, r\z - 760.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			
 			it = CreateItem("SCP-1025", "scp1025", r\x + 552.0 * RoomScale, r\y + 224.0 * RoomScale, r\z - 758.0 * RoomScale)
@@ -3631,10 +3640,19 @@ Function FillRoom(r.Rooms)
 			TurnEntity(sc\CameraObj, 30, 0, 0)
 			EntityParent(sc\obj, r\obj)
 			
-			it = CreateItem("Document SCP-714", "paper", r\x - 728.0 * RoomScale, r\y + 288.0 * RoomScale, r\z - 328.0 * RoomScale)
+			sc.SecurityCams = CreateSecurityCam(r\x + 560.0 * RoomScale, r\y + 386 * RoomScale, r\z + 480.0 * RoomScale, r)
+            sc\angle = 0 : sc\turn = 30
+            TurnEntity(sc\CameraObj, 30, 0, 0)
+            EntityParent(sc\obj, r\obj)
+			
+            sc.SecurityCams = CreateSecurityCam(r\x - 560.0 * RoomScale, r\y + 386 * RoomScale, r\z + 480.0 * RoomScale, r)
+            sc\angle = 0 : sc\turn = 30
+            TurnEntity(sc\CameraObj, 30, 0, 0)
+            EntityParent(sc\obj, r\obj)
+			
+			it = CreateItem("Document SCP-714", "paper", r\x - 728.0 * RoomScale, r\y + 288.0 * RoomScale, r\z - 360.0 * RoomScale)
 			EntityParent(it\collider, r\obj)	
 			;[End Block]
-			
 		Case "room205"
 			;[Block]
 			;d.Doors = CreateDoor(r\zone, r\x + 128.0 * RoomScale, 0, r\z + 640.0 *RoomScale, 90, r, True, False, 3)
@@ -3644,7 +3662,7 @@ Function FillRoom(r.Rooms)
 			;PositionEntity(d\buttons[0], r\x + 320.0 * RoomScale, EntityY(d\buttons[0],True), EntityZ(d\buttons[0],True), True)
 			;PositionEntity(d\buttons[1], r\x + 224.0 * RoomScale, EntityY(d\buttons[1],True), EntityZ(d\buttons[1],True), True)
 			
-			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 1392.0 * RoomScale, -128.0 * RoomScale, r\z - 384*RoomScale, 0, r, True, False, 3)
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 1392.0 * RoomScale, -128.0 * RoomScale, r\z - 384*RoomScale, 0, r, True, False, 3, "", True)
 			r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = False
 			FreeEntity(r\RoomDoors[0]\buttons[0]) : r\RoomDoors[0]\buttons[0]=0
 			FreeEntity(r\RoomDoors[0]\buttons[1]) : r\RoomDoors[0]\buttons[1]=0
@@ -3736,6 +3754,7 @@ Function FillRoom(r.Rooms)
 			
 			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x + 280.0 * RoomScale, r\y -1456.0 * RoomScale, r\z + 2164.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
+			it\state = 400
 			
 			r\Objects[1] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[1], r\x + 96.0*RoomScale, -1532.0 * RoomScale, r\z + 2016.0 * RoomScale,True)
@@ -3907,7 +3926,7 @@ Function FillRoom(r.Rooms)
 			;AddLight(r, r\x-224.0*RoomScale, r\y+640.0*RoomScale, r\z+128.0*RoomScale,2,2,200,200,200)
 			;AddLight(r, r\x-1056.0*RoomScale, r\y+608.0*RoomScale, r\z+416.0*RoomScale,2,2,200,200,200)
 			
-			r\RoomDoors[2] = CreateDoor(r\zone, r\x - 1008.0 * RoomScale, 0, r\z - 688.0 * RoomScale, 90, r, True)
+			r\RoomDoors[2] = CreateDoor(r\zone, r\x - 1008.0 * RoomScale, 0, r\z - 688.0 * RoomScale, 90, r, True, False, False, "", True)
 			r\RoomDoors[2]\AutoClose = False : r\RoomDoors[2]\open = False : r\RoomDoors[2]\locked = True
 			FreeEntity(r\RoomDoors[2]\buttons[0]) : r\RoomDoors[2]\buttons[0] = 0
 			FreeEntity(r\RoomDoors[2]\buttons[1]) : r\RoomDoors[2]\buttons[1] = 0
@@ -4340,15 +4359,6 @@ Function FillRoom(r.Rooms)
 			EntityType r\Objects[14],HIT_MAP
 			EntityAlpha r\Objects[14],0.0
 			;[End Block]
-		Case "room178"
-			;[Block]
-			r\RoomDoors[0] = CreateDoor(r\zone,r\x,r\y,r\z - 672.0*RoomScale,0,r,False,False,3)
-			
-			it = CreateItem("SCP-178","scp178",r\x,200.0 * RoomScale,r\z - 80.0 * RoomScale)
-			RotateEntity it\collider,0,0,0
-			EntityParent it\collider,r\obj
-			SetAnimTime it\model,0.0
-			;[End Block]	
 		Case "pocketdimension"
 			;[Block]
 			Local hallway = LoadMesh_Strict("GFX\map\pocketdimension2.b3d") ;the tunnels in the first room
@@ -4544,7 +4554,7 @@ Function FillRoom(r.Rooms)
 			d.Doors\locked = True
 			d.Doors\DisableWaypoint = True
 			it = CreateItem("Night Vision Goggles", "nvgoggles", r\x + 56.0154 * RoomScale, r\y - 648.0 * RoomScale, r\z + 749.638 * RoomScale)
-			it\state = 20
+			it\state = 200
 			RotateEntity it\collider, 0, r\angle+Rand(245), 0
 			EntityParent(it\collider, r\obj)
 			;[End Block]
@@ -4926,6 +4936,16 @@ Function FillRoom(r.Rooms)
 			r\Objects[3] = CreatePivot(r\obj)
 			;PositionEntity r\Objects[3],r\x-926.891*RoomScale,r\y,r\z-318.399*RoomScale,True
 			PositionEntity r\Objects[3],r\x-820.0*RoomScale,r\y,r\z-318.399*RoomScale,True
+			;[End Block]
+		Case "dimension1499"
+			;[Block]
+			ent = LoadMesh_Strict("GFX\map\dimension1499\1499object0_cull.b3d",r\obj)
+			EntityType ent,HIT_MAP
+			EntityAlpha ent,0
+			
+			r\Levers[0] = CreatePivot()
+			PositionEntity r\Levers[0],r\x+205.0*RoomScale,r\y+400.0*RoomScale,r\z+2287.0*RoomScale
+			EntityParent r\Levers[0],r\obj
 			;[End Block]
 	End Select
 	
@@ -7019,7 +7039,6 @@ Function CreateMap()
 	SetRoom("914", ROOM1, Floor(0.3*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("room1archive",ROOM1,Floor(0.5*Float(Room1Amount[0])),min_pos,max_pos)
 	SetRoom("room205", ROOM1, Floor(0.6*Float(Room1Amount[0])),min_pos,max_pos)
-	SetRoom("room178",ROOM1,Floor(0.7*Float(Room1Amount[0])),min_pos,max_pos)
 	
 	MapRoom(ROOM2C, 0) = "lockroom"
 	
@@ -7808,6 +7827,7 @@ Function CreateChunkParts(r.Rooms)
 				ScaleEntity chp\obj[j],RoomScale,RoomScale,RoomScale
 				EntityType chp\obj[j],HIT_MAP
 				EntityPickMode chp\obj[j],2
+				HideEntity chp\obj[j]
 				;EntityParent chp\obj[j],r\obj
 			Next
 			chp2 = Before(chp)
@@ -7829,8 +7849,8 @@ Type Chunk
 	Field Amount%
 	Field IsSpawnChunk%
 	Field ChunkPivot%
-	Field ChunkPivotDebug%
-	Field ChunkDebugObj%
+	;Field ChunkPivotDebug%
+	;Field ChunkDebugObj%
 	Field PlatForm%
 End Type
 
@@ -7846,15 +7866,15 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#,isSpawnChunk%=False)
 	
 	ch\IsSpawnChunk = isSpawnChunk
 	
-	ch\ChunkPivotDebug% = CreateSphere(8,ch\ChunkPivot)
-	EntityColor ch\ChunkPivotDebug,255*(Not isSpawnChunk),255*(isSpawnChunk),0
-	EntityFX ch\ChunkPivotDebug,1
+	;ch\ChunkPivotDebug% = CreateSphere(8,ch\ChunkPivot)
+	;EntityColor ch\ChunkPivotDebug,255*(Not isSpawnChunk),255*(isSpawnChunk),0
+	;EntityFX ch\ChunkPivotDebug,1
 	
-	ch\ChunkDebugObj = CreateCube(ch\ChunkPivotDebug)
-	ScaleEntity ch\ChunkDebugObj,20,0.1,20
-	EntityColor ch\ChunkDebugObj,Rand(255),Rand(255),Rand(255)
-	EntityFX ch\ChunkDebugObj,1
-	EntityAlpha ch\ChunkDebugObj,0.2
+	;ch\ChunkDebugObj = CreateCube(ch\ChunkPivotDebug)
+	;ScaleEntity ch\ChunkDebugObj,20,0.1,20
+	;EntityColor ch\ChunkDebugObj,Rand(255),Rand(255),Rand(255)
+	;EntityFX ch\ChunkDebugObj,1
+	;EntityAlpha ch\ChunkDebugObj,0.2
 	
 	If obj% > -1
 		ch\Amount% = GetINIInt("Data\1499chunks.INI","chunk"+obj,"count")
@@ -7911,11 +7931,11 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 	Until z# > (ChunkMaxDistance#+(ChunkZ*40))
 	
 	For ch = Each Chunk
-		If DebugHUD
-			ShowEntity ch\ChunkPivotDebug
-		Else
-			HideEntity ch\ChunkPivotDebug
-		EndIf
+;		If DebugHUD
+;			ShowEntity ch\ChunkPivotDebug
+;		Else
+;			HideEntity ch\ChunkPivotDebug
+;		EndIf
 		If (Not ch\IsSpawnChunk)
 			If Distance(EntityX(Collider),EntityZ(Collider),EntityX(ch\ChunkPivot),EntityZ(ch\ChunkPivot))>ChunkMaxDistance
 				FreeEntity ch\ChunkPivot
@@ -7956,10 +7976,12 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 		n\Angle = Rnd(360)
 	Else
 		For n = Each NPCs
-			If n\NPCtype = NPCtype1499
-				If EntityDistance(n\Collider,Collider)>ChunkMaxDistance Or EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5
-					;This will be updated like this so that new NPCs can spawn for the player
-					RemoveNPC(n)
+			If n\NPCtype = NPCtype1499 Then
+				If n\PrevState=0 Then
+					If EntityDistance(n\Collider,Collider)>ChunkMaxDistance Or EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5 Then
+						;This will be updated like this so that new NPCs can spawn for the player
+						RemoveNPC(n)
+					EndIf
 				EndIf
 			EndIf
 		Next
@@ -7972,6 +7994,10 @@ Function HideChunks()
 	
 	For ch = Each Chunk
 		If (Not ch\IsSpawnChunk)
+			For i = 0 To ch\Amount
+				FreeEntity ch\obj[i]
+			Next
+			FreeEntity ch\PlatForm
 			FreeEntity ch\ChunkPivot
 			Delete ch
 		EndIf
@@ -7985,6 +8011,11 @@ Function DeleteChunks()
 	Delete Each ChunkPart
 	
 End Function
+
+Type Dummy1499
+	Field anim%
+	Field obj%
+End Type
 
 ;#########################################################################
 ;END CHUNKS
