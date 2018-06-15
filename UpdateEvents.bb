@@ -2434,6 +2434,7 @@ Function UpdateEvents()
 											RemoveItem(SelectedItem)
 											SelectedItem=Null
 											e\EventState2 = 1
+											PlaySound_Strict LoadTempSound("SFX\SCP\294\coin_drop.ogg")
 										EndIf
 									EndIf
 									If e\EventState2 = 1 Then
