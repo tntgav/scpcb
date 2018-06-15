@@ -10348,7 +10348,9 @@ Function UpdateInfect()
 				Exit
 			EndIf
 		Next
-	ElseIf PlayerRoom\RoomTemplate\Name = "dimension1499" Or PlayerRoom\RoomTemplate\Name = "pocketdimension"
+	ElseIf PlayerRoom\RoomTemplate\Name = "dimension1499" Or PlayerRoom\RoomTemplate\Name = "pocketdimension" Or PlayerRoom\RoomTemplate\Name = "gatea"
+		teleportForInfect = False
+	ElseIf PlayerRoom\RoomTemplate\Name = "exit1" And EntityY(Collider)>1040.0*RoomScale
 		teleportForInfect = False
 	EndIf
 	
@@ -10484,6 +10486,10 @@ Function UpdateInfect()
 				BlinkTimer = Max(Min(-10*(Infect-96),BlinkTimer),-10)
 				If PlayerRoom\RoomTemplate\Name = "dimension1499"
 					DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate repots of a violent attack to a church in the Russian town of [REDACTED]."
+				ElseIf PlayerRoom\RoomTemplate\Name = "gatea"
+					DeathMSG = "008_DEATH_GATEA"
+				ElseIf PlayerRoom\RoomTemplate\Name = "exit1"
+					DeathMSG = "008_DEATH_GATEB"
 				Else
 					DeathMSG = ""
 				EndIf
