@@ -4937,6 +4937,20 @@ Function FillRoom(r.Rooms)
 			;PositionEntity r\Objects[3],r\x-926.891*RoomScale,r\y,r\z-318.399*RoomScale,True
 			PositionEntity r\Objects[3],r\x-820.0*RoomScale,r\y,r\z-318.399*RoomScale,True
 			;[End Block]
+		Case "room2cpit"
+			;[Block]
+			em.Emitters = CreateEmitter(r\x + 512.0 * RoomScale, -76 * RoomScale, r\z - 688 * RoomScale, 0)
+            TurnEntity(em\Obj, -90, 0, 0)
+            EntityParent(em\Obj, r\obj)
+            em\RandAngle = 55
+            em\Speed = 0.0005
+            em\Achange = -0.015
+            em\SizeChange = 0.007
+            
+            d = CreateDoor(r\zone,r\x-256.0*RoomScale, 0.0, r\z-752.0*RoomScale,90,r,False,2,3)
+            d\locked = True : d\open = False : d\AutoClose = False : d\MTFClose = False : d\DisableWaypoint = True
+			PositionEntity d\buttons[0],r\x-240.0*RoomScale,EntityY(d\buttons[0],True),EntityZ(d\buttons[0],True),True
+			;[End Block]
 		Case "dimension1499"
 			;[Block]
 			ent = LoadMesh_Strict("GFX\map\dimension1499\1499object0_cull.b3d",r\obj)
@@ -7061,6 +7075,8 @@ Function CreateMap()
 	
 	MapRoom(ROOM2C, Floor(0.5*Float(Room2CAmount[0]))) = "room1162"
 	
+	MapRoom(ROOM4, Floor(0.3*Float(Room4Amount[0]))) = "room4info"
+	
 	;zone 2 --------------------------------------------------------------------------------------------------
 	
 	min_pos = Room1Amount[0]
@@ -7085,6 +7101,8 @@ Function CreateMap()
 	
 	MapRoom(ROOM3, Room3Amount[0]+Floor(0.3*Float(Room3Amount[1]))) = "room513"
 	MapRoom(ROOM3, Room3Amount[0]+Floor(0.6*Float(Room3Amount[1]))) = "room966"
+	
+	MapRoom(ROOM2C, Room2CAmount[0]+Floor(0.5*Float(Room2CAmount[1]))) = "room2cpit"
 	
 	
 	;zone 3  --------------------------------------------------------------------------------------------------
