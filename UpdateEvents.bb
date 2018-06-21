@@ -8536,6 +8536,7 @@ Function UpdateDimension1499()
 							;1687.0
 							PositionEntity du\obj,Max(Min((e\room\x+(1887.0-((2560.0/7.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1887.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(1796.0-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+1796.0*RoomScale),e\room\z+1028.0*RoomScale)
 							RotateEntity du\obj,0,270,0
+							EntityAutoFade du\obj,25,39
 						Next
 					Next
 					;Zone 2
@@ -8556,6 +8557,7 @@ Function UpdateDimension1499()
 							;1175.0
 							PositionEntity du\obj,Max(Min((e\room\x+(1375.0-((2048.0/6.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1375.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(3588-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+3588.0*RoomScale),e\room\z+2820.0*RoomScale)
 							RotateEntity du\obj,0,270,0
+							EntityAutoFade du\obj,25,39
 						Next
 					Next
 				EndIf
@@ -8702,6 +8704,16 @@ Function UpdateDimension1499()
 							UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
 						EndIf
 					EndIf
+					
+					If EntityDistance(Collider,e\room\obj)>40.0
+						For du.Dummy1499 = Each Dummy1499
+							HideEntity du\obj
+						Next
+					Else
+						For du.Dummy1499 = Each Dummy1499
+							ShowEntity du\obj
+						Next
+					EndIf
 				Else
 					DropSpeed = 0
 				EndIf
@@ -8709,6 +8721,12 @@ Function UpdateDimension1499()
 				PlayerFallingPickDistance = 0.0
 			Else
 				If e\EventState = 2.0
+					If e\SoundCHN<>0 Then
+						StopStream_Strict(e\SoundCHN)
+						StopStream_Strict(e\SoundCHN2)
+						e\SoundCHN = 0
+						e\SoundCHN2 = 0
+					EndIf
 					HideEntity NTF_1499Sky
 					HideChunks()
 					For n.NPCs = Each NPCs
