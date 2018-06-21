@@ -9893,7 +9893,18 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("Pill", "pill", x, y, z)
 					RemoveItem(item)
 				Case "fine"
-					it2 = CreateItem("SCP-427", "scp427", x, y, z)
+					Local no427Spawn% = False
+					For it3.Items = Each Items
+						If it3\itemtemplate\tempname = "scp427" Then
+							no427Spawn = True
+							Exit
+						EndIf
+					Next
+					If (Not no427Spawn) Then
+						it2 = CreateItem("SCP-427", "scp427", x, y, z)
+					Else
+						it2 = CreateItem("Upgraded pill", "scp500death", x, y, z)
+					EndIf
 					RemoveItem(item)
 				Case "very fine"
 					it2 = CreateItem("Upgraded pill", "scp500death", x, y, z)
