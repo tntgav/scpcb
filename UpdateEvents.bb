@@ -8190,7 +8190,7 @@ Function UpdateEvents()
 						EndIf
 						For e2.Events = Each Events
 							If e2\EventName = "room2servers"
-								If e2\EventState = 0 And (Abs(e2\room\dist-e\room\dist)<HideDistance)
+								If e2\EventState = 0 ;And (Abs(e2\room\dist-e\room\dist)<HideDistance)
 									e\EventState = 2
 									DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 									DebugLog "- room2servers event not activated + room is too close to room2servers"
