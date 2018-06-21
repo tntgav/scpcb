@@ -1982,6 +1982,7 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 			EntityFX d\DoorHitOBJ,1
 			EntityType d\DoorHitOBJ,HIT_MAP
 			EntityColor d\DoorHitOBJ,255,0,0
+			HideEntity d\DoorHitOBJ
 		EndIf
 	EndIf
 	
