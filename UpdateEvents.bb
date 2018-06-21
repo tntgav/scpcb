@@ -8318,6 +8318,12 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				If e\EventState = 2.0
+					If e\SoundCHN<>0 Then
+						StopStream_Strict(e\SoundCHN)
+						StopStream_Strict(e\SoundCHN2)
+						e\SoundCHN = 0
+						e\SoundCHN2 = 0
+					EndIf
 					HideEntity NTF_1499Sky
 					HideChunks()
 					For n.NPCs = Each NPCs
@@ -8680,19 +8686,22 @@ Function UpdateDimension1499()
 						EndIf
 					EndIf
 					
-					If Abs(EntityX(Collider)-(e\room\x-56.0*RoomScale))<2160.0*RoomScale Then
-						If Abs(EntityZ(Collider)-(e\room\z+2287.0*RoomScale))<1408.0*RoomScale Then
-							ShouldPlay = 66
-						EndIf
+					;If Abs(EntityX(Collider)-(e\room\x-56.0*RoomScale))<2160.0*RoomScale Then
+					;	If Abs(EntityZ(Collider)-(e\room\z+2287.0*RoomScale))<1408.0*RoomScale Then
+					;		ShouldPlay = 66
+					;	EndIf
+					;EndIf
+					If e\EventState3 > 0.0 Then
+						ShouldPlay = 66
 					EndIf
 					
 					If NowPlaying<>66 Then
-						If e\SoundCHN<>0 Then
-							StopStream_Strict(e\SoundCHN)
-							StopStream_Strict(e\SoundCHN2)
-							e\SoundCHN = 0
-							e\SoundCHN2 = 0
-						EndIf
+						;If e\SoundCHN<>0 Then
+						;	StopStream_Strict(e\SoundCHN)
+						;	StopStream_Strict(e\SoundCHN2)
+						;	e\SoundCHN = 0
+						;	e\SoundCHN2 = 0
+						;EndIf
 					Else
 						If e\SoundCHN = 0 Then
 							e\SoundCHN = StreamSound_Strict("SFX\Music\HaveMercyOnMe(NoChoir).ogg",MusicVolume)
@@ -8700,9 +8709,12 @@ Function UpdateDimension1499()
 							e\SoundCHN_isStream = True
 							e\SoundCHN2_isStream = True
 						EndIf
-						If e\SoundCHN2<>0 Then
-							UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
-						EndIf
+						;If e\SoundCHN2<>0 Then
+						;	UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
+						;EndIf
+					EndIf
+					If e\SoundCHN2<>0 Then
+						UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
 					EndIf
 					
 					If EntityDistance(Collider,e\room\obj)>40.0
