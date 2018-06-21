@@ -561,6 +561,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj, temp, temp, temp
 			
 			EntityFX n\obj,1
+			
+			EntityAutoFade n\obj,HideDistance*2.5,HideDistance*2.95
 			;[End Block]
 		Case NPCtype008
 			;[Block]
