@@ -5754,23 +5754,23 @@ Function DrawGUI()
 					If CanUseItem(False, False, True)
 						GiveAchievement(Achv500)
 						
-						If (Injuries > 0 Or Bloodloss > 0) And Infect > 0 Then
-							Msg = "You swallowed the pill. Your wounds are healing rapidly and your nausea is fading."
-						ElseIf Infect > 0 Then
+						If Infect > 0 Then
 							Msg = "You swallowed the pill. Your nausea is fading."
 						Else
-							Msg = "You swallowed the pill. Your wounds are healing rapidly."
+							Msg = "You swallowed the pill."
 						EndIf
 						MsgTimer = 70*7
 						
 						DeathTimer = 0
-						Injuries = 0
-						Bloodloss = 0
 						Infect = 0
 						Stamina = 100
 						For i = 0 To 5
 							SCP1025state[i]=0
 						Next
+						If StaminaEffect > 1.0 Then
+							StaminaEffect = 1.0
+							StaminaEffectTimer = 0.0
+						EndIf
 						
 						RemoveItem(SelectedItem)
 						SelectedItem = Null
