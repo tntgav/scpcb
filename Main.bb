@@ -4620,7 +4620,9 @@ Function MouseLook()
 					Stamina = Stamina - FPSfactor * 0.1
 				Case 3 ;appendicitis
 					;0.035/sec = 2.1/min
-					SCP1025state[i]=SCP1025state[i]+FPSfactor*0.0005
+					If (Not I_427\Using And I_427\Timer < 70*360) Then
+						SCP1025state[i]=SCP1025state[i]+FPSfactor*0.0005
+					EndIf
 					If SCP1025state[i]>20.0 Then
 						If SCP1025state[i]-FPSfactor<=20.0 Then Msg="The pain in your stomach is becoming unbearable."
 						Stamina = Stamina - FPSfactor * 0.3
@@ -4639,7 +4641,9 @@ Function MouseLook()
 						CurrSpeed = CurveValue(0, CurrSpeed, 10+Stamina*15)
 					EndIf
 				Case 5;cardiac arrest
-					SCP1025state[i]=SCP1025state[i]+FPSfactor*0.35
+					If (Not I_427\Using And I_427\Timer < 70*360) Then
+						SCP1025state[i]=SCP1025state[i]+FPSfactor*0.35
+					EndIf
 					;35/sec
 					If SCP1025state[i]>110 Then
 						HeartBeatRate=0
@@ -4902,6 +4906,10 @@ Function DrawGUI()
 			AAText x + 350, 110, "Triangles rendered: "+CurrTrisAmount
 			AAText x + 350, 130, "Active textures: "+ActiveTextures()
 			AAText x + 350, 150, "SCP-427 state (secs): "+Int(I_427\Timer/70.0)
+			AAText x + 350, 170, "SCP-008 infection: "+Infect
+			For i = 0 To 5
+				AAText x + 350, 190+(20*i), "SCP-1025 State "+i+": "+SCP1025state[i]
+			Next
 			
 			AASetFont Font1
 		EndIf
@@ -10183,6 +10191,14 @@ Function Use427()
 			If Bloodloss > 0.0 And Injuries <= 1.0 Then
 				Bloodloss = Max(Bloodloss - 0.001 * FPSfactor,0.0)
 			EndIf
+			If Infect > 0.0 Then
+				Infect = Max(Infect - 0.001 * FPSfactor,0.0)
+			EndIf
+			For i = 0 To 5
+				If SCP1025state[i]>0.0 Then
+					SCP1025state[i] = Max(SCP1025state[i] - 0.001 * FPSfactor,0.0)
+				EndIf
+			Next
 			If I_427\Sound[0]=0 Then
 				I_427\Sound[0] = LoadSound_Strict("SFX\SCP\427\Effect.ogg")
 			EndIf
@@ -10370,7 +10386,9 @@ Function UpdateInfect()
 		
 		If Infect < 93.0 Then
 			temp=Infect
-			Infect = Min(Infect+FPSfactor*0.002,100)
+			If (Not I_427\Using And I_427\Timer < 70*360) Then
+				Infect = Min(Infect+FPSfactor*0.002,100)
+			EndIf
 			
 			BlurTimer = Max(Infect*3*(2.0-CrouchState),BlurTimer)
 			
