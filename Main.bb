@@ -2204,9 +2204,11 @@ Function UseDoor(d.Doors, showmsg%=True)
 	Local temp% = 0
 	If d\KeyCard > 0 Then
 		If SelectedItem = Null Then
-			If showmsg = True Then 
-				Msg = "A keycard is required to operate this door."
-				MsgTimer = 70 * 5
+			If showmsg = True Then
+				If (Instr(Msg,"The keycard")=0 And Instr(Msg,"A keycard with")=0) Or (MsgTimer<70*3) Then
+					Msg = "A keycard is required to operate this door."
+					MsgTimer = 70 * 7
+				EndIf
 			EndIf
 			Return
 		Else
@@ -2228,9 +2230,11 @@ Function UseDoor(d.Doors, showmsg%=True)
 			End Select
 			
 			If temp =-1 Then 
-				If showmsg = True Then 
-					Msg = "A keycard is required to operate this door."
-					MsgTimer = 70 * 5
+				If showmsg = True Then
+					If (Instr(Msg,"The keycard")=0 And Instr(Msg,"A keycard with")=0) Or (MsgTimer<70*3) Then
+						Msg = "A keycard is required to operate this door."
+						MsgTimer = 70 * 7
+					EndIf
 				EndIf
 				Return				
 			ElseIf temp >= d\KeyCard 
@@ -2239,12 +2243,12 @@ Function UseDoor(d.Doors, showmsg%=True)
 					If d\locked Then
 						PlaySound_Strict KeyCardSFX2
 						Msg = "The keycard was inserted into the slot but nothing happened."
-						MsgTimer = 70 * 5
+						MsgTimer = 70 * 7
 						Return
 					Else
 						PlaySound_Strict KeyCardSFX1
 						Msg = "The keycard was inserted into the slot."
-						MsgTimer = 70 * 5		
+						MsgTimer = 70 * 7	
 					EndIf
 				EndIf
 			Else
@@ -2256,7 +2260,7 @@ Function UseDoor(d.Doors, showmsg%=True)
 					Else
 						Msg = "A keycard with a higher security clearance is required to operate this door."
 					EndIf
-					MsgTimer = 70 * 5							
+					MsgTimer = 70 * 7					
 				EndIf
 				Return
 			End If
@@ -2269,7 +2273,9 @@ Function UseDoor(d.Doors, showmsg%=True)
 		SelectedItem = Null
 		If temp <> 0 Then
 			PlaySound_Strict ScannerSFX1
-			Msg = "You place the palm of the hand onto the scanner. The scanner reads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
+			If (Instr(Msg,"You placed your")=0) Or (MsgTimer < 70*3) Then
+				Msg = "You place the palm of the hand onto the scanner. The scanner reads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
+			EndIf
 			MsgTimer = 70 * 10
 		Else
 			If showmsg = True Then 
