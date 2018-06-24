@@ -6797,8 +6797,8 @@ Function UpdateEvents()
 								SpriteViewMode(e\room\Objects[2],2)
 								ScaleSprite(e\room\Objects[2],182.0*RoomScale*0.5, 192.0*RoomScale*0.5)
 								pvt% = CreatePivot(e\room\obj)
-								PositionEntity pvt%,-595.0,224.0,-208.0,False
-								;PositionEntity(e\room\Objects[2], e\room\x - 595.0 * RoomScale, 224.0*RoomScale, e\room\z - 208.0 * RoomScale)
+								;PositionEntity pvt%,-595.0,224.0,-208.0,False
+								PositionEntity pvt%,-632.0,224.0,-208.0,False
 								PositionEntity(e\room\Objects[2], EntityX(pvt,True), EntityY(pvt,True), EntityZ(pvt,True))
 								FreeEntity pvt
 								RotateEntity e\room\Objects[2],0,e\room\angle,0
