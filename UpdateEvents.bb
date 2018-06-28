@@ -9538,7 +9538,11 @@ Function UpdateEndings()
 								ElseIf e\EventState3 = 1.0
 									
 									For i = 5 To 8
-										If EntityDistance(e\room\NPC[i]\Collider,Collider)> 4.0 Then e\room\NPC[i]\State = 3
+										If EntityDistance(e\room\NPC[i]\Collider,Collider)> 4.0 Then
+											e\room\NPC[i]\State = 3
+										Else
+											e\room\NPC[i]\State = 1
+										EndIf
 									Next
 									
 									If Abs(EntityY(Collider)-EntityY(e\room\Objects[11],True))<1.0 Then
