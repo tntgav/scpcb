@@ -2,7 +2,7 @@ Function UpdateEvents()
 	CatchErrors("Uncaught (UpdateEvents)")
 	Local dist#, i%, temp%, pvt%, strtemp$, j%, k%
 	
-	Local p.Particles, n.NPCs, r.Rooms, e.Events, e2.Events, it.Items, em.Emitters, sc.SecurityCams, sc2.SecurityCams
+	Local p.Particles, n.NPCs, r.Rooms, e.Events, e2.Events, it.Items, it2.Items, em.Emitters, sc.SecurityCams, sc2.SecurityCams
 	
 	Local CurrTrigger$ = ""
 	
@@ -2530,8 +2530,27 @@ Function UpdateEvents()
 						EndIf
 						BlinkTimer = Max((70*6.5-e\EventState)/5.0 - Rnd(0.0,2.0),-10)
 						If BlinkTimer =-10 Then
-							If e\EventState > 70*7.5 And e\EventState-FPSfactor =< 70*7.5 Then PlaySound2(NeckSnapSFX(0),Camera,e\room\NPC[0]\Collider,8.0)
-							If e\EventState > 70*8.0 And e\EventState-FPSfactor =< 70*8.0 Then PlaySound2(NeckSnapSFX(1),Camera,e\room\NPC[1]\Collider,8.0)
+							If e\EventState > 70*7.5 And e\EventState-FPSfactor =< 70*7.5 Then
+								PlaySound2(NeckSnapSFX(0),Camera,e\room\NPC[0]\Collider,8.0)
+								;Wallet spawning (with 3 coins)
+								it.Items = CreateItem("Wallet","wallet",EntityX(e\room\NPC[0]\Collider,True),EntityY(e\room\NPC[0]\Collider,True),EntityZ(e\room\NPC[0]\Collider,True))
+								EntityType(it\collider, HIT_ITEM)
+								PointEntity it\collider,e\room\NPC[1]\Collider
+								MoveEntity it\collider,-0.4,0,-0.2
+								TeleportEntity(it\collider,EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),-0.02,True,10)
+								For i = 0 To 2
+									it2.Items = CreateItem("50 Cent Coin","50ct",1,1,1)
+									it2\Picked = True
+									it2\Dropped = -1
+									it2\itemtemplate\found=True
+									it\SecondInv[i] = it2
+									HideEntity(it2\collider)
+									EntityType(it2\collider, HIT_ITEM)
+								Next
+							EndIf
+							If e\EventState > 70*8.0 And e\EventState-FPSfactor =< 70*8.0 Then
+								PlaySound2(NeckSnapSFX(1),Camera,e\room\NPC[1]\Collider,8.0)
+							EndIf
 							SetNPCFrame e\room\NPC[0], 60
 							e\room\NPC[0]\State=8
 							
