@@ -6530,6 +6530,8 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 							EndIf
 						EndIf
 					Next
+					UpdateDoorsTimer = 0
+					DropSpeed = 0
 					UpdateDoors()
 					UpdateRooms()
 				EndIf
@@ -6618,6 +6620,8 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 							EndIf
 						EndIf
 					Next
+					UpdateDoorsTimer = 0
+					DropSpeed = 0
 					UpdateDoors()
 					UpdateRooms()
 				EndIf
