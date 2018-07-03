@@ -6949,7 +6949,7 @@ Function UpdateEvents()
 									
 									If MouseDown1 Then
 										DrawArrowIcon(2) = True
-										RotateEntity(e\room\Objects[1], Max(Min(EntityPitch(e\room\Objects[1])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Objects[1]), 0)
+										RotateEntity(e\room\Levers[0], Max(Min(EntityPitch(e\room\Levers[0])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Levers[0]), 0)
 									EndIf
 								EndIf
 							EndIf
@@ -6962,7 +6962,7 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 						
-						If EntityPitch(e\room\Objects[1],True)<40 Then 
+						If EntityPitch(e\room\Levers[0],True)<40 Then 
 							e\EventState = 2
 							PlaySound_Strict LeverSFX
 						Else
@@ -6979,9 +6979,9 @@ Function UpdateEvents()
 						e\room\RoomDoors[1]\locked = False
 						e\room\RoomDoors[2]\locked = False
 						
-						RotateEntity (e\room\Objects[1],CurveAngle(1,EntityPitch(e\room\Objects[1],True),15.0),EntityYaw(e\room\Objects[1],True),0,True)
+						RotateEntity (e\room\Levers[0],CurveAngle(1,EntityPitch(e\room\Levers[0],True),15.0),EntityYaw(e\room\Levers[0],True),0,True)
 						
-						If EntityPitch(e\room\Objects[1],True)=<1.0 Then
+						If EntityPitch(e\room\Levers[0],True)=<1.0 Then
 							RemoveEvent(e)
 						EndIf
 					EndIf
