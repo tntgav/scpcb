@@ -2074,7 +2074,7 @@ Function UpdateNPCs()
 							ElseIf PlayerSeeAble% = 2 And n\State3 > 0.0
 								n\PathStatus = FindPath(n,EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 							Else
-								If n\State3 = 5.0
+								If n\State3 = 6.0
 									If EntityDistance(n\Collider,Collider)>HideDistance
 										n\State = 2
 										n\PathStatus = 0
@@ -2139,8 +2139,9 @@ Function UpdateNPCs()
 								EndIf
 							EndIf
 							
-							If Music(20) = 0 Then Music(20) = LoadSound_Strict("SFX\Music\049Chase.ogg")
-							ShouldPlay = 20
+							If PlayerRoom\RoomTemplate\Name = "room2sl" Then
+								ShouldPlay = 20
+							EndIf
 							
 							If n\CurrSpeed > 0.005 Then
 								If (prevFrame < 361 And n\Frame=>361) Or (prevFrame < 377 And n\Frame=>377) Then
@@ -6794,7 +6795,7 @@ End Function
 Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False)
 	
 	;muzzle flash
-	Local p.particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
+	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
 	TurnEntity p\obj, 0,0,Rnd(360)
 	p\Achange = -0.15
 	

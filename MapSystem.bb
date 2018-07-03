@@ -2211,7 +2211,6 @@ Function FillRoom(r.Rooms)
 			sc\angle = 45
 			sc\turn = 0
 			TurnEntity(sc\CameraObj, 20, 0, 0)
-			sc\ID = 5
 			
 			r\Objects[2] = CopyEntity(Monitor2,r\obj)
 			ScaleEntity(r\Objects[2], 2.0, 2.0, 2.0)
@@ -2587,7 +2586,6 @@ Function FillRoom(r.Rooms)
 			sc\angle = 90
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
-			sc\ID = 6
 			;[End Block]
 		Case "room2tunnel"
 			;[Block]
@@ -2713,7 +2711,6 @@ Function FillRoom(r.Rooms)
 			sc\angle = 135
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
-			sc\ID = 7
 			;[End Block]
 		Case "room035"
 			;[Block]
@@ -2833,7 +2830,6 @@ Function FillRoom(r.Rooms)
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
-			sc\ID = 9
 			
 			r\Objects[0] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[0], r\x, 0.5, r\z + 512.0 * RoomScale, True)
@@ -3417,7 +3413,6 @@ Function FillRoom(r.Rooms)
 			sc\angle = 180
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
-			sc\ID = 0
 			;sc\FollowPlayer = True
 			;[End Block]
 		Case "room2offices"
@@ -4042,7 +4037,6 @@ Function FillRoom(r.Rooms)
 			sc\angle = 45
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
-			sc\ID = 10
 			;[End Block]
 		Case "room106"
 			;[Block]
@@ -4231,7 +4225,6 @@ Function FillRoom(r.Rooms)
 			sc\angle = 180
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
-			sc\ID = 1
 			;[End Block]
 		Case "room2test1074"
 			;[Block]
@@ -4522,7 +4515,6 @@ Function FillRoom(r.Rooms)
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
-			sc\ID = 2
 			;[End Block]
 		Case "room2_3"
 			;[Block]
@@ -4542,7 +4534,6 @@ Function FillRoom(r.Rooms)
 			sc\room = r
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			EntityParent(sc\obj, r\obj)
-			sc\ID = 3
 			;[End Block]
 		Case "room2servers2"
 			;[Block]
@@ -4680,7 +4671,6 @@ Function FillRoom(r.Rooms)
 			sc\angle = 225
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
-			sc\ID = 8
 			;[End Block]
 		Case "room2scps2"
 			;[Block]
@@ -4725,12 +4715,55 @@ Function FillRoom(r.Rooms)
 		Case "room2sl"
 			;[Block]
 			Local scale# = RoomScale * 4.5 * 0.4
+			Local screen%
+			
+			r\Textures[0] = LoadAnimTexture("GFX\SL_monitors_checkpoint.jpg",1,512,512,0,4)
+			r\Textures[1] = LoadAnimTexture("GFX\Sl_monitors.jpg",1,256,256,0,8)
 			
 			;Monitor Objects
 			For i = 0 To 14
-				If i <> 7
+				If i <> 7 Then
 					r\Objects[i] = CopyEntity(Monitor)
 					ScaleEntity(r\Objects[i], scale, scale, scale)
+					If i <> 4 And i <> 13 Then
+						screen = CreateSprite()
+						EntityFX screen,17
+						SpriteViewMode screen,2
+						ScaleSprite(screen, MeshWidth(Monitor) * scale * 0.95 * 0.5, MeshHeight(Monitor) * scale * 0.95 * 0.5)
+						Select i
+							Case 0
+								EntityTexture screen,r\Textures[1],0
+							Case 2
+								EntityTexture screen,r\Textures[1],2
+							Case 3
+								EntityTexture screen,r\Textures[1],1
+							Case 8
+								EntityTexture screen,r\Textures[1],4
+							Case 9
+								EntityTexture screen,r\Textures[1],5
+							Case 10
+								EntityTexture screen,r\Textures[1],3
+							Case 11
+								EntityTexture screen,r\Textures[1],7
+							Default
+								EntityTexture screen,r\Textures[0],3
+						End Select
+						EntityParent screen,r\Objects[i]
+					ElseIf i = 4 Then
+						r\Objects[20] = CreateSprite()
+						EntityFX r\Objects[20],17
+						SpriteViewMode r\Objects[20],2
+						ScaleSprite(r\Objects[20], MeshWidth(Monitor) * scale * 0.95 * 0.5, MeshHeight(Monitor) * scale * 0.95 * 0.5)
+						EntityTexture r\Objects[20],r\Textures[0],2
+						EntityParent r\Objects[20],r\Objects[i]
+					Else
+						r\Objects[21] = CreateSprite()
+						EntityFX r\Objects[21],17
+						SpriteViewMode r\Objects[21],2
+						ScaleSprite(r\Objects[21], MeshWidth(Monitor) * scale * 0.95 * 0.5, MeshHeight(Monitor) * scale * 0.95 * 0.5)
+						EntityTexture r\Objects[21],r\Textures[1],6
+						EntityParent r\Objects[21],r\Objects[i]
+					EndIf
 				EndIf
 			Next
 			For i = 0 To 2
@@ -4785,8 +4818,11 @@ Function FillRoom(r.Rooms)
 			PositionEntity r\Objects[15],r\x+700.0*RoomScale,r\y+700.0*RoomScale,r\z+256.0*RoomScale,True
 			EntityParent r\Objects[15],r\obj
 			r\Objects[16] = CreatePivot()
-			PositionEntity r\Objects[16],r\x-100.0*RoomScale,r\y+700.0*RoomScale,r\z+256.0*RoomScale,True
+			PositionEntity r\Objects[16],r\x-60.0*RoomScale,r\y+700.0*RoomScale,r\z+200.0*RoomScale,True
 			EntityParent r\Objects[16],r\obj
+			r\Objects[17] = CreatePivot()
+			PositionEntity r\Objects[17],r\x-48.0*RoomScale,r\y+540.0*RoomScale,r\z+656.0*RoomScale,True
+			EntityParent r\Objects[17],r\obj
 			
 			;Faked room409
 			;r\Objects[17] = LoadMesh_Strict("GFX\map\room2sl_2.b3d",r\obj)
@@ -4827,39 +4863,18 @@ Function FillRoom(r.Rooms)
 			TurnEntity(sc\ScrObj, 0, 90, 0)
 			EntityParent(sc\ScrObj, r\obj)
 			
-			r\Objects[20] = CopyEntity(LeverBaseOBJ)
-			r\Objects[21] = CopyEntity(LeverOBJ)
-			
-			For  i% = 0 To 1
-				ScaleEntity(r\Objects[20 + i], 0.04, 0.04, 0.04)
-				PositionEntity r\Objects[20],r\x+82.0*RoomScale, r\y+689.0*RoomScale, r\z+912.0*RoomScale,True
-				PositionEntity r\Objects[21],r\x+90.9775*RoomScale, r\y+604.347*RoomScale, r\z+890.584*RoomScale,True
-				
-				EntityParent(r\Objects[20 + i], r\obj)
-			Next
-			
-			RotateEntity r\Objects[21],8.6,-150.0,-5.0
-			
-			;For tw.TempWayPoints = Each TempWayPoints
-			;	If tw\roomtemplate = r\RoomTemplate
-			;		If tw\y > 480.0*RoomScale
-			;			tw\y = 540.0*RoomScale
-			;		EndIf
-			;	EndIf
-			;Next
-			
-			;w.waypoints = CreateWaypoint(r\x, r\y + 64.0 * RoomScale, r\z - 640.0 * RoomScale, Null, r)
-			;w2.waypoints = CreateWaypoint(r\x + 1024.0*RoomScale, r\y + 320.0 * RoomScale, r\z - 640.0 * RoomScale, Null, r)
-			;w3.waypoints = CreateWaypoint(r\x + 1552.0*RoomScale, r\y + 540.0 * RoomScale, r\z - 636.0*RoomScale, Null, r)
-			;w3\connected[0] = w2 : w3\dist[0] = EntityDistance(w3\obj, w2\obj)
-			;w2\connected[1] = w3 : w2\dist[1] = w3\dist[0]
-			
-			;r\MaxWayPointY# = 400.0*RoomScale
-			
-			r\Objects[22] = LoadMesh_Strict("GFX\map\room2sl_hb.b3d",r\obj)
-			EntityPickMode r\Objects[22],2
-			EntityType r\Objects[22],HIT_MAP
-			EntityAlpha r\Objects[22],0.0
+;			r\Objects[20] = CopyEntity(LeverBaseOBJ)
+;			r\Objects[21] = CopyEntity(LeverOBJ)
+;			
+;			For  i% = 0 To 1
+;				ScaleEntity(r\Objects[20 + i], 0.04, 0.04, 0.04)
+;				PositionEntity r\Objects[20],r\x+82.0*RoomScale, r\y+689.0*RoomScale, r\z+912.0*RoomScale,True
+;				PositionEntity r\Objects[21],r\x+90.9775*RoomScale, r\y+604.347*RoomScale, r\z+890.584*RoomScale,True
+;				
+;				EntityParent(r\Objects[20 + i], r\obj)
+;			Next
+;			
+;			RotateEntity r\Objects[21],8.6,-150.0,-5.0
 			;[End Block]
 		Case "room2_4"
 			;[Block]
@@ -5756,12 +5771,6 @@ Type SecurityCams
 	Field AllowSaving%
 	
 	Field MinAngle#, MaxAngle#, dir%
-	
-	Field IsRoom2slCam% = False
-	Field Room2slTexs%[2]
-	Field SpecialCam% = False
-	Field ID% = -1
-	Field Room2slID% = 0
 End Type
 
 Global ScreenTexs%[2]
@@ -5831,26 +5840,20 @@ Function UpdateSecurityCams()
 	
 	For sc.SecurityCams = Each SecurityCams
 		Local close = False
-		If sc\room = Null And (Not sc\SpecialCam) Then
+		If sc\room = Null Then
 			HideEntity sc\Cam
 		Else
-			If (Not sc\SpecialCam)
-				If sc\room\dist < 6.0 Or PlayerRoom=sc\room Then 
-					close = True
-				ElseIf sc\IsRoom2slCam
-					close = True
-				ElseIf sc\Cam<>0
-					HideEntity sc\Cam
-				EndIf
+			If sc\room\dist < 6.0 Or PlayerRoom=sc\room Then 
+				close = True
+			ElseIf sc\Cam<>0
+				HideEntity sc\Cam
 			EndIf
 			
-			If sc\IsRoom2slCam Then sc\CoffinEffect = 0
 			If sc\room <> Null
 				If sc\room\RoomTemplate\Name$ = "room2sl" Then sc\CoffinEffect = 0
 			EndIf
-			If sc\SpecialCam Then sc\CoffinEffect = 0
 			
-			If close Or sc=CoffinCam Or sc\IsRoom2slCam Then 
+			If close Or sc=CoffinCam Then 
 				If sc\FollowPlayer Then
 					If sc<>CoffinCam
 						If EntityVisible(sc\CameraObj,Camera)
@@ -5884,18 +5887,10 @@ Function UpdateSecurityCams()
 					PositionEntity(sc\CameraObj, EntityX(sc\obj, True), EntityY(sc\obj, True) - 0.083, EntityZ(sc\obj, True))
 					RotateEntity(sc\CameraObj, EntityPitch(sc\CameraObj), EntityYaw(sc\obj), 0)
 					
-					If (Not sc\IsRoom2slCam)
-						If sc\Cam<>0 Then 
-							PositionEntity(sc\Cam, EntityX(sc\CameraObj, True), EntityY(sc\CameraObj, True), EntityZ(sc\CameraObj, True))
-							RotateEntity(sc\Cam, EntityPitch(sc\CameraObj), EntityYaw(sc\CameraObj), 0)
-							MoveEntity(sc\Cam, 0, 0, 0.1)
-						EndIf
-					Else
-						;If sc\Room2slID = CurrRoom2slRenderCam
-							PositionEntity(Room2slCam, EntityX(sc\CameraObj, True), EntityY(sc\CameraObj, True), EntityZ(sc\CameraObj, True))
-							RotateEntity(Room2slCam, EntityPitch(sc\CameraObj), EntityYaw(sc\CameraObj), 0)
-							MoveEntity(Room2slCam, 0, 0, 0.1)
-						;EndIf
+					If sc\Cam<>0 Then 
+						PositionEntity(sc\Cam, EntityX(sc\CameraObj, True), EntityY(sc\CameraObj, True), EntityZ(sc\CameraObj, True))
+						RotateEntity(sc\Cam, EntityPitch(sc\CameraObj), EntityYaw(sc\CameraObj), 0)
+						MoveEntity(sc\Cam, 0, 0, 0.1)
 					EndIf
 					
 					If sc<>CoffinCam
@@ -5910,7 +5905,7 @@ Function UpdateSecurityCams()
 				EndIf
 			EndIf
 			
-			If close = True Or sc\IsRoom2slCam Or sc\SpecialCam Then
+			If close = True Then
 				If sc\Screen Then
 					If sc\RenderInterval<>666
 						sc\State = sc\State+FPSfactor
@@ -5950,102 +5945,56 @@ Function UpdateSecurityCams()
 					If (sc\State >= sc\RenderInterval) Or sc\RenderInterval=666
 						sc\InSight = False
 						If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) And sc\RenderInterval<>667 Then
-							If (Not sc\IsRoom2slCam)
-								If EntityVisible(Camera,sc\ScrObj) Then
-									sc\InSight = True
-								
-;									If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
-;										If BlinkTimer > - 5
-;											Sanity=Sanity-(FPSfactor * 16)
-;											DebugLog Sanity
-;											RestoreSanity = False
-;										EndIf
-;										
-;										If Sanity < (-1000) Then 
-;											DeathMSG = Chr(34)+"What we know is that he died of cardiac arrest. My guess is that it was caused by SCP-895, although it has never been observed affecting video equipment from this far before. "
-;											DeathMSG = DeathMSG + "Further testing is needed to determine whether SCP-895's "+Chr(34)+"Red Zone"+Chr(34)+" is increasing."+Chr(34)
-;										
-;											Kill()				
-;										EndIf
-;									EndIf
-									If (Not sc\SpecialCam)
-										If CoffinCam = Null Or Rand(5)=5 Or sc\CoffinEffect <> 3 Then
-											HideEntity(Camera)
-											ShowEntity(sc\Cam)
-											Cls
-											
-											;UpdateRoomLights(sc\Cam)
-											
-											SetBuffer BackBuffer()
-											RenderWorld
-											CopyRect 0,0,512,512,0,0,BackBuffer(),TextureBuffer(ScreenTexs[sc\ScrTexture])
-											
-											HideEntity(sc\Cam)
-											ShowEntity(Camera)										
-										Else
-											HideEntity(Camera)
-											ShowEntity (CoffinCam\room\obj)
-											EntityAlpha(GetChild(CoffinCam\room\obj,2),1)
-											ShowEntity(CoffinCam\Cam)
-											Cls
-											
-											;UpdateRoomLights(CoffinCam\Cam)
-											
-											SetBuffer BackBuffer()
-											RenderWorld
-											CopyRect 0,0,512,512,0,0,BackBuffer(),TextureBuffer(ScreenTexs[sc\ScrTexture])
-											
-											HideEntity (CoffinCam\room\obj)
-											HideEntity(CoffinCam\Cam)
-											ShowEntity(Camera)										
-										EndIf
-									Else
-										HideEntity(Camera)
-										ShowEntity(sc\Cam)
-										Cls
-										
-										;UpdateRoomLights(sc\Cam)
-										
-										RenderWorld
-										
-										HideEntity(sc\Cam)
-										ShowEntity(Camera)	
-										
-										CopyRect(0,0,512,512,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
-									EndIf
-								EndIf
-							Else
+							If EntityVisible(Camera,sc\ScrObj) Then
 								sc\InSight = True
 								
-								PositionEntity(Room2slCam, EntityX(sc\CameraObj, True), EntityY(sc\CameraObj, True), EntityZ(sc\CameraObj, True))
-								RotateEntity(Room2slCam, EntityPitch(sc\CameraObj), EntityYaw(sc\CameraObj), 0)
-								MoveEntity(Room2slCam, 0, 0, 0.1)
-								
-								HideEntity(Camera)
-								ShowEntity (sc\room\obj)
-								EntityAlpha(GetChild(sc\room\obj,2),1)
-								ShowEntity(Room2slCam)
-								Cls
-								
-								;UpdateRoomLights(Room2slCam)
-								
-								RenderWorld
-								
-								HideEntity (sc\room\obj)
-								HideEntity(Room2slCam)
-								ShowEntity(Camera)
-								
-								CopyRect(0,0,128,128,0,0,BackBuffer(),TextureBuffer(sc\Room2slTexs[sc\ScrTexture]))
-								
-								If sc\RenderInterval=666 Then sc\RenderInterval=667
+;								If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
+;									If BlinkTimer > - 5
+;										Sanity=Sanity-(FPSfactor * 16)
+;										DebugLog Sanity
+;										RestoreSanity = False
+;									EndIf
+;									
+;									If Sanity < (-1000) Then 
+;										DeathMSG = Chr(34)+"What we know is that he died of cardiac arrest. My guess is that it was caused by SCP-895, although it has never been observed affecting video equipment from this far before. "
+;										DeathMSG = DeathMSG + "Further testing is needed to determine whether SCP-895's "+Chr(34)+"Red Zone"+Chr(34)+" is increasing."+Chr(34)
+;									
+;										Kill()				
+;									EndIf
+;								EndIf
+								If CoffinCam = Null Or Rand(5)=5 Or sc\CoffinEffect <> 3 Then
+									HideEntity(Camera)
+									ShowEntity(sc\Cam)
+									Cls
+									
+									;UpdateRoomLights(sc\Cam)
+									
+									SetBuffer BackBuffer()
+									RenderWorld
+									CopyRect 0,0,512,512,0,0,BackBuffer(),TextureBuffer(ScreenTexs[sc\ScrTexture])
+									
+									HideEntity(sc\Cam)
+									ShowEntity(Camera)										
+								Else
+									HideEntity(Camera)
+									ShowEntity (CoffinCam\room\obj)
+									EntityAlpha(GetChild(CoffinCam\room\obj,2),1)
+									ShowEntity(CoffinCam\Cam)
+									Cls
+									
+									;UpdateRoomLights(CoffinCam\Cam)
+									
+									SetBuffer BackBuffer()
+									RenderWorld
+									CopyRect 0,0,512,512,0,0,BackBuffer(),TextureBuffer(ScreenTexs[sc\ScrTexture])
+									
+									HideEntity (CoffinCam\room\obj)
+									HideEntity(CoffinCam\Cam)
+									ShowEntity(Camera)										
+								EndIf
 							EndIf
 						EndIf
 						sc\State = 0
-						;If CurrRoom2slRenderCam >= 10
-						;	CurrRoom2slRenderCam = 0
-						;Else
-						;	CurrRoom2slRenderCam = CurrRoom2slRenderCam + 1
-						;EndIf
 					EndIf
 					
 					If SelectedMonitor = sc Or ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714)) Then

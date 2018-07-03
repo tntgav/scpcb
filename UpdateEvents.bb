@@ -1519,17 +1519,13 @@ Function UpdateEvents()
 					If PlayerZone > 0 Then 
 						If EntityPitch(e\room\Levers[0],True) > 0 Then ;camera feed on
 							For sc.SecurityCams = Each SecurityCams
-								If (Not sc\SpecialCam)
-									If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" And sc\room\RoomTemplate\Name<>"room205" Then sc\CoffinEffect = 2
-									If sc\room = e\room Then sc\Screen = True
-								EndIf
+								If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" And sc\room\RoomTemplate\Name<>"room205" Then sc\CoffinEffect = 2
+								If sc\room = e\room Then sc\Screen = True
 							Next
 						Else ;camera feed off
 							For sc.SecurityCams = Each SecurityCams
-								If (Not sc\SpecialCam)
-									If sc\CoffinEffect<>1 Then sc\CoffinEffect = 0
-									If sc\room = e\room Then sc\Screen = False
-								EndIf
+								If sc\CoffinEffect<>1 Then sc\CoffinEffect = 0
+								If sc\room = e\room Then sc\Screen = False
 							Next
 						EndIf						
 					EndIf
@@ -1676,19 +1672,15 @@ Function UpdateEvents()
 					
 					If UpdateLever(e\room\Levers[0]) Then
 						For sc.SecurityCams = Each SecurityCams
-							If (Not sc\SpecialCam)
-								If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" Then sc\CoffinEffect = 2
-								If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 3)
-								If sc\room = e\room Then sc\Screen = True
-							EndIf
+							If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" Then sc\CoffinEffect = 2
+							If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 3)
+							If sc\room = e\room Then sc\Screen = True
 						Next
 					Else
 						For sc.SecurityCams = Each SecurityCams
-							If (Not sc\SpecialCam)
-								If sc\CoffinEffect <> 1 Then sc\CoffinEffect = 0
-								If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 0)
-								If sc\room = e\room Then sc\Screen = False
-							EndIf
+							If sc\CoffinEffect <> 1 Then sc\CoffinEffect = 0
+							If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 0)
+							If sc\room = e\room Then sc\Screen = False
 						Next
 					EndIf
 				Else
@@ -7856,7 +7848,7 @@ Function UpdateEvents()
 				;e\EventState2: Variable used for the SCP-049 event
 				;e\EventState3: Checks if Lever is activated or not
 				
-				;Camera-Spawning Code + SCP-049-Spawning (will now be loaded in a pointer)
+				;Camera-Spawning Code + SCP-049-Spawning (will now be loaded in the QuickLoadEvents function)
 				;[Block]
 				If PlayerRoom = e\room
 					If e\EventStr = "" And QuickLoadPercent = -1
@@ -8000,12 +7992,14 @@ Function UpdateEvents()
 										e\room\NPC[0]\PrevState = 2
 										DebugLog "Path2"
 									Case 3
-										;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
-										;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\obj,True),EntityY(e\room\Objects[7],True),EntityZ(e\room\obj,True))
-										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],e\room\NPC[0]\PathX,0.1,e\room\NPC[0]\PathZ)
-										e\room\NPC[0]\PrevState = 1
+										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[17],True),EntityY(e\room\Objects[17],True),EntityZ(e\room\Objects[17],True))
+										e\room\NPC[0]\PrevState = 2
 										DebugLog "Path3"
 									Case 4
+										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],e\room\NPC[0]\PathX,0.1,e\room\NPC[0]\PathZ)
+										e\room\NPC[0]\PrevState = 2
+										DebugLog "Path4"
+									Case 5
 										e\EventState2 = 5
 								End Select
 								e\room\NPC[0]\PathTimer# = 0.0
@@ -8015,7 +8009,7 @@ Function UpdateEvents()
 					ElseIf e\EventState2 = 4
 						If e\room\NPC[0]\State <> 5
 							e\EventState2 = 7
-							e\room\NPC[0]\State3 = 5.0
+							e\room\NPC[0]\State3 = 6.0
 							DebugLog "fffffffff"
 						EndIf
 					ElseIf e\EventState2 = 5
@@ -8038,7 +8032,9 @@ Function UpdateEvents()
 							e\EventState2 = 7
 						Else
 							;Still playing the Music for SCP-049 (in the real, SCP-049's State will be set to 2, causing it to stop playing the chasing track)
-							ShouldPlay = 20
+							If PlayerRoom = e\room Then
+								ShouldPlay = 20
+							EndIf
 							If e\room\NPC[0]\PathStatus<>1
 								e\room\NPC[0]\Idle = 70*60 ;(Making SCP-049 idle for one minute (twice as fast for aggressive NPCs = True))
 								PositionEntity e\room\NPC[0]\Collider,0,500,0
@@ -8092,71 +8088,76 @@ Function UpdateEvents()
 				EndIf
 				;[End Block]
 				
-				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint needs to be locked again)
-				If PlayerRoom = e\room
+				;Other code
+				;[Block]
+				If PlayerRoom = e\room Then
+					;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint needs to be locked again)
 					e\EventState3 = UpdateLever(e\room\Levers[0])
 					If e\EventState3 = 1 Then
 						UpdateCheckpointMonitors(0)
+						If MonitorTimer# < 50 Then
+							EntityTexture e\room\Objects[20],e\room\Textures[0],1
+						Else
+							EntityTexture e\room\Objects[20],e\room\Textures[0],2
+						EndIf
 					Else
 						TurnCheckpointMonitorsOff(0)
+						EntityTexture e\room\Objects[20],e\room\Textures[0],0
+					EndIf
+					
+					;Checking if the monitors and such should be rendered or not
+					If Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(Collider))>1.0 Then
+						For i = 0 To 14
+							If e\room\Objects[i]<>0 And i<>7 Then
+								ShowEntity e\room\Objects[i]
+							EndIf
+						Next
+						For sc.SecurityCams = Each SecurityCams
+							If sc\room = e\room Then
+								If sc\ScrObj<>0
+									ShowEntity sc\ScrObj
+								EndIf
+								If sc\ScrOverlay<>0
+									ShowEntity sc\ScrOverlay
+								EndIf
+								Exit
+							EndIf
+						Next
+						For i = 0 To 3
+							If PlayerRoom\Adjacent[i]<>Null Then
+								EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
+							EndIf
+						Next
+					Else
+						For i = 0 To 14
+							If e\room\Objects[i]<>0 And i<>7 Then
+								HideEntity e\room\Objects[i]
+							EndIf
+						Next
+						For sc.SecurityCams = Each SecurityCams
+							If sc\room = e\room Then
+								If sc\ScrObj<>0
+									HideEntity sc\ScrObj
+								EndIf
+								If sc\ScrOverlay<>0
+									HideEntity sc\ScrOverlay
+								EndIf
+								Exit
+							EndIf
+						Next
 					EndIf
 				EndIf
 				
-				;Checking if the monitors and such should be rendered or not
-				If PlayerRoom = e\room And Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(Collider))>1.0
-					For i = 0 To 14
-						If e\room\Objects[i]<>0
-							ShowEntity e\room\Objects[i]
+				For e2.Events = Each Events
+					If e2\EventName = "008"
+						If e2\EventState = 2
+							EntityTexture e\room\Objects[21],e\room\Textures[0],3
+						Else
+							EntityTexture e\room\Objects[21],e\room\Textures[1],6
 						EndIf
-					Next
-					For sc.SecurityCams = Each SecurityCams
-						If sc\IsRoom2slCam
-							If sc\ScrObj<>0
-								ShowEntity sc\ScrObj
-							EndIf
-							If sc\ScrOverlay<>0
-								ShowEntity sc\ScrOverlay
-							EndIf
-						EndIf
-						If sc\room = e\room
-							If sc\ScrObj<>0
-								ShowEntity sc\ScrObj
-							EndIf
-							If sc\ScrOverlay<>0
-								ShowEntity sc\ScrOverlay
-							EndIf
-						EndIf
-					Next
-					For i = 0 To 3
-						If PlayerRoom\Adjacent[i]<>Null
-							EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-						EndIf
-					Next
-				Else
-					For i = 0 To 14
-						If e\room\Objects[i]<>0
-							HideEntity e\room\Objects[i]
-						EndIf
-					Next
-					For sc.SecurityCams = Each SecurityCams
-						If sc\IsRoom2slCam
-							If sc\ScrObj<>0
-								HideEntity sc\ScrObj
-							EndIf
-							If sc\ScrOverlay<>0
-								HideEntity sc\ScrOverlay
-							EndIf
-						EndIf
-						If sc\room = e\room
-							If sc\ScrObj<>0
-								HideEntity sc\ScrObj
-							EndIf
-							If sc\ScrOverlay<>0
-								HideEntity sc\ScrOverlay
-							EndIf
-						EndIf
-					Next
-				EndIf
+					EndIf
+				Next
+				;[End Block]
 				
 				;[End Block]
 			Case "096spawn"
