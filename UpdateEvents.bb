@@ -315,14 +315,14 @@ Function UpdateEvents()
 						
 						If i = 0 Then PlaySound_Strict(LoadTempSound("SFX\Room\Intro\PA\scripted\scripted6.ogg"))
 						
-						If (i>0 And i<24) Then
+						If (i>0 And i<26) Then
 							If Not CommotionState(i) Then ;Prevents the same commotion file from playing more then once.
 								PlaySound_Strict(LoadTempSound("SFX\Room\Intro\Commotion\Commotion"+i+".ogg"))
 								CommotionState(i) = True
 							EndIf
 						EndIf
 						
-						If (i>24) Then
+						If (i>26) Then
 							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
 							;If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
 							;If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
