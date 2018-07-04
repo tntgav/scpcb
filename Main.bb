@@ -1850,6 +1850,8 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	Local d.Doors, parent, i%
 	If room <> Null Then parent = room\obj
 	
+	Local d2.Doors
+	
 	d.Doors = New Doors
 	If big=1 Then
 		d\obj = CopyEntity(BigDoorOBJ(0))
@@ -1861,12 +1863,29 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 		ScaleEntity(d\frameobj, RoomScale, RoomScale, RoomScale)
 		EntityType d\frameobj, HIT_MAP
 		EntityAlpha d\frameobj, 0.0
-	ElseIf big=2
+	ElseIf big=2 Then
 		d\obj = CopyEntity(HeavyDoorObj(0))
 		ScaleEntity(d\obj, RoomScale, RoomScale, RoomScale)
 		d\obj2 = CopyEntity(HeavyDoorObj(1))
 		ScaleEntity(d\obj2, RoomScale, RoomScale, RoomScale)
 		
+		d\frameobj = CopyEntity(DoorFrameOBJ)
+	ElseIf big=3 Then
+		For d2 = Each Doors
+			If d2 <> d And d2\dir = 3 Then
+				d\obj = CopyEntity(d2\obj)
+				d\obj2 = CopyEntity(d2\obj2)
+				ScaleEntity d\obj, RoomScale, RoomScale, RoomScale
+				ScaleEntity d\obj2, RoomScale, RoomScale, RoomScale
+				Exit
+			EndIf
+		Next
+		If d\obj=0 Then
+			d\obj = LoadMesh_Strict("GFX\map\elevatordoor.b3d")
+			d\obj2 = CopyEntity(d\obj)
+			ScaleEntity d\obj, RoomScale, RoomScale, RoomScale
+			ScaleEntity d\obj2, RoomScale, RoomScale, RoomScale
+		EndIf
 		d\frameobj = CopyEntity(DoorFrameOBJ)
 	Else
 		d\obj = CopyEntity(DoorOBJ)
@@ -1962,7 +1981,6 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	
 	d\MTFClose = True
 	
-	Local d2.Doors
 	If useCollisionMesh Then
 		For d2.Doors = Each Doors
 			If d2 <> d Then
@@ -2093,7 +2111,11 @@ Function UpdateDoors()
 						Case 2
 							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen+1) * FPSfactor / 85.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 120.0, 0, 0)		
+							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 120.0, 0, 0)
+						Case 3
+							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
+							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
+							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
 					End Select
 				Else
 					d\fastopen = 0
@@ -2152,6 +2174,10 @@ Function UpdateDoors()
 							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 85.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 120.0, 0, 0)
+						Case 3
+							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
+							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 162.0, 0, 0)
+							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 162.0, 0, 0)
 					End Select
 					
 					If d\angle = 0 Or d\angle=180 Then
@@ -2200,7 +2226,7 @@ Function UpdateDoors()
 	Next
 End Function
 
-Function UseDoor(d.Doors, showmsg%=True)
+Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 	Local temp% = 0
 	If d\KeyCard > 0 Then
 		If SelectedItem = Null Then
@@ -2339,14 +2365,21 @@ Function UseDoor(d.Doors, showmsg%=True)
 	;If d\dir = 1 Then sound = 0 Else sound=Rand(0, 2)
 	If d\dir = 1 Then sound=Rand(0, 1) Else sound=Rand(0, 2)
 	
-	If d\open Then
-		If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer
-		d\timerstate = d\timer
-		d\SoundCHN = PlaySound2 (OpenDoorSFX(d\dir, sound), Camera, d\obj)
+	If playsfx=True Then
+		If d\open Then
+			If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer
+			d\timerstate = d\timer
+			d\SoundCHN = PlaySound2 (OpenDoorSFX(d\dir, sound), Camera, d\obj)
+		Else
+			d\SoundCHN = PlaySound2 (CloseDoorSFX(d\dir, sound), Camera, d\obj)
+		EndIf
+		UpdateSoundOrigin(d\SoundCHN,Camera,d\obj)
 	Else
-		d\SoundCHN = PlaySound2 (CloseDoorSFX(d\dir, sound), Camera, d\obj)
+		If d\open Then
+			If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer
+			d\timerstate = d\timer
+		EndIf
 	EndIf
-	UpdateSoundOrigin(d\SoundCHN,Camera,d\obj)
 	
 End Function
 
