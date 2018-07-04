@@ -4974,7 +4974,7 @@ Function FillRoom(r.Rooms)
 			EntityAlpha ent,0
 			
 			r\Levers[0] = CreatePivot()
-			PositionEntity r\Levers[0],r\x+205.0*RoomScale,r\y+400.0*RoomScale,r\z+2287.0*RoomScale
+			PositionEntity r\Levers[0],r\x+205.0*RoomScale,r\y+200.0*RoomScale,r\z+2287.0*RoomScale
 			EntityParent r\Levers[0],r\obj
 			;[End Block]
 	End Select
@@ -7939,6 +7939,15 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 	Next
 	
 	Local MaxNPCs% = 64 ;<---- the maximum amount of NPCs in dimension1499
+	Local e.Events
+	For e.Events = Each Events
+		If e\room = PlayerRoom Then
+			If e\room\NPC[0]<>Null Then
+				MaxNPCs = 16
+				Exit
+			EndIf
+		EndIf
+	Next
 	
 	If currNPCNumb < MaxNPCs
 		Select Rand(1,8)
@@ -8279,7 +8288,6 @@ Function PreventRoomOverlap(r.Rooms)
 					isIntersecting = False
 				EndIf
 			EndIf
-					
 		EndIf
 	Next
 	

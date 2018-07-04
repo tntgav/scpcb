@@ -8340,7 +8340,7 @@ Function UpdateEvents()
 				If e\EventState = 2.0
 					If e\SoundCHN<>0 Then
 						StopStream_Strict(e\SoundCHN)
-						StopStream_Strict(e\SoundCHN2)
+						StopChannel(e\SoundCHN2)
 						e\SoundCHN = 0
 						e\SoundCHN2 = 0
 					EndIf
@@ -8356,7 +8356,14 @@ Function UpdateEvents()
 						FreeEntity(du\obj)
 						Delete du
 					Next
+					If e\EventState3 < 70*30 Then
+						e\EventState3 = 0.0
+					EndIf
 					e\EventState = 1.0
+					If e\Sound2 <> 0 Then
+						FreeSound_Strict e\Sound2
+						e\Sound2 = 0
+					EndIf
 				EndIf
 				;[End Block]
 			Case "room2offices035"
@@ -8510,101 +8517,110 @@ Function UpdateDimension1499()
 						Next
 						e\EventState2 = 5
 					EndIf
-					;Guards at the entrance to church
-					n.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+1884.0*RoomScale)
-					n\PrevState = 3
-					n\Angle = 270
-					RotateEntity n\Collider,0,n\Angle,0
-					n2.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+2876.0*RoomScale)
-					n2\PrevState = 3
-					n2\Angle = 270
-					RotateEntity n2\Collider,0,n2\Angle,0
-					n\Target = n2
-					n2\Target = n
-					e\room\NPC[2] = n
-					e\room\NPC[3] = n2
-					;Guard at stairs
-					n.NPCs = CreateNPC(NPCtype1499,e\room\x-2761.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+3204.0*RoomScale)
-					n\PrevState = 1
-					n\Angle = 180
-					RotateEntity n\Collider,0,n\Angle,0
-					;King
-					n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2308.0*RoomScale)
-					n\PrevState = 2
-					n\Angle = 270
-					RotateEntity n\Collider,0,n\Angle,0
-					tex = LoadTexture_Strict("GFX\npcs\1499_King.jpg")
-					EntityTexture n\obj,tex
-					FreeTexture tex
-					e\room\NPC[0] = n
-					;Guard next to king
-					n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2052.0*RoomScale)
-					n\PrevState = 1
-					n\Angle = 270
-					RotateEntity n\Collider,0,n\Angle,0
-					e\room\NPC[1] = n
-					;1499-1 instances praying in church
-					;Zone 1
-					For x=0 To 7
-						For y=0 To 2
-							du = New Dummy1499
-							For n.NPCs = Each NPCs
-								If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
-									du\obj = CopyEntity(n\obj)
-									Exit
-								EndIf
+					If e\EventState3 < 70*30 Then
+						;Guards at the entrance to church
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+1884.0*RoomScale)
+						n\PrevState = 3
+						n\Angle = 270
+						RotateEntity n\Collider,0,n\Angle,0
+						n2.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+2876.0*RoomScale)
+						n2\PrevState = 3
+						n2\Angle = 270
+						RotateEntity n2\Collider,0,n2\Angle,0
+						n\Target = n2
+						n2\Target = n
+						e\room\NPC[2] = n
+						e\room\NPC[3] = n2
+						;Guard at stairs
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x-2761.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+3204.0*RoomScale)
+						n\PrevState = 1
+						n\Angle = 180
+						RotateEntity n\Collider,0,n\Angle,0
+						n\Speed = 0.0
+						;King
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2308.0*RoomScale)
+						n\PrevState = 2
+						n\Angle = 270
+						RotateEntity n\Collider,0,n\Angle,0
+						tex = LoadTexture_Strict("GFX\npcs\1499_King.jpg")
+						EntityTexture n\obj,tex
+						FreeTexture tex
+						e\room\NPC[0] = n
+						;Guard next to king
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2052.0*RoomScale)
+						n\PrevState = 1
+						n\Angle = 270
+						RotateEntity n\Collider,0,n\Angle,0
+						e\room\NPC[1] = n
+						;1499-1 instances praying in church
+						;Zone 1
+						For x=0 To 7
+							For y=0 To 2
+								du = New Dummy1499
+								For n.NPCs = Each NPCs
+									If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
+										du\obj = CopyEntity(n\obj)
+										Exit
+									EndIf
+								Next
+								scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
+								ScaleEntity du\obj, scale#,scale#,scale#
+								EntityFX du\obj,1
+								du\anim = Rand(0,1)
+								;2560=x		768=z
+								;1687.0
+								PositionEntity du\obj,Max(Min((e\room\x+(1887.0-((2560.0/7.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1887.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(1796.0-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+1796.0*RoomScale),e\room\z+1028.0*RoomScale)
+								RotateEntity du\obj,0,270,0
+								EntityAutoFade du\obj,25,39
 							Next
-							scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
-							ScaleEntity du\obj, scale#,scale#,scale#
-							EntityFX du\obj,1
-							du\anim = Rand(0,1)
-							;2560=x		768=z
-							;1687.0
-							PositionEntity du\obj,Max(Min((e\room\x+(1887.0-((2560.0/7.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1887.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(1796.0-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+1796.0*RoomScale),e\room\z+1028.0*RoomScale)
-							RotateEntity du\obj,0,270,0
-							EntityAutoFade du\obj,25,39
 						Next
-					Next
-					;Zone 2
-					For x=0 To 6
-						For y=0 To 2
-							du = New Dummy1499
-							For n.NPCs = Each NPCs
-								If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
-									du\obj = CopyEntity(n\obj)
-									Exit
-								EndIf
+						;Zone 2
+						For x=0 To 6
+							For y=0 To 2
+								du = New Dummy1499
+								For n.NPCs = Each NPCs
+									If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
+										du\obj = CopyEntity(n\obj)
+										Exit
+									EndIf
+								Next
+								scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
+								ScaleEntity du\obj, scale#,scale#,scale#
+								EntityFX du\obj,1
+								du\anim = Rand(0,1)
+								;2048=x		768=z
+								;1175.0
+								PositionEntity du\obj,Max(Min((e\room\x+(1375.0-((2048.0/6.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1375.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(3588-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+3588.0*RoomScale),e\room\z+2820.0*RoomScale)
+								RotateEntity du\obj,0,270,0
+								EntityAutoFade du\obj,25,39
 							Next
-							scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
-							ScaleEntity du\obj, scale#,scale#,scale#
-							EntityFX du\obj,1
-							du\anim = Rand(0,1)
-							;2048=x		768=z
-							;1175.0
-							PositionEntity du\obj,Max(Min((e\room\x+(1375.0-((2048.0/6.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1375.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(3588-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+3588.0*RoomScale),e\room\z+2820.0*RoomScale)
-							RotateEntity du\obj,0,270,0
-							EntityAutoFade du\obj,25,39
 						Next
+						;4055, 240, 2084
+						;4055, 240, 3076
+						;-2761, 240, 3204 for stairs guard
+						;-1449, 240, 1092
+						;-1449, 240, 3524
+						;-1917, 1904, 2052 - guard
+						;-1917, 1904, 2308 - king
+						
+						;1687, 240, 1028
+						;1687, 240, 1796
+						;-873, 240, 1796
+						;-873, 240, 1028
+						;that's the First zone
+						;1175, 240, 2820
+						;1175, 240, 3588
+						;-873, 240, 3588
+						;-873, 240, 2820
+						;that's For second zone
+					EndIf
+					
+					For i = 0 To 14
+						n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(-20,20),EntityY(Collider)+0.1,EntityZ(Collider)+Rnd(-20,20))
+						If Rand(2)=1 Then n\State2 = 500*3
+						n\Angle = Rnd(360)
 					Next
 				EndIf
-				;4055, 240, 2084
-				;4055, 240, 3076
-				;-2761, 240, 3204 for stairs guard
-				;-1449, 240, 1092
-				;-1449, 240, 3524
-				;-1917, 1904, 2052 - guard
-				;-1917, 1904, 2308 - king
-				
-				;1687, 240, 1028
-				;1687, 240, 1796
-				;-873, 240, 1796
-				;-873, 240, 1028
-				;that's the First zone
-				;1175, 240, 2820
-				;1175, 240, 3588
-				;-873, 240, 3588
-				;-873, 240, 2820
-				;that's For second zone
 				
 				;PositionEntity e\room\Objects[0],0,800,0
 				If (Not DebugHUD)
@@ -8642,36 +8658,57 @@ Function UpdateDimension1499()
 						EndIf
 					Next
 					For du = Each Dummy1499
-						If du\anim=0 Then
-							;321-361
-							If AnimTime(du\obj)<=360.5 Then
-								Animate2(du\obj,AnimTime(du\obj),321,361,0.2,False)
-							;362-402
-							ElseIf AnimTime(du\obj)>361.5 And AnimTime(du\obj)<=401.5 Then
-								Animate2(du\obj,AnimTime(du\obj),362,402,0.2,False)
-							Else
-								temp = Rand(0,1)
-								If temp=0 Then
-									SetAnimTime(du\obj,321)
+						If e\EventState3 < 70*30 Then
+							If du\anim=0 Then
+								;321-361
+								If AnimTime(du\obj)<=360.5 Then
+									Animate2(du\obj,AnimTime(du\obj),321,361,0.2,False)
+								;362-402
+								ElseIf AnimTime(du\obj)>361.5 And AnimTime(du\obj)<=401.5 Then
+									Animate2(du\obj,AnimTime(du\obj),362,402,0.2,False)
 								Else
-									SetAnimTime(du\obj,362)
+									temp = Rand(0,1)
+									If temp=0 Then
+										SetAnimTime(du\obj,321)
+									Else
+										SetAnimTime(du\obj,362)
+									EndIf
+								EndIf
+							Else
+								;413-453
+								If AnimTime(du\obj)<=452.5 Then
+									Animate2(du\obj,AnimTime(du\obj),413,453,0.2,False)
+								;454-498
+								ElseIf AnimTime(du\obj)>453.5 And AnimTime(du\obj)<=497.5 Then
+									Animate2(du\obj,AnimTime(du\obj),454,498,0.2,False)
+								Else
+									temp = Rand(0,1)
+									If temp=0 Then
+										SetAnimTime(du\obj,413)
+									Else
+										SetAnimTime(du\obj,454)
+									EndIf
 								EndIf
 							EndIf
 						Else
-							;413-453
-							If AnimTime(du\obj)<=452.5 Then
-								Animate2(du\obj,AnimTime(du\obj),413,453,0.2,False)
-							;454-498
-							ElseIf AnimTime(du\obj)>453.5 And AnimTime(du\obj)<=497.5 Then
-								Animate2(du\obj,AnimTime(du\obj),454,498,0.2,False)
-							Else
-								temp = Rand(0,1)
-								If temp=0 Then
-									SetAnimTime(du\obj,413)
+							If du\anim=0 Then
+								If AnimTime(du\obj)<=411.5 And AnimTime(du\obj)>320.5 Then
+									Animate2(du\obj,AnimTime(du\obj),403,412,0.2,False)
 								Else
-									SetAnimTime(du\obj,454)
+									Animate2(du\obj,AnimTime(du\obj),296,320,0.2,True)
+								EndIf
+							Else
+								If AnimTime(du\obj)<=507.5 And AnimTime(du\obj)>320.5 Then
+									Animate2(du\obj,AnimTime(du\obj),499,508,0.2,False)
+								Else
+									Animate2(du\obj,AnimTime(du\obj),296,320,0.2,True)
 								EndIf
 							EndIf
+							Local pvt = CreatePivot()
+							PositionEntity pvt,EntityX(du\obj),EntityY(du\obj),EntityZ(du\obj),True
+							PointEntity pvt,Collider
+							RotateEntity du\obj,0,CurveAngle(EntityYaw(pvt),EntityYaw(du\obj)-180,10.0)+180,0
+							FreeEntity pvt
 						EndIf
 					Next
 					;-56,0,2287
@@ -8711,30 +8748,36 @@ Function UpdateDimension1499()
 					;		ShouldPlay = 66
 					;	EndIf
 					;EndIf
-					If e\EventState3 > 0.0 Then
-						ShouldPlay = 66
-					EndIf
 					
-					If NowPlaying<>66 Then
-						;If e\SoundCHN<>0 Then
-						;	StopStream_Strict(e\SoundCHN)
-						;	StopStream_Strict(e\SoundCHN2)
-						;	e\SoundCHN = 0
-						;	e\SoundCHN2 = 0
-						;EndIf
-					Else
-						If e\SoundCHN = 0 Then
-							e\SoundCHN = StreamSound_Strict("SFX\Music\HaveMercyOnMe(NoChoir).ogg",MusicVolume)
-							e\SoundCHN2 = StreamSound_Strict("SFX\Music\HaveMercyOnMe(Choir).ogg",0.0)
-							e\SoundCHN_isStream = True
-							e\SoundCHN2_isStream = True
+					If e\room\NPC[0]<>Null Then
+						If e\EventState3 < 70*30 Then
+							ShouldPlay = 66
+							If NowPlaying = 66 Then
+								If e\SoundCHN = 0 Then
+									e\Sound2 = LoadSound_Strict("SFX\Music\HaveMercyOnMe(Choir).ogg")
+									e\SoundCHN = StreamSound_Strict("SFX\Music\HaveMercyOnMe(NoChoir).ogg",MusicVolume)
+									e\SoundCHN_isStream = True
+								EndIf
+								;If e\SoundCHN2<>0 Then
+								;	UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
+								;EndIf
+							EndIf
+							If e\Sound2<>0 Then
+								e\SoundCHN2 = LoopSound2(e\Sound2,e\SoundCHN2,Camera,e\room\Levers[0],10,MusicVolume)
+							EndIf
+						Else
+							ShouldPlay = 19
+							If e\SoundCHN<>0 Then
+								StopStream_Strict(e\SoundCHN)
+								StopChannel(e\SoundCHN2)
+								e\SoundCHN = 0
+								e\SoundCHN2 = 0
+							EndIf
+							If e\Sound2 <> 0 Then
+								FreeSound_Strict e\Sound2
+								e\Sound2 = 0
+							EndIf
 						EndIf
-						;If e\SoundCHN2<>0 Then
-						;	UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
-						;EndIf
-					EndIf
-					If e\SoundCHN2<>0 Then
-						UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
 					EndIf
 					
 					If EntityDistance(Collider,e\room\obj)>40.0
@@ -8755,7 +8798,7 @@ Function UpdateDimension1499()
 				If e\EventState = 2.0
 					If e\SoundCHN<>0 Then
 						StopStream_Strict(e\SoundCHN)
-						StopStream_Strict(e\SoundCHN2)
+						StopChannel(e\SoundCHN2)
 						e\SoundCHN = 0
 						e\SoundCHN2 = 0
 					EndIf
@@ -8771,8 +8814,14 @@ Function UpdateDimension1499()
 						FreeEntity du\obj
 						Delete du
 					Next
-					e\EventState3 = 0.0
+					If e\EventState3 < 70*30 Then
+						e\EventState3 = 0.0
+					EndIf
 					e\EventState = 1.0
+					If e\Sound2 <> 0 Then
+						FreeSound_Strict e\Sound2
+						e\Sound2 = 0
+					EndIf
 				EndIf
 			EndIf
 			;[End Block]

@@ -8775,7 +8775,7 @@ Function LoopSound2%(SoundHandle%, Chn%, cam%, entity%, range# = 10, volume# = 1
 	If volume>0 Then
 		
 		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 - dist# > 0 And 1 - dist# < 1 Then
+		;If 1 - dist# > 0 And 1 - dist# < 1 Then
 			
 			Local panvalue# = Sin(-DeltaYaw(cam,entity))
 			
@@ -8787,7 +8787,7 @@ Function LoopSound2%(SoundHandle%, Chn%, cam%, entity%, range# = 10, volume# = 1
 			
 			ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
 			ChannelPan(Chn, panvalue)
-		EndIf
+		;EndIf
 	Else
 		If Chn <> 0 Then
 			ChannelVolume (Chn, 0)
