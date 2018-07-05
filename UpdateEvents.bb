@@ -3000,7 +3000,7 @@ Function UpdateEvents()
 							
 							BlinkTimer = -10
 							
-							PlaySound_Strict DripSFX(0);HorrorSFX(11)
+							PlaySound_Strict HorrorSFX(11);DripSFX(0)
 							
 							PositionEntity Collider, EntityX(pvt),EntityY(pvt)+0.05,EntityZ(pvt)
 							UpdateWorld()
