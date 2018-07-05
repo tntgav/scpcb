@@ -3854,12 +3854,14 @@ Function FillRoom(r.Rooms)
 			FreeEntity (d\obj2) : d\obj2 = 0
 			FreeEntity (d\buttons[0]) : d\buttons[0] = 0
 			FreeEntity (d\buttons[1]) : d\buttons[1] = 0
+			d\dir = 4
 			r\RoomDoors[0] = d: d\AutoClose = False
 			
 			d = CreateDoor(r\zone, r\x + 816.0 * RoomScale, 0.0, r\z + 528.0 * RoomScale, 180, r, True)
 			FreeEntity (d\obj2) : d\obj2 = 0	
 			FreeEntity (d\buttons[0]) : d\buttons[0] = 0
 			FreeEntity (d\buttons[1]) : d\buttons[1] = 0
+			d\dir = 4
 			r\RoomDoors[1] = d : d\AutoClose = False
 			
 			r\Objects[2] = CreatePivot()

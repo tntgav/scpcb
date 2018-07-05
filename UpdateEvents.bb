@@ -7164,6 +7164,7 @@ Function UpdateEvents()
 													If Abs(EntityY(it\collider) - (e\room\y + 648.0 * RoomScale)) < 104.0 Then
 														e\EventState = 1
 														e\SoundCHN = PlaySound2(MachineSFX, Camera, e\room\Objects[1])
+														e\room\RoomDoors[1]\SoundCHN = PlaySound2(LoadTempSound("SFX\SCP\914\DoorClose.ogg"), Camera, e\room\RoomDoors[1]\obj)
 														Exit
 													EndIf
 												End If
@@ -7237,6 +7238,10 @@ Function UpdateEvents()
 						
 						e\room\RoomDoors[1]\open = False
 						If e\EventState > 70 * 2 Then
+							If e\room\RoomDoors[0]\open=True Then
+								e\room\RoomDoors[0]\SoundCHN = PlaySound2(LoadTempSound("SFX\SCP\914\DoorClose.ogg"), Camera, e\room\RoomDoors[0]\obj)
+							EndIf
+							
 							e\room\RoomDoors[0]\open = False
 						EndIf
 						
@@ -7305,10 +7310,15 @@ Function UpdateEvents()
 							e\room\RoomDoors[1]\open = True
 							RotateEntity(e\room\Objects[0], 0, 0, 0)
 							e\EventState = 0
+							
+							Local opensfx914 = LoadTempSound("SFX\SCP\914\DoorOpen.ogg")
+							e\room\RoomDoors[0]\SoundCHN = PlaySound2(opensfx914, Camera, e\room\RoomDoors[0]\obj)
+							e\room\RoomDoors[1]\SoundCHN = PlaySound2(opensfx914, Camera, e\room\RoomDoors[1]\obj)
 						End If
 					End If
 					
 				EndIf
+				UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[1])
 				;[End Block]
 			Case "1048a"
 				;[Block]

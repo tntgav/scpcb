@@ -1619,6 +1619,7 @@ DrawLoading(20, True)
 
 Dim RustleSFX%(3)
 
+Global Use914SFX%
 Global Death914SFX% 
 
 Dim DripSFX%(4)
@@ -2116,6 +2117,9 @@ Function UpdateDoors()
 							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
+						Case 4 ;Used for 914 only
+							d\openstate = Min(180, d\openstate + FPSfactor * 1.4)
+							MoveEntity(d\obj, Sin(d\openstate) * FPSfactor / 114.0, 0, 0)
 					End Select
 				Else
 					d\fastopen = 0
@@ -2178,6 +2182,9 @@ Function UpdateDoors()
 							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 162.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 162.0, 0, 0)
+						Case 4 ;Used for 914 only
+							d\openstate = Min(180, d\openstate - FPSfactor * 1.4)
+							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 114.0, 0, 0)
 					End Select
 					
 					If d\angle = 0 Or d\angle=180 Then
