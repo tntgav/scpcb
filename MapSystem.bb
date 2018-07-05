@@ -2434,6 +2434,14 @@ Function FillRoom(r.Rooms)
 			;Player's position after leaving the pocket dimension
 			r\Objects[0] = CreatePivot(r\obj)
 			PositionEntity r\Objects[0],r\x+1560.0*RoomScale,r\y,r\z+250.0*RoomScale,True
+			
+			r\Objects[1] = CreatePivot(r\obj)
+            PositionEntity r\Objects[1],r\x + 1344.0 * RoomScale, -752.0 * RoomScale,r\z - 384.0 * RoomScale,True
+            
+            de.Decals = CreateDecal(3,  r\x + 1334.0*RoomScale, -796.0*RoomScale+0.01, r\z-220.0*RoomScale,90,Rnd(360),0)
+            de\Size = 0.25
+            ScaleSprite(de\obj, de\Size,de\Size)
+            EntityParent de\obj, r\obj
 			;[End Block]
 		Case "room2poffices"
 			;[Block]
@@ -2586,6 +2594,10 @@ Function FillRoom(r.Rooms)
 			sc\angle = 90
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
+			
+			r\Objects[6] = CreatePivot()
+			PositionEntity r\Objects[6],r\x+1110.0*RoomScale,r\y+36.0*RoomScale,r\z-208.0*RoomScale
+			EntityParent r\Objects[6],r\obj
 			;[End Block]
 		Case "room2tunnel"
 			;[Block]

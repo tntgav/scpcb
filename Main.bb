@@ -2644,6 +2644,7 @@ Function InitEvents()
 	CreateEvent("room_gw","room3gw",0,1.0)
 	CreateEvent("room2sl","room2sl",0)
 	CreateEvent("medibay","medibay",0)
+	CreateEvent("room2shaft","room2shaft",0)
 	
 	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
 	

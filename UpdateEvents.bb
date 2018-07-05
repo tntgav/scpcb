@@ -2695,6 +2695,19 @@ Function UpdateEvents()
 					e\EventState = UpdateLever(e\room\Objects[1])
 					UpdateLever(e\room\Objects[3])
 				EndIf
+				
+				If e\EventState3 = 0 Then
+					n.NPCs = CreateNPC(NPCtypeD,EntityX(e\room\Objects[6],True),0.5,EntityZ(e\room\Objects[6],True))
+					RotateEntity n\Collider,0,e\room\angle+90,0
+					n\State = 3
+					SetNPCFrame(n,40)
+					n\IsDead = True
+					n\texture = "GFX\npcs\body2.jpg"
+					tex = LoadTexture_Strict(n\texture)
+					EntityTexture(n\obj, tex)
+					FreeTexture tex
+					e\EventState3 = 1
+				EndIf
 				;[End Block]
 			Case "room2offices2"
 				;[Block]
@@ -8433,6 +8446,19 @@ Function UpdateEvents()
 					e\room\RoomDoors[0]\KeyCard = e\EventState
 				EndIf
 				;[End Block]
+			Case "room2shaft"
+                ;[Block]
+                If e\EventState = 0 Then
+                    e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[1],True), EntityY(e\room\Objects[1],True)+0.5, EntityZ(e\room\Objects[1],True))
+                    RotateEntity e\room\NPC[0]\Collider, 0, e\room\angle+180,0, True
+					
+                    SetNPCFrame (e\room\NPC[0], 286)
+                    e\room\NPC[0]\State = 8
+                    
+                    e\EventState = 1
+                    RemoveEvent(e)
+                EndIf
+                ;[End Block]
 		End Select
 		
 		If e<>Null Then
