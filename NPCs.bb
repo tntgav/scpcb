@@ -6670,7 +6670,9 @@ Function UpdateMTFUnit(n.NPCs)
 								EndIf
 								SetNPCFrame(n\Target,133)
 								n\Target\IsDead = True
+								n\Target = Null
 								n\State = 0
+								Return
 							EndIf
 							n\Reload = 7
 							
@@ -6741,6 +6743,11 @@ Function UpdateMTFUnit(n.NPCs)
 							n\PathTimer=0.0
 						EndIf
 					EndIf
+				EndIf
+				
+				If n\Target\IsDead = True Then
+					n\Target = Null
+					n\State = 0
 				EndIf
 				
 				;[End Block]
