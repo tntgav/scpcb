@@ -11888,6 +11888,11 @@ End Function
 Function Update096ElevatorEvent#(e.Events,EventState#,d.Doors,elevatorobj%)
 	Local prevEventState# = EventState#
 	
+	If EventState < 0 Then
+		EventState = 0
+		prevEventState = 0
+	EndIf
+	
 	If d\openstate = 0 And d\open = False Then
 		If Abs(EntityX(Collider)-EntityX(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
 			If Abs(EntityZ(Collider)-EntityZ(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
@@ -11924,15 +11929,14 @@ Function Update096ElevatorEvent#(e.Events,EventState#,d.Doors,elevatorobj%)
 			CameraShake = 1
 			d\fastopen = True
 			d\open = True
+			Curr096\State = 4
+			Curr096\LastSeen = 1
 		ElseIf EventState > 70*8.1 And EventState < 70*8.15+FPSfactor
 			CameraShake = 1
 		EndIf
 		
 		If EventState <= 70*8.1 Then
-			d\openstate = Min(d\openstate,10)
-		Else
-			Curr096\State = 4
-			Curr096\LastSeen = 1
+			d\openstate = Min(d\openstate,20)
 		EndIf
 		EventState = EventState + FPSfactor * 1.4
 	EndIf
