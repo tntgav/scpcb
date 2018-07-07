@@ -2413,10 +2413,6 @@ Function FillRoom(r.Rooms)
 			d = CreateDoor(r\zone, r\x + 256.0 * RoomScale, r\y, r\z + 744.0 * RoomScale, 90, r, False, False, 2)
 			d\AutoClose = False : d\open = False
 			
-			it = CreateItem("Level 2 Key Card", "key2", r\x + 256.0 * RoomScale, r\y, r\z + 744.0 * RoomScale)
-			RotateEntity(it\collider, 0, 90, 0)
-			EntityParent(it\collider, r\obj)
-			
 			it = CreateItem("Level 3 Key Card", "key3", r\x + 1119.0 * RoomScale, r\y + 233.0 * RoomScale, r\z + 494.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			
