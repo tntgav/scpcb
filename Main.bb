@@ -1648,7 +1648,7 @@ AmbientSFXAmount(5)=10
 
 Dim AmbientSFX%(6, 15)
 
-Dim OldManSFX%(6)
+Dim OldManSFX%(8)
 
 Dim Scp173SFX%(3)
 

@@ -107,6 +107,9 @@ Next
 OldManSFX(3) = LoadSound_Strict("SFX\SCP\106\Laugh.ogg")
 OldManSFX(4) = LoadSound_Strict("SFX\SCP\106\Breathing.ogg")
 OldManSFX(5) = LoadSound_Strict("SFX\Room\PocketDimension\Enter.ogg")
+For i = 0 To 2
+	OldManSFX(6+i) = LoadSound_Strict("SFX\SCP\106\WallDecay"+(i+1)+".ogg")
+Next
 
 ;Dim Scp173SFX%(3)
 For i = 0 To 2

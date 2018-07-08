@@ -1173,6 +1173,7 @@ Function UpdateNPCs()
                                             RotateEntity(n\Collider,0,EntityYaw(n\Collider),0)
                                             MoveEntity(n\Collider,0,0,-2)
                                             PlaySound2(OldManSFX(3),Camera,n\Collider)
+											n\SoundChn2 = PlaySound2(OldManSFX(6+Rand(0,2)),Camera,n\Collider)
                                             n\PathTimer = 0
                                             n\Reload = (70*10.0)/(SelectedDifficulty\otherFactors+1)
                                             DebugLog "Teleported 106 (Distance: "+EntityDistance(n\Collider,Collider)+")"
@@ -1183,6 +1184,7 @@ Function UpdateNPCs()
                             n\Reload = Max(0, n\Reload - FPSfactor)
                             DebugLog "106 in... "+n\Reload 
 							
+							UpdateSoundOrigin(n\SoundChn2,Camera,n\Collider)
 						Else ;idling outside the map
 							n\CurrSpeed = 0
 							MoveEntity n\Collider, 0, ((EntityY(Collider) - 30) - EntityY(n\Collider)) / 200.0, 0
