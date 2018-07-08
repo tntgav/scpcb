@@ -298,7 +298,7 @@ Function UpdateEvents()
 						End If
 					EndIf
 					
-					If (e\EventState3<10) Then
+					If (e\EventState3<11) Then
 						If (Not ChannelPlaying(e\SoundCHN2)) Then
 							e\EventState3 = e\EventState3+1
 							
