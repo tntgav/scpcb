@@ -1665,7 +1665,7 @@ Dim IntroSFX%(20)
 
 Dim AlarmSFX%(5)
 
-Dim CommotionState%(23)
+Dim CommotionState%(25)
 
 Global HeartBeatSFX 
 
