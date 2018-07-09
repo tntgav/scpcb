@@ -7233,7 +7233,7 @@ Function CreateMap()
 		Next
 	Next		
 	
-	r = CreateRoom(0, ROOM1, 0, 0, 8, "gatea")
+	r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, 8, "gatea")
 	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
 	
 	r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, (MapHeight-1) * 8, "pocketdimension")
