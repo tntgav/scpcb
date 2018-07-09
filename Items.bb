@@ -840,7 +840,9 @@ Function Update294()
 		If VomitTimer < -15 Then
 			FreeSound_Strict(VomitSFX)
 			VomitTimer = 0
-			PlaySound_Strict(BreathSFX(0,0))
+			If KillTimer >= 0 Then
+				PlaySound_Strict(BreathSFX(0,0))
+			EndIf
 			Injuries = PrevInjuries
 			Bloodloss = PrevBloodloss
 			Vomit = False

@@ -1610,7 +1610,13 @@ Function UpdateEvents()
 							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
 							RestoreSanity = False
 							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
-							If Sanity < -1000
+							
+							If VomitTimer < 0 Then
+								RestoreSanity = False
+								Sanity = -1010
+							EndIf
+							
+							If Sanity < -1000 Then
 								If WearingNightVision > 1
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
 									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
@@ -1618,7 +1624,9 @@ Function UpdateEvents()
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
 								EndIf
 								EntityTexture(NVOverlay, NVTexture)
-								Kill()
+								If VomitTimer < -10 Then
+									Kill()
+								EndIf
 							ElseIf Sanity < - 800 Then
 								If Rand(3) = 1 Then EntityTexture(NVOverlay, NVTexture)
 								If Rand(6) < 5 Then
@@ -1632,9 +1640,12 @@ Function UpdateEvents()
 											EndIf
 										EndIf
 									Next
-								EndIf	
+								EndIf
 								BlurTimer = 1000
-							ElseIf Sanity < - 500
+								If VomitTimer = 0 Then
+									VomitTimer = 1
+								EndIf
+							ElseIf Sanity < - 500 Then
 								If Rand(7) = 1 Then EntityTexture(NVOverlay, NVTexture)
 								If Rand(50) = 1 Then
 									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))

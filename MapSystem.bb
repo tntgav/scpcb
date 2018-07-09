@@ -5940,15 +5940,22 @@ Function UpdateSecurityCams()
 									DebugLog Sanity
 									RestoreSanity = False
 								EndIf
-								
-								If Sanity < (-1000) Then 
-									DeathMSG = Chr(34)+"What we know is that he died of cardiac arrest. My guess is that it was caused by SCP-895, although it has never been observed affecting video equipment from this far before. "
-									DeathMSG = DeathMSG + "Further testing is needed to determine whether SCP-895's "+Chr(34)+"Red Zone"+Chr(34)+" is increasing."+Chr(34)
-									
-									Kill()				
-								EndIf
 							EndIf
 						EndIf
+					EndIf
+					
+					If Sanity < (-1000) Then 
+						DeathMSG = Chr(34)+"What we know is that he died of cardiac arrest. My guess is that it was caused by SCP-895, although it has never been observed affecting video equipment from this far before. "
+						DeathMSG = DeathMSG + "Further testing is needed to determine whether SCP-895's "+Chr(34)+"Red Zone"+Chr(34)+" is increasing."+Chr(34)
+						
+						If VomitTimer < -10 Then
+							Kill()
+						EndIf
+					EndIf
+					
+					If VomitTimer < 0 Then
+						RestoreSanity = False
+						Sanity = -1010
 					EndIf
 					
 					;If ((sc\State >= sc\RenderInterval And ((Not sc\IsRoom2slCam) Or sc\Room2slID=CurrRoom2slRenderCam))) Or sc\RenderInterval=666 Then
@@ -6041,6 +6048,9 @@ Function UpdateSecurityCams()
 										If sc\CoffinEffect=3 And Rand(200)=1 Then sc\CoffinEffect=2 : sc\PlayerState = Rand(10000, 20000)
 									End If	
 									BlurTimer = 1000
+									If VomitTimer = 0 Then
+										VomitTimer = 1
+									EndIf
 								ElseIf Sanity < - 500
 									If Rand(7) = 1 Then EntityTexture(sc\ScrOverlay, MonitorTexture)
 									If Rand(50) = 1 Then
