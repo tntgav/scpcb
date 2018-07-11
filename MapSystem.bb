@@ -3879,7 +3879,7 @@ Function FillRoom(r.Rooms)
 			EntityParent(r\Objects[2], r\obj)
 			EntityParent(r\Objects[3], r\obj)
 			
-			it = CreateItem("Note", "paper", r\x +954.0 * RoomScale, r\y +228.0 * RoomScale, r\z + 127.0 * RoomScale)
+			it = CreateItem("Addendum: 5/14 Test Log", "paper", r\x +954.0 * RoomScale, r\y +228.0 * RoomScale, r\z + 127.0 * RoomScale)
 			EntityParent(it\collider, r\obj)	
 			
 			it = CreateItem("First Aid Kit", "firstaid", r\x + 960.0 * RoomScale, r\y + 112.0 * RoomScale, r\z - 40.0 * RoomScale)
