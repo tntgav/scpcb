@@ -4979,9 +4979,9 @@ Function FillRoom(r.Rooms)
 			;[End Block]
 		Case "dimension1499"
 			;[Block]
-			ent = LoadMesh_Strict("GFX\map\dimension1499\1499object0_cull.b3d",r\obj)
-			EntityType ent,HIT_MAP
-			EntityAlpha ent,0
+			r\Levers[1] = LoadMesh_Strict("GFX\map\dimension1499\1499object0_cull.b3d",r\obj)
+			EntityType r\Levers[1],HIT_MAP
+			EntityAlpha r\Levers[1],0
 			
 			r\Levers[0] = CreatePivot()
 			PositionEntity r\Levers[0],r\x+205.0*RoomScale,r\y+200.0*RoomScale,r\z+2287.0*RoomScale

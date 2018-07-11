@@ -8668,6 +8668,8 @@ Function UpdateDimension1499()
 						;-873, 240, 3588
 						;-873, 240, 2820
 						;that's For second zone
+					Else
+						HideEntity e\room\Levers[1]
 					EndIf
 					
 					For i = 0 To 14
@@ -8805,6 +8807,7 @@ Function UpdateDimension1499()
 					;EndIf
 					
 					If e\room\NPC[0]<>Null Then
+						ShowEntity e\room\Levers[1]
 						If e\EventState3 < 70*30 Then
 							ShouldPlay = 66
 							If NowPlaying = 66 Then
