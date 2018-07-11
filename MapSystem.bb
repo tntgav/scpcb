@@ -2496,6 +2496,9 @@ Function FillRoom(r.Rooms)
 			
 			it = CreateItem("Dr L's Burnt Note", "paper", r\x - 808.0 * RoomScale, 1.0, r\z - 72.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
+			
+			it = CreateItem("The Modular Site Project", "paper", r\x + 622.0*RoomScale, r\y + 125.0*RoomScale, r\z - 73.0*RoomScale)
+			EntityParent(it\collider, r\obj)
 			;[End Block]
 		Case "room2elevator"
 			;[Block]
@@ -2582,9 +2585,6 @@ Function FillRoom(r.Rooms)
 			
 			it = CreateItem("Ballistic Vest", "vest", r\x - 944.0 * RoomScale, r\y + 1652.0 * RoomScale, r\z - 656.0 * RoomScale)
 			EntityParent(it\collider, r\obj) : RotateEntity(it\collider, 0, -90, 0)
-			
-			it = CreateItem("Dr L's Note", "paper", r\x + 800.0 * RoomScale, 88.0 * RoomScale, r\z + 256.0 * RoomScale)
-			EntityParent(it\collider, r\obj)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x+624.0*RoomScale, r\y+1888.0*RoomScale, r\z-312.0*RoomScale, r)
 			sc\angle = 90
@@ -4720,7 +4720,10 @@ Function FillRoom(r.Rooms)
 		Case "room2offices4"
 			;[Block]
 			d.Doors = CreateDoor(0, r\x - 240.0 * RoomScale, 0.0, r\z, 90, r, False)
-			d\open = False : d\AutoClose = False 
+			d\open = False : d\AutoClose = False
+			
+			it = CreateItem("Sticky Note", "paper", r\x - 991.0*RoomScale, r\y - 242.0*RoomScale, r\z + 904.0*RoomScale)
+			EntityParent(it\collider, r\obj)
 			;[End Block]
 		Case "room2sl"
 			;[Block]
@@ -4976,6 +4979,9 @@ Function FillRoom(r.Rooms)
             d = CreateDoor(r\zone,r\x-256.0*RoomScale, 0.0, r\z-752.0*RoomScale,90,r,False,2,3)
             d\locked = True : d\open = False : d\AutoClose = False : d\MTFClose = False : d\DisableWaypoint = True
 			PositionEntity d\buttons[0],r\x-240.0*RoomScale,EntityY(d\buttons[0],True),EntityZ(d\buttons[0],True),True
+			
+			it = CreateItem("Dr L's Note", "paper", r\x - 160.0 * RoomScale, 32.0 * RoomScale, r\z - 353.0 * RoomScale)
+			EntityParent(it\collider, r\obj)
 			;[End Block]
 		Case "dimension1499"
 			;[Block]
