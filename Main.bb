@@ -2511,7 +2511,6 @@ Function InitEvents()
 	CreateEvent("room2fan", "room2_2", 0, 1.0)
 	
 	CreateEvent("room2elevator2", "room2elevator", 0)
-	;CreateEvent("room2elevator", "room2elevator", 0, 1)
 	CreateEvent("room2elevator", "room2elevator", Rand(1,2))
 	
 	CreateEvent("room3storage", "room3storage", 0, 0)

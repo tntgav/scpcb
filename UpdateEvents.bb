@@ -2614,7 +2614,7 @@ Function UpdateEvents()
 					ElseIf e\EventState = 2
 						If EntityDistance(e\room\NPC[0]\Collider,e\room\Objects[1])<2.0 Then
 							e\room\RoomDoors[0]\open = False
-							PlaySound2(CloseDoorSFX(0, 0), Camera, e\room\RoomDoors[0]\obj, 8.0)			
+							PlaySound2(CloseDoorSFX(3, 0), Camera, e\room\RoomDoors[0]\obj, 8.0)			
 							
 							PlaySound_Strict (LoadTempSound("SFX\Room\Room2ElevatorDeath.ogg"))
 							
