@@ -2,7 +2,7 @@ Function UpdateEvents()
 	CatchErrors("Uncaught (UpdateEvents)")
 	Local dist#, i%, temp%, pvt%, strtemp$, j%, k%
 	
-	Local p.Particles, n.NPCs, r.Rooms, e.Events, e2.Events, it.Items, em.Emitters, sc.SecurityCams, sc2.SecurityCams
+	Local p.Particles, n.NPCs, r.Rooms, e.Events, e2.Events, it.Items, it2.Items, em.Emitters, sc.SecurityCams, sc2.SecurityCams
 	
 	Local CurrTrigger$ = ""
 	
@@ -32,10 +32,14 @@ Function UpdateEvents()
 				Else
 					e\room\RoomDoors[4]\locked=False
 					
-					If Curr096\State = 0 Or Curr096\State = 5 Then
-						e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1], e\room\Objects[8], e\room\Objects[9], e)
+					If Curr096 <> Null Then
+						If Curr096\State = 0 Or Curr096\State = 5 Then
+							e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1], e\room\Objects[8], e\room\Objects[9], e)
+						Else
+							e\EventState2 = Update096ElevatorEvent(e,e\EventState2,e\room\RoomDoors[0],e\room\Objects[8])
+						EndIf
 					Else
-						e\EventState2 = Update096ElevatorEvent(e,e\EventState2,e\room\RoomDoors[0],e\room\Objects[8])
+						e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1], e\room\Objects[8], e\room\Objects[9], e)
 					EndIf
 					
 					EntityAlpha Fog, 1.0						
@@ -294,7 +298,7 @@ Function UpdateEvents()
 						End If
 					EndIf
 					
-					If (e\EventState3<10) Then
+					If (e\EventState3<11) Then
 						If (Not ChannelPlaying(e\SoundCHN2)) Then
 							e\EventState3 = e\EventState3+1
 							
@@ -315,14 +319,14 @@ Function UpdateEvents()
 						
 						If i = 0 Then PlaySound_Strict(LoadTempSound("SFX\Room\Intro\PA\scripted\scripted6.ogg"))
 						
-						If (i>0 And i<24) Then
+						If (i>0 And i<26) Then
 							If Not CommotionState(i) Then ;Prevents the same commotion file from playing more then once.
 								PlaySound_Strict(LoadTempSound("SFX\Room\Intro\Commotion\Commotion"+i+".ogg"))
 								CommotionState(i) = True
 							EndIf
 						EndIf
 						
-						If (i>24) Then
+						If (i>26) Then
 							If e\room\NPC[0] <> Null Then RemoveNPC(e\room\NPC[0])
 							;If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
 							;If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
@@ -1519,17 +1523,13 @@ Function UpdateEvents()
 					If PlayerZone > 0 Then 
 						If EntityPitch(e\room\Levers[0],True) > 0 Then ;camera feed on
 							For sc.SecurityCams = Each SecurityCams
-								If (Not sc\SpecialCam)
-									If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" And sc\room\RoomTemplate\Name<>"room205" Then sc\CoffinEffect = 2
-									If sc\room = e\room Then sc\Screen = True
-								EndIf
+								If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" And sc\room\RoomTemplate\Name<>"room205" Then sc\CoffinEffect = 2
+								If sc\room = e\room Then sc\Screen = True
 							Next
 						Else ;camera feed off
 							For sc.SecurityCams = Each SecurityCams
-								If (Not sc\SpecialCam)
-									If sc\CoffinEffect<>1 Then sc\CoffinEffect = 0
-									If sc\room = e\room Then sc\Screen = False
-								EndIf
+								If sc\CoffinEffect<>1 Then sc\CoffinEffect = 0
+								If sc\room = e\room Then sc\Screen = False
 							Next
 						EndIf						
 					EndIf
@@ -1610,7 +1610,13 @@ Function UpdateEvents()
 							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
 							RestoreSanity = False
 							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
-							If Sanity < -1000
+							
+							If VomitTimer < 0 Then
+								RestoreSanity = False
+								Sanity = -1010
+							EndIf
+							
+							If Sanity < -1000 Then
 								If WearingNightVision > 1
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
 									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
@@ -1618,7 +1624,9 @@ Function UpdateEvents()
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
 								EndIf
 								EntityTexture(NVOverlay, NVTexture)
-								Kill()
+								If VomitTimer < -10 Then
+									Kill()
+								EndIf
 							ElseIf Sanity < - 800 Then
 								If Rand(3) = 1 Then EntityTexture(NVOverlay, NVTexture)
 								If Rand(6) < 5 Then
@@ -1632,9 +1640,12 @@ Function UpdateEvents()
 											EndIf
 										EndIf
 									Next
-								EndIf	
+								EndIf
 								BlurTimer = 1000
-							ElseIf Sanity < - 500
+								If VomitTimer = 0 Then
+									VomitTimer = 1
+								EndIf
+							ElseIf Sanity < - 500 Then
 								If Rand(7) = 1 Then EntityTexture(NVOverlay, NVTexture)
 								If Rand(50) = 1 Then
 									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
@@ -1676,19 +1687,15 @@ Function UpdateEvents()
 					
 					If UpdateLever(e\room\Levers[0]) Then
 						For sc.SecurityCams = Each SecurityCams
-							If (Not sc\SpecialCam)
-								If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" Then sc\CoffinEffect = 2
-								If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 3)
-								If sc\room = e\room Then sc\Screen = True
-							EndIf
+							If sc\CoffinEffect=0 And sc\room\RoomTemplate\Name<>"room106" Then sc\CoffinEffect = 2
+							If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 3)
+							If sc\room = e\room Then sc\Screen = True
 						Next
 					Else
 						For sc.SecurityCams = Each SecurityCams
-							If (Not sc\SpecialCam)
-								If sc\CoffinEffect <> 1 Then sc\CoffinEffect = 0
-								If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 0)
-								If sc\room = e\room Then sc\Screen = False
-							EndIf
+							If sc\CoffinEffect <> 1 Then sc\CoffinEffect = 0
+							If sc\CoffinEffect = 1 Then EntityBlend(sc\ScrOverlay, 0)
+							If sc\room = e\room Then sc\Screen = False
 						Next
 					EndIf
 				Else
@@ -1812,10 +1819,14 @@ Function UpdateEvents()
 							EndIf
 						Next
 						
-						If Curr096\State = 0 Or Curr096\State = 5 Then
-							e\EventState = UpdateElevators(e\EventState, e\room\RoomDoors[0], gatea\RoomDoors[1], e\room\Objects[0], e\room\Objects[1], e)
+						If Curr096 <> Null Then
+							If Curr096\State = 0 Or Curr096\State = 5 Then
+								e\EventState = UpdateElevators(e\EventState, e\room\RoomDoors[0], gatea\RoomDoors[1], e\room\Objects[0], e\room\Objects[1], e)
+							Else
+								e\EventState = Update096ElevatorEvent(e,e\EventState,e\room\RoomDoors[0],e\room\Objects[0])
+							EndIf
 						Else
-							e\EventState = Update096ElevatorEvent(e,e\EventState,e\room\RoomDoors[0],e\room\Objects[0])
+							e\EventState = UpdateElevators(e\EventState, e\room\RoomDoors[0], gatea\RoomDoors[1], e\room\Objects[0], e\room\Objects[1], e)
 						EndIf
 						If Contained106 = False Then 
 							If e\EventState < -1.5 And e\EventState+FPSfactor=> -1.5 Then
@@ -2434,6 +2445,7 @@ Function UpdateEvents()
 											RemoveItem(SelectedItem)
 											SelectedItem=Null
 											e\EventState2 = 1
+											PlaySound_Strict LoadTempSound("SFX\SCP\294\coin_drop.ogg")
 										EndIf
 									EndIf
 									If e\EventState2 = 1 Then
@@ -2529,8 +2541,27 @@ Function UpdateEvents()
 						EndIf
 						BlinkTimer = Max((70*6.5-e\EventState)/5.0 - Rnd(0.0,2.0),-10)
 						If BlinkTimer =-10 Then
-							If e\EventState > 70*7.5 And e\EventState-FPSfactor =< 70*7.5 Then PlaySound2(NeckSnapSFX(0),Camera,e\room\NPC[0]\Collider,8.0)
-							If e\EventState > 70*8.0 And e\EventState-FPSfactor =< 70*8.0 Then PlaySound2(NeckSnapSFX(1),Camera,e\room\NPC[1]\Collider,8.0)
+							If e\EventState > 70*7.5 And e\EventState-FPSfactor =< 70*7.5 Then
+								PlaySound2(NeckSnapSFX(0),Camera,e\room\NPC[0]\Collider,8.0)
+								;Wallet spawning (with 3 coins)
+								it.Items = CreateItem("Wallet","wallet",EntityX(e\room\NPC[0]\Collider,True),EntityY(e\room\NPC[0]\Collider,True),EntityZ(e\room\NPC[0]\Collider,True))
+								EntityType(it\collider, HIT_ITEM)
+								PointEntity it\collider,e\room\NPC[1]\Collider
+								MoveEntity it\collider,-0.4,0,-0.2
+								TeleportEntity(it\collider,EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),-0.02,True,10)
+								For i = 0 To 2
+									it2.Items = CreateItem("50 Cent Coin","50ct",1,1,1)
+									it2\Picked = True
+									it2\Dropped = -1
+									it2\itemtemplate\found=True
+									it\SecondInv[i] = it2
+									HideEntity(it2\collider)
+									EntityType(it2\collider, HIT_ITEM)
+								Next
+							EndIf
+							If e\EventState > 70*8.0 And e\EventState-FPSfactor =< 70*8.0 Then
+								PlaySound2(NeckSnapSFX(1),Camera,e\room\NPC[1]\Collider,8.0)
+							EndIf
 							SetNPCFrame e\room\NPC[0], 60
 							e\room\NPC[0]\State=8
 							
@@ -2583,7 +2614,7 @@ Function UpdateEvents()
 					ElseIf e\EventState = 2
 						If EntityDistance(e\room\NPC[0]\Collider,e\room\Objects[1])<2.0 Then
 							e\room\RoomDoors[0]\open = False
-							PlaySound2(CloseDoorSFX(0, 0), Camera, e\room\RoomDoors[0]\obj, 8.0)			
+							PlaySound2(CloseDoorSFX(3, 0), Camera, e\room\RoomDoors[0]\obj, 8.0)			
 							
 							PlaySound_Strict (LoadTempSound("SFX\Room\Room2ElevatorDeath.ogg"))
 							
@@ -2674,6 +2705,19 @@ Function UpdateEvents()
 					
 					e\EventState = UpdateLever(e\room\Objects[1])
 					UpdateLever(e\room\Objects[3])
+				EndIf
+				
+				If e\EventState3 = 0 Then
+					n.NPCs = CreateNPC(NPCtypeD,EntityX(e\room\Objects[6],True),0.5,EntityZ(e\room\Objects[6],True))
+					RotateEntity n\Collider,0,e\room\angle+90,0
+					n\State = 3
+					SetNPCFrame(n,40)
+					n\IsDead = True
+					n\texture = "GFX\npcs\body2.jpg"
+					tex = LoadTexture_Strict(n\texture)
+					EntityTexture(n\obj, tex)
+					FreeTexture tex
+					e\EventState3 = 1
 				EndIf
 				;[End Block]
 			Case "room2offices2"
@@ -2967,7 +3011,7 @@ Function UpdateEvents()
 							
 							BlinkTimer = -10
 							
-							PlaySound_Strict DripSFX(0);HorrorSFX(11)
+							PlaySound_Strict HorrorSFX(11);DripSFX(0)
 							
 							PositionEntity Collider, EntityX(pvt),EntityY(pvt)+0.05,EntityZ(pvt)
 							UpdateWorld()
@@ -3287,7 +3331,7 @@ Function UpdateEvents()
 									End Select
 									
 									If e\room\grid\grid[ix+(iy*gridsz)]=6 Or e\room\grid\grid[ix+(iy*gridsz)]=5 Then
-										dr=CreateDoor(e\room\zone,e\room\x+(ix*2.0)+(Cos(EntityYaw(tempInt,True))*240.0*RoomScale),8.0,e\room\z+(iy*2.0)+(Sin(EntityYaw(tempInt,True))*240.0*RoomScale),EntityYaw(tempInt,True)+90.0,Null,False,False,False,"")
+										dr=CreateDoor(e\room\zone,e\room\x+(ix*2.0)+(Cos(EntityYaw(tempInt,True))*240.0*RoomScale),8.0,e\room\z+(iy*2.0)+(Sin(EntityYaw(tempInt,True))*240.0*RoomScale),EntityYaw(tempInt,True)+90.0,Null,False,3,False,"")
 										PositionEntity dr\buttons[0],EntityX(dr\buttons[0],True)+(Cos(EntityYaw(tempInt,True))*0.05),EntityY(dr\buttons[0],True)+0.0,EntityZ(dr\buttons[0],True)+(Sin(EntityYaw(tempInt,True))*0.05),True
 										
 										AddLight%(Null, e\room\x+ix*2.0+(Cos(EntityYaw(tempInt,True))*555.0*RoomScale), 8.0+(469.0*RoomScale), e\room\z+iy*2.0+(Sin(EntityYaw(tempInt,True))*555.0*RoomScale), 2, 600.0 * RoomScale, 255, 255, 255)
@@ -3497,7 +3541,7 @@ Function UpdateEvents()
 									End Select
 									
 									If e\room\grid\grid[ix+(iy*gridsz)]=6 Or e\room\grid\grid[ix+(iy*gridsz)]=5 Then
-										dr=CreateDoor(e\room\zone,e\room\x+(ix*2.0)+(Cos(EntityYaw(tempInt,True))*240.0*RoomScale),8.0,e\room\z+(iy*2.0)+(Sin(EntityYaw(tempInt,True))*240.0*RoomScale),EntityYaw(tempInt,True)+90.0,Null,False,False,False,"")
+										dr=CreateDoor(e\room\zone,e\room\x+(ix*2.0)+(Cos(EntityYaw(tempInt,True))*240.0*RoomScale),8.0,e\room\z+(iy*2.0)+(Sin(EntityYaw(tempInt,True))*240.0*RoomScale),EntityYaw(tempInt,True)+90.0,Null,False,3,False,"")
 										
 										AddLight%(Null, e\room\x+ix*2.0+(Cos(EntityYaw(tempInt,True))*555.0*RoomScale), 8.0+(469.0*RoomScale), e\room\z+iy*2.0+(Sin(EntityYaw(tempInt,True))*555.0*RoomScale), 2, 600.0 * RoomScale, 255, 255, 255)
 										
@@ -6796,8 +6840,8 @@ Function UpdateEvents()
 								SpriteViewMode(e\room\Objects[2],2)
 								ScaleSprite(e\room\Objects[2],182.0*RoomScale*0.5, 192.0*RoomScale*0.5)
 								pvt% = CreatePivot(e\room\obj)
-								PositionEntity pvt%,-595.0,224.0,-208.0,False
-								;PositionEntity(e\room\Objects[2], e\room\x - 595.0 * RoomScale, 224.0*RoomScale, e\room\z - 208.0 * RoomScale)
+								;PositionEntity pvt%,-595.0,224.0,-208.0,False
+								PositionEntity pvt%,-632.0,224.0,-208.0,False
 								PositionEntity(e\room\Objects[2], EntityX(pvt,True), EntityY(pvt,True), EntityZ(pvt,True))
 								FreeEntity pvt
 								RotateEntity e\room\Objects[2],0,e\room\angle,0
@@ -6929,7 +6973,7 @@ Function UpdateEvents()
 									
 									If MouseDown1 Then
 										DrawArrowIcon(2) = True
-										RotateEntity(e\room\Objects[1], Max(Min(EntityPitch(e\room\Objects[1])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Objects[1]), 0)
+										RotateEntity(e\room\Levers[0], Max(Min(EntityPitch(e\room\Levers[0])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Levers[0]), 0)
 									EndIf
 								EndIf
 							EndIf
@@ -6942,7 +6986,7 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 						
-						If EntityPitch(e\room\Objects[1],True)<40 Then 
+						If EntityPitch(e\room\Levers[0],True)<40 Then 
 							e\EventState = 2
 							PlaySound_Strict LeverSFX
 						Else
@@ -6959,9 +7003,9 @@ Function UpdateEvents()
 						e\room\RoomDoors[1]\locked = False
 						e\room\RoomDoors[2]\locked = False
 						
-						RotateEntity (e\room\Objects[1],CurveAngle(1,EntityPitch(e\room\Objects[1],True),15.0),EntityYaw(e\room\Objects[1],True),0,True)
+						RotateEntity (e\room\Levers[0],CurveAngle(1,EntityPitch(e\room\Levers[0],True),15.0),EntityYaw(e\room\Levers[0],True),0,True)
 						
-						If EntityPitch(e\room\Objects[1],True)=<1.0 Then
+						If EntityPitch(e\room\Levers[0],True)=<1.0 Then
 							RemoveEvent(e)
 						EndIf
 					EndIf
@@ -7144,6 +7188,7 @@ Function UpdateEvents()
 													If Abs(EntityY(it\collider) - (e\room\y + 648.0 * RoomScale)) < 104.0 Then
 														e\EventState = 1
 														e\SoundCHN = PlaySound2(MachineSFX, Camera, e\room\Objects[1])
+														e\room\RoomDoors[1]\SoundCHN = PlaySound2(LoadTempSound("SFX\SCP\914\DoorClose.ogg"), Camera, e\room\RoomDoors[1]\obj)
 														Exit
 													EndIf
 												End If
@@ -7217,6 +7262,10 @@ Function UpdateEvents()
 						
 						e\room\RoomDoors[1]\open = False
 						If e\EventState > 70 * 2 Then
+							If e\room\RoomDoors[0]\open=True Then
+								e\room\RoomDoors[0]\SoundCHN = PlaySound2(LoadTempSound("SFX\SCP\914\DoorClose.ogg"), Camera, e\room\RoomDoors[0]\obj)
+							EndIf
+							
 							e\room\RoomDoors[0]\open = False
 						EndIf
 						
@@ -7285,10 +7334,15 @@ Function UpdateEvents()
 							e\room\RoomDoors[1]\open = True
 							RotateEntity(e\room\Objects[0], 0, 0, 0)
 							e\EventState = 0
+							
+							Local opensfx914 = LoadTempSound("SFX\SCP\914\DoorOpen.ogg")
+							e\room\RoomDoors[0]\SoundCHN = PlaySound2(opensfx914, Camera, e\room\RoomDoors[0]\obj)
+							e\room\RoomDoors[1]\SoundCHN = PlaySound2(opensfx914, Camera, e\room\RoomDoors[1]\obj)
 						End If
 					End If
 					
 				EndIf
+				UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[1])
 				;[End Block]
 			Case "1048a"
 				;[Block]
@@ -7836,7 +7890,7 @@ Function UpdateEvents()
 				;e\EventState2: Variable used for the SCP-049 event
 				;e\EventState3: Checks if Lever is activated or not
 				
-				;Camera-Spawning Code + SCP-049-Spawning (will now be loaded in a pointer)
+				;Camera-Spawning Code + SCP-049-Spawning (will now be loaded in the QuickLoadEvents function)
 				;[Block]
 				If PlayerRoom = e\room
 					If e\EventStr = "" And QuickLoadPercent = -1
@@ -7980,12 +8034,14 @@ Function UpdateEvents()
 										e\room\NPC[0]\PrevState = 2
 										DebugLog "Path2"
 									Case 3
-										;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True),EntityZ(e\room\Objects[7],True))
-										;e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\obj,True),EntityY(e\room\Objects[7],True),EntityZ(e\room\obj,True))
-										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],e\room\NPC[0]\PathX,0.1,e\room\NPC[0]\PathZ)
-										e\room\NPC[0]\PrevState = 1
+										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(e\room\Objects[17],True),EntityY(e\room\Objects[17],True),EntityZ(e\room\Objects[17],True))
+										e\room\NPC[0]\PrevState = 2
 										DebugLog "Path3"
 									Case 4
+										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],e\room\NPC[0]\PathX,0.1,e\room\NPC[0]\PathZ)
+										e\room\NPC[0]\PrevState = 2
+										DebugLog "Path4"
+									Case 5
 										e\EventState2 = 5
 								End Select
 								e\room\NPC[0]\PathTimer# = 0.0
@@ -7995,7 +8051,7 @@ Function UpdateEvents()
 					ElseIf e\EventState2 = 4
 						If e\room\NPC[0]\State <> 5
 							e\EventState2 = 7
-							e\room\NPC[0]\State3 = 5.0
+							e\room\NPC[0]\State3 = 6.0
 							DebugLog "fffffffff"
 						EndIf
 					ElseIf e\EventState2 = 5
@@ -8018,7 +8074,9 @@ Function UpdateEvents()
 							e\EventState2 = 7
 						Else
 							;Still playing the Music for SCP-049 (in the real, SCP-049's State will be set to 2, causing it to stop playing the chasing track)
-							ShouldPlay = 20
+							If PlayerRoom = e\room Then
+								ShouldPlay = 20
+							EndIf
 							If e\room\NPC[0]\PathStatus<>1
 								e\room\NPC[0]\Idle = 70*60 ;(Making SCP-049 idle for one minute (twice as fast for aggressive NPCs = True))
 								PositionEntity e\room\NPC[0]\Collider,0,500,0
@@ -8072,71 +8130,76 @@ Function UpdateEvents()
 				EndIf
 				;[End Block]
 				
-				;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint needs to be locked again)
-				If PlayerRoom = e\room
+				;Other code
+				;[Block]
+				If PlayerRoom = e\room Then
+					;Lever for checkpoint locking (might have a function in the future for the case if the checkpoint needs to be locked again)
 					e\EventState3 = UpdateLever(e\room\Levers[0])
 					If e\EventState3 = 1 Then
 						UpdateCheckpointMonitors(0)
+						If MonitorTimer# < 50 Then
+							EntityTexture e\room\Objects[20],e\room\Textures[0],1
+						Else
+							EntityTexture e\room\Objects[20],e\room\Textures[0],2
+						EndIf
 					Else
 						TurnCheckpointMonitorsOff(0)
+						EntityTexture e\room\Objects[20],e\room\Textures[0],0
+					EndIf
+					
+					;Checking if the monitors and such should be rendered or not
+					If Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(Collider))>1.0 Then
+						For i = 0 To 14
+							If e\room\Objects[i]<>0 And i<>7 Then
+								ShowEntity e\room\Objects[i]
+							EndIf
+						Next
+						For sc.SecurityCams = Each SecurityCams
+							If sc\room = e\room Then
+								If sc\ScrObj<>0
+									ShowEntity sc\ScrObj
+								EndIf
+								If sc\ScrOverlay<>0
+									ShowEntity sc\ScrOverlay
+								EndIf
+								Exit
+							EndIf
+						Next
+						For i = 0 To 3
+							If PlayerRoom\Adjacent[i]<>Null Then
+								EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
+							EndIf
+						Next
+					Else
+						For i = 0 To 14
+							If e\room\Objects[i]<>0 And i<>7 Then
+								HideEntity e\room\Objects[i]
+							EndIf
+						Next
+						For sc.SecurityCams = Each SecurityCams
+							If sc\room = e\room Then
+								If sc\ScrObj<>0
+									HideEntity sc\ScrObj
+								EndIf
+								If sc\ScrOverlay<>0
+									HideEntity sc\ScrOverlay
+								EndIf
+								Exit
+							EndIf
+						Next
 					EndIf
 				EndIf
 				
-				;Checking if the monitors and such should be rendered or not
-				If PlayerRoom = e\room And Abs(EntityY(e\room\RoomDoors[0]\frameobj)-EntityY(Collider))>1.0
-					For i = 0 To 14
-						If e\room\Objects[i]<>0
-							ShowEntity e\room\Objects[i]
+				For e2.Events = Each Events
+					If e2\EventName = "008"
+						If e2\EventState = 2
+							EntityTexture e\room\Objects[21],e\room\Textures[0],3
+						Else
+							EntityTexture e\room\Objects[21],e\room\Textures[1],6
 						EndIf
-					Next
-					For sc.SecurityCams = Each SecurityCams
-						If sc\IsRoom2slCam
-							If sc\ScrObj<>0
-								ShowEntity sc\ScrObj
-							EndIf
-							If sc\ScrOverlay<>0
-								ShowEntity sc\ScrOverlay
-							EndIf
-						EndIf
-						If sc\room = e\room
-							If sc\ScrObj<>0
-								ShowEntity sc\ScrObj
-							EndIf
-							If sc\ScrOverlay<>0
-								ShowEntity sc\ScrOverlay
-							EndIf
-						EndIf
-					Next
-					For i = 0 To 3
-						If PlayerRoom\Adjacent[i]<>Null
-							EntityAlpha(GetChild(PlayerRoom\Adjacent[i]\obj,2),0)
-						EndIf
-					Next
-				Else
-					For i = 0 To 14
-						If e\room\Objects[i]<>0
-							HideEntity e\room\Objects[i]
-						EndIf
-					Next
-					For sc.SecurityCams = Each SecurityCams
-						If sc\IsRoom2slCam
-							If sc\ScrObj<>0
-								HideEntity sc\ScrObj
-							EndIf
-							If sc\ScrOverlay<>0
-								HideEntity sc\ScrOverlay
-							EndIf
-						EndIf
-						If sc\room = e\room
-							If sc\ScrObj<>0
-								HideEntity sc\ScrObj
-							EndIf
-							If sc\ScrOverlay<>0
-								HideEntity sc\ScrOverlay
-							EndIf
-						EndIf
-					Next
-				EndIf
+					EndIf
+				Next
+				;[End Block]
 				
 				;[End Block]
 			Case "096spawn"
@@ -8189,7 +8252,7 @@ Function UpdateEvents()
 						EndIf
 						For e2.Events = Each Events
 							If e2\EventName = "room2servers"
-								If e2\EventState = 0 And (Abs(e2\room\dist-e\room\dist)<HideDistance)
+								If e2\EventState = 0 ;And (Abs(e2\room\dist-e\room\dist)<HideDistance)
 									e\EventState = 2
 									DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 									DebugLog "- room2servers event not activated + room is too close to room2servers"
@@ -8317,6 +8380,12 @@ Function UpdateEvents()
 					EndIf
 				EndIf
 				If e\EventState = 2.0
+					If e\SoundCHN<>0 Then
+						StopStream_Strict(e\SoundCHN)
+						StopChannel(e\SoundCHN2)
+						e\SoundCHN = 0
+						e\SoundCHN2 = 0
+					EndIf
 					HideEntity NTF_1499Sky
 					HideChunks()
 					For n.NPCs = Each NPCs
@@ -8329,7 +8398,14 @@ Function UpdateEvents()
 						FreeEntity(du\obj)
 						Delete du
 					Next
+					If e\EventState3 < 70*30 Then
+						e\EventState3 = 0.0
+					EndIf
 					e\EventState = 1.0
+					If e\Sound2 <> 0 Then
+						FreeSound_Strict e\Sound2
+						e\Sound2 = 0
+					EndIf
 				EndIf
 				;[End Block]
 			Case "room2offices035"
@@ -8381,6 +8457,19 @@ Function UpdateEvents()
 					e\room\RoomDoors[0]\KeyCard = e\EventState
 				EndIf
 				;[End Block]
+			Case "room2shaft"
+                ;[Block]
+                If e\EventState = 0 Then
+                    e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[1],True), EntityY(e\room\Objects[1],True)+0.5, EntityZ(e\room\Objects[1],True))
+                    RotateEntity e\room\NPC[0]\Collider, 0, e\room\angle+180,0, True
+					
+                    SetNPCFrame (e\room\NPC[0], 286)
+                    e\room\NPC[0]\State = 8
+                    
+                    e\EventState = 1
+                    RemoveEvent(e)
+                EndIf
+                ;[End Block]
 		End Select
 		
 		If e<>Null Then
@@ -8483,99 +8572,112 @@ Function UpdateDimension1499()
 						Next
 						e\EventState2 = 5
 					EndIf
-					;Guards at the entrance to church
-					n.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+1884.0*RoomScale)
-					n\PrevState = 3
-					n\Angle = 270
-					RotateEntity n\Collider,0,n\Angle,0
-					n2.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+2876.0*RoomScale)
-					n2\PrevState = 3
-					n2\Angle = 270
-					RotateEntity n2\Collider,0,n2\Angle,0
-					n\Target = n2
-					n2\Target = n
-					e\room\NPC[2] = n
-					e\room\NPC[3] = n2
-					;Guard at stairs
-					n.NPCs = CreateNPC(NPCtype1499,e\room\x-2761.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+3204.0*RoomScale)
-					n\PrevState = 1
-					n\Angle = 180
-					RotateEntity n\Collider,0,n\Angle,0
-					;King
-					n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2308.0*RoomScale)
-					n\PrevState = 2
-					n\Angle = 270
-					RotateEntity n\Collider,0,n\Angle,0
-					tex = LoadTexture_Strict("GFX\npcs\1499_King.jpg")
-					EntityTexture n\obj,tex
-					FreeTexture tex
-					e\room\NPC[0] = n
-					;Guard next to king
-					n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2052.0*RoomScale)
-					n\PrevState = 1
-					n\Angle = 270
-					RotateEntity n\Collider,0,n\Angle,0
-					e\room\NPC[1] = n
-					;1499-1 instances praying in church
-					;Zone 1
-					For x=0 To 7
-						For y=0 To 2
-							du = New Dummy1499
-							For n.NPCs = Each NPCs
-								If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
-									du\obj = CopyEntity(n\obj)
-									Exit
-								EndIf
+					If e\EventState3 < 70*30 Then
+						;Guards at the entrance to church
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+1884.0*RoomScale)
+						n\PrevState = 3
+						n\Angle = 270
+						RotateEntity n\Collider,0,n\Angle,0
+						n2.NPCs = CreateNPC(NPCtype1499,e\room\x+4055.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+2876.0*RoomScale)
+						n2\PrevState = 3
+						n2\Angle = 270
+						RotateEntity n2\Collider,0,n2\Angle,0
+						n\Target = n2
+						n2\Target = n
+						e\room\NPC[2] = n
+						e\room\NPC[3] = n2
+						;Guard at stairs
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x-2761.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+3204.0*RoomScale)
+						n\PrevState = 1
+						n\Angle = 180
+						RotateEntity n\Collider,0,n\Angle,0
+						n\Speed = 0.0
+						;King
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2308.0*RoomScale)
+						n\PrevState = 2
+						n\Angle = 270
+						RotateEntity n\Collider,0,n\Angle,0
+						tex = LoadTexture_Strict("GFX\npcs\1499_King.jpg")
+						EntityTexture n\obj,tex
+						FreeTexture tex
+						e\room\NPC[0] = n
+						;Guard next to king
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x-1917.0*RoomScale,e\room\y+1904.0*RoomScale,e\room\z+2052.0*RoomScale)
+						n\PrevState = 1
+						n\Angle = 270
+						RotateEntity n\Collider,0,n\Angle,0
+						e\room\NPC[1] = n
+						;1499-1 instances praying in church
+						;Zone 1
+						For x=0 To 7
+							For y=0 To 2
+								du = New Dummy1499
+								For n.NPCs = Each NPCs
+									If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
+										du\obj = CopyEntity(n\obj)
+										Exit
+									EndIf
+								Next
+								scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
+								ScaleEntity du\obj, scale#,scale#,scale#
+								EntityFX du\obj,1
+								du\anim = Rand(0,1)
+								;2560=x		768=z
+								;1687.0
+								PositionEntity du\obj,Max(Min((e\room\x+(1887.0-((2560.0/7.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1887.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(1796.0-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+1796.0*RoomScale),e\room\z+1028.0*RoomScale)
+								RotateEntity du\obj,0,270,0
+								EntityAutoFade du\obj,25,39
 							Next
-							scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
-							ScaleEntity du\obj, scale#,scale#,scale#
-							EntityFX du\obj,1
-							du\anim = Rand(0,1)
-							;2560=x		768=z
-							;1687.0
-							PositionEntity du\obj,Max(Min((e\room\x+(1887.0-((2560.0/7.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1887.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(1796.0-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+1796.0*RoomScale),e\room\z+1028.0*RoomScale)
-							RotateEntity du\obj,0,270,0
 						Next
-					Next
-					;Zone 2
-					For x=0 To 6
-						For y=0 To 2
-							du = New Dummy1499
-							For n.NPCs = Each NPCs
-								If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
-									du\obj = CopyEntity(n\obj)
-									Exit
-								EndIf
+						;Zone 2
+						For x=0 To 6
+							For y=0 To 2
+								du = New Dummy1499
+								For n.NPCs = Each NPCs
+									If n\NPCtype = NPCtype1499 And n\PrevState<>2 Then
+										du\obj = CopyEntity(n\obj)
+										Exit
+									EndIf
+								Next
+								scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
+								ScaleEntity du\obj, scale#,scale#,scale#
+								EntityFX du\obj,1
+								du\anim = Rand(0,1)
+								;2048=x		768=z
+								;1175.0
+								PositionEntity du\obj,Max(Min((e\room\x+(1375.0-((2048.0/6.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1375.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(3588-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+3588.0*RoomScale),e\room\z+2820.0*RoomScale)
+								RotateEntity du\obj,0,270,0
+								EntityAutoFade du\obj,25,39
 							Next
-							scale# = (GetINIFloat("DATA\NPCs.ini", "SCP-1499-1", "scale") / 4.0) * Rnd(0.8,1.0)
-							ScaleEntity du\obj, scale#,scale#,scale#
-							EntityFX du\obj,1
-							du\anim = Rand(0,1)
-							;2048=x		768=z
-							;1175.0
-							PositionEntity du\obj,Max(Min((e\room\x+(1375.0-((2048.0/6.0)*x))*RoomScale)+Rnd(-0.5,0.5),e\room\x+1375.0*RoomScale),e\room\x-873.0*RoomScale),e\room\y,Max(Min((e\room\z+(3588-(384.0*y))*RoomScale)+Rnd(-0.5,0.5),e\room\z+3588.0*RoomScale),e\room\z+2820.0*RoomScale)
-							RotateEntity du\obj,0,270,0
 						Next
+						;4055, 240, 2084
+						;4055, 240, 3076
+						;-2761, 240, 3204 for stairs guard
+						;-1449, 240, 1092
+						;-1449, 240, 3524
+						;-1917, 1904, 2052 - guard
+						;-1917, 1904, 2308 - king
+						
+						;1687, 240, 1028
+						;1687, 240, 1796
+						;-873, 240, 1796
+						;-873, 240, 1028
+						;that's the First zone
+						;1175, 240, 2820
+						;1175, 240, 3588
+						;-873, 240, 3588
+						;-873, 240, 2820
+						;that's For second zone
+					Else
+						HideEntity e\room\Levers[1]
+					EndIf
+					
+					For i = 0 To 14
+						n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(-20,20),EntityY(Collider)+0.1,EntityZ(Collider)+Rnd(-20,20))
+						If Rand(2)=1 Then n\State2 = 500*3
+						n\Angle = Rnd(360)
 					Next
 				EndIf
-				;4055, 240, 2084
-				;4055, 240, 3076
-				;-2761, 240, 3204 for stairs guard
-				;-1449, 240, 1092
-				;-1449, 240, 3524
-				;-1917, 1904, 2052 - guard
-				;-1917, 1904, 2308 - king
-				
-				;1687, 240, 1028
-				;1687, 240, 1796
-				;-873, 240, 1796
-				;-873, 240, 1028
-				;that's the First zone
-				;1175, 240, 2820
-				;1175, 240, 3588
-				;-873, 240, 3588
-				;-873, 240, 2820
-				;that's For second zone
 				
 				;PositionEntity e\room\Objects[0],0,800,0
 				If (Not DebugHUD)
@@ -8613,36 +8715,57 @@ Function UpdateDimension1499()
 						EndIf
 					Next
 					For du = Each Dummy1499
-						If du\anim=0 Then
-							;321-361
-							If AnimTime(du\obj)<=360.5 Then
-								Animate2(du\obj,AnimTime(du\obj),321,361,0.2,False)
-							;362-402
-							ElseIf AnimTime(du\obj)>361.5 And AnimTime(du\obj)<=401.5 Then
-								Animate2(du\obj,AnimTime(du\obj),362,402,0.2,False)
-							Else
-								temp = Rand(0,1)
-								If temp=0 Then
-									SetAnimTime(du\obj,321)
+						If e\EventState3 < 70*30 Then
+							If du\anim=0 Then
+								;321-361
+								If AnimTime(du\obj)<=360.5 Then
+									Animate2(du\obj,AnimTime(du\obj),321,361,0.2,False)
+								;362-402
+								ElseIf AnimTime(du\obj)>361.5 And AnimTime(du\obj)<=401.5 Then
+									Animate2(du\obj,AnimTime(du\obj),362,402,0.2,False)
 								Else
-									SetAnimTime(du\obj,362)
+									temp = Rand(0,1)
+									If temp=0 Then
+										SetAnimTime(du\obj,321)
+									Else
+										SetAnimTime(du\obj,362)
+									EndIf
+								EndIf
+							Else
+								;413-453
+								If AnimTime(du\obj)<=452.5 Then
+									Animate2(du\obj,AnimTime(du\obj),413,453,0.2,False)
+								;454-498
+								ElseIf AnimTime(du\obj)>453.5 And AnimTime(du\obj)<=497.5 Then
+									Animate2(du\obj,AnimTime(du\obj),454,498,0.2,False)
+								Else
+									temp = Rand(0,1)
+									If temp=0 Then
+										SetAnimTime(du\obj,413)
+									Else
+										SetAnimTime(du\obj,454)
+									EndIf
 								EndIf
 							EndIf
 						Else
-							;413-453
-							If AnimTime(du\obj)<=452.5 Then
-								Animate2(du\obj,AnimTime(du\obj),413,453,0.2,False)
-							;454-498
-							ElseIf AnimTime(du\obj)>453.5 And AnimTime(du\obj)<=497.5 Then
-								Animate2(du\obj,AnimTime(du\obj),454,498,0.2,False)
-							Else
-								temp = Rand(0,1)
-								If temp=0 Then
-									SetAnimTime(du\obj,413)
+							If du\anim=0 Then
+								If AnimTime(du\obj)<=411.5 And AnimTime(du\obj)>320.5 Then
+									Animate2(du\obj,AnimTime(du\obj),403,412,0.2,False)
 								Else
-									SetAnimTime(du\obj,454)
+									Animate2(du\obj,AnimTime(du\obj),296,320,0.2,True)
+								EndIf
+							Else
+								If AnimTime(du\obj)<=507.5 And AnimTime(du\obj)>320.5 Then
+									Animate2(du\obj,AnimTime(du\obj),499,508,0.2,False)
+								Else
+									Animate2(du\obj,AnimTime(du\obj),296,320,0.2,True)
 								EndIf
 							EndIf
+							Local pvt = CreatePivot()
+							PositionEntity pvt,EntityX(du\obj),EntityY(du\obj),EntityZ(du\obj),True
+							PointEntity pvt,Collider
+							RotateEntity du\obj,0,CurveAngle(EntityYaw(pvt),EntityYaw(du\obj)-180,10.0)+180,0
+							FreeEntity pvt
 						EndIf
 					Next
 					;-56,0,2287
@@ -8677,29 +8800,52 @@ Function UpdateDimension1499()
 						EndIf
 					EndIf
 					
-					If Abs(EntityX(Collider)-(e\room\x-56.0*RoomScale))<2160.0*RoomScale Then
-						If Abs(EntityZ(Collider)-(e\room\z+2287.0*RoomScale))<1408.0*RoomScale Then
+					;If Abs(EntityX(Collider)-(e\room\x-56.0*RoomScale))<2160.0*RoomScale Then
+					;	If Abs(EntityZ(Collider)-(e\room\z+2287.0*RoomScale))<1408.0*RoomScale Then
+					;		ShouldPlay = 66
+					;	EndIf
+					;EndIf
+					
+					If e\room\NPC[0]<>Null Then
+						ShowEntity e\room\Levers[1]
+						If e\EventState3 < 70*30 Then
 							ShouldPlay = 66
+							If NowPlaying = 66 Then
+								If e\SoundCHN = 0 Then
+									e\Sound2 = LoadSound_Strict("SFX\Music\HaveMercyOnMe(Choir).ogg")
+									e\SoundCHN = StreamSound_Strict("SFX\Music\HaveMercyOnMe(NoChoir).ogg",MusicVolume)
+									e\SoundCHN_isStream = True
+								EndIf
+								;If e\SoundCHN2<>0 Then
+								;	UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
+								;EndIf
+							EndIf
+							If e\Sound2<>0 Then
+								e\SoundCHN2 = LoopSound2(e\Sound2,e\SoundCHN2,Camera,e\room\Levers[0],10,MusicVolume)
+							EndIf
+						Else
+							ShouldPlay = 19
+							If e\SoundCHN<>0 Then
+								StopStream_Strict(e\SoundCHN)
+								StopChannel(e\SoundCHN2)
+								e\SoundCHN = 0
+								e\SoundCHN2 = 0
+							EndIf
+							If e\Sound2 <> 0 Then
+								FreeSound_Strict e\Sound2
+								e\Sound2 = 0
+							EndIf
 						EndIf
 					EndIf
 					
-					If NowPlaying<>66 Then
-						If e\SoundCHN<>0 Then
-							StopStream_Strict(e\SoundCHN)
-							StopStream_Strict(e\SoundCHN2)
-							e\SoundCHN = 0
-							e\SoundCHN2 = 0
-						EndIf
+					If EntityDistance(Collider,e\room\obj)>40.0
+						For du.Dummy1499 = Each Dummy1499
+							HideEntity du\obj
+						Next
 					Else
-						If e\SoundCHN = 0 Then
-							e\SoundCHN = StreamSound_Strict("SFX\Music\HaveMercyOnMe(NoChoir).ogg",MusicVolume)
-							e\SoundCHN2 = StreamSound_Strict("SFX\Music\HaveMercyOnMe(Choir).ogg",0.0)
-							e\SoundCHN_isStream = True
-							e\SoundCHN2_isStream = True
-						EndIf
-						If e\SoundCHN2<>0 Then
-							UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
-						EndIf
+						For du.Dummy1499 = Each Dummy1499
+							ShowEntity du\obj
+						Next
 					EndIf
 				Else
 					DropSpeed = 0
@@ -8708,6 +8854,12 @@ Function UpdateDimension1499()
 				PlayerFallingPickDistance = 0.0
 			Else
 				If e\EventState = 2.0
+					If e\SoundCHN<>0 Then
+						StopStream_Strict(e\SoundCHN)
+						StopChannel(e\SoundCHN2)
+						e\SoundCHN = 0
+						e\SoundCHN2 = 0
+					EndIf
 					HideEntity NTF_1499Sky
 					HideChunks()
 					For n.NPCs = Each NPCs
@@ -8720,8 +8872,14 @@ Function UpdateDimension1499()
 						FreeEntity du\obj
 						Delete du
 					Next
-					e\EventState3 = 0.0
+					If e\EventState3 < 70*30 Then
+						e\EventState3 = 0.0
+					EndIf
 					e\EventState = 1.0
+					If e\Sound2 <> 0 Then
+						FreeSound_Strict e\Sound2
+						e\Sound2 = 0
+					EndIf
 				EndIf
 			EndIf
 			;[End Block]
@@ -9488,7 +9646,11 @@ Function UpdateEndings()
 								ElseIf e\EventState3 = 1.0
 									
 									For i = 5 To 8
-										If EntityDistance(e\room\NPC[i]\Collider,Collider)> 4.0 Then e\room\NPC[i]\State = 3
+										If EntityDistance(e\room\NPC[i]\Collider,Collider)> 4.0 Then
+											e\room\NPC[i]\State = 3
+										Else
+											e\room\NPC[i]\State = 1
+										EndIf
 									Next
 									
 									If Abs(EntityY(Collider)-EntityY(e\room\Objects[11],True))<1.0 Then

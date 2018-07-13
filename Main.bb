@@ -1619,6 +1619,7 @@ DrawLoading(20, True)
 
 Dim RustleSFX%(3)
 
+Global Use914SFX%
 Global Death914SFX% 
 
 Dim DripSFX%(4)
@@ -1647,7 +1648,7 @@ AmbientSFXAmount(5)=10
 
 Dim AmbientSFX%(6, 15)
 
-Dim OldManSFX%(6)
+Dim OldManSFX%(8)
 
 Dim Scp173SFX%(3)
 
@@ -1664,7 +1665,7 @@ Dim IntroSFX%(20)
 
 Dim AlarmSFX%(5)
 
-Dim CommotionState%(23)
+Dim CommotionState%(25)
 
 Global HeartBeatSFX 
 
@@ -1850,6 +1851,8 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	Local d.Doors, parent, i%
 	If room <> Null Then parent = room\obj
 	
+	Local d2.Doors
+	
 	d.Doors = New Doors
 	If big=1 Then
 		d\obj = CopyEntity(BigDoorOBJ(0))
@@ -1861,12 +1864,29 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 		ScaleEntity(d\frameobj, RoomScale, RoomScale, RoomScale)
 		EntityType d\frameobj, HIT_MAP
 		EntityAlpha d\frameobj, 0.0
-	ElseIf big=2
+	ElseIf big=2 Then
 		d\obj = CopyEntity(HeavyDoorObj(0))
 		ScaleEntity(d\obj, RoomScale, RoomScale, RoomScale)
 		d\obj2 = CopyEntity(HeavyDoorObj(1))
 		ScaleEntity(d\obj2, RoomScale, RoomScale, RoomScale)
 		
+		d\frameobj = CopyEntity(DoorFrameOBJ)
+	ElseIf big=3 Then
+		For d2 = Each Doors
+			If d2 <> d And d2\dir = 3 Then
+				d\obj = CopyEntity(d2\obj)
+				d\obj2 = CopyEntity(d2\obj2)
+				ScaleEntity d\obj, RoomScale, RoomScale, RoomScale
+				ScaleEntity d\obj2, RoomScale, RoomScale, RoomScale
+				Exit
+			EndIf
+		Next
+		If d\obj=0 Then
+			d\obj = LoadMesh_Strict("GFX\map\elevatordoor.b3d")
+			d\obj2 = CopyEntity(d\obj)
+			ScaleEntity d\obj, RoomScale, RoomScale, RoomScale
+			ScaleEntity d\obj2, RoomScale, RoomScale, RoomScale
+		EndIf
 		d\frameobj = CopyEntity(DoorFrameOBJ)
 	Else
 		d\obj = CopyEntity(DoorOBJ)
@@ -1962,7 +1982,6 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	
 	d\MTFClose = True
 	
-	Local d2.Doors
 	If useCollisionMesh Then
 		For d2.Doors = Each Doors
 			If d2 <> d Then
@@ -1982,6 +2001,7 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 			EntityFX d\DoorHitOBJ,1
 			EntityType d\DoorHitOBJ,HIT_MAP
 			EntityColor d\DoorHitOBJ,255,0,0
+			HideEntity d\DoorHitOBJ
 		EndIf
 	EndIf
 	
@@ -2092,7 +2112,14 @@ Function UpdateDoors()
 						Case 2
 							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen+1) * FPSfactor / 85.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 120.0, 0, 0)		
+							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 120.0, 0, 0)
+						Case 3
+							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
+							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
+							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
+						Case 4 ;Used for 914 only
+							d\openstate = Min(180, d\openstate + FPSfactor * 1.4)
+							MoveEntity(d\obj, Sin(d\openstate) * FPSfactor / 114.0, 0, 0)
 					End Select
 				Else
 					d\fastopen = 0
@@ -2151,6 +2178,13 @@ Function UpdateDoors()
 							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 85.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 120.0, 0, 0)
+						Case 3
+							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
+							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 162.0, 0, 0)
+							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 162.0, 0, 0)
+						Case 4 ;Used for 914 only
+							d\openstate = Min(180, d\openstate - FPSfactor * 1.4)
+							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 114.0, 0, 0)
 					End Select
 					
 					If d\angle = 0 Or d\angle=180 Then
@@ -2199,13 +2233,15 @@ Function UpdateDoors()
 	Next
 End Function
 
-Function UseDoor(d.Doors, showmsg%=True)
+Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 	Local temp% = 0
 	If d\KeyCard > 0 Then
 		If SelectedItem = Null Then
-			If showmsg = True Then 
-				Msg = "A keycard is required to operate this door."
-				MsgTimer = 70 * 5
+			If showmsg = True Then
+				If (Instr(Msg,"The keycard")=0 And Instr(Msg,"A keycard with")=0) Or (MsgTimer<70*3) Then
+					Msg = "A keycard is required to operate this door."
+					MsgTimer = 70 * 7
+				EndIf
 			EndIf
 			Return
 		Else
@@ -2227,9 +2263,11 @@ Function UseDoor(d.Doors, showmsg%=True)
 			End Select
 			
 			If temp =-1 Then 
-				If showmsg = True Then 
-					Msg = "A keycard is required to operate this door."
-					MsgTimer = 70 * 5
+				If showmsg = True Then
+					If (Instr(Msg,"The keycard")=0 And Instr(Msg,"A keycard with")=0) Or (MsgTimer<70*3) Then
+						Msg = "A keycard is required to operate this door."
+						MsgTimer = 70 * 7
+					EndIf
 				EndIf
 				Return				
 			ElseIf temp >= d\KeyCard 
@@ -2238,12 +2276,12 @@ Function UseDoor(d.Doors, showmsg%=True)
 					If d\locked Then
 						PlaySound_Strict KeyCardSFX2
 						Msg = "The keycard was inserted into the slot but nothing happened."
-						MsgTimer = 70 * 5
+						MsgTimer = 70 * 7
 						Return
 					Else
 						PlaySound_Strict KeyCardSFX1
 						Msg = "The keycard was inserted into the slot."
-						MsgTimer = 70 * 5		
+						MsgTimer = 70 * 7	
 					EndIf
 				EndIf
 			Else
@@ -2255,7 +2293,7 @@ Function UseDoor(d.Doors, showmsg%=True)
 					Else
 						Msg = "A keycard with a higher security clearance is required to operate this door."
 					EndIf
-					MsgTimer = 70 * 5							
+					MsgTimer = 70 * 7					
 				EndIf
 				Return
 			End If
@@ -2268,7 +2306,9 @@ Function UseDoor(d.Doors, showmsg%=True)
 		SelectedItem = Null
 		If temp <> 0 Then
 			PlaySound_Strict ScannerSFX1
-			Msg = "You place the palm of the hand onto the scanner. The scanner reads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
+			If (Instr(Msg,"You placed your")=0) Or (MsgTimer < 70*3) Then
+				Msg = "You place the palm of the hand onto the scanner. The scanner reads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
+			EndIf
 			MsgTimer = 70 * 10
 		Else
 			If showmsg = True Then 
@@ -2332,14 +2372,21 @@ Function UseDoor(d.Doors, showmsg%=True)
 	;If d\dir = 1 Then sound = 0 Else sound=Rand(0, 2)
 	If d\dir = 1 Then sound=Rand(0, 1) Else sound=Rand(0, 2)
 	
-	If d\open Then
-		If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer
-		d\timerstate = d\timer
-		d\SoundCHN = PlaySound2 (OpenDoorSFX(d\dir, sound), Camera, d\obj)
+	If playsfx=True Then
+		If d\open Then
+			If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer
+			d\timerstate = d\timer
+			d\SoundCHN = PlaySound2 (OpenDoorSFX(d\dir, sound), Camera, d\obj)
+		Else
+			d\SoundCHN = PlaySound2 (CloseDoorSFX(d\dir, sound), Camera, d\obj)
+		EndIf
+		UpdateSoundOrigin(d\SoundCHN,Camera,d\obj)
 	Else
-		d\SoundCHN = PlaySound2 (CloseDoorSFX(d\dir, sound), Camera, d\obj)
+		If d\open Then
+			If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer
+			d\timerstate = d\timer
+		EndIf
 	EndIf
-	UpdateSoundOrigin(d\SoundCHN,Camera,d\obj)
 	
 End Function
 
@@ -2464,7 +2511,6 @@ Function InitEvents()
 	CreateEvent("room2fan", "room2_2", 0, 1.0)
 	
 	CreateEvent("room2elevator2", "room2elevator", 0)
-	;CreateEvent("room2elevator", "room2elevator", 0, 1)
 	CreateEvent("room2elevator", "room2elevator", Rand(1,2))
 	
 	CreateEvent("room3storage", "room3storage", 0, 0)
@@ -2554,8 +2600,8 @@ Function InitEvents()
 	
 	CreateEvent("914", "914", 0, 0)
 	
-	CreateEvent("toiletguard", "room2toilets", 1)
-	CreateEvent("buttghost", "room2toilets", 0, 0.8)
+	CreateEvent("buttghost", "room2toilets", 0, 0)
+	CreateEvent("toiletguard", "room2toilets", 1, 0)
 	
 	CreateEvent("room2pipes106", "room2pipes", Rand(0, 3)) 
 	
@@ -2597,6 +2643,7 @@ Function InitEvents()
 	CreateEvent("room_gw","room3gw",0,1.0)
 	CreateEvent("room2sl","room2sl",0)
 	CreateEvent("medibay","medibay",0)
+	CreateEvent("room2shaft","room2shaft",0)
 	
 	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
 	
@@ -3280,170 +3327,6 @@ Function QuickLoadEvents()
 		Case "room2sl"
 			;[Block]
 			If e\EventState = 0 And e\EventStr <> ""
-				For r.Rooms = Each Rooms
-					If ValidRoom2slCamRoom(r)
-						For sc.SecurityCams = Each SecurityCams
-							If sc\room = r And (Not sc\SpecialCam)
-								Local HasCamera% = False
-								For sc2.SecurityCams = Each SecurityCams
-									If sc2\room <> sc\room And (Not sc2\SpecialCam)
-										If sc2\room\RoomTemplate\Name = sc\room\RoomTemplate\Name
-											If sc2\Screen
-												HasCamera% = True
-												DebugLog "HasCamera% = True ("+Chr(34)+sc2\room\RoomTemplate\Name+Chr(34)+")"
-												Exit
-											EndIf
-										EndIf
-									EndIf
-								Next
-								If (Not HasCamera%) Then
-									If Left(e\EventStr,4) <> "load"
-										DebugLog "### "+Int(e\EventStr)
-										If Int(e\EventStr)=sc\ID
-											sc\Screen = True
-											sc\AllowSaving = False
-											
-											sc\RenderInterval = 12
-											
-											scale# = RoomScale * 4.5 * 0.4
-											
-											sc\ScrObj = CreateSprite()
-											EntityFX sc\ScrObj, 17
-											SpriteViewMode(sc\ScrObj, 2)
-											sc\ScrTexture = 0
-											;EntityTexture sc\ScrObj, ScreenTexs[sc\ScrTexture]
-											ScaleSprite(sc\ScrObj, MeshWidth(Monitor) * scale * 0.95* 0.5, MeshHeight(Monitor) * scale * 0.95* 0.5)
-											
-											sc\ScrOverlay = CreateSprite(sc\ScrObj)
-											
-											ScaleSprite(sc\ScrOverlay, MeshWidth(Monitor) * scale * 0.95 * 0.5, MeshHeight(Monitor) * scale * 0.95 * 0.5)
-											MoveEntity(sc\ScrOverlay, 0, 0, -0.0005)
-											EntityTexture(sc\ScrOverlay, MonitorTexture)
-											SpriteViewMode(sc\ScrOverlay, 2)
-											EntityBlend(sc\ScrOverlay , 3)
-											
-											sc\MonitorObj = CopyEntity(Monitor, sc\ScrObj)
-											
-											ScaleEntity(sc\MonitorObj, scale, scale, scale)
-											
-											sc\Cam = CreateCamera()
-											CameraViewport(sc\Cam, 0, 0, 512, 512)
-											CameraRange sc\Cam, 0.05, 6.0
-											CameraZoom(sc\Cam, 0.8)
-											HideEntity(sc\Cam)
-											
-											sc\IsRoom2slCam = True
-											sc\Room2slTexs%[0] = CreateTexture(128, 128, 1+256)
-											EntityTexture sc\ScrObj, sc\Room2slTexs%[0]
-											sc\RenderInterval = 666
-											sc\turn = 0
-											
-											pvt% = CreatePivot(e\room\obj)
-											Select r\RoomTemplate\Name$
-												Case "room2closets" ;ID=0 q
-													PositionEntity pvt%,-207.94,872.0,-60.0686,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
-													sc\Room2slID = 0
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"room2closets"+Chr(34)
-												Case "room1archive" ;ID=1 q
-													PositionEntity pvt%,-231.489,872.0,95.7443,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-													sc\Room2slID = 1
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"room1archive"+Chr(34)
-												Case "room3z3" ;ID=2 q
-													PositionEntity pvt%,-231.489,872.0,255.744,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-													sc\Room2slID = 2
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"room3z3"+Chr(34)
-												Case "room1lifts" ;ID=3 q
-													PositionEntity pvt%,-231.489,872.0,415.744,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-													sc\Room2slID = 3
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"room1lifts"+Chr(34)
-												;ID=4 q (it was room106)
-												Case "checkpoint1" ;ID=5 q
-													PositionEntity pvt%,-207.94,760.0,-60.0686,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
-													sc\Room2slID = 5
-													sc\RenderInterval = 12
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"checkpoint1"+Chr(34)
-												Case "room2nuke" ;ID=6 q
-													PositionEntity pvt%,-231.489,760.0,415.744,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-													sc\Room2slID = 6
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"room2nuke"+Chr(34)
-												Case "008" ;ID=7 q
-													PositionEntity pvt%,-208.138,760.0,571.583,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 75+e\room\angle, 0)
-													sc\Room2slID = 7
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"008"+Chr(34)
-												Case "room1162" ;ID=8 q
-													PositionEntity pvt%,-207.94,648.0,-60.0686,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 105+e\room\angle, 0)
-													sc\Room2slID = 8
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"room1162"+Chr(34)
-												Case "room966" ;ID=9 q
-													PositionEntity pvt%,-231.489,648.0,255.744,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-													sc\Room2slID = 9
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"room966"+Chr(34)
-												Case "room2ccont" ;ID=10 q
-													PositionEntity pvt%,-231.489,648.0,415.744,False
-													PositionEntity(sc\ScrObj,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True))
-													EntityParent(sc\ScrObj, e\room\obj)
-													TurnEntity(sc\ScrObj, 0, 90+e\room\angle, 0)
-													sc\Room2slID = 10
-													FreeEntity sc\Cam
-													FindAndDeleteFakeMonitor(e\room,EntityX(pvt%,True),EntityY(pvt%,True),EntityZ(pvt%,True),14)
-													DebugLog "Created Monitor for "+Chr(34)+"room2ccont"+Chr(34)
-											End Select
-											
-											FreeEntity pvt%
-											
-											Exit
-										EndIf
-									EndIf
-								EndIf
-							EndIf
-						Next
-					EndIf
-				Next
 				If e\EventStr <> "" And Left(e\EventStr,4) <> "load"
 					QuickLoadPercent = QuickLoadPercent + 5
 					If Int(e\EventStr) > 9
@@ -4620,7 +4503,9 @@ Function MouseLook()
 					Stamina = Stamina - FPSfactor * 0.1
 				Case 3 ;appendicitis
 					;0.035/sec = 2.1/min
-					SCP1025state[i]=SCP1025state[i]+FPSfactor*0.0005
+					If (Not I_427\Using And I_427\Timer < 70*360) Then
+						SCP1025state[i]=SCP1025state[i]+FPSfactor*0.0005
+					EndIf
 					If SCP1025state[i]>20.0 Then
 						If SCP1025state[i]-FPSfactor<=20.0 Then Msg="The pain in your stomach is becoming unbearable."
 						Stamina = Stamina - FPSfactor * 0.3
@@ -4639,7 +4524,9 @@ Function MouseLook()
 						CurrSpeed = CurveValue(0, CurrSpeed, 10+Stamina*15)
 					EndIf
 				Case 5;cardiac arrest
-					SCP1025state[i]=SCP1025state[i]+FPSfactor*0.35
+					If (Not I_427\Using And I_427\Timer < 70*360) Then
+						SCP1025state[i]=SCP1025state[i]+FPSfactor*0.35
+					EndIf
 					;35/sec
 					If SCP1025state[i]>110 Then
 						HeartBeatRate=0
@@ -4902,6 +4789,10 @@ Function DrawGUI()
 			AAText x + 350, 110, "Triangles rendered: "+CurrTrisAmount
 			AAText x + 350, 130, "Active textures: "+ActiveTextures()
 			AAText x + 350, 150, "SCP-427 state (secs): "+Int(I_427\Timer/70.0)
+			AAText x + 350, 170, "SCP-008 infection: "+Infect
+			For i = 0 To 5
+				AAText x + 350, 190+(20*i), "SCP-1025 State "+i+": "+SCP1025state[i]
+			Next
 			
 			AASetFont Font1
 		EndIf
@@ -5754,23 +5645,23 @@ Function DrawGUI()
 					If CanUseItem(False, False, True)
 						GiveAchievement(Achv500)
 						
-						If (Injuries > 0 Or Bloodloss > 0) And Infect > 0 Then
-							Msg = "You swallowed the pill. Your wounds are healing rapidly and your nausea is fading."
-						ElseIf Infect > 0 Then
+						If Infect > 0 Then
 							Msg = "You swallowed the pill. Your nausea is fading."
 						Else
-							Msg = "You swallowed the pill. Your wounds are healing rapidly."
+							Msg = "You swallowed the pill."
 						EndIf
 						MsgTimer = 70*7
 						
 						DeathTimer = 0
-						Injuries = 0
-						Bloodloss = 0
 						Infect = 0
 						Stamina = 100
 						For i = 0 To 5
 							SCP1025state[i]=0
 						Next
+						If StaminaEffect > 1.0 Then
+							StaminaEffect = 1.0
+							StaminaEffectTimer = 0.0
+						EndIf
 						
 						RemoveItem(SelectedItem)
 						SelectedItem = Null
@@ -8891,7 +8782,7 @@ Function LoopSound2%(SoundHandle%, Chn%, cam%, entity%, range# = 10, volume# = 1
 	If volume>0 Then
 		
 		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 - dist# > 0 And 1 - dist# < 1 Then
+		;If 1 - dist# > 0 And 1 - dist# < 1 Then
 			
 			Local panvalue# = Sin(-DeltaYaw(cam,entity))
 			
@@ -8903,7 +8794,7 @@ Function LoopSound2%(SoundHandle%, Chn%, cam%, entity%, range# = 10, volume# = 1
 			
 			ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
 			ChannelPan(Chn, panvalue)
-		EndIf
+		;EndIf
 	Else
 		If Chn <> 0 Then
 			ChannelVolume (Chn, 0)
@@ -9893,7 +9784,18 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("Pill", "pill", x, y, z)
 					RemoveItem(item)
 				Case "fine"
-					it2 = CreateItem("SCP-427", "scp427", x, y, z)
+					Local no427Spawn% = False
+					For it3.Items = Each Items
+						If it3\itemtemplate\tempname = "scp427" Then
+							no427Spawn = True
+							Exit
+						EndIf
+					Next
+					If (Not no427Spawn) Then
+						it2 = CreateItem("SCP-427", "scp427", x, y, z)
+					Else
+						it2 = CreateItem("Upgraded pill", "scp500death", x, y, z)
+					EndIf
 					RemoveItem(item)
 				Case "very fine"
 					it2 = CreateItem("Upgraded pill", "scp500death", x, y, z)
@@ -10172,6 +10074,14 @@ Function Use427()
 			If Bloodloss > 0.0 And Injuries <= 1.0 Then
 				Bloodloss = Max(Bloodloss - 0.001 * FPSfactor,0.0)
 			EndIf
+			If Infect > 0.0 Then
+				Infect = Max(Infect - 0.001 * FPSfactor,0.0)
+			EndIf
+			For i = 0 To 5
+				If SCP1025state[i]>0.0 Then
+					SCP1025state[i] = Max(SCP1025state[i] - 0.001 * FPSfactor,0.0)
+				EndIf
+			Next
 			If I_427\Sound[0]=0 Then
 				I_427\Sound[0] = LoadSound_Strict("SFX\SCP\427\Effect.ogg")
 			EndIf
@@ -10348,7 +10258,9 @@ Function UpdateInfect()
 				Exit
 			EndIf
 		Next
-	ElseIf PlayerRoom\RoomTemplate\Name = "dimension1499" Or PlayerRoom\RoomTemplate\Name = "pocketdimension"
+	ElseIf PlayerRoom\RoomTemplate\Name = "dimension1499" Or PlayerRoom\RoomTemplate\Name = "pocketdimension" Or PlayerRoom\RoomTemplate\Name = "gatea"
+		teleportForInfect = False
+	ElseIf PlayerRoom\RoomTemplate\Name = "exit1" And EntityY(Collider)>1040.0*RoomScale
 		teleportForInfect = False
 	EndIf
 	
@@ -10357,7 +10269,9 @@ Function UpdateInfect()
 		
 		If Infect < 93.0 Then
 			temp=Infect
-			Infect = Min(Infect+FPSfactor*0.002,100)
+			If (Not I_427\Using And I_427\Timer < 70*360) Then
+				Infect = Min(Infect+FPSfactor*0.002,100)
+			EndIf
 			
 			BlurTimer = Max(Infect*3*(2.0-CrouchState),BlurTimer)
 			
@@ -10484,6 +10398,10 @@ Function UpdateInfect()
 				BlinkTimer = Max(Min(-10*(Infect-96),BlinkTimer),-10)
 				If PlayerRoom\RoomTemplate\Name = "dimension1499"
 					DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate repots of a violent attack to a church in the Russian town of [REDACTED]."
+				ElseIf PlayerRoom\RoomTemplate\Name = "gatea"
+					DeathMSG = "008_DEATH_GATEA"
+				ElseIf PlayerRoom\RoomTemplate\Name = "exit1"
+					DeathMSG = "008_DEATH_GATEB"
 				Else
 					DeathMSG = ""
 				EndIf
@@ -11977,6 +11895,11 @@ End Function
 Function Update096ElevatorEvent#(e.Events,EventState#,d.Doors,elevatorobj%)
 	Local prevEventState# = EventState#
 	
+	If EventState < 0 Then
+		EventState = 0
+		prevEventState = 0
+	EndIf
+	
 	If d\openstate = 0 And d\open = False Then
 		If Abs(EntityX(Collider)-EntityX(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
 			If Abs(EntityZ(Collider)-EntityZ(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
@@ -12013,15 +11936,14 @@ Function Update096ElevatorEvent#(e.Events,EventState#,d.Doors,elevatorobj%)
 			CameraShake = 1
 			d\fastopen = True
 			d\open = True
+			Curr096\State = 4
+			Curr096\LastSeen = 1
 		ElseIf EventState > 70*8.1 And EventState < 70*8.15+FPSfactor
 			CameraShake = 1
 		EndIf
 		
 		If EventState <= 70*8.1 Then
-			d\openstate = Min(d\openstate,10)
-		Else
-			Curr096\State = 4
-			Curr096\LastSeen = 1
+			d\openstate = Min(d\openstate,20)
 		EndIf
 		EventState = EventState + FPSfactor * 1.4
 	EndIf

@@ -1156,6 +1156,8 @@ Function LoadGame(file$)
 		EndIf
 	EndIf
 	
+	UpdateDoorsTimer = 0
+	
 	CatchErrors("LoadGame")
 End Function
 
@@ -1803,6 +1805,8 @@ Function LoadGameQuick(file$)
 			HideEntity PlayerRoom\obj
 		EndIf
 	EndIf
+	
+	UpdateDoorsTimer = 0
 	
 	CatchErrors("LoadGameQuick")
 End Function
