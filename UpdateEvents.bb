@@ -1552,6 +1552,85 @@ Function UpdateEvents()
 								e\EventState2 = 1
 							EndIf
 						EndIf
+					ElseIf CoffinDistance < 3.0 Then
+						If e\room\NPC[0]=Null Then
+							e\room\NPC[0]=CreateNPC(NPCtypeGuard,e\room\x,e\room\y,e\room\z)
+							RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+90,0
+							e\room\NPC[0]\State = 8
+							;270, 286, 0.4, False
+							SetNPCFrame(e\room\NPC[0],270)
+							e\room\NPC[0]\GravityMult = 0.0
+							e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\895Chamber\GuardIdle"+Rand(1,3)+".ogg")
+							e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider)
+							e\room\NPC[0]\IsDead = True
+							e\room\NPC[0]\FallingPickDistance = 0.0
+						EndIf
+					ElseIf CoffinDistance > 5.0 Then
+						If e\room\NPC[0]<>Null Then
+							If e\room\NPC[0]\PrevState = 0 Then
+								If ChannelPlaying(e\room\NPC[0]\SoundChn) Then
+									StopChannel e\room\NPC[0]\SoundChn
+								EndIf
+								FreeSound_Strict e\room\NPC[0]\Sound
+								e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\895Chamber\GuardScream"+Rand(1,3)+".ogg")
+								e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,100)
+								e\room\NPC[0]\PrevState = 1
+								e\room\NPC[0]\State2 = 0.0
+							EndIf
+						EndIf
+					EndIf
+					
+					If e\room\NPC[0]<>Null Then
+						UpdateSoundOrigin(e\room\NPC[0]\SoundChn,Camera,e\room\NPC[0]\Collider,100)
+						If e\room\NPC[0]\PrevState = 0 Then
+							e\room\NPC[0]\GravityMult = 0.0
+						ElseIf e\room\NPC[0]\PrevState = 1 Then
+							If e\room\NPC[0]\State2 < 70*1 Then
+								e\room\NPC[0]\State2 = e\room\NPC[0]\State2 + FPSfactor
+								e\room\NPC[0]\GravityMult = 0.0
+							Else
+								e\room\NPC[0]\GravityMult = 1.0
+							EndIf
+							If EntityY(e\room\NPC[0]\Collider)>(-1531.0*RoomScale)+0.35 Then
+								dist# = EntityDistance(Collider,e\room\NPC[0]\Collider)
+								If dist<0.8 Then ;get the player out of the way
+									fdir# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\NPC[0]\Collider,True),EntityZ(e\room\NPC[0]\Collider,True))
+									TranslateEntity Collider,Cos(-fdir+90)*(dist-0.8)*(dist-0.8),0,Sin(-fdir+90)*(dist-0.8)*(dist-0.8)
+								EndIf
+								
+								If EntityY(e\room\NPC[0]\Collider)>0.6 Then EntityType e\room\NPC[0]\Collider,0
+							Else
+								e\EventState=e\EventState+FPSfactor
+								AnimateNPC(e\room\NPC[0], 270, 286, 0.4, False)
+								If e\Sound=0 Then
+									LoadEventSound(e,"SFX\General\BodyFall.ogg")
+									e\SoundCHN = PlaySound_Strict(e\Sound)
+									
+									de.Decals = CreateDecal(3, EntityX(e\room\obj), -1531.0*RoomScale, EntityZ(e\room\obj), 90, Rand(360), 0)
+									de\Size = 0.4 : ScaleSprite(de\obj,de\Size,de\Size) : UpdateDecals()
+								EndIf
+								If e\room\NPC[0]\Frame = 286.0 Then
+									e\room\NPC[0]\PrevState = 2
+								EndIf
+							EndIf
+							If e\room\NPC[0]\SoundChn2 = 0 Then
+								e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\Room\895Chamber\GuardRadio.ogg")
+								e\room\NPC[0]\SoundChn2 = LoopSound2(e\room\NPC[0]\Sound2,e\room\NPC[0]\SoundChn2,Camera,e\room\NPC[0]\Collider,5)
+							EndIf
+						ElseIf e\room\NPC[0]\PrevState = 2 Then
+							If (Not ChannelPlaying(e\SoundCHN)) And e\Sound<>0 Then
+								FreeSound_Strict e\Sound : e\Sound = 0
+								e\SoundCHN = 0
+							EndIf
+							If (Not ChannelPlaying(e\room\NPC[0]\SoundChn)) And e\room\NPC[0]\Sound<>0 Then
+								FreeSound_Strict e\room\NPC[0]\Sound : e\room\NPC[0]\Sound = 0
+								e\room\NPC[0]\SoundChn = 0
+							EndIf
+							If e\room\NPC[0]\Sound2 = 0 Then
+								e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\Room\895Chamber\GuardRadio.ogg")
+							EndIf
+							e\room\NPC[0]\SoundChn2 = LoopSound2(e\room\NPC[0]\Sound2,e\room\NPC[0]\SoundChn2,Camera,e\room\NPC[0]\Collider,5)
+						EndIf
 					EndIf
 					
 					If WearingNightVision > 0 Then
@@ -1567,38 +1646,6 @@ Function UpdateEvents()
 							EndIf
 						Next
 						If (CoffinDistance < 4.0) And (hasBatteryFor895) And (Not Wearing714) Then
-;							
-;							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
-;							RestoreSanity = False
-;							BlurTimer = Sin(MilliSecs2()/10)*Abs(Sanity)
-;							
-;							tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
-;							tempF2# = EntityYaw(Collider)
-;							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
-;							
-;							TurnEntity Collider, 0,tempF3/4,0,True
-;							
-;							tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
-;							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
-;							
-;							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
-;							
-;							If (Rand(Int(Max(tempF*100.0,1.0)))=1) And (e\EventState3<0.0) Then
-;								EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
-;								PlaySound_Strict(HorrorSFX(1))
-;								e\EventState3 = 10.0
-;								EntityColor(NVOverlay, 255,255,255)
-;							EndIf
-;							If Sanity < (-1000) Then 
-;								If WearingNightVision > 1
-;									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
-;									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
-;								Else
-;									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
-;								EndIf
-;								Kill()
-;							EndIf
-							
 							tempF# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
 							tempF2# = EntityYaw(Collider)
 							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
