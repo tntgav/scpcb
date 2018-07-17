@@ -507,6 +507,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 		
 		If isAlpha=1 Then
 			AddMesh childMesh,Alpha
+			EntityAlpha childMesh,0.0
 		Else
 			AddMesh childMesh,Opaque
 			EntityParent childMesh,collisionMeshes
