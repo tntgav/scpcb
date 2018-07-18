@@ -1670,9 +1670,11 @@ Function UpdateNPCs()
 					If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
 				Else
 					If n\Idle = 0.1
-						TeleportCloser(n)
-						n\Idle = 0.0
-						DebugLog "SCP-049 not idle"
+						If PlayerInReachableRoom() Then
+							TeleportCloser(n)
+							n\Idle = 0.0
+							DebugLog "SCP-049 not idle"
+						EndIf
 					EndIf
 					
 					Select n\State
@@ -1797,9 +1799,8 @@ Function UpdateNPCs()
 												temp = True
 												If n\Path[n\PathLocation]\door <> Null Then
 													If (Not n\Path[n\PathLocation]\door\IsElevatorDoor)
-														If (n\Path[n\PathLocation]\door\locked And (Not n\Path[n\PathLocation]\door\open)) Or n\Path[n\PathLocation]\door\KeyCard<>0 Or n\Path[n\PathLocation]\door\Code<>"" Then
+														If (n\Path[n\PathLocation]\door\locked Or n\Path[n\PathLocation]\door\KeyCard<>0 Or n\Path[n\PathLocation]\door\Code<>"") And (Not n\Path[n\PathLocation]\door\open) Then
 															temp = False
-															;n\CurrSpeed = 0
 														Else
 															If n\Path[n\PathLocation]\door\open = False And (n\Path[n\PathLocation]\door\buttons[0]<>0 Or n\Path[n\PathLocation]\door\buttons[1]<>0) Then
 																UseDoor(n\Path[n\PathLocation]\door, False)
@@ -1810,7 +1811,7 @@ Function UpdateNPCs()
 												If dist2#<0.2 And temp
 													n\PathLocation = n\PathLocation + 1
 												ElseIf dist2#<0.5 And (Not temp)
-													;Breaking up the path because the door cannot be operated by SCP-049
+													;Breaking up the path when the door in front of 049 cannot be operated by himself
 													n\PathStatus = 0
 													n\PathTimer# = 0.0
 												EndIf
@@ -1831,28 +1832,23 @@ Function UpdateNPCs()
 											EndIf
 											
 											;Resetting the "PrevState" value randomly, to make 049 talking randomly 
-											If Rand(300)=1 And ChannelPlaying(n\SoundChn2)=False Then n\PrevState = 0
-											
-											;n\State3 = n\State3 + FPSfactor
+											If Rand(600)=1 And ChannelPlaying(n\SoundChn2)=False Then n\PrevState = 0
 											
 											If n\PrevState > 1 Then n\PrevState = 1
-											
-											;If n\State3 > 70*7 ;Upadting the path every 7 seconds
-											;	n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider),EntityZ(Collider))
-											;	n\State3 = 0.0
-											;EndIf
 										EndIf
 									Else ;No Path to the player found - stands still and tries to find a path
+										;[Block]
 										n\PathTimer# = n\PathTimer# + FPSfactor
 										If n\PathTimer# > 70*(5-(2*SelectedDifficulty\aggressiveNPCs)) Then
 											n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 											n\PathTimer# = 0.0
+											n\State3 = 0
 											
 											;Attempt to find a room (the Playerroom or one of it's adjacent rooms) for 049 to go to but select the one closest to him
 											If n\PathStatus <> 1 Then
 												Local closestdist# = EntityDistance(PlayerRoom\obj,n\Collider)
 												Local closestRoom.Rooms = PlayerRoom
-												Local currdist#
+												Local currdist# = 0.0
 												For i = 0 To 3
 													If PlayerRoom\Adjacent[i]<>Null Then
 														currdist = EntityDistance(PlayerRoom\Adjacent[i]\obj,n\Collider)
@@ -1863,7 +1859,81 @@ Function UpdateNPCs()
 													EndIf
 												Next
 												n\PathStatus = FindPath(n,EntityX(closestRoom\obj),0.5,EntityZ(closestRoom\obj))
+												DebugLog "Find path for 049 in another room (pathstatus: "+n\PathStatus+")"
 											EndIf
+											
+											;Making 3 attempts at finding a path
+											While Int(n\State3) < 3
+												;Breaking up the path if no "real" path has been found (only 1 waypoint and it is too close)
+												If n\PathStatus = 1 Then
+													If n\Path[1]<>Null Then
+														If n\Path[2]=Null And EntityDistance(n\Path[1]\obj,n\Collider)<0.4 Then
+															n\PathLocation = 0
+															n\PathStatus = 0
+															DebugLog "Breaking up path for 049 because no waypoint number 2 has been found and waypoint number 1 is too close."
+														EndIf
+													EndIf
+													If n\Path[0]<>Null And n\Path[1]=Null Then
+														n\PathLocation = 0
+														n\PathStatus = 0
+														DebugLog "Breaking up path for 049 because no waypoint number 1 has been found."
+													EndIf
+												EndIf
+												
+												;No path could still be found, just make 049 go to a room (further away than the very first attempt)
+												If n\PathStatus <> 1 Then
+													closestdist# = 100.0 ;Prevent the PlayerRoom to be considered the closest, so 049 wouldn't try to find a path there
+													closestRoom.Rooms = PlayerRoom
+													currdist# = 0.0
+													For i = 0 To 3
+														If PlayerRoom\Adjacent[i]<>Null Then
+															currdist = EntityDistance(PlayerRoom\Adjacent[i]\obj,n\Collider)
+															If currdist < closestdist Then
+																closestdist = currdist
+																For j = 0 To 3
+																	If PlayerRoom\Adjacent[i]\Adjacent[j]<>Null Then
+																		If PlayerRoom\Adjacent[i]\Adjacent[j]<>PlayerRoom Then
+																			closestRoom = PlayerRoom\Adjacent[i]\Adjacent[j]
+																			Exit
+																		EndIf
+																	EndIf
+																Next
+															EndIf
+														EndIf
+													Next
+													n\PathStatus = FindPath(n,EntityX(closestRoom\obj),0.5,EntityZ(closestRoom\obj))
+													DebugLog "Find path for 049 in another further away room (pathstatus: "+n\PathStatus+")"
+												EndIf
+												
+												;Making 049 skip waypoints for doors he can't interact with, but only if the actual path is behind him
+												If n\PathStatus = 1 Then
+													If n\Path[1]<>Null Then
+														If n\Path[1]\door<>Null Then
+															If (n\Path[1]\door\locked Or n\Path[1]\door\KeyCard<>0 Or n\Path[1]\door\Code<>"") And (Not n\Path[1]\door\open) Then
+																Repeat
+																	If n\PathLocation > 19
+																		n\PathLocation = 0 : n\PathStatus = 0 : Exit
+																	Else
+																		n\PathLocation = n\PathLocation + 1
+																	EndIf
+																	If n\Path[n\PathLocation]<>Null Then
+																		If Abs(DeltaYaw(n\Collider,n\Path[n\PathLocation]\obj))>(45.0-Abs(DeltaYaw(n\Collider,n\Path[1]\obj))) Then
+																			DebugLog "Skip until waypoint number "+n\PathLocation
+																			n\State3 = 3
+																			Exit
+																		EndIf
+																	EndIf
+																Forever
+															Else
+																n\State3 = 3
+															EndIf
+														Else
+															n\State3 = 3
+														EndIf
+													EndIf
+												EndIf
+												n\State3 = n\State3 + 1
+											Wend
 											
 											;Path still can't be found, teleport 049 somewhere else if player is far away enough
 											If n\PathStatus <> 1 Then
@@ -1873,7 +1943,7 @@ Function UpdateNPCs()
 											EndIf
 										EndIf
 										AnimateNPC(n, 269, 345, 0.2)
-										;n\PrevState = 0
+										;[End Block]
 									EndIf
 								EndIf
 								
