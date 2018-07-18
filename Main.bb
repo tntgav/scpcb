@@ -2918,6 +2918,9 @@ Repeat
 			CameraFogColor(Camera, 0,0,0)
 			CameraFogMode Camera,1
 			CameraRange(Camera, 0.05, Min(CameraFogFar*LightVolume*1.5,28))	
+			If PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then
+				CameraClsColor(Camera, 0,0,0)
+			EndIf
 			
 			AmbientLight Brightness, Brightness, Brightness	
 			PlayerSoundVolume = CurveValue(0.0, PlayerSoundVolume, 5.0)

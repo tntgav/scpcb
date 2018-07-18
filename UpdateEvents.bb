@@ -2459,8 +2459,7 @@ Function UpdateEvents()
 					
 				Else
 					HideEntity e\room\obj
-					
-					CameraClsColor Camera, 0,0,0
+					;CameraClsColor Camera, 0,0,0
 					e\EventState = 0
 					e\EventState2 = 0
 					e\EventState3 = 0
