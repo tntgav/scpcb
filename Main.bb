@@ -8616,6 +8616,13 @@ Function NullGame(playbuttonsfx%=True)
 	BlurTimer = 0
 	SuperMan = False
 	SuperManTimer = 0
+	Sanity = 0
+	RestoreSanity = True
+	Crouch = False
+	CrouchState = 0.0
+	LightVolume = 0.0
+	Vomit = False
+	VomitTimer = 0.0
 	
 	InfiniteStamina% = False
 	
