@@ -44,8 +44,10 @@ Dim SaveGameTime$(SaveGameAmount + 1)
 Dim SaveGameDate$(SaveGameAmount + 1)
 Dim SaveGameVersion$(SaveGameAmount + 1)
 
-Const MAXSAVEDMAPS = 20
-Dim SavedMaps$(MAXSAVEDMAPS)
+Global SavedMapsAmount% = 0
+Dim SavedMaps$(SavedMapsAmount+1)
+Dim SavedMapsAuthor$(SavedMapsAmount+1)
+
 Global SelectedMap$
 
 LoadSaveGames()
@@ -247,6 +249,7 @@ Function UpdateMainMenu()
 					MainMenuTab = 0
 				Case 4 ;move back to the "new game" tab
 					MainMenuTab = 1
+					CurrLoadGamePage = 0
 					MouseHit1 = False
 				Default
 					MainMenuTab = 0
@@ -298,7 +301,11 @@ Function UpdateMainMenu()
 					Rect(x+150*MenuScale+2, y+55*MenuScale+2, 200*MenuScale-4, 30*MenuScale-4)
 					
 					Color (255, 0,0)
-					AAText(x+150*MenuScale + 100*MenuScale, y+55*MenuScale + 15*MenuScale, SelectedMap, True, True)
+					If Len(SelectedMap)>15 Then
+						AAText(x+150*MenuScale + 100*MenuScale, y+55*MenuScale + 15*MenuScale, Left(SelectedMap,14)+"...", True, True)
+					Else
+						AAText(x+150*MenuScale + 100*MenuScale, y+55*MenuScale + 15*MenuScale, SelectedMap, True, True)
+					EndIf
 					
 					If DrawButton(x+370*MenuScale, y+55*MenuScale, 120*MenuScale, 30*MenuScale, "Deselect", False) Then
 						SelectedMap=""
@@ -1007,7 +1014,7 @@ Function UpdateMainMenu()
 				;[Block]
 				y = y + height + 20 * MenuScale
 				width = 580 * MenuScale
-				height = 350 * MenuScale
+				height = 510 * MenuScale
 				
 				DrawFrame(x, y, width, height)
 				
@@ -1020,12 +1027,47 @@ Function UpdateMainMenu()
 				Color(255, 255, 255)
 				AASetFont Font2
 				AAText(x + width / 2, y + height / 2, "LOAD MAP", True, True)
-				AASetFont Font1
 				
 				x = 160 * MenuScale
 				y = y + height + 20 * MenuScale
 				width = 580 * MenuScale
 				height = 350 * MenuScale
+				
+				AASetFont Font2
+				
+				tx# = x+width
+				ty# = y
+				tw# = 400*MenuScale
+				th# = 150*MenuScale
+				
+				If CurrLoadGamePage < Ceil(Float(SavedMapsAmount)/6.0)-1 Then 
+					If DrawButton(x+530*MenuScale, y + 510*MenuScale, 50*MenuScale, 55*MenuScale, ">") Then
+						CurrLoadGamePage = CurrLoadGamePage+1
+					EndIf
+				Else
+					DrawFrame(x+530*MenuScale, y + 510*MenuScale, 50*MenuScale, 55*MenuScale)
+					Color(100, 100, 100)
+					AAText(x+555*MenuScale, y + 537.5*MenuScale, ">", True, True)
+				EndIf
+				If CurrLoadGamePage > 0 Then
+					If DrawButton(x, y + 510*MenuScale, 50*MenuScale, 55*MenuScale, "<") Then
+						CurrLoadGamePage = CurrLoadGamePage-1
+					EndIf
+				Else
+					DrawFrame(x, y + 510*MenuScale, 50*MenuScale, 55*MenuScale)
+					Color(100, 100, 100)
+					AAText(x+25*MenuScale, y + 537.5*MenuScale, "<", True, True)
+				EndIf
+				
+				DrawFrame(x+50*MenuScale,y+510*MenuScale,width-100*MenuScale,55*MenuScale)
+				
+				AAText(x+(width/2.0),y+536*MenuScale,"Page "+Int(Max((CurrLoadGamePage+1),1))+"/"+Int(Max((Int(Ceil(Float(SavedMapsAmount)/6.0))),1)),True,True)
+				
+				AASetFont Font1
+				
+				If CurrLoadGamePage > Ceil(Float(SavedMapsAmount)/6.0)-1 Then
+					CurrLoadGamePage = CurrLoadGamePage - 1
+				EndIf
 				
 				AASetFont Font1
 				
@@ -1034,26 +1076,27 @@ Function UpdateMainMenu()
 				Else
 					x = x + 20 * MenuScale
 					y = y + 20 * MenuScale
-					For i = 0 To MAXSAVEDMAPS-1
-						If SavedMaps(i)<>"" Then
+					For i = (1+(6*CurrLoadGamePage)) To 6+(6*CurrLoadGamePage)
+						If i <= SavedMapsAmount Then
+							DrawFrame(x,y,540* MenuScale, 70* MenuScale)
 							
-							If DrawButton(x + 20 * MenuScale, y + 20 * MenuScale, 170, 25, SavedMaps(i), False) Then
-								SelectedMap=SavedMaps(i)
+							AAText(x + 20 * MenuScale, y + 10 * MenuScale, SavedMaps(i - 1))
+							AAText(x + 20 * MenuScale, y + (10+27) * MenuScale, SavedMapsAuthor(i - 1))
+							
+							If DrawButton(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, "Load", False) Then
+								SelectedMap=SavedMaps(i - 1)
 								MainMenuTab = 1
 							EndIf
-							
-							y=y+30*MenuScale
-							If y > (286+230) * MenuScale Then
-								y = 286*MenuScale + 2*MenuScale
-								x = x+175*MenuScale
+							If MouseOn(x + 400 * MenuScale, y + 20 * MenuScale, 100*MenuScale,30*MenuScale)
+								DrawMapCreatorTooltip(tx,ty,tw,th,SavedMaps(i-1))
 							EndIf
+							
+							y = y + 80 * MenuScale
 						Else
 							Exit
 						EndIf
 					Next
 				EndIf
-				
-				
 				;[End Block]
 		End Select
 		
@@ -2098,6 +2141,77 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			DrawImage Menu_TestIMG,x+(width/2),y+100*MenuScale+(((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)+(AAStringHeight(txt2)*lines2)+(10+lines2)*MenuScale)
 		EndIf
 	EndIf
+	
+End Function
+
+Function DrawMapCreatorTooltip(x%,y%,width%,height%,mapname$)
+	Local fx# = x+6*MenuScale
+	Local fy# = y+6*MenuScale
+	Local fw# = width-12*MenuScale
+	Local fh# = height-12*MenuScale
+	Local lines% = 0
+	
+	AASetFont Font1
+	Color 255,255,255
+	
+	Local txt$[5]
+	If Right(mapname,6)="cbmap2" Then
+		txt[0] = Left(mapname$,Len(mapname$)-7)
+		Local f% = OpenFile("Map Creator\Maps\"+mapname$)
+		
+		Local author$ = ReadLine(f)
+		Local descr$ = ReadLine(f)
+		ReadByte(f)
+		ReadByte(f)
+		Local ramount% = ReadInt(f)
+		If ReadInt(f) > 0 Then
+			Local hasForest% = True
+		Else
+			hasForest% = False
+		EndIf
+		If ReadInt(f) > 0 Then
+			Local hasMT% = True
+		Else
+			hasMT% = False
+		EndIf
+		
+		CloseFile f%
+	Else
+		txt[0] = Left(mapname$,Len(mapname$)-6)
+		author$ = "[Unknown]"
+		descr$ = "[No description]"
+		ramount% = 0
+		hasForest% = False
+		hasMT% = False
+	EndIf
+	txt[1] = "Made by: "+author$
+	txt[2] = "Description: "+descr$
+	If ramount > 0 Then
+		txt[3] = "Room amount: "+ramount
+	Else
+		txt[3] = "Room amount: [Unknown]"
+	EndIf
+	If hasForest Then
+		txt[4] = "Has custom forest: Yes"
+	Else
+		txt[4] = "Has custom forest: No"
+	EndIf
+	If hasMT Then
+		txt[5] = "Has custom maintenance tunnel: Yes"
+	Else
+		txt[5] = "Has custom maintenance tunnel: No"
+	EndIf
+	
+	lines% = GetLineAmount(txt[2],fw,fh)
+	DrawFrame(x,y,width,(AAStringHeight(txt[0])*6)+AAStringHeight(txt[2])*lines+5*MenuScale)
+	
+	Color 255,255,255
+	AAText(fx,fy,txt[0])
+	AAText(fx,fy+AAStringHeight(txt[0]),txt[1])
+	RowText(txt[2],fx,fy+(AAStringHeight(txt[0])*2),fw,fh)
+	AAText(fx,fy+((AAStringHeight(txt[0])*2)+AAStringHeight(txt[2])*lines+5*MenuScale),txt[3])
+	AAText(fx,fy+((AAStringHeight(txt[0])*3)+AAStringHeight(txt[2])*lines+5*MenuScale),txt[4])
+	AAText(fx,fy+((AAStringHeight(txt[0])*4)+AAStringHeight(txt[2])*lines+5*MenuScale),txt[5])
 	
 End Function
 

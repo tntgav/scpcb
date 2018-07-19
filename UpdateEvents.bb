@@ -3094,6 +3094,12 @@ Function UpdateEvents()
 					Local tempInt%,tempInt2%
 					Local ix%,iy%
 					
+					If I_Zone\HasCustomMT Then
+						If e\room\grid\Meshes[0]=0 Then
+							PlaceGrid_MapCreator(e\room)
+						EndIf
+					EndIf
+					
 					If e\room\grid = Null Then
 						
 						e\room\grid = New Grids

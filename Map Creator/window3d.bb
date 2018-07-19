@@ -92,7 +92,22 @@ Dim MapName$(MapWidth, MapHeight)
 Dim MapRoomID%(ROOM4 + 1)
 Dim MapRoom$(ROOM4 + 1, 0)
 
+Global zonetransvalue1% = 13, zonetransvalue2% = 7
+
+Global MT_GridSize% = 19
+Dim MTName$(MT_GridSize,MT_GridSize)
+
+Global ForestGridSize% = 10
+Dim ForestName$(ForestGridSize,ForestGridSize)
+Global ForestMeshWidth#
+
+Global CurrMapGrid% = 0
+;0 = Facility
+;1 = Forest (SCP-860-1)
+;2 = Maintenance Tunnels
+
 Global PickedRoom.Rooms
+Global CurrSelectedRoom.Rooms
 
 ChangeDir ".."
 
@@ -211,53 +226,180 @@ Repeat
 		
 		f = ReadFile("CONFIG_MAPINIT.SI")
 		
-		While Not Eof(f)
-			x = ReadByte(f)
-			y = ReadByte(f)
-			name$ = Lower(ReadString(f))
-			
-			angle = ReadByte(f)*90.0
-			
-			ename = ReadString(f)
-			eprob# = ReadFloat(f)
-			
-			For rt.RoomTemplates=Each RoomTemplates
-				If Lower(rt\Name) = name
-					;If angle<>90 And angle<>270
-					;	angle = angle - 180
-					;EndIf
+		ReadLine(f) ;Author
+		ReadLine(f) ;Description
+		zonetransvalue1 = ReadByte(f)
+		zonetransvalue2 = ReadByte(f)
+		Local roomamount% = ReadInt(f) ;Amount of rooms
+		Local forestamount% = ReadInt(f) ;Amount of forest grid parts
+		Local mtroomamount% = ReadInt(f) ;Amount of maintenance tunnel rooms
+		
+		CurrMapGrid = ReadInt(f)
+		
+		;While Not Eof(f)
+		
+		Select CurrMapGrid
+			Case 0
+				;Room data
+				For i = 0 To roomamount-1
+					x = ReadByte(f)
+					y = ReadByte(f)
+					name$ = Lower(ReadString(f))
 					
-					r = PlaceRoom(name,MapWidth-x,y,GetZone(y),rt\Shape,ename,eprob)
+					angle = ReadByte(f)*90.0
 					
-					r\angle = angle
-					If r\angle<>90 And r\angle<>270
-						r\angle = r\angle + 180
+					ename = ReadString(f)
+					eprob# = ReadFloat(f)
+					
+					For rt.RoomTemplates=Each RoomTemplates
+						If Lower(rt\Name) = name
+							;If angle<>90 And angle<>270
+							;	angle = angle - 180
+							;EndIf
+							
+							r = PlaceRoom(name,MapWidth-x,y,GetZone(y),rt\Shape,ename,eprob)
+							r\GridX = x
+							r\GridZ = y
+							
+							r\angle = angle
+							If r\angle<>90 And r\angle<>270
+								r\angle = r\angle + 180
+							EndIf
+							r\angle = WrapAngle(r\angle)
+							
+							TurnEntity(r\obj, 0, r\angle, 0)
+							
+							MapTemp(MapWidth-x,y)=1
+							
+							Exit
+						EndIf
+					Next
+					
+					Local isSelRoom% = ReadByte(f)
+					If isSelRoom%
+						PositionEntity Camera,(MapWidth-x)*8,1,y*8
+						RotateEntity Camera,0,angle,0
+						MXS = -angle
+						MYS = 0
 					EndIf
-					r\angle = WrapAngle(r\angle)
+				Next
+			Case 1
+				;Skip room data
+				For i = 0 To roomamount-1
+					ReadByte(f)
+					ReadByte(f)
+					ReadString(f)
+					ReadByte(f)
+					ReadString(f)
+					ReadFloat(f)
+					ReadByte(f)
+				Next
+				;Forest data
+				For i = 0 To forestamount-1
+					x = ReadByte(f)
+					y = ReadByte(f)
+					name$ = Lower(ReadString(f))
 					
-					TurnEntity(r\obj, 0, r\angle, 0)
+					angle = ReadByte(f)*90.0
 					
-					MapTemp(MapWidth-x,y)=1
+					For rt.RoomTemplates=Each RoomTemplates
+						If Lower(rt\Name) = name Then
+							
+							r = PlaceRoom(name,ForestGridSize-x,y,GetZone(y),rt\Shape,"",0.0,1)
+							r\GridX = x
+							r\GridZ = y
+							
+							r\angle = angle
+							If r\angle<>90 And r\angle<>270
+								r\angle = r\angle + 180
+							EndIf
+							;If rt\Shape = ROOM2C Or rt\Shape = ROOM3 Then
+							;	r\angle = r\angle - 90
+							;EndIf
+							r\angle = WrapAngle(r\angle)
+							
+							TurnEntity(r\obj, 0, r\angle, 0)
+							
+							;MapTemp(MapWidth-x,y)=1
+							
+							Exit
+						EndIf
+					Next
 					
-					Exit
-				EndIf
-			Next
-			
-			Local isSelRoom% = ReadByte(f)
-			If isSelRoom%
-				PositionEntity Camera,(MapWidth-x)*8,1,y*8
-				RotateEntity Camera,0,angle,0
-				MXS = -angle
-				MYS = 0
-			EndIf
-			
-		Wend
+					isSelRoom% = ReadByte(f)
+					If isSelRoom% Then
+						PositionEntity Camera,(ForestGridSize-x)*12,1,y*12
+						RotateEntity Camera,0,angle,0
+						MXS = -angle
+						MYS = 0
+					EndIf
+				Next
+			Case 2
+				;Skip room data
+				For i = 0 To roomamount-1
+					ReadByte(f)
+					ReadByte(f)
+					ReadString(f)
+					ReadByte(f)
+					ReadString(f)
+					ReadFloat(f)
+					ReadByte(f)
+				Next
+				;Skip forest data
+				For i = 0 To forestamount-1
+					ReadByte(f)
+					ReadByte(f)
+					ReadString(f)
+					ReadByte(f)
+					ReadByte(f)
+				Next
+				;Maintenance tunnel data
+				For i = 0 To mtroomamount-1
+					x = ReadByte(f)
+					y = ReadByte(f)
+					name$ = Lower(ReadString(f))
+					
+					angle = ReadByte(f)*90.0
+					
+					For rt.RoomTemplates=Each RoomTemplates
+						If Lower(rt\Name) = name Then
+							
+							r = PlaceRoom(name,MT_GridSize-x,y,GetZone(y),rt\Shape,"",0.0,2)
+							r\GridX = x
+							r\GridZ = y
+							
+							r\angle = angle
+							If r\angle<>90 And r\angle<>270
+								r\angle = r\angle + 180
+							EndIf
+							If rt\Shape = ROOM2C Or rt\Shape = ROOM3 Then
+								r\angle = r\angle - 90
+							EndIf
+							r\angle = WrapAngle(r\angle)
+							
+							TurnEntity(r\obj, 0, r\angle, 0)
+							
+							;MapTemp(MapWidth-x,y)=1
+							
+							Exit
+						EndIf
+					Next
+					
+					isSelRoom% = ReadByte(f)
+					If isSelRoom% Then
+						PositionEntity Camera,(MT_GridSize-x)*2,1,y*2
+						RotateEntity Camera,0,angle,0
+						MXS = -angle
+						MYS = 0
+					EndIf
+				Next
+		End Select
 		
 		FreeTextureCache
 		
 		CloseFile f
 		
-		If AdjDoorPlace
+		If AdjDoorPlace And CurrMapGrid=0 Then
 			PlaceAdjacentDoors()
 		EndIf
 		
@@ -265,6 +407,8 @@ Repeat
 	EndIf
 	
 	While ElapsedTime>0.0
+		MouseHit1 = MouseHit(1)
+		
 		If MouseHit(2)
 			IsRemote = Not IsRemote
 			MoveMouse GraphicsWidth()/2,GraphicsHeight()/2
@@ -273,16 +417,44 @@ Repeat
 		For r = Each Rooms
 			If r\resetoverlaytex And r<>PickedRoom
 				SetBuffer TextureBuffer(r\overlaytex)
-				ClsColor 0,0,0
+				If CurrMapGrid <> 1 Then
+					ClsColor 0,0,0
+				Else
+					ClsColor 255,255,255
+				EndIf
 				Cls
 				SetBuffer BackBuffer()
 				r\resetoverlaytex=False
 			EndIf
 			PickedRoom = Null
-			If EntityDistance(Camera,r\obj)>(CamRange) Or (Not EntityInView(GetChild(r\obj,2),Camera))
-				HideEntity r\obj
+			If CurrMapGrid <> 1 Then
+				If EntityDistance(Camera,r\obj)>(CamRange) Or (Not EntityInView(GetChild(r\obj,2),Camera))
+					HideEntity r\obj
+				Else
+					ShowEntity r\obj
+				EndIf
 			Else
-				ShowEntity r\obj
+				If EntityDistance(Camera,r\obj)>(CamRange) Or (Not EntityInView(r\obj,Camera))
+					HideEntity r\obj
+				Else
+					ShowEntity r\obj
+				EndIf
+			EndIf
+		Next
+		
+		For d = Each Doors
+			If EntityDistance(Camera,d\frameobj)>(CamRange) Or (Not EntityInView(d\frameobj,Camera))
+				HideEntity d\frameobj
+				HideEntity d\obj
+				HideEntity d\obj2
+				HideEntity d\buttons[0]
+				HideEntity d\buttons[1]
+			Else
+				ShowEntity d\frameobj
+				ShowEntity d\obj
+				ShowEntity d\obj2
+				ShowEntity d\buttons[0]
+				ShowEntity d\buttons[1]
 			EndIf
 		Next
 		
@@ -296,6 +468,8 @@ Repeat
 			MXS# = MXS# + MouseXSpeed()*0.25
 			MYS# = MYS# + MouseYSpeed()*0.25
 			
+			MYS = Max(Min(MYS,85),-85)
+			
 			RotateEntity Camera,MYS,-MXS,0
 			
 			Faster = 0
@@ -308,19 +482,42 @@ Repeat
 			If KeyDown(31) Then MoveEntity Camera,0,0,(-0.05-(0.05*Faster))/(1+Slower)
 			If KeyDown(32) Then MoveEntity Camera,(0.05+(0.05*Faster))/(1+Slower),0,0
 			
-			Local picker% = EntityPick(Camera,CamRange/2.5)
+			Local picker% = EntityPick(Camera,CamRange/(2.5-(CurrMapGrid=1)))
 			If picker<>0
 				For r = Each Rooms
-					If PickedEntity()=GetChild(r\obj,2)
-						SetBuffer TextureBuffer(r\overlaytex)
-						ClsColor 70,70,20+(Sin(MilliSecs2()/4.0)*20)
-						Cls
-						SetBuffer BackBuffer()
-						PickedRoom = r
-						r\resetoverlaytex=True
-						Exit
+					If CurrMapGrid<>1 Then
+						If PickedEntity()=GetChild(r\obj,2)
+							SetBuffer TextureBuffer(r\overlaytex)
+							ClsColor 70,70,20+(Float(Sin(MilliSecs2()/4.0))*20)
+							Cls
+							SetBuffer BackBuffer()
+							PickedRoom = r
+							r\resetoverlaytex=True
+							Exit
+						EndIf
+					Else
+						If PickedEntity()=r\obj
+							SetBuffer TextureBuffer(r\overlaytex)
+							ClsColor 60,60,50-(Float(Sin(MilliSecs2()/4.0))*50)
+							Cls
+							SetBuffer BackBuffer()
+							PickedRoom = r
+							r\resetoverlaytex=True
+							Exit
+						EndIf
 					EndIf
 				Next
+			EndIf
+			If MouseHit1 Then
+				If PickedRoom <> Null Then
+					CurrSelectedRoom = PickedRoom
+					f = WriteFile("CONFIG_TO2D.SI")
+					WriteInt f,CurrSelectedRoom\GridX
+					WriteInt f,CurrSelectedRoom\GridZ
+					CloseFile f
+				Else
+					CurrSelectedRoom = Null
+				EndIf
 			EndIf
 		Else
 			ShowPointer()
@@ -346,6 +543,7 @@ Repeat
 			Local rname$ = PickedRoom\RoomTemplate\Name
 			Local rX% = Int(PickedRoom\x)
 			Local rZ% = Int(PickedRoom\z)
+			Local rAngle% = Int(PickedRoom\angle)
 			
 			Color 0,0,0
 			Rect 2,32,StringWidth("Room name: "+rname),StringHeight("Room name: "+rname)
@@ -369,6 +567,16 @@ Repeat
 				Text 2,92,"Room event: "+ename
 				Text 2,112,"Room event chance: "+Int(echance*100)+"%"
 			EndIf
+		EndIf
+		
+		If CurrSelectedRoom<>Null Then
+			rname$ = CurrSelectedRoom\RoomTemplate\Name
+			
+			Color 0,0,0
+			Rect (ResWidth-2)-StringWidth("Selected room: "+rname),2,StringWidth("Selected room: "+rname),StringHeight("Selected room: "+rname)
+			
+			Color 255,255,255
+			Text (ResWidth-2)-StringWidth("Selected room: "+rname),2,"Selected room: "+rname
 		EndIf
 		
 		Color CursorColorR,CursorColorG,CursorColorB
@@ -463,12 +671,44 @@ Function LoadRoomTemplates(file$)
 ;		i=i+1
 ;	Forever
 	
+	
+	
 	CloseFile f
 	
 End Function
 
 Function LoadRoomTemplateMeshes()
-	Local rt.RoomTemplates
+	Local rt.RoomTemplates,i%
+	
+	Local mt_prefix$ = "maintenance tunnel "
+	rt = New RoomTemplates
+	rt\objPath = "GFX\map\mt1.rmesh"
+	rt\Name = mt_prefix+"endroom"
+	rt\Shape = ROOM1
+	rt = New RoomTemplates
+	rt\objPath = "GFX\map\mt2.rmesh"
+	rt\Name = mt_prefix+"corridor"
+	rt\Shape = ROOM2
+	rt = New RoomTemplates
+	rt\objPath = "GFX\map\mt2c.rmesh"
+	rt\Name = mt_prefix+"corner"
+	rt\Shape = ROOM2C
+	rt = New RoomTemplates
+	rt\objPath = "GFX\map\mt3.rmesh"
+	rt\Name = mt_prefix+"t-shaped room"
+	rt\Shape = ROOM3
+	rt = New RoomTemplates
+	rt\objPath = "GFX\map\mt4.rmesh"
+	rt\Name = mt_prefix+"4-way room"
+	rt\Shape = ROOM4
+	rt = New RoomTemplates
+	rt\objPath = "GFX\map\mt_elevator.rmesh"
+	rt\Name = mt_prefix+"elevator"
+	rt\Shape = ROOM2
+	rt = New RoomTemplates
+	rt\objPath = "GFX\map\mt_generator.rmesh"
+	rt\Name = mt_prefix+"generator room"
+	rt\Shape = ROOM1
 	
 	For rt = Each RoomTemplates
 		If rt\objPath<>""
@@ -476,14 +716,78 @@ Function LoadRoomTemplateMeshes()
 		EndIf
 	Next
 	
+	Local hmap[ROOM4], mask[ROOM4]
+	Local GroundTexture = LoadTexture("GFX\map\forest\forestfloor.jpg")
+	Local PathTexture = LoadTexture("GFX\map\forest\forestpath.jpg")
+	hmap[ROOM1]=LoadImage("GFX\map\forest\forest1h.png")
+	mask[ROOM1]=LoadTexture("GFX\map\forest\forest1h_mask.png",1+2)
+	hmap[ROOM2]=LoadImage("GFX\map\forest\forest2h.png")
+	mask[ROOM2]=LoadTexture("GFX\map\forest\forest2h_mask.png",1+2)
+	hmap[ROOM2C]=LoadImage("GFX\map\forest\forest2Ch.png")
+	mask[ROOM2C]=LoadTexture("GFX\map\forest\forest2Ch_mask.png",1+2)
+	hmap[ROOM3]=LoadImage("GFX\map\forest\forest3h.png")
+	mask[ROOM3]=LoadTexture("GFX\map\forest\forest3h_mask.png",1+2)
+	hmap[ROOM4]=LoadImage("GFX\map\forest\forest4h.png")
+	mask[ROOM4]=LoadTexture("GFX\map\forest\forest4h_mask.png",1+2)
+	
+	Local fr_prefix$ = "scp-860-1 "
+	rt = New RoomTemplates
+	rt\obj = load_terrain(hmap[ROOM2],0.03,GroundTexture,PathTexture,mask[ROOM2])
+	rt\Name = fr_prefix$+"door"
+	rt\Shape = ROOM2
+	ForestMeshWidth = MeshWidth(rt\obj)
+	HideEntity rt\obj
+	rt = New RoomTemplates
+	rt\obj = load_terrain(hmap[ROOM1],0.03,GroundTexture,PathTexture,mask[ROOM1])
+	rt\Name = fr_prefix$+"endroom"
+	rt\Shape = ROOM1
+	HideEntity rt\obj
+	rt = New RoomTemplates
+	rt\obj = load_terrain(hmap[ROOM2],0.03,GroundTexture,PathTexture,mask[ROOM2])
+	rt\Name = fr_prefix$+"path"
+	rt\Shape = ROOM2
+	HideEntity rt\obj
+	rt = New RoomTemplates
+	rt\obj = load_terrain(hmap[ROOM2C],0.03,GroundTexture,PathTexture,mask[ROOM2C])
+	rt\Name = fr_prefix$+"corner"
+	rt\Shape = ROOM2C
+	HideEntity rt\obj
+	rt = New RoomTemplates
+	rt\obj = load_terrain(hmap[ROOM3],0.03,GroundTexture,PathTexture,mask[ROOM3])
+	rt\Name = fr_prefix$+"t-shaped path"
+	rt\Shape = ROOM3
+	HideEntity rt\obj
+	rt = New RoomTemplates
+	rt\obj = load_terrain(hmap[ROOM4],0.03,GroundTexture,PathTexture,mask[ROOM4])
+	rt\Name = fr_prefix$+"4-way path"
+	rt\Shape = ROOM4
+	HideEntity rt\obj
+	
+	FreeTexture GroundTexture
+	FreeTexture PathTexture
+	For i = ROOM1 To ROOM4
+		FreeImage(hmap[i])
+		FreeTexture(mask[i])
+	Next
+	
 End Function
 
-Function PlaceRoom.Rooms(name$,x%,z%,zone%,shape%,event$="",eventchance#=1.0)
+Function PlaceRoom.Rooms(name$,x%,z%,zone%,shape%,event$="",eventchance#=1.0,mapgrid%=0)
 	Local rt.RoomTemplates,r.Rooms
+	
+	Local spacing#
+	Select mapgrid
+		Case 0
+			spacing# = 8.0
+		Case 1
+			spacing# = 12.0
+		Case 2
+			spacing# = 2.0
+	End Select
 	
 	For rt = Each RoomTemplates
 		If rt\Name = name$
-			r = CreateRoom(zone,shape,x*8.0,0.0,z*8.0,name)
+			r = CreateRoom(zone,shape,x*spacing,0.0,z*spacing,name)
 			Exit
 		EndIf
 	Next
@@ -612,11 +916,16 @@ Type Rooms
 	
 	Field Adjacent.Rooms[4]
 	Field AdjDoor.Doors[4]
+	
+	Field GridX%,GridZ%
+	
+	Field forestwallobj%
 End Type 
 
 Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 	Local r.Rooms = New Rooms
 	Local rt.RoomTemplates
+	Local tempf1#,tempf2#,tempf3#
 	
 	r\zone = zone
 	
@@ -631,18 +940,41 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 				r\RoomTemplate = rt
 				
 				r\obj = CopyEntity(rt\obj)
-				ScaleEntity(r\obj, RoomScale, RoomScale, RoomScale)
-				;EntityPickMode(r\obj, 2)
+				If CurrMapGrid<>1 Then
+					ScaleEntity(r\obj, RoomScale, RoomScale, RoomScale)
+				Else
+					tempf3=ForestMeshWidth
+					tempf1=12.0/tempf3
+					ScaleEntity r\obj,tempf1,tempf1,tempf1
+				EndIf
 				
 				PositionEntity(r\obj, x, y, z)
 				
-				r\overlaytex = CreateTexture(1,1)
-				SetBuffer TextureBuffer(r\overlaytex)
-				ClsColor 0,0,0
-				Cls
-				SetBuffer BackBuffer()
+				If name = "scp-860-1 door" Then
+					r\forestwallobj = LoadMesh("..\GFX\map\forest\wall.b3d")
+					ScaleEntity r\forestwallobj,RoomScale,RoomScale,RoomScale
+					PositionEntity r\forestwallobj,x,y,z,True
+					EntityParent r\forestwallobj,r\obj
+					RotateEntity r\forestwallobj,0,180,0
+					MoveEntity r\forestwallobj,0,0,-(14+tempf1)
+				EndIf
 				
-				EntityTexture GetChild(r\obj,2),r\overlaytex,0,0
+				If CurrMapGrid<>1 Then
+					r\overlaytex = CreateTexture(1,1)
+					SetBuffer TextureBuffer(r\overlaytex)
+					ClsColor 0,0,0
+					Cls
+					SetBuffer BackBuffer()
+					EntityTexture GetChild(r\obj,2),r\overlaytex,0,0
+				Else
+					r\overlaytex = CreateTexture(1,1)
+					TextureBlend r\overlaytex,5
+					SetBuffer TextureBuffer(r\overlaytex)
+					ClsColor 255,255,255
+					Cls
+					SetBuffer BackBuffer()
+					EntityTexture r\obj,r\overlaytex,0,0
+				EndIf
 				
 				Return r
 			EndIf
@@ -1571,9 +1903,17 @@ Function PlaceAdjacentDoors()
 	
 	For y = MapHeight To 0 Step -1
 		
-		If y < MapHeight/3+1 Then
+		;If GetZone(y)=0
+		;	zone=1
+		;ElseIf GetZone(y)=1
+		;	zone=2
+		;Else
+		;	zone=3
+		;EndIf
+		
+		If y<zonetransvalue2 Then
 			zone=3
-		ElseIf y < MapHeight*(2.0/3.0)-1
+		ElseIf y>=zonetransvalue2 And y<zonetransvalue1 Then
 			zone=2
 		Else
 			zone=1
@@ -1673,13 +2013,107 @@ Function PlaceAdjacentDoors()
 	
 End Function
 
+Function load_terrain(hmap,yscale#=0.7,t1%,t2%,mask%)
+	
+	DebugLog "load_terrain: "+hmap
+	
+	; load the heightmap
+	If hmap = 0 Then RuntimeError "Heightmap image "+hmap+" does not exist."
+	
+	; store heightmap dimensions
+	Local x = ImageWidth(hmap)-1, y = ImageHeight(hmap)-1
+	Local lx,ly,index
+	
+	; load texture and lightmaps
+	If t1 = 0 Then RuntimeError "load_terrain error: invalid texture 1"
+	If t2 = 0 Then RuntimeError "load_terrain error: invalid texture 2"
+	If mask = 0 Then RuntimeError "load_terrain error: invalid texture mask"
+	
+	; auto scale the textures to the right size
+	If t1 Then ScaleTexture t1,x/4,y/4
+	If t2 Then ScaleTexture t2,x/4,y/4
+	If mask Then ScaleTexture mask,x,y
+	
+	; start building the terrain
+	Local mesh = CreateMesh()
+	Local surf = CreateSurface(mesh)
+	
+	; create some verts for the terrain
+	For ly = 0 To y
+		For lx = 0 To x
+			AddVertex surf,lx,0,ly,1.0/lx,1.0/ly
+		Next
+	Next
+	RenderWorld
+	
+	; connect the verts with faces
+	For ly = 0 To y-1
+		For lx = 0 To x-1
+			AddTriangle surf,lx+((x+1)*ly),lx+((x+1)*ly)+(x+1),(lx+1)+((x+1)*ly)
+			AddTriangle surf,(lx+1)+((x+1)*ly),lx+((x+1)*ly)+(x+1),(lx+1)+((x+1)*ly)+(x+1)
+		Next
+	Next
+	
+	; position the terrain to center 0,0,0
+	Local mesh2% = CopyMesh(mesh,mesh)
+	Local surf2% = GetSurface(mesh2,1)
+	PositionMesh mesh, -x/2.0,0,-y/2.0
+	PositionMesh mesh2, -x/2.0,0.01,-y/2.0
+	
+	; alter vertice height to match the heightmap red channel
+	LockBuffer ImageBuffer(hmap)
+	LockBuffer TextureBuffer(mask)
+	;SetBuffer 
+	For lx = 0 To x
+		For ly = 0 To y
+			;using vertex alpha and two meshes instead of FE_ALPHAWHATEVER
+			;it doesn't look perfect but it does the job
+			;you might get better results by downscaling the mask to the same size as the heightmap
+			Local maskX# = Min(lx*Float(TextureWidth(mask))/Float(ImageWidth(hmap)),TextureWidth(mask)-1)
+			Local maskY# = TextureHeight(mask)-Min(ly*Float(TextureHeight(mask))/Float(ImageHeight(hmap)),TextureHeight(mask)-1)
+			RGB1=ReadPixelFast(Min(lx,x-1),y-Min(ly,y-1),ImageBuffer(hmap))
+			r=(RGB1 And $FF0000)Shr 16 ;separate out the red
+			Local alpha#=(((ReadPixelFast(Max(maskX-5,5),Max(maskY-5,5),TextureBuffer(mask)) And $FF000000) Shr 24)/$FF)
+			alpha#=alpha+(((ReadPixelFast(Min(maskX+5,TextureWidth(mask)-5),Min(maskY+5,TextureHeight(mask)-5),TextureBuffer(mask)) And $FF000000) Shr 24)/$FF)
+			alpha#=alpha+(((ReadPixelFast(Max(maskX-5,5),Min(maskY+5,TextureHeight(mask)-5),TextureBuffer(mask)) And $FF000000) Shr 24)/$FF)
+			alpha#=alpha+(((ReadPixelFast(Min(maskX+5,TextureWidth(mask)-5),Max(maskY-5,5),TextureBuffer(mask)) And $FF000000) Shr 24)/$FF)
+			alpha#=alpha*0.25
+			alpha#=Sqr(alpha)
+			
+			index = lx + ((x+1)*ly)
+			VertexCoords surf, index , VertexX(surf,index), r*yscale,VertexZ(surf,index)
+			VertexCoords surf2, index , VertexX(surf2,index), r*yscale,VertexZ(surf2,index)
+			VertexColor surf2, index, 255.0,255.0,255.0,alpha
+			; set the terrain texture coordinates
+			VertexTexCoords surf,index,lx,-ly 
+			VertexTexCoords surf2,index,lx,-ly 
+		Next
+	Next
+	UnlockBuffer TextureBuffer(mask)
+	UnlockBuffer ImageBuffer(hmap)
+	
+	UpdateNormals mesh
+	UpdateNormals mesh2
+	
+	EntityTexture mesh,t1,0,1
+	EntityTexture mesh2,t2,0,1
+	
+	EntityFX mesh, 1
+	EntityFX mesh2, 1+2+32
+	
+	EntityPickMode mesh,2
+	
+	Return mesh
+End Function
+
+
 
 
 
 
 
 ;~IDEal Editor Parameters:
-;~F#188#193#19E#1D5#1E0#1F2#219#238#23C#241#24F#268#28D#2BA#2C8#2D7#2DF#307#30E#315
-;~F#31C#335#33D#345#492#4A2#4B3#4C9#4DE#4EC#4F0#540#54E#556#55D#561#565#593#5AA#5BD
-;~F#5C9#5CF#5DA#5E0#61C
+;~F#258#263#26E#2A7#306#322#349#368#36C#371#37F#39C#3D9#406#414#423#42B#453#45A#461
+;~F#468#481#489#491#5DE#5EE#5FF#615#62A#638#63C#68C#69A#6A2#6A9#6AD#6B1#6DF#6F6#709
+;~F#715#71B#726#72C#768#7DF
 ;~C#Blitz3D
