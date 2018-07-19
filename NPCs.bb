@@ -954,6 +954,9 @@ Function UpdateNPCs()
 							Exit
 						EndIf
 					Next
+					If PlayerRoom\RoomTemplate\Name$ = "room049" And EntityY(Collider) <= -2848*RoomScale Then
+						spawn106% = False
+					EndIf
 					;GateA event has been triggered - don't make 106 disapper!
 					;The reason why this is a seperate For loop is because we need to make sure that room860 would not be able to overwrite the "spawn106%" variable
 					For e.events = Each Events
@@ -969,7 +972,10 @@ Function UpdateNPCs()
 							Exit
 						EndIf
 					Next
-					If (Not spawn106%) And n\State <= 0 Then n\State = Rand(22000, 27000)
+					If (Not spawn106%) And n\State <= 0 Then
+						n\State = Rand(22000, 27000)
+						PositionEntity n\Collider,0,500,0
+					EndIf
 					
 					If (Not n\Idle) And spawn106%
 						If n\State <= 0 Then	;attacking	
@@ -1153,7 +1159,10 @@ Function UpdateNPCs()
 							MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 							
 							If n\State <= Rand(-3500, -3000) Then 
-								If Not EntityInView(n\obj,Camera) Then n\State = Rand(22000, 27000)
+								If Not EntityInView(n\obj,Camera) Then
+									n\State = Rand(22000, 27000)
+									PositionEntity n\Collider,0,500,0
+								EndIf
 							EndIf
 							
 							If FallTimer < -250.0 Then
@@ -2100,23 +2109,19 @@ Function UpdateNPCs()
 					If (Not n\IsDead)
 						Select n\State
 							Case 0
+								;[Block]
 								AnimateNPC(n, 719, 777, 0.2, False)
 								
-								;Animate2(n\obj, AnimTime(n\obj), 719, 777, 0.2, False)
 								If n\Frame=777 Then
-									If Rand(700)=1 Then 							
+									If Rand(700)=1 Then
 										If EntityDistance(Collider, n\Collider)<5.0 Then
 											n\Frame = 719
-											;SetAnimTime (n\obj, 719)	
-											If Rand(3)=1 Then 
-												n\State=1
-												n\Frame = 155
-												;SetAnimTime n\obj, 155
-											EndIf
 										EndIf
 									EndIf
 								EndIf
+								;[End Block]
 							Case 1 ;stands up
+								;[Block]
 								If n\Frame=>682 Then 
 									AnimateNPC(n, 926, 935, 0.3, False)
 									If n\Frame = 935 Then n\State = 2
@@ -2127,7 +2132,9 @@ Function UpdateNPCs()
 									AnimateNPC(n, 155, 682, 1.5, False)
 									;Animate2(n\obj, AnimTime(n\obj), 155, 682, 1.5, False)
 								EndIf
+								;[End Block]
 							Case 2 ;following the player
+								;[Block]
 								If n\State3 < 0 Then ;check if the player is visible every three seconds
 									If EntityDistance(Collider, n\Collider)<5.0 Then 
 										If EntityVisible(Collider, n\Collider) Then n\State2 = 70*5
@@ -2208,8 +2215,10 @@ Function UpdateNPCs()
 										;PlaySound2(StepSFX(0,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 										PlaySound2(StepSFX(2,0,Rand(0,2)),Camera, n\Collider, 8.0, Rnd(0.3,0.5))
 									EndIf
-								EndIf						
+								EndIf
+								;[End Block]
 							Case 3
+								;[Block]
 								If NoTarget Then n\State = 2
 								If n\Frame < 66 Then
 									AnimateNPC(n, 2, 65, 0.7, False)
@@ -2241,7 +2250,7 @@ Function UpdateNPCs()
 										n\State = 2
 									EndIf		
 								EndIf
-								
+								;[End Block]
 						End Select
 					Else
 						AnimateNPC(n, 133, 157, 0.5, False)

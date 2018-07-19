@@ -1568,6 +1568,7 @@ Music(21) = "..\Ending\MenuBreath"
 Music(22) = "914"
 Music(23) = "Ending"
 Music(24) = "Credits"
+Music(25) = "SaveMeFrom"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
@@ -2066,7 +2067,7 @@ Function UpdateDoors()
 	ClosestDoor = Null
 	
 	For d.Doors = Each Doors
-		If d\dist < HideDistance*2 Then 
+		If d\dist < HideDistance*2 Or d\IsElevatorDoor>0 Then ;Make elevator doors update everytime because if not, this can cause a bug where the elevators suddenly won't work, most noticeable in room2tunnel - ENDSHN
 			
 			If (d\openstate >= 180 Or d\openstate <= 0) And GrabbedEntity = 0 Then
 				For i% = 0 To 1
@@ -6539,7 +6540,7 @@ Function DrawGUI()
 					
 					AASetFont Font3
 					
-					If PlayerRoom\RoomTemplate\Name = "pocketdimension" Then
+					If PlayerRoom\RoomTemplate\Name = "pocketdimension" Or PlayerRoom\RoomTemplate\Name = "dimension1499" Then
 						If (MilliSecs2() Mod 1000) > 300 Then	
 							AAText(x, y + height / 2 - 80, "ERROR 06", True)
 							AAText(x, y + height / 2 - 60, "LOCATION UNKNOWN", True)						
