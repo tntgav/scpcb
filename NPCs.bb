@@ -1934,13 +1934,6 @@ Function UpdateNPCs()
 												EndIf
 												n\State3 = n\State3 + 1
 											Wend
-											
-											;Path still can't be found, teleport 049 somewhere else if player is far away enough
-											If n\PathStatus <> 1 Then
-												If dist > HideDistance/2.0 Then
-													TeleportCloser(n)
-												EndIf
-											EndIf
 										EndIf
 										AnimateNPC(n, 269, 345, 0.2)
 										;[End Block]
