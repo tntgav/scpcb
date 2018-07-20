@@ -6847,20 +6847,31 @@ Function UpdateEvents()
 					EndIf
 				Else
 					e\EventState = e\EventState+FPSfactor
-					
-					PositionEntity(Curr106\Collider, EntityX(e\room\obj, True) - Sin(MilliSecs2() / 150.0) / 4.0, EntityY(Collider) + 1.0 - Min(Sin(e\EventState)*1.5,1.1), EntityZ(e\room\obj, True) - Sin(MilliSecs2() / 190.0) / 4.0)
-					
-					;TranslateEntity(Curr106\Collider, 0, -Max((3.0-dist),0), 0, True)
-					PointEntity(Curr106\Collider, Camera)
-					Curr106\State = -11
-					AnimateNPC(Curr106, 55, 104, 0.1)
-					Curr106\Idle = True
-					
-					If e\EventState > 180 Then
+					If e\EventState <= 180 Then
+						PositionEntity(Curr106\Collider, EntityX(e\room\obj, True), EntityY(Collider) + 1.0 - Min(Sin(e\EventState)*1.5,1.1), EntityZ(e\room\obj, True), True)
+						PointEntity(Curr106\Collider, Camera)
+						AnimateNPC(Curr106, 55, 104, 0.1)
+						Curr106\Idle = True
+						Curr106\State = 1
+						ResetEntity(Curr106\Collider)
+						Curr106\DropSpeed = 0
+						PositionEntity(Curr106\obj, EntityX(Curr106\Collider), EntityY(Curr106\Collider) - 0.15, EntityZ(Curr106\Collider))
+						RotateEntity Curr106\obj, 0, EntityYaw(Curr106\Collider), 0
+						ShowEntity Curr106\obj
+					ElseIf e\EventState > 180 And e\EventState < 300 Then
 						Curr106\Idle = False
-						PositionEntity(Curr106\Collider, EntityX(Curr106\Collider), -3.0, EntityZ(Curr106\Collider), True)
-						
-						RemoveEvent(e)
+						Curr106\State = -11
+						PositionEntity(Curr106\Collider, EntityX(e\room\obj, True), -3.0, EntityZ(e\room\obj, True), True)
+						Curr106\PathTimer = 70*10
+						Curr106\PathStatus = 0
+						Curr106\PathLocation = 0
+						e\EventState = 300
+					Else
+						If EntityY(Curr106\Collider)>=EntityY(Collider) Then
+							RemoveEvent(e)
+						Else
+							TranslateEntity Curr106\Collider, 0, ((EntityY(Collider,True) - 0.11) - EntityY(Curr106\Collider)) / 50.0, 0
+						EndIf
 					EndIf
 					
 				EndIf
