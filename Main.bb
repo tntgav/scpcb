@@ -10416,12 +10416,17 @@ Function UpdateInfect()
 			Else
 				Kill()
 				BlinkTimer = Max(Min(-10*(Infect-96),BlinkTimer),-10)
-				If PlayerRoom\RoomTemplate\Name = "dimension1499"
-					DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate repots of a violent attack to a church in the Russian town of [REDACTED]."
-				ElseIf PlayerRoom\RoomTemplate\Name = "gatea"
-					DeathMSG = "008_DEATH_GATEA"
-				ElseIf PlayerRoom\RoomTemplate\Name = "exit1"
-					DeathMSG = "008_DEATH_GATEB"
+				If PlayerRoom\RoomTemplate\Name = "dimension1499" Then
+					DeathMSG = "The whereabouts of SCP-1499 are still unknown, but a recon team has been dispatched to investigate reports of a violent attack to a church in the Russian town of [REDACTED]."
+				ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Or PlayerRoom\RoomTemplate\Name = "exit1" Then
+					DeathMSG = "Subject D-9341 found wandering around Gate "
+					If PlayerRoom\RoomTemplate\Name = "gatea" Then
+						DeathMSG = DeathMSG + "A"
+					Else
+						DeathMSG = DeathMSG + "B"
+					EndIf
+					DeathMSG = DeathMSG + ". Subject was immediately terminated by Nine-Tailed Fox and sent for autopsy. "
+					DeathMSG = DeathMSG + "SCP-008 infection was confirmed, after which the body was incinerated."
 				Else
 					DeathMSG = ""
 				EndIf
