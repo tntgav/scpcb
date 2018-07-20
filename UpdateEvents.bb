@@ -5965,15 +5965,17 @@ Function UpdateEvents()
 							EndIf
 						EndIf
 						
-						UpdateButton(e\room\Objects[4])
-						If ClosestButton = e\room\Objects[4] And MouseHit1 Then
-							e\EventState = 1 ;start the femur breaker
-							If SoundTransmission = True Then ;only play sounds if transmission is on
-								If e\SoundCHN2 <> 0 Then
-									If ChannelPlaying(e\SoundCHN2) Then StopChannel e\SoundCHN2
-								EndIf 
-								FemurBreakerSFX = LoadSound_Strict("SFX\Room\106Chamber\FemurBreaker.ogg")
-								e\SoundCHN2 = PlaySound_Strict (FemurBreakerSFX)
+						If SoundTransmission Then
+							UpdateButton(e\room\Objects[4])
+							If ClosestButton = e\room\Objects[4] And MouseHit1 Then
+								e\EventState = 1 ;start the femur breaker
+								If SoundTransmission = True Then ;only play sounds if transmission is on
+									If e\SoundCHN2 <> 0 Then
+										If ChannelPlaying(e\SoundCHN2) Then StopChannel e\SoundCHN2
+									EndIf 
+									FemurBreakerSFX = LoadSound_Strict("SFX\Room\106Chamber\FemurBreaker.ogg")
+									e\SoundCHN2 = PlaySound_Strict (FemurBreakerSFX)
+								EndIf
 							EndIf
 						EndIf
 					ElseIf e\EventState = 1 ;bone broken

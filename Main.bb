@@ -1427,6 +1427,11 @@ Function UpdateConsole()
 					
 					I_427\Timer = Float(StrTemp)*70.0
 					;[End Block]
+				Case "teleport106"
+					;[Block]
+					Curr106\State = 0
+					Curr106\Idle = False
+					;[End Block]
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
 					;[Block]
 					ConsoleFlush = True 
