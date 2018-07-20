@@ -1312,7 +1312,7 @@ Repeat
 							Exit
 						EndIf
 					Next
-					SetGadgetText event_prob_label,"Event chance: "+(SliderValue(event_prob)+1)+"%
+					SetGadgetText event_prob_label,"Event chance: "+(SliderValue(event_prob)+1)+"%"
 					EnableGadget event_prob
 					SetSliderValue event_prob,99
 				Else
