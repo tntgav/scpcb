@@ -2260,7 +2260,7 @@ Function UpdateEvents()
 										e\EventState = 0
 										e\EventState2 = 0
 										
-										TeleportEntity(Collider,EntityX(r\obj,True),0.4,EntityZ(r\obj,True),0.3,True)
+										TeleportEntity(Collider,EntityX(r\Objects[10],True),0.4,EntityZ(r\Objects[10],True),0.3,True)
 										
 										GiveAchievement(AchvPD)
 										SecondaryLightOn = PrevSecondaryLightOn

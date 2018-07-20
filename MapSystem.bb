@@ -4631,6 +4631,9 @@ Function FillRoom(r.Rooms)
 			
 			r\Objects[9] = CreatePivot(r\obj)
 			PositionEntity (r\Objects[9], r\x - 272 * RoomScale, r\y - 672.0 * RoomScale, r\z + 2736.0 * RoomScale, True)
+			
+			r\Objects[10] = CreatePivot(r\obj)
+			PositionEntity (r\Objects[10], r\x, r\y, r\z - 720.0 * RoomScale, True)
 			;[End Block]
 		Case "room1archive"
 			;[Block]
