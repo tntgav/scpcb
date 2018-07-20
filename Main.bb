@@ -6579,8 +6579,8 @@ Function DrawGUI()
 							
 							x = x - 12 + ((EntityX(Collider) - 4.0) Mod 8.0)*3
 							y = y + 12 - ((EntityZ(Collider)-4.0) Mod 8.0)*3
-							For x2 = Max(1, PlayerX - 6) To Min(MapWidth - 1, PlayerX + 6)
-								For z2 = Max(1, PlayerZ - 6) To Min(MapHeight - 1, PlayerZ + 6)
+							For x2 = Max(0, PlayerX - 6) To Min(MapWidth, PlayerX + 6)
+								For z2 = Max(0, PlayerZ - 6) To Min(MapHeight, PlayerZ + 6)
 									
 									If CoffinDistance > 16.0 Or Rnd(16.0)<CoffinDistance Then 
 										If MapTemp(x2, z2) And (MapFound(x2, z2) > 0 Or SelectedItem\itemtemplate\name = "S-NAV 310 Navigator" Or SelectedItem\itemtemplate\name = "S-NAV Navigator Ultimate") Then
@@ -6595,16 +6595,32 @@ Function DrawGUI()
 											;If MapTemp(x2, z2 - 1) = False Then Line(drawx - 12, drawy - 12, drawx + 12, drawy - 12)
 											;If MapTemp(x2, z2 + 1)= False Then Line(drawx - 12, drawy + 12, drawx + 12, drawy + 12)
 											
-											If MapTemp(x2+1,z2)=False
+											If x2+1<=MapWidth Then
+												If MapTemp(x2+1,z2)=False
+													DrawImage NavImages(3),drawx-12,drawy-12
+												EndIf
+											Else
 												DrawImage NavImages(3),drawx-12,drawy-12
 											EndIf
-											If MapTemp(x2-1,z2)=False
+											If x2-1 > 0 Then
+												If MapTemp(x2-1,z2)=False
+													DrawImage NavImages(1),drawx-12,drawy-12
+												EndIf
+											Else
 												DrawImage NavImages(1),drawx-12,drawy-12
 											EndIf
-											If MapTemp(x2,z2-1)=False
+											If z2-1 > 0 Then
+												If MapTemp(x2,z2-1)=False
+													DrawImage NavImages(0),drawx-12,drawy-12
+												EndIf
+											Else
 												DrawImage NavImages(0),drawx-12,drawy-12
 											EndIf
-											If MapTemp(x2,z2+1)=False
+											If z2+1<=MapHeight Then
+												If MapTemp(x2,z2+1)=False
+													DrawImage NavImages(2),drawx-12,drawy-12
+												EndIf
+											Else
 												DrawImage NavImages(2),drawx-12,drawy-12
 											EndIf
 										EndIf
