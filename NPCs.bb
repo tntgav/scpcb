@@ -1159,7 +1159,7 @@ Function UpdateNPCs()
 							MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 							
 							If n\State <= Rand(-3500, -3000) Then 
-								If Not EntityInView(n\obj,Camera) Then
+								If Not EntityInView(n\obj,Camera) And dist > 5 Then
 									n\State = Rand(22000, 27000)
 									PositionEntity n\Collider,0,500,0
 								EndIf
