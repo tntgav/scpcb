@@ -4068,7 +4068,66 @@ Function FillRoom(r.Rooms)
             EntityParent(sc\obj, r\obj)
 			
 			it = CreateItem("Document SCP-714", "paper", r\x - 728.0 * RoomScale, r\y + 288.0 * RoomScale, r\z - 360.0 * RoomScale)
-			EntityParent(it\collider, r\obj)	
+			EntityParent(it\collider, r\obj)
+			
+			Local dx#,dy#
+			For i = 0 To 14
+				Select i
+					Case 0
+						dx# = -64.0
+						dz# = -516.0
+					Case 1
+						dx# = -96.0
+						dz# = -388.0
+					Case 2
+						dx# = -128.0
+						dz# = -292.0
+					Case 3
+						dx# = -128.0
+						dz# = -132.0
+					Case 4
+						dx# = -160.0
+						dz# = -36.0
+					Case 5
+						dx# = -192.0
+						dz# = 28.0
+					Case 6
+						dx# = -384.0
+						dz# = 28.0
+					Case 7
+						dx# = -448.0
+						dz# = 92.0
+					Case 8
+						dx# = -480.0
+						dz# = 124.0
+					Case 9
+						dx# = -512.0
+						dz# = 156.0
+					Case 10
+						dx# = -544.0
+						dz# = 220.0
+					Case 11
+						dx# = -544.0
+						dz# = 380.0
+					Case 12
+						dx# = -544.0
+						dz# = 476.0
+					Case 13
+						dx# = -544.0
+						dz# = 572.0
+					Case 14
+						dx# = -544.0
+						dz# = 636.0
+				End Select
+				de.Decals = CreateDecal(Rand(15,16),r\x+dx#*RoomScale,0.005,r\z+dz#*RoomScale,90,Rand(360),0)
+				If i > 10 Then
+					de\Size = Rnd(0.2,0.25)
+				Else
+					de\Size = Rnd(0.1,0.17)
+				EndIf
+				EntityAlpha(de\obj, 1.0) : ScaleSprite(de\obj,de\Size,de\Size)
+				EntityParent de\obj, r\obj
+			Next
 			;[End Block]
 		Case "room205"
 			;[Block]
