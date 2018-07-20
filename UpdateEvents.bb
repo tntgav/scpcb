@@ -6822,7 +6822,14 @@ Function UpdateEvents()
 				;[Block]
 				If e\EventState = 0 Then
 					If e\room\dist < 5.0 And e\room\dist > 0 Then
-						If Curr106\State >= 0 Then e\EventState = 1	
+						If Curr106\State >= 0 Then
+							e\EventState = 1
+						Else
+							If Curr106\State <= -10 And EntityDistance(Curr106\Collider,Collider)>5 And (Not EntityInView(Curr106\obj,Camera)) Then
+								e\EventState = 1
+								e\EventState2 = 1
+							EndIf
+						EndIf
 					ElseIf Contained106
 						RemoveEvent(e)
 					EndIf
@@ -6846,6 +6853,9 @@ Function UpdateEvents()
 						End If
 					EndIf
 				Else
+					If e\EventState2 = 1 Then
+						ShouldPlay = 10
+					EndIf
 					e\EventState = e\EventState+FPSfactor
 					If e\EventState <= 180 Then
 						PositionEntity(Curr106\Collider, EntityX(e\room\obj, True), EntityY(Collider) + 1.0 - Min(Sin(e\EventState)*1.5,1.1), EntityZ(e\room\obj, True), True)
@@ -6860,18 +6870,25 @@ Function UpdateEvents()
 						ShowEntity Curr106\obj
 					ElseIf e\EventState > 180 And e\EventState < 300 Then
 						Curr106\Idle = False
-						Curr106\State = -11
+						Curr106\State = -10
 						PositionEntity(Curr106\Collider, EntityX(e\room\obj, True), -3.0, EntityZ(e\room\obj, True), True)
 						Curr106\PathTimer = 70*10
 						Curr106\PathStatus = 0
 						Curr106\PathLocation = 0
+						de.Decals = CreateDecal(0, EntityX(e\room\obj, True), 0.01, EntityZ(e\room\obj, True), 90, Rand(360), 0)
+						de\Size = 0.05 : de\SizeChange = 0.01 : EntityAlpha(de\obj, 0.8) : UpdateDecals
 						e\EventState = 300
-					Else
-						If EntityY(Curr106\Collider)>=EntityY(Collider) Then
+					ElseIf e\EventState < 800
+						If EntityY(Curr106\Collider)>=EntityY(Collider)-0.05 Then
 							RemoveEvent(e)
 						Else
 							TranslateEntity Curr106\Collider, 0, ((EntityY(Collider,True) - 0.11) - EntityY(Curr106\Collider)) / 50.0, 0
+							If EntityY(Curr106\Collider)<-0.1 Then
+								Curr106\CurrSpeed = 0.0
+							EndIf
 						EndIf
+					Else
+						RemoveEvent(e)
 					EndIf
 					
 				EndIf
