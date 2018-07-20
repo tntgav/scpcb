@@ -1637,8 +1637,8 @@ Function UpdateEvents()
 						Local hasBatteryFor895% = 0
 						For i% = 0 To MaxItemAmount - 1
 							If (Inventory(i) <> Null) Then
-								If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
-									If Inventory(i)\state > 0.0 Then
+								If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Or (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvgoggles") Then
+									If Inventory(i)\state > 0.0 Or WearingNightVision=3 Then
 										hasBatteryFor895 = 1
 										Exit
 									EndIf
@@ -1665,7 +1665,7 @@ Function UpdateEvents()
 							
 							If Sanity < -1000 Then
 								If WearingNightVision > 1
-									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject"
+									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, presumably enhanced by SCP-914. It might be possible that the subject "
 									DeathMSG = DeathMSG + "was able to resist the memetic effects partially through these goggles. The goggles have been stored for further study."+Chr(34)
 								Else
 									DeathMSG = Chr(34)+"Class D viewed SCP-895 through a pair of digital night vision goggles, killing him."+Chr(34)
@@ -1680,7 +1680,7 @@ Function UpdateEvents()
 									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
 									For i% = 0 To MaxItemAmount - 1
 										If (Inventory(i) <> Null) Then
-											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Or (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvgoggles") Then
 												If Inventory(i)\state2 = 1 Then PlaySound_Strict(HorrorSFX(1))
 												Inventory(i)\state2 = 2
 												Exit
@@ -1698,7 +1698,7 @@ Function UpdateEvents()
 									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
 									For i% = 0 To MaxItemAmount - 1
 										If (Inventory(i) <> Null) Then
-											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Or (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvgoggles") Then
 												If Inventory(i)\state2 = 0 Then PlaySound_Strict(HorrorSFX(0))
 												Inventory(i)\state2 = 1
 												Exit
@@ -1710,7 +1710,7 @@ Function UpdateEvents()
 								EntityTexture(NVOverlay, NVTexture)
 								For i% = 0 To MaxItemAmount - 1
 									If (Inventory(i) <> Null) Then
-										If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Then
+										If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Or (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvgoggles") Then
 											Inventory(i)\state2 = 0
 										EndIf
 									EndIf
