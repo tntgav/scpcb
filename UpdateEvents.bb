@@ -2852,6 +2852,7 @@ Function UpdateEvents()
 									PointEntity e\room\NPC[0]\Collider,e\room\Objects[2]
 									e\room\NPC[0]\State = 2
 									e\EventStr = "step1"
+									e\EventState = 0
 									e\EventState2 = 0
 									e\EventState3 = 0
 								EndIf
