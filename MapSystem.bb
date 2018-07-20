@@ -4070,6 +4070,9 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("Document SCP-714", "paper", r\x - 728.0 * RoomScale, r\y + 288.0 * RoomScale, r\z - 360.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			
+			it = CreateItem("Document SCP-427", "paper", r\x - 608.0 * RoomScale, r\y + 66.0 * RoomScale, r\z + 636.0 * RoomScale)
+			EntityParent(it\collider, r\obj)
+			
 			Local dx#,dy#
 			For i = 0 To 14
 				Select i

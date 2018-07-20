@@ -313,6 +313,8 @@ Function InitItemTemplates()
 	
 	it = CreateItemTemplate("Research Sector-02 Scheme", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docmap.jpg", 0.003) : it\sound = 0
 	
+	it = CreateItemTemplate("Document SCP-427", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc427.jpg", 0.003) : it\sound = 0
+	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
 			If (it\texpath<>"") Then
