@@ -2972,6 +2972,7 @@ Repeat
 			UpdateItems()
 			UpdateParticles()
 			Use427()
+			UpdateMonitorSaving()
 			;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
 			UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
 			If UpdateParticles_Time#=1
@@ -4806,6 +4807,11 @@ Function DrawGUI()
 			For i = 0 To 5
 				AAText x + 350, 190+(20*i), "SCP-1025 State "+i+": "+SCP1025state[i]
 			Next
+			If SelectedMonitor <> Null Then
+				AAText x + 350, 310, "Current monitor: "+SelectedMonitor\ScrObj
+			Else
+				AAText x + 350, 310, "Current monitor: NULL"
+			EndIf
 			
 			AASetFont Font1
 		EndIf

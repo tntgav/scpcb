@@ -6411,20 +6411,7 @@ Function UpdateSecurityCams()
 			
 			If close = True Then
 				If sc\Screen Then
-					If sc\RenderInterval<>666
-						sc\State = sc\State+FPSfactor
-					EndIf
-					
-					If sc\InSight And sc\AllowSaving Then 
-						If SelectedDifficulty\saveType = SAVEONSCREENS And EntityDistance(Camera, sc\ScrObj)<1.0 Then
-							DrawHandIcon = True
-							If MouseHit1 Then SelectedMonitor = sc
-						Else If SelectedMonitor = sc
-							SelectedMonitor = Null
-						EndIf
-					Else
-						SelectedMonitor = Null
-					EndIf
+					sc\State = sc\State+FPSfactor
 					
 					If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) Then
 						If EntityVisible(Camera,sc\ScrObj) Then
@@ -6452,27 +6439,17 @@ Function UpdateSecurityCams()
 						Sanity = -1010
 					EndIf
 					
-					;If ((sc\State >= sc\RenderInterval And ((Not sc\IsRoom2slCam) Or sc\Room2slID=CurrRoom2slRenderCam))) Or sc\RenderInterval=666 Then
-					If (sc\State >= sc\RenderInterval) Or sc\RenderInterval=666
+					If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) And EntityVisible(Camera,sc\ScrObj) Then
+						sc\InSight = True
+					Else
 						sc\InSight = False
-						If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) And sc\RenderInterval<>667 Then
+					EndIf
+					
+					If (sc\State >= sc\RenderInterval)
+						;sc\InSight = False
+						If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera)Then
 							If EntityVisible(Camera,sc\ScrObj) Then
-								sc\InSight = True
-								
-;								If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
-;									If BlinkTimer > - 5
-;										Sanity=Sanity-(FPSfactor * 16)
-;										DebugLog Sanity
-;										RestoreSanity = False
-;									EndIf
-;									
-;									If Sanity < (-1000) Then 
-;										DeathMSG = Chr(34)+"What we know is that he died of cardiac arrest. My guess is that it was caused by SCP-895, although it has never been observed affecting video equipment from this far before. "
-;										DeathMSG = DeathMSG + "Further testing is needed to determine whether SCP-895's "+Chr(34)+"Red Zone"+Chr(34)+" is increasing."+Chr(34)
-;									
-;										Kill()				
-;									EndIf
-;								EndIf
+								;sc\InSight = True
 								If CoffinCam = Null Or Rand(5)=5 Or sc\CoffinEffect <> 3 Then
 									HideEntity(Camera)
 									ShowEntity(sc\Cam)
@@ -6508,25 +6485,19 @@ Function UpdateSecurityCams()
 						sc\State = 0
 					EndIf
 					
-					If SelectedMonitor = sc Or ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714)) Then
+					If ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714)) Then
 						If sc\InSight Then
-						;If (Not NoClip) Then 
 							Local pvt% = CreatePivot()
 							PositionEntity pvt, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
 							PointEntity(pvt, sc\ScrObj)
 							
-							;DebugLog("curvea: "+CurveAngle(EntityYaw(pvt), EntityYaw(Collider), Min(Max(15000.0 / (-Sanity), 20.0), 200.0)))
 							RotateEntity(Collider, EntityPitch(Collider), CurveAngle(EntityYaw(pvt), EntityYaw(Collider), Min(Max(15000.0 / (-Sanity), 20.0), 200.0)), 0)
 							
 							TurnEntity(pvt, 90, 0, 0)
 							user_camera_pitch = CurveAngle(EntityPitch(pvt), user_camera_pitch + 90.0, Min(Max(15000.0 / (-Sanity), 20.0), 200.0))
-							user_camera_pitch=user_camera_pitch-90						
-							
-							;DebugLog("pvt: "+EntityYaw(pvt)+"   - coll: "+EntityYaw(Collider))
-							
+							user_camera_pitch=user_camera_pitch-90
 							
 							FreeEntity pvt
-						;EndIf
 							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
 								If Sanity < - 800 Then
 									If Rand(3) = 1 Then EntityTexture(sc\ScrOverlay, MonitorTexture)
@@ -6561,7 +6532,7 @@ Function UpdateSecurityCams()
 								EntityTexture(sc\ScrOverlay, MonitorTexture)
 							EndIf
 						EndIf
-					EndIf 
+					EndIf
 					
 					If sc\InSight And sc\CoffinEffect=0 Or sc\CoffinEffect=2 Then
 						If sc\PlayerState = 0 Then
@@ -6591,7 +6562,7 @@ Function UpdateSecurityCams()
 				
 				If (Not sc\InSight) Then sc\soundCHN = LoopSound2(CameraSFX, sc\soundCHN, Camera, sc\CameraObj, 4.0)
 			Else
-				If SelectedMonitor=sc Then SelectedMonitor=Null
+				;If SelectedMonitor=sc Then SelectedMonitor=Null
 			EndIf
 			
 			If sc<>Null Then
@@ -6611,6 +6582,50 @@ Function UpdateSecurityCams()
 	
 End Function
 
+Function UpdateMonitorSaving()
+	Local sc.SecurityCams
+	Local close% = False
+	
+	If SelectedDifficulty\saveType <> SAVEONSCREENS Then Return
+	
+	For sc = Each SecurityCams
+		If sc\AllowSaving And sc\Screen Then
+			close = False
+			If sc\room\dist < 6.0 Or PlayerRoom=sc\room Then 
+				close = True
+			EndIf
+			
+			If close And GrabbedEntity = 0 And ClosestButton = 0 Then
+				If EntityInView(sc\ScrObj,Camera) And EntityDistance(sc\ScrObj,Camera)<1.0 Then
+					If EntityVisible(sc\ScrObj,Camera) Then
+						DrawHandIcon = True
+						If MouseHit1 Then SelectedMonitor = sc
+					Else
+						If SelectedMonitor = sc Then SelectedMonitor = Null
+					EndIf
+				Else
+					If SelectedMonitor = sc Then SelectedMonitor = Null
+				EndIf
+				
+				If SelectedMonitor = sc Then
+					If sc\InSight Then
+						Local pvt% = CreatePivot()
+						PositionEntity pvt, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
+						PointEntity(pvt, sc\ScrObj)
+						RotateEntity(Collider, EntityPitch(Collider), CurveAngle(EntityYaw(pvt), EntityYaw(Collider), Min(Max(15000.0 / (-Sanity), 20.0), 200.0)), 0)
+						TurnEntity(pvt, 90, 0, 0)
+						user_camera_pitch = CurveAngle(EntityPitch(pvt), user_camera_pitch + 90.0, Min(Max(15000.0 / (-Sanity), 20.0), 200.0))
+						user_camera_pitch=user_camera_pitch-90
+						FreeEntity pvt
+					EndIf
+				EndIf
+			Else
+				If SelectedMonitor = sc Then SelectedMonitor = Null
+			EndIf
+		EndIf
+	Next
+	
+End Function
 
 Function UpdateLever(obj, locked=False)
 	
