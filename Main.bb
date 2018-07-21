@@ -6679,13 +6679,14 @@ Function DrawGUI()
 									If np\NPCtype = NPCtype049
 										dist# = EntityDistance(Camera, np\obj)
 										If dist < 8.0 * 4 Then
-											If (Not np\HideFromNVG)
-											Color 100, 0, 0
-											Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
+											If (Not np\HideFromNVG) Then
+												Color 100, 0, 0
+												Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
 												AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-049")
-											SCPs_found% = SCPs_found% + 1
+												SCPs_found% = SCPs_found% + 1
+											EndIf
 										EndIf
-									EndIf
+										Exit
 									EndIf
 								Next
 								If PlayerRoom\RoomTemplate\Name = "coffin" Then
