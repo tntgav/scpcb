@@ -125,7 +125,11 @@ Function LoadSound_Strict(file$)
 	snd\name = file
 	snd\internalHandle = 0
 	snd\releaseTime = 0
-	If (Not EnableSFXRelease) Then snd\internalHandle = LoadSound(snd\name)
+	If (Not EnableSFXRelease) Then
+		If snd\internalHandle = 0 Then 
+			snd\internalHandle = LoadSound(snd\name)
+		EndIf
+	EndIf
 	
 	Return Handle(snd)
 End Function
