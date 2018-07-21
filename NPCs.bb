@@ -5076,11 +5076,13 @@ Function TeleportCloser(n.NPCs)
 	Next
 	
 	If (closestWaypoint<>Null) Then
-		PositionEntity n\Collider, EntityX(closestWaypoint\obj,True), EntityY(closestWaypoint\obj,True)+0.15, EntityZ(closestWaypoint\obj,True), True
-		ResetEntity n\Collider
-		n\PathStatus = 0
-		n\PathTimer# = 0.0
-		n\PathLocation = 0
+		If n\InFacility <> 1 Or n\InFacility = InFacility Or SelectedDifficulty\aggressiveNPCs Then
+			PositionEntity n\Collider, EntityX(closestWaypoint\obj,True), EntityY(closestWaypoint\obj,True)+0.15, EntityZ(closestWaypoint\obj,True), True
+			ResetEntity n\Collider
+			n\PathStatus = 0
+			n\PathTimer# = 0.0
+			n\PathLocation = 0
+		EndIf
 	EndIf
 	
 End Function
