@@ -5182,6 +5182,16 @@ Function FillRoom(r.Rooms)
 			
 			it = CreateItem("Emily Ross' Badge", "badge", r\x + 364.0 * RoomScale, r\y + 5.0 * RoomScale, r\z + 716.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
+			
+			sc.SecurityCams = CreateSecurityCam(r\x + 850.0 * RoomScale, r\y + 350.0 * RoomScale, r\z + 876.0 * RoomScale, r)
+            sc\angle = 220 : sc\turn = 30
+            TurnEntity(sc\CameraObj, 30, 0, 0)
+            EntityParent(sc\obj, r\obj)
+			
+            sc.SecurityCams = CreateSecurityCam(r\x + 600.0 * RoomScale, r\y + 514.0 * RoomScale, r\z + 150.0 * RoomScale, r)
+            sc\angle = 180 : sc\turn = 30
+            TurnEntity(sc\CameraObj, 30, 0, 0)
+            EntityParent(sc\obj, r\obj)
 			;[End Block]
 		Case "room3offices"
 			;[Block]			
