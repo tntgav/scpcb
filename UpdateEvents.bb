@@ -6085,6 +6085,29 @@ Function UpdateEvents()
 						PositionEntity (e\room\Objects[6],EntityX(e\room\Objects[6],True),CurveValue(-1280.0*RoomScale,EntityY(e\room\Objects[6],True),200.0),EntityZ(e\room\Objects[6],True),True)
 						RotateEntity(e\room\Objects[6], 0, EntityYaw(e\room\Objects[6],True), 0, True)
 					EndIf
+				Else
+					If PlayerRoom\RoomTemplate\Name = "pocketdimension" Or PlayerRoom\RoomTemplate\Name = "dimension1499" Then
+						If (e\SoundCHN2<>0) Then
+							If ChannelPlaying(e\SoundCHN2) Then StopChannel e\SoundCHN2
+						EndIf
+						If (e\SoundCHN<>0) Then
+							If ChannelPlaying(e\SoundCHN) Then StopChannel e\SoundCHN
+						EndIf
+					ElseIf PlayerRoom\RoomTemplate\Name = "room860" Then
+						For e2.Events = Each Events
+							If e2\EventName = "room860" Then
+								If e2\EventState = 1.0 Then
+									If (e\SoundCHN2<>0) Then
+										If ChannelPlaying(e\SoundCHN2) Then StopChannel e\SoundCHN2
+									EndIf
+									If (e\SoundCHN<>0) Then
+										If ChannelPlaying(e\SoundCHN) Then StopChannel e\SoundCHN
+									EndIf
+								EndIf
+								Exit
+							EndIf
+						Next
+					EndIf
 				EndIf
 				;[End Block]
 			Case "room205"
