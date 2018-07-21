@@ -6046,7 +6046,7 @@ Function UpdateEvents()
 								
 								d.Decals = CreateDecal(0, EntityX(e\room\Objects[7], True), EntityY(e\room\Objects[7], True) , EntityZ(e\room\Objects[7], True), 0, 0, 0) 
 								RotateEntity(d\obj, EntityPitch(e\room\Objects[7], True)+Rand(10,20), EntityYaw(e\room\Objects[7], True)+30, EntityRoll(d\obj))
-								MoveEntity d\obj, 0,0,0.15
+								MoveEntity d\obj, 0,0.05,0.2 ;0.15
 								RotateEntity(d\obj, EntityPitch(e\room\Objects[7], True), EntityYaw(e\room\Objects[7], True), EntityRoll(d\obj))
 								
 								EntityParent d\obj, e\room\Objects[7]
@@ -6056,8 +6056,8 @@ Function UpdateEvents()
 								d\Alpha = 0.01 : d\AlphaChange = 0.005
 								d\Size = 0.05 : d\SizeChange = 0.002
 							ElseIf e\EventState3 > 3200 Then
-								PositionEntity e\room\Objects[8], 0, 1000.0, 0, True 
-								PositionEntity e\room\Objects[7], 0, 1000.0, 0, True 
+								;PositionEntity e\room\Objects[8], 0, 1000.0, 0, True 
+								;PositionEntity e\room\Objects[7], 0, 1000.0, 0, True 
 								
 								If e\EventState2 = True Then ;magnets off -> 106 caught
 									Contained106 = True

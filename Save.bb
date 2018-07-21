@@ -977,6 +977,10 @@ Function LoadGame(file$)
 			e\EventStr = ""
 		ElseIf e\EventName = "room205"
 			e\EventStr = ""
+		ElseIf e\EventName = "room106"
+			If e\EventState2 = False Then
+				PositionEntity (e\room\Objects[6],EntityX(e\room\Objects[6],True),-1280.0*RoomScale,EntityZ(e\room\Objects[6],True),True)
+			EndIf
 		EndIf
 	Next
 	
