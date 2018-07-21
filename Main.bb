@@ -315,7 +315,7 @@ Global MouseHit1%, MouseDown1%, MouseHit2%, DoubleClick%, LastMouseHit1%, MouseU
 
 Global GodMode%, NoClip%, NoClipSpeed# = 2.0
 
-Global CoffinDistance#
+Global CoffinDistance# = 100.0
 
 Global PlayerSoundVolume#
 
@@ -6569,31 +6569,22 @@ Function DrawGUI()
 						
 						If SelectedItem\state > 0 And (Rnd(CoffinDistance + 15.0) > 1.0 Or PlayerRoom\RoomTemplate\Name <> "coffin") Then
 							
-							PlayerX% = Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5)
-							PlayerZ% = Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5)
+							PlayerX% = Floor((EntityX(PlayerRoom\obj)+8) / 8.0 + 0.5)
+							PlayerZ% = Floor((EntityZ(PlayerRoom\obj)+8) / 8.0 + 0.5)
 							
 							SetBuffer ImageBuffer(NavBG)
 							Local xx = x-ImageWidth(SelectedItem\itemtemplate\img)/2
 							Local yy = y-ImageHeight(SelectedItem\itemtemplate\img)/2+85
 							DrawImage(SelectedItem\itemtemplate\img, xx, yy)
 							
-							x = x - 12 + ((EntityX(Collider) - 4.0) Mod 8.0)*3
-							y = y + 12 - ((EntityZ(Collider)-4.0) Mod 8.0)*3
+							x = x - 12 + (((EntityX(Collider)-4.0)+8.0) Mod 8.0)*3
+							y = y + 12 - (((EntityZ(Collider)-4.0)+8.0) Mod 8.0)*3
 							For x2 = Max(0, PlayerX - 6) To Min(MapWidth, PlayerX + 6)
 								For z2 = Max(0, PlayerZ - 6) To Min(MapHeight, PlayerZ + 6)
 									
 									If CoffinDistance > 16.0 Or Rnd(16.0)<CoffinDistance Then 
-										If MapTemp(x2, z2) And (MapFound(x2, z2) > 0 Or SelectedItem\itemtemplate\name = "S-NAV 310 Navigator" Or SelectedItem\itemtemplate\name = "S-NAV Navigator Ultimate") Then
-											Local drawx% = x + (PlayerX - x2) * 24 , drawy% = y - (PlayerZ - z2) * 24 
-											
-											;Color (30,30,30)
-											;If SelectedItem\itemtemplate\name = "S-NAV Navigator" Then Color(100, 0, 0)
-											;
-											;If MapTemp(x2 + 1, z2) = False Then Line(drawx - 12, drawy - 12, drawx - 12, drawy + 12)
-											;If MapTemp(x2 - 1, z2) = False Then Line(drawx + 12, drawy - 12, drawx + 12, drawy + 12)
-											;
-											;If MapTemp(x2, z2 - 1) = False Then Line(drawx - 12, drawy - 12, drawx + 12, drawy - 12)
-											;If MapTemp(x2, z2 + 1)= False Then Line(drawx - 12, drawy + 12, drawx + 12, drawy + 12)
+										If MapTemp(x2, z2)>0 And (MapFound(x2, z2) > 0 Or SelectedItem\itemtemplate\name = "S-NAV 310 Navigator" Or SelectedItem\itemtemplate\name = "S-NAV Navigator Ultimate") Then
+											Local drawx% = x + (PlayerX - 1 - x2) * 24 , drawy% = y - (PlayerZ - 1 - z2) * 24
 											
 											If x2+1<=MapWidth Then
 												If MapTemp(x2+1,z2)=False
@@ -6602,14 +6593,14 @@ Function DrawGUI()
 											Else
 												DrawImage NavImages(3),drawx-12,drawy-12
 											EndIf
-											If x2-1 > 0 Then
+											If x2-1>=0 Then
 												If MapTemp(x2-1,z2)=False
 													DrawImage NavImages(1),drawx-12,drawy-12
 												EndIf
 											Else
 												DrawImage NavImages(1),drawx-12,drawy-12
 											EndIf
-											If z2-1 > 0 Then
+											If z2-1>=0 Then
 												If MapTemp(x2,z2-1)=False
 													DrawImage NavImages(0),drawx-12,drawy-12
 												EndIf
@@ -6732,7 +6723,7 @@ Function DrawGUI()
 								For i = 1 To Ceil(SelectedItem\state / 10.0)
 									DrawImage NavImages(4),xtemp+i*8-6,ytemp+4
 								Next
-											
+								
 								AASetFont Font3
 						EndIf
 						EndIf
@@ -8563,8 +8554,8 @@ Function NullGame(playbuttonsfx%=True)
 	HideDistance# = 15.0
 	
 	For lvl = 0 To 0
-		For x = 0 To MapWidth - 1
-			For y = 0 To MapHeight - 1
+		For x = 0 To MapWidth+1
+			For y = 0 To MapHeight+1
 				MapTemp(x, y) = 0
 				MapFound(x, y) = 0
 			Next
@@ -8622,6 +8613,8 @@ Function NullGame(playbuttonsfx%=True)
 	ForceMove = 0.0
 	ForceAngle = 0.0	
 	Playable = True
+	
+	CoffinDistance = 100
 	
 	Contained106 = False
 	If Curr173 <> Null Then Curr173\Idle = False

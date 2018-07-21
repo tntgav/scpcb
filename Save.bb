@@ -1966,6 +1966,17 @@ Function LoadMap(file$)
 	f% = ReadFile(file)
 	DebugLog file
 	
+	Dim MapTemp%(MapWidth+1, MapHeight+1)
+	Dim MapFound%(MapWidth+1, MapHeight+1)
+	CoffinDistance = 100
+	
+	For x = 0 To MapWidth+1
+		For y = 0 To MapHeight+1
+			MapTemp(x,y)=False
+			MapFound(x,y)=False
+		Next
+	Next
+	
 	If Right(file,6)="cbmap2" Then
 		ReadLine(f)
 		ReadLine(f)
@@ -2007,7 +2018,7 @@ Function LoadMap(file$)
 					
 					TurnEntity(r\obj, 0, r\angle, 0)
 					
-					MapTemp(MapWidth-x,y)=1
+					MapTemp(MapWidth-x,y)=True
 					
 					Exit
 				EndIf
@@ -2183,7 +2194,7 @@ Function LoadMap(file$)
 					
 					TurnEntity(r\obj, 0, r\angle, 0)
 					
-					MapTemp(MapWidth-x,y)=1
+					MapTemp(MapWidth-x,y)=True
 					
 					Exit
 				EndIf
@@ -2340,6 +2351,16 @@ Function LoadMap(file$)
 				EndIf
 			EndIf
 			If (r\Adjacent[0]<>Null) And (r\Adjacent[1]<>Null) And (r\Adjacent[2]<>Null) And (r\Adjacent[3]<>Null) Then Exit
+		Next
+	Next
+	
+	For x = 0 To MapWidth+1
+		For y = 0 To MapHeight+1
+			If MapTemp(x,y)>0 Then
+				DebugLog "MapTemp("+x+","+y+") = True"
+			Else
+				DebugLog "MapTemp("+x+","+y+") = False"
+			EndIf
 		Next
 	Next
 	
