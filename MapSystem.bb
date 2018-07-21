@@ -6333,7 +6333,7 @@ Function CreateSecurityCam.SecurityCams(x#, y#, z#, r.Rooms, screen% = False)
 		
 		sc\Cam = CreateCamera()
 		CameraViewport(sc\Cam, 0, 0, 512, 512)
-		CameraRange sc\Cam, 0.05, 6.0
+		CameraRange sc\Cam, 0.05, 8.0 ;6.0
 		CameraZoom(sc\Cam, 0.8)
 		HideEntity(sc\Cam)	
 	End If
