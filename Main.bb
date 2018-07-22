@@ -2297,7 +2297,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 					If d\locked Then
 						Msg = "The keycard was inserted into the slot but nothing happened."
 					Else
-						Msg = "A keycard with the security clearance "+d\KeyCard+" or higher is required to operate this door."
+						Msg = "A keycard with security clearance "+d\KeyCard+" or higher is required to operate this door."
 					EndIf
 					MsgTimer = 70 * 7					
 				EndIf
