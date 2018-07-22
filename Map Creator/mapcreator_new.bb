@@ -1904,6 +1904,8 @@ Function LoadMap(file$)
 		SetGadgetText descr_text,MapDescription$
 		zonetransvalue1 = ReadByte(f)
 		zonetransvalue2 = ReadByte(f)
+		SetGadgetText zonetrans1,(MapHeight)-zonetransvalue1
+		SetGadgetText zonetrans2,(MapHeight)-zonetransvalue2
 		Local roomamount = ReadInt(f) ;Amount of rooms
 		Local forestamount = ReadInt(f) ;Amount of forest pieces
 		Local mtroomamount = ReadInt(f) ;Amount of maintenance tunnel rooms
