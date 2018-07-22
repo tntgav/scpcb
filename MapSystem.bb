@@ -8148,18 +8148,19 @@ Function UpdateRoomLights(cam%)
 								EndIf
 							EndIf
 						Else
-							If (Not r\LightSpriteHidden[i]) Then
-								If PlayerRoom\RoomTemplate\Name$ = "173" Then
+							If PlayerRoom\RoomTemplate\Name$ = "173" Then
+								random# = Rnd(0.38,0.42)
+							Else
+								If r\LightFlicker%[i]<5 Then
 									random# = Rnd(0.38,0.42)
+								ElseIf r\LightFlicker%[i]>4 And r\LightFlicker%[i]<10 Then
+									random# = Rnd(0.35,0.45)
 								Else
-									If r\LightFlicker%[i]<5 Then
-										random# = Rnd(0.38,0.42)
-									ElseIf r\LightFlicker%[i]>4 And r\LightFlicker%[i]<10 Then
-										random# = Rnd(0.35,0.45)
-									Else
-										random# = Rnd(0.3,0.5)
-									EndIf
+									random# = Rnd(0.3,0.5)
 								EndIf
+							EndIf
+							
+							If (Not r\LightSpriteHidden[i]) Then
 								ScaleSprite r\LightSprites2[i],random#,random#
 							EndIf
 							
