@@ -447,6 +447,8 @@ Function SaveGame(file$)
 	WriteByte f, I_Zone\Transition[1]
 	WriteByte f, I_Zone\HasCustomForest
 	WriteByte f, I_Zone\HasCustomMT
+	
+	WriteByte f, Wearing714
 	CloseFile f
 	
 	If Not MenuOpen Then
@@ -1167,6 +1169,8 @@ Function LoadGame(file$)
 	I_Zone\HasCustomForest = ReadByte(f)
 	I_Zone\HasCustomMT = ReadByte(f)
 	
+	Wearing714 = ReadByte(f)
+	
 	CloseFile f
 	
 	For r.Rooms = Each Rooms
@@ -1883,6 +1887,8 @@ Function LoadGameQuick(file$)
 	I_Zone\Transition[1] = ReadByte(f)
 	I_Zone\HasCustomForest = ReadByte(f)
 	I_Zone\HasCustomMT = ReadByte(f)
+	
+	Wearing714 = ReadByte(f)
 	CloseFile f
 	
 	If Collider <> 0 Then
