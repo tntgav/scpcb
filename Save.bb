@@ -332,13 +332,13 @@ Function SaveGame(file$)
 	For d.Decals = Each Decals
 		WriteInt f, d\ID
 		
-		WriteFloat f, d\x
-		WriteFloat f, d\y
-		WriteFloat f, d\z
+		WriteFloat f, EntityX(d\obj,True)
+		WriteFloat f, EntityY(d\obj,True)
+		WriteFloat f, EntityZ(d\obj,True)
 		
-		WriteFloat f, d\pitch
-		WriteFloat f, d\yaw
-		WriteFloat f, d\roll
+		WriteFloat f, EntityPitch(d\obj,True)
+		WriteFloat f, EntityYaw(d\obj,True)
+		WriteFloat f, EntityRoll(d\obj,True)
 		
 		WriteByte f, d\blendmode
 		WriteInt f, d\fx
@@ -958,6 +958,12 @@ Function LoadGame(file$)
 	
 	If ReadInt(f) <> 1845 Then RuntimeError("Couldn't load the game, save file corrupted (error 3)")
 	
+	Local d.Decals
+	For d.Decals = Each Decals
+		FreeEntity d\obj
+		Delete d
+	Next
+	
 	temp = ReadInt(f)
 	For i = 1 To temp
 		id% = ReadInt(f)
@@ -967,7 +973,7 @@ Function LoadGame(file$)
 		Local pitch# = ReadFloat(f)
 		Local yaw# = ReadFloat(f)
 		Local roll# = ReadFloat(f)
-		Local d.Decals = CreateDecal(id, x, y, z, pitch, yaw, roll)
+		d.Decals = CreateDecal(id, x, y, z, pitch, yaw, roll)
 		d\blendmode = ReadByte (f)
 		d\fx = ReadInt(f)
 		
@@ -980,7 +986,10 @@ Function LoadGame(file$)
 		ScaleSprite(d\obj, d\Size, d\Size)
 		EntityBlend d\obj, d\blendmode
 		EntityFX d\obj, d\fx
+		
+		DebugLog "Created Decal @"+x+","+y+","+z
 	Next
+	UpdateDecals()
 	
 	temp = ReadInt(f)
 	For i = 1 To temp
@@ -1694,7 +1703,10 @@ Function LoadGameQuick(file$)
 		ScaleSprite(d\obj, d\Size, d\Size)
 		EntityBlend d\obj, d\blendmode
 		EntityFX d\obj, d\fx
+		
+		DebugLog "Created Decal @"+x+","+y+","+z
 	Next
+	UpdateDecals()
 	
 	Local e.Events
 	For e.Events = Each Events
