@@ -844,6 +844,7 @@ Function LoadGame(file$)
 				If zone = 2 Then temp=2 Else temp=0
                 
                 For r.Rooms = Each Rooms
+					r\angle = WrapAngle(r\angle)
 					If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
 						shouldSpawnDoor = False
 						Select r\RoomTemplate\Shape
@@ -2314,6 +2315,7 @@ Function LoadMap(file$)
 				If zone = 2 Then temp=2 Else temp=0
                 
                 For r.Rooms = Each Rooms
+					r\angle = WrapAngle(r\angle)
 					If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
 						shouldSpawnDoor = False
 						Select r\RoomTemplate\Shape
