@@ -4045,6 +4045,7 @@ Function UpdateEvents()
 									PickItem(SelectedItem)
 									
 									FreeEntity(e\room\Objects[2])
+									e\room\Objects[2] = 0
 									
 									e\EventState = 3
 									RemoveEvent(e)
