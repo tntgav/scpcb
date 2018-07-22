@@ -8126,30 +8126,6 @@ Function UpdateRoomLights(cam%)
 								EndIf
 							EndIf
 							
-							If r\LightCone[i]<>0 Then ShowEntity r\LightCone[i]
-							
-							If r\LightConeSpark[i]<>0 Then
-								If r\LightConeSparkTimer[i]>0 And r\LightConeSparkTimer[i]<10
-									ShowEntity r\LightConeSpark[i]
-									r\LightConeSparkTimer[i]=r\LightConeSparkTimer[i]+FPSfactor
-								Else
-									HideEntity r\LightConeSpark[i]
-									r\LightConeSparkTimer[i]=0
-								EndIf
-							EndIf
-							
-							If r\LightCone[i]<>0 Then
-								ScaleEntity r\LightCone[i],0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025)
-								If r\LightFlicker%[i]>4 Then
-									If Rand(400)=1 Then
-										SetEmitter(r\LightSpritesPivot[i],ParticleEffect[0])
-										PlaySound2(IntroSFX(Rand(10,12)),cam,r\LightSpritesPivot[i])
-										ShowEntity r\LightConeSpark[i]
-										r\LightConeSparkTimer[i] = FPSfactor
-									EndIf
-								EndIf
-							EndIf
-							
 							If (EntityDistance(cam%,r\LightSprites2[i])<8.5 Or r\RoomTemplate\UseLightCones) Then
 								If EntityVisible(cam%,r\LightSpritesPivot[i]) Or r\RoomTemplate\UseLightCones Then
 									If r\LightSpriteHidden%[i] Then
@@ -8201,23 +8177,53 @@ Function UpdateRoomLights(cam%)
 									r\LightSpriteHidden%[i] = True
 									If r\LightCone[i]<>0 Then HideEntity r\LightCone[i]
 									If r\LightConeSpark[i]<>0 HideEntity r\LightConeSpark[i]
+									EndIf
 								EndIf
-							EndIf
-						Else
-							If PlayerRoom\RoomTemplate\Name$ = "173" Then
-								random# = Rnd(0.38,0.42)
-							Else
-								If r\LightFlicker%[i]<5 Then
-									random# = Rnd(0.38,0.42)
-								ElseIf r\LightFlicker%[i]>4 And r\LightFlicker%[i]<10 Then
-									random# = Rnd(0.35,0.45)
+							
+							If r\LightCone[i]<>0 Then ShowEntity r\LightCone[i]
+							
+							If r\LightConeSpark[i]<>0 Then
+								If r\LightConeSparkTimer[i]>0 And r\LightConeSparkTimer[i]<10
+									ShowEntity r\LightConeSpark[i]
+									r\LightConeSparkTimer[i]=r\LightConeSparkTimer[i]+FPSfactor
 								Else
-									random# = Rnd(0.3,0.5)
+									HideEntity r\LightConeSpark[i]
+									r\LightConeSparkTimer[i]=0
 								EndIf
 							EndIf
 							
-							If (Not r\LightSpriteHidden[i]) Then
-								ScaleSprite r\LightSprites2[i],random#,random#
+							If r\LightCone[i]<>0 Then
+								ScaleEntity r\LightCone[i],0.005+Max(((-0.4+random#)*0.025),0),0.005+Max(((-0.4+random#)*0.025),0),0.005+Max(((-0.4+random#)*0.025),0)
+								If r\LightFlicker%[i]>4 Then
+									If Rand(400)=1 Then
+										SetEmitter(r\LightSpritesPivot[i],ParticleEffect[0])
+										PlaySound2(IntroSFX(Rand(10,12)),cam,r\LightSpritesPivot[i])
+										ShowEntity r\LightConeSpark[i]
+										r\LightConeSparkTimer[i] = FPSfactor
+									EndIf
+								EndIf
+							EndIf
+						Else
+							If (EntityDistance(cam%,r\LightSprites2[i])<8.5 Or r\RoomTemplate\UseLightCones) Then
+								If PlayerRoom\RoomTemplate\Name$ = "173" Then
+									random# = Rnd(0.38,0.42)
+								Else
+									If r\LightFlicker%[i]<5 Then
+										random# = Rnd(0.38,0.42)
+									ElseIf r\LightFlicker%[i]>4 And r\LightFlicker%[i]<10 Then
+										random# = Rnd(0.35,0.45)
+									Else
+										random# = Rnd(0.3,0.5)
+									EndIf
+								EndIf
+								
+								If (Not r\LightSpriteHidden[i]) Then
+									ScaleSprite r\LightSprites2[i],random#,random#
+								EndIf
+							EndIf
+							
+							If r\LightCone[i]<>0 Then
+								ScaleEntity r\LightCone[i],0.005+Max(((-0.4+random#)*0.025),0),0.005+Max(((-0.4+random#)*0.025),0),0.005+Max(((-0.4+random#)*0.025),0)
 							EndIf
 							
 							If r\LightConeSpark[i]<>0 Then
@@ -8228,10 +8234,6 @@ Function UpdateRoomLights(cam%)
 									HideEntity r\LightConeSpark[i]
 									r\LightConeSparkTimer[i]=0
 								EndIf
-							EndIf
-							
-							If r\LightCone[i]<>0 Then
-								ScaleEntity r\LightCone[i],0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025),0.005+((-0.4+random#)*0.025)
 							EndIf
 						EndIf
 						UpdateRoomLightsTimer = UpdateRoomLightsTimer + FPSfactor
