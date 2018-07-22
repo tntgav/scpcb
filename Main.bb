@@ -6560,8 +6560,23 @@ Function DrawGUI()
 					
 					AASetFont Font3
 					
-					If PlayerRoom\RoomTemplate\Name = "pocketdimension" Or PlayerRoom\RoomTemplate\Name = "dimension1499" Then
-						If (MilliSecs2() Mod 1000) > 300 Then	
+					Local NavWorks% = True
+					If PlayerRoom\RoomTemplate\Name$ = "pocketdimension" Or PlayerRoom\RoomTemplate\Name$ = "dimension1499" Then
+						NavWorks% = False
+					ElseIf PlayerRoom\RoomTemplate\Name$ = "room860" Then
+						For e.Events = Each Events
+							If e\EventName = "room860" Then
+								If e\EventState = 1.0 Then
+									NavWorks% = False
+								EndIf
+								Exit
+							EndIf
+						Next
+					EndIf
+					
+					If (Not NavWorks) Then
+						If (MilliSecs2() Mod 1000) > 300 Then
+							Color(200, 0, 0)
 							AAText(x, y + height / 2 - 80, "ERROR 06", True)
 							AAText(x, y + height / 2 - 60, "LOCATION UNKNOWN", True)						
 						EndIf
