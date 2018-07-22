@@ -1985,9 +1985,17 @@ Function UpdateNPCs()
 								;Animate2(n\obj, AnimTime(n\obj), 18, 19, 0.05)
 								PointEntity n\obj, Collider	
 								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 45.0), 0
-							ElseIf dist > HideDistance*0.8
+								
+								n\State3 = 1
+							ElseIf dist > HideDistance*0.8 And n\State3 > 0 Then
 								n\State = 2
-								TeleportCloser(n)
+								n\State3 = 0
+								For r.Rooms = Each Rooms
+									If EntityDistance(r\obj,n\Collider)<4.0 Then
+										TeleportEntity(n\Collider,EntityX(r\obj),0.1,EntityZ(r\obj),n\CollRadius,True)
+										Exit
+									EndIf
+								Next
 							EndIf
 							;[End Block]
 						Case 5 ;used for "room2sl"

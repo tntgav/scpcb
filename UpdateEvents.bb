@@ -4955,6 +4955,7 @@ Function UpdateEvents()
 										n\PathStatus = 0
 										n\State = 4
 										n\State2 = 0
+										n\State3 = 0
 										RemoveEvent(e)
 									EndIf
 									Exit
