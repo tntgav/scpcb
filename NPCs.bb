@@ -5214,6 +5214,9 @@ Function UpdateMTFUnit(n.NPCs)
 	If n\IsDead Then
 		n\BlinkTimer = -1.0
 		SetNPCFrame(n, 532)
+		If ChannelPlaying(n\SoundChn2) Then
+			StopChannel(n\SoundChn2)
+		EndIf
 		Return
 	EndIf
 	
@@ -5241,6 +5244,8 @@ Function UpdateMTFUnit(n.NPCs)
 	n\NPCNameInSection = "MTF"
 	
 	If Int(n\State) <> 1 Then n\PrevState = 0
+	
+	n\SoundChn2 = LoopSound2(MTFSFX(6),n\SoundChn2,Camera,n\Collider)
 	
 	If n\Idle>0.0 Then
 		FinishWalking(n,488,522,0.015*26)
