@@ -5619,6 +5619,8 @@ Function UpdateEvents()
 							
 							e\room\RoomDoors[1]\locked = True
 							e\room\RoomDoors[3]\locked = True
+							e\room\RoomDoors[1]\IsElevatorDoor = 0
+							e\room\RoomDoors[3]\IsElevatorDoor = 0
 							
 							If (prevGenLever <> x) Then
 								If x=False Then
@@ -5668,13 +5670,17 @@ Function UpdateEvents()
 										PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[i],True),EntityY(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)
 										ResetEntity e\room\NPC[0]\Collider
 										PlaySound2(ElevatorBeepSFX, Camera, e\room\Objects[i], 4.0)
-										UseDoor(e\room\RoomDoors[i],False)
+										e\room\RoomDoors[i]\locked = False
+										UseDoor(e\room\RoomDoors[i],False,True)
 										e\room\RoomDoors[i-1]\open = False
 										e\room\RoomDoors[i]\open = True
 										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
-										PlaySound2(LoadTempSound("SFX\SCP\049\Greeting"+Rand(1,2)+".ogg"),Camera, e\room\NPC[0]\Collider)
+										If e\room\NPC[0]\Sound2 <> 0 Then FreeSound_Strict(e\room\NPC[0]\Sound2)
+										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Greeting"+Rand(1,2)+".ogg")
+										e\room\NPC[0]\SoundChn2 = LoopSound2(e\room\NPC[0]\Sound2,e\room\NPC[0]\SoundChn2,Camera,e\room\NPC[0]\obj)
 										e\room\NPC[0]\Idle = 0
 										e\room\NPC[0]\HideFromNVG = False
+										e\room\NPC[0]\PrevState = 2
 									EndIf
 								EndIf
 							EndIf
