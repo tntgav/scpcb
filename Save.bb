@@ -1237,7 +1237,7 @@ Function LoadGame(file$)
 			ShowEntity PlayerRoom\obj
 		EndIf
 		ShowEntity Collider
-		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider))
+		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider),0.3,True)
 		If PlayerRoom<>Null Then
 			HideEntity PlayerRoom\obj
 		EndIf
@@ -1897,7 +1897,7 @@ Function LoadGameQuick(file$)
 			ShowEntity PlayerRoom\obj
 		EndIf
 		ShowEntity Collider
-		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider))
+		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider),0.3,True)
 		If PlayerRoom<>Null Then
 			HideEntity PlayerRoom\obj
 		EndIf
