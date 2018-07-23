@@ -6717,292 +6717,62 @@ Function UpdateButton(obj)
 	
 End Function
 
-Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.Events)
-	Local x#, z#, n.NPCs, NPC_inside.NPCs, it.Items, sound%
+Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.Events, ignorerotation% = True)
+	Local x#, z#, sound%
+	Local dist#, dir#, n.NPCs, it.Items
 	
 	door1\IsElevatorDoor = 1
 	door2\IsElevatorDoor = 1
-	If door1\open = True And door2\open = False Then 
+	If door1\open = True And door2\open = False And door1\openstate = 180 Then 
 		State = -1
+		door1\locked = False
 		If (ClosestButton = door2\buttons[0] Or ClosestButton = door2\buttons[1]) And MouseHit1 Then
 			UseDoor(door1,False)
 		EndIf
-		If door2\NPCCalledElevator = True Then
-			UseDoor(door1,False)
-			door2\NPCCalledElevator = 2
-		EndIf
-	ElseIf door2\open = True And door1\open = False Then
+	ElseIf door2\open = True And door1\open = False And door2\openstate = 180 Then
 		State = 1
+		door2\locked = False
 		If (ClosestButton = door1\buttons[0] Or ClosestButton = door1\buttons[1]) And MouseHit1 Then
 			UseDoor(door2,False)
-		EndIf
-		If door1\NPCCalledElevator = True Then
-			UseDoor(door2,False)
-			door1\NPCCalledElevator = 2
 		EndIf
 	ElseIf Abs(door1\openstate-door2\openstate)<0.2 Then
 		door1\IsElevatorDoor = 2
 		door2\IsElevatorDoor = 2
 	EndIf
 	
-	Local inside = False
-	NPC_inside = Null
-	
-	;molemmat ovet kiinni = hissi liikkuu
-	If door1\open = False And door2\open = False Then
-		door1\locked = True 
-		door2\locked = True
-		door1\NPCCalledElevator = 2
-		door2\NPCCalledElevator = 2
-		If door1\openstate = 0 And door2\openstate = 0 Then
-			If State < 0 Then ;ylh��lt� alas
-				State = State - FPSfactor
-				;pelaaja hissin sis�ll�
-				If Abs(EntityX(Collider)-EntityX(room1,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-					If Abs(EntityZ(Collider)-EntityZ(room1,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-						If Abs(EntityY(Collider)-EntityY(room1,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-							inside = True
-							
-							If event\SoundCHN = 0 Then
-								event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
-							Else
-								If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
-							EndIf
-							
-							CameraShake = Sin(Abs(State)/3.0)*0.3
-						EndIf
-					EndIf
-				EndIf
-				
-				For n.NPCs = Each NPCs
-					If n\CanUseElevator
-						If Abs(EntityX(n\Collider)-EntityX(room1,True))<280.0*RoomScale+(0.015*FPSfactor)
-							If Abs(EntityZ(n\Collider)-EntityZ(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-								If Abs(EntityY(n\Collider)-EntityY(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									NPC_inside = n
-								EndIf
-							EndIf
-						EndIf
-					EndIf
-				Next
-				
-				If NPC_inside <> Null And (Not inside)
-					NPC_inside\Idle = True
-				ElseIf NPC_inside <> Null And inside
-					NPC_inside\Idle = False
-				EndIf
-				
-				If State < -500 Then
+	door1\locked = True
+	door2\locked = True
+	If door1\open Then
+		door1\IsElevatorDoor = 3
+		If Abs(EntityX(Collider)-EntityX(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
+			If Abs(EntityZ(Collider)-EntityZ(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then	
+				If Abs(EntityY(Collider)-EntityY(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then	
 					door1\locked = False
-					door2\locked = False
-					door1\NPCCalledElevator = False
-					door2\NPCCalledElevator = False
-					State = 0
-					
-					If inside Then
-						;x# = Max(Min((EntityX(Collider)-EntityX(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
-						;z# = Max(Min((EntityZ(Collider)-EntityZ(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
-						x# = Max(Min((EntityX(Collider)-EntityX(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-						z# = Max(Min((EntityZ(Collider)-EntityZ(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-						TeleportEntity(Collider, EntityX(room2,True)+x,(0.1*FPSfactor)+EntityY(room2,True)+(EntityY(Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,0.3,True)
-						UpdateDoorsTimer = 0
-						DropSpeed = 0
-						UpdateDoors()
-						UpdateRooms()
-						
-						sound=Rand(0, 2)
-						door2\SoundCHN = PlaySound_Strict(OpenDoorSFX(3, sound))
-					EndIf
-					
-					For n.NPCs = Each NPCs
-						If Abs(EntityX(n\Collider)-EntityX(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-							If Abs(EntityZ(n\Collider)-EntityZ(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-								If Abs(EntityY(n\Collider)-EntityY(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									x# = Max(Min((EntityX(n\Collider)-EntityX(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-									z# = Max(Min((EntityZ(n\Collider)-EntityZ(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-									TeleportEntity(n\Collider, EntityX(room2,True)+x,(0.1*FPSfactor)+EntityY(room2,True)+(EntityY(n\Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,n\CollRadius,True)
-									If n = Curr173
-										Curr173\IdleTimer = 10
-									EndIf
-								EndIf
-							EndIf
-						EndIf
-					Next
-					For it.Items = Each Items
-						If Abs(EntityX(it\collider)-EntityX(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-							If Abs(EntityZ(it\collider)-EntityZ(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-								If Abs(EntityY(it\collider)-EntityY(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									x# = Max(Min((EntityX(it\collider)-EntityX(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-									z# = Max(Min((EntityZ(it\collider)-EntityZ(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-									TeleportEntity(it\collider, EntityX(room2,True)+x,(0.1*FPSfactor)+EntityY(room2,True)+(EntityY(it\collider)-EntityY(room1,True)),EntityZ(room2,True)+z,0.01,True)
-								EndIf
-							EndIf
-						EndIf
-					Next
-					
-					If NPC_inside <> Null
-						x# = Max(Min((EntityX(NPC_inside\Collider)-EntityX(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-						z# = Max(Min((EntityZ(NPC_inside\Collider)-EntityZ(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-						TeleportEntity(NPC_inside\Collider, EntityX(room2,True)+x,(0.1*FPSfactor)+EntityY(room2,True)+(EntityY(NPC_inside\Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,NPC_inside\CollRadius,True)
-						UpdateDoorsTimer = 0
-						NPC_inside\DropSpeed = 0
-						If NPC_inside\Idle
-							TurnEntity NPC_inside\obj,0,180,0
-							TurnEntity NPC_inside\Collider,0,180,0
-							NPC_inside\Idle = False
-						EndIf
-						NPC_inside\CurrElevator = Null
-					EndIf
-					
-					UseDoor(door2,False,Not inside)
-					
-					PlaySound2(ElevatorBeepSFX, Camera, room1, 4.0)
+					door1\IsElevatorDoor = 1
 				EndIf
-			Else ;alhaalta yl�s
-				State = State + FPSfactor
-				;pelaaja hissin sis�ll�
-				If Abs(EntityX(Collider)-EntityX(room2,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-					If Abs(EntityZ(Collider)-EntityZ(room2,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-						If Abs(EntityY(Collider)-EntityY(room2,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-							inside = True
-							
-							If event\SoundCHN = 0 Then
-								event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
-							Else
-								If (Not ChannelPlaying(event\SoundCHN)) Then event\SoundCHN = PlaySound_Strict(ElevatorMoveSFX)
-							EndIf
-							
-							CameraShake = Sin(Abs(State)/3.0)*0.3
-						EndIf
-					EndIf
-				EndIf	
-				
-				For n.NPCs = Each NPCs
-					If n\CanUseElevator
-						If Abs(EntityX(n\Collider)-EntityX(room2,True))<280.0*RoomScale+(0.015*FPSfactor)
-							If Abs(EntityZ(n\Collider)-EntityZ(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-								If Abs(EntityY(n\Collider)-EntityY(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									NPC_inside = n
-								EndIf
-							EndIf
-						EndIf
-					EndIf
-				Next
-				
-				If NPC_inside <> Null And (Not inside)
-					NPC_inside\Idle = True
-				ElseIf NPC_inside <> Null And inside
-					NPC_inside\Idle = False
-				EndIf
-				
-				If State > 500 Then
-					door1\locked = False
-					door2\locked = False
-					door1\NPCCalledElevator = False
-					door2\NPCCalledElevator = False
-					State = 0
-					
-					;pelaaja hissin sis�ll�, siirret��n
-					If inside Then
-						;x# = Max(Min((EntityX(Collider)-EntityX(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
-						;z# = Max(Min((EntityZ(Collider)-EntityZ(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
-						x# = Max(Min((EntityX(Collider)-EntityX(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-						z# = Max(Min((EntityZ(Collider)-EntityZ(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-						TeleportEntity(Collider, EntityX(room1,True)+x,(0.1*FPSfactor)+EntityY(room1,True)+(EntityY(Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,0.3,True)
-						UpdateDoorsTimer = 0
-						DropSpeed = 0
-						UpdateDoors()
-						UpdateRooms()
-						
-						sound=Rand(0, 2)
-						door1\SoundCHN = PlaySound_Strict(OpenDoorSFX(3, sound))
-					EndIf
-					
-					For n.NPCs = Each NPCs
-						If Abs(EntityX(n\Collider)-EntityX(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-							If Abs(EntityZ(n\Collider)-EntityZ(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-								If Abs(EntityY(n\Collider)-EntityY(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									x# = Max(Min((EntityX(n\Collider)-EntityX(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-									z# = Max(Min((EntityZ(n\Collider)-EntityZ(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-									TeleportEntity(n\Collider, EntityX(room1,True)+x,(0.1*FPSfactor)+EntityY(room1,True)+(EntityY(n\Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,n\CollRadius,True)
-									If n = Curr173
-										Curr173\IdleTimer = 10
-									EndIf
-								EndIf
-							EndIf
-						EndIf
-					Next
-					For it.Items = Each Items
-						If Abs(EntityX(it\collider)-EntityX(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-							If Abs(EntityZ(it\collider)-EntityZ(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-								If Abs(EntityY(it\collider)-EntityY(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									x# = Max(Min((EntityX(it\collider)-EntityX(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-									z# = Max(Min((EntityZ(it\collider)-EntityZ(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-									TeleportEntity(it\collider, EntityX(room1,True)+x,(0.1*FPSfactor)+EntityY(room1,True)+(EntityY(it\collider)-EntityY(room2,True)),EntityZ(room1,True)+z,0.01,True)
-								EndIf
-							EndIf
-						EndIf
-					Next
-					
-					If NPC_inside <> Null
-						x# = Max(Min((EntityX(NPC_inside\Collider)-EntityX(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-						z# = Max(Min((EntityZ(NPC_inside\Collider)-EntityZ(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
-						TeleportEntity(NPC_inside\Collider, EntityX(room1,True)+x,(0.1*FPSfactor)+EntityY(room1,True)+(EntityY(NPC_inside\Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,NPC_inside\CollRadius,True)
-						UpdateDoorsTimer = 0
-						NPC_inside\DropSpeed = 0
-						If NPC_inside\Idle
-							TurnEntity NPC_inside\obj,0,180,0
-							TurnEntity NPC_inside\Collider,0,180,0
-							NPC_inside\Idle = False
-						EndIf
-						NPC_inside\CurrElevator = Null
-					EndIf
-					
-					UseDoor(door1,False,Not inside)
-					
-					PlaySound2(ElevatorBeepSFX, Camera, room2, 4.0)
-				EndIf	
-				
 			EndIf
 		EndIf
 	EndIf
-	
-	Return State
-	
-End Function
-
-Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event.Events)
-	Local x#, z#, sound%
-	
-	door1\IsElevatorDoor = 1
-	door2\IsElevatorDoor = 1
-	If door1\open = True And door2\open = False Then 
-		State = -1
-		door2\IsElevatorDoor = 2
-		If (ClosestButton = door2\buttons[0] Or ClosestButton = door2\buttons[1]) And MouseHit1 Then
-			UseDoor(door1,False)
-		EndIf
-	ElseIf door2\open = True And door1\open = False
-		State = 1
-		door1\IsElevatorDoor = 2
-		If (ClosestButton = door1\buttons[0] Or ClosestButton = door1\buttons[1]) And MouseHit1 Then
-			UseDoor(door2,False)
-		EndIf
-	ElseIf Abs(door1\openstate-door2\openstate)<0.2 Then
-		door1\IsElevatorDoor = 2
-		door2\IsElevatorDoor = 2
+	If door2\open Then
+		door2\IsElevatorDoor = 3
+		If Abs(EntityX(Collider)-EntityX(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
+			If Abs(EntityZ(Collider)-EntityZ(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then	
+				If Abs(EntityY(Collider)-EntityY(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
+					door2\locked = False
+					door2\IsElevatorDoor = 1
+				EndIf
+			EndIf
+		EndIf	
 	EndIf
 	
 	Local inside = False
 	
-	;molemmat ovet kiinni = hissi liikkuu
 	If door1\open = False And door2\open = False Then
 		door1\locked = True
 		door2\locked = True
 		If door1\openstate = 0 And door2\openstate = 0 Then
-			If State < 0 Then ;ylh��lt?alas
+			If State < 0 Then
 				State = State - FPSfactor
-				;pelaaja hissin sis�ll?
 				If Abs(EntityX(Collider)-EntityX(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 					If Abs(EntityZ(Collider)-EntityZ(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then	
 						If Abs(EntityY(Collider)-EntityY(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then	
@@ -7020,29 +6790,23 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 				EndIf
 				
 				If State < -500 Then
-					door1\locked = False
+					door1\locked = True
 					door2\locked = False
 					State = 0
 					
 					If inside Then
-						
-						dist# = Distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(room1,True),EntityZ(room1,True))
-						
-						dir# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(room1,True),EntityZ(room1,True))
-						dir=dir+EntityYaw(room2,True)-EntityYaw(room1,True);EntityYaw(room2,True)+angleDist(dir,EntityYaw(room1,True))
-						;dir=dir-90.0
-						
-						;dir# = EntityYaw(Collider)-EntityYaw(room1,True)+EntityYaw(room2,True)
-						
-						dir=WrapAngle(dir)
-						
-						x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-						z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-						
-						;x# = Max(Min((EntityX(Collider)-EntityX(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
-						;z# = Max(Min((EntityZ(Collider)-EntityZ(room1,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
-						
-						RotateEntity Collider,EntityPitch(Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(Collider,True),EntityYaw(room1,True)),EntityRoll(Collider,True),True ;dir
+						If (Not ignorerotation) Then
+							dist# = Distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(room1,True),EntityZ(room1,True))
+							dir# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(room1,True),EntityZ(room1,True))
+							dir=dir+EntityYaw(room2,True)-EntityYaw(room1,True)
+							dir=WrapAngle(dir)
+							x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+							z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+							RotateEntity Collider,EntityPitch(Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(Collider,True),EntityYaw(room1,True)),EntityRoll(Collider,True),True
+						Else
+							x# = Max(Min((EntityX(Collider)-EntityX(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+							z# = Max(Min((EntityZ(Collider)-EntityZ(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+						EndIf
 						
 						TeleportEntity(Collider, EntityX(room2,True)+x,(0.1*FPSfactor)+EntityY(room2,True)+(EntityY(Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,0.3,True)
 						UpdateDoorsTimer = 0
@@ -7058,13 +6822,19 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 						If Abs(EntityX(n\Collider)-EntityX(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 							If Abs(EntityZ(n\Collider)-EntityZ(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 								If Abs(EntityY(n\Collider)-EntityY(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room1,True),EntityZ(room1,True))
-									dir# = point_direction(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room1,True),EntityZ(room1,True))
-									dir=dir+EntityYaw(room2,True)-EntityYaw(room1,True)
-									dir=WrapAngle(dir)
-									x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-									z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-									RotateEntity n\Collider,EntityPitch(n\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(n\Collider,True),EntityYaw(room1,True)),EntityRoll(n\Collider,True),True
+									If (Not ignorerotation) Then
+										dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room1,True),EntityZ(room1,True))
+										dir# = point_direction(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room1,True),EntityZ(room1,True))
+										dir=dir+EntityYaw(room2,True)-EntityYaw(room1,True)
+										dir=WrapAngle(dir)
+										x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+										z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+										RotateEntity n\Collider,EntityPitch(n\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(n\Collider,True),EntityYaw(room1,True)),EntityRoll(n\Collider,True),True
+									Else
+										x# = Max(Min((EntityX(n\Collider)-EntityX(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+										z# = Max(Min((EntityZ(n\Collider)-EntityZ(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+									EndIf
+									
 									TeleportEntity(n\Collider, EntityX(room2,True)+x,(0.1*FPSfactor)+EntityY(room2,True)+(EntityY(n\Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,n\CollRadius,True)
 									If n = Curr173
 										Curr173\IdleTimer = 10
@@ -7077,27 +6847,32 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 						If Abs(EntityX(it\collider)-EntityX(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 							If Abs(EntityZ(it\collider)-EntityZ(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 								If Abs(EntityY(it\collider)-EntityY(room1,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									dist# = Distance(EntityX(it\Collider,True),EntityZ(it\Collider,True),EntityX(room1,True),EntityZ(room1,True))
-									dir# = point_direction(EntityX(it\Collider,True),EntityZ(it\Collider,True),EntityX(room1,True),EntityZ(room1,True))
-									dir=dir+EntityYaw(room2,True)-EntityYaw(room1,True)
-									dir=WrapAngle(dir)
-									x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-									z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-									RotateEntity it\Collider,EntityPitch(it\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(it\Collider,True),EntityYaw(room1,True)),EntityRoll(it\Collider,True),True
-									TeleportEntity(it\Collider, EntityX(room2,True)+x,(0.1*FPSfactor)+EntityY(room2,True)+(EntityY(it\Collider)-EntityY(room1,True)),EntityZ(room2,True)+z,0.01,True)
+									If (Not ignorerotation) Then
+										dist# = Distance(EntityX(it\collider,True),EntityZ(it\collider,True),EntityX(room1,True),EntityZ(room1,True))
+										dir# = point_direction(EntityX(it\collider,True),EntityZ(it\collider,True),EntityX(room1,True),EntityZ(room1,True))
+										dir=dir+EntityYaw(room2,True)-EntityYaw(room1,True)
+										dir=WrapAngle(dir)
+										x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+										z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+										RotateEntity it\collider,EntityPitch(it\collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(it\collider,True),EntityYaw(room1,True)),EntityRoll(it\collider,True),True
+									Else
+										x# = Max(Min((EntityX(it\collider)-EntityX(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+										z# = Max(Min((EntityZ(it\collider)-EntityZ(room1,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+									EndIf
+									
+									TeleportEntity(it\collider, EntityX(room2,True)+x,(0.1*FPSfactor)+EntityY(room2,True)+(EntityY(it\collider)-EntityY(room1,True)),EntityZ(room2,True)+z,0.01,True)
 								EndIf
 							EndIf
 						EndIf
 					Next
 					
 					UseDoor(door2,False,Not inside)
+					door1\open = False
 					
 					PlaySound2(ElevatorBeepSFX, Camera, room1, 4.0)
-					;PlaySound_Strict(ElevatorBeepSFX)
 				EndIf
-			Else ;alhaalta yl�s
+			Else
 				State = State + FPSfactor
-				;pelaaja hissin sis�ll?
 				If Abs(EntityX(Collider)-EntityX(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 					If Abs(EntityZ(Collider)-EntityZ(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then	
 						If Abs(EntityY(Collider)-EntityY(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
@@ -7116,29 +6891,21 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 				
 				If State > 500 Then 
 					door1\locked = False
-					door2\locked = False				
+					door2\locked = True				
 					State = 0
 					
-					;pelaaja hissin sis�ll? siirret��n
 					If inside Then	
-						
-						dist# = Distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(room2,True),EntityZ(room2,True))
-						
-						dir# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(room2,True),EntityZ(room2,True))
-						dir=dir+EntityYaw(room1,True)-EntityYaw(room2,True) ;EntityYaw(room1,True)+angleDist(dir,EntityYaw(room2,True))
-						;dir=dir-90.0
-						
-						;dir# = EntityYaw(Collider)-EntityYaw(room2,True)+EntityYaw(room1,True)
-						
-						;dir=WrapAngle(dir)
-						
-						x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-						z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-						
-						;x# = Max(Min((EntityX(Collider)-EntityX(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
-						;z# = Max(Min((EntityZ(Collider)-EntityZ(room2,True)),280*RoomScale-0.17),-280*RoomScale+0.17)
-						
-						RotateEntity Collider,EntityPitch(Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(Collider,True),EntityYaw(room1,True)),EntityRoll(Collider,True),True ;dir
+						If (Not ignorerotation) Then
+							dist# = Distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(room2,True),EntityZ(room2,True))
+							dir# = point_direction(EntityX(Collider,True),EntityZ(Collider,True),EntityX(room2,True),EntityZ(room2,True))
+							dir=dir+EntityYaw(room1,True)-EntityYaw(room2,True)
+							x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+							z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+							RotateEntity Collider,EntityPitch(Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(Collider,True),EntityYaw(room1,True)),EntityRoll(Collider,True),True
+						Else
+							x# = Max(Min((EntityX(Collider)-EntityX(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+							z# = Max(Min((EntityZ(Collider)-EntityZ(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+						EndIf
 						
 						TeleportEntity(Collider, EntityX(room1,True)+x,(0.1*FPSfactor)+EntityY(room1,True)+(EntityY(Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,0.3,True)
 						UpdateDoorsTimer = 0
@@ -7154,12 +6921,18 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 						If Abs(EntityX(n\Collider)-EntityX(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 							If Abs(EntityZ(n\Collider)-EntityZ(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 								If Abs(EntityY(n\Collider)-EntityY(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room2,True),EntityZ(room2,True))
-									dir# = point_direction(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room2,True),EntityZ(room2,True))
-									dir=dir+EntityYaw(room1,True)-EntityYaw(room2,True)
-									x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-									z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-									RotateEntity n\Collider,EntityPitch(n\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(n\Collider,True),EntityYaw(room1,True)),EntityRoll(n\Collider,True),True
+									If (Not ignorerotation) Then
+										dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room2,True),EntityZ(room2,True))
+										dir# = point_direction(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(room2,True),EntityZ(room2,True))
+										dir=dir+EntityYaw(room1,True)-EntityYaw(room2,True)
+										x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+										z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+										RotateEntity n\Collider,EntityPitch(n\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(n\Collider,True),EntityYaw(room1,True)),EntityRoll(n\Collider,True),True
+									Else
+										x# = Max(Min((EntityX(n\Collider)-EntityX(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+										z# = Max(Min((EntityZ(n\Collider)-EntityZ(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+									EndIf
+									
 									TeleportEntity(n\Collider, EntityX(room1,True)+x,(0.1*FPSfactor)+EntityY(room1,True)+(EntityY(n\Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,n\CollRadius,True)
 									If n = Curr173
 										Curr173\IdleTimer = 10
@@ -7172,19 +6945,26 @@ Function UpdateElevators2#(State#, door1.Doors, door2.Doors, room1, room2, event
 						If Abs(EntityX(it\collider)-EntityX(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 							If Abs(EntityZ(it\collider)-EntityZ(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
 								If Abs(EntityY(it\collider)-EntityY(room2,True))<280.0*RoomScale+(0.015*FPSfactor) Then
-									dist# = Distance(EntityX(it\Collider,True),EntityZ(it\Collider,True),EntityX(room2,True),EntityZ(room2,True))
-									dir# = point_direction(EntityX(it\Collider,True),EntityZ(it\Collider,True),EntityX(room2,True),EntityZ(room2,True))
-									dir=dir+EntityYaw(room1,True)-EntityYaw(room2,True)
-									x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-									z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
-									RotateEntity it\Collider,EntityPitch(it\Collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(it\Collider,True),EntityYaw(room1,True)),EntityRoll(it\Collider,True),True
-									TeleportEntity(it\Collider, EntityX(room1,True)+x,(0.1*FPSfactor)+EntityY(room1,True)+(EntityY(it\Collider)-EntityY(room2,True)),EntityZ(room1,True)+z,0.01,True)
+									If (Not ignorerotation) Then
+										dist# = Distance(EntityX(it\collider,True),EntityZ(it\collider,True),EntityX(room2,True),EntityZ(room2,True))
+										dir# = point_direction(EntityX(it\collider,True),EntityZ(it\collider,True),EntityX(room2,True),EntityZ(room2,True))
+										dir=dir+EntityYaw(room1,True)-EntityYaw(room2,True)
+										x# = Max(Min(Cos(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+										z# = Max(Min(Sin(dir)*dist,280*RoomScale-0.22),-280*RoomScale+0.22)
+										RotateEntity it\collider,EntityPitch(it\collider,True),EntityYaw(room2,True)+angleDist(EntityYaw(it\collider,True),EntityYaw(room1,True)),EntityRoll(it\collider,True),True
+									Else
+										x# = Max(Min((EntityX(it\collider)-EntityX(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+										z# = Max(Min((EntityZ(it\collider)-EntityZ(room2,True)),280*RoomScale-0.22),-280*RoomScale+0.22)
+									EndIf
+									
+									TeleportEntity(it\collider, EntityX(room1,True)+x,(0.1*FPSfactor)+EntityY(room1,True)+(EntityY(it\collider)-EntityY(room2,True)),EntityZ(room1,True)+z,0.01,True)
 								EndIf
 							EndIf
 						EndIf
 					Next
 					
 					UseDoor(door1,False,Not inside)
+					door2\open = False
 					
 					PlaySound2(ElevatorBeepSFX, Camera, room2, 4.0)
 				EndIf	

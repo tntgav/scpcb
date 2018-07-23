@@ -2343,6 +2343,9 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 					If d\IsElevatorDoor = 1 Then
 						Msg = "You called the elevator."
 						MsgTimer = 70 * 5
+					ElseIf d\IsElevatorDoor = 3 Then
+						Msg = "The elevator is already on this floor."
+						MsgTimer = 70 * 5
 					ElseIf (Msg<>"You called the elevator.")
 						If (Msg="You already called the elevator.") Or (MsgTimer<70*3)	
 							Select Rand(10)

@@ -3821,8 +3821,8 @@ Function UpdateEvents()
 						Next
 					EndIf ;entityy(collider) >4
 					
-					e\EventState2 = UpdateElevators2(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1],e\room\Objects[2],e\room\Objects[3], e)
-					e\EventState3 = UpdateElevators2(e\EventState3, e\room\RoomDoors[2], e\room\RoomDoors[3],e\room\Objects[4],e\room\Objects[5], e)
+					e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1],e\room\Objects[2],e\room\Objects[3], e, False)
+					e\EventState3 = UpdateElevators(e\EventState3, e\room\RoomDoors[2], e\room\RoomDoors[3],e\room\Objects[4],e\room\Objects[5], e, False)
 				Else
 					If e\room\grid <> Null
 						If e\room\grid\Meshes[0]<>0
@@ -4834,9 +4834,9 @@ Function UpdateEvents()
 			Case "room3storage"
 				;[Block]
 				If PlayerRoom = e\room Then
-					e\EventState2 = UpdateElevators2(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1],e\room\Objects[0],e\room\Objects[1], e)
+					e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1],e\room\Objects[0],e\room\Objects[1], e)
 					
-					e\EventState3 = UpdateElevators2(e\EventState3, e\room\RoomDoors[2], e\room\RoomDoors[3],e\room\Objects[2],e\room\Objects[3], e)
+					e\EventState3 = UpdateElevators(e\EventState3, e\room\RoomDoors[2], e\room\RoomDoors[3],e\room\Objects[2],e\room\Objects[3], e)
 					
 					If EntityY(Collider)<-4600*RoomScale Then
 						
