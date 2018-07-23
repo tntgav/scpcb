@@ -3393,11 +3393,31 @@ Function UpdateEvents()
 										RotateEntity tempInt2,0,EntityYaw(tempInt,True)+180.0,0,True
 										PositionEntity tempInt2,e\room\x+(ix*2.0)+(Cos(EntityYaw(tempInt,True))*552.0*RoomScale),8.0+(240.0*RoomScale),e\room\z+(iy*2.0)+(Sin(EntityYaw(tempInt,True))*552.0*RoomScale)
 										If e\room\grid\grid[ix+(iy*gridsz)]=6 Then
-											e\room\RoomDoors[1]=dr
-											e\room\Objects[3]=tempInt2
+											If e\room\RoomDoors[1]=Null Then
+												dr\open = (Not e\room\RoomDoors[0]\open)
+												e\room\RoomDoors[1]=dr
+											Else
+												RemoveDoor(dr)
+											EndIf
+											If e\room\Objects[3]=0 Then
+												e\room\Objects[3]=tempInt2
+												PositionEntity e\room\Objects[1],e\room\x+ix*2.0,8.0,e\room\z+iy*2.0,True
+											Else
+												FreeEntity tempInt2
+											EndIf
 										Else
-											e\room\RoomDoors[3]=dr
-											e\room\Objects[5]=tempInt2
+											If e\room\RoomDoors[3]=Null Then
+												dr\open = (Not e\room\RoomDoors[2]\open)
+												e\room\RoomDoors[3]=dr
+											Else
+												RemoveDoor(dr)
+											EndIf
+											If e\room\Objects[5]=0 Then
+												e\room\Objects[5]=tempInt2
+												PositionEntity e\room\Objects[0],e\room\x+ix*2.0,8.0,e\room\z+iy*2.0,True
+											Else
+												FreeEntity tempInt2
+											EndIf
 										EndIf
 									EndIf
 									
