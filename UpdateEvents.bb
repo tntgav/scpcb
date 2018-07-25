@@ -7579,7 +7579,7 @@ Function UpdateEvents()
 									Case 3
 										Msg = "Ears are growing all over your body. They are crawling on your skin."
 								End Select
-
+								
 								MsgTimer = 70.0 * 3.0
 							Else If (e\EventState2>600.0 And e\EventState2-FPSfactor <= 600.0)
 								Select Rand(4)
@@ -7592,11 +7592,13 @@ Function UpdateEvents()
 									Case 4
 										Msg = Chr(34)+"Can't... Breathe..."+Chr(34)
 								End Select
-
+								
 								MsgTimer = 70.0 * 5.0
 							EndIf
 							
 							If (e\EventState2>70*15) Then
+								DeathMSG = "A dead body covered in ears was found in [REDACTED]. Subject was presumably attacked by an instance of SCP-1048-A and suffocated to death by the ears. "
+								DeathMSG = DeathMSG + "Body was sent for autopsy."
 								Kill()
 								e\EventState = 4
 								RemoveEvent(e)
