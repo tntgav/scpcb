@@ -378,7 +378,7 @@ Function UpdateEvents()
 							
 							If e\EventState3 < 3 Then
 								e\EventState3 = e\EventState3+FPSfactor/100.0
-							Else
+							ElseIf e\EventState3 < 15 Or e\EventState3 >= 50 Then
 								e\EventState3 = e\EventState3+FPSfactor/30.0
 							EndIf
 							
@@ -422,30 +422,19 @@ Function UpdateEvents()
 									ShowEntity Collider
 									DropSpeed = 0
 									e\EventState3 = 15
+									Msg = "Pick up the paper on the desk."
+									MsgTimer=70*7
 								EndIf
 								
 								user_camera_pitch = 0
 								RotateEntity Collider, 0, EntityYaw(Camera), 0
 								
-							ElseIf e\EventState3 < 30
-								If e\EventState3 > 25 Then 
-									e\EventState3 = e\EventState3+FPSfactor/3.0
-									Msg = "Pick up the paper on the desk."
-									MsgTimer=70*7
-									e\EventState3=30
-								EndIf
-							ElseIf e\EventState3 < 35
+							ElseIf e\EventState3 < 40
 								If Inventory(0)<>Null Then
 									Msg = "Press "+KeyName(KEY_INV)+" to open the inventory."
-									MsgTimer=70*4
+									MsgTimer=70*7
 									e\EventState3 = 40
 									Exit
-								EndIf
-							Else;If e\EventState > 45 And e\EventState3 < 45
-								If InvOpen Then
-									Msg = "Double click on the document to view it."
-									MsgTimer=70*4
-									e\EventState3 = 45
 								EndIf
 							EndIf
 							
@@ -820,8 +809,7 @@ Function UpdateEvents()
 									If e\room\NPC[i]<>Null Then
 										RemoveNPC(e\room\NPC[i])
 									EndIf
-								Next		
-								
+								Next
 								
 								FreeSound_Strict e\room\NPC[3]\Sound
 								e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortDone"+Rand(1,5)+".ogg")
@@ -833,34 +821,71 @@ Function UpdateEvents()
 								e\room\NPC[6]\CurrSpeed = 0
 								e\room\NPC[6]\State = 0
 								
-								e\EventState3 = 910
+								e\EventState3 = 905 ;910
 								
 								e\room\RoomDoors[3]\locked = False
 								UseDoor(e\room\RoomDoors[3],False)
 								e\room\RoomDoors[3]\locked = True
 								
-								e\room\RoomDoors[2]\locked = False
-								UseDoor(e\room\RoomDoors[2],False)
-								e\room\RoomDoors[2]\locked = True
+								e\room\NPC[4]\State = 9
+								
+								;e\room\RoomDoors[2]\locked = False
+								;UseDoor(e\room\RoomDoors[2],False)
+								;e\room\RoomDoors[2]\locked = True
+							EndIf
+						ElseIf e\EventState3 <= 905
+							If (Not ChannelPlaying(e\room\NPC[3]\SoundChn)) And e\room\NPC[3]\Frame < 358.0 Then
+								e\room\NPC[3]\State = 8
+								FreeSound_Strict e\room\NPC[3]\Sound
+								e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\OhAndByTheWay.ogg")
+								e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+								SetNPCFrame(e\room\NPC[3],358)
+							ElseIf e\room\NPC[3]\Frame >= 358.0 Then
+								PointEntity e\room\NPC[3]\Collider,Collider
+								RotateEntity e\room\NPC[3]\Collider,0,EntityYaw(e\room\NPC[3]\Collider),0
+								
+								If e\room\NPC[3]\Frame <= 481.5 Then
+									Local prevAnimFrame# = e\room\NPC[3]\Frame
+									AnimateNPC(e\room\NPC[3],358.0,482.0,0.4,False)
+								Else
+									AnimateNPC(e\room\NPC[3],483.0,607.0,0.2,True)
+									If (EntityDistance(Collider, e\room\NPC[3]\Collider)<1.5) Then
+										If EntityInView(e\room\NPC[3]\obj, Camera) Then
+											DrawHandIcon = True
+											
+											If MouseHit1 Then
+												SelectedItem = CreateItem("Document SCP-173", "paper", 0.0, 0.0, 0.0)
+												
+												PickItem(SelectedItem)
+												
+												e\room\RoomDoors[2]\locked = False
+												UseDoor(e\room\RoomDoors[2],False)
+												e\room\RoomDoors[2]\locked = True
+												e\EventState3 = 910
+												SetNPCFrame(e\room\NPC[3],608)
+											EndIf
+										EndIf
+									EndIf
+								EndIf
 							EndIf
 						Else
-							e\room\NPC[3]\State = 9
-							;PointEntity e\room\NPC[3]\obj, Collider
-							;RotateEntity e\room\NPC[3]\Collider,0,CurveAngle(EntityYaw(e\room\NPC[3]\obj),EntityYaw(e\room\NPC[3]\Collider),20.0),0,True	
-							e\room\NPC[4]\State = 9
-							;PointEntity e\room\NPC[4]\obj, Collider
-							;RotateEntity e\room\NPC[4]\Collider,0,CurveAngle(EntityYaw(e\room\NPC[4]\obj),EntityYaw(e\room\NPC[4]\Collider),20.0),0,True
-							If Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\obj), EntityZ(e\room\obj)) < 4.0 Then
-								e\room\RoomDoors[2]\locked = False
-								UseDoor(e\room\RoomDoors[2],False)
-								e\room\RoomDoors[2]\locked = True
-								e\EventState3 = 0
-								e\room\NPC[3]\State = 0
-								e\room\NPC[4]\State = 0
-								;e\room\NPC[5]\State = 0
-								
-								UseDoor(e\room\RoomDoors[1],False)
-							EndIf	
+							If e\room\NPC[3]\Frame <= 620.5 And e\room\NPC[3]\State = 8 Then
+								AnimateNPC(e\room\NPC[3],608,621,0.4,False)
+							Else
+								e\room\NPC[3]\Angle = EntityYaw(e\room\NPC[3]\Collider)
+								e\room\NPC[3]\State = 9
+								e\room\NPC[4]\State = 9
+								If Distance(EntityX(Collider), EntityZ(Collider), EntityX(e\room\obj), EntityZ(e\room\obj)) < 4.0 Then
+									e\room\RoomDoors[2]\locked = False
+									UseDoor(e\room\RoomDoors[2],False)
+									e\room\RoomDoors[2]\locked = True
+									e\EventState3 = 0
+									e\room\NPC[3]\State = 0
+									e\room\NPC[4]\State = 0
+									
+									UseDoor(e\room\RoomDoors[1],False)
+								EndIf
+							EndIf
 						EndIf
 						
 						;the scientist sitting at his desk

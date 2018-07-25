@@ -405,11 +405,11 @@ Function UpdateConsole()
 	
 	If ConsoleOpen Then
 		Local cm.ConsoleMsg
-	
+		
 		AASetFont ConsoleFont
 		
 		ConsoleR = 255 : ConsoleG = 255 : ConsoleB = 255
-	
+		
 		Local x% = 0, y% = GraphicHeight-300*MenuScale, width% = GraphicWidth, height% = 300*MenuScale-30*MenuScale
 		Local StrTemp$, temp%,  i%
 		Local ev.Events, r.Rooms, it.Items
@@ -1431,6 +1431,13 @@ Function UpdateConsole()
 					;[Block]
 					Curr106\State = 0
 					Curr106\Idle = False
+					;[End Block]
+				Case "setblinkeffect"
+					;[Block]
+					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					BlinkEffect = Float(Left(args, Len(args) - Instr(args, " ")))
+					BlinkEffectTimer = Float(Right(args, Len(args) - Instr(args, " ")))
+					CreateConsoleMsg("Set BlinkEffect to: " + BlinkEffect + "and BlinkEffect timer: " + BlinkEffectTimer)
 					;[End Block]
 				Case Chr($6A)+Chr($6F)+Chr($72)+Chr($67)+Chr($65)
 					;[Block]
@@ -3231,6 +3238,22 @@ Repeat
 		EndIf
 		
 		UpdateConsole()
+		
+		If PlayerRoom <> Null Then
+			If PlayerRoom\RoomTemplate\Name = "173" Then
+				For e.Events = Each Events
+					If e\EventName = "173" Then
+						If e\EventState3 => 40 And e\EventState3 < 50 Then
+							If InvOpen Then
+								Msg = "Double click on the document to view it."
+								MsgTimer=70*7
+								e\EventState3 = 50
+							EndIf
+						EndIf
+					EndIf
+				Next
+			EndIf
+		EndIf
 		
 		If MsgTimer > 0 Then
 			Local temp% = False
