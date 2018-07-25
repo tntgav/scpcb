@@ -1905,6 +1905,55 @@ Function LoadGameQuick(file$)
 	
 	UpdateDoorsTimer = 0
 	
+	;Free some entities that could potentially cause memory leaks (for the endings)
+	;This is only required for the LoadGameQuick function, as the other one is from the menu where everything is already deleted anyways
+	Local xtemp#,ztemp#
+	If Sky <> 0 Then
+		FreeEntity Sky
+		Sky = 0
+	EndIf
+	For r.Rooms = Each Rooms
+		If r\RoomTemplate\Name = "gatea" Then
+			If r\Objects[0]<>0 Then
+				FreeEntity r\Objects[0] : r\Objects[0] = 0
+				xtemp#=EntityX(r\Objects[9],True)
+				ztemp#=EntityZ(r\Objects[9],True)
+				FreeEntity r\Objects[9] : r\Objects[9] = 0
+				r\Objects[10] = 0 ;r\Objects[10] is already deleted because it is a parent object to r\Objects[9] which is already deleted a line before
+				;Readding this object, as it is originally inside the "FillRoom" function but gets deleted when it loads GateA
+				r\Objects[9]=CreatePivot()
+				PositionEntity(r\Objects[9], xtemp#, 992.0*RoomScale, ztemp#, True)
+				EntityParent r\Objects[9], r\obj
+				;The GateA wall pieces
+				xtemp# = EntityX(r\Objects[13],True)
+				ztemp# = EntityZ(r\Objects[13],True)
+				FreeEntity r\Objects[13]
+				r\Objects[13]=LoadMesh_Strict("GFX\map\gateawall1.b3d",r\obj)
+				PositionEntity(r\Objects[13], xtemp#, -1045.0*RoomScale, ztemp#, True)
+				EntityColor r\Objects[13], 25,25,25
+				EntityType r\Objects[13],HIT_MAP
+				xtemp# = EntityX(r\Objects[14],True)
+				ztemp# = EntityZ(r\Objects[14],True)
+				FreeEntity r\Objects[14]
+				r\Objects[14]=LoadMesh_Strict("GFX\map\gateawall2.b3d",r\obj)
+				PositionEntity(r\Objects[14], xtemp#, -1045.0*RoomScale, ztemp#, True)	
+				EntityColor r\Objects[14], 25,25,25
+				EntityType r\Objects[14],HIT_MAP
+			EndIf
+			If r\Objects[12]<>0 Then
+				FreeEntity r\Objects[12] : r\Objects[12] = 0
+				FreeEntity r\Objects[17] : r\Objects[17] = 0
+			EndIf
+		ElseIf r\RoomTemplate\Name = "exit1" Then
+			If r\Objects[0]<>0 Then
+				FreeEntity r\Objects[0] : r\Objects[0] = 0
+			EndIf
+		EndIf
+	Next
+	;Resetting some stuff (those get changed when going to the endings)
+	CameraFogMode(Camera, 1)
+	HideDistance# = 15.0
+	
 	CatchErrors("LoadGameQuick")
 End Function
 

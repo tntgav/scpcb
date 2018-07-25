@@ -8831,6 +8831,7 @@ Function NullGame(playbuttonsfx%=True)
 	Camera = 0
 	ark_blur_cam = 0
 	Collider = 0
+	Sky = 0
 	InitFastResize()
 	
 	CatchErrors("NullGame")

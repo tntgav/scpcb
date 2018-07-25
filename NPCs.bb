@@ -3134,10 +3134,11 @@ Function UpdateNPCs()
 							PositionEntity(n\Collider, EntityX(n\obj), EntityY(n\obj), EntityZ(n\obj))
 							
 							If EntityDistance(n\obj, target) <0.3 Then
-								If TempSound2 <> 0 Then FreeSound_Strict TempSound2 : TempSound2 = 0
-								TempSound2 = LoadSound_Strict("SFX\Character\Apache\Crash"+Rand(1,2)+".ogg")
+								;If TempSound2 <> 0 Then FreeSound_Strict TempSound2 : TempSound2 = 0
+								;TempSound2 = LoadSound_Strict("SFX\Character\Apache\Crash"+Rand(1,2)+".ogg")
 								CameraShake = Max(CameraShake, 3.0)
-								PlaySound_Strict TempSound2
+								;PlaySound_Strict TempSound2
+								PlaySound_Strict LoadTempSound("SFX\Character\Apache\Crash"+Rand(1,2)+".ogg")
 								n\State = 5
 							EndIf
 							

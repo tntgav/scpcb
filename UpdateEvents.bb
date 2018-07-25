@@ -9803,7 +9803,7 @@ Function UpdateEndings()
 											e\room\RoomDoors[2]\open = True
 											
 											For i = 2 To 4
-												Delete e\room\NPC[i]
+												RemoveNPC(e\room\NPC[i])
 												e\room\NPC[i]=Null
 											Next
 											
@@ -9827,14 +9827,16 @@ Function UpdateEndings()
 											ScaleMesh (e\room\Objects[12], 0.32/21.3, 0.32/21.3, 0.32/21.3)
 											PositionEntity e\room\Objects[12], EntityX(e\room\Objects[11],True), EntityY(e\room\Objects[11],True), EntityZ(e\room\Objects[11],True)
 											
-											obj = CopyEntity(e\room\Objects[12])
-											PositionEntity obj, EntityX(e\room\obj,True)-3968*RoomScale, EntityY(e\room\Objects[11],True), EntityZ(e\room\obj,True)-1920*RoomScale
+											e\room\Objects[17] = CopyEntity(e\room\Objects[12])
+											PositionEntity e\room\Objects[17], EntityX(e\room\obj,True)-3968*RoomScale, EntityY(e\room\Objects[11],True), EntityZ(e\room\obj,True)-1920*RoomScale
 											
 											obj = CopyEntity(e\room\Objects[12])
 											PositionEntity obj, EntityX(e\room\obj,True)-4160*RoomScale, EntityY(e\room\Objects[11],True), EntityZ(e\room\obj,True)-1920*RoomScale
+											EntityParent obj,e\room\Objects[17]
 											
 											obj = CopyEntity(e\room\Objects[12])
 											PositionEntity obj, EntityX(e\room\obj,True)-4064*RoomScale, EntityY(e\room\Objects[11],True), EntityZ(e\room\obj,True)-2112*RoomScale
+											EntityParent obj,e\room\Objects[17]
 											
 											e\SoundCHN = PlaySound2(LoadTempSound("SFX\Ending\GateA\Bell1.ogg"), Camera, e\room\Objects[12])
 											
