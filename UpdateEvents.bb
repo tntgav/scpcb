@@ -6467,7 +6467,7 @@ Function UpdateEvents()
 											;SecondaryLightOn = 0.0
 											
 											e\EventState = 0.0
-											
+											e\EventState3 = 0.0
 										Else
 											PlaySound_Strict(LoadTempSound("SFX\Door\WoodenDoorBudge.ogg"))
 											Msg = "The door will not budge."
