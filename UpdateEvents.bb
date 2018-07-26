@@ -9525,23 +9525,16 @@ Function UpdateEndings()
 						HideDistance = 35.0
 						
 						For i = 2 To 4
-							e\room\NPC[i] = CreateNPC(NPCtypeApache, e\room\x, 100.0, e\room\z)
+							e\room\NPC[i] = CreateNPC(NPCtypeApache, e\room\x, e\room\y+11, e\room\z)
 							e\room\NPC[i]\State = (Not Contained106)
 						Next
 						
 						CreateConsoleMsg("WARNING! Teleporting away from this area may cause bugs or crashing.")
 						
-						TranslateEntity(e\room\obj, 0,12000.0*RoomScale,0)
-						TranslateEntity(Collider, 0,12000.0*RoomScale,0)
-						
 						Sky = sky_CreateSky("GFX\map\sky\sky")
 						RotateEntity Sky,0,e\room\angle,0
 						
 						DrawLoading(60)
-						
-						For n.NPCs = Each NPCs
-							If n\NPCtype = NPCtypeMTF Then Delete n
-						Next
 						
 						For i = 0 To 1
 							e\room\NPC[i] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[i+5],True),EntityY(e\room\Objects[i+5],True),EntityZ(e\room\Objects[i+5],True))
@@ -9578,11 +9571,11 @@ Function UpdateEndings()
 						e\room\Objects[9] = LoadMesh_Strict("GFX\map\lightgunbase.b3d")
 						ScaleEntity e\room\Objects[9], RoomScale,RoomScale,RoomScale
 						EntityFX(e\room\Objects[9],0)
-						PositionEntity(e\room\Objects[9], xtemp, (992.0+12000.0)*RoomScale, ztemp)
+						PositionEntity(e\room\Objects[9], xtemp, e\room\y+992.0*RoomScale, ztemp)
 						e\room\Objects[10] = LoadMesh_Strict("GFX\map\lightgun.b3d")
 						EntityFX(e\room\Objects[10],0)
 						ScaleEntity e\room\Objects[10], RoomScale,RoomScale,RoomScale
-						PositionEntity(e\room\Objects[10], xtemp, (992.0+12000.0+288.0)*RoomScale, ztemp-176.0*RoomScale,True)
+						PositionEntity(e\room\Objects[10], xtemp, e\room\y+(992.0+288.0)*RoomScale, ztemp-176.0*RoomScale,True)
 						EntityParent e\room\Objects[10],e\room\Objects[9]
 						RotateEntity e\room\Objects[9], 0, 48, 0
 						RotateEntity e\room\Objects[10], 40, 0, 0
@@ -9623,7 +9616,7 @@ Function UpdateEndings()
 						For i = 2 To 4
 							If e\room\NPC[i]<>Null Then 
 								If e\room\NPC[i]\State < 2 Then 
-									PositionEntity(e\room\NPC[i]\Collider, EntityX(e\room\Objects[3],True)+Cos(e\EventState/10+(120*i))*6000.0*RoomScale,15000*RoomScale,EntityZ(e\room\Objects[3],True)+Sin(e\EventState/10+(120*i))*6000.0*RoomScale)
+									PositionEntity(e\room\NPC[i]\Collider, EntityX(e\room\Objects[3],True)+Cos(e\EventState/10+(120*i))*6000.0*RoomScale,e\room\y+11,EntityZ(e\room\Objects[3],True)+Sin(e\EventState/10+(120*i))*6000.0*RoomScale)
 									RotateEntity e\room\NPC[i]\Collider,7.0,(e\EventState/10+(120*i)),20.0
 								EndIf
 							EndIf

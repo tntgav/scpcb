@@ -1622,9 +1622,6 @@ Function LoadGameQuick(file$)
 			NTF_1499PrevRoom = r
 			Exit
 		EndIf
-		If r\RoomTemplate\Name = "gatea" Then
-			PositionEntity r\obj,EntityX(r\obj),r\y,EntityZ(r\obj)
-		EndIf
 	Next
 	
 	;InitWayPoints()
@@ -1922,21 +1919,21 @@ Function LoadGameQuick(file$)
 				r\Objects[10] = 0 ;r\Objects[10] is already deleted because it is a parent object to r\Objects[9] which is already deleted a line before
 				;Readding this object, as it is originally inside the "FillRoom" function but gets deleted when it loads GateA
 				r\Objects[9]=CreatePivot()
-				PositionEntity(r\Objects[9], xtemp#, 992.0*RoomScale, ztemp#, True)
+				PositionEntity(r\Objects[9], xtemp#, r\y+992.0*RoomScale, ztemp#, True)
 				EntityParent r\Objects[9], r\obj
 				;The GateA wall pieces
 				xtemp# = EntityX(r\Objects[13],True)
 				ztemp# = EntityZ(r\Objects[13],True)
 				FreeEntity r\Objects[13]
 				r\Objects[13]=LoadMesh_Strict("GFX\map\gateawall1.b3d",r\obj)
-				PositionEntity(r\Objects[13], xtemp#, -1045.0*RoomScale, ztemp#, True)
+				PositionEntity(r\Objects[13], xtemp#, r\y-1045.0*RoomScale, ztemp#, True)
 				EntityColor r\Objects[13], 25,25,25
 				EntityType r\Objects[13],HIT_MAP
 				xtemp# = EntityX(r\Objects[14],True)
 				ztemp# = EntityZ(r\Objects[14],True)
 				FreeEntity r\Objects[14]
 				r\Objects[14]=LoadMesh_Strict("GFX\map\gateawall2.b3d",r\obj)
-				PositionEntity(r\Objects[14], xtemp#, -1045.0*RoomScale, ztemp#, True)	
+				PositionEntity(r\Objects[14], xtemp#, r\y-1045.0*RoomScale, ztemp#, True)	
 				EntityColor r\Objects[14], 25,25,25
 				EntityType r\Objects[14],HIT_MAP
 			EndIf
@@ -2444,7 +2441,7 @@ Function LoadMap(file$)
 	;r = CreateRoom(0, ROOM1, 0, 0, 8, "gatea")
 	If IntroEnabled Then r = CreateRoom(0, ROOM1, 8, 0, (MapHeight+2) * 8, "173")
 	r = CreateRoom(0, ROOM1, (MapWidth+2) * 8, 0, (MapHeight+2) * 8, "pocketdimension")
-	r = CreateRoom(0, ROOM1, 0, 0, -16, "gatea")
+	r = CreateRoom(0, ROOM1, 0, 500, -16, "gatea")
 	r = CreateRoom(0, ROOM1, -16, 800, 0, "dimension1499")
 	
 	CreateEvent("173", "173", 0)
