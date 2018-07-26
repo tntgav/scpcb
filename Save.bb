@@ -1946,7 +1946,11 @@ Function LoadGameQuick(file$)
 			EndIf
 		ElseIf r\RoomTemplate\Name = "exit1" Then
 			If r\Objects[0]<>0 Then
+				xtemp# = EntityX(r\Objects[0],True)
+				ztemp# = EntityZ(r\Objects[0],True)
 				FreeEntity r\Objects[0] : r\Objects[0] = 0
+				r\Objects[0] = CreatePivot(r\obj)
+				PositionEntity(r\Objects[0], xtemp#, 9767.0*RoomScale, ztemp#, True)
 			EndIf
 		EndIf
 	Next
