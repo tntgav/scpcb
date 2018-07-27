@@ -2016,12 +2016,19 @@ Function UpdateEvents()
 							AnimateNPC(Curr106, 55, 104, 0.5)
 							RotateEntity(Curr106\Collider, 0,angle+90,0)
 							Curr106\Idle = True
+							ShowEntity Curr106\obj
+							ShowEntity Curr106\Collider
+							ResetEntity Curr106\Collider
+							Curr106\GravityMult = 0.0
+							Curr106\DropSpeed = 0
+							PositionEntity(Curr106\obj, EntityX(Curr106\Collider), EntityY(Curr106\Collider) - 0.15, EntityZ(Curr106\Collider))
+							RotateEntity Curr106\obj, 0, EntityYaw(Curr106\Collider), 0
 						EndIf
 					EndIf 
 					
 					If EntityDistance(Collider, Curr106\Collider) < 0.3 Then ;106 attacks if close enough to player
 						Curr106\Idle = False
-						Curr106\State = -11
+						Curr106\State = -10
 					EndIf
 					
 					If e\EventState2 = 1 Then ;in the second room
@@ -2443,6 +2450,14 @@ Function UpdateEvents()
 							TurnEntity(Curr106\Collider, 0, Sin(MilliSecs2() / 20) * 6.0, 0, True)
 							MoveEntity(Curr106\Collider, 0, 0, Sin(MilliSecs2() / 15) * 0.06)
 							
+							ShowEntity Curr106\obj
+							ShowEntity Curr106\Collider
+							ResetEntity Curr106\Collider
+							Curr106\GravityMult = 0.0
+							Curr106\DropSpeed = 0
+							PositionEntity(Curr106\obj, EntityX(Curr106\Collider), EntityY(Curr106\Collider) - 0.15, EntityZ(Curr106\Collider))
+							RotateEntity Curr106\obj, 0, EntityYaw(Curr106\Collider), 0
+							
 							If Rand(750)=1 And e\EventState2 > 12 Then
 								BlinkTimer = -10
 								e\EventState2 = e\EventState2-1
@@ -2452,12 +2467,12 @@ Function UpdateEvents()
 							If e\EventState2 = 12 Then
 								CameraShake = 1.0
 								PositionEntity(Curr106\Collider, EntityX(e\room\Objects[e\EventState2],True),-1.0, EntityZ(e\room\Objects[e\EventState2],True))
-								Curr106\State = -11
+								Curr106\State = -10
 								ResetEntity Curr106\Collider
 							EndIf
 							
 						Else 
-							Curr106\State = -11
+							Curr106\State = -10
 							Curr106\Idle = False
 						EndIf
 						
