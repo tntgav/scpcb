@@ -2004,6 +2004,7 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 					EntityFX d\DoorHitOBJ,1
 					EntityType d\DoorHitOBJ,HIT_MAP
 					EntityColor d\DoorHitOBJ,255,0,0
+					HideEntity d\DoorHitOBJ
 					Exit
 				EndIf
 			EndIf
@@ -8341,10 +8342,10 @@ Function InitNewGame()
 	
 	For d.Doors = Each Doors
 		EntityParent(d\obj, 0)
-		If d\obj2 > 0 Then EntityParent(d\obj2, 0)
-		If d\frameobj > 0 Then EntityParent(d\frameobj, 0)
-		If d\buttons[0] > 0 Then EntityParent(d\buttons[0], 0)
-		If d\buttons[1] > 0 Then EntityParent(d\buttons[1], 0)
+		If d\obj2 <> 0 Then EntityParent(d\obj2, 0)
+		If d\frameobj <> 0 Then EntityParent(d\frameobj, 0)
+		If d\buttons[0] <> 0 Then EntityParent(d\buttons[0], 0)
+		If d\buttons[1] <> 0 Then EntityParent(d\buttons[1], 0)
 		
 		If d\obj2 <> 0 And d\dir = 0 Then
 			MoveEntity(d\obj, 0, 0, 8.0 * RoomScale)
@@ -8475,10 +8476,10 @@ Function InitLoadGame()
 	
 	For d.Doors = Each Doors
 		EntityParent(d\obj, 0)
-		If d\obj2 > 0 Then EntityParent(d\obj2, 0)
-		If d\frameobj > 0 Then EntityParent(d\frameobj, 0)
-		If d\buttons[0] > 0 Then EntityParent(d\buttons[0], 0)
-		If d\buttons[1] > 0 Then EntityParent(d\buttons[1], 0)
+		If d\obj2 <> 0 Then EntityParent(d\obj2, 0)
+		If d\frameobj <> 0 Then EntityParent(d\frameobj, 0)
+		If d\buttons[0] <> 0 Then EntityParent(d\buttons[0], 0)
+		If d\buttons[1] <> 0 Then EntityParent(d\buttons[1], 0)
 		
 	Next
 	

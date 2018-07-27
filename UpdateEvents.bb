@@ -1331,7 +1331,7 @@ Function UpdateEvents()
 												
 												For do.doors = Each Doors
 													If do\room = e\room Then
-														Delete do
+														RemoveDoor(do)
 													EndIf
 												Next
 												
