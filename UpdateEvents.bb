@@ -2157,7 +2157,9 @@ Function UpdateEvents()
 												KillTimer=-1.0
 											EndIf
 										EndIf
-										e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\Objects[i], 6.0)	
+										If Float(e\EventStr) < 1000.0 Then
+											e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\Objects[i], 6.0)
+										EndIf
 									EndIf
 								Next
 								
@@ -2184,11 +2186,12 @@ Function UpdateEvents()
 										PlaySound_Strict LoadTempSound("SFX\Room\PocketDimension\Kneel.ogg")
 										LoadEventSound(e,"SFX\Room\PocketDimension\Screech.ogg")
 										e\EventStr = Float(1000.0)
+										DebugLog "Loaded screech sound"
 									EndIf
 									
 									Sanity = Max(Sanity - FPSfactor / temp / 8,-1000)
 									
-									e\SoundCHN = LoopSound2(OldManSFX(4), e\SoundCHN, Camera, e\room\Objects[17], 5.0, 0.6)
+									;e\SoundCHN = LoopSound2(OldManSFX(4), e\SoundCHN, Camera, e\room\Objects[17], 5.0, 0.6)
 									
 									CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs2()) / 20.0)+1.0)*15.0*Max((6.0-temp)/6.0,0.0))
 									

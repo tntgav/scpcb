@@ -4634,13 +4634,16 @@ Function DrawGUI()
 					If BlinkTimer < -3 And BlinkTimer > -10 Then
 						If e\img = 0 Then
 							If BlinkTimer > -5 Then
-								If e\img = 0 Then e\img = LoadImage_Strict("GFX\kneelmortal.pd")
+								If e\img = 0 Then
+									e\img = LoadImage_Strict("GFX\kneelmortal.pd")
+									If (ChannelPlaying(e\SoundCHN)) Then
+										StopChannel(e\SoundCHN)
+									EndIf
+									e\SoundCHN = PlaySound_Strict(e\Sound)
+								EndIf
 							EndIf
 						Else
 							DrawImage e\img, GraphicWidth/2-Rand(390,310), GraphicHeight/2-Rand(290,310)
-						EndIf
-						If (Not ChannelPlaying(e\SoundCHN)) Then
-							e\SoundCHN = PlaySound_Strict(e\Sound)
 						EndIf
 					Else
 						If e\img <> 0 Then FreeImage e\img : e\img = 0
