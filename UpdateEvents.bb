@@ -4972,7 +4972,7 @@ Function UpdateEvents()
 							
 							PlayerFallingPickDistance = 0.0
 							
-							If EntityY(Collider)<-6400*RoomScale And KillTimer=>0 Then
+							If EntityY(Collider)<-6400*RoomScale And KillTimer >= 0 And FallTimer >= 0 Then
 								DeathMSG=""
 								PlaySound_Strict LoadTempSound("SFX\Room\PocketDimension\Impact.ogg")
 								KillTimer=-1.0
