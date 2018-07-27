@@ -8848,6 +8848,10 @@ Function UpdateDimension1499()
 						n.NPCs = CreateNPC(NPCtype1499,EntityX(Collider)+Rnd(-20,20),EntityY(Collider)+0.1,EntityZ(Collider)+Rnd(-20,20))
 						If Rand(2)=1 Then n\State2 = 500*3
 						n\Angle = Rnd(360)
+						n\State2 = 0
+						If EntityDistance(n\Collider,Collider)<10.0 Then
+							n\State = 2
+						EndIf
 					Next
 				EndIf
 				
