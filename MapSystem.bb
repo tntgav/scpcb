@@ -4287,6 +4287,16 @@ Function FillRoom(r.Rooms)
 			r\Objects[6] = CreatePivot()
 			PositionEntity(r\Objects[6],r\x,0,r\z+800*RoomScale)
 			EntityParent(r\Objects[6],r\obj)
+			
+			For r2.Rooms = Each Rooms
+				If r2<>r Then
+					If r2\RoomTemplate\Name = "room2tesla" Or r2\RoomTemplate\Name = "room2tesla_lcz" Or r2\RoomTemplate\Name = "room2tesla_hcz" Then
+						r\Objects[7] = CopyEntity(r2\Objects[7],r\obj) ;don't load the mesh again
+						Exit
+					EndIf
+				EndIf
+			Next
+			If r\Objects[7]=0 Then r\Objects[7] = LoadMesh_Strict("GFX\map\room2tesla_caution.b3d",r\obj)
 			;[End Block]
 		Case "room2doors"
 			;[Block]
