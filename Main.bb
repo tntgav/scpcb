@@ -8703,6 +8703,9 @@ Function NullGame(playbuttonsfx%=True)
 	LightVolume = 0.0
 	Vomit = False
 	VomitTimer = 0.0
+	SecondaryLightOn# = True
+	PrevSecondaryLightOn# = True
+	RemoteDoorOn = True
 	
 	InfiniteStamina% = False
 	
