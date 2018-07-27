@@ -9088,6 +9088,10 @@ Function UpdateEndings()
 							For n.NPCs = Each NPCs
 								RemoveNPC(n)
 							Next
+							Curr173 = Null
+							Curr106 = Null
+							Curr096 = Null
+							Curr5131 = Null
 							
 							CameraFogMode(Camera, 0)
 							SecondaryLightOn = True
@@ -9518,6 +9522,8 @@ Function UpdateEndings()
 							EndIf
 						Next
 						Curr173\Idle = True
+						Curr096 = Null
+						Curr5131 = Null
 						
 						CameraFogMode(Camera, 0)
 						SecondaryLightOn = True
