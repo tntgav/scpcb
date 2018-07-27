@@ -2002,13 +2002,7 @@ Function UpdateEvents()
 						e\room\RoomDoors[0]\open = False
 						e\room\RoomDoors[1]\open = False
 						
-						If e\EventState > 65*70 Then
-							If Rand(800)=1 And Curr106\State =>0 Then	
-								PlaySound_Strict HorrorSFX(8)
-								Curr106\State = -0.1
-								e\EventState = 601
-							EndIf
-						ElseIf Curr106\State > 0 ;106 circles around the starting room
+						If Curr106\State > 0 ;106 circles around the starting room
 							angle = (e\EventState/10 Mod 360)
 							PositionEntity(Curr106\Collider, EntityX(e\room\obj), 0.2+0.35+Sin(e\EventState/14.0+i*20.0)*0.4, EntityX(e\room\obj))
 							RotateEntity(Curr106\Collider, 0,angle,0)
@@ -2023,6 +2017,15 @@ Function UpdateEvents()
 							Curr106\DropSpeed = 0
 							PositionEntity(Curr106\obj, EntityX(Curr106\Collider), EntityY(Curr106\Collider) - 0.15, EntityZ(Curr106\Collider))
 							RotateEntity Curr106\obj, 0, EntityYaw(Curr106\Collider), 0
+							
+							If e\EventState > 65*70 Then
+								If Rand(800)=1 Then	
+									PlaySound_Strict HorrorSFX(8)
+									Curr106\State = -0.1
+									Curr106\Idle = False
+									e\EventState = 601
+								EndIf
+							EndIf
 						EndIf
 					EndIf 
 					
