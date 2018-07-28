@@ -8710,6 +8710,7 @@ Function NullGame(playbuttonsfx%=True)
 	SecondaryLightOn# = True
 	PrevSecondaryLightOn# = True
 	RemoteDoorOn = True
+	SoundTransmission = False
 	
 	InfiniteStamina% = False
 	
