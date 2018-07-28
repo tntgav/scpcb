@@ -8403,6 +8403,15 @@ Function InitNewGame()
 			EntityType (it\collider, HIT_ITEM)
 			EntityParent(it\collider, 0)
 			ItemAmount = ItemAmount + 1
+			it = CreateItem("Document SCP-173", "paper", 1, 1, 1)
+			it\Picked = True
+			it\Dropped = -1
+			it\itemtemplate\found=True
+			Inventory(1) = it
+			HideEntity(it\collider)
+			EntityType (it\collider, HIT_ITEM)
+			EntityParent(it\collider, 0)
+			ItemAmount = ItemAmount + 1
 		ElseIf (r\RoomTemplate\Name = "173" And IntroEnabled) Then
 			PositionEntity (Collider, EntityX(r\obj), 1.0, EntityZ(r\obj))
 			PlayerRoom = r
