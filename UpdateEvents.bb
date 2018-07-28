@@ -2259,6 +2259,7 @@ Function UpdateEvents()
 													
 													UpdateRooms()
 													UpdateDoors()
+													Curr106\State = 10000
 													Curr106\Idle = False
 													
 													de.decals = CreateDecal(0, EntityX(r\Objects[0],True),EntityY(r\Objects[0],True),EntityZ(r\Objects[0],True), 270, Rand(360), 0)
@@ -2274,6 +2275,7 @@ Function UpdateEvents()
 														EndIf
 													Next
 													Exit
+													Return
 												EndIf
 											Next
 										EndIf
@@ -2317,6 +2319,7 @@ Function UpdateEvents()
 											EndIf
 										Next
 										Exit
+										Return
 									EndIf
 								Next
 								ResetEntity Collider
@@ -2392,6 +2395,7 @@ Function UpdateEvents()
 											SecondaryLightOn = PrevSecondaryLightOn
 											PrevSecondaryLightOn = 0.0
 											TeleportEntity(Collider,EntityX(r\obj,True),0.4,EntityZ(r\obj,True),0.3,True)
+											Curr106\State = 250
 											Curr106\Idle = False
 											
 											For e2.Events = Each Events
@@ -2404,6 +2408,7 @@ Function UpdateEvents()
 												EndIf
 											Next
 											Exit
+											Return
 										EndIf
 									Next
 								Case 20,21,22 ;the tower room
