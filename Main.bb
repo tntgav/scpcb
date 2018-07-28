@@ -6833,6 +6833,7 @@ Function DrawGUI()
 									
 									If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0 Then
 										PositionEntity (Collider, r\x+3319.0*RoomScale, r\y+304.0*RoomScale, r\z-2044.0*RoomScale)
+										RotateEntity Collider,0,0,0,True
 									Else
 										PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
 									EndIf
