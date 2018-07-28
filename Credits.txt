@@ -2,95 +2,114 @@
 *Programmers
 
 		Joonas Rikkonen ("Regalis")
-		MonocleBios
-		Juanjpro
-		Ryan Stillings
-		Luggs123
-		ENDSHN
-		InnocentSam
 		CommanderMark
+		Jesse Ludtke ("MonocleBios")
+		Juan Pablo Arce ("Juanjpro")
+		Luggs123
+		Ryan Stillings ("Risingstar64")
+		Sam Lynch ("InnocentSam")
+		Shaun Gaylard ("ENDSHN")
 
 
 *3D Modellers
 
-		Reilly Grindle ("Mirocaine")
-		Night
-		Hakkla
-		Prosth
-		Micro
-		GamerEntitlement
-		Atomicsneak
-		James Bear
-		Kenneth Crooker
-		Redbull.Ivan and TheKMan
-		Brandon Smith
-		Lionel Ruskin ("Cridone")
-		Tom Malinowski
-		SaitoFox
+		Joonas Rikkonen ("Regalis")
 		Apocryphos
-		InnocentSam
+		Atomicsneak
+		Brandon Smith
+		GamerEntitlement
+		Hakkla
+		James Bear ("Moonsaber")
+		Kenneth Crooker
+		Lionel Ruskin ("Cridone")
+		Micro
+		Night
+		Prosth
+		Redbull.Ivan and TheKMan
+		Reilly Grindle ("Mirocaine")
+		SaitoFox
+		Sam Lynch ("InnocentSam")
+		Shaun Gaylard ("ENDSHN")
+		Tom Malinowski
+		Vladislav Borisevich ("Vane Brain")
 
 
 *Sound Effects and Music
 
-		Kevin MacLeod
-		Slagar
-		revo794
-		Tim Morrison
+		Joonas Rikkonen ("Regalis")
+		Caleb Yu ("Omniary")
 		Class401
 		FireFox
-		phlip45
-		Caleb Yu ("Omniary")
 		gmodfan11
+		Kevin MacLeod
+		phlip45
+		revo794
+		Shaun Gaylard ("ENDSHN")
+		Slagar
+		Tim Morrison
+		Vladislav Borisevich ("Vane Brain")
 		Walach
-		Joonas Rikkonen ("Regalis")
-		ENDSHN
-		Vane Brain
 
 
 *Voice Actors
 
 		Aaron Mckee ("TheVolgun")
 		Brendan Sussman ("DukeLovesYou")
-		ItsDuke
-		Tallfellow
-		Joshofsouls
+		CDWinters
+		Graham Ruruku ("Stealthy Zoroark")
 		Hunter
+		ItsDuke
+		Joshofsouls
+		Moonstiee
 		SolidBaker
+		Tallfellow
 
 
 *Graphics and Sprites
 
-		KyoteeWilliams
-		Brokami
-		Anon4743
-		Orgil Pount ("Destructoid")
-		Balzac
-		Shadowscale48
 		Joonas Rikkonen ("Regalis")
+		Anon4743
+		Balzac
+		Brokami
 		Caleb Yu ("Omniary")
-		ENDSHN
-		Vane Brain
+		KyoteeWilliams
+		Orgil Pount ("Destructoid")
+		Shadowscale48
+		Shaun Gaylard ("ENDSHN")
+		Vladislav Borisevich ("Vane Brain")
 
 
 *Writers
 
 		Joonas Rikkonen ("Regalis")
-		Dr. Gears
-		Steelpoint
 		Caleb Yu ("Omniary")
+		Dr. Gears
 		Irontaco
-		Vane Brain
+		Steelpoint
+		Vladislav Borisevich ("Vane Brain")
+
+
+*Testers
+
+		Christian Rieß
+		Emil215p
+		Inclination
+		LordDeathv11
+		Onemario1234
+		RadReed
+		TheHappyJammer
+		Zadrakos
 
 
 *Others
 
-		Gage Allen ("Lotims")
-		Turtle Sandwich/Catnipbuddy
-		Christian Rieß
 		Agent G
-		Meow :3
+		Gage Allen ("Lotims")
 		Haversine
+		Jabka
+		Max Taylor
+		Meow :3
+		Turtle Sandwich/Catnipbuddy
 		/v/ and everyone in the SCP-CB forum
 
 
