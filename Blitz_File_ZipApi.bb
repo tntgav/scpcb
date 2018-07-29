@@ -292,7 +292,7 @@ End Function
 Function ZipApi_Compress%(bankHandle%, compressionLevel% = ZIPAPI_DEFAULT_COMPRESSION)
 	
 	; Check bank input - return 0 if invalid
-	If bankhandle < 1 Then Return False
+	If bankHandle < 1 Then Return False
 	If BankSize(bankHandle) < 1 Then Return False
 	
 	; Check compression level and limit appropriately
@@ -300,11 +300,11 @@ Function ZipApi_Compress%(bankHandle%, compressionLevel% = ZIPAPI_DEFAULT_COMPRE
 	If compressionLevel > 9 Then compressionLevel = 9
 	
 	; Create a bank to place compressed data into
-	Local destBank	= CreateBank(ZlibWapi_CompressBound(BankSize(bankhandle)))
+	Local destBank	= CreateBank(ZlibWapi_CompressBound(BankSize(bankHandle)))
 	
 	; Create bank to store dest size & populate
 	Local destSize	= CreateBank(4)
-	PokeInt(destSize, 0, BankSize(destbank))
+	PokeInt(destSize, 0, BankSize(destBank))
 	
 	; Compress
 	Local zipResult	= ZlibWapi_Compress2(destBank, destSize, bankHandle, BankSize(bankHandle), compressionLevel)
@@ -507,7 +507,7 @@ Function ZipApi_ExtractFileAsBank%(zipHandle, fileName$, password$ = "")
 	If fileName = "" Then Return ZIPAPI_END_OF_LIST_OF_FILE
 	
 	; Find file & get quick information
-	Local prevFile.ZipApi_unzFileInfo	= ZipApi_GetCurrentFileInfo(zipHandle)
+	Local prevFile.ZIPAPI_UnzFileInfo	= ZipApi_GetCurrentFileInfo(zipHandle)
 	ZipApi_GotoFirstFile(zipHandle)
 	
 	; Find file
@@ -637,9 +637,9 @@ Function ZipApi_GetCurrentFileInfo.ZIPAPI_UnzFileInfo(zipHandle%)
 	ZlibWapi_UnzGetCurrentFileInfo(zipHandle, tBank, fileNameBank, fileInfo\FileNameLength, extraFieldBank, fileInfo\ExtraFieldLength, commentBank, fileInfo\CommentLength)
 	
 	; Peek our strings
-	fileInfo\FileName	= peekstring(fileNameBank, 0)
-	fileInfo\ExtraField	= peekstring(extraFieldBank, 0)
-	fileInfo\Comment	= peekstring(commentBank, 0)
+	fileInfo\FileName	= PeekString(fileNameBank, 0)
+	fileInfo\ExtraField	= PeekString(extraFieldBank, 0)
+	fileInfo\Comment	= PeekString(commentBank, 0)
 	
 	; Cleanup & Return
 	FreeBank tBank
@@ -669,7 +669,7 @@ Function ZipApi_GetGlobalInfo.ZIPAPI_GlobalInfo(zipHandle)
 		Return Null
 	EndIf
 	
-	zipInfo = ZipApi_GlobalInfo_FromBank(infoBank)
+	zipInfo = ZIPAPI_GlobalInfo_FromBank(infoBank)
 	
 	; Now get the comment
 	Local commentBank	= CreateBank(zipInfo\CommentLength + 1)

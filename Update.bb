@@ -815,15 +815,19 @@ Function CheckForUpdates()
 								Text 320,240,"Can't extract zlibwapi.dll",True,True
 							Else
 								Text 320,240,"Extracting "+Chr(34)+fileData+Chr(34),True,True
-								ZipApi_ExtractFile(zipIn, fileData, Replace(fileData,".exe"," "+latest+".exe"))
+								If Instr(fileData,".exe")=0 Or Instr(fileData,"Map Creator")=0
+									ZipApi_ExtractFile(zipIn, fileData, Replace(fileData,".exe"," "+latest+".exe"))
+								Else
+									ZipApi_ExtractFile(zipIn, fileData, fileData)
+								EndIf
 							EndIf
 						Else If FileType(fileData)=0
 							CreateDir fileData
 						EndIf
 						
 						If Instr(fileData,".exe")>0 Then
-							newRun=Chr$(34)+Replace(fileData,".exe"," "+latest+".exe")+Chr$(34)
-						EndIf
+                            newRun=Chr$(34)+"SCP - Containment Breach "+latest+".exe"+Chr$(34)
+                        EndIf
 					EndIf
 					
 					Flip

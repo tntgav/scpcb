@@ -125,7 +125,11 @@ Function LoadSound_Strict(file$)
 	snd\name = file
 	snd\internalHandle = 0
 	snd\releaseTime = 0
-	If (Not EnableSFXRelease) Then snd\internalHandle = LoadSound(snd\name)
+	If (Not EnableSFXRelease) Then
+		If snd\internalHandle = 0 Then 
+			snd\internalHandle = LoadSound(snd\name)
+		EndIf
+	EndIf
 	
 	Return Handle(snd)
 End Function
@@ -205,7 +209,7 @@ Function SetStreamVolume_Strict(streamHandle%,volume#)
 	Local st.Stream = Object.Stream(streamHandle)
 	
 	If st = Null
-		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		CreateConsoleMsg("Failed to set stream Sound volume: Unknown Stream")
 		Return
 	EndIf
 	If st\chn=0 Or st\chn=-1
@@ -222,7 +226,7 @@ Function SetStreamPaused_Strict(streamHandle%,paused%)
 	Local st.Stream = Object.Stream(streamHandle)
 	
 	If st = Null
-		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		CreateConsoleMsg("Failed to pause/unpause stream Sound: Unknown Stream")
 		Return
 	EndIf
 	If st\chn=0 Or st\chn=-1
@@ -238,7 +242,7 @@ Function IsStreamPlaying_Strict(streamHandle%)
 	Local st.Stream = Object.Stream(streamHandle)
 	
 	If st = Null
-		;CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		CreateConsoleMsg("Failed to find stream Sound: Unknown Stream")
 		Return
 	EndIf
 	If st\chn=0 Or st\chn=-1
@@ -254,7 +258,7 @@ Function SetStreamPan_Strict(streamHandle%,pan#)
 	Local st.Stream = Object.Stream(streamHandle)
 	
 	If st = Null
-		;CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		CreateConsoleMsg("Failed to find stream Sound: Unknown Stream")
 		Return
 	EndIf
 	If st\chn=0 Or st\chn=-1

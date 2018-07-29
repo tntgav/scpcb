@@ -5,6 +5,8 @@ For i = 0 To 2
 	CloseDoorSFX(0,i) = LoadSound_Strict("SFX\Door\DoorClose" + (i + 1) + ".ogg")
 	OpenDoorSFX(2,i) = LoadSound_Strict("SFX\Door\Door2Open" + (i + 1) + ".ogg")
 	CloseDoorSFX(2,i) = LoadSound_Strict("SFX\Door\Door2Close" + (i + 1) + ".ogg")
+	OpenDoorSFX(3,i) = LoadSound_Strict("SFX\Door\ElevatorOpen" + (i + 1) + ".ogg")
+	CloseDoorSFX(3,i) = LoadSound_Strict("SFX\Door\ElevatorClose" + (i + 1) + ".ogg")
 Next
 For i = 0 To 1
 	OpenDoorSFX(1,i) = LoadSound_Strict("SFX\Door\BigDoorOpen" + (i + 1) + ".ogg")
@@ -90,7 +92,7 @@ Next
 ;CurrAmbientSFX%
 ;Dim AmbientSFXAmount(6)
 ;0 = light containment, 1 = heavy containment, 2 = entrance
-AmbientSFXAmount(0)=8 : AmbientSFXAmount(1)=11 : AmbientSFXAmount(2)=12
+AmbientSFXAmount(0)=11 : AmbientSFXAmount(1)=11 : AmbientSFXAmount(2)=12
 ;3 = general, 4 = pre-breach
 AmbientSFXAmount(3)=15 : AmbientSFXAmount(4)=5
 ;5 = forest
@@ -105,6 +107,9 @@ Next
 OldManSFX(3) = LoadSound_Strict("SFX\SCP\106\Laugh.ogg")
 OldManSFX(4) = LoadSound_Strict("SFX\SCP\106\Breathing.ogg")
 OldManSFX(5) = LoadSound_Strict("SFX\Room\PocketDimension\Enter.ogg")
+For i = 0 To 2
+	OldManSFX(6+i) = LoadSound_Strict("SFX\SCP\106\WallDecay"+(i+1)+".ogg")
+Next
 
 ;Dim Scp173SFX%(3)
 For i = 0 To 2
@@ -112,7 +117,7 @@ For i = 0 To 2
 Next
 
 ;Dim HorrorSFX%(20)
-For i = 0 To 10
+For i = 0 To 11
 	HorrorSFX(i) = LoadSound_Strict("SFX\Horror\Horror" + i + ".ogg")
 Next
 For i = 14 To 15
@@ -137,6 +142,10 @@ IntroSFX(15) = LoadSound_Strict("SFX\Room\Intro\173Vent.ogg")
 AlarmSFX(0) = LoadSound_Strict("SFX\Alarm\Alarm.ogg")
 ;AlarmSFX(1) = LoadSound_Strict("SFX\Alarm\Alarm2.ogg")
 AlarmSFX(2) = LoadSound_Strict("SFX\Alarm\Alarm3.ogg")
+
+;room_gw alarms
+AlarmSFX(3) = LoadSound_Strict("SFX\Alarm\Alarm4.ogg")
+AlarmSFX(4) = LoadSound_Strict("SFX\Alarm\Alarm5.ogg")
 
 ;Dim CommotionState%(23)
 

@@ -182,7 +182,7 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Nuclear Device Document", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docNDP.jpg", 0.003) : it\sound = 0	
 	it = CreateItemTemplate("Class D Orientation Leaflet", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docORI.jpg", 0.003) : it\sound = 0	
 	
-	it = CreateItemTemplate("Note from Daniel", "paper", "GFX\items\paper.x", "GFX\items\INVnote.jpg", "GFX\items\docdan.jpg", 0.0025, "GFX\items\notetexture.jpg") : it\sound = 0			
+	it = CreateItemTemplate("Note from Daniel", "paper", "GFX\items\note.x", "GFX\items\INVnote2.jpg", "GFX\items\docdan.jpg", 0.0025) : it\sound = 0
 	
 	it = CreateItemTemplate("Burnt Note", "paper", "GFX\items\paper.x", "GFX\items\INVbn.jpg", "GFX\items\bn.it", 0.003, "GFX\items\BurntNoteTexture.jpg")
 	it\img = BurntNote : it\sound = 0
@@ -193,7 +193,7 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Security Clearance Levels", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docSC.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Object Classes", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docOBJC.jpg", 0.003) : it\sound = 0
 	it = CreateItemTemplate("Document", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docRAND3.jpg", 0.003) : it\sound = 0 
-	it = CreateItemTemplate("Note", "paper", "GFX\items\paper.x", "GFX\items\INVnote.jpg", "GFX\items\docRAND2.jpg", 0.003, "GFX\items\notetexture.jpg") : it\sound = 0 
+	it = CreateItemTemplate("Addendum: 5/14 Test Log", "paper", "GFX\items\paper.x", "GFX\items\INVnote.jpg", "GFX\items\docRAND2.jpg", 0.003, "GFX\items\notetexture.jpg") : it\sound = 0 
 	it = CreateItemTemplate("Notification", "paper", "GFX\items\paper.x", "GFX\items\INVnote.jpg", "GFX\items\docRAND1.jpg", 0.003, "GFX\items\notetexture.jpg") :it\sound = 0 	
 	it = CreateItemTemplate("Incident Report SCP-106-0204", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docIR106.jpg", 0.003) : it\sound = 0 
 	
@@ -214,7 +214,8 @@ Function InitItemTemplates()
 	
 	it = CreateItemTemplate("Empty Cup", "emptycup", "GFX\items\cup.x", "GFX\items\INVcup.jpg", "", 0.04) : it\sound = 2	
 	
-	it = CreateItemTemplate("SCP-500-01", "scp500", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0010) : it\sound = 2
+	it = CreateItemTemplate("SCP-500-01", "scp500", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0001) : it\sound = 2
+	EntityColor it\obj,255,0,0
 	
 	it = CreateItemTemplate("First Aid Kit", "firstaid", "GFX\items\firstaid.x", "GFX\items\INVfirstaid.jpg", "", 0.05)
 	it = CreateItemTemplate("Small First Aid Kit", "finefirstaid", "GFX\items\firstaid.x", "GFX\items\INVfirstaid.jpg", "", 0.03)
@@ -274,7 +275,6 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Clipboard", "clipboard", "GFX\items\clipboard.b3d", "GFX\items\INVclipboard.jpg", "", 0.003, "", "GFX\items\INVclipboard2.jpg", 1)
 	
 	it = CreateItemTemplate("SCP-1123", "1123", "GFX\items\HGIB_Skull1.b3d", "GFX\items\inv1123.jpg", "", 0.015) : it\sound = 2
-	it = CreateItemTemplate("SCP-178", "scp178", "GFX\items\scp178.b3d", "GFX\items\INV178.jpg", "", 0.02,"","",1)
 	
 	;it = CreateItemTemplate("Document SCP-1074", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc1074.jpg", 0.003) : it\sound = 0
 	;it = CreateItemTemplate("SCP-1074 Containment Notice", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc_arce.jpg", 0.003) : it\sound = 0
@@ -290,17 +290,30 @@ Function InitItemTemplates()
 	;.........
 	
 	;new Items in SCP:CB 1.3 - ENDSHN
-	it = CreateItemTemplate("SCP-1499","scp1499","GFX\items\SCP-1499.3ds","GFX\items\INVscp1499.jpg", "", 0.023,"GFX\items\SCP-1499.jpg") : it\sound = 2
-	it = CreateItemTemplate("SCP-1499","super1499","GFX\items\SCP-1499.3ds","GFX\items\INVscp1499.jpg", "", 0.023,"GFX\items\SCP-1499.jpg") : it\sound = 2
+	it = CreateItemTemplate("SCP-1499","scp1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.023) : it\sound = 2
+	it = CreateItemTemplate("SCP-1499","super1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.023) : it\sound = 2
 	CreateItemTemplate("Emily Ross' Badge", "badge", "GFX\items\badge.x", "GFX\items\INVbadge.jpg", "GFX\items\badge1.jpg", 0.0001, "GFX\items\badge1_tex.jpg")
 	it = CreateItemTemplate("Lost Key", "key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, "GFX\items\key2.png","",0,1+2+8) : it\sound = 3
 	it = CreateItemTemplate("Disciplinary Hearing DH-S-4137-17092", "oldpaper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\dh.s", 0.003) : it\sound = 0
-	
 	it = CreateItemTemplate("Coin", "coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","",0,1+2+8) : it\sound = 3
-	
 	it = CreateItemTemplate("Movie Ticket", "ticket", "GFX\items\key.b3d", "GFX\items\INVticket.jpg", "GFX\items\ticket.png", 0.002, "GFX\items\tickettexture.png","",0,1+2+8) : it\sound = 0
-	
 	CreateItemTemplate("Old Badge", "badge", "GFX\items\badge.x", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, "GFX\items\badge2_tex.png","",0,1+2+8)
+	
+	it = CreateItemTemplate("50 Cent Coin","50ct", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","",0,1+2+8) : it\sound = 3
+	it = CreateItemTemplate("Wallet","wallet", "GFX\items\wallet.b3d", "GFX\items\INVwallet.jpg", "", 0.0005,"","",1) : it\sound = 2
+	
+	CreateItemTemplate("SCP-427","scp427","GFX\items\427.b3d","GFX\items\INVscp427.jpg", "", 0.001)
+	it = CreateItemTemplate("Upgraded pill", "scp500death", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0001) : it\sound = 2
+	EntityColor it\obj,255,0,0
+	it = CreateItemTemplate("Pill", "pill", "GFX\items\pill.b3d", "GFX\items\INVpillwhite.jpg", "", 0.0001) : it\sound = 2
+	EntityColor it\obj,255,255,255
+	
+	it = CreateItemTemplate("Sticky Note", "paper", "GFX\items\note.x", "GFX\items\INVnote2.jpg", "GFX\items\note682.jpg", 0.0025) : it\sound = 0
+	it = CreateItemTemplate("The Modular Site Project", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docMSP.jpg", 0.003) : it\sound = 0
+	
+	it = CreateItemTemplate("Research Sector-02 Scheme", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\docmap.jpg", 0.003) : it\sound = 0
+	
+	it = CreateItemTemplate("Document SCP-427", "paper", "GFX\items\paper.x", "GFX\items\INVpaper.jpg", "GFX\items\doc427.jpg", 0.003) : it\sound = 0
 	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -407,6 +420,9 @@ Function CreateItem.Items(name$, tempname$, x#, y#, z#, r%=0,g%=0,b%=0,a#=1.0,in
 		invSlots = 10
 		SetAnimTime i\model,17.0
 		i\invimg = i\itemtemplate\invimg2
+	ElseIf (tempname="wallet") And (invSlots=0) Then
+		invSlots = 10
+		SetAnimTime i\model,0.0
 	EndIf
 	
 	i\invSlots=invSlots
@@ -445,6 +461,8 @@ Function RemoveItem(i.Items)
 				Wearing714 = False
 			Case "scp1499","super1499"
 				Wearing1499 = False
+			Case "scp427"
+				I_427\Using = False
 		End Select
 		
 		SelectedItem = Null
@@ -572,14 +590,21 @@ End Function
 
 Function PickItem(item.Items)
 	Local n% = 0
+	Local canpickitem = True
+	Local fullINV% = True
+	
+	For n% = 0 To MaxItemAmount - 1
+		If Inventory(n)=Null
+			fullINV = False
+			Exit
+		EndIf
+	Next
 	
 	CatchErrors("Uncaught (PickItem)")
-	If ItemAmount < MaxItemAmount Then
+	If (Not fullINV) Then
 		For n% = 0 To MaxItemAmount - 1
 			If Inventory(n) = Null Then
 				Select item\itemtemplate\tempname
-					Case "scp178"
-						SetAnimTime item\model,19.0
 					Case "1123"
 						If Not (Wearing714 = 1) Then
 							If PlayerRoom\RoomTemplate\Name <> "room1123" Then
@@ -631,25 +656,57 @@ Function PickItem(item.Items)
 					Case "navigator", "nav"
 						If item\itemtemplate\name = "S-NAV Navigator Ultimate" Then GiveAchievement(AchvSNAV)
 					Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
-						Msg = "You put on the hazmat suit."
-						TakeOffStuff(1+16)
-						MsgTimer = 70 * 5
-						If item\itemtemplate\tempname="hazmatsuit3" Then
-							WearingHazmat = 3
-						ElseIf item\itemtemplate\tempname="hazmatsuit2"
-							WearingHazmat = 2
-						Else
-							WearingHazmat = 1
-						EndIf
-						
+						canpickitem = True
 						For z% = 0 To MaxItemAmount - 1
 							If Inventory(z) <> Null Then
 								If Inventory(z)\itemtemplate\tempname="hazmatsuit" Or Inventory(z)\itemtemplate\tempname="hazmatsuit2" Or Inventory(z)\itemtemplate\tempname="hazmatsuit3" Then
-									DropItem(Inventory(z))
+									canpickitem% = False
+									Exit
+								ElseIf Inventory(z)\itemtemplate\tempname="vest" Or Inventory(z)\itemtemplate\tempname="finevest" Then
+									canpickitem% = 2
+									Exit
 								EndIf
 							EndIf
 						Next
 						
+						If canpickitem=False Then
+							Msg = "You are not able to wear two hazmat suits at the same time."
+							MsgTimer = 70 * 5
+							Return
+						ElseIf canpickitem=2 Then
+							Msg = "You are not able to wear a vest and a hazmat suit at the same time."
+							MsgTimer = 70 * 5
+							Return
+						Else
+							;TakeOffStuff(1+16)
+							SelectedItem = item
+						EndIf
+					Case "vest","finevest"
+						canpickitem = True
+						For z% = 0 To MaxItemAmount - 1
+							If Inventory(z) <> Null Then
+								If Inventory(z)\itemtemplate\tempname="vest" Or Inventory(z)\itemtemplate\tempname="finevest" Then
+									canpickitem% = False
+									Exit
+								ElseIf Inventory(z)\itemtemplate\tempname="hazmatsuit" Or Inventory(z)\itemtemplate\tempname="hazmatsuit2" Or Inventory(z)\itemtemplate\tempname="hazmatsuit3" Then
+									canpickitem% = 2
+									Exit
+								EndIf
+							EndIf
+						Next
+						
+						If canpickitem=False Then
+							Msg = "You are not able to wear two vests at the same time."
+							MsgTimer = 70 * 5
+							Return
+						ElseIf canpickitem=2 Then
+							Msg = "You are not able to wear a vest and a hazmat suit at the same time."
+							MsgTimer = 70 * 5
+							Return
+						Else
+							;TakeOffStuff(2)
+							SelectedItem = item
+						EndIf
 				End Select
 				
 				If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
@@ -671,9 +728,11 @@ Function PickItem(item.Items)
 	CatchErrors("PickItem")
 End Function
 
-Function DropItem(item.Items)
+Function DropItem(item.Items,playdropsound%=True)
 	CatchErrors("Uncaught (DropItem)")
-	If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
+	If playdropsound Then
+		If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
+	EndIf
 	
 	item\Dropped = 1
 	
@@ -704,10 +763,10 @@ Function DropItem(item.Items)
 			If WearingNightVision = 3 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
 		Case "scp714"
 			Wearing714 = False
-		Case "scp178"
-			Wearing178 = False
 		Case "scp1499","super1499"
 			Wearing1499 = False
+		Case "scp427"
+			I_427\Using = False
 	End Select
 	
 	CatchErrors("DropItem")
@@ -788,7 +847,9 @@ Function Update294()
 		If VomitTimer < -15 Then
 			FreeSound_Strict(VomitSFX)
 			VomitTimer = 0
-			PlaySound_Strict(BreathSFX(0,0))
+			If KillTimer >= 0 Then
+				PlaySound_Strict(BreathSFX(0,0))
+			EndIf
 			Injuries = PrevInjuries
 			Bloodloss = PrevBloodloss
 			Vomit = False
