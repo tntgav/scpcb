@@ -117,7 +117,7 @@ For i = 0 To 2
 Next
 
 ;Dim HorrorSFX%(20)
-For i = 0 To 10
+For i = 0 To 11
 	HorrorSFX(i) = LoadSound_Strict("SFX\Horror\Horror" + i + ".ogg")
 Next
 For i = 14 To 15

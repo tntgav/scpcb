@@ -128,8 +128,8 @@ Function SaveGame(file$)
 	WriteInt f, MapWidth
 	WriteInt f, MapHeight
 	For lvl = 0 To 0
-		For x = 0 To MapWidth - 1
-			For y = 0 To MapHeight - 1
+		For x = 0 To MapWidth
+			For y = 0 To MapHeight
 				WriteInt f, MapTemp(x, y)
 				WriteByte f, MapFound(x, y)
 			Next
@@ -270,7 +270,11 @@ Function SaveGame(file$)
 		If r\fr=Null Then ;this room doesn't have a forest
 			WriteByte(f,0)
 		Else ;this room has a forest
-			WriteByte(f,1)
+			If (Not I_Zone\HasCustomForest) Then
+				WriteByte(f,1)
+			Else
+				WriteByte(f,2)
+			EndIf
 			For y=0 To gridsize-1
 				For x=0 To gridsize-1
 					WriteByte(f,r\fr\grid[x+(y*gridsize)])
@@ -328,13 +332,13 @@ Function SaveGame(file$)
 	For d.Decals = Each Decals
 		WriteInt f, d\ID
 		
-		WriteFloat f, d\x
-		WriteFloat f, d\y
-		WriteFloat f, d\z
+		WriteFloat f, EntityX(d\obj,True)
+		WriteFloat f, EntityY(d\obj,True)
+		WriteFloat f, EntityZ(d\obj,True)
 		
-		WriteFloat f, d\pitch
-		WriteFloat f, d\yaw
-		WriteFloat f, d\roll
+		WriteFloat f, EntityPitch(d\obj,True)
+		WriteFloat f, EntityYaw(d\obj,True)
+		WriteFloat f, EntityRoll(d\obj,True)
 		
 		WriteByte f, d\blendmode
 		WriteInt f, d\fx
@@ -439,6 +443,12 @@ Function SaveGame(file$)
 	WriteFloat f, StoredCameraFogFar
 	WriteByte f, I_427\Using
 	WriteFloat f, I_427\Timer
+	WriteByte f, I_Zone\Transition[0]
+	WriteByte f, I_Zone\Transition[1]
+	WriteByte f, I_Zone\HasCustomForest
+	WriteByte f, I_Zone\HasCustomMT
+	
+	WriteByte f, Wearing714
 	CloseFile f
 	
 	If Not MenuOpen Then
@@ -577,8 +587,8 @@ Function LoadGame(file$)
 	
 	MapWidth = ReadInt(f)
 	MapHeight = ReadInt(f)
-	For x = 0 To MapWidth - 1
-		For y = 0 To MapHeight - 1
+	For x = 0 To MapWidth 
+		For y = 0 To MapHeight
 			MapTemp( x, y) = ReadInt(f)
 			MapFound(x, y) = ReadByte(f)
 		Next
@@ -778,7 +788,8 @@ Function LoadGame(file$)
 			Next
 		EndIf
 		
-		If ReadByte(f)=1 Then ;this room has a forest
+		Local hasForest = ReadByte(f)
+		If hasForest>0 Then ;this room has a forest
 			If r\fr<>Null Then ;remove the old forest
 				DestroyForest(r\fr)
 			Else
@@ -795,7 +806,11 @@ Function LoadGame(file$)
 			lx# = ReadFloat(f)
 			ly# = ReadFloat(f)
 			lz# = ReadFloat(f)
-			PlaceForest(r\fr,lx,ly,lz,r)
+			If hasForest=1 Then
+				PlaceForest(r\fr,lx,ly,lz,r)
+			Else
+				PlaceForest_MapCreator(r\fr,lx,ly,lz,r)
+			EndIf
 		ElseIf r\fr<>Null Then ;remove the old forest
 			DestroyForest(r\fr)
 			Delete r\fr
@@ -813,38 +828,90 @@ Function LoadGame(file$)
 	If ReadInt(f) <> 954 Then RuntimeError("Couldn't load the game, save file may be corrupted (error 2)")
 	
 	Local spacing# = 8.0
-	For lvl = 0 To 0
-		For y = MapHeight - 1 To 1 Step - 1
+	Local zone%,shouldSpawnDoor%
+	For y = MapHeight To 0 Step -1
+		
+		If y<I_Zone\Transition[1]-1 Then
+			zone=3
+		ElseIf y>=I_Zone\Transition[1]-1 And y<I_Zone\Transition[0]-1 Then
+			zone=2
+		Else
+			zone=1
+		EndIf
+		
+		For x = MapWidth To 0 Step -1
+			If MapTemp(x,y) > 0 Then
+				If zone = 2 Then temp=2 Else temp=0
+                
+                For r.Rooms = Each Rooms
+					r\angle = WrapAngle(r\angle)
+					If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=90 Or r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=0 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=0 Or r\angle=180 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (x+1)<(MapWidth+1)
+								If MapTemp(x + 1, y) > 0 Then
+									do.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), temp)
+									r\AdjDoor[0] = do
+								EndIf
+							EndIf
+						EndIf
+						
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=0 Or r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=180 Or r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=180 Or r\angle=90 Or r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (y+1)<(MapHeight+1)
+								If MapTemp(x, y + 1) > 0 Then
+									do.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), temp)
+									r\AdjDoor[3] = do
+								EndIf
+							EndIf
+						EndIf
+						
+						Exit
+					EndIf
+                Next
+                
+			End If
 			
-			If y < MapHeight/3+1 Then
-				temp=0
-			ElseIf y < MapHeight*(2.0/3.0)-1
-				temp=2
-			Else
-				temp=0
-			EndIf
-			
-			For x = 1 To MapWidth - 2
-				If MapTemp(x, y) > 0 Then
-					If (Floor((x + y) / 2.0) = Ceil((x + y) / 2.0)) Then
-						If MapTemp(x + 1, y) Then
-							CreateDoor(lvl, x * spacing + spacing / 2.0, 0, y * spacing, 90, Null, Max(Rand(-3, 1), 0), temp)
-						EndIf
-						
-						If MapTemp(x - 1, y) Then
-							CreateDoor(lvl, x * spacing - spacing / 2.0, 0, y * spacing, 90, Null, Max(Rand(-3, 1), 0), temp)
-						EndIf
-						
-						If MapTemp(x, y + 1) Then
-							CreateDoor(lvl, x * spacing, 0, y * spacing + spacing / 2.0, 0, Null, Max(Rand(-3, 1), 0), temp)
-						EndIf
-						
-						If MapTemp(x, y - 1)Then
-							CreateDoor(lvl, x * spacing, 0, y * spacing - spacing / 2.0, 0, Null, Max(Rand(-3, 1), 0), temp)
-						EndIf
-					End If
-				EndIf
-			Next
 		Next
 	Next
 	
@@ -894,6 +961,12 @@ Function LoadGame(file$)
 	
 	If ReadInt(f) <> 1845 Then RuntimeError("Couldn't load the game, save file corrupted (error 3)")
 	
+	Local d.Decals
+	For d.Decals = Each Decals
+		FreeEntity d\obj
+		Delete d
+	Next
+	
 	temp = ReadInt(f)
 	For i = 1 To temp
 		id% = ReadInt(f)
@@ -903,7 +976,7 @@ Function LoadGame(file$)
 		Local pitch# = ReadFloat(f)
 		Local yaw# = ReadFloat(f)
 		Local roll# = ReadFloat(f)
-		Local d.Decals = CreateDecal(id, x, y, z, pitch, yaw, roll)
+		d.Decals = CreateDecal(id, x, y, z, pitch, yaw, roll)
 		d\blendmode = ReadByte (f)
 		d\fx = ReadInt(f)
 		
@@ -916,7 +989,10 @@ Function LoadGame(file$)
 		ScaleSprite(d\obj, d\Size, d\Size)
 		EntityBlend d\obj, d\blendmode
 		EntityFX d\obj, d\fx
+		
+		DebugLog "Created Decal @"+x+","+y+","+z
 	Next
+	UpdateDecals()
 	
 	temp = ReadInt(f)
 	For i = 1 To temp
@@ -964,6 +1040,10 @@ Function LoadGame(file$)
 			e\EventStr = ""
 		ElseIf e\EventName = "room205"
 			e\EventStr = ""
+		ElseIf e\EventName = "room106"
+			If e\EventState2 = False Then
+				PositionEntity (e\room\Objects[6],EntityX(e\room\Objects[6],True),-1280.0*RoomScale,EntityZ(e\room\Objects[6],True),True)
+			EndIf
 		EndIf
 	Next
 	
@@ -1085,6 +1165,13 @@ Function LoadGame(file$)
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
 	
+	I_Zone\Transition[0] = ReadByte(f)
+	I_Zone\Transition[1] = ReadByte(f)
+	I_Zone\HasCustomForest = ReadByte(f)
+	I_Zone\HasCustomMT = ReadByte(f)
+	
+	Wearing714 = ReadByte(f)
+	
 	CloseFile f
 	
 	For r.Rooms = Each Rooms
@@ -1150,7 +1237,7 @@ Function LoadGame(file$)
 			ShowEntity PlayerRoom\obj
 		EndIf
 		ShowEntity Collider
-		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider))
+		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider),0.3,True)
 		If PlayerRoom<>Null Then
 			HideEntity PlayerRoom\obj
 		EndIf
@@ -1317,8 +1404,8 @@ Function LoadGameQuick(file$)
 	MapHeight = ReadInt(f)
 	DebugLog MapWidth
 	DebugLog MapHeight
-	For x = 0 To MapWidth - 1
-		For y = 0 To MapHeight - 1
+	For x = 0 To MapWidth
+		For y = 0 To MapHeight
 			MapTemp(x, y) = ReadInt(f)
 			MapFound(x, y) = ReadByte(f)
 		Next
@@ -1513,7 +1600,7 @@ Function LoadGameQuick(file$)
 			EndIf
 		EndIf
 		
-		If ReadByte(f)=1 Then ;this room has a forest
+		If ReadByte(f)>0 Then ;this room has a forest
 			For y=0 To gridsize-1
 				For x=0 To gridsize-1
 					ReadByte(f)
@@ -1534,9 +1621,6 @@ Function LoadGameQuick(file$)
 		If r\x = r1499_x# And r\z = r1499_z#
 			NTF_1499PrevRoom = r
 			Exit
-		EndIf
-		If r\RoomTemplate\Name = "gatea" Then
-			PositionEntity r\obj,EntityX(r\obj),r\y,EntityZ(r\obj)
 		EndIf
 	Next
 	
@@ -1621,7 +1705,10 @@ Function LoadGameQuick(file$)
 		ScaleSprite(d\obj, d\Size, d\Size)
 		EntityBlend d\obj, d\blendmode
 		EntityFX d\obj, d\fx
+		
+		DebugLog "Created Decal @"+x+","+y+","+z
 	Next
+	UpdateDecals()
 	
 	Local e.Events
 	For e.Events = Each Events
@@ -1793,6 +1880,13 @@ Function LoadGameQuick(file$)
 	EndIf
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
+	
+	I_Zone\Transition[0] = ReadByte(f)
+	I_Zone\Transition[1] = ReadByte(f)
+	I_Zone\HasCustomForest = ReadByte(f)
+	I_Zone\HasCustomMT = ReadByte(f)
+	
+	Wearing714 = ReadByte(f)
 	CloseFile f
 	
 	If Collider <> 0 Then
@@ -1800,13 +1894,66 @@ Function LoadGameQuick(file$)
 			ShowEntity PlayerRoom\obj
 		EndIf
 		ShowEntity Collider
-		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider))
+		TeleportEntity(Collider,EntityX(Collider),EntityY(Collider)+0.5,EntityZ(Collider),0.3,True)
 		If PlayerRoom<>Null Then
 			HideEntity PlayerRoom\obj
 		EndIf
 	EndIf
 	
 	UpdateDoorsTimer = 0
+	
+	;Free some entities that could potentially cause memory leaks (for the endings)
+	;This is only required for the LoadGameQuick function, as the other one is from the menu where everything is already deleted anyways
+	Local xtemp#,ztemp#
+	If Sky <> 0 Then
+		FreeEntity Sky
+		Sky = 0
+	EndIf
+	For r.Rooms = Each Rooms
+		If r\RoomTemplate\Name = "gatea" Then
+			If r\Objects[0]<>0 Then
+				FreeEntity r\Objects[0] : r\Objects[0] = 0
+				xtemp#=EntityX(r\Objects[9],True)
+				ztemp#=EntityZ(r\Objects[9],True)
+				FreeEntity r\Objects[9] : r\Objects[9] = 0
+				r\Objects[10] = 0 ;r\Objects[10] is already deleted because it is a parent object to r\Objects[9] which is already deleted a line before
+				;Readding this object, as it is originally inside the "FillRoom" function but gets deleted when it loads GateA
+				r\Objects[9]=CreatePivot()
+				PositionEntity(r\Objects[9], xtemp#, r\y+992.0*RoomScale, ztemp#, True)
+				EntityParent r\Objects[9], r\obj
+				;The GateA wall pieces
+				xtemp# = EntityX(r\Objects[13],True)
+				ztemp# = EntityZ(r\Objects[13],True)
+				FreeEntity r\Objects[13]
+				r\Objects[13]=LoadMesh_Strict("GFX\map\gateawall1.b3d",r\obj)
+				PositionEntity(r\Objects[13], xtemp#, r\y-1045.0*RoomScale, ztemp#, True)
+				EntityColor r\Objects[13], 25,25,25
+				EntityType r\Objects[13],HIT_MAP
+				xtemp# = EntityX(r\Objects[14],True)
+				ztemp# = EntityZ(r\Objects[14],True)
+				FreeEntity r\Objects[14]
+				r\Objects[14]=LoadMesh_Strict("GFX\map\gateawall2.b3d",r\obj)
+				PositionEntity(r\Objects[14], xtemp#, r\y-1045.0*RoomScale, ztemp#, True)	
+				EntityColor r\Objects[14], 25,25,25
+				EntityType r\Objects[14],HIT_MAP
+			EndIf
+			If r\Objects[12]<>0 Then
+				FreeEntity r\Objects[12] : r\Objects[12] = 0
+				FreeEntity r\Objects[17] : r\Objects[17] = 0
+			EndIf
+		ElseIf r\RoomTemplate\Name = "exit1" Then
+			If r\Objects[0]<>0 Then
+				xtemp# = EntityX(r\Objects[0],True)
+				ztemp# = EntityZ(r\Objects[0],True)
+				FreeEntity r\Objects[0] : r\Objects[0] = 0
+				r\Objects[0] = CreatePivot(r\obj)
+				PositionEntity(r\Objects[0], xtemp#, 9767.0*RoomScale, ztemp#, True)
+			EndIf
+		EndIf
+	Next
+	;Resetting some stuff (those get changed when going to the endings)
+	CameraFogMode(Camera, 1)
+	HideDistance# = 15.0
 	
 	CatchErrors("LoadGameQuick")
 End Function
@@ -1876,30 +2023,59 @@ End Function
 
 Function LoadSavedMaps()
 	CatchErrors("Uncaught (LoadSavedMaps)")
-	Local i, Dir, file$
+	Local i%, Dir, file$
 	
-	For i = 0 To MAXSAVEDMAPS-1
+	For i = 0 To SavedMapsAmount
 		SavedMaps(i)=""
+		SavedMapsAuthor(i)=""
 	Next
+	SavedMapsAmount = 0
 	
-	Dir=ReadDir("Map Creator\Maps") 
-	i = 0
-	Repeat 
+	Dir=ReadDir("Map Creator\Maps")
+	Repeat
 		file$=NextFile$(Dir)
 		
 		DebugLog file
 		
-		If file$="" Then Exit 
+		If file$="" Then Exit
 		DebugLog (CurrentDir()+"Map Creator\Maps\"+file$)
 		If FileType(CurrentDir()+"Map Creator\Maps\"+file$) = 1 Then 
-			If file <> "." And file <> ".." Then 
-				SavedMaps(i) = Left(file,Max(Len(file)-6,1))
-				DebugLog i+": "+file
-				i=i+1
+			If file <> "." And file <> ".." Then
+				If Right(file,6)="cbmap2" Or Right(file,5)="cbmap" Then
+					SavedMapsAmount = SavedMapsAmount + 1
+				EndIf
 			EndIf
-			
-			If i > MAXSAVEDMAPS Then Exit
-		End If 
+		EndIf 
+	Forever 
+	CloseDir Dir
+	
+	Dim SavedMaps(SavedMapsAmount+1)
+	Dim SavedMapsAuthor$(SavedMapsAmount+1)
+	
+	i = 0
+	Dir=ReadDir("Map Creator\Maps") 
+	Repeat
+		file$=NextFile$(Dir)
+		
+		DebugLog file
+		
+		If file$="" Then Exit
+		DebugLog (CurrentDir()+"Map Creator\Maps\"+file$)
+		If FileType(CurrentDir()+"Map Creator\Maps\"+file$) = 1 Then 
+			If file <> "." And file <> ".." Then
+				If Right(file,6)="cbmap2" Or Right(file,5)="cbmap" Then
+					SavedMaps(i) = file
+					If Right(file,6)="cbmap2" Then
+						Local f = ReadFile("Map Creator\Maps\"+file)
+						SavedMapsAuthor$(i) = ReadLine(f)
+						CloseFile f
+					Else
+						SavedMapsAuthor$(i) = "[Unknown]"
+					EndIf
+					i=i+1
+				EndIf
+			EndIf
+		EndIf 
 	Forever 
 	CloseDir Dir 
 	CatchErrors("LoadSavedMaps")
@@ -1909,77 +2085,287 @@ Function LoadMap(file$)
 	CatchErrors("Uncaught (LoadMap)")
 	Local f%, x%, y%, name$, angle%, prob#
 	Local r.Rooms, rt.RoomTemplates, e.Events
+	Local roomamount%,forestpieceamount%,mtpieceamount%,i%
 	
-	f% = ReadFile(file+".cbmap")
-	DebugLog file+".cbmap"
+	f% = ReadFile(file)
+	DebugLog file
 	
-	While Not Eof(f)
-		x = ReadByte(f)
-		y = ReadByte(f)
-		name$ = Lower(ReadString(f))
+	Dim MapTemp%(MapWidth+1, MapHeight+1)
+	Dim MapFound%(MapWidth+1, MapHeight+1)
+	CoffinDistance = 100
+	
+	For x = 0 To MapWidth+1
+		For y = 0 To MapHeight+1
+			MapTemp(x,y)=False
+			MapFound(x,y)=False
+		Next
+	Next
+	
+	If Right(file,6)="cbmap2" Then
+		ReadLine(f)
+		ReadLine(f)
+		I_Zone\Transition[0] = ReadByte(f)
+		I_Zone\Transition[1] = ReadByte(f)
+		roomamount = ReadInt(f)
+		forestpieceamount = ReadInt(f)
+		mtpieceamount = ReadInt(f)
 		
-		angle = ReadByte(f)*90.0
+		If forestpieceamount > 0 Then
+			I_Zone\HasCustomForest = True
+		EndIf
+		If mtpieceamount > 0 Then
+			I_Zone\HasCustomMT = True
+		EndIf
 		
-		DebugLog x+", "+y+": "+name
-		DebugLog "angle: "+angle
-		
-		For rt.RoomTemplates=Each RoomTemplates
-			If Lower(rt\Name) = name Then
-                
-                r.Rooms = CreateRoom(0, rt\Shape, (MapWidth-x) * 8.0, 0, y * 8.0, name)
-				DebugLog "createroom"
-				
-                r\angle = angle
-                If r\angle<>90 And r\angle<>270
-					r\angle = r\angle + 180
+		;Facility rooms
+		For i = 0 To roomamount-1
+			x = ReadByte(f)
+			y = ReadByte(f)
+			name$ = Lower(ReadString(f))
+			
+			angle = ReadByte(f)*90.0
+			
+			DebugLog x+", "+y+": "+name
+			DebugLog "angle: "+angle
+			
+			For rt.RoomTemplates=Each RoomTemplates
+				If Lower(rt\Name) = name Then
+					
+					r.Rooms = CreateRoom(0, rt\Shape, (MapWidth-x) * 8.0, 0, y * 8.0, name)
+					DebugLog "createroom"
+					
+					r\angle = angle
+					If r\angle<>90 And r\angle<>270
+						r\angle = r\angle + 180
+					EndIf
+					r\angle = WrapAngle(r\angle)
+					
+					TurnEntity(r\obj, 0, r\angle, 0)
+					
+					MapTemp(MapWidth-x,y)=True
+					
+					Exit
 				EndIf
-				r\angle = WrapAngle(r\angle)
-                
-                TurnEntity(r\obj, 0, r\angle, 0)
-                
-                MapTemp(MapWidth-x,y)=1
-                
-                Exit
+			Next
+			
+			name = ReadString(f)
+			prob# = ReadFloat(f)
+			
+			If r<>Null Then
+				If prob>0.0 Then
+					If Rnd(0.0,1.0)<=prob Then
+						e.Events = New Events
+						e\EventName = name
+						e\room = r   
+					EndIf
+				ElseIf prob = 0.0 And name <> "" Then
+					e.Events = New Events
+					e\EventName = name
+					e\room = r  
+				EndIf
 			EndIf
 		Next
 		
-		name = ReadString(f)
-		prob# = ReadFloat(f)
-		
-		If r<>Null Then
-			If prob>0.0
-				If Rnd(0.0,1.0)<=prob
-					e.Events = New Events
-					e\EventName = name
-					e\room = r   
-				EndIf
+		Local ForestRoom.Rooms
+		For r.Rooms = Each Rooms
+			If r\RoomTemplate\Name = "room860" Then
+				ForestRoom = r
+				Exit
 			EndIf
+		Next
+		
+		If ForestRoom<>Null Then
+			Local fr.Forest = New Forest
 		EndIf
 		
-	Wend
+		;Forest rooms
+		For i = 0 To forestpieceamount-1
+			x = ReadByte(f)
+			y = ReadByte(f)
+			name$ = Lower(ReadString(f))
+			
+			angle = ReadByte(f)
+			
+			DebugLog x+", "+y+": "+name
+			DebugLog "angle: "+angle
+			
+			If angle <> 0 And angle <> 2 Then
+				angle = angle + 2
+			EndIf
+			angle = angle + 1
+			If angle > 3 Then
+				angle = (angle Mod 4)
+			EndIf
+			
+			x = (gridsize-1)-x
+			
+			If fr<>Null Then
+				Select name
+					;1,2,3,4 = ROOM1
+					;5,6,7,8 = ROOM2
+					;9,10,11,12 = ROOM2C
+					;13,14,15,16 = ROOM3
+					;17,18,19,20 = ROOM4
+					;21,22,23,24 = DOORROOM
+					Case "scp-860-1 endroom"
+						fr\grid[(y*gridsize)+x] = 1+angle
+					Case "scp-860-1 path"
+						fr\grid[(y*gridsize)+x] = 5+angle
+					Case "scp-860-1 corner"
+						fr\grid[(y*gridsize)+x] = 9+angle
+					Case "scp-860-1 t-shaped path"
+						fr\grid[(y*gridsize)+x] = 13+angle
+					Case "scp-860-1 4-way path"
+						fr\grid[(y*gridsize)+x] = 17+angle
+					Case "scp-860-1 door"
+						fr\grid[(y*gridsize)+x] = 21+angle
+				End Select
+				DebugLog "created forest piece "+Chr(34)+name+Chr(34)+" successfully"
+			EndIf
+		Next
+		
+		If fr<>Null Then
+			ForestRoom\fr=fr
+			PlaceForest_MapCreator(ForestRoom\fr,ForestRoom\x,ForestRoom\y+30.0,ForestRoom\z,ForestRoom)
+		EndIf
+		
+		Local MTRoom.Rooms
+		For r.Rooms = Each Rooms
+			If r\RoomTemplate\Name = "room2tunnel" Then
+				MTRoom = r
+				Exit
+			EndIf
+		Next
+		
+		If MTRoom<>Null Then
+			MTRoom\grid = New Grids
+		EndIf
+		
+		;Maintenance tunnels rooms
+		For i = 0 To mtpieceamount-1
+			x = ReadByte(f)
+			y = ReadByte(f)
+			name$ = Lower(ReadString(f))
+			
+			angle = ReadByte(f)
+			
+			DebugLog x+", "+y+": "+name
+			DebugLog "angle: "+angle
+			
+			If angle<>1 And angle<>3 Then
+				angle = angle + 2
+			EndIf
+			If name = "maintenance tunnel corner" Or name = "maintenance tunnel t-shaped room" Then
+				angle = angle + 3
+			EndIf
+			If angle > 3 Then
+				angle = (angle Mod 4)
+			EndIf
+			
+			x = (gridsz-1)-x
+			
+			If MTRoom<>Null Then
+				Select name
+					Case "maintenance tunnel endroom"
+						MTRoom\grid\grid[x+(y*gridsz)]=ROOM1
+					Case "maintenance tunnel corridor"
+						MTRoom\grid\grid[x+(y*gridsz)]=ROOM2
+					Case "maintenance tunnel corner"
+						MTRoom\grid\grid[x+(y*gridsz)]=ROOM2C
+					Case "maintenance tunnel t-shaped room"
+						MTRoom\grid\grid[x+(y*gridsz)]=ROOM3
+					Case "maintenance tunnel 4-way room"
+						MTRoom\grid\grid[x+(y*gridsz)]=ROOM4
+					Case "maintenance tunnel elevator"
+						MTRoom\grid\grid[x+(y*gridsz)]=ROOM4+1
+					Case "maintenance tunnel generator room"
+						MTRoom\grid\grid[x+(y*gridsz)]=ROOM4+2
+				End Select
+				MTRoom\grid\angles[x+(y*gridsz)]=angle
+				DebugLog "created mtunnel piece "+Chr(34)+name+Chr(34)+" successfully"
+			EndIf
+		Next
+		
+		;If MTRoom<>Null Then
+		;	PlaceGrid_MapCreator(MTRoom)
+		;EndIf
+	Else
+		I_Zone\Transition[0] = 13
+		I_Zone\Transition[1] = 7
+		I_Zone\HasCustomForest = False
+		I_Zone\HasCustomMT = False
+		While Not Eof(f)
+			x = ReadByte(f)
+			y = ReadByte(f)
+			name$ = Lower(ReadString(f))
+			
+			angle = ReadByte(f)*90.0
+			
+			DebugLog x+", "+y+": "+name
+			DebugLog "angle: "+angle
+			
+			For rt.RoomTemplates=Each RoomTemplates
+				If Lower(rt\Name) = name Then
+					
+					r.Rooms = CreateRoom(0, rt\Shape, (MapWidth-x) * 8.0, 0, y * 8.0, name)
+					DebugLog "createroom"
+					
+					r\angle = angle
+					If r\angle<>90 And r\angle<>270
+						r\angle = r\angle + 180
+					EndIf
+					r\angle = WrapAngle(r\angle)
+					
+					TurnEntity(r\obj, 0, r\angle, 0)
+					
+					MapTemp(MapWidth-x,y)=True
+					
+					Exit
+				EndIf
+			Next
+			
+			name = ReadString(f)
+			prob# = ReadFloat(f)
+			
+			If r<>Null Then
+				If prob>0.0 Then
+					If Rnd(0.0,1.0)<=prob Then
+						e.Events = New Events
+						e\EventName = name
+						e\room = r   
+					EndIf
+				ElseIf prob = 0.0 And name <> "" Then
+					e.Events = New Events
+					e\EventName = name
+					e\room = r
+				EndIf
+			EndIf
+			
+		Wend
+	EndIf
 	
 	CloseFile f
 	
 	Local temp = 0, zone
 	Local spacing# = 8.0
 	Local shouldSpawnDoor% = False
-	;For y = MapHeight - 1 To 1 Step - 1
+	Local d.Doors
 	For y = MapHeight To 0 Step -1
 		
-		If y < MapHeight/3+1 Then
+		If y<I_Zone\Transition[1] Then
 			zone=3
-		ElseIf y < MapHeight*(2.0/3.0)-1
+		ElseIf y>=I_Zone\Transition[1] And y<I_Zone\Transition[0] Then
 			zone=2
 		Else
 			zone=1
 		EndIf
 		
-		;For x = 1 To MapWidth - 2
 		For x = MapWidth To 0 Step -1
 			If MapTemp(x,y) > 0 Then
 				If zone = 2 Then temp=2 Else temp=0
                 
                 For r.Rooms = Each Rooms
+					r\angle = WrapAngle(r\angle)
 					If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
 						shouldSpawnDoor = False
 						Select r\RoomTemplate\Shape
@@ -2055,7 +2441,7 @@ Function LoadMap(file$)
 	;r = CreateRoom(0, ROOM1, 0, 0, 8, "gatea")
 	If IntroEnabled Then r = CreateRoom(0, ROOM1, 8, 0, (MapHeight+2) * 8, "173")
 	r = CreateRoom(0, ROOM1, (MapWidth+2) * 8, 0, (MapHeight+2) * 8, "pocketdimension")
-	r = CreateRoom(0, ROOM1, 0, 0, -16, "gatea")
+	r = CreateRoom(0, ROOM1, 0, 500, -16, "gatea")
 	r = CreateRoom(0, ROOM1, -16, 800, 0, "dimension1499")
 	
 	CreateEvent("173", "173", 0)
@@ -2089,6 +2475,16 @@ Function LoadMap(file$)
 				EndIf
 			EndIf
 			If (r\Adjacent[0]<>Null) And (r\Adjacent[1]<>Null) And (r\Adjacent[2]<>Null) And (r\Adjacent[3]<>Null) Then Exit
+		Next
+	Next
+	
+	For x = 0 To MapWidth+1
+		For y = 0 To MapHeight+1
+			If MapTemp(x,y)>0 Then
+				DebugLog "MapTemp("+x+","+y+") = True"
+			Else
+				DebugLog "MapTemp("+x+","+y+") = False"
+			EndIf
 		Next
 	Next
 	

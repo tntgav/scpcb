@@ -63,7 +63,7 @@ Function writemesh(mesh,e_filename$)
 					If Instr(l$,"//Exported By") headerwrite=0
 				Else
 					l$=ReadLine(rfile)
-					If Instr (l$,"//") Then l$=usv(ReadLine(rfile),1,"//")
+					If Instr (l$,"//") Then l$=USV(ReadLine(rfile),1,"//")
 					l$=Trim(l$)
 					WriteLine wfile,l$
 					;dat$=dat$+l$
@@ -160,7 +160,7 @@ End Function
 
 Function GetStringofMatElement$(mesh,x,y)
 	me$=GetMatElement(mesh,x,y)
-	dp$=usv(me$,2,".")
+	dp$=USV(me$,2,".")
 	final$=me$
 	If Len(dp$)=0
 		final$=me$+"000000"
@@ -194,10 +194,10 @@ Function RecursiveAddMesh(h,basescaleX#=1,basescaleY#=1,basescaleZ#=1)
 
 		WriteLine XE_XF,"   Frame "+ChiName$+" {"
 		WriteLine XE_XF,"      FrameTransformMatrix {"
-		WriteLine XE_XF,"         "+GetStringOfMatElement(mesh,0,0)+","+GetStringOfMatElement(mesh,0,1)+","+GetStringOfMatElement(mesh,0,2)+",0.000000,"
-		WriteLine XE_XF,"         "+GetStringOfMatElement(mesh,1,0)+","+GetStringOfMatElement(mesh,1,1)+","+GetStringOfMatElement(mesh,1,2)+",0.000000,"
-		WriteLine XE_XF,"         "+GetStringOfMatElement(mesh,2,0)+","+GetStringOfMatElement(mesh,2,1)+","+GetStringOfMatElement(mesh,2,2)+",0.000000,"
-		WriteLine XE_XF,"         "+GetStringOfMatElement(mesh,3,0)+","+GetStringOfMatElement(mesh,3,1)+","+GetStringOfMatElement(mesh,3,2)+",1.000000;;"
+		WriteLine XE_XF,"         "+GetStringofMatElement(mesh,0,0)+","+GetStringofMatElement(mesh,0,1)+","+GetStringofMatElement(mesh,0,2)+",0.000000,"
+		WriteLine XE_XF,"         "+GetStringofMatElement(mesh,1,0)+","+GetStringofMatElement(mesh,1,1)+","+GetStringofMatElement(mesh,1,2)+",0.000000,"
+		WriteLine XE_XF,"         "+GetStringofMatElement(mesh,2,0)+","+GetStringofMatElement(mesh,2,1)+","+GetStringofMatElement(mesh,2,2)+",0.000000,"
+		WriteLine XE_XF,"         "+GetStringofMatElement(mesh,3,0)+","+GetStringofMatElement(mesh,3,1)+","+GetStringofMatElement(mesh,3,2)+",1.000000;;"
 		WriteLine XE_XF,"   }"
 
 		
@@ -350,11 +350,11 @@ Function USV$(in$,which%=1,sep$=",")
 
 		End If
 
-		valueret$ = Mid$(in$,offset+1,nextoffset-offset-1)
+		ValueRet$ = Mid$(in$,offset+1,nextoffset-offset-1)
 
 		If which = n	
 
-			Return valueret	
+			Return ValueRet	
 
 		End If
 
@@ -666,6 +666,7 @@ Function LoadRMesh(file$)
 		
 		If isAlpha=1 Then
 			AddMesh childMesh,Alpha
+			EntityAlpha childMesh,0.0
 		Else
 			AddMesh childMesh,Opaque
 			EntityParent childMesh,collisionMeshes
