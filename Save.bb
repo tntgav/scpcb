@@ -213,6 +213,11 @@ Function SaveGame(file$)
 	WriteFloat f,room2gw_x
 	WriteFloat f,room2gw_z
 	
+	WriteByte f, I_Zone\Transition[0]
+	WriteByte f, I_Zone\Transition[1]
+	WriteByte f, I_Zone\HasCustomForest
+	WriteByte f, I_Zone\HasCustomMT
+	
 	temp = 0
 	For r.Rooms = Each Rooms
 		temp=temp+1
@@ -443,10 +448,6 @@ Function SaveGame(file$)
 	WriteFloat f, StoredCameraFogFar
 	WriteByte f, I_427\Using
 	WriteFloat f, I_427\Timer
-	WriteByte f, I_Zone\Transition[0]
-	WriteByte f, I_Zone\Transition[1]
-	WriteByte f, I_Zone\HasCustomForest
-	WriteByte f, I_Zone\HasCustomMT
 	
 	WriteByte f, Wearing714
 	CloseFile f
@@ -706,6 +707,11 @@ Function LoadGame(file$)
 	room2gw_x = ReadFloat(f)
 	room2gw_z = ReadFloat(f)
 	
+	I_Zone\Transition[0] = ReadByte(f)
+	I_Zone\Transition[1] = ReadByte(f)
+	I_Zone\HasCustomForest = ReadByte(f)
+	I_Zone\HasCustomMT = ReadByte(f)
+	
 	temp = ReadInt(f)
 	For i = 1 To temp
 		Local roomtemplateID% = ReadInt(f)
@@ -720,9 +726,10 @@ Function LoadGame(file$)
 		
 		temp2 = ReadByte(f)		
 		
-		If angle >= 360
-            angle = angle-360
-        EndIf
+;		If angle >= 360
+;            angle = angle-360
+;        EndIf
+		angle=WrapAngle(angle)
 		
 		For rt.roomtemplates = Each RoomTemplates
 			If rt\id = roomtemplateID Then
@@ -831,9 +838,9 @@ Function LoadGame(file$)
 	Local zone%,shouldSpawnDoor%
 	For y = MapHeight To 0 Step -1
 		
-		If y<I_Zone\Transition[1]-1 Then
+		If y<I_Zone\Transition[1]-(SelectedMap="") Then
 			zone=3
-		ElseIf y>=I_Zone\Transition[1]-1 And y<I_Zone\Transition[0]-1 Then
+		ElseIf y>=I_Zone\Transition[1]-(SelectedMap="") And y<I_Zone\Transition[0]-(SelectedMap="") Then
 			zone=2
 		Else
 			zone=1
@@ -1165,11 +1172,6 @@ Function LoadGame(file$)
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
 	
-	I_Zone\Transition[0] = ReadByte(f)
-	I_Zone\Transition[1] = ReadByte(f)
-	I_Zone\HasCustomForest = ReadByte(f)
-	I_Zone\HasCustomMT = ReadByte(f)
-	
 	Wearing714 = ReadByte(f)
 	
 	CloseFile f
@@ -1184,18 +1186,18 @@ Function LoadGame(file$)
 				If r2\z=r\z Then
 					If (r2\x)=(r\x+8.0) Then
 						r\Adjacent[0]=r2
-						;If r\AdjDoor[0] = Null Then r\AdjDoor[0] = r2\AdjDoor[2]
+						If r\AdjDoor[0] = Null Then r\AdjDoor[0] = r2\AdjDoor[2]
 					ElseIf (r2\x)=(r\x-8.0)
 						r\Adjacent[2]=r2
-						;If r\AdjDoor[2] = Null Then r\AdjDoor[2] = r2\AdjDoor[0]
+						If r\AdjDoor[2] = Null Then r\AdjDoor[2] = r2\AdjDoor[0]
 					EndIf
 				ElseIf r2\x=r\x Then
 					If (r2\z)=(r\z-8.0) Then
 						r\Adjacent[1]=r2
-						;If r\AdjDoor[1] = Null Then r\AdjDoor[1] = r2\AdjDoor[3]
+						If r\AdjDoor[1] = Null Then r\AdjDoor[1] = r2\AdjDoor[3]
 					ElseIf (r2\z)=(r\z+8.0)
 						r\Adjacent[3]=r2
-						;If r\AdjDoor[3] = Null Then r\AdjDoor[3] = r2\AdjDoor[1]
+						If r\AdjDoor[3] = Null Then r\AdjDoor[3] = r2\AdjDoor[1]
 					EndIf
 				EndIf
 			EndIf
@@ -1524,6 +1526,11 @@ Function LoadGameQuick(file$)
 	room2gw_brokendoor = ReadInt(f)
 	room2gw_x = ReadFloat(f)
 	room2gw_z = ReadFloat(f)
+	
+	I_Zone\Transition[0] = ReadByte(f)
+	I_Zone\Transition[1] = ReadByte(f)
+	I_Zone\HasCustomForest = ReadByte(f)
+	I_Zone\HasCustomMT = ReadByte(f)
 	
 	temp = ReadInt(f)
 	For i = 1 To temp
@@ -1880,11 +1887,6 @@ Function LoadGameQuick(file$)
 	EndIf
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
-	
-	I_Zone\Transition[0] = ReadByte(f)
-	I_Zone\Transition[1] = ReadByte(f)
-	I_Zone\HasCustomForest = ReadByte(f)
-	I_Zone\HasCustomMT = ReadByte(f)
 	
 	Wearing714 = ReadByte(f)
 	CloseFile f

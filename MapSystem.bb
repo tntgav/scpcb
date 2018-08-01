@@ -7732,9 +7732,10 @@ Function CreateMap()
 	Next
 	
 	For r.Rooms = Each Rooms
-		If r\angle >= 360
-            r\angle = r\angle-360
-        EndIf
+		;If r\angle >= 360
+        ;    r\angle = r\angle-360
+        ;EndIf
+		r\angle = WrapAngle(r\angle)
 		r\Adjacent[0]=Null
 		r\Adjacent[1]=Null
 		r\Adjacent[2]=Null
