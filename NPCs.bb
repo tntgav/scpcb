@@ -1677,10 +1677,22 @@ Function UpdateNPCs()
 					n\DropSpeed = 0
 					If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
 					If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
+					PositionEntity n\Collider,0,-500,0
+					PositionEntity n\obj,0,-500,0
 				Else
-					If n\Idle = 0.1
+					If n\Idle = 0.1 Then
 						If PlayerInReachableRoom() Then
-							TeleportCloser(n)
+							For i = 0 To 3
+								If PlayerRoom\Adjacent[i]<>Null Then
+									For j = 0 To 3
+										If PlayerRoom\Adjacent[i]\Adjacent[j]<>Null Then
+											TeleportEntity(n\Collider,PlayerRoom\Adjacent[i]\Adjacent[j]\x,0.5,PlayerRoom\Adjacent[i]\Adjacent[j]\z,n\CollRadius,True)
+											Exit
+										EndIf
+									Next
+									Exit
+								EndIf
+							Next
 							n\Idle = 0.0
 							DebugLog "SCP-049 not idle"
 						EndIf
@@ -1965,7 +1977,13 @@ Function UpdateNPCs()
 									StopChannel(n\SoundChn)
 								EndIf
 								If PlayerInReachableRoom() Then ;Player is in a room where SCP-049 can teleport to
-									TeleportCloser(n)
+									If Rand(SelectedDifficulty\otherFactors)=1 Then
+										TeleportCloser(n)
+										DebugLog "SCP-049 teleported closer due to distance"
+									Else
+										n\Idle = 60*70
+										DebugLog "SCP-049 is now idle"
+									EndIf
 								EndIf
 							EndIf
 							;[End Block]
