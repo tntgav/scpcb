@@ -2836,6 +2836,9 @@ Function FillRoom(r.Rooms)
             de\Size = 0.25
             ScaleSprite(de\obj, de\Size,de\Size)
             EntityParent de\obj, r\obj
+			
+			r\Objects[2] = CreateButton(r\x + 1181.0 *RoomScale, r\y + 180.0 * RoomScale, r\z - 512.0 * RoomScale, 0, 270)
+            EntityParent (r\Objects[2],r\obj)
 			;[End Block]
 		Case "room2poffices"
 			;[Block]
@@ -4500,6 +4503,12 @@ Function FillRoom(r.Rooms)
 			EntityPickMode r\Objects[9],2
 			
 			r\Objects[10] = LoadMesh_Strict("GFX\map\intro_labels.b3d",r\obj)
+			
+			r\Objects[11] = CreateButton(r\x +1362.0 *RoomScale, r\y + 561.0 * RoomScale, r\z -80.0 * RoomScale, 0, 270)
+            EntityParent (r\Objects[11],r\obj)
+            
+            r\Objects[12] = CreateButton(r\x +1426.0 *RoomScale, r\y + 561.0 * RoomScale, r\z +210.0 * RoomScale, 0, -270)
+            EntityParent (r\Objects[12],r\obj)
 			;[End Block]
 		Case "room2ccont"
 			;[Block]

@@ -8662,8 +8662,17 @@ Function UpdateEvents()
                     e\room\NPC[0]\State = 8
                     
                     e\EventState = 1
-                    RemoveEvent(e)
                 EndIf
+				
+				If PlayerRoom=e\room Then
+					UpdateButton(e\room\Objects[2])
+					If ClosestButton = e\room\Objects[2] And MouseHit1 Then
+						Msg = "The elevator appears to be broken."
+						PlaySound2(ButtonSFX2, Camera, e\room\Objects[2])
+						MsgTimer = 5*70
+						MouseHit1=0
+					EndIf
+				EndIf
                 ;[End Block]
 		End Select
 		
