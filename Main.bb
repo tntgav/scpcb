@@ -2416,9 +2416,7 @@ Function RemoveDoor(d.Doors)
 	If d\obj2 <> 0 Then FreeEntity d\obj2
 	If d\frameobj <> 0 Then FreeEntity d\frameobj
 	If d\buttons[0] <> 0 Then FreeEntity d\buttons[0]
-	If d\buttons[1] <> 0 Then FreeEntity d\buttons[1]	
-	
-	If d\DoorHitOBJ <> 0 Then FreeEntity d\DoorHitOBJ
+	If d\buttons[1] <> 0 Then FreeEntity d\buttons[1]
 	
 	Delete d
 End Function
@@ -5580,60 +5578,72 @@ Function DrawGUI()
 			Select SelectedItem\itemtemplate\tempname
 				Case "nvgoggles"
 					;[Block]
-					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
-					If WearingNightVision = 1 Then
-						Msg = "You removed the goggles."
-						CameraFogFar = StoredCameraFogFar
+					If Wearing1499 = 0 And WearingHazmat=0 Then
+						If WearingNightVision = 1 Then
+							Msg = "You removed the goggles."
+							CameraFogFar = StoredCameraFogFar
+						Else
+							Msg = "You put on the goggles."
+							WearingGasMask = 0
+							WearingNightVision = 0
+							StoredCameraFogFar = CameraFogFar
+							CameraFogFar = 30
+						EndIf
+						
+						WearingNightVision = (Not WearingNightVision)
+					ElseIf Wearing1499 > 0 Then
+						Msg = "You need to take off SCP-1499 in order to put on the goggles."
 					Else
-						Msg = "You put on the goggles."
-						;WearingGasMask = 0
-						;Wearing178 = False
-						TakeOffStuff(1+2+8+32+64)
-						StoredCameraFogFar = CameraFogFar
-						CameraFogFar = 30
+						Msg = "You need to take off the hazmat suit in order to put on the goggles."
 					EndIf
-					
-					WearingNightVision = (Not WearingNightVision)
-					SelectedItem = Null	
-					
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 					;[End Block]
 				Case "supernv"
 					;[Block]
-					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
-					If WearingNightVision = 2 Then
-						Msg = "You removed the goggles."
-						CameraFogFar = StoredCameraFogFar
+					If Wearing1499 = 0 And WearingHazmat=0 Then
+						If WearingNightVision = 2 Then
+							Msg = "You removed the goggles."
+							CameraFogFar = StoredCameraFogFar
+						Else
+							Msg = "You put on the goggles."
+							WearingGasMask = 0
+							WearingNightVision = 0
+							StoredCameraFogFar = CameraFogFar
+							CameraFogFar = 30
+						EndIf
+						
+						WearingNightVision = (Not WearingNightVision) * 2
+					ElseIf Wearing1499 > 0 Then
+						Msg = "You need to take off SCP-1499 in order to put on the goggles."
 					Else
-						Msg = "You put on the goggles."
-						;WearingGasMask = 0
-						;Wearing178 = False
-						TakeOffStuff(1+2+8+32+64)
-						StoredCameraFogFar = CameraFogFar
-						CameraFogFar = 30
+						Msg = "You need to take off the hazmat suit in order to put on the goggles."
 					EndIf
-					
-					WearingNightVision = (Not WearingNightVision) * 2
-					SelectedItem = Null	
-					
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 					;[End Block]
 				Case "finenvgoggles"
 					;[Block]
-					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
-					If WearingNightVision = 3 Then
-						Msg = "You removed the goggles."
-						CameraFogFar = StoredCameraFogFar
-					Else
-						Msg = "You put on the goggles."
-						;WearingGasMask = 0
-						;Wearing178 = False
-						TakeOffStuff(1+2+8+32+64)
-						StoredCameraFogFar = CameraFogFar
-						CameraFogFar = 30
-					EndIf
+					If Wearing1499 = 0 And WearingHazmat = 0 Then
+						If WearingNightVision = 3 Then
+							Msg = "You removed the goggles."
+							CameraFogFar = StoredCameraFogFar
+						Else
+							Msg = "You put on the goggles."
+							WearingGasMask = 0
+							WearingNightVision = 0
+							StoredCameraFogFar = CameraFogFar
+							CameraFogFar = 30
+						EndIf
 						
-					WearingNightVision = (Not WearingNightVision) * 3
-					SelectedItem = Null	
-					
+						WearingNightVision = (Not WearingNightVision) * 3
+					ElseIf Wearing1499 > 0 Then
+						Msg = "You need to take off SCP-1499 in order to put on the goggles."
+					Else
+						Msg = "You need to take off the hazmat suit in order to put on the goggles."
+					EndIf
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 					;[End Block]
 				Case "ring"
 					;[Block]
@@ -5644,11 +5654,9 @@ Function DrawGUI()
 						;Achievements(Achv714)=True
 						Msg = "You put on the ring."
 						Wearing714 = 2
-						TakeOffStuff(1+2+8+32+64)
 					EndIf
 					MsgTimer = 70 * 5
-					SelectedItem = Null	
-					
+					SelectedItem = Null
 					;[End Block]
 				Case "1123"
 					;[Block]
@@ -5676,7 +5684,6 @@ Function DrawGUI()
 							EndIf
 						Next
 					EndIf
-					
 					;[End Block]
 				Case "battery"
 					;[Block]
@@ -5955,7 +5962,6 @@ Function DrawGUI()
 					If (Not Wearing714) Then SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
-					
 					;[End Block]
 				Case "cup"
 					;[Block]
@@ -6390,7 +6396,6 @@ Function DrawGUI()
 						EndIf
 						
 					EndIf
-					
 					;[End Block]
 				Case "cigarette"
 					;[Block]
@@ -6467,44 +6472,48 @@ Function DrawGUI()
 					;[End Block]
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
 					;[Block]
-					CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-					
-					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
-					
-					width% = 300
-					height% = 20
-					x% = GraphicWidth / 2 - width / 2
-					y% = GraphicHeight / 2 + 80
-					Rect(x, y, width+4, height, False)
-					For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
-						DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
-					Next
-					
-					SelectedItem\state = Min(SelectedItem\state+(FPSfactor/4.0),100)
-					
-					If SelectedItem\state=100 Then
-						If WearingHazmat>0 Then
-							Msg = "You removed the hazmat suit."
-							WearingHazmat = False
-							DropItem(SelectedItem)
-						Else
-							If SelectedItem\itemtemplate\tempname="hazmatsuit" Then
-								;Msg = "Hazmat1."
-								WearingHazmat = 1
-							ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2" Then
-								;Msg = "Hazmat2."
-								WearingHazmat = 2
+					If WearingVest = 0 Then
+						CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
+						
+						DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+						
+						width% = 300
+						height% = 20
+						x% = GraphicWidth / 2 - width / 2
+						y% = GraphicHeight / 2 + 80
+						Rect(x, y, width+4, height, False)
+						For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
+						Next
+						
+						SelectedItem\state = Min(SelectedItem\state+(FPSfactor/4.0),100)
+						
+						If SelectedItem\state=100 Then
+							If WearingHazmat>0 Then
+								Msg = "You removed the hazmat suit."
+								WearingHazmat = False
+								DropItem(SelectedItem)
 							Else
-								;Msg = "Hazmat3."
-								WearingHazmat = 3
+								If SelectedItem\itemtemplate\tempname="hazmatsuit" Then
+									;Msg = "Hazmat1."
+									WearingHazmat = 1
+								ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2" Then
+									;Msg = "Hazmat2."
+									WearingHazmat = 2
+								Else
+									;Msg = "Hazmat3."
+									WearingHazmat = 3
+								EndIf
+								If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+								Msg = "You put on the hazmat suit."
+								If WearingNightVision Then CameraFogFar = StoredCameraFogFar
+								WearingGasMask = 0
+								WearingNightVision = 0
 							EndIf
-							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
-							Msg = "You put on the hazmat suit."
-							TakeOffStuff(1+16)
+							SelectedItem\state=0
+							MsgTimer = 70 * 5
+							SelectedItem = Null
 						EndIf
-						SelectedItem\state=0
-						MsgTimer = 70 * 5
-						SelectedItem = Null
 					EndIf
 					;[End Block]
 				Case "vest","finevest"
@@ -6538,7 +6547,6 @@ Function DrawGUI()
 								WearingVest = 2
 							EndIf
 							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
-							TakeOffStuff(2)
 						EndIf
 						SelectedItem\state=0
 						MsgTimer = 70 * 5
@@ -6547,28 +6555,33 @@ Function DrawGUI()
 					;[End Block]
 				Case "gasmask", "supergasmask", "gasmask3"
 					;[Block]
-					If WearingGasMask Then
-						Msg = "You removed the gas mask."
-					Else
-						If SelectedItem\itemtemplate\tempname = "supergasmask"
-							Msg = "You put on the gas mask and you can breathe easier."
+					If Wearing1499 = 0 And WearingHazmat = 0 Then
+						If WearingGasMask Then
+							Msg = "You removed the gas mask."
 						Else
-							Msg = "You put on the gas mask."
+							If SelectedItem\itemtemplate\tempname = "supergasmask"
+								Msg = "You put on the gas mask and you can breathe easier."
+							Else
+								Msg = "You put on the gas mask."
+							EndIf
+							If WearingNightVision Then CameraFogFar = StoredCameraFogFar
+							WearingNightVision = 0
+							WearingGasMask = 0
 						EndIf
-						;Wearing178 = 0
-						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-						;WearingNightVision = 0
-						TakeOffStuff(2+8+32+64)
-					EndIf
-					MsgTimer = 70 * 5
-					If SelectedItem\itemtemplate\tempname="gasmask3" Then
-						If WearingGasMask = 0 Then WearingGasMask = 3 Else WearingGasMask=0
-					ElseIf SelectedItem\itemtemplate\tempname="supergasmask"
-						If WearingGasMask = 0 Then WearingGasMask = 2 Else WearingGasMask=0
+						If SelectedItem\itemtemplate\tempname="gasmask3" Then
+							If WearingGasMask = 0 Then WearingGasMask = 3 Else WearingGasMask=0
+						ElseIf SelectedItem\itemtemplate\tempname="supergasmask"
+							If WearingGasMask = 0 Then WearingGasMask = 2 Else WearingGasMask=0
+						Else
+							WearingGasMask = (Not WearingGasMask)
+						EndIf
+					ElseIf Wearing1499 > 0 Then
+						Msg = "You need to take off SCP-1499 in order to put on the gas mask."
 					Else
-						WearingGasMask = (Not WearingGasMask)
+						Msg = "You need to take off the hazmat suit in order to put on the gas mask."
 					EndIf
-					SelectedItem = Null				
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 					;[End Block]
 				Case "navigator", "nav"
 					;[Block]
@@ -6823,7 +6836,8 @@ Function DrawGUI()
 							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
 							GiveAchievement(Achv1499)
 							If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-							TakeOffStuff(1+2+8+32)
+							WearingGasMask = 0
+							WearingNightVision = 0
 							For r.Rooms = Each Rooms
 								If r\RoomTemplate\Name = "dimension1499" Then
 									BlinkTimer = -1
@@ -10695,67 +10709,6 @@ Function Rnd_Array#(numb1#,numb2#,Array1#,Array2#)
 		Return Rnd(Array1#,numb1#)
 	Else
 		Return Rnd(numb2#,Array2#)
-	EndIf
-	
-End Function
-
-Function TakeOffStuff(flag%=0)
-	;FLAG variables:
-		;1: GasMask
-		;2: Hazmat Suit
-		;4: SCP-714
-		;8: SCP-178
-		;16: Kevlar Vest
-		;32: Night Vision Goggles
-		;64: SCP-1499
-	
-	Local numb_flag% = Bin(flag%)
-	
-	If Right(numb_flag%,1) = 1
-		WearingGasMask = False
-		DebugLog "GasMask Off"
-	EndIf
-	If Len(numb_flag%)>1
-		If Mid(numb_flag%,Len(numb_flag%)-1,1) = 1
-			WearingHazmat = False
-			For i = 0 To MaxItemAmount-1
-				If Inventory(i) <> Null Then
-					If Inventory(i)\itemtemplate\name = "Hazmat Suit" Or Inventory(i)\itemtemplate\tempname = "hazmatsuit3"
-						DropItem(Inventory(i))
-						Exit
-					EndIf
-				EndIf
-			Next
-			DebugLog "Hazmat Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>2
-		If Mid(numb_flag%,Len(numb_flag%)-2,1) = 1
-			Wearing714 = False
-			DebugLog "SCP-714 Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>3
-		
-	EndIf
-	If Len(numb_flag%)>4
-		If Mid(numb_flag%,Len(numb_flag%)-4,1) = 1
-			WearingVest = False
-			DebugLog "Kevlar Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>5
-		If Mid(numb_flag%,Len(numb_flag%)-5,1) = 1
-			WearingNightVision = False
-			CameraFogFar = StoredCameraFogFar
-			DebugLog "NVG Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>6
-		If Mid(numb_flag%,Len(numb_flag%)-6,1) = 1
-			Wearing1499 = False
-			DebugLog "SCP-1499 Off"
-		EndIf
 	EndIf
 	
 End Function
