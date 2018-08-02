@@ -199,8 +199,6 @@ Global CurrFrameLimit# = (Framelimit%-19)/100.0
 Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
 ;If Fullscreen Then UpdateScreenGamma()
 
-Global FOV# = GetINIFloat(OptionFile, "options", "fov")
-
 Const HIT_MAP% = 1, HIT_PLAYER% = 2, HIT_ITEM% = 3, HIT_APACHE% = 4, HIT_178% = 5, HIT_DEAD% = 6
 SeedRnd MilliSecs()
 
@@ -4365,7 +4363,8 @@ Function MouseLook()
 	
 	CameraShake = Max(CameraShake - (FPSfactor / 10), 0)
 	
-	CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan((2*ATan(Tan((FOV#)/2)*RealGraphicWidth/RealGraphicHeight))/2.0))
+	;CameraZoomTemp = CurveValue(CurrCameraZoom,CameraZoomTemp, 5.0)
+	CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1))
 	CurrCameraZoom = Max(CurrCameraZoom - FPSfactor, 0)
 	
 	If KillTimer >= 0 And FallTimer >=0 Then
@@ -7210,6 +7209,15 @@ Function DrawMenu()
 					;[Block]
 					y=y+50*MenuScale
 					
+					Color 100,100,100
+					AAText(x, y, "Enable bump mapping:")	
+					BumpEnabled = DrawTick(x + 270 * MenuScale, y + MenuScale, BumpEnabled, True)
+					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"bump")
+					EndIf
+					
+					y=y+30*MenuScale
+					
 					Color 255,255,255
 					AAText(x, y, "VSync:")
 					Vsync% = DrawTick(x + 270 * MenuScale, y + MenuScale, Vsync%)
@@ -7244,6 +7252,8 @@ Function DrawMenu()
 						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
 					EndIf
 					
+					;y = y + 50*MenuScale
+					
 					y=y+50*MenuScale
 					
 					Color 255,255,255
@@ -7276,17 +7286,13 @@ Function DrawMenu()
 					EndIf
 					
 					y=y+50*MenuScale
-					Local SlideBarFOV# = FOV#-50
-					SlideBarFOV = (SlideBar(x + 270*MenuScale, y+6*MenuScale,100*MenuScale, SlideBarFOV*2.0)/2.0)
-					FOV = SlideBarFOV+50
-					Color 255,255,255
-					AAText(x, y, "Field of view:")
-					Color 255,255,0
-					AAText(x + 5 * MenuScale, y + 25 * MenuScale, Int(FOV#)+" FOV")
-					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"fov")
+					Color 100,100,100
+					AAText(x, y, "Save textures in the VRAM:")	
+					EnableVRam = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableVRam, True)
+					If MouseOn(x + 270 * MenuScale, y + MenuScale, 20*MenuScale,20*MenuScale) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"vram")
 					EndIf
-					CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan((2*ATan(Tan((FOV#)/2)*RealGraphicWidth/RealGraphicHeight))/2.0))
+					
 					;[End Block]
 				Case 2 ;Audio
 					AASetFont Font1
@@ -7308,6 +7314,24 @@ Function DrawMenu()
 					AAText(x, y, "Sound volume:")
 					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
 						DrawOptionsTooltip(tx,ty,tw,th,"soundvol")
+					EndIf
+					
+					y = y + 30*MenuScale
+					
+					Color 100,100,100
+					AAText x, y, "Sound auto-release:"
+					EnableSFXRelease = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableSFXRelease,True)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th+220*MenuScale,"sfxautorelease")
+					EndIf
+					
+					y = y + 30*MenuScale
+					
+					Color 100,100,100
+					AAText x, y, "Enable user tracks:"
+					EnableUserTracks = DrawTick(x + 270 * MenuScale, y + MenuScale, EnableUserTracks,True)
+					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
+						DrawOptionsTooltip(tx,ty,tw,th,"usertrack")
 					EndIf
 					
 					If EnableUserTracks
@@ -7874,7 +7898,7 @@ Function LoadEntities()
 	Cls
 	SetBuffer BackBuffer()
 	
-	Dark = CreateSprite(ark_blur_cam)
+	Dark = CreateSprite(Camera)
 	ScaleSprite(Dark, Max(GraphicWidth / 1240.0, 1.0), Max(GraphicHeight / 960.0 * 0.8, 0.8))
 	EntityTexture(Dark, DarkTexture)
 	EntityBlend (Dark, 1)
@@ -7891,7 +7915,7 @@ Function LoadEntities()
 	
 	TeslaTexture = LoadTexture_Strict("GFX\map\tesla.jpg", 1+2)
 	
-	Light = CreateSprite(ark_blur_cam)
+	Light = CreateSprite(Camera)
 	ScaleSprite(Light, Max(GraphicWidth / 1240.0, 1.0), Max(GraphicHeight / 960.0 * 0.8, 0.8))
 	EntityTexture(Light, LightTexture)
 	EntityBlend (Light, 1)
@@ -11092,7 +11116,6 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 	PutINIValue(OptionFile, "options", "particle amount", ParticleAmount)
 	PutINIValue(OptionFile, "options", "enable vram", EnableVRam)
-	PutINIValue(OptionFile, "options", "fov", Int(FOV))
 	
 	PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 	PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
