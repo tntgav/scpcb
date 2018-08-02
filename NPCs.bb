@@ -1977,7 +1977,7 @@ Function UpdateNPCs()
 									StopChannel(n\SoundChn)
 								EndIf
 								If PlayerInReachableRoom() Then ;Player is in a room where SCP-049 can teleport to
-									If Rand(SelectedDifficulty\otherFactors)=1 Then
+									If Rand(1,3-SelectedDifficulty\otherFactors)=1 Then
 										TeleportCloser(n)
 										DebugLog "SCP-049 teleported closer due to distance"
 									Else
