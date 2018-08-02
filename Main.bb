@@ -4485,11 +4485,12 @@ Function MouseLook()
 	EndIf
 	
 	If WearingGasMask Or WearingHazmat Or Wearing1499 Then
-		If WearingGasMask = 2 Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
-		If Wearing1499 = 2 Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
-		If WearingHazmat = 2 Then 
-			Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
-		ElseIf WearingHazmat=1
+		If Wearing714 = False Then
+			If WearingGasMask = 2 Or Wearing1499 = 2 Or WearingHazmat = 2 Then
+				Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
+			EndIf
+		EndIf
+		If WearingHazmat = 1 Then
 			Stamina = Min(60, Stamina)
 		EndIf
 		
