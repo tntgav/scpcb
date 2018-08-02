@@ -8674,6 +8674,20 @@ Function UpdateEvents()
 					EndIf
 				EndIf
                 ;[End Block]
+			Case "room1lifts"
+				;[Block]
+				If PlayerRoom=e\room Then
+					For i = 0 To 1
+						UpdateButton(e\room\Objects[i])
+						If ClosestButton = e\room\Objects[i] And MouseHit1 Then
+							Msg = "The elevator appears to be broken."
+							PlaySound2(ButtonSFX2, Camera, e\room\Objects[i])
+							MsgTimer = 5*70
+							MouseHit1=0
+						EndIf
+					Next
+				EndIf
+				;[End Block]
 		End Select
 		
 		If e<>Null Then

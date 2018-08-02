@@ -2660,6 +2660,7 @@ Function InitEvents()
 	CreateEvent("room2sl","room2sl",0)
 	CreateEvent("medibay","medibay",0)
 	CreateEvent("room2shaft","room2shaft",0)
+	CreateEvent("room1lifts","room1lifts",0)
 	
 	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
 	

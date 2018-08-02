@@ -3950,9 +3950,8 @@ Function FillRoom(r.Rooms)
 			
 			d.Doors = CreateDoor(r\zone, r\x + 1392.0 * RoomScale, 384.0*RoomScale, r\z + 64.0 * RoomScale, 90, r, True)
 			d\AutoClose = False
-			FreeEntity(d\buttons[0]) : d\buttons[0]=0
-			FreeEntity(d\buttons[1]) : d\buttons[1]=0
 			d\MTFClose = False
+			d\locked = True
 			
 			d.Doors = CreateDoor(r\zone, r\x - 640.0 * RoomScale, 384.0*RoomScale, r\z + 64.0 * RoomScale, 90, r, False)
 			d\locked = True : d\AutoClose = False
@@ -4015,7 +4014,6 @@ Function FillRoom(r.Rooms)
 			
 			;3384,510,2400
 			CreateDevilEmitter(r\x+3384.0*RoomScale,r\y+510.0*RoomScale,r\z+2400.0*RoomScale,r,1,4)
-			
 			;[End Block]
 		Case "room2scps"
 			;[Block]
@@ -4449,8 +4447,8 @@ Function FillRoom(r.Rooms)
 			
 			;the door to the staircase in the office room
 			d.Doors = CreateDoor(r\zone, r\x - 2432 * RoomScale, 0, r\z - 1000 * RoomScale, 0, r, False)
-			PositionEntity(d\buttons[0], r\x - 2592 * RoomScale, EntityY(d\buttons[0],True), r\z - 1024 * RoomScale, True)
-			PositionEntity(d\buttons[1], r\x - 2592 * RoomScale, EntityY(d\buttons[0],True), r\z - 992 * RoomScale, True)
+			PositionEntity(d\buttons[0], r\x - 2592 * RoomScale, EntityY(d\buttons[0],True), r\z - 1016 * RoomScale, True)
+			PositionEntity(d\buttons[1], r\x - 2592 * RoomScale, EntityY(d\buttons[0],True), r\z - 984 * RoomScale, True)
 			d\locked = True : d\DisableWaypoint = True
 			
 			tex = LoadTexture_Strict("GFX\map\Door02.jpg")
@@ -4503,12 +4501,6 @@ Function FillRoom(r.Rooms)
 			EntityPickMode r\Objects[9],2
 			
 			r\Objects[10] = LoadMesh_Strict("GFX\map\intro_labels.b3d",r\obj)
-			
-			r\Objects[11] = CreateButton(r\x +1362.0 *RoomScale, r\y + 561.0 * RoomScale, r\z -80.0 * RoomScale, 0, 270)
-            EntityParent (r\Objects[11],r\obj)
-            
-            r\Objects[12] = CreateButton(r\x +1426.0 *RoomScale, r\y + 561.0 * RoomScale, r\z +210.0 * RoomScale, 0, -270)
-            EntityParent (r\Objects[12],r\obj)
 			;[End Block]
 		Case "room2ccont"
 			;[Block]
@@ -5023,7 +5015,7 @@ Function FillRoom(r.Rooms)
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
 			;[End Block]
-		Case "room2_3"
+		Case "room2_3","room3_3"
 			;[Block]
 			w.waypoints = CreateWaypoint(r\x, r\y + 66.0 * RoomScale, r\z, Null, r)
 			;[End Block]
@@ -5041,6 +5033,8 @@ Function FillRoom(r.Rooms)
 			sc\room = r
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			EntityParent(sc\obj, r\obj)
+			
+			w.waypoints = CreateWaypoint(r\x, r\y + 66.0 * RoomScale, r\z, Null, r)
 			;[End Block]
 		Case "room2servers2"
 			;[Block]
