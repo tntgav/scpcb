@@ -526,7 +526,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			EntityType n\Collider,HIT_PLAYER
 			
-			n\Speed = 0.02
+			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-966", "speed") / 100.0)
 			;[End Block]
 		Case NPCtype1048a
 			;[Block]
@@ -4200,12 +4200,16 @@ Function UpdateNPCs()
 							RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),20.0),0.0
 						Case 5,6,8 ;walking or chasing
 							;If n\Frame<2343.0 Then
-							If n\Frame<580.0 ;start walking
+							If n\Frame<580.0 And n\Frame>214.0 ;start walking
 								;AnimateNPC(n, 2319, 2343, 0.5, False)
 								AnimateNPC(n, 556, 580, 0.25, False)
 							Else
 								;AnimateNPC(n, 2343, 2391, n\CurrSpeed*25.0)
-								AnimateNPC(n, 580, 628, n\CurrSpeed*25.0)
+								If n\CurrSpeed >= 0.005 Then
+									AnimateNPC(n, 580, 628, n\CurrSpeed*25.0)
+								Else
+									AnimateNPC(n, 2, 214, 0.25)
+								EndIf
 								
 								;chasing the player
 								If n\State = 8 And dist<32 Then
@@ -4234,25 +4238,40 @@ Function UpdateNPCs()
 												
 												dist2 = EntityDistance(n\Collider,n\Path[n\PathLocation]\obj)
 												
+												temp = True
 												If dist2 < 0.8 Then 
 													If n\Path[n\PathLocation]\door<>Null Then
-														If (Not n\Path[n\PathLocation]\door\open) Then UseDoor(n\Path[n\PathLocation]\door,False)
+														If (Not n\Path[n\PathLocation]\door\IsElevatorDoor)
+															If (n\Path[n\PathLocation]\door\locked Or n\Path[n\PathLocation]\door\KeyCard<>0 Or n\Path[n\PathLocation]\door\Code<>"") And (Not n\Path[n\PathLocation]\door\open) Then
+																temp = False
+															Else
+																If n\Path[n\PathLocation]\door\open = False And (n\Path[n\PathLocation]\door\buttons[0]<>0 Or n\Path[n\PathLocation]\door\buttons[1]<>0) Then
+																	UseDoor(n\Path[n\PathLocation]\door, False)
+																EndIf
+															EndIf
+														EndIf
 													EndIf
-													If dist < 0.2 Then n\PathLocation = n\PathLocation + 1
+													If dist2 < 0.3 Then n\PathLocation = n\PathLocation + 1
 												EndIf
 												
+												If temp = False Then
+													n\PathStatus = 0
+													n\PathLocation = 0
+													n\PathTimer = 40*10
+												EndIf
 											EndIf
+											
+											n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
 										ElseIf n\PathStatus = 0
 											n\CurrSpeed = CurveValue(0,n\CurrSpeed,10.0)
 										EndIf
 									Else
 										n\Angle = VectorYaw(EntityX(Collider)-EntityX(n\Collider),0,EntityZ(Collider)-EntityZ(n\Collider))
+										n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
 										
 										If dist<1.0 Then n\State=10
 										
 									EndIf
-									
-									n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
 								Else
 									If MilliSecs2() > n\State2 And dist<16.0 Then
 										HideEntity n\Collider
@@ -4275,7 +4294,7 @@ Function UpdateNPCs()
                                     PlaySound2(StepSFX(4,0,Rand(0,3)),Camera, n\Collider, 7.0, Rnd(0.5,0.7))
                                 EndIf
 								
-								RotateEntity n\Collider, 0, CurveAngle(n\Angle,EntityYaw(n\Collider),30.0),0
+								RotateEntity n\Collider, 0, CurveAngle(n\Angle,EntityYaw(n\Collider),10.0),0
 								
 								MoveEntity n\Collider,0,0,n\CurrSpeed*FPSfactor
 							EndIf
