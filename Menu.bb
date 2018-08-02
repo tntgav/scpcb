@@ -598,7 +598,7 @@ Function UpdateMainMenu()
 				If MainMenuTab = 3 ;Graphics
 					;[Block]
 					;height = 380 * MenuScale
-					height = 330 * MenuScale
+					height = 400 * MenuScale
 					DrawFrame(x, y, width, height)
 					
 					y=y+20*MenuScale
@@ -694,6 +694,19 @@ Function UpdateMainMenu()
 					EnableVRam = DrawTick(x + 310 * MenuScale, y + MenuScale, EnableVRam)
 					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale) And OnSliderID=0
 						DrawOptionsTooltip(tx,ty,tw,th,"vram")
+					EndIf
+					
+					y=y+50*MenuScale
+					
+					Local SlideBarFOV# = FOV#-50
+					SlideBarFOV = (SlideBar(x + 310*MenuScale, y+6*MenuScale,150*MenuScale, SlideBarFOV*2.0)/2.0)
+					FOV = SlideBarFOV+50
+					Color 255,255,255
+					AAText(x + 20 * MenuScale, y, "Field of view:")
+					Color 255,255,0
+					AAText(x + 25 * MenuScale, y + 25 * MenuScale, Int(FOV#)+" FOV")
+					If MouseOn(x+310*MenuScale,y+6*MenuScale,150*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"fov")
 					EndIf
 					
 					;[End Block]
@@ -2060,6 +2073,8 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			txt = "Textures that are stored in the Video-RAM will load faster, but this also has negative effects on the texture quality as well."
 			txt2 = "This option cannot be changed in-game."
 			R = 255
+		Case "fov"
+			txt = Chr(34)+"Field of view"+Chr(34)+" (FOV) is the amount of game view that is on display during a game."
 			;[End Block]
 		;Sound options
 			;[Block]
