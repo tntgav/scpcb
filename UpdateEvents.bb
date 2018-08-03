@@ -7544,7 +7544,19 @@ Function UpdateEvents()
 					If PlayerRoom<>e\room And BlinkTimer<-10 Then
 						dist = Distance(EntityX(Collider),EntityZ(Collider), EntityX(e\room\obj),EntityZ(e\room\obj))
 						If (dist<16.0) Then
-							e\room\Objects[0] =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
+							For e2.Events = Each Events
+								If e2\EventName = e\EventName Then
+									If e2\room <> e\room Then
+										If e2\room\Objects[0]<>0 Then
+											e\room\Objects[0]=CopyEntity(e2\room\Objects[0])
+											Exit
+										EndIf
+									EndIf
+								EndIf
+							Next
+							If e\room\Objects[0]=0 Then
+								e\room\Objects[0] =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
+							EndIf
 							ScaleEntity e\room\Objects[0], 0.05,0.05,0.05
 							SetAnimTime(e\room\Objects[0], 2)
 							PositionEntity(e\room\Objects[0], EntityX(e\room\obj), 0.0, EntityZ(e\room\obj))
