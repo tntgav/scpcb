@@ -468,6 +468,8 @@ Function SaveGame(file$)
 End Function
 
 Function LoadGame(file$)
+	Local version$ = ""
+	
 	CatchErrors("Uncaught (LoadGame)")
 	DebugLog "---------------------------------------------------------------------------"
 	
@@ -504,8 +506,7 @@ Function LoadGame(file$)
 	RotateEntity(Collider, x, y, 0, 0)
 	
 	strtemp = ReadString(f)
-	;If (strtemp <> VersionNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+".")
-	If (strtemp <> CompatibleNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+" (latest compatible version: "+CompatibleNumber+").")
+	version = strtemp
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	
@@ -707,10 +708,12 @@ Function LoadGame(file$)
 	room2gw_x = ReadFloat(f)
 	room2gw_z = ReadFloat(f)
 	
-	I_Zone\Transition[0] = ReadByte(f)
-	I_Zone\Transition[1] = ReadByte(f)
-	I_Zone\HasCustomForest = ReadByte(f)
-	I_Zone\HasCustomMT = ReadByte(f)
+	If version = CompatibleNumber Then
+		I_Zone\Transition[0] = ReadByte(f)
+		I_Zone\Transition[1] = ReadByte(f)
+		I_Zone\HasCustomForest = ReadByte(f)
+		I_Zone\HasCustomMT = ReadByte(f)
+	EndIf
 	
 	temp = ReadInt(f)
 	For i = 1 To temp
@@ -1172,6 +1175,13 @@ Function LoadGame(file$)
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
 	
+	If version = "1.3.10" Then
+		I_Zone\Transition[0] = ReadByte(f)
+		I_Zone\Transition[1] = ReadByte(f)
+		I_Zone\HasCustomForest = ReadByte(f)
+		I_Zone\HasCustomMT = ReadByte(f)
+	EndIf
+	
 	Wearing714 = ReadByte(f)
 	
 	CloseFile f
@@ -1251,6 +1261,8 @@ Function LoadGame(file$)
 End Function
 
 Function LoadGameQuick(file$)
+	Local version$ = ""
+	
 	CatchErrors("Uncaught (LoadGameQuick)")
 	DebugLog "---------------------------------------------------------------------------"
 	
@@ -1320,8 +1332,7 @@ Function LoadGameQuick(file$)
 	RotateEntity(Collider, x, y, 0, 0)
 	
 	strtemp = ReadString(f)
-	;If (strtemp <> VersionNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+".")
-	If (strtemp <> CompatibleNumber) Then RuntimeError("The save files of v"+strtemp+" aren't compatible with SCP - Containment Breach "+VersionNumber+" (latest compatible version: "+CompatibleNumber+").")
+	version = strtemp
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	
@@ -1527,10 +1538,12 @@ Function LoadGameQuick(file$)
 	room2gw_x = ReadFloat(f)
 	room2gw_z = ReadFloat(f)
 	
-	I_Zone\Transition[0] = ReadByte(f)
-	I_Zone\Transition[1] = ReadByte(f)
-	I_Zone\HasCustomForest = ReadByte(f)
-	I_Zone\HasCustomMT = ReadByte(f)
+	If version = CompatibleNumber Then
+		I_Zone\Transition[0] = ReadByte(f)
+		I_Zone\Transition[1] = ReadByte(f)
+		I_Zone\HasCustomForest = ReadByte(f)
+		I_Zone\HasCustomMT = ReadByte(f)
+	EndIf
 	
 	temp = ReadInt(f)
 	For i = 1 To temp
@@ -1887,6 +1900,13 @@ Function LoadGameQuick(file$)
 	EndIf
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
+	
+	If version = "1.3.10" Then
+		I_Zone\Transition[0] = ReadByte(f)
+		I_Zone\Transition[1] = ReadByte(f)
+		I_Zone\HasCustomForest = ReadByte(f)
+		I_Zone\HasCustomMT = ReadByte(f)
+	EndIf
 	
 	Wearing714 = ReadByte(f)
 	CloseFile f
