@@ -8816,6 +8816,19 @@ Function UpdateDimension1499()
 						n2\Target = n
 						e\room\NPC[2] = n
 						e\room\NPC[3] = n2
+						;More guards
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x-1877.0*RoomScale,e\room\y+192.0*RoomScale,e\room\z+1071.0*RoomScale)
+						n\PrevState = 3
+						n\Angle = 270
+						RotateEntity n\Collider,0,n\Angle,0
+						n2.NPCs = CreateNPC(NPCtype1499,e\room\x-1877.0*RoomScale,e\room\y+192.0*RoomScale,e\room\z+3503.0*RoomScale)
+						n2\PrevState = 3
+						n2\Angle = 270
+						RotateEntity n2\Collider,0,n2\Angle,0
+						n\Target = n2
+						n2\Target = n
+						e\room\NPC[4] = n
+						e\room\NPC[5] = n2
 						;Guard at stairs
 						n.NPCs = CreateNPC(NPCtype1499,e\room\x-2761.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+3204.0*RoomScale)
 						n\PrevState = 1
@@ -9021,11 +9034,11 @@ Function UpdateDimension1499()
 						e\EventState3 = 70*20
 					ElseIf e\EventState3 = 70*20
 						If e\room\NPC[0]\Frame > 854.5 Then
-							For i = 2 To 3
+							For i = 2 To 5
 								If i = 2
 									If e\room\NPC[i]\Sound <> 0 Then FreeSound_Strict e\room\NPC[i]\Sound : e\room\NPC[i]\Sound = 0
 									e\room\NPC[i]\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
-									e\room\NPC[i]\SoundChn = PlaySound2(e\room\NPC[i]\Sound, Camera, e\room\NPC[i]\Collider,20.0)
+									e\room\NPC[i]\SoundChn = PlaySound2(e\room\NPC[i]\Sound, Camera, e\room\NPC[i]\Collider,50.0)
 								EndIf
 								e\room\NPC[i]\State = 1
 								e\room\NPC[i]\Frame = 203
