@@ -1761,6 +1761,10 @@ Function LoadGameQuick(file$)
 				e\room\Objects[0]=CreatePivot()
 				e\room\Objects[1]=CreatePivot()
 			EndIf
+		ElseIf e\EventName = "room860" Then
+			If e\EventState = 1.0 Then
+				ShowEntity e\room\fr\Forest_Pivot
+			EndIf
 		EndIf
 	Next
 	
