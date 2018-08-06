@@ -2538,7 +2538,7 @@ Function UpdateEvents()
 										EndIf
 									Next
 									If SelectedItem<>Null Then
-										If SelectedItem\itemtemplate\tempname="50ct" Then
+										If SelectedItem\itemtemplate\tempname="50ct" Or SelectedItem\itemtemplate\tempname="coin" Then
 											RemoveItem(SelectedItem)
 											SelectedItem=Null
 											e\EventState2 = 1
@@ -2646,7 +2646,7 @@ Function UpdateEvents()
 								PointEntity it\collider,e\room\NPC[1]\Collider
 								MoveEntity it\collider,-0.4,0,-0.2
 								TeleportEntity(it\collider,EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),-0.02,True,10)
-								For i = 0 To 2
+								For i = 0 To 1
 									it2.Items = CreateItem("50 Cent Coin","50ct",1,1,1)
 									it2\Picked = True
 									it2\Dropped = -1

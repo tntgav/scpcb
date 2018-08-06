@@ -6955,7 +6955,7 @@ Function DrawGUI()
 					Msg = ""
 					
 					SelectedItem\state = 1
-					SelectedItem = Null
+					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 					;[End Block]
 				Case "scp427"
 					;[Block]
