@@ -600,6 +600,12 @@ Function PickItem(item.Items)
 		EndIf
 	Next
 	
+	If WearingHazmat > 0 Then
+		Msg = "You cannot pick up any items while wearing a hazmat suit."
+		MsgTimer = 70*5
+		Return
+	EndIf
+	
 	CatchErrors("Uncaught (PickItem)")
 	If (Not fullINV) Then
 		For n% = 0 To MaxItemAmount - 1
@@ -729,6 +735,12 @@ Function PickItem(item.Items)
 End Function
 
 Function DropItem(item.Items,playdropsound%=True)
+	If WearingHazmat > 0 Then
+		Msg = "You cannot drop any items while wearing a hazmat suit."
+		MsgTimer = 70*5
+		Return
+	EndIf
+	
 	CatchErrors("Uncaught (DropItem)")
 	If playdropsound Then
 		If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))

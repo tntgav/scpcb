@@ -5320,6 +5320,12 @@ Function DrawGUI()
 							MouseHit1 = False
 							
 							If DoubleClick Then
+								If WearingHazmat > 0 And Instr(SelectedItem\itemtemplate\tempname,"hazmatsuit")=0 Then
+									Msg = "You cannot use any items while wearing a hazmat suit."
+									MsgTimer = 70*5
+									SelectedItem = Null
+									Return
+								EndIf
 								If Inventory(n)\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(Inventory(n)\itemtemplate\sound))
 								InvOpen = False
 								DoubleClick = False
