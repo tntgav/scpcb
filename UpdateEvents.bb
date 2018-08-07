@@ -2537,20 +2537,28 @@ Function UpdateEvents()
 											EndIf
 										EndIf
 									Next
-									If SelectedItem<>Null Then
-										If SelectedItem\itemtemplate\tempname="50ct" Or SelectedItem\itemtemplate\tempname="coin" Then
-											RemoveItem(SelectedItem)
-											SelectedItem=Null
-											e\EventState2 = 1
-											PlaySound_Strict LoadTempSound("SFX\SCP\294\coin_drop.ogg")
+									Local inserted% = False
+									If e\EventState2 < 2 Then
+										If SelectedItem<>Null Then
+											If SelectedItem\itemtemplate\tempname="25ct" Or SelectedItem\itemtemplate\tempname="coin" Then
+												RemoveItem(SelectedItem)
+												SelectedItem=Null
+												e\EventState2 = e\EventState2 + 1
+												PlaySound_Strict LoadTempSound("SFX\SCP\294\coin_drop.ogg")
+												inserted = True
+											EndIf
 										EndIf
 									EndIf
-									If e\EventState2 = 1 Then
+									If e\EventState2 = 2 Then
 										Using294=temp
 										If Using294 Then MouseHit1=False
-									Else
+									ElseIf e\EventState2 = 1 And (Not inserted) Then
 										Using294=False
-										Msg = "You need to insert a 50 cent coin in order to use this machine."
+										Msg = "You need to insert another 25 cent coin in order to use this machine."
+										MsgTimer = 70*5
+									ElseIf (Not inserted) Then
+										Using294=False
+										Msg = "You need to insert two 25 cent coins in order to use this machine."
 										MsgTimer = 70*5
 									EndIf
 								EndIf
@@ -2647,7 +2655,7 @@ Function UpdateEvents()
 								MoveEntity it\collider,-0.4,0,-0.2
 								TeleportEntity(it\collider,EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),-0.02,True,10)
 								For i = 0 To 1
-									it2.Items = CreateItem("50 Cent Coin","50ct",1,1,1)
+									it2.Items = CreateItem("25 Cent Coin","25ct",1,1,1)
 									it2\Picked = True
 									it2\Dropped = -1
 									it2\itemtemplate\found=True

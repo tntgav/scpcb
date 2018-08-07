@@ -1068,6 +1068,11 @@ Function LoadGame(file$)
 		Local tempName$ = ReadString(f)
 		Local Name$ = ReadString(f)
 		
+		If tempName = "50ct" Then
+			ittName = "25 Cent Coin"
+			tempName = "25ct"
+		EndIf
+		
 		x = ReadFloat(f)
 		y = ReadFloat(f)
 		z = ReadFloat(f)
@@ -1778,6 +1783,11 @@ Function LoadGameQuick(file$)
 		Local ittName$ = ReadString(f)
 		Local tempName$ = ReadString(f)
 		Local Name$ = ReadString(f)
+		
+		If tempName = "50ct" Then
+			ittName = "25 Cent Coin"
+			tempName = "25ct"
+		EndIf
 		
 		x = ReadFloat(f)
 		y = ReadFloat(f)
