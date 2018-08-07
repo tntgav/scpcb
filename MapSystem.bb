@@ -2932,9 +2932,9 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("Empty Cup", "emptycup", r\x-540*RoomScale, -187*RoomScale, r\z+124.0*RoomScale)
 			EntityParent(it\collider, r\obj)
 			
-			it = CreateItem("50 Cent Coin", "50ct", r\x-447.0*RoomScale, r\y-334.0*RoomScale, r\z+36.0*RoomScale)
+			it = CreateItem("Quarter", "25ct", r\x-447.0*RoomScale, r\y-334.0*RoomScale, r\z+36.0*RoomScale)
 			EntityParent(it\collider, r\obj)
-			it = CreateItem("50 Cent Coin", "50ct", r\x+1409.0*RoomScale, r\y-334.0*RoomScale, r\z-732.0*RoomScale)
+			it = CreateItem("Quarter", "25ct", r\x+1409.0*RoomScale, r\y-334.0*RoomScale, r\z-732.0*RoomScale)
 			EntityParent(it\collider, r\obj)
 			;[End Block]
 		Case "room2nuke"

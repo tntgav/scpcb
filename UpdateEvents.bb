@@ -2554,11 +2554,11 @@ Function UpdateEvents()
 										If Using294 Then MouseHit1=False
 									ElseIf e\EventState2 = 1 And (Not inserted) Then
 										Using294=False
-										Msg = "You need to insert another 25 cent coin in order to use this machine."
+										Msg = "You need to insert another Quarter in order to use this machine."
 										MsgTimer = 70*5
 									ElseIf (Not inserted) Then
 										Using294=False
-										Msg = "You need to insert two 25 cent coins in order to use this machine."
+										Msg = "You need to insert two Quarters in order to use this machine."
 										MsgTimer = 70*5
 									EndIf
 								EndIf
@@ -2655,7 +2655,7 @@ Function UpdateEvents()
 								MoveEntity it\collider,-0.4,0,-0.2
 								TeleportEntity(it\collider,EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),-0.02,True,10)
 								For i = 0 To 1
-									it2.Items = CreateItem("25 Cent Coin","25ct",1,1,1)
+									it2.Items = CreateItem("Quarter","25ct",1,1,1)
 									it2\Picked = True
 									it2\Dropped = -1
 									it2\itemtemplate\found=True

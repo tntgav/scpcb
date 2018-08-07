@@ -9718,7 +9718,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 			End Select			
 			
 			RemoveItem(item)
-		Case "Playing Card", "Coin", "25 Cent Coin"
+		Case "Playing Card", "Coin", "Quarter"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
@@ -9735,11 +9735,11 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "coarse"
-					it2 = CreateItem("25 Cent Coin", "25ct", x, y, z)
+					it2 = CreateItem("Quarter", "25ct", x, y, z)
 					Local it3.Items,it4.Items,it5.Items
-					it3 = CreateItem("25 Cent Coin", "25ct", x, y, z)
-					it4 = CreateItem("25 Cent Coin", "25ct", x, y, z)
-					it5 = CreateItem("25 Cent Coin", "25ct", x, y, z)
+					it3 = CreateItem("Quarter", "25ct", x, y, z)
+					it4 = CreateItem("Quarter", "25ct", x, y, z)
+					it5 = CreateItem("Quarter", "25ct", x, y, z)
 					EntityType (it3\collider, HIT_ITEM)
 					EntityType (it4\collider, HIT_ITEM)
 					EntityType (it5\collider, HIT_ITEM)
