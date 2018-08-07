@@ -855,6 +855,7 @@ Function UpdateEvents()
 											
 											If MouseHit1 Then
 												SelectedItem = CreateItem("Document SCP-173", "paper", 0.0, 0.0, 0.0)
+												EntityType SelectedItem\collider,HIT_ITEM
 												
 												PickItem(SelectedItem)
 												
@@ -4117,17 +4118,21 @@ Function UpdateEvents()
 								DrawHandIcon = True
 								
 								If MouseHit1 Then
-									SelectedItem = CreateItem("Drawing", "paper", 0.0, 0.0, 0.0)
-									
-									If ItemAmount >= MaxItemAmount Then DropItem(Inventory(0))
-									
-									PickItem(SelectedItem)
-									
-									FreeEntity(e\room\Objects[2])
-									e\room\Objects[2] = 0
-									
-									e\EventState = 3
-									RemoveEvent(e)
+									If ItemAmount >= MaxItemAmount Then
+										Msg = "You cannot carry any more items."
+										MsgTimer = 70 * 5
+									Else
+										SelectedItem = CreateItem("Drawing", "paper", 0.0, 0.0, 0.0)
+										EntityType SelectedItem\collider,HIT_ITEM
+										
+										PickItem(SelectedItem)
+										
+										FreeEntity(e\room\Objects[2])
+										e\room\Objects[2] = 0
+										
+										e\EventState = 3
+										RemoveEvent(e)
+									EndIf
 								EndIf
 							EndIf
 						EndIf
