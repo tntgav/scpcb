@@ -266,6 +266,8 @@ Global KEY_CROUCH = GetINIInt(OptionFile, "binds", "Crouch key")
 Global KEY_SAVE = GetINIInt(OptionFile, "binds", "Save key")
 Global KEY_CONSOLE = GetINIInt(OptionFile, "binds", "Console key")
 
+Global MouseSmooth# = GetINIFloat(OptionFile,"options", "mouse smoothing", 1.0)
+
 Const INFINITY# = (999.0) ^ (99999.0), NAN# = (-1.0) ^ (0.5)
 
 Global Mesh_MinX#, Mesh_MinY#, Mesh_MinZ#
@@ -4396,13 +4398,13 @@ Function MouseLook()
 		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), 0
 		;moveentity player, side, up, 0	
 		; -- Update the smoothing que To smooth the movement of the mouse.
-		mouse_x_speed_1# = CurveValue(MouseXSpeed() * (MouseSens + 0.6) , mouse_x_speed_1, 6.0 / (MouseSens + 1.0)) 
+		mouse_x_speed_1# = CurveValue(MouseXSpeed() * (MouseSens + 0.6) , mouse_x_speed_1, (6.0 / (MouseSens + 1.0))*MouseSmooth) 
 		If Int(mouse_x_speed_1) = Int(Nan1) Then mouse_x_speed_1 = 0
 		
 		If InvertMouse Then
-			mouse_y_speed_1# = CurveValue(-MouseYSpeed() * (MouseSens + 0.6), mouse_y_speed_1, 6.0/(MouseSens+1.0)) 
+			mouse_y_speed_1# = CurveValue(-MouseYSpeed() * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth) 
 		Else
-			mouse_y_speed_1# = CurveValue(MouseYSpeed () * (MouseSens + 0.6), mouse_y_speed_1, 6.0/(MouseSens+1.0)) 
+			mouse_y_speed_1# = CurveValue(MouseYSpeed () * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth) 
 		EndIf
 		If Int(mouse_y_speed_1) = Int(Nan1) Then mouse_y_speed_1 = 0
 		
@@ -7255,7 +7257,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Screen gamma")
 					If MouseOn(x+270*MenuScale,y+6*MenuScale,100*MenuScale+14,20) And OnSliderID=0
-						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
+						DrawOptionsTooltip(tx,ty,tw,th,"gamma",ScreenGamma)
 					EndIf
 					
 					;y = y + 50*MenuScale
@@ -7309,7 +7311,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Music volume:")
 					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"musicvol")
+						DrawOptionsTooltip(tx,ty,tw,th,"musicvol",MusicVolume)
 					EndIf
 					
 					y = y + 30*MenuScale
@@ -7319,7 +7321,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Sound volume:")
 					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"soundvol")
+						DrawOptionsTooltip(tx,ty,tw,th,"soundvol",PrevSFXVolume)
 					EndIf
 					
 					y = y + 30*MenuScale
@@ -7367,8 +7369,8 @@ Function DrawMenu()
 					MouseSens = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
 					Color(255, 255, 255)
 					AAText(x, y, "Mouse sensitivity:")
-					If MouseOn(x+270*MenuScale,y-4*MenuScale,100*MenuScale,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"mousesensitivity")
+					If MouseOn(x+270*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesensitivity",MouseSens)
 					EndIf
 					
 					y = y + 30*MenuScale
@@ -7379,6 +7381,17 @@ Function DrawMenu()
 					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"mouseinvert")
 					EndIf
+					
+					y = y + 40*MenuScale
+					
+					MouseSmooth = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, (MouseSmooth)*50.0)/50.0)
+					Color(255, 255, 255)
+					AAText(x, y, "Mouse smoothing:")
+					If MouseOn(x+270*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesmoothing",MouseSmooth)
+					EndIf
+					
+					Color(255, 255, 255)
 					
 					y = y + 30*MenuScale
 					AAText(x, y, "Control configuration:")
@@ -7509,7 +7522,7 @@ Function DrawMenu()
 					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
 					EndIf
-					If MouseOn(x+150*MenuScale,y+30*MenuScale,100*MenuScale,20)
+					If MouseOn(x+150*MenuScale,y+30*MenuScale,100*MenuScale+14,20)
 						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
 					EndIf
 					
@@ -11118,6 +11131,7 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 	PutINIValue(OptionFile, "options", "particle amount", ParticleAmount)
 	PutINIValue(OptionFile, "options", "enable vram", EnableVRam)
+	PutINIValue(OptionFile, "options", "mouse smoothing", MouseSmooth)
 	
 	PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 	PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)
