@@ -471,7 +471,7 @@ Function UpdateMainMenu()
 						If i <= SaveGameAmount Then
 							DrawFrame(x,y,540* MenuScale, 70* MenuScale)
 							
-							If SaveGameVersion(i - 1) <> CompatibleNumber Then
+							If SaveGameVersion(i - 1) <> CompatibleNumber And SaveGameVersion(i - 1) <> "1.3.10" Then
 								Color 255,0,0
 							Else
 								Color 255,255,255
