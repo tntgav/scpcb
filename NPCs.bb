@@ -1718,16 +1718,16 @@ Function UpdateNPCs()
 							;[End Block]
 						Case 2 ;being active
 							;[Block]
-							If (dist < HideDistance*2) And (Not n\Idle) And PlayerInReachableRoom() Then
+							If (dist < HideDistance*2) And (Not n\Idle) And PlayerInReachableRoom(True) Then
 								n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider)
 								PlayerSeeAble% = MeNPCSeesPlayer(n)
 								If PlayerSeeAble%=True Or n\State2>0 Then ;Player is visible for 049's sight - attacking
 									GiveAchievement(Achv049)
 									
 									;Playing a sound after detecting the player
-									If n\PrevState < 1 And ChannelPlaying(n\SoundChn2)=False
+									If n\PrevState <= 1 And ChannelPlaying(n\SoundChn2)=False
 										If n\Sound2 <> 0 Then FreeSound_Strict(n\Sound2)
-										n\Sound2 = LoadSound_Strict("SFX\SCP\049\Spotted"+Rand(1,2)+".ogg")
+										n\Sound2 = LoadSound_Strict("SFX\SCP\049\Spotted"+Rand(1,7)+".ogg")
 										n\SoundChn2 = LoopSound2(n\Sound2,n\SoundChn2,Camera,n\obj)
 										n\PrevState = 2
 									EndIf
@@ -1764,6 +1764,9 @@ Function UpdateNPCs()
 													Kill()
 												EndIf
 												PlaySound_Strict HorrorSFX(13)
+												If n\Sound2 <> 0 Then FreeSound_Strict(n\Sound2)
+												n\Sound2 = LoadSound_Strict("SFX\SCP\049\Kidnap"+Rand(1,2)+".ogg")
+												n\SoundChn2 = LoopSound2(n\Sound2,n\SoundChn2,Camera,n\obj)
 												n\State = 3
 											EndIf										
 										EndIf
@@ -1843,10 +1846,10 @@ Function UpdateNPCs()
 											;Playing a sound if he hears the player
 											If n\PrevState = 0 And ChannelPlaying(n\SoundChn2)=False
 												If n\Sound2 <> 0 Then FreeSound_Strict(n\Sound2)
-												If Rand(20)=1
-													n\Sound2 = LoadSound_Strict("SFX\SCP\049\Detected4.ogg")
+												If Rand(30)=1
+													n\Sound2 = LoadSound_Strict("SFX\SCP\049\Searching7.ogg")
 												Else
-													n\Sound2 = LoadSound_Strict("SFX\SCP\049\Detected"+Rand(1,3)+".ogg")
+													n\Sound2 = LoadSound_Strict("SFX\SCP\049\Searching"+Rand(1,6)+".ogg")
 												EndIf
 												n\SoundChn2 = LoopSound2(n\Sound2,n\SoundChn2,Camera,n\obj)
 												n\PrevState = 1
@@ -1976,7 +1979,7 @@ Function UpdateNPCs()
 								If ChannelPlaying(n\SoundChn) Then
 									StopChannel(n\SoundChn)
 								EndIf
-								If PlayerInReachableRoom() Then ;Player is in a room where SCP-049 can teleport to
+								If PlayerInReachableRoom(True) And InFacility=1 Then ;Player is in a room where SCP-049 can teleport to
 									If Rand(1,3-SelectedDifficulty\otherFactors)=1 Then
 										TeleportCloser(n)
 										DebugLog "SCP-049 teleported closer due to distance"
@@ -5121,8 +5124,15 @@ Function TeleportCloser(n.NPCs)
 		EndIf
 	Next
 	
+	Local shouldTeleport% = False
 	If (closestWaypoint<>Null) Then
-		If n\InFacility <> 1 Or n\InFacility = InFacility Or SelectedDifficulty\aggressiveNPCs Then
+		If n\InFacility <> 1 Or SelectedDifficulty\aggressiveNPCs Then
+			shouldTeleport = True
+		ElseIf EntityY(closestWaypoint\obj,True)<=7.0 And EntityY(closestWaypoint\obj,True)>=-10.0 Then
+			shouldTeleport = True
+		EndIf
+		
+		If shouldTeleport Then
 			PositionEntity n\Collider, EntityX(closestWaypoint\obj,True), EntityY(closestWaypoint\obj,True)+0.15, EntityZ(closestWaypoint\obj,True), True
 			ResetEntity n\Collider
 			n\PathStatus = 0
@@ -7252,28 +7262,35 @@ Function NPCSpeedChange(n.NPCs)
 	
 End Function
 
-Function PlayerInReachableRoom()
+Function PlayerInReachableRoom(canSpawnIn049Chamber%=False)
 	Local RN$ = PlayerRoom\RoomTemplate\Name$
 	Local e.Events, temp
 	
 	;Player is in these rooms, returning false
-	If RN = "pocketdimension" Or RN = "gatea" Or RN = "dimension1499" Or RN = "173"
+	If RN = "pocketdimension" Or RN = "gatea" Or RN = "dimension1499" Or RN = "173" Then
 		Return False
 	EndIf
 	;Player is at GateB and is at the surface, returning false
-	If RN = "exit1" And EntityY(Collider)>1040.0*RoomScale
+	If RN = "exit1" And EntityY(Collider)>1040.0*RoomScale Then
 		Return False
 	EndIf
 	;Player is in 860's test room and inside the forest, returning false
 	temp = False
 	For e = Each Events
-		If e\EventName$ = "room860" And e\EventState = 1.0
+		If e\EventName$ = "room860" And e\EventState = 1.0 Then
 			temp = True
 			Exit
 		EndIf
 	Next
-	If RN = "room860" And temp
+	If RN = "room860" And temp Then
 		Return False
+	EndIf
+	If (Not canSpawnIn049Chamber) Then
+		If SelectedDifficulty\aggressiveNPCs = False Then
+			If RN = "room049" And EntityY(Collider)<=-2848*RoomScale Then
+				Return False
+			EndIf
+		EndIf
 	EndIf
 	;Return true, this means player is in reachable room
 	Return True

@@ -5740,11 +5740,12 @@ Function UpdateEvents()
 										e\room\RoomDoors[i]\open = True
 										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 										If e\room\NPC[0]\Sound2 <> 0 Then FreeSound_Strict(e\room\NPC[0]\Sound2)
-										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Greeting"+Rand(1,2)+".ogg")
+										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\DetectedInChamber.ogg")
 										e\room\NPC[0]\SoundChn2 = LoopSound2(e\room\NPC[0]\Sound2,e\room\NPC[0]\SoundChn2,Camera,e\room\NPC[0]\obj)
 										e\room\NPC[0]\Idle = 0
 										e\room\NPC[0]\HideFromNVG = False
 										e\room\NPC[0]\PrevState = 2
+										e\room\NPC[0]\State = 2
 									EndIf
 								EndIf
 							EndIf
@@ -8231,16 +8232,29 @@ Function UpdateEvents()
 								;e\room\NPC[0]\PathTimer# = e\room\NPC[0]\PathTimer# + FPSfactor
 								If e\room\NPC[0]\PrevState = 1 Then
 									If (e\room\NPC[0]\SoundChn2 = 0) Then
-										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Room2SLEnter.ogg")
+										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Room2SL1.ogg")
 										e\room\NPC[0]\SoundChn2 = PlaySound2(e\room\NPC[0]\Sound2, Camera, e\room\NPC[0]\Collider)
 									Else
 										If (Not ChannelPlaying(e\room\NPC[0]\SoundChn2))
 											e\room\NPC[0]\PathTimer# = 1.0
+											e\room\NPC[0]\SoundChn2 = 0
 										EndIf
 									EndIf
 								ElseIf e\room\NPC[0]\PrevState = 2
-									If e\room\NPC[0]\Frame >= 1118
-										e\room\NPC[0]\PathTimer# = 1.0
+									If e\room\NPC[0]\State3 = 3 Then
+										If (e\room\NPC[0]\SoundChn2 = 0) Then
+											e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Room2SL2.ogg")
+											e\room\NPC[0]\SoundChn2 = PlaySound2(e\room\NPC[0]\Sound2, Camera, e\room\NPC[0]\Collider)
+										Else
+											If (Not ChannelPlaying(e\room\NPC[0]\SoundChn2))
+												e\room\NPC[0]\PathTimer# = 1.0
+												e\room\NPC[0]\SoundChn2 = 0
+											EndIf
+										EndIf
+									Else
+										If e\room\NPC[0]\Frame >= 1118
+											e\room\NPC[0]\PathTimer# = 1.0
+										EndIf
 									EndIf
 								EndIf
 							Else
