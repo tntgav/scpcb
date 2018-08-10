@@ -455,7 +455,7 @@ Function RemoveItem(i.Items)
 				WearingGasMask = False
 			Case "vest", "finevest", "veryfinevest"
 				WearingVest = False
-			Case "hazmatsuit","hazmatsuit2"
+			Case "hazmatsuit","hazmatsuit2","hazmatsuit3"
 				WearingHazmat = False	
 			Case "scp714"
 				Wearing714 = False

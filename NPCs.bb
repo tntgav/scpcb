@@ -1740,7 +1740,30 @@ Function UpdateNPCs()
 									RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),10.0),0
 									
 									If dist < 0.5 Then
-										If Wearing714 Then
+										If WearingHazmat>0 Then
+											BlurTimer = BlurTimer+FPSfactor*2.5
+											If BlurTimer>250 And BlurTimer-FPSfactor*2.5 <= 250 And n\PrevState<>3 Then
+												If n\SoundChn2 <> 0 Then StopChannel(n\SoundChn2)
+												n\SoundChn2 = PlaySound_Strict(LoadTempSound("SFX\SCP\049\TakeOffHazmat.ogg"))
+												n\PrevState=3
+											ElseIf BlurTimer => 500
+												For i = 0 To MaxItemAmount-1
+													If Inventory(i)<>Null Then
+														If Instr(Inventory(i)\itemtemplate\tempname,"hazmatsuit") And WearingHazmat<3 Then
+															If Inventory(i)\state2 < 3 Then
+																Inventory(i)\state2 = Inventory(i)\state2 + 1
+																BlurTimer = 260.0
+																CameraShake = 2.0
+															Else
+																RemoveItem(Inventory(i))
+																WearingHazmat = False
+															EndIf
+															Exit
+														EndIf
+													EndIf
+												Next
+											EndIf
+										ElseIf Wearing714 Then
 											BlurTimer = BlurTimer+FPSfactor*2.5
 											If BlurTimer>250 And BlurTimer-FPSfactor*2.5 <= 250 And n\PrevState<>3 Then
 												If n\SoundChn2 <> 0 Then StopChannel(n\SoundChn2)
