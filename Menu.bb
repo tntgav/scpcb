@@ -288,6 +288,10 @@ Function UpdateMainMenu()
 				CurrSave = Replace(CurrSave,"\","")
 				CurrSave = Replace(CurrSave,"<","")
 				CurrSave = Replace(CurrSave,">","")
+				CurrSave = Replace(CurrSave,"|","")
+				CurrSave = Replace(CurrSave,"?","")
+				CurrSave = Replace(CurrSave,Chr(34),"")
+				CurrSave = Replace(CurrSave,"*","")
 				
 				Color 255,255,255
 				If SelectedMap = "" Then
