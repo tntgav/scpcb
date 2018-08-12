@@ -839,11 +839,11 @@ Function UpdateMainMenu()
 					
 					y = y + 40*MenuScale
 					
-					MouseSmooth = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, (MouseSmooth)*50.0)/50.0)
+					mouse_smooth = DrawTick(x + 310*MenuScale, y+MenuScale,mouse_smooth)
 					Color(255, 255, 255)
 					AAText(x + 20 * MenuScale, y, "Mouse smoothing:")
 					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale+14,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"mousesmoothing",MouseSmooth)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesmoothing")
 					EndIf
 					
 					Color(255, 255, 255)
@@ -2116,11 +2116,7 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 		Case "mouseinvert"
 			txt = Chr(34)+"Invert mouse Y-axis"+Chr(34)+" is self-explanatory."
 		Case "mousesmoothing"
-			txt = "Adjusts the amount of smoothing of the mouse pointer."
-			R = 255
-			G = 255
-			B = 255
-			txt2 = "Current value: "+Int(value*100)+"% (default is 100%)"
+			txt = "Toggles mouselook smoothing."
 		Case "controls"
 			txt = "Configure the in-game control scheme."
 			;[End Block]
