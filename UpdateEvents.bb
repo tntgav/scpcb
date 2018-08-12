@@ -7376,7 +7376,7 @@ Function UpdateEvents()
 							If GrabbedEntity = e\room\Objects[0] Then
 								If e\EventState = 0 Then
 									DrawHandIcon = True
-									TurnEntity(GrabbedEntity, 0, 0, -mouse_x_leverTurn * 2.5)
+									TurnEntity(GrabbedEntity, 0, 0, -mouse_x_speed_1 * 2.5)
 									
 									angle = WrapAngle(EntityRoll(e\room\Objects[0]))
 									If angle > 181 Then DrawArrowIcon(3) = True
@@ -7406,7 +7406,7 @@ Function UpdateEvents()
 							ElseIf GrabbedEntity = e\room\Objects[1]
 								If e\EventState = 0 Then
 									DrawHandIcon = True
-									TurnEntity(GrabbedEntity, 0, 0, -mouse_x_leverTurn * 2.5)
+									TurnEntity(GrabbedEntity, 0, 0, -mouse_x_speed_1 * 2.5)
 									
 									angle# = WrapAngle(EntityRoll(e\room\Objects[1]))
 									DrawArrowIcon(3) = True

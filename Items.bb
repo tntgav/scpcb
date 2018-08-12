@@ -816,7 +816,7 @@ Function Update294()
 		EndIf
 		
 		If Regurgitate > MilliSecs2() And Regurgitate <> 0 Then
-			mouse_y_speed_1 = mouse_y_speed_1 + 4.0
+			mouse_y_speed_1 = mouse_y_speed_1 + 1.0
 		Else
 			Regurgitate = 0
 		EndIf
@@ -854,7 +854,7 @@ Function Update294()
 		
 		UpdateDecals()
 		
-		mouse_y_speed_1 = mouse_y_speed_1 + Max((1.0 + VomitTimer / 10), 0.0)*4.0
+		mouse_y_speed_1 = mouse_y_speed_1 + Max((1.0 + VomitTimer / 10), 0.0)
 		
 		If VomitTimer < -15 Then
 			FreeSound_Strict(VomitSFX)
