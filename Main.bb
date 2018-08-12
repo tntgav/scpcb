@@ -186,7 +186,7 @@ Global MenuScale# = (GraphicHeight / 1024.0)
 
 SetBuffer(BackBuffer())
 
-Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, FPSfactor2#
+Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, FPSfactor2#, PrevFPSFactor#
 Local CheckFPS%, ElapsedLoops%, FPS%, ElapsedTime#
 
 Global Framelimit% = GetINIInt(OptionFile, "options", "framelimit")
@@ -2814,6 +2814,7 @@ Repeat
 	CurTime = MilliSecs2()
 	ElapsedTime = (CurTime - PrevTime) / 1000.0
 	PrevTime = CurTime
+	PrevFPSFactor = FPSfactor
 	FPSfactor = Max(Min(ElapsedTime * 70, 5.0), 0.2)
 	FPSfactor2 = FPSfactor
 	
@@ -4400,7 +4401,13 @@ Function MouseLook()
 		; -- Update the smoothing que To smooth the movement of the mouse.
 		mouse_x_speed_1# = CurveValue(MouseXSpeed() * (MouseSens + 0.6) , mouse_x_speed_1, (6.0 / (MouseSens + 1.0))*MouseSmooth) 
 		If Int(mouse_x_speed_1) = Int(Nan1) Then mouse_x_speed_1 = 0
-		
+		If PrevFPSFactor>0 Then
+            If Abs(FPSfactor/PrevFPSFactor-1.0)>1.0 Then
+                ;lag spike detected - stop all camera movement
+                mouse_x_speed_1 = 0.0
+                mouse_y_speed_1 = 0.0
+            EndIf
+        EndIf
 		If InvertMouse Then
 			mouse_y_speed_1# = CurveValue(-MouseYSpeed() * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth) 
 		Else
