@@ -5000,6 +5000,14 @@ Function DrawGUI()
 		SelectedDoor = Null
 		SelectedScreen = Null
 		SelectedMonitor = Null
+		If SelectedItem <> Null Then
+			If Instr(SelectedItem\itemtemplate\tempname,"vest") Or Instr(SelectedItem\itemtemplate\tempname,"hazmatsuit") Then
+				If (Not WearingVest) And (Not WearingHazmat) Then
+					DropItem(SelectedItem)
+				EndIf
+				SelectedItem = Null
+			EndIf
+		EndIf
 	EndIf
 	
 	Local spacing%
