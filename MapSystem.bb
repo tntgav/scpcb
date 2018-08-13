@@ -6445,7 +6445,7 @@ Function UpdateSecurityCams()
 					
 					If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) Then
 						If EntityVisible(Camera,sc\ScrObj) Then
-							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
+							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) And (WearingHazmat<3) And (WearingGasMask<3) Then
 								If BlinkTimer > - 5
 									Sanity=Sanity-FPSfactor
 									DebugLog Sanity
@@ -6515,7 +6515,7 @@ Function UpdateSecurityCams()
 						sc\State = 0
 					EndIf
 					
-					If ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714)) Then
+					If ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) And (WearingHazmat<3) And (WearingGasMask<3)) Then
 						If sc\InSight Then
 							Local pvt% = CreatePivot()
 							PositionEntity pvt, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
@@ -6558,7 +6558,7 @@ Function UpdateSecurityCams()
 									EntityTexture(sc\ScrOverlay, MonitorTexture)
 								EndIf
 							EndIf
-							If (Wearing714) Then
+							If (Wearing714) Or (WearingHazmat=3) Or (WearingGasMask=3) Then
 								EntityTexture(sc\ScrOverlay, MonitorTexture)
 							EndIf
 						EndIf
