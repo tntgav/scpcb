@@ -3106,6 +3106,13 @@ Repeat
 			EndIf
 			
 			If FallTimer < 0 Then
+				If SelectedItem <> Null Then
+					If Instr(SelectedItem\itemtemplate\tempname,"hazmatsuit") Or Instr(SelectedItem\itemtemplate\tempname,"vest") Then
+						If WearingHazmat=0 And WearingVest=0 Then
+							DropItem(SelectedItem)
+						EndIf
+					EndIf
+				EndIf
 				InvOpen = False
 				SelectedItem = Null
 				SelectedScreen = Null
