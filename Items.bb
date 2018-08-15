@@ -479,9 +479,10 @@ End Function
 
 Function UpdateItems()
 	CatchErrors("Uncaught (UpdateItems)")
-	Local n, i.Items
+	Local n, i.Items, i2.Items
 	Local xtemp#, ytemp#, ztemp#
 	Local temp%, np.NPCs
+	Local pick%
 	
 	Local HideDist = HideDistance*0.5
 	Local deletedItem% = False
@@ -492,26 +493,31 @@ Function UpdateItems()
 		
 		If (Not i\Picked) Then
 			If i\disttimer < MilliSecs2() Then
-				i\dist = EntityDistance(Collider, i\collider)
-				i\disttimer = MilliSecs2() + Rand(600,800)
+				i\dist = EntityDistance(Camera, i\collider)
+				i\disttimer = MilliSecs2() + 700
 				If i\dist < HideDist Then ShowEntity i\collider
 			EndIf
 			
 			If i\dist < HideDist Then
 				ShowEntity i\collider
 				
-				If (Not EntityVisible(i\collider,Camera)) Then
-					;the player can't grab this
-					If (Not EntityVisible(i\collider,Collider)) Then i\dist = 2.5
-				EndIf
-				
 				If i\dist < 1.2 Then
 					If ClosestItem = Null Then
-						If EntityInView(i\model, Camera) Then ClosestItem = i
-					Else If ClosestItem = i Or i\dist < EntityDistance(Collider, ClosestItem\collider) Then 
-						If EntityInView(i\model, Camera) Then ClosestItem = i
-					End If
-				EndIf					
+						If EntityInView(i\model, Camera) Then
+							pick = LinePick(EntityX(Camera),EntityY(i\collider),EntityZ(Camera),EntityX(i\collider)-EntityX(Camera),0,EntityZ(i\collider)-EntityZ(Camera),0.0)
+							If pick=i\collider Or pick=0 Then
+								ClosestItem = i
+							EndIf
+						EndIf
+					ElseIf ClosestItem = i Or i\dist < EntityDistance(Camera, ClosestItem\collider) Then 
+						If EntityInView(i\model, Camera) Then
+							pick = LinePick(EntityX(Camera),EntityY(i\collider),EntityZ(Camera),EntityX(i\collider)-EntityX(Camera),0,EntityZ(i\collider)-EntityZ(Camera),0.0)
+							If pick=i\collider Or pick=0 Then
+								ClosestItem = i
+							EndIf
+						EndIf
+					EndIf
+				EndIf
 				
 				If EntityCollided(i\collider, HIT_MAP) Then
 					i\DropSpeed = 0
@@ -519,7 +525,7 @@ Function UpdateItems()
 					i\zspeed = 0.0
 				Else
 					If ShouldEntitiesFall
-						Local pick = LinePick(EntityX(i\collider),EntityY(i\collider),EntityZ(i\collider),0,-10,0)
+						pick = LinePick(EntityX(i\collider),EntityY(i\collider),EntityZ(i\collider),0,-10,0)
 						If pick
 							i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
 							TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
@@ -558,7 +564,7 @@ Function UpdateItems()
 									
 									TranslateEntity i2\collider,xtemp,0,ztemp
 									TranslateEntity i\collider,-xtemp,0,-ztemp
-								EndIf	
+								EndIf
 							EndIf
 						EndIf
 					Next
@@ -584,7 +590,7 @@ Function UpdateItems()
 		;DrawHandIcon = True
 		
 		If MouseHit1 Then PickItem(ClosestItem)
-	End If
+	EndIf
 	
 End Function
 
