@@ -6558,6 +6558,9 @@ Function UpdateSecurityCams()
 									EntityTexture(sc\ScrOverlay, MonitorTexture)
 								EndIf
 							EndIf
+						EndIf
+					Else
+						If sc\InSight Then
 							If (Wearing714) Or (WearingHazmat=3) Or (WearingGasMask=3) Then
 								EntityTexture(sc\ScrOverlay, MonitorTexture)
 							EndIf
