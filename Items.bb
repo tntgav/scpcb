@@ -504,15 +504,13 @@ Function UpdateItems()
 				If i\dist < 1.2 Then
 					If ClosestItem = Null Then
 						If EntityInView(i\model, Camera) Then
-							pick = LinePick(EntityX(Camera),EntityY(i\collider),EntityZ(Camera),EntityX(i\collider)-EntityX(Camera),0,EntityZ(i\collider)-EntityZ(Camera),0.0)
-							If pick=i\collider Or pick=0 Then
+							If EntityVisible(i\collider,Camera) Then
 								ClosestItem = i
 							EndIf
 						EndIf
 					ElseIf ClosestItem = i Or i\dist < EntityDistance(Camera, ClosestItem\collider) Then 
 						If EntityInView(i\model, Camera) Then
-							pick = LinePick(EntityX(Camera),EntityY(i\collider),EntityZ(Camera),EntityX(i\collider)-EntityX(Camera),0,EntityZ(i\collider)-EntityZ(Camera),0.0)
-							If pick=i\collider Or pick=0 Then
+							If EntityVisible(i\collider,Camera) Then
 								ClosestItem = i
 							EndIf
 						EndIf
