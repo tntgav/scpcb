@@ -1918,6 +1918,7 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	;scaleentity(d\obj, 0.1, 0.1, 0.1)
 	PositionEntity d\frameobj, x, y, z	
 	ScaleEntity(d\frameobj, (8.0 / 2048.0), (8.0 / 2048.0), (8.0 / 2048.0))
+	EntityPickMode d\frameobj,2
 	EntityType d\obj, HIT_MAP
 	EntityType d\obj2, HIT_MAP
 	
@@ -1983,12 +1984,10 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	d\angle = angle
 	d\open = dopen		
 	
-	EntityPickMode(d\obj, 3)
-	MakeCollBox(d\obj)
+	EntityPickMode(d\obj, 2)
 	If d\obj2 <> 0 Then
-		EntityPickMode(d\obj2, 3)
-		MakeCollBox(d\obj2)
-	End If
+		EntityPickMode(d\obj2, 2)
+	EndIf
 	
 	EntityPickMode d\frameobj,2
 	
