@@ -855,6 +855,7 @@ Function UpdateEvents()
 											
 											If MouseHit1 Then
 												SelectedItem = CreateItem("Document SCP-173", "paper", 0.0, 0.0, 0.0)
+												EntityType SelectedItem\collider,HIT_ITEM
 												
 												PickItem(SelectedItem)
 												
@@ -2537,20 +2538,28 @@ Function UpdateEvents()
 											EndIf
 										EndIf
 									Next
-									If SelectedItem<>Null Then
-										If SelectedItem\itemtemplate\tempname="50ct" Then
-											RemoveItem(SelectedItem)
-											SelectedItem=Null
-											e\EventState2 = 1
-											PlaySound_Strict LoadTempSound("SFX\SCP\294\coin_drop.ogg")
+									Local inserted% = False
+									If e\EventState2 < 2 Then
+										If SelectedItem<>Null Then
+											If SelectedItem\itemtemplate\tempname="25ct" Or SelectedItem\itemtemplate\tempname="coin" Then
+												RemoveItem(SelectedItem)
+												SelectedItem=Null
+												e\EventState2 = e\EventState2 + 1
+												PlaySound_Strict LoadTempSound("SFX\SCP\294\coin_drop.ogg")
+												inserted = True
+											EndIf
 										EndIf
 									EndIf
-									If e\EventState2 = 1 Then
+									If e\EventState2 = 2 Then
 										Using294=temp
 										If Using294 Then MouseHit1=False
-									Else
+									ElseIf e\EventState2 = 1 And (Not inserted) Then
 										Using294=False
-										Msg = "You need to insert a 50 cent coin in order to use this machine."
+										Msg = "You need to insert another Quarter in order to use this machine."
+										MsgTimer = 70*5
+									ElseIf (Not inserted) Then
+										Using294=False
+										Msg = "You need to insert two Quarters in order to use this machine."
 										MsgTimer = 70*5
 									EndIf
 								EndIf
@@ -2646,8 +2655,8 @@ Function UpdateEvents()
 								PointEntity it\collider,e\room\NPC[1]\Collider
 								MoveEntity it\collider,-0.4,0,-0.2
 								TeleportEntity(it\collider,EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),-0.02,True,10)
-								For i = 0 To 2
-									it2.Items = CreateItem("50 Cent Coin","50ct",1,1,1)
+								For i = 0 To 1
+									it2.Items = CreateItem("Quarter","25ct",1,1,1)
 									it2\Picked = True
 									it2\Dropped = -1
 									it2\itemtemplate\found=True
@@ -4109,17 +4118,21 @@ Function UpdateEvents()
 								DrawHandIcon = True
 								
 								If MouseHit1 Then
-									SelectedItem = CreateItem("Drawing", "paper", 0.0, 0.0, 0.0)
-									
-									If ItemAmount >= MaxItemAmount Then DropItem(Inventory(0))
-									
-									PickItem(SelectedItem)
-									
-									FreeEntity(e\room\Objects[2])
-									e\room\Objects[2] = 0
-									
-									e\EventState = 3
-									RemoveEvent(e)
+									If ItemAmount >= MaxItemAmount Then
+										Msg = "You cannot carry any more items."
+										MsgTimer = 70 * 5
+									Else
+										SelectedItem = CreateItem("Drawing", "paper", 0.0, 0.0, 0.0)
+										EntityType SelectedItem\collider,HIT_ITEM
+										
+										PickItem(SelectedItem)
+										
+										FreeEntity(e\room\Objects[2])
+										e\room\Objects[2] = 0
+										
+										e\EventState = 3
+										RemoveEvent(e)
+									EndIf
 								EndIf
 							EndIf
 						EndIf
@@ -5727,11 +5740,12 @@ Function UpdateEvents()
 										e\room\RoomDoors[i]\open = True
 										e\room\NPC[0]\PathStatus = FindPath(e\room\NPC[0],EntityX(Collider),EntityY(Collider),EntityZ(Collider))
 										If e\room\NPC[0]\Sound2 <> 0 Then FreeSound_Strict(e\room\NPC[0]\Sound2)
-										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Greeting"+Rand(1,2)+".ogg")
+										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\DetectedInChamber.ogg")
 										e\room\NPC[0]\SoundChn2 = LoopSound2(e\room\NPC[0]\Sound2,e\room\NPC[0]\SoundChn2,Camera,e\room\NPC[0]\obj)
 										e\room\NPC[0]\Idle = 0
 										e\room\NPC[0]\HideFromNVG = False
 										e\room\NPC[0]\PrevState = 2
+										e\room\NPC[0]\State = 2
 									EndIf
 								EndIf
 							EndIf
@@ -7544,7 +7558,19 @@ Function UpdateEvents()
 					If PlayerRoom<>e\room And BlinkTimer<-10 Then
 						dist = Distance(EntityX(Collider),EntityZ(Collider), EntityX(e\room\obj),EntityZ(e\room\obj))
 						If (dist<16.0) Then
-							e\room\Objects[0] =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
+							For e2.Events = Each Events
+								If e2\EventName = e\EventName Then
+									If e2\room <> e\room Then
+										If e2\room\Objects[0]<>0 Then
+											e\room\Objects[0]=CopyEntity(e2\room\Objects[0])
+											Exit
+										EndIf
+									EndIf
+								EndIf
+							Next
+							If e\room\Objects[0]=0 Then
+								e\room\Objects[0] =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
+							EndIf
 							ScaleEntity e\room\Objects[0], 0.05,0.05,0.05
 							SetAnimTime(e\room\Objects[0], 2)
 							PositionEntity(e\room\Objects[0], EntityX(e\room\obj), 0.0, EntityZ(e\room\obj))
@@ -8206,16 +8232,29 @@ Function UpdateEvents()
 								;e\room\NPC[0]\PathTimer# = e\room\NPC[0]\PathTimer# + FPSfactor
 								If e\room\NPC[0]\PrevState = 1 Then
 									If (e\room\NPC[0]\SoundChn2 = 0) Then
-										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Room2SLEnter.ogg")
+										e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Room2SL1.ogg")
 										e\room\NPC[0]\SoundChn2 = PlaySound2(e\room\NPC[0]\Sound2, Camera, e\room\NPC[0]\Collider)
 									Else
 										If (Not ChannelPlaying(e\room\NPC[0]\SoundChn2))
 											e\room\NPC[0]\PathTimer# = 1.0
+											e\room\NPC[0]\SoundChn2 = 0
 										EndIf
 									EndIf
 								ElseIf e\room\NPC[0]\PrevState = 2
-									If e\room\NPC[0]\Frame >= 1118
-										e\room\NPC[0]\PathTimer# = 1.0
+									If e\room\NPC[0]\State3 = 3 Then
+										If (e\room\NPC[0]\SoundChn2 = 0) Then
+											e\room\NPC[0]\Sound2 = LoadSound_Strict("SFX\SCP\049\Room2SL2.ogg")
+											e\room\NPC[0]\SoundChn2 = PlaySound2(e\room\NPC[0]\Sound2, Camera, e\room\NPC[0]\Collider)
+										Else
+											If (Not ChannelPlaying(e\room\NPC[0]\SoundChn2))
+												e\room\NPC[0]\PathTimer# = 1.0
+												e\room\NPC[0]\SoundChn2 = 0
+											EndIf
+										EndIf
+									Else
+										If e\room\NPC[0]\Frame >= 1118
+											e\room\NPC[0]\PathTimer# = 1.0
+										EndIf
 									EndIf
 								EndIf
 							Else
@@ -8662,9 +8701,32 @@ Function UpdateEvents()
                     e\room\NPC[0]\State = 8
                     
                     e\EventState = 1
-                    RemoveEvent(e)
                 EndIf
+				
+				If PlayerRoom=e\room Then
+					UpdateButton(e\room\Objects[2])
+					If ClosestButton = e\room\Objects[2] And MouseHit1 Then
+						Msg = "The elevator appears to be broken."
+						PlaySound2(ButtonSFX2, Camera, e\room\Objects[2])
+						MsgTimer = 5*70
+						MouseHit1=0
+					EndIf
+				EndIf
                 ;[End Block]
+			Case "room1lifts"
+				;[Block]
+				If PlayerRoom=e\room Then
+					For i = 0 To 1
+						UpdateButton(e\room\Objects[i])
+						If ClosestButton = e\room\Objects[i] And MouseHit1 Then
+							Msg = "The elevator appears to be broken."
+							PlaySound2(ButtonSFX2, Camera, e\room\Objects[i])
+							MsgTimer = 5*70
+							MouseHit1=0
+						EndIf
+					Next
+				EndIf
+				;[End Block]
 		End Select
 		
 		If e<>Null Then
@@ -8781,6 +8843,19 @@ Function UpdateDimension1499()
 						n2\Target = n
 						e\room\NPC[2] = n
 						e\room\NPC[3] = n2
+						;More guards
+						n.NPCs = CreateNPC(NPCtype1499,e\room\x-1877.0*RoomScale,e\room\y+192.0*RoomScale,e\room\z+1071.0*RoomScale)
+						n\PrevState = 3
+						n\Angle = 270
+						RotateEntity n\Collider,0,n\Angle,0
+						n2.NPCs = CreateNPC(NPCtype1499,e\room\x-1877.0*RoomScale,e\room\y+192.0*RoomScale,e\room\z+3503.0*RoomScale)
+						n2\PrevState = 3
+						n2\Angle = 270
+						RotateEntity n2\Collider,0,n2\Angle,0
+						n\Target = n2
+						n2\Target = n
+						e\room\NPC[4] = n
+						e\room\NPC[5] = n2
 						;Guard at stairs
 						n.NPCs = CreateNPC(NPCtype1499,e\room\x-2761.0*RoomScale,e\room\y+240.0*RoomScale,e\room\z+3204.0*RoomScale)
 						n\PrevState = 1
@@ -8986,11 +9061,11 @@ Function UpdateDimension1499()
 						e\EventState3 = 70*20
 					ElseIf e\EventState3 = 70*20
 						If e\room\NPC[0]\Frame > 854.5 Then
-							For i = 2 To 3
+							For i = 2 To 5
 								If i = 2
 									If e\room\NPC[i]\Sound <> 0 Then FreeSound_Strict e\room\NPC[i]\Sound : e\room\NPC[i]\Sound = 0
 									e\room\NPC[i]\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
-									e\room\NPC[i]\SoundChn = PlaySound2(e\room\NPC[i]\Sound, Camera, e\room\NPC[i]\Collider,20.0)
+									e\room\NPC[i]\SoundChn = PlaySound2(e\room\NPC[i]\Sound, Camera, e\room\NPC[i]\Collider,50.0)
 								EndIf
 								e\room\NPC[i]\State = 1
 								e\room\NPC[i]\Frame = 203
