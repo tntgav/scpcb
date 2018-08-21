@@ -2836,6 +2836,9 @@ Function FillRoom(r.Rooms)
             de\Size = 0.25
             ScaleSprite(de\obj, de\Size,de\Size)
             EntityParent de\obj, r\obj
+			
+			r\Objects[2] = CreateButton(r\x + 1181.0 *RoomScale, r\y + 180.0 * RoomScale, r\z - 512.0 * RoomScale, 0, 270)
+            EntityParent (r\Objects[2],r\obj)
 			;[End Block]
 		Case "room2poffices"
 			;[Block]
@@ -2927,6 +2930,11 @@ Function FillRoom(r.Rooms)
 			EntityParent(it\collider, r\obj) : it\name = "Cup of Coffee"
 			
 			it = CreateItem("Empty Cup", "emptycup", r\x-540*RoomScale, -187*RoomScale, r\z+124.0*RoomScale)
+			EntityParent(it\collider, r\obj)
+			
+			it = CreateItem("Quarter", "25ct", r\x-447.0*RoomScale, r\y-334.0*RoomScale, r\z+36.0*RoomScale)
+			EntityParent(it\collider, r\obj)
+			it = CreateItem("Quarter", "25ct", r\x+1409.0*RoomScale, r\y-334.0*RoomScale, r\z-732.0*RoomScale)
 			EntityParent(it\collider, r\obj)
 			;[End Block]
 		Case "room2nuke"
@@ -3947,9 +3955,8 @@ Function FillRoom(r.Rooms)
 			
 			d.Doors = CreateDoor(r\zone, r\x + 1392.0 * RoomScale, 384.0*RoomScale, r\z + 64.0 * RoomScale, 90, r, True)
 			d\AutoClose = False
-			FreeEntity(d\buttons[0]) : d\buttons[0]=0
-			FreeEntity(d\buttons[1]) : d\buttons[1]=0
 			d\MTFClose = False
+			d\locked = True
 			
 			d.Doors = CreateDoor(r\zone, r\x - 640.0 * RoomScale, 384.0*RoomScale, r\z + 64.0 * RoomScale, 90, r, False)
 			d\locked = True : d\AutoClose = False
@@ -4012,7 +4019,6 @@ Function FillRoom(r.Rooms)
 			
 			;3384,510,2400
 			CreateDevilEmitter(r\x+3384.0*RoomScale,r\y+510.0*RoomScale,r\z+2400.0*RoomScale,r,1,4)
-			
 			;[End Block]
 		Case "room2scps"
 			;[Block]
@@ -4446,8 +4452,8 @@ Function FillRoom(r.Rooms)
 			
 			;the door to the staircase in the office room
 			d.Doors = CreateDoor(r\zone, r\x - 2432 * RoomScale, 0, r\z - 1000 * RoomScale, 0, r, False)
-			PositionEntity(d\buttons[0], r\x - 2592 * RoomScale, EntityY(d\buttons[0],True), r\z - 1024 * RoomScale, True)
-			PositionEntity(d\buttons[1], r\x - 2592 * RoomScale, EntityY(d\buttons[0],True), r\z - 992 * RoomScale, True)
+			PositionEntity(d\buttons[0], r\x - 2592 * RoomScale, EntityY(d\buttons[0],True), r\z - 1016 * RoomScale, True)
+			PositionEntity(d\buttons[1], r\x - 2592 * RoomScale, EntityY(d\buttons[0],True), r\z - 984 * RoomScale, True)
 			d\locked = True : d\DisableWaypoint = True
 			
 			tex = LoadTexture_Strict("GFX\map\Door02.jpg")
@@ -5014,7 +5020,7 @@ Function FillRoom(r.Rooms)
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			;sc\FollowPlayer = True
 			;[End Block]
-		Case "room2_3"
+		Case "room2_3","room3_3"
 			;[Block]
 			w.waypoints = CreateWaypoint(r\x, r\y + 66.0 * RoomScale, r\z, Null, r)
 			;[End Block]
@@ -5032,6 +5038,8 @@ Function FillRoom(r.Rooms)
 			sc\room = r
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 			EntityParent(sc\obj, r\obj)
+			
+			w.waypoints = CreateWaypoint(r\x, r\y + 66.0 * RoomScale, r\z, Null, r)
 			;[End Block]
 		Case "room2servers2"
 			;[Block]
@@ -6437,7 +6445,7 @@ Function UpdateSecurityCams()
 					
 					If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) Then
 						If EntityVisible(Camera,sc\ScrObj) Then
-							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
+							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) And (WearingHazmat<3) And (WearingGasMask<3) Then
 								If BlinkTimer > - 5
 									Sanity=Sanity-FPSfactor
 									DebugLog Sanity
@@ -6507,7 +6515,7 @@ Function UpdateSecurityCams()
 						sc\State = 0
 					EndIf
 					
-					If ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714)) Then
+					If ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) And (WearingHazmat<3) And (WearingGasMask<3)) Then
 						If sc\InSight Then
 							Local pvt% = CreatePivot()
 							PositionEntity pvt, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
@@ -6550,7 +6558,10 @@ Function UpdateSecurityCams()
 									EntityTexture(sc\ScrOverlay, MonitorTexture)
 								EndIf
 							EndIf
-							If (Wearing714) Then
+						EndIf
+					Else
+						If sc\InSight Then
+							If (Wearing714) Or (WearingHazmat=3) Or (WearingGasMask=3) Then
 								EntityTexture(sc\ScrOverlay, MonitorTexture)
 							EndIf
 						EndIf
@@ -7723,9 +7734,10 @@ Function CreateMap()
 	Next
 	
 	For r.Rooms = Each Rooms
-		If r\angle >= 360
-            r\angle = r\angle-360
-        EndIf
+		;If r\angle >= 360
+        ;    r\angle = r\angle-360
+        ;EndIf
+		r\angle = WrapAngle(r\angle)
 		r\Adjacent[0]=Null
 		r\Adjacent[1]=Null
 		r\Adjacent[2]=Null

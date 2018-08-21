@@ -42,8 +42,8 @@ Global UpdaterFont%
 Global Font1%, Font2%, Font3%, Font4%, Font5%
 Global ConsoleFont%
 
-Global VersionNumber$ = "1.3.10"
-Global CompatibleNumber$ = "1.3.10" ;Only change this if the version given isn't working with the current build version - ENDSHN
+Global VersionNumber$ = "1.3.11"
+Global CompatibleNumber$ = "1.3.11" ;Only change this if the version given isn't working with the current build version - ENDSHN
 
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%
@@ -186,7 +186,7 @@ Global MenuScale# = (GraphicHeight / 1024.0)
 
 SetBuffer(BackBuffer())
 
-Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, FPSfactor2#
+Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, FPSfactor2#, PrevFPSFactor#
 Local CheckFPS%, ElapsedLoops%, FPS%, ElapsedTime#
 
 Global Framelimit% = GetINIInt(OptionFile, "options", "framelimit")
@@ -265,6 +265,8 @@ Global KEY_INV = GetINIInt(OptionFile, "binds", "Inventory key")
 Global KEY_CROUCH = GetINIInt(OptionFile, "binds", "Crouch key")
 Global KEY_SAVE = GetINIInt(OptionFile, "binds", "Save key")
 Global KEY_CONSOLE = GetINIInt(OptionFile, "binds", "Console key")
+
+Global MouseSmooth# = GetINIFloat(OptionFile,"options", "mouse smoothing", 1.0)
 
 Const INFINITY# = (999.0) ^ (99999.0), NAN# = (-1.0) ^ (0.5)
 
@@ -1916,6 +1918,7 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	;scaleentity(d\obj, 0.1, 0.1, 0.1)
 	PositionEntity d\frameobj, x, y, z	
 	ScaleEntity(d\frameobj, (8.0 / 2048.0), (8.0 / 2048.0), (8.0 / 2048.0))
+	EntityPickMode d\frameobj,2
 	EntityType d\obj, HIT_MAP
 	EntityType d\obj2, HIT_MAP
 	
@@ -1981,12 +1984,10 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	d\angle = angle
 	d\open = dopen		
 	
-	EntityPickMode(d\obj, 3)
-	MakeCollBox(d\obj)
+	EntityPickMode(d\obj, 2)
 	If d\obj2 <> 0 Then
-		EntityPickMode(d\obj2, 3)
-		MakeCollBox(d\obj2)
-	End If
+		EntityPickMode(d\obj2, 2)
+	EndIf
 	
 	EntityPickMode d\frameobj,2
 	
@@ -2416,9 +2417,7 @@ Function RemoveDoor(d.Doors)
 	If d\obj2 <> 0 Then FreeEntity d\obj2
 	If d\frameobj <> 0 Then FreeEntity d\frameobj
 	If d\buttons[0] <> 0 Then FreeEntity d\buttons[0]
-	If d\buttons[1] <> 0 Then FreeEntity d\buttons[1]	
-	
-	If d\DoorHitOBJ <> 0 Then FreeEntity d\DoorHitOBJ
+	If d\buttons[1] <> 0 Then FreeEntity d\buttons[1]
 	
 	Delete d
 End Function
@@ -2662,6 +2661,7 @@ Function InitEvents()
 	CreateEvent("room2sl","room2sl",0)
 	CreateEvent("medibay","medibay",0)
 	CreateEvent("room2shaft","room2shaft",0)
+	CreateEvent("room1lifts","room1lifts",0)
 	
 	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
 	
@@ -2813,6 +2813,7 @@ Repeat
 	CurTime = MilliSecs2()
 	ElapsedTime = (CurTime - PrevTime) / 1000.0
 	PrevTime = CurTime
+	PrevFPSFactor = FPSfactor
 	FPSfactor = Max(Min(ElapsedTime * 70, 5.0), 0.2)
 	FPSfactor2 = FPSfactor
 	
@@ -3104,6 +3105,13 @@ Repeat
 			EndIf
 			
 			If FallTimer < 0 Then
+				If SelectedItem <> Null Then
+					If Instr(SelectedItem\itemtemplate\tempname,"hazmatsuit") Or Instr(SelectedItem\itemtemplate\tempname,"vest") Then
+						If WearingHazmat=0 And WearingVest=0 Then
+							DropItem(SelectedItem)
+						EndIf
+					EndIf
+				EndIf
 				InvOpen = False
 				SelectedItem = Null
 				SelectedScreen = Null
@@ -4397,13 +4405,19 @@ Function MouseLook()
 		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), 0
 		;moveentity player, side, up, 0	
 		; -- Update the smoothing que To smooth the movement of the mouse.
-		mouse_x_speed_1# = CurveValue(MouseXSpeed() * (MouseSens + 0.6) , mouse_x_speed_1, 6.0 / (MouseSens + 1.0)) 
+		mouse_x_speed_1# = CurveValue(MouseXSpeed() * (MouseSens + 0.6) , mouse_x_speed_1, (6.0 / (MouseSens + 1.0))*MouseSmooth) 
 		If Int(mouse_x_speed_1) = Int(Nan1) Then mouse_x_speed_1 = 0
-		
+		If PrevFPSFactor>0 Then
+            If Abs(FPSfactor/PrevFPSFactor-1.0)>1.0 Then
+                ;lag spike detected - stop all camera movement
+                mouse_x_speed_1 = 0.0
+                mouse_y_speed_1 = 0.0
+            EndIf
+        EndIf
 		If InvertMouse Then
-			mouse_y_speed_1# = CurveValue(-MouseYSpeed() * (MouseSens + 0.6), mouse_y_speed_1, 6.0/(MouseSens+1.0)) 
+			mouse_y_speed_1# = CurveValue(-MouseYSpeed() * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth) 
 		Else
-			mouse_y_speed_1# = CurveValue(MouseYSpeed () * (MouseSens + 0.6), mouse_y_speed_1, 6.0/(MouseSens+1.0)) 
+			mouse_y_speed_1# = CurveValue(MouseYSpeed () * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth) 
 		EndIf
 		If Int(mouse_y_speed_1) = Int(Nan1) Then mouse_y_speed_1 = 0
 		
@@ -4486,11 +4500,12 @@ Function MouseLook()
 	EndIf
 	
 	If WearingGasMask Or WearingHazmat Or Wearing1499 Then
-		If WearingGasMask = 2 Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
-		If Wearing1499 = 2 Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
-		If WearingHazmat = 2 Then 
-			Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
-		ElseIf WearingHazmat=1
+		If Wearing714 = False Then
+			If WearingGasMask = 2 Or Wearing1499 = 2 Or WearingHazmat = 2 Then
+				Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
+			EndIf
+		EndIf
+		If WearingHazmat = 1 Then
 			Stamina = Min(60, Stamina)
 		EndIf
 		
@@ -4991,6 +5006,14 @@ Function DrawGUI()
 		SelectedDoor = Null
 		SelectedScreen = Null
 		SelectedMonitor = Null
+		If SelectedItem <> Null Then
+			If Instr(SelectedItem\itemtemplate\tempname,"vest") Or Instr(SelectedItem\itemtemplate\tempname,"hazmatsuit") Then
+				If (Not WearingVest) And (Not WearingHazmat) Then
+					DropItem(SelectedItem)
+				EndIf
+				SelectedItem = Null
+			EndIf
+		EndIf
 	EndIf
 	
 	Local spacing%
@@ -5159,7 +5182,7 @@ Function DrawGUI()
 							For z% = 0 To OtherSize - 1
 								If OtherOpen\SecondInv[z]<>Null
 									Local name$=OtherOpen\SecondInv[z]\itemtemplate\tempname
-									If name$<>"50ct" And name$<>"coin" And name$<>"key" And name$<>"scp860" And name$<>"scp714" Then
+									If name$<>"25ct" And name$<>"coin" And name$<>"key" And name$<>"scp860" And name$<>"scp714" Then
 										isEmpty=False
 										Exit
 									EndIf
@@ -5320,6 +5343,12 @@ Function DrawGUI()
 							MouseHit1 = False
 							
 							If DoubleClick Then
+								If WearingHazmat > 0 And Instr(SelectedItem\itemtemplate\tempname,"hazmatsuit")=0 Then
+									Msg = "You cannot use any items while wearing a hazmat suit."
+									MsgTimer = 70*5
+									SelectedItem = Null
+									Return
+								EndIf
 								If Inventory(n)\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(Inventory(n)\itemtemplate\sound))
 								InvOpen = False
 								DoubleClick = False
@@ -5392,14 +5421,14 @@ Function DrawGUI()
 						SelectedItem = Null
 					ElseIf Inventory(MouseSlot) <> SelectedItem
 						Select SelectedItem\itemtemplate\tempname
-							Case "paper","key1","key2","key3","key4","key5","key6","misc","oldpaper","badge","ticket","50ct","coin","key","scp860","scp714"
+							Case "paper","key1","key2","key3","key4","key5","key6","misc","oldpaper","badge","ticket","25ct","coin","key","scp860"
 								;[Block]
 								If Inventory(MouseSlot)\itemtemplate\tempname = "clipboard" Then
 									;Add an item to clipboard
 									Local added.Items = Null
 									Local b$ = SelectedItem\itemtemplate\tempname
 									Local b2$ = SelectedItem\itemtemplate\name
-									If (b<>"misc" And b<>"50ct" And b<>"coin" And b<>"key" And b<>"scp860" And b<>"scp714") Or (b2="Playing Card" Or b2="Mastercard") Then
+									If (b<>"misc" And b<>"25ct" And b<>"coin" And b<>"key" And b<>"scp860" And b<>"scp714") Or (b2="Playing Card" Or b2="Mastercard") Then
 										For c% = 0 To Inventory(MouseSlot)\invSlots-1
 											If (Inventory(MouseSlot)\SecondInv[c] = Null)
 												If SelectedItem <> Null Then
@@ -5447,7 +5476,7 @@ Function DrawGUI()
 												If SelectedItem <> Null Then
 													Inventory(MouseSlot)\SecondInv[c] = SelectedItem
 													Inventory(MouseSlot)\state = 1.0
-													If b<>"50ct" And b<>"coin" And b<>"key" And b<>"scp860" And b<>"scp714"
+													If b<>"25ct" And b<>"coin" And b<>"key" And b<>"scp860"
 														SetAnimTime Inventory(MouseSlot)\model,3.0
 													EndIf
 													Inventory(MouseSlot)\invimg = Inventory(MouseSlot)\itemtemplate\invimg
@@ -5580,60 +5609,72 @@ Function DrawGUI()
 			Select SelectedItem\itemtemplate\tempname
 				Case "nvgoggles"
 					;[Block]
-					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
-					If WearingNightVision = 1 Then
-						Msg = "You removed the goggles."
-						CameraFogFar = StoredCameraFogFar
+					If Wearing1499 = 0 And WearingHazmat=0 Then
+						If WearingNightVision = 1 Then
+							Msg = "You removed the goggles."
+							CameraFogFar = StoredCameraFogFar
+						Else
+							Msg = "You put on the goggles."
+							WearingGasMask = 0
+							WearingNightVision = 0
+							StoredCameraFogFar = CameraFogFar
+							CameraFogFar = 30
+						EndIf
+						
+						WearingNightVision = (Not WearingNightVision)
+					ElseIf Wearing1499 > 0 Then
+						Msg = "You need to take off SCP-1499 in order to put on the goggles."
 					Else
-						Msg = "You put on the goggles."
-						;WearingGasMask = 0
-						;Wearing178 = False
-						TakeOffStuff(1+2+8+32+64)
-						StoredCameraFogFar = CameraFogFar
-						CameraFogFar = 30
+						Msg = "You need to take off the hazmat suit in order to put on the goggles."
 					EndIf
-					
-					WearingNightVision = (Not WearingNightVision)
-					SelectedItem = Null	
-					
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 					;[End Block]
 				Case "supernv"
 					;[Block]
-					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
-					If WearingNightVision = 2 Then
-						Msg = "You removed the goggles."
-						CameraFogFar = StoredCameraFogFar
+					If Wearing1499 = 0 And WearingHazmat=0 Then
+						If WearingNightVision = 2 Then
+							Msg = "You removed the goggles."
+							CameraFogFar = StoredCameraFogFar
+						Else
+							Msg = "You put on the goggles."
+							WearingGasMask = 0
+							WearingNightVision = 0
+							StoredCameraFogFar = CameraFogFar
+							CameraFogFar = 30
+						EndIf
+						
+						WearingNightVision = (Not WearingNightVision) * 2
+					ElseIf Wearing1499 > 0 Then
+						Msg = "You need to take off SCP-1499 in order to put on the goggles."
 					Else
-						Msg = "You put on the goggles."
-						;WearingGasMask = 0
-						;Wearing178 = False
-						TakeOffStuff(1+2+8+32+64)
-						StoredCameraFogFar = CameraFogFar
-						CameraFogFar = 30
+						Msg = "You need to take off the hazmat suit in order to put on the goggles."
 					EndIf
-					
-					WearingNightVision = (Not WearingNightVision) * 2
-					SelectedItem = Null	
-					
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 					;[End Block]
 				Case "finenvgoggles"
 					;[Block]
-					;PlaySound_Strict PickSFX(SelectedItem\itemtemplate\sound)
-					If WearingNightVision = 3 Then
-						Msg = "You removed the goggles."
-						CameraFogFar = StoredCameraFogFar
-					Else
-						Msg = "You put on the goggles."
-						;WearingGasMask = 0
-						;Wearing178 = False
-						TakeOffStuff(1+2+8+32+64)
-						StoredCameraFogFar = CameraFogFar
-						CameraFogFar = 30
-					EndIf
+					If Wearing1499 = 0 And WearingHazmat = 0 Then
+						If WearingNightVision = 3 Then
+							Msg = "You removed the goggles."
+							CameraFogFar = StoredCameraFogFar
+						Else
+							Msg = "You put on the goggles."
+							WearingGasMask = 0
+							WearingNightVision = 0
+							StoredCameraFogFar = CameraFogFar
+							CameraFogFar = 30
+						EndIf
 						
-					WearingNightVision = (Not WearingNightVision) * 3
-					SelectedItem = Null	
-					
+						WearingNightVision = (Not WearingNightVision) * 3
+					ElseIf Wearing1499 > 0 Then
+						Msg = "You need to take off SCP-1499 in order to put on the goggles."
+					Else
+						Msg = "You need to take off the hazmat suit in order to put on the goggles."
+					EndIf
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 					;[End Block]
 				Case "ring"
 					;[Block]
@@ -5644,11 +5685,9 @@ Function DrawGUI()
 						;Achievements(Achv714)=True
 						Msg = "You put on the ring."
 						Wearing714 = 2
-						TakeOffStuff(1+2+8+32+64)
 					EndIf
 					MsgTimer = 70 * 5
-					SelectedItem = Null	
-					
+					SelectedItem = Null
 					;[End Block]
 				Case "1123"
 					;[Block]
@@ -5676,13 +5715,12 @@ Function DrawGUI()
 							EndIf
 						Next
 					EndIf
-					
 					;[End Block]
 				Case "battery"
 					;[Block]
 					;InvOpen = True
 					;[End Block]
-				Case "key1", "key2", "key3", "key4", "key5", "key6", "keyomni", "scp860", "hand", "hand2", "50ct"
+				Case "key1", "key2", "key3", "key4", "key5", "key6", "keyomni", "scp860", "hand", "hand2", "25ct"
 					;[Block]
 					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 					;[End Block]
@@ -5955,7 +5993,6 @@ Function DrawGUI()
 					If (Not Wearing714) Then SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])
 					
 					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
-					
 					;[End Block]
 				Case "cup"
 					;[Block]
@@ -6390,7 +6427,6 @@ Function DrawGUI()
 						EndIf
 						
 					EndIf
-					
 					;[End Block]
 				Case "cigarette"
 					;[Block]
@@ -6467,44 +6503,48 @@ Function DrawGUI()
 					;[End Block]
 				Case "hazmatsuit", "hazmatsuit2", "hazmatsuit3"
 					;[Block]
-					CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-					
-					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
-					
-					width% = 300
-					height% = 20
-					x% = GraphicWidth / 2 - width / 2
-					y% = GraphicHeight / 2 + 80
-					Rect(x, y, width+4, height, False)
-					For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
-						DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
-					Next
-					
-					SelectedItem\state = Min(SelectedItem\state+(FPSfactor/4.0),100)
-					
-					If SelectedItem\state=100 Then
-						If WearingHazmat>0 Then
-							Msg = "You removed the hazmat suit."
-							WearingHazmat = False
-							DropItem(SelectedItem)
-						Else
-							If SelectedItem\itemtemplate\tempname="hazmatsuit" Then
-								;Msg = "Hazmat1."
-								WearingHazmat = 1
-							ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2" Then
-								;Msg = "Hazmat2."
-								WearingHazmat = 2
+					If WearingVest = 0 Then
+						CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
+						
+						DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+						
+						width% = 300
+						height% = 20
+						x% = GraphicWidth / 2 - width / 2
+						y% = GraphicHeight / 2 + 80
+						Rect(x, y, width+4, height, False)
+						For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
+						Next
+						
+						SelectedItem\state = Min(SelectedItem\state+(FPSfactor/4.0),100)
+						
+						If SelectedItem\state=100 Then
+							If WearingHazmat>0 Then
+								Msg = "You removed the hazmat suit."
+								WearingHazmat = False
+								DropItem(SelectedItem)
 							Else
-								;Msg = "Hazmat3."
-								WearingHazmat = 3
+								If SelectedItem\itemtemplate\tempname="hazmatsuit" Then
+									;Msg = "Hazmat1."
+									WearingHazmat = 1
+								ElseIf SelectedItem\itemtemplate\tempname="hazmatsuit2" Then
+									;Msg = "Hazmat2."
+									WearingHazmat = 2
+								Else
+									;Msg = "Hazmat3."
+									WearingHazmat = 3
+								EndIf
+								If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+								Msg = "You put on the hazmat suit."
+								If WearingNightVision Then CameraFogFar = StoredCameraFogFar
+								WearingGasMask = 0
+								WearingNightVision = 0
 							EndIf
-							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
-							Msg = "You put on the hazmat suit."
-							TakeOffStuff(1+16)
+							SelectedItem\state=0
+							MsgTimer = 70 * 5
+							SelectedItem = Null
 						EndIf
-						SelectedItem\state=0
-						MsgTimer = 70 * 5
-						SelectedItem = Null
 					EndIf
 					;[End Block]
 				Case "vest","finevest"
@@ -6538,7 +6578,6 @@ Function DrawGUI()
 								WearingVest = 2
 							EndIf
 							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
-							TakeOffStuff(2)
 						EndIf
 						SelectedItem\state=0
 						MsgTimer = 70 * 5
@@ -6547,28 +6586,33 @@ Function DrawGUI()
 					;[End Block]
 				Case "gasmask", "supergasmask", "gasmask3"
 					;[Block]
-					If WearingGasMask Then
-						Msg = "You removed the gas mask."
-					Else
-						If SelectedItem\itemtemplate\tempname = "supergasmask"
-							Msg = "You put on the gas mask and you can breathe easier."
+					If Wearing1499 = 0 And WearingHazmat = 0 Then
+						If WearingGasMask Then
+							Msg = "You removed the gas mask."
 						Else
-							Msg = "You put on the gas mask."
+							If SelectedItem\itemtemplate\tempname = "supergasmask"
+								Msg = "You put on the gas mask and you can breathe easier."
+							Else
+								Msg = "You put on the gas mask."
+							EndIf
+							If WearingNightVision Then CameraFogFar = StoredCameraFogFar
+							WearingNightVision = 0
+							WearingGasMask = 0
 						EndIf
-						;Wearing178 = 0
-						If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-						;WearingNightVision = 0
-						TakeOffStuff(2+8+32+64)
-					EndIf
-					MsgTimer = 70 * 5
-					If SelectedItem\itemtemplate\tempname="gasmask3" Then
-						If WearingGasMask = 0 Then WearingGasMask = 3 Else WearingGasMask=0
-					ElseIf SelectedItem\itemtemplate\tempname="supergasmask"
-						If WearingGasMask = 0 Then WearingGasMask = 2 Else WearingGasMask=0
+						If SelectedItem\itemtemplate\tempname="gasmask3" Then
+							If WearingGasMask = 0 Then WearingGasMask = 3 Else WearingGasMask=0
+						ElseIf SelectedItem\itemtemplate\tempname="supergasmask"
+							If WearingGasMask = 0 Then WearingGasMask = 2 Else WearingGasMask=0
+						Else
+							WearingGasMask = (Not WearingGasMask)
+						EndIf
+					ElseIf Wearing1499 > 0 Then
+						Msg = "You need to take off SCP-1499 in order to put on the gas mask."
 					Else
-						WearingGasMask = (Not WearingGasMask)
+						Msg = "You need to take off the hazmat suit in order to put on the gas mask."
 					EndIf
-					SelectedItem = Null				
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 					;[End Block]
 				Case "navigator", "nav"
 					;[Block]
@@ -6823,7 +6867,8 @@ Function DrawGUI()
 							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
 							GiveAchievement(Achv1499)
 							If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-							TakeOffStuff(1+2+8+32)
+							WearingGasMask = 0
+							WearingNightVision = 0
 							For r.Rooms = Each Rooms
 								If r\RoomTemplate\Name = "dimension1499" Then
 									BlinkTimer = -1
@@ -6833,8 +6878,8 @@ Function DrawGUI()
 									NTF_1499PrevZ# = EntityZ(Collider)
 									
 									If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0 Then
-										PositionEntity (Collider, r\x+3319.0*RoomScale, r\y+304.0*RoomScale, r\z-2044.0*RoomScale)
-										RotateEntity Collider,0,0,0,True
+										PositionEntity (Collider, r\x+6086.0*RoomScale, r\y+304.0*RoomScale, r\z+2292.5*RoomScale)
+										RotateEntity Collider,0,90,0,True
 									Else
 										PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
 									EndIf
@@ -6939,7 +6984,7 @@ Function DrawGUI()
 					Msg = ""
 					
 					SelectedItem\state = 1
-					SelectedItem = Null
+					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 					;[End Block]
 				Case "scp427"
 					;[Block]
@@ -7233,7 +7278,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Screen gamma")
 					If MouseOn(x+270*MenuScale,y+6*MenuScale,100*MenuScale+14,20) And OnSliderID=0
-						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
+						DrawOptionsTooltip(tx,ty,tw,th,"gamma",ScreenGamma)
 					EndIf
 					
 					;y = y + 50*MenuScale
@@ -7287,7 +7332,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Music volume:")
 					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"musicvol")
+						DrawOptionsTooltip(tx,ty,tw,th,"musicvol",MusicVolume)
 					EndIf
 					
 					y = y + 30*MenuScale
@@ -7297,7 +7342,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, "Sound volume:")
 					If MouseOn(x+250*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"soundvol")
+						DrawOptionsTooltip(tx,ty,tw,th,"soundvol",PrevSFXVolume)
 					EndIf
 					
 					y = y + 30*MenuScale
@@ -7345,8 +7390,8 @@ Function DrawMenu()
 					MouseSens = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
 					Color(255, 255, 255)
 					AAText(x, y, "Mouse sensitivity:")
-					If MouseOn(x+270*MenuScale,y-4*MenuScale,100*MenuScale,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"mousesensitivity")
+					If MouseOn(x+270*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesensitivity",MouseSens)
 					EndIf
 					
 					y = y + 30*MenuScale
@@ -7357,6 +7402,17 @@ Function DrawMenu()
 					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"mouseinvert")
 					EndIf
+					
+					y = y + 40*MenuScale
+					
+					MouseSmooth = (SlideBar(x + 270*MenuScale, y-4*MenuScale, 100*MenuScale, (MouseSmooth)*50.0)/50.0)
+					Color(255, 255, 255)
+					AAText(x, y, "Mouse smoothing:")
+					If MouseOn(x+270*MenuScale,y-4*MenuScale,100*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesmoothing",MouseSmooth)
+					EndIf
+					
+					Color(255, 255, 255)
 					
 					y = y + 30*MenuScale
 					AAText(x, y, "Control configuration:")
@@ -7487,7 +7543,7 @@ Function DrawMenu()
 					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
 					EndIf
-					If MouseOn(x+150*MenuScale,y+30*MenuScale,100*MenuScale,20)
+					If MouseOn(x+150*MenuScale,y+30*MenuScale,100*MenuScale+14,20)
 						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
 					EndIf
 					
@@ -9549,114 +9605,110 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "1:1"
 					it2 = CreateItem("Playing Card", "misc", x, y, z)
 				Case "fine"
-					If Rand(6)=1 Then 
-						it2 = CreateItem("Playing Card", "misc", x, y, z)
-					Else
-						Select item\itemtemplate\name
-							Case "Level 1 Key Card"
-								Select SelectedDifficulty\otherFactors
-									Case EASY
+					Select item\itemtemplate\name
+						Case "Level 1 Key Card"
+							Select SelectedDifficulty\otherFactors
+								Case EASY
+									it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+								Case NORMAL
+									If Rand(5)=1 Then
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									Else
 										it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-									Case NORMAL
-										If Rand(5)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-										EndIf
-									Case HARD
-										If Rand(4)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
-										EndIf
-								End Select
-							Case "Level 2 Key Card"
-								Select SelectedDifficulty\otherFactors
-									Case EASY
-										it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-									Case NORMAL
-										If Rand(4)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-										EndIf
-									Case HARD
-										If Rand(3)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
-										EndIf
-								End Select
-			     			Case "Level 3 Key Card"
-								Select SelectedDifficulty\otherFactors
-									Case EASY
-										If Rand(10)=1 Then
-											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-										Else
-											it2 = CreateItem("Playing Card", "misc", x, y, z)	
-										EndIf
-									Case NORMAL
-										If Rand(15)=1 Then
-											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-										Else
-											it2 = CreateItem("Playing Card", "misc", x, y, z)	
-										EndIf
-									Case HARD
-										If Rand(20)=1 Then
-											it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
-										Else
-											it2 = CreateItem("Playing Card", "misc", x, y, z)	
-										EndIf
-								End Select
-							Case "Level 4 Key Card"
-								Select SelectedDifficulty\otherFactors
-									Case EASY
-										it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-									Case NORMAL
-										If Rand(4)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-										EndIf
-									Case HARD
-										If Rand(3)=1 Then
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										Else
-											it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
-										EndIf
-								End Select
-							Case "Level 5 Key Card"	
-								Local CurrAchvAmount%=0
-								For i = 0 To MAXACHIEVEMENTS-1
-									If Achievements(i)=True
-										CurrAchvAmount=CurrAchvAmount+1
 									EndIf
-								Next
-								
-								DebugLog CurrAchvAmount
-								
-								Select SelectedDifficulty\otherFactors
-									Case EASY
-										If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
-											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf
-									Case NORMAL
-										If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
-											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf
-									Case HARD
-										If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
-											it2 = CreateItem("Key Card Omni", "key6", x, y, z)
-										Else
-											it2 = CreateItem("Mastercard", "misc", x, y, z)
-										EndIf
-								End Select		
-						End Select
-					EndIf
+								Case HARD
+									If Rand(4)=1 Then
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									Else
+										it2 = CreateItem("Level 2 Key Card", "key2", x, y, z)
+									EndIf
+							End Select
+						Case "Level 2 Key Card"
+							Select SelectedDifficulty\otherFactors
+								Case EASY
+									it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+								Case NORMAL
+									If Rand(4)=1 Then
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									Else
+										it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+									EndIf
+								Case HARD
+									If Rand(3)=1 Then
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									Else
+										it2 = CreateItem("Level 3 Key Card", "key3", x, y, z)
+									EndIf
+							End Select
+						Case "Level 3 Key Card"
+							Select SelectedDifficulty\otherFactors
+								Case EASY
+									If Rand(10)=1 Then
+										it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+									Else
+										it2 = CreateItem("Playing Card", "misc", x, y, z)	
+									EndIf
+								Case NORMAL
+									If Rand(15)=1 Then
+										it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+									Else
+										it2 = CreateItem("Playing Card", "misc", x, y, z)	
+									EndIf
+								Case HARD
+									If Rand(20)=1 Then
+										it2 = CreateItem("Level 4 Key Card", "key4", x, y, z)
+									Else
+										it2 = CreateItem("Playing Card", "misc", x, y, z)	
+									EndIf
+							End Select
+						Case "Level 4 Key Card"
+							Select SelectedDifficulty\otherFactors
+								Case EASY
+									it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+								Case NORMAL
+									If Rand(4)=1 Then
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									Else
+										it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+									EndIf
+								Case HARD
+									If Rand(3)=1 Then
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									Else
+										it2 = CreateItem("Level 5 Key Card", "key5", x, y, z)
+									EndIf
+							End Select
+						Case "Level 5 Key Card"	
+							Local CurrAchvAmount%=0
+							For i = 0 To MAXACHIEVEMENTS-1
+								If Achievements(i)=True
+									CurrAchvAmount=CurrAchvAmount+1
+								EndIf
+							Next
+							
+							DebugLog CurrAchvAmount
+							
+							Select SelectedDifficulty\otherFactors
+								Case EASY
+									If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
+										it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+									Else
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									EndIf
+								Case NORMAL
+									If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
+										it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+									Else
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									EndIf
+								Case HARD
+									If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
+										it2 = CreateItem("Key Card Omni", "key6", x, y, z)
+									Else
+										it2 = CreateItem("Mastercard", "misc", x, y, z)
+									EndIf
+							End Select		
+					End Select
 				Case "very fine"
 					CurrAchvAmount%=0
 					For i = 0 To MAXACHIEVEMENTS-1
@@ -9706,7 +9758,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 			End Select			
 			
 			RemoveItem(item)
-		Case "Playing Card", "Coin", "50 Cent Coin"
+		Case "Playing Card", "Coin", "Quarter"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
@@ -9723,11 +9775,11 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "coarse"
-					it2 = CreateItem("50 Cent Coin", "50ct", x, y, z)
+					it2 = CreateItem("Quarter", "25ct", x, y, z)
 					Local it3.Items,it4.Items,it5.Items
-					it3 = CreateItem("50 Cent Coin", "50ct", x, y, z)
-					it4 = CreateItem("50 Cent Coin", "50ct", x, y, z)
-					it5 = CreateItem("50 Cent Coin", "50ct", x, y, z)
+					it3 = CreateItem("Quarter", "25ct", x, y, z)
+					it4 = CreateItem("Quarter", "25ct", x, y, z)
+					it5 = CreateItem("Quarter", "25ct", x, y, z)
 					EntityType (it3\collider, HIT_ITEM)
 					EntityType (it4\collider, HIT_ITEM)
 					EntityType (it5\collider, HIT_ITEM)
@@ -10699,67 +10751,6 @@ Function Rnd_Array#(numb1#,numb2#,Array1#,Array2#)
 	
 End Function
 
-Function TakeOffStuff(flag%=0)
-	;FLAG variables:
-		;1: GasMask
-		;2: Hazmat Suit
-		;4: SCP-714
-		;8: SCP-178
-		;16: Kevlar Vest
-		;32: Night Vision Goggles
-		;64: SCP-1499
-	
-	Local numb_flag% = Bin(flag%)
-	
-	If Right(numb_flag%,1) = 1
-		WearingGasMask = False
-		DebugLog "GasMask Off"
-	EndIf
-	If Len(numb_flag%)>1
-		If Mid(numb_flag%,Len(numb_flag%)-1,1) = 1
-			WearingHazmat = False
-			For i = 0 To MaxItemAmount-1
-				If Inventory(i) <> Null Then
-					If Inventory(i)\itemtemplate\name = "Hazmat Suit" Or Inventory(i)\itemtemplate\tempname = "hazmatsuit3"
-						DropItem(Inventory(i))
-						Exit
-					EndIf
-				EndIf
-			Next
-			DebugLog "Hazmat Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>2
-		If Mid(numb_flag%,Len(numb_flag%)-2,1) = 1
-			Wearing714 = False
-			DebugLog "SCP-714 Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>3
-		
-	EndIf
-	If Len(numb_flag%)>4
-		If Mid(numb_flag%,Len(numb_flag%)-4,1) = 1
-			WearingVest = False
-			DebugLog "Kevlar Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>5
-		If Mid(numb_flag%,Len(numb_flag%)-5,1) = 1
-			WearingNightVision = False
-			CameraFogFar = StoredCameraFogFar
-			DebugLog "NVG Off"
-		EndIf
-	EndIf
-	If Len(numb_flag%)>6
-		If Mid(numb_flag%,Len(numb_flag%)-6,1) = 1
-			Wearing1499 = False
-			DebugLog "SCP-1499 Off"
-		EndIf
-	EndIf
-	
-End Function
-
 ;--------------------------------------- decals -------------------------------------------------------
 
 Type Decals
@@ -11161,6 +11152,7 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
 	PutINIValue(OptionFile, "options", "particle amount", ParticleAmount)
 	PutINIValue(OptionFile, "options", "enable vram", EnableVRam)
+	PutINIValue(OptionFile, "options", "mouse smoothing", MouseSmooth)
 	
 	PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 	PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)

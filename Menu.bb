@@ -288,6 +288,10 @@ Function UpdateMainMenu()
 				CurrSave = Replace(CurrSave,"\","")
 				CurrSave = Replace(CurrSave,"<","")
 				CurrSave = Replace(CurrSave,">","")
+				CurrSave = Replace(CurrSave,"|","")
+				CurrSave = Replace(CurrSave,"?","")
+				CurrSave = Replace(CurrSave,Chr(34),"")
+				CurrSave = Replace(CurrSave,"*","")
 				
 				Color 255,255,255
 				If SelectedMap = "" Then
@@ -471,7 +475,7 @@ Function UpdateMainMenu()
 						If i <= SaveGameAmount Then
 							DrawFrame(x,y,540* MenuScale, 70* MenuScale)
 							
-							If SaveGameVersion(i - 1) <> CompatibleNumber Then
+							If SaveGameVersion(i - 1) <> CompatibleNumber And SaveGameVersion(i - 1) <> "1.3.10" Then
 								Color 255,0,0
 							Else
 								Color 255,255,255
@@ -483,7 +487,7 @@ Function UpdateMainMenu()
 							AAText(x + 20 * MenuScale, y + (10+36) * MenuScale, SaveGameVersion(i - 1))
 							
 							If SaveMSG = "" Then
-								If SaveGameVersion(i - 1) <> CompatibleNumber Then
+								If SaveGameVersion(i - 1) <> CompatibleNumber And SaveGameVersion(i - 1) <> "1.3.10" Then
 									DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
 									Color(255, 0, 0)
 									AAText(x + 330 * MenuScale, y + 34 * MenuScale, "Load", True, True)
@@ -505,7 +509,7 @@ Function UpdateMainMenu()
 								EndIf
 							Else
 								DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
-								If SaveGameVersion(i - 1) <> CompatibleNumber Then
+								If SaveGameVersion(i - 1) <> CompatibleNumber And SaveGameVersion(i - 1) <> "1.3.10" Then
 									Color(255, 0, 0)
 								Else
 									Color(100, 100, 100)
@@ -645,16 +649,9 @@ Function UpdateMainMenu()
 					ScreenGamma = (SlideBar(x + 310*MenuScale, y+6*MenuScale, 150*MenuScale, ScreenGamma*50.0)/50.0)
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Screen gamma")
-					If MouseOn(x+310*MenuScale,y+6*MenuScale,150*MenuScale,20) And OnSliderID=0
-						DrawOptionsTooltip(tx,ty,tw,th,"gamma")
+					If MouseOn(x+310*MenuScale,y+6*MenuScale,150*MenuScale+14,20) And OnSliderID=0
+						DrawOptionsTooltip(tx,ty,tw,th,"gamma",ScreenGamma)
 					EndIf
-					;Text(x + 20 * MenuScale, y + 15 * MenuScale, "(fullscreen mode only)")
-					
-					;If prevGamma<>ScreenGamma Then
-					;	UpdateScreenGamma()
-					;EndIf
-					
-					;y = y + 50*MenuScale
 					
 					y=y+50*MenuScale
 					
@@ -707,8 +704,8 @@ Function UpdateMainMenu()
 					MusicVolume = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, MusicVolume*100.0)/100.0)
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Music volume:")
-					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"musicvol")
+					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"musicvol",MusicVolume)
 					EndIf
 					
 					y = y + 40*MenuScale
@@ -718,8 +715,8 @@ Function UpdateMainMenu()
 					SFXVolume = PrevSFXVolume
 					Color 255,255,255
 					AAText(x + 20 * MenuScale, y, "Sound volume:")
-					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"soundvol")
+					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"soundvol",PrevSFXVolume)
 					EndIf
 					;If MouseDown1 Then
 					;	If MouseX() >= x And MouseX() <= x + width + 14 And MouseY() >= y And MouseY() <= y + 20 Then
@@ -819,7 +816,7 @@ Function UpdateMainMenu()
 					;[End Block]
 				ElseIf MainMenuTab = 6 ;Controls
 					;[Block]
-					height = 230 * MenuScale
+					height = 270 * MenuScale
 					DrawFrame(x, y, width, height)	
 					
 					y = y + 20*MenuScale
@@ -827,8 +824,8 @@ Function UpdateMainMenu()
 					MouseSens = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, (MouseSens+0.5)*100.0)/100.0)-0.5
 					Color(255, 255, 255)
 					AAText(x + 20 * MenuScale, y, "Mouse sensitivity:")
-					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale,20)
-						DrawOptionsTooltip(tx,ty,tw,th,"mousesensitivity")
+					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesensitivity",MouseSens)
 					EndIf
 					
 					y = y + 40*MenuScale
@@ -839,6 +836,17 @@ Function UpdateMainMenu()
 					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"mouseinvert")
 					EndIf
+					
+					y = y + 40*MenuScale
+					
+					MouseSmooth = (SlideBar(x + 310*MenuScale, y-4*MenuScale, 150*MenuScale, (MouseSmooth)*50.0)/50.0)
+					Color(255, 255, 255)
+					AAText(x + 20 * MenuScale, y, "Mouse smoothing:")
+					If MouseOn(x+310*MenuScale,y-4*MenuScale,150*MenuScale+14,20)
+						DrawOptionsTooltip(tx,ty,tw,th,"mousesmoothing",MouseSmooth)
+					EndIf
+					
+					Color(255, 255, 255)
 					
 					y = y + 30*MenuScale
 					AAText(x + 20 * MenuScale, y, "Control configuration:")
@@ -970,7 +978,7 @@ Function UpdateMainMenu()
 					If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
 					EndIf
-					If MouseOn(x+150*MenuScale,y+30*MenuScale,100*MenuScale,20)
+					If MouseOn(x+150*MenuScale,y+30*MenuScale,100*MenuScale+14,20)
 						DrawOptionsTooltip(tx,ty,tw,th,"framelimit",Framelimit)
 					EndIf
 					
@@ -2040,6 +2048,10 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 		Case "gamma"
 			txt = Chr(34)+"Gamma correction"+Chr(34)+" is used to achieve a good brightness factor to balance out your display's gamma if the game appears either too dark or bright. "
 			txt = txt + "Setting it too high or low can cause the graphics to look less detailed."
+			R = 255
+			G = 255
+			B = 255
+			txt2 = "Current value: "+Int(value*100)+"% (default is 100%)"
 		Case "texquality"
 			txt = Chr(34)+"Texture LOD Bias"+Chr(34)+" affects the distance at which texture detail will change to prevent aliasing. Change this option if textures flicker or look too blurry."
 		Case "particleamount"
@@ -2065,8 +2077,16 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			;[Block]
 		Case "musicvol"
 			txt = "Adjusts the volume of background music. Sliding the bar fully to the left will mute all music."
+			R = 255
+			G = 255
+			B = 255
+			txt2 = "Current value: "+Int(value*100)+"% (default is 50%)"
 		Case "soundvol"
 			txt = "Adjusts the volume of sound effects. Sliding the bar fully to the left will mute all sounds."
+			R = 255
+			G = 255
+			B = 255
+			txt2 = "Current value: "+Int(value*100)+"% (default is 100%)"
 		Case "sfxautorelease"
 			txt = Chr(34)+"Sound auto-release"+Chr(34)+" will free a sound from memory if it not used after 5 seconds. Prevents memory allocation issues."
 			R = 255
@@ -2089,8 +2109,18 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			;[Block]
 		Case "mousesensitivity"
 			txt = "Adjusts the speed of the mouse pointer."
+			R = 255
+			G = 255
+			B = 255
+			txt2 = "Current value: "+Int((0.5+value)*100)+"% (default is 50%)"
 		Case "mouseinvert"
 			txt = Chr(34)+"Invert mouse Y-axis"+Chr(34)+" is self-explanatory."
+		Case "mousesmoothing"
+			txt = "Adjusts the amount of smoothing of the mouse pointer."
+			R = 255
+			G = 255
+			B = 255
+			txt2 = "Current value: "+Int(value*100)+"% (default is 100%)"
 		Case "controls"
 			txt = "Configure the in-game control scheme."
 			;[End Block]

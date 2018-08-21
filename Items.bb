@@ -299,7 +299,7 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("Movie Ticket", "ticket", "GFX\items\key.b3d", "GFX\items\INVticket.jpg", "GFX\items\ticket.png", 0.002, "GFX\items\tickettexture.png","",0,1+2+8) : it\sound = 0
 	CreateItemTemplate("Old Badge", "badge", "GFX\items\badge.x", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, "GFX\items\badge2_tex.png","",0,1+2+8)
 	
-	it = CreateItemTemplate("50 Cent Coin","50ct", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","",0,1+2+8) : it\sound = 3
+	it = CreateItemTemplate("Quarter","25ct", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, "GFX\items\coin.png","",0,1+2+8) : it\sound = 3
 	it = CreateItemTemplate("Wallet","wallet", "GFX\items\wallet.b3d", "GFX\items\INVwallet.jpg", "", 0.0005,"","",1) : it\sound = 2
 	
 	CreateItemTemplate("SCP-427","scp427","GFX\items\427.b3d","GFX\items\INVscp427.jpg", "", 0.001)
@@ -455,7 +455,7 @@ Function RemoveItem(i.Items)
 				WearingGasMask = False
 			Case "vest", "finevest", "veryfinevest"
 				WearingVest = False
-			Case "hazmatsuit","hazmatsuit2"
+			Case "hazmatsuit","hazmatsuit2","hazmatsuit3"
 				WearingHazmat = False	
 			Case "scp714"
 				Wearing714 = False
@@ -479,9 +479,10 @@ End Function
 
 Function UpdateItems()
 	CatchErrors("Uncaught (UpdateItems)")
-	Local n, i.Items
+	Local n, i.Items, i2.Items
 	Local xtemp#, ytemp#, ztemp#
 	Local temp%, np.NPCs
+	Local pick%
 	
 	Local HideDist = HideDistance*0.5
 	Local deletedItem% = False
@@ -492,26 +493,29 @@ Function UpdateItems()
 		
 		If (Not i\Picked) Then
 			If i\disttimer < MilliSecs2() Then
-				i\dist = EntityDistance(Collider, i\collider)
-				i\disttimer = MilliSecs2() + Rand(600,800)
+				i\dist = EntityDistance(Camera, i\collider)
+				i\disttimer = MilliSecs2() + 700
 				If i\dist < HideDist Then ShowEntity i\collider
 			EndIf
 			
 			If i\dist < HideDist Then
 				ShowEntity i\collider
 				
-				If (Not EntityVisible(i\collider,Camera)) Then
-					;the player can't grab this
-					If (Not EntityVisible(i\collider,Collider)) Then i\dist = 2.5
-				EndIf
-				
 				If i\dist < 1.2 Then
 					If ClosestItem = Null Then
-						If EntityInView(i\model, Camera) Then ClosestItem = i
-					Else If ClosestItem = i Or i\dist < EntityDistance(Collider, ClosestItem\collider) Then 
-						If EntityInView(i\model, Camera) Then ClosestItem = i
-					End If
-				EndIf					
+						If EntityInView(i\model, Camera) Then
+							If EntityVisible(i\collider,Camera) Then
+								ClosestItem = i
+							EndIf
+						EndIf
+					ElseIf ClosestItem = i Or i\dist < EntityDistance(Camera, ClosestItem\collider) Then 
+						If EntityInView(i\model, Camera) Then
+							If EntityVisible(i\collider,Camera) Then
+								ClosestItem = i
+							EndIf
+						EndIf
+					EndIf
+				EndIf
 				
 				If EntityCollided(i\collider, HIT_MAP) Then
 					i\DropSpeed = 0
@@ -519,7 +523,7 @@ Function UpdateItems()
 					i\zspeed = 0.0
 				Else
 					If ShouldEntitiesFall
-						Local pick = LinePick(EntityX(i\collider),EntityY(i\collider),EntityZ(i\collider),0,-10,0)
+						pick = LinePick(EntityX(i\collider),EntityY(i\collider),EntityZ(i\collider),0,-10,0)
 						If pick
 							i\DropSpeed = i\DropSpeed - 0.0004 * FPSfactor
 							TranslateEntity i\collider, i\xspeed*FPSfactor, i\DropSpeed * FPSfactor, i\zspeed*FPSfactor
@@ -558,7 +562,7 @@ Function UpdateItems()
 									
 									TranslateEntity i2\collider,xtemp,0,ztemp
 									TranslateEntity i\collider,-xtemp,0,-ztemp
-								EndIf	
+								EndIf
 							EndIf
 						EndIf
 					Next
@@ -584,7 +588,7 @@ Function UpdateItems()
 		;DrawHandIcon = True
 		
 		If MouseHit1 Then PickItem(ClosestItem)
-	End If
+	EndIf
 	
 End Function
 
@@ -599,6 +603,12 @@ Function PickItem(item.Items)
 			Exit
 		EndIf
 	Next
+	
+	If WearingHazmat > 0 Then
+		Msg = "You cannot pick up any items while wearing a hazmat suit."
+		MsgTimer = 70*5
+		Return
+	EndIf
 	
 	CatchErrors("Uncaught (PickItem)")
 	If (Not fullINV) Then
@@ -729,6 +739,12 @@ Function PickItem(item.Items)
 End Function
 
 Function DropItem(item.Items,playdropsound%=True)
+	If WearingHazmat > 0 Then
+		Msg = "You cannot drop any items while wearing a hazmat suit."
+		MsgTimer = 70*5
+		Return
+	EndIf
+	
 	CatchErrors("Uncaught (DropItem)")
 	If playdropsound Then
 		If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
