@@ -1,4 +1,39 @@
-﻿v1.3.10
+﻿v1.3.11
+Save files from version 1.3.10 are compatible with this version.
+
+- Added a mouse smoothing option.
+- New voice lines for SCP-049 (as well as some remade lines).
+- Decreased SCP-049's speed from 1.6 to 1.5.
+- Decreased the spawn rate of SCP-049 (now it depends on the difficulty).
+- Decreased SCP-966's speed from 2.0 to 1.0.
+- Fixed a bug where SCP-966 would spin around in circles. They are now following the player properly.
+- Fixed a bug where SCP-966 could use keycard doors when the player has a keycard in his hand.
+- You can't get infinite stamina with an upgraded gasmask or hazmat suit anymore when you wear SCP-714.
+- Fixed a bug where item equip timers could be interrupted.
+- Added some missing waypoints and buttons to some rooms.
+- Fixed wrong adjacent doors appearing when loading the game.
+- Fixed an issue where the adjacent room assignment didn't work properly.
+- Changed the default position of the player when he spawns in SCP-1499's dimension (he faces the entrance of the church now).
+- Fixed the forest disappearing when you save in it, leave the forest and quickload the game.
+- Changed the 50 cent coins to quarters (this means that you need to insert 2 coins into SCP-294).
+- Added 2 coins to the cafeteria.
+- Made it possible to use a coin from SCP-1162 for SCP-294.
+- The player cannot pick up the drawing from SCP-1048 anymore if he has a full inventory.
+- Fixed a bug where the SCP-1048 drawing could fall through the floor, as well as the SCP-173 document from Ulgrin.
+- You cannot use, drop or pick up any items while wearing a hazmat suit.
+- The hazmat suit now protects against SCP-049 (but he can eventually break it).
+- The heavy gas mask and heavy hazmat suit now protect against the effects of SCP-895 and SCP-966.
+- Fixed mouselook jerk on lag spike.
+- The hazmat suit and vest will now be dropped when attempting to wear them but you get caught by SCP-106.
+- You cannot put SCP-714 into the wallet anymore.
+- Fixed a visual glitch in which the gorepic on SCP-895's monitor would still be displayed when taking on SCP-714, the heavy gasmask or the heavy hazmat suit.
+- Refinery system for keycards from v1.3.8 now should work correctly.
+- Updated the Map Creator Manual.
+- Added an option for the Converter and LightMapPNG tool to only convert a specific room by entering its path.
+
+----------------------------------------------------------------------------------
+
+v1.3.10
 
 - Added SCP-427.
 - New rooms (room4info, room2cpit, room2pipes2, room3_3), including improved old rooms (room2nuke, room2testroom2, room049, room2sroom).
