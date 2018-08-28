@@ -5803,7 +5803,7 @@ Function DrawGUI()
 											Exit
 										EndIf
 									Next
-									Msg = "For some inexplicable reason. You find yourself inside the pocket dimension."
+									Msg = "For some inexplicable reason, you find yourself inside the pocket dimension."
 									MsgTimer = 70*8
 								EndIf
 						End Select
@@ -5814,7 +5814,7 @@ Function DrawGUI()
 				Case "firstaid", "finefirstaid", "firstaid2"
 					;[Block]
 					If Bloodloss = 0 And Injuries = 0 Then
-						Msg = "You do not need to use a first aid right now."
+						Msg = "You do not need to use a first aid kit right now."
 						MsgTimer = 70*5
 						SelectedItem = Null
 					Else
