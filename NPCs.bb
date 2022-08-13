@@ -3333,6 +3333,17 @@ Function UpdateNPCs()
 									HideEntity ForestNPC
 								EndIf
 							EndIf
+							If ForestNPCData[1]=0.0
+								If Rand(200)=1
+									ForestNPCData[1]=FPSfactor
+									EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]+1
+								EndIf
+							ElseIf ForestNPCData[1]>0.0 And ForestNPCData[1]<5.0
+								ForestNPCData[1]=Min(ForestNPCData[1]+FPSfactor,5.0)
+							Else
+								ForestNPCData[1]=0
+								EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
+							EndIf
 						Else
 							HideEntity ForestNPC
 						EndIf
@@ -3366,14 +3377,14 @@ Function UpdateNPCs()
 											;spawn the monster between the empty cell and the cell the player is in
 											TFormPoint(((x2+x)/2)*12.0,0,((z2+z)/2)*12.0,fr\Forest_Pivot,0)
 											
+											PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+2.3, TFormedZ()
+											
 											;in view -> nope, keep searching for a more suitable cell
 											If EntityInView(n\Collider, Camera) Then
 												PositionEntity n\Collider, 0, -110, 0
 												DebugLog("spawned monster in view -> hide")
 											Else ; not in view -> all good
 												DebugLog("spawned monster successfully")
-												
-												PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+2.3, TFormedZ()
 												
 												x2 = gridsize
 												Exit												
@@ -3444,18 +3455,6 @@ Function UpdateNPCs()
 											EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
 										Else
 											ForestNPCData[2]=2
-										EndIf
-									ElseIf ForestNPCData[2]=1
-										If ForestNPCData[1]=0.0
-											If Rand(200)=1
-												ForestNPCData[1]=FPSfactor
-												EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]+1
-											EndIf
-										ElseIf ForestNPCData[1]>0.0 And ForestNPCData[1]<5.0
-											ForestNPCData[1]=Min(ForestNPCData[1]+FPSfactor,5.0)
-										Else
-											ForestNPCData[1]=0
-											EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
 										EndIf
 									EndIf
 								EndIf
@@ -7453,9 +7452,6 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#0#A#4F#6B#85#95#C5#D5#DE#EC#FB#10F#12F#159#16D#18A#1CB#1E2#203#226
-;~F#230#248#25C#27C#2AC#3A0#49B#5FE#803#89E#9FB#A00#A37#AD9#B15#BA8#C14#D28#DF7#EAE
-;~F#F61#107F#1088#1248#126F#127A#12A2#12B5#12B6#1313#1472#15BE#1640#169F#171F#174F#1775#178E#180E#18BC
-;~F#1946#1957#1971#1982#198C#19AD#1A18#1A99#1AB2#1ACB#1AD9#1AF5#1B07#1B2B#1B4E#1B5C
-;~B#197#12A9#1343#13DC#1590#169B#185C#18B8
+;~F#0
+;~B#197#12A8#1342#13DB#158F#169A#185B#18B7
 ;~C#Blitz3D
