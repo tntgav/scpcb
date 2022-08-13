@@ -1504,6 +1504,7 @@ Function UpdateEvents()
 									e\room\RoomDoors[1]\locked = True
 								EndIf
 							EndIf
+							Exit
 						EndIf
 					Next
 				Else
@@ -1522,6 +1523,7 @@ Function UpdateEvents()
 									e\room\RoomDoors[1]\locked = True
 								EndIf
 							EndIf
+							Exit
 						EndIf
 					Next
 				EndIf
@@ -1738,6 +1740,7 @@ Function UpdateEvents()
 									If (Inventory(i) <> Null) Then
 										If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Or (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvgoggles") Then
 											Inventory(i)\state2 = 0
+											Exit
 										EndIf
 									EndIf
 								Next
@@ -7460,6 +7463,7 @@ Function UpdateEvents()
 							ElseIf EntityDistance(e\room\Objects[i], Camera) > 1.0
 								GrabbedEntity = 0
 							End If
+							Exit
 						End If
 					Next
 					
@@ -8431,6 +8435,7 @@ Function UpdateEvents()
 						Else
 							EntityTexture e\room\Objects[21],e\room\Textures[1],6
 						EndIf
+						Exit
 					EndIf
 				Next
 				;[End Block]
@@ -10174,9 +10179,6 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#1#14#29#13B#343#535#545#5B1#630#68D#6B4#6C2#6CC#6D9#8CA#8EB#93F#976#983#9BD
-;~F#9CE#9EE#9F7#A01#A10#B0B#B2D#DE2#E29#E3F#E4B#E68#EB9#ED2#FA1#10A3#1123#113C#115B#11C6
-;~F#11D3#11EC#1284#1439#152D#1581#1633#16D4#1796#17A9#187A#18A7#18C4#18EB#191B#1941#1969#19BB#19F8#1A29
-;~F#1A3C#1AFD#1B6A#1B7D#1B8B#1BCF#1BF0#1CDE#1D53#1E50#1ED1#1F1F#1F24#1F73#1F79#213E
-;~B#10D3#1DD1
+;~F#A13
+;~B#10D6#1DD5
 ;~C#Blitz3D
