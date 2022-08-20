@@ -30,7 +30,7 @@ Function CreateParticle.Particles(x#, y#, z#, image%, size#, gravity# = 1.0, lif
 		Case 0,5,6
 			EntityBlend(p\obj, 1)
 		Case 1,2,3,4,7
-			EntityBlend(p\obj, BLEND_ADD)
+			EntityBlend(p\obj, 3)
 	End Select
 	
 	p\pvt = CreatePivot()
@@ -285,5 +285,5 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#4#10#2E#4A#54#66#A0#C5#D0#E0#112
+;~F#4#2E#4A#54#66#C5#D0
 ;~C#Blitz3D
