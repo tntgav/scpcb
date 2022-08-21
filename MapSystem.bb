@@ -5033,7 +5033,7 @@ Function FillRoom(r.Rooms)
 			r\Objects[1] = CreateButton(r\x - 96.0*RoomScale, r\y + 160.0 * RoomScale, r\z + 64.0 * RoomScale, 0,0,0)
 			EntityParent (r\Objects[1],r\obj)
 			
-			sc.SecurityCams = CreateSecurityCam(r\x+384.0*RoomScale, r\y+(448-64)*RoomScale, r\z-960.0*RoomScale, r, True)
+			sc.SecurityCams = CreateSecurityCam(r\x+384.0*RoomScale, r\y+(448-64)*RoomScale, r\z-960.0*RoomScale, r)
 			sc\angle = 45
 			sc\turn = 45
 			sc\room = r
