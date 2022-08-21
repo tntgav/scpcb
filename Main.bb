@@ -3258,6 +3258,7 @@ Repeat
 								Msg = "Double click on the document to view it."
 								MsgTimer=70*7
 								e\EventState3 = 50
+								Exit
 							EndIf
 						EndIf
 					EndIf
@@ -4107,7 +4108,10 @@ Function MovePlayer()
 	
 	For i = 0 To MaxItemAmount-1
 		If Inventory(i)<>Null Then
-			If Inventory(i)\itemtemplate\tempname = "finevest" Then Stamina = Min(Stamina, 60)
+			If Inventory(i)\itemtemplate\tempname = "finevest" Then
+				Stamina = Min(Stamina, 60)
+				Exit
+			EndIf
 		EndIf
 	Next
 	
@@ -5119,7 +5123,10 @@ Function DrawGUI()
 			Else
 				If isMouseOn And MouseHit1 Then
 					For z% = 0 To OtherSize - 1
-						If OtherOpen\SecondInv[z] = SelectedItem Then OtherOpen\SecondInv[z] = Null
+						If OtherOpen\SecondInv[z] = SelectedItem Then
+							OtherOpen\SecondInv[z] = Null
+							Exit
+						EndIf
 					Next
 					OtherOpen\SecondInv[n] = SelectedItem
 				EndIf
@@ -5173,7 +5180,10 @@ Function DrawGUI()
 					
 					SelectedItem\Picked = False
 					For z% = 0 To OtherSize - 1
-						If OtherOpen\SecondInv[z] = SelectedItem Then OtherOpen\SecondInv[z] = Null
+						If OtherOpen\SecondInv[z] = SelectedItem Then
+							OtherOpen\SecondInv[z] = Null
+							Exit
+						EndIf
 					Next
 					
 					isEmpty=True
@@ -5217,7 +5227,10 @@ Function DrawGUI()
 					
 					If PrevOtherOpen\SecondInv[MouseSlot] = Null Then
 						For z% = 0 To OtherSize - 1
-							If PrevOtherOpen\SecondInv[z] = SelectedItem Then PrevOtherOpen\SecondInv[z] = Null
+							If PrevOtherOpen\SecondInv[z] = SelectedItem Then
+								PrevOtherOpen\SecondInv[z] = Null
+								Exit
+							EndIf
 						Next
 						PrevOtherOpen\SecondInv[MouseSlot] = SelectedItem
 						SelectedItem = Null
@@ -5369,7 +5382,10 @@ Function DrawGUI()
 			Else
 				If isMouseOn And MouseHit1 Then
 					For z% = 0 To MaxItemAmount - 1
-						If Inventory(z) = SelectedItem Then Inventory(z) = Null
+						If Inventory(z) = SelectedItem Then
+							Inventory(z) = Null
+							Exit
+						EndIf
 					Next
 					Inventory(n) = SelectedItem
 				End If
@@ -5415,7 +5431,10 @@ Function DrawGUI()
 				Else
 					If Inventory(MouseSlot) = Null Then
 						For z% = 0 To MaxItemAmount - 1
-							If Inventory(z) = SelectedItem Then Inventory(z) = Null
+							If Inventory(z) = SelectedItem Then
+								Inventory(z) = Null
+								Exit
+							EndIf
 						Next
 						Inventory(MouseSlot) = SelectedItem
 						SelectedItem = Null
@@ -5441,6 +5460,7 @@ Function DrawGUI()
 														If Inventory(ri) = SelectedItem Then
 															Inventory(ri) = Null
 															PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+															Exit
 														EndIf
 													Next
 													added = SelectedItem
@@ -5485,6 +5505,7 @@ Function DrawGUI()
 														If Inventory(ri) = SelectedItem Then
 															Inventory(ri) = Null
 															PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+															Exit
 														EndIf
 													Next
 													added = SelectedItem
@@ -7048,8 +7069,8 @@ Function DrawGUI()
 								If IN2$ = "paper" Or IN2$ = "badge" Or IN2$ = "oldpaper" Or IN2$ = "ticket" Then
 									If a_it\itemtemplate\img<>0
 										If a_it\itemtemplate\img <> SelectedItem\itemtemplate\img
-											FreeImage(a_it\itemtemplate\img)
-											a_it\itemtemplate\img = 0
+											FreeImage(a_it\itemtemplate\img) : a_it\itemtemplate\img = 0
+											Exit
 										EndIf
 									EndIf
 								EndIf
@@ -8431,7 +8452,11 @@ Function InitNewGame()
 	
 	For r.Rooms = Each Rooms
 		For i = 0 To MaxRoomLights
-			If r\Lights[i]<>0 Then EntityParent(r\Lights[i],0)
+			If r\Lights[i]<>0 Then
+				EntityParent(r\Lights[i],0)
+			Else
+				Exit
+			EndIf
 		Next
 		
 		If (Not r\RoomTemplate\DisableDecals) Then
@@ -10890,6 +10915,7 @@ Function UpdateINIFile$(filename$)
 	For k.INIFile = Each INIFile
 		If k\name = Lower(filename) Then
 			file = k
+			Exit
 		EndIf
 	Next
 	
@@ -10917,6 +10943,7 @@ Function GetINIString$(file$, section$, parameter$, defaultvalue$="")
 	For k.INIFile = Each INIFile
 		If k\name = Lower(file) Then
 			lfile = k
+			Exit
 		EndIf
 	Next
 	
@@ -12087,6 +12114,6 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#39#D8#DCC#1618#2422#2B1E
-;~B#11DC#1454#1BF2
+;~F#39#D8#DCD#162D#242C#2B2A
+;~B#11E0#145E#1C07
 ;~C#Blitz3D
