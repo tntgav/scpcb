@@ -11850,8 +11850,8 @@ Function UpdateStreamSounds()
 					EndIf
 					If e\SoundCHN2<>0 And e\SoundCHN2_isStream Then
 						StopStream_Strict(e\SoundCHN2)
-						e\SoundCHN = 0
-						e\SoundCHN_isStream = 0
+						e\SoundCHN2 = 0
+						e\SoundCHN2_isStream = 0
 					EndIf
 				Next
 			EndIf
