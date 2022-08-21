@@ -7832,17 +7832,15 @@ Function UpdateEvents()
 											itemName = "Old Badge"
 									End Select
 									
-									Local itemExists% = False
 									For it.Items = Each Items
 										If (it\name = itemName) Then
-											itemExists = True
 											e\EventState3 = 1.0
 											e\EventState = 0.0
 											Exit
 										EndIf
 									Next
 									
-									If ((Not itemExists) And (Not isSlotEmpty)) Exit
+									If (Not isSlotEmpty) Then Exit
 								Else
 									If isSlotEmpty Then
 										e\EventState3 = 2.0
