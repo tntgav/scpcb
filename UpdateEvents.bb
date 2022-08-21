@@ -6209,7 +6209,7 @@ Function UpdateEvents()
 			Case "room205"
 				;[Block]
 				If PlayerRoom = e\room Then
-					If e\EventState=0 Or e\room\Objects[0]=0 Then
+					If e\EventState=0 Or e\EventStr <> "loaddone" Then
 						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
 							QuickLoad_CurrEvent = e
