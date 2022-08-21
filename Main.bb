@@ -3241,12 +3241,6 @@ Repeat
 		
 		DrawGUI()
 		
-		If EndingTimer < 0 Then
-			If SelectedEnding <> "" Then DrawEnding()
-		Else
-			DrawMenu()			
-		EndIf
-		
 		UpdateConsole()
 		
 		If PlayerRoom <> Null Then
@@ -3298,6 +3292,12 @@ Repeat
 		
 		Color 255, 255, 255
 		If ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
+		
+		If EndingTimer < 0 Then
+			If SelectedEnding <> "" Then DrawEnding()
+		Else
+			DrawMenu()			
+		EndIf
 		
 		DrawQuickLoading()
 		
