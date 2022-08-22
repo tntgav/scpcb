@@ -7,7 +7,7 @@ Const Achv008%=0, Achv012%=1, Achv035%=2, Achv049%=3, Achv055=4,  Achv079%=5, Ac
 Const Achv294%=10, Achv372%=11, Achv420%=12, Achv427=13, Achv500%=14, Achv513%=15, Achv714%=16, Achv789%=17, Achv860%=18, Achv895%=19
 Const Achv914%=20, Achv939%=21, Achv966%=22, Achv970=23, Achv1025%=24, Achv1048=25, Achv1123=26, Achv1162%=27, Achv1499%=28
 
-Const AchvMaynard%=29, AchvHarp%=30, AchvSNAV%=31, AchvOmni%=32, AchvConsole%=33, AchvTesla%=34, AchvPD%=35
+Const AchvMaynard%=29, AchvHarp%=30, AchvSNAV%=31, AchvOmni%=32, AchvConsole%=33, AchvTesla%=34, AchvPD%=35, AchvKeter%=36
 
 Global UsedConsole
 
