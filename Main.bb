@@ -9376,7 +9376,7 @@ End Function
 ;--------------------------------------- random -------------------------------------------------------
 
 Function f2s$(n#, count%)
-	Return Left(n, Len(Int(n))+count+1)
+	Return Left(n, Len(Int(Str(n)))+count+1)
 End Function
 
 Function AnimateNPC(n.NPCs, start#, quit#, speed#, loop=True)
