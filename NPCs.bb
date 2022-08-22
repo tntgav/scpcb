@@ -391,7 +391,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			FreeTexture tex
 			
 			EntityFX(n\obj2, 1 + 8)
-			EntityBlend(n\obj2, BLEND_ADD)
+			EntityBlend(n\obj2, 3)
 			SpriteViewMode(n\obj2, 2)
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "forestmonster", "speed") / 100.0)
@@ -6683,7 +6683,7 @@ Function UpdateMTFUnit(n.NPCs)
 							Else
 								If (Not n\Target\IsDead)
 									If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-									If n\NPCtype = NPCtypeZombie
+									If n\Target\NPCtype = NPCtypeZombie
 										n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_2.ogg")
 										PlayMTFSound(n\Sound, n)
 									Else
@@ -7453,5 +7453,5 @@ End Function
 
 ;~IDEal Editor Parameters:
 ;~F#0
-;~B#197#12A8#1342#13DB#158F#169A#185B#18B7
+;~B#197#12A9#1343#13DC#1590#169B#185C#18B8
 ;~C#Blitz3D

@@ -1504,6 +1504,7 @@ Function UpdateEvents()
 									e\room\RoomDoors[1]\locked = True
 								EndIf
 							EndIf
+							Exit
 						EndIf
 					Next
 				Else
@@ -1522,6 +1523,7 @@ Function UpdateEvents()
 									e\room\RoomDoors[1]\locked = True
 								EndIf
 							EndIf
+							Exit
 						EndIf
 					Next
 				EndIf
@@ -1738,6 +1740,7 @@ Function UpdateEvents()
 									If (Inventory(i) <> Null) Then
 										If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvgoggles") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernv") Or (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvgoggles") Then
 											Inventory(i)\state2 = 0
+											Exit
 										EndIf
 									EndIf
 								Next
@@ -4585,7 +4588,7 @@ Function UpdateEvents()
 						
 						Select e\EventState 
 							Case 2
-								i = Rand(MaxItemAmount)
+								i = Rand(0,MaxItemAmount-1)
 								If Inventory(i)<>Null Then RemoveItem(Inventory(i))								
 							Case 5
 								Injuries = Injuries + 0.3
@@ -6206,7 +6209,7 @@ Function UpdateEvents()
 			Case "room205"
 				;[Block]
 				If PlayerRoom = e\room Then
-					If e\EventState=0 Or e\room\Objects[0]=0 Then
+					If e\EventState=0 Or e\EventStr <> "loaddone" Then
 						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
 							QuickLoad_CurrEvent = e
@@ -7460,6 +7463,7 @@ Function UpdateEvents()
 							ElseIf EntityDistance(e\room\Objects[i], Camera) > 1.0
 								GrabbedEntity = 0
 							End If
+							Exit
 						End If
 					Next
 					
@@ -7828,17 +7832,15 @@ Function UpdateEvents()
 											itemName = "Old Badge"
 									End Select
 									
-									Local itemExists% = False
 									For it.Items = Each Items
 										If (it\name = itemName) Then
-											itemExists = True
 											e\EventState3 = 1.0
 											e\EventState = 0.0
 											Exit
 										EndIf
 									Next
 									
-									If ((Not itemExists) And (Not isSlotEmpty)) Exit
+									If (Not isSlotEmpty) Then Exit
 								Else
 									If isSlotEmpty Then
 										e\EventState3 = 2.0
@@ -8431,6 +8433,7 @@ Function UpdateEvents()
 						Else
 							EntityTexture e\room\Objects[21],e\room\Textures[1],6
 						EndIf
+						Exit
 					EndIf
 				Next
 				;[End Block]
@@ -10174,6 +10177,6 @@ End Function
 
 
 ;~IDEal Editor Parameters:
-;~F#A10
-;~B#10D3#1DD1
+;~F#A13
+;~B#10D6#1DD5
 ;~C#Blitz3D
