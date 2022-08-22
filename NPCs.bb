@@ -1784,7 +1784,7 @@ Function UpdateNPCs()
 													Next
 												Else
 													DeathMSG = "An active instance of SCP-049-2 was discovered in [REDACTED]. Terminated by Nine-Tailed Fox."
-													Kill()
+													Kill() : KillAnim = 0
 												EndIf
 												PlaySound_Strict HorrorSFX(13)
 												If n\Sound2 <> 0 Then FreeSound_Strict(n\Sound2)
