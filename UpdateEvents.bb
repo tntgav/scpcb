@@ -2924,7 +2924,7 @@ Function UpdateEvents()
 							HideEntity e\room\Objects[4]
 						EndIf
 						
-						If Curr106\State < -10 And e\EventState = 0 Then 
+						If Curr106\State <= -10 And e\EventState = 0 Then 
 							For i = 0 To 2
 								If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 300.0*RoomScale Then
 									;play the activation sound
@@ -2973,7 +2973,7 @@ Function UpdateEvents()
 									e\room\NPC[0]\State = 3
 								EndIf
 								
-								If Curr106\State < -10 Then
+								If Curr106\State <= -10 Then
 									For i = 0 To 2
 										If Distance(EntityX(Curr106\Collider),EntityZ(Curr106\Collider),EntityX(e\room\Objects[i],True),EntityZ(e\room\Objects[i],True)) < 250.0*RoomScale Then
 											ShowEntity Light
