@@ -3822,11 +3822,15 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("Level 1 Key Card", "key1", r\x + 736.0 * RoomScale, r\y + 240.0 * RoomScale, r\z + 752.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			
-			Local clipboard.Items = CreateItem("Clipboard","clipboard",r\x + 736.0 * RoomScale, r\y + 224.0 * RoomScale, r\z -480.0 * RoomScale)
-			EntityParent(it\collider, r\obj)
+			Local clipboard.Items = CreateItem("Clipboard","clipboard",r\x + 736.0 * RoomScale, r\y + 224.0 * RoomScale, r\z -720.0 * RoomScale)
+			EntityParent(clipboard\collider, r\obj)
 			
-			it = CreateItem("Incident Report SCP-1048-A", "paper",r\x + 736.0 * RoomScale, r\y + 224.0 * RoomScale, r\z -480.0 * RoomScale)
-			;clipboard\SecondInv[0] = it
+			it = CreateItem("Incident Report SCP-1048-A", "paper",r\x + 736.0 * RoomScale, r\y + 224.0 * RoomScale, r\z -720.0 * RoomScale)
+			it\Picked = True
+			it\Dropped = -1
+			clipboard\SecondInv[0] = it
+			SetAnimTime clipboard\model, 0.0
+			clipboard\invimg = clipboard\itemtemplate\invimg
 			HideEntity(it\collider)
 			
 			r\Objects[0]=CreatePivot(r\obj)
