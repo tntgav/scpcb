@@ -5070,7 +5070,7 @@ Function DrawGUI()
 		spacing% = 35
 		
 		x = GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
-		y = GraphicHeight / 2 - (height * OtherSize /5 + spacing * (OtherSize / 5 - 1)) / 2;height
+		y = GraphicHeight / 2 - (height * OtherSize /5 + height * (OtherSize / 5 - 1)) / 2;height
 		
 		ItemAmount = 0
 		For  n% = 0 To OtherSize - 1
@@ -5098,6 +5098,9 @@ Function DrawGUI()
 			If OtherOpen\SecondInv[n] <> Null And SelectedItem <> OtherOpen\SecondInv[n] Then
 			;drawimage(OtherOpen\SecondInv[n].InvIMG, x + width / 2 - 32, y + height / 2 - 32)
 				If isMouseOn Then
+					AASetFont Font1
+					Color 0,0,0
+					AAText(x + width / 2 + 1, y + height + spacing - 15 + 1, OtherOpen\SecondInv[n]\itemtemplate\name, True)
 					Color 255, 255, 255	
 					AAText(x + width / 2, y + height + spacing - 15, OtherOpen\SecondInv[n]\itemtemplate\name, True)				
 					If SelectedItem = Null Then
@@ -5278,7 +5281,7 @@ Function DrawGUI()
 		spacing% = 35
 		
 		x = GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
-		y = GraphicHeight / 2 - height
+		y = GraphicHeight / 2 - (height * MaxItemAmount /5 + height * (MaxItemAmount / 5 - 1)) / 2
 		
 		ItemAmount = 0
 		For  n% = 0 To MaxItemAmount - 1
@@ -9373,7 +9376,7 @@ End Function
 ;--------------------------------------- random -------------------------------------------------------
 
 Function f2s$(n#, count%)
-	Return Left(n, Len(Int(n))+count+1)
+	Return Left(n, Len(Int(Str(n)))+count+1)
 End Function
 
 Function AnimateNPC(n.NPCs, start#, quit#, speed#, loop=True)
