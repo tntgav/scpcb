@@ -340,6 +340,8 @@ Global MsgTimer#, Msg$, DeathMSG$
 
 Global AccessCode%, KeypadInput$, KeypadTimer#, KeypadMSG$
 
+Const HARPCODE% = 7816
+
 Global DrawHandIcon%
 Dim DrawArrowIcon%(4)
 
@@ -4948,7 +4950,7 @@ Function DrawGUI()
 										
 										If SelectedDoor\Code = Str(AccessCode) Then
 											GiveAchievement(AchvMaynard)
-										ElseIf SelectedDoor\Code = "7816"
+										ElseIf SelectedDoor\Code = Str(HARPCODE)
 											GiveAchievement(AchvHarp)
 										EndIf									
 										
@@ -8414,8 +8416,9 @@ Function InitNewGame()
 	
 	AccessCode = 0
 	For i = 0 To 3
-		AccessCode = AccessCode + Rand(1,9)*(10^i)
-	Next	
+		AccessCode = AccessCode + (Rand(1,9)*(10^i))
+	Next
+	If AccessCode = HARPCODE Then AccessCode = AccessCode + 1
 	
 	If SelectedMap = "" Then
 		CreateMap()
