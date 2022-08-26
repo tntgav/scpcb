@@ -3651,8 +3651,6 @@ Function QuickLoadEvents()
 						Local ch.Chunk
 						For i = -2 To 0 Step 2
 							ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#,True)
-						Next
-						For i = -2 To 0 Step 2
 							ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#-40,True)
 						Next
 						e\EventState = 2.0
@@ -8636,13 +8634,8 @@ Function InitLoadGame()
 			If e\EventState = 2
 				;[Block]
 				DrawLoading(91)
-				e\room\Objects[0] = CreatePlane()
-				Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
-				EntityTexture e\room\Objects[0],planetex%
-				FreeTexture planetex%
-				PositionEntity e\room\Objects[0],0,EntityY(e\room\obj),0
-				EntityType e\room\Objects[0],HIT_MAP
-				;EntityParent e\room\Objects[0],e\room\obj
+				e\room\Objects[0] = LoadMesh_Strict("GFX\map\dimension1499\1499plane.b3d")
+				HideEntity(e\room\Objects[0])
 				DrawLoading(92)
 				NTF_1499Sky = sky_CreateSky("GFX\map\sky\1499sky")
 				DrawLoading(93)
@@ -8657,7 +8650,8 @@ Function InitLoadGame()
 				z# = EntityZ(e\room\obj)
 				Local ch.Chunk
 				For i = -2 To 2 Step 2
-					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
+					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#,True)
+					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#-40,True)
 				Next
 				DrawLoading(98)
 				UpdateChunks(e\room,15,False)
