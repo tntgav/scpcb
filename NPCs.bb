@@ -2474,7 +2474,7 @@ Function UpdateNPCs()
 						If dist < 15.0 Then
 							
 							If WrapAngle(EntityYaw(n\Collider)-DeltaYaw(n\Collider, Collider))<90 Then
-								If EntityVisible(pvt,Collider) Then n\State = 1
+								If EntityVisible(n\Collider,Collider) Then n\State = 1
 							EndIf
 							
 						EndIf
@@ -2740,6 +2740,9 @@ Function UpdateNPCs()
 				EndIf
 				
 				If n\Frame > 286.5 And n\Frame < 288.5
+					n\IsDead = True
+				EndIf
+				If AnimTime(n\obj) > 286.5 And AnimTime(n\obj) < 288.5 Then
 					n\IsDead = True
 				EndIf
 				
