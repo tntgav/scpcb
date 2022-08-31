@@ -3789,8 +3789,11 @@ Function DrawEnding()
 					
 					Local roomamount = 0, roomsfound = 0
 					For r.Rooms = Each Rooms
-						roomamount = roomamount + 1
-						roomsfound = roomsfound + r\found
+						Local RN$ = r\RoomTemplate\Name$
+						If RN$ <> "dimension1499" And RN$ <> "gatea" And RN$ <> "pocketdimension" Then 
+							roomamount = roomamount + 1
+							roomsfound = roomsfound + r\found
+						EndIf
 					Next
 					
 					Local docamount=0, docsfound=0
