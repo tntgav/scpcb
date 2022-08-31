@@ -3333,6 +3333,17 @@ Function UpdateNPCs()
 									HideEntity ForestNPC
 								EndIf
 							EndIf
+							If ForestNPCData[1]=0.0
+								If Rand(200)=1
+									ForestNPCData[1]=FPSfactor
+									EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]+1
+								EndIf
+							ElseIf ForestNPCData[1]>0.0 And ForestNPCData[1]<5.0
+								ForestNPCData[1]=Min(ForestNPCData[1]+FPSfactor,5.0)
+							Else
+								ForestNPCData[1]=0
+								EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
+							EndIf
 						Else
 							HideEntity ForestNPC
 						EndIf
@@ -3366,14 +3377,14 @@ Function UpdateNPCs()
 											;spawn the monster between the empty cell and the cell the player is in
 											TFormPoint(((x2+x)/2)*12.0,0,((z2+z)/2)*12.0,fr\Forest_Pivot,0)
 											
+											PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+2.3, TFormedZ()
+											
 											;in view -> nope, keep searching for a more suitable cell
 											If EntityInView(n\Collider, Camera) Then
 												PositionEntity n\Collider, 0, -110, 0
 												DebugLog("spawned monster in view -> hide")
 											Else ; not in view -> all good
 												DebugLog("spawned monster successfully")
-												
-												PositionEntity n\Collider, TFormedX(), EntityY(fr\Forest_Pivot,True)+2.3, TFormedZ()
 												
 												x2 = gridsize
 												Exit												
@@ -3444,18 +3455,6 @@ Function UpdateNPCs()
 											EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
 										Else
 											ForestNPCData[2]=2
-										EndIf
-									ElseIf ForestNPCData[2]=1
-										If ForestNPCData[1]=0.0
-											If Rand(200)=1
-												ForestNPCData[1]=FPSfactor
-												EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]+1
-											EndIf
-										ElseIf ForestNPCData[1]>0.0 And ForestNPCData[1]<5.0
-											ForestNPCData[1]=Min(ForestNPCData[1]+FPSfactor,5.0)
-										Else
-											ForestNPCData[1]=0
-											EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
 										EndIf
 									EndIf
 								EndIf

@@ -6457,7 +6457,7 @@ Function UpdateEvents()
 						If e\room\NPC[0]<>Null
 							If e\room\NPC[0]\State = 0 Or EntityDistance(Collider, e\room\NPC[0]\Collider)>20.0 Then
 								e\EventState3 = e\EventState3 + (1+CurrSpeed)* FPSfactor
-								If (e\EventState3 Mod 500) < 10.0 And ((e\EventState3-FPSfactor) Mod 500) > 490.0 Then
+								If (e\EventState3 Mod 500) < 10.0 And ((e\EventState3-(1+CurrSpeed)*FPSfactor) Mod 500) > 490.0 Then
 									;If e\EventState3 > 3500 And Rnd(10000)<e\EventState3 Then
 									If e\EventState3 > 3000-(500*SelectedDifficulty\aggressiveNPCs) And Rnd(10000+(500*SelectedDifficulty\aggressiveNPCs)) < e\EventState3
 										e\room\NPC[0]\State=2
