@@ -6428,7 +6428,7 @@ Function UpdateEvents()
 						;ShowEntity fr\DetailEntities[0]
 						;ShowEntity fr\DetailEntities[1]
 						
-						UpdateForest(fr,Collider)
+						UpdateForest(fr)
 						
 						If e\EventStr = "" And QuickLoadPercent = -1
 							QuickLoadPercent = 0
@@ -6455,7 +6455,7 @@ Function UpdateEvents()
 						EndIf
 						
 						If e\room\NPC[0]<>Null
-							If e\room\NPC[0]\State = 0 Or EntityDistance(Collider, e\room\NPC[0]\Collider)>20.0 Then
+							If e\room\NPC[0]\State = 0 Or EntityDistance(Collider, e\room\NPC[0]\Collider)>HideDistance Then
 								e\EventState3 = e\EventState3 + (1+CurrSpeed)* FPSfactor
 								If (e\EventState3 Mod 500) < 10.0 And ((e\EventState3-(1+CurrSpeed)*FPSfactor) Mod 500) > 490.0 Then
 									;If e\EventState3 > 3500 And Rnd(10000)<e\EventState3 Then
@@ -6481,7 +6481,7 @@ Function UpdateEvents()
 						;EndIf
 						
 						For i = 0 To 1
-							If EntityDistance(fr\Door[i], Collider)<0.5 Then
+							If EntityDistance(fr\Door[i], Collider)<0.8 Then
 								If EntityInView(fr\Door[i], Camera) Then
 									DrawHandIcon = True
 									If MouseHit1 Then
