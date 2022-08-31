@@ -387,10 +387,13 @@ Function UpdateMainMenu()
 					
 					SeedRnd GenerateSeedNumber(RandomSeed)
 					
-					Local SameFound% = False
+					Local SameFound% = 0
 					
-					For  i% = 1 To SaveGameAmount
-						If SaveGames(i - 1) = CurrSave Then SameFound = SameFound + 1
+					For i% = 1 To SaveGameAmount
+						If (SameFound = 0 And SaveGames(i - 1) = CurrSave) Or (SameFound > 0 And SaveGames(i - 1) = CurrSave + " (" + (SameFound + 1) + ")") Then
+							SameFound = SameFound + 1
+							i = 0
+						EndIf
 					Next
 						
 					If SameFound > 0 Then CurrSave = CurrSave + " (" + (SameFound + 1) + ")"
