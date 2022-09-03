@@ -6028,9 +6028,6 @@ Function DrawGUI()
 							SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-9)
 						EndIf
 						
-						;the state of refined items is more than 1.0 (fine setting increases it by 1, very fine doubles it)
-						x2 = (SelectedItem\state+1.0)
-						
 						Local iniStr$ = "DATA\SCP-294.ini"
 						
 						Local loc% = GetINISectionLocation(iniStr, SelectedItem\name)
@@ -6057,11 +6054,11 @@ Function DrawGUI()
 						
 						DeathTimer=GetINIInt2(iniStr, loc, "deathtimer")*70
 						
-						BlinkEffect = Float(GetINIString2(iniStr, loc, "blink effect", 1.0))*x2
-						BlinkEffectTimer = Float(GetINIString2(iniStr, loc, "blink effect timer", 1.0))*x2
-						
-						StaminaEffect = Float(GetINIString2(iniStr, loc, "stamina effect", 1.0))*x2
-						StaminaEffectTimer = Float(GetINIString2(iniStr, loc, "stamina effect timer", 1.0))*x2
+						;the state of refined drinks is more than 1.0 (fine setting increases it by 1, very fine doubles it)
+						BlinkEffect = Float(GetINIString2(iniStr, loc, "blink effect", 1.0))^SelectedItem\state
+						BlinkEffectTimer = Float(GetINIString2(iniStr, loc, "blink effect timer", 1.0))*SelectedItem\state
+						StaminaEffect = Float(GetINIString2(iniStr, loc, "stamina effect", 1.0))^SelectedItem\state
+						StaminaEffectTimer = Float(GetINIString2(iniStr, loc, "stamina effect timer", 1.0))*SelectedItem\state
 						
 						strtemp = GetINIString2(iniStr, loc, "refusemessage")
 						If strtemp <> "" Then
@@ -10013,25 +10010,17 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
 							d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 						Case "1:1"
-							it2 = CreateItem("cup", "cup", x,y,z)
+							it2 = CreateItem("cup", "cup", x,y,z, 255-item\r,255-item\g,255-item\b,item\a)
 							it2\name = item\name
-							it2\r = 255-item\r
-							it2\g = 255-item\g
-							it2\b = 255-item\b
+							it2\state = item\state
 						Case "fine"
-							it2 = CreateItem("cup", "cup", x,y,z)
+							it2 = CreateItem("cup", "cup", x,y,z, Min(item\r*Rnd(0.9,1.1),255),Min(item\g*Rnd(0.9,1.1),255),Min(item\b*Rnd(0.9,1.1),255),item\a)
 							it2\name = item\name
-							it2\state = 1.0
-							it2\r = Min(item\r*Rnd(0.9,1.1),255)
-							it2\g = Min(item\g*Rnd(0.9,1.1),255)
-							it2\b = Min(item\b*Rnd(0.9,1.1),255)
+							it2\state = item\state+1.0
 						Case "very fine"
-							it2 = CreateItem("cup", "cup", x,y,z)
+							it2 = CreateItem("cup", "cup", x,y,z, Min(item\r*Rnd(0.5,1.5),255),Min(item\g*Rnd(0.5,1.5),255),Min(item\b*Rnd(0.5,1.5),255),item\a)
 							it2\name = item\name
-							it2\state = Max(it2\state*2.0,2.0)	
-							it2\r = Min(item\r*Rnd(0.5,1.5),255)
-							it2\g = Min(item\g*Rnd(0.5,1.5),255)
-							it2\b = Min(item\b*Rnd(0.5,1.5),255)
+							it2\state = item\state*2
 							If Rand(5)=1 Then
 								ExplosionTimer = 135
 							EndIf
