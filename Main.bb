@@ -10075,7 +10075,7 @@ Function Use294()
 	temp = True
 	If PlayerRoom\SoundCHN<>0 Then temp = False
 	
-	AAText x+907, y+185, Input294, True,True
+	AAText x+905, y+185, Right(Input294,13), True,True
 	
 	If temp Then
 		If MouseHit1 Then
@@ -10169,8 +10169,6 @@ Function Use294()
 			EndIf
 			
 			Input294 = Input294 + strtemp
-			
-			Input294 = Left(Input294, Min(Len(Input294),15))
 			
 			If temp And Input294<>"" Then ;dispense
 				Input294 = Trim(Lower(Input294))
@@ -11044,12 +11042,13 @@ Function GetINISectionLocation%(file$, section$)
 		If Left(strtemp,1) = "[" Then
 			strtemp$ = Lower(strtemp)
 			Temp = Instr(strtemp, section)
-			If Temp>0 Then
-				If Mid(strtemp, Temp-1, 1)="[" Or Mid(strtemp, Temp-1, 1)="|" Then
+			While Temp>0
+				If (Mid(strtemp, Temp-1, 1)="[" Or Mid(strtemp, Temp-1, 1)="|") And (Mid(strtemp, Temp+Len(section), 1)="]" Or Mid(strtemp, Temp+Len(section), 1)="|") Then
 					CloseFile f
 					Return n
 				EndIf
-			EndIf
+				Temp = Instr(strtemp, section, Temp+Len(section)+1)
+			Wend
 		EndIf
 	Wend
 	
