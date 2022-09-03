@@ -6034,6 +6034,9 @@ Function DrawGUI()
 						
 						;Stop
 						
+						strtemp = GetINIString2(iniStr, loc, "sound")
+						If strtemp <> "" Then PlaySound_Strict LoadTempSound(strtemp)
+						
 						strtemp = GetINIString2(iniStr, loc, "message")
 						If strtemp <> "" Then Msg = strtemp : MsgTimer = 70*6
 						
@@ -6041,26 +6044,32 @@ Function DrawGUI()
 							DeathMSG = GetINIString2(iniStr, loc, "deathmessage")
 							If GetINIInt2(iniStr, loc, "lethal") Then Kill()
 						EndIf
-						BlurTimer = Max(BlurTimer + GetINIInt2(iniStr, loc, "blur")*70, 0);*temp
-						If VomitTimer = 0 Then
-							VomitTimer = GetINIInt2(iniStr, loc, "vomit")
-						Else
-							VomitTimer = Min(VomitTimer, GetINIInt2(iniStr, loc, "vomit"))
-						EndIf
-						CameraShakeTimer = Max(CameraShakeTimer + GetINIString2(iniStr, loc, "camerashake"), 0)
-						Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
-						Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"),0);*temp
-						strtemp = GetINIString2(iniStr, loc, "sound")
-						If strtemp <> "" Then
-							PlaySound_Strict LoadTempSound(strtemp)
-						EndIf
-						If GetINIInt2(iniStr, loc, "stomachache") Then SCP1025state[3]=1
 						
-						If DeathTimer = 0 Then
-							DeathTimer = GetINIInt2(iniStr, loc, "deathtimer")*70
-						Else
-							DeathTimer = Min(DeathTimer, GetINIInt2(iniStr, loc, "deathtimer")*70)
+						BlurTimer = Max(BlurTimer + GetINIInt2(iniStr, loc, "blur")*70, 0);*temp
+						CameraShakeTimer = Max(CameraShakeTimer + GetINIString2(iniStr, loc, "camerashake"), 0)
+						
+						temp = GetINIInt2(iniStr, loc, "vomit")*70
+						If temp > 0 Then
+							If VomitTimer = 0 Then
+								VomitTimer = temp
+							Else
+								VomitTimer = Min(VomitTimer, temp)
+							EndIf
 						EndIf
+						
+						temp = GetINIInt2(iniStr, loc, "deathtimer")*70
+						If temp > 0 Then
+							If DeathTimer = 0 Then
+								DeathTimer = temp
+							Else
+								DeathTimer = Min(DeathTimer, temp)
+							EndIf
+						EndIf
+						
+						Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"), 0);*temp
+						Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"), 0);*temp
+						
+						If GetINIInt2(iniStr, loc, "stomachache") Then SCP1025state[3]=1
 						
 						;the state of refined drinks is more than 1.0 (fine setting increases it by 1, very fine doubles it)
 						strtemp = GetINIString2(iniStr, loc, "blink effect")
