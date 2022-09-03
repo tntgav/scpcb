@@ -6021,16 +6021,16 @@ Function DrawGUI()
 				Case "cup"
 					;[Block]
 					If CanUseItem(False,False,True)
-						SelectedItem\name = Trim(Lower(SelectedItem\name))
-						If Left(SelectedItem\name, Min(6,Len(SelectedItem\name))) = "cup of" Then
-							SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-7)
-						ElseIf Left(SelectedItem\name, Min(8,Len(SelectedItem\name))) = "a cup of" 
-							SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-9)
+						strtemp = Trim(Lower(SelectedItem\name))
+						If Left(strtemp, 6) = "cup of" Then
+							strtemp = Right(strtemp, Len(strtemp)-7)
+						ElseIf Left(strtemp, 8) = "a cup of"
+							strtemp = Right(strtemp, Len(strtemp)-9)
 						EndIf
 						
 						Local iniStr$ = "DATA\SCP-294.ini"
 						
-						Local loc% = GetINISectionLocation(iniStr, SelectedItem\name)
+						Local loc% = GetINISectionLocation(iniStr, strtemp)
 						
 						;Stop
 						
@@ -6041,24 +6041,36 @@ Function DrawGUI()
 							DeathMSG = GetINIString2(iniStr, loc, "deathmessage")
 							If GetINIInt2(iniStr, loc, "lethal") Then Kill()
 						EndIf
-						BlurTimer = GetINIInt2(iniStr, loc, "blur")*70;*temp
-						If VomitTimer = 0 Then VomitTimer = GetINIInt2(iniStr, loc, "vomit")
-						CameraShakeTimer = GetINIString2(iniStr, loc, "camerashake")
+						BlurTimer = Max(BlurTimer + GetINIInt2(iniStr, loc, "blur")*70, 0);*temp
+						If VomitTimer = 0 Then
+							VomitTimer = GetINIInt2(iniStr, loc, "vomit")
+						Else
+							VomitTimer = Min(VomitTimer, GetINIInt2(iniStr, loc, "vomit"))
+						EndIf
+						CameraShakeTimer = Max(CameraShakeTimer + GetINIString2(iniStr, loc, "camerashake"), 0)
 						Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
 						Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"),0);*temp
-						strtemp =  GetINIString2(iniStr, loc, "sound")
-						If strtemp<>"" Then
+						strtemp = GetINIString2(iniStr, loc, "sound")
+						If strtemp <> "" Then
 							PlaySound_Strict LoadTempSound(strtemp)
 						EndIf
 						If GetINIInt2(iniStr, loc, "stomachache") Then SCP1025state[3]=1
 						
-						DeathTimer=GetINIInt2(iniStr, loc, "deathtimer")*70
+						If DeathTimer = 0 Then
+							DeathTimer = GetINIInt2(iniStr, loc, "deathtimer")*70
+						Else
+							DeathTimer = Min(DeathTimer, GetINIInt2(iniStr, loc, "deathtimer")*70)
+						EndIf
 						
 						;the state of refined drinks is more than 1.0 (fine setting increases it by 1, very fine doubles it)
-						BlinkEffect = Float(GetINIString2(iniStr, loc, "blink effect", 1.0))^SelectedItem\state
-						BlinkEffectTimer = Float(GetINIString2(iniStr, loc, "blink effect timer", 1.0))*SelectedItem\state
-						StaminaEffect = Float(GetINIString2(iniStr, loc, "stamina effect", 1.0))^SelectedItem\state
-						StaminaEffectTimer = Float(GetINIString2(iniStr, loc, "stamina effect timer", 1.0))*SelectedItem\state
+						strtemp = GetINIString2(iniStr, loc, "blink effect")
+						If strtemp <> "" Then BlinkEffect = Float(strtemp)^SelectedItem\state
+						strtemp = GetINIString2(iniStr, loc, "blink effect timer")
+						If strtemp <> "" Then BlinkEffectTimer = Float(strtemp)*SelectedItem\state
+						strtemp = GetINIString2(iniStr, loc, "stamina effect")
+						If strtemp <> "" Then StaminaEffect = Float(strtemp)^SelectedItem\state
+						strtemp = GetINIString2(iniStr, loc, "stamina effect timer")
+						If strtemp <> "" Then StaminaEffectTimer = Float(strtemp)*SelectedItem\state
 						
 						strtemp = GetINIString2(iniStr, loc, "refusemessage")
 						If strtemp <> "" Then

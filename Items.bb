@@ -800,7 +800,7 @@ Function Update294()
 	CatchErrors("Uncaught (Update294)")
 	
 	If CameraShakeTimer > 0 Then
-		CameraShakeTimer = CameraShakeTimer - (FPSfactor/70)
+		CameraShakeTimer = Max(CameraShakeTimer - (FPSfactor/70), 0)
 		CameraShake = 2
 	EndIf
 	
