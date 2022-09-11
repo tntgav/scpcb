@@ -667,6 +667,7 @@ Function RemoveNPC(n.NPCs)
 	Delete n
 End Function
 
+Global TakeOffTimer#
 
 Function UpdateNPCs()
 	CatchErrors("Uncaught (UpdateNPCs)")
@@ -1744,19 +1745,23 @@ Function UpdateNPCs()
 											BlurTimer = BlurTimer+FPSfactor*2.5
 											If BlurTimer>250 And BlurTimer-FPSfactor*2.5 <= 250 And n\PrevState<>3 Then
 												If n\SoundChn2 <> 0 Then StopChannel(n\SoundChn2)
+											If TakeOffTimer>100 And TakeOffTimer-FPSfactor*1.5 <= 100 And (Not ChannelPlaying(n\SoundChn2)) Then
 												n\SoundChn2 = PlaySound_Strict(LoadTempSound("SFX\SCP\049\TakeOffHazmat.ogg"))
-												n\PrevState=3
-											ElseIf BlurTimer => 500
+											ElseIf TakeOffTimer => 500
 												For i = 0 To MaxItemAmount-1
 													If Inventory(i)<>Null Then
 														If Instr(Inventory(i)\itemtemplate\tempname,"hazmatsuit") And WearingHazmat<3 Then
 															If Inventory(i)\state2 < 3 Then
 																Inventory(i)\state2 = Inventory(i)\state2 + 1
-																BlurTimer = 260.0
+																TakeOffTimer = 260.0
 																CameraShake = 2.0
 															Else
 																RemoveItem(Inventory(i))
 																WearingHazmat = False
+																PlaySound_Strict(PickSFX(2))
+																Msg="The hazmat suit was destroyed."
+																MsgTimer=70*5
+																TakeOffTimer = 0.0
 															EndIf
 															Exit
 														EndIf
@@ -1764,17 +1769,18 @@ Function UpdateNPCs()
 												Next
 											EndIf
 										ElseIf Wearing714 Then
-											BlurTimer = BlurTimer+FPSfactor*2.5
-											If BlurTimer>250 And BlurTimer-FPSfactor*2.5 <= 250 And n\PrevState<>3 Then
-												If n\SoundChn2 <> 0 Then StopChannel(n\SoundChn2)
+											TakeOffTimer=Min(TakeOffTimer+(FPSfactor*1.5),500)
+											If TakeOffTimer>100 And TakeOffTimer-FPSfactor*1.5 <= 100 And (Not ChannelPlaying(n\SoundChn2)) Then
 												n\SoundChn2 = PlaySound_Strict(LoadTempSound("SFX\SCP\049\714Equipped.ogg"))
-												n\PrevState=3
-											ElseIf BlurTimer => 500
+											ElseIf TakeOffTimer => 500
 												Wearing714=False
+												PlaySound_Strict(PickSFX(3))
+												Msg="The ring was forcibly removed."
+												MsgTimer=70*5
+												TakeOffTimer = 0.0
 											EndIf
 										Else
 											CurrCameraZoom = 20.0
-											BlurTimer = 500.0
 											
 											If (Not GodMode) Then
 												If PlayerRoom\RoomTemplate\Name$ = "room049"
@@ -1794,10 +1800,12 @@ Function UpdateNPCs()
 											EndIf										
 										EndIf
 									Else
+										If TakeOffTimer>0 Then
+											TakeOffTimer=Max(TakeOffTimer-FPSfactor,0.0)
+										EndIf
+										
 										n\CurrSpeed = CurveValue(n\Speed, n\CurrSpeed, 20.0)
 										MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor	
-										
-										If n\PrevState = 3 Then n\PrevState = 2
 										
 										If dist < 3.0 Then
 											AnimateNPC(n, Max(Min(AnimTime(n\obj),428.0),387), 463.0, n\CurrSpeed*38)

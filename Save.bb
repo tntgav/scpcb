@@ -1265,6 +1265,7 @@ Function LoadGame(file$)
 	EndIf
 	
 	UpdateDoorsTimer = 0
+	TakeOffTimer = 0
 	
 	CatchErrors("LoadGame")
 End Function
@@ -1994,6 +1995,8 @@ Function LoadGameQuick(file$)
 	;Resetting some stuff (those get changed when going to the endings)
 	CameraFogMode(Camera, 1)
 	HideDistance# = 15.0
+	
+	TakeOffTimer = 0
 	
 	CatchErrors("LoadGameQuick")
 End Function
