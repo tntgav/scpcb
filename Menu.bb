@@ -1141,7 +1141,7 @@ Function UpdateLauncher()
 	MenuWhite = LoadImage_Strict("GFX\menu\menuwhite.jpg")
 	MenuBlack = LoadImage_Strict("GFX\menu\menublack.jpg")	
 	MaskImage MenuBlack, 255,255,0
-	LauncherIMG = LoadImage_Strict("GFX\menu\launcher.jpg")
+	LauncherIMG = LoadImage_Strict("GFX\menu\launcher.png")
 	Local i%	
 	
 	For i = 0 To 3
