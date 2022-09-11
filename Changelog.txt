@@ -1,4 +1,40 @@
-﻿v1.3.11
+﻿v1.3.12
+
+- Fixed crashing when loading a save done while wearing SCP-1499.
+- Fixed crashing when loading a save done in SCP-205's containment chamber.
+- Fixed interacting with SCP-1162 sometimes injuring the player when their inventory isn't empty.
+- Fixed MTFs not announcing the presence of SCP-049-2.
+- Fixes to the generation of the SCP-860-1 (the forest).
+- Fixes SCP-860-2 (the forest guardian) sometimes spawning in the player's field of view.
+- Fixed notes found in the forest being scaled down more than intended.
+- Fixed UI messages being visible in the pause menu or console.
+- Fixed inability to unlock both of the achievements for reaching Dr. Harps and Dr. Maynard's offices if the random access code happens to be the same for both rooms.
+- Fixed SCP-1025's appendicitis messages not showing up.
+- Fixed a bugged monitor model positioned in the world center. It was sometimes possible to see this monitor after dying.
+- Fixed duplicate buttons on SCP-294's keyboard.
+- Fixed SCP-860-2's eyes and certain particles rendering incorrectly (using alpha blending instead of additive blending).
+- Fixed certain locations such as the exterior area of Gate A and the place you appear in while wearing SCP-1499, contributing to "rooms found" despite not really being 'rooms'.
+- Fixed UI button sounds not working when not using the launcher.
+- Fixed framelimit tooltip showing up in the settings menu even if the framelimit slider is hidden.
+- Fixed certain inventory texts being rendered with an incorrect font while wearing the night vision goggles.
+- Fixed some inconsistencies in the positioning of the inventory slots.
+- Fixed tesla gates occasionally not reacting to SCP-106.
+- Fixed occasional MAVs when travelling through SCP-970 results in an item disappearing from the player's inventory.
+- Fixed items in the room affected by SCP-970 sometimes spawning in incorrect positions.
+- Fixed SCP-049's grabbing animation not being visible if you happen to fall down face-first when getting caught by it.
+- Fixed an incorrect type of door being used in the Heavy Containment Zone's deadend checkpoint rooms.
+- Fixed saves ending in (2) being overwritten instead of creating a new save ending in (3).
+- Fixed sprite tiling issues in some menus.
+- Fixed the floor of the area you appear in while wearing SCP-1499 getting duplicated after loading a save.
+- Fixed SCP-966 instances playing their idle sounds much more frequently than intended.
+- Fixed several SCP-966 animation issues.
+- Fixed debuff messages when affected by SCP-966 not being shown.
+- Fixed sprinting and walking sound volumes not working as intended.
+- Fixed green dots in the launcher on AMD GPUs.
+
+----------------------------------------------------------------------------------
+
+v1.3.11
 Save files from version 1.3.10 are compatible with this version.
 
 - Added a mouse smoothing option.
