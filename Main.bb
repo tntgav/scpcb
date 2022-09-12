@@ -948,9 +948,11 @@ Function UpdateConsole()
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
 							n\State = 0
-							StopStream_Strict(n\SoundChn) : n\SoundChn=0
+							If n\SoundChn<>0
+								StopStream_Strict(n\SoundChn) : n\SoundChn=0 : n\SoundChn_isStream = False
+							EndIf
 							If n\SoundChn2<>0
-								StopStream_Strict(n\SoundChn2) : n\SoundChn2=0
+								StopStream_Strict(n\SoundChn2) : n\SoundChn2=0 : n\SoundChn2_isStream = False
 							EndIf
 							Exit
 						EndIf
@@ -9064,14 +9066,14 @@ Function PauseSounds()
 	For e.events = Each Events
 		If e\soundchn <> 0 Then
 			If (Not e\soundchn_isstream)
-				If ChannelPlaying(e\soundchn) Then PauseChannel(e\soundchn)
+				PauseChannel(e\soundchn)
 			Else
 				SetStreamPaused_Strict(e\soundchn,True)
 			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
 			If (Not e\soundchn2_isstream)
-				If ChannelPlaying(e\soundchn2) Then PauseChannel(e\soundchn2)
+				PauseChannel(e\soundchn2)
 			Else
 				SetStreamPaused_Strict(e\soundchn2,True)
 			EndIf
@@ -9081,42 +9083,46 @@ Function PauseSounds()
 	For n.npcs = Each NPCs
 		If n\soundchn <> 0 Then
 			If (Not n\soundchn_isstream)
-				If ChannelPlaying(n\soundchn) Then PauseChannel(n\soundchn)
+				PauseChannel(n\soundchn)
 			Else
-				If n\soundchn_isstream=True
-					SetStreamPaused_Strict(n\soundchn,True)
-				EndIf
+				SetStreamPaused_Strict(n\soundchn,True)
 			EndIf
 		EndIf
 		If n\soundchn2 <> 0 Then
 			If (Not n\soundchn2_isstream)
-				If ChannelPlaying(n\soundchn2) Then PauseChannel(n\soundchn2)
+				PauseChannel(n\soundchn2)
 			Else
-				If n\soundchn2_isstream=True
-					SetStreamPaused_Strict(n\soundchn2,True)
-				EndIf
+				SetStreamPaused_Strict(n\soundchn2,True)
 			EndIf
 		EndIf
 	Next	
 	
 	For d.doors = Each Doors
 		If d\soundchn <> 0 Then
-			If ChannelPlaying(d\soundchn) Then PauseChannel(d\soundchn)
+			PauseChannel(d\soundchn)
 		EndIf
 	Next
 	
 	For dem.DevilEmitters = Each DevilEmitters
 		If dem\soundchn <> 0 Then
-			If ChannelPlaying(dem\soundchn) Then PauseChannel(dem\soundchn)
+			PauseChannel(dem\soundchn)
 		EndIf
 	Next
 	
 	If AmbientSFXCHN <> 0 Then
-		If ChannelPlaying(AmbientSFXCHN) Then PauseChannel(AmbientSFXCHN)
+		PauseChannel(AmbientSFXCHN)
 	EndIf
 	
 	If BreathCHN <> 0 Then
-		If ChannelPlaying(BreathCHN) Then PauseChannel(BreathCHN)
+		PauseChannel(BreathCHN)
+	EndIf
+	
+	If CoughCHN <> 0 Then
+		PauseChannel(CoughCHN)
+	EndIf
+	
+	If VomitCHN <> 0 Then
+		PauseChannel(VomitCHN)
 	EndIf
 	
 	If IntercomStreamCHN <> 0
@@ -9128,14 +9134,14 @@ Function ResumeSounds()
 	For e.events = Each Events
 		If e\soundchn <> 0 Then
 			If (Not e\soundchn_isstream)
-				If ChannelPlaying(e\soundchn) Then ResumeChannel(e\soundchn)
+				ResumeChannel(e\soundchn)
 			Else
 				SetStreamPaused_Strict(e\soundchn,False)
 			EndIf
 		EndIf
 		If e\soundchn2 <> 0 Then
 			If (Not e\soundchn2_isstream)
-				If ChannelPlaying(e\soundchn2) Then ResumeChannel(e\soundchn2)
+				ResumeChannel(e\soundchn2)
 			Else
 				SetStreamPaused_Strict(e\soundchn2,False)
 			EndIf
@@ -9145,42 +9151,46 @@ Function ResumeSounds()
 	For n.npcs = Each NPCs
 		If n\soundchn <> 0 Then
 			If (Not n\soundchn_isstream)
-				If ChannelPlaying(n\soundchn) Then ResumeChannel(n\soundchn)
+				ResumeChannel(n\soundchn)
 			Else
-				If n\soundchn_isstream=True
-					SetStreamPaused_Strict(n\soundchn,False)
-				EndIf
+				SetStreamPaused_Strict(n\soundchn,False)
 			EndIf
 		EndIf
 		If n\soundchn2 <> 0 Then
 			If (Not n\soundchn2_isstream)
-				If ChannelPlaying(n\soundchn2) Then ResumeChannel(n\soundchn2)
+				ResumeChannel(n\soundchn2)
 			Else
-				If n\soundchn2_isstream=True
-					SetStreamPaused_Strict(n\soundchn2,False)
-				EndIf
+				SetStreamPaused_Strict(n\soundchn2,False)
 			EndIf
 		EndIf
 	Next	
 	
 	For d.doors = Each Doors
 		If d\soundchn <> 0 Then
-			If ChannelPlaying(d\soundchn) Then ResumeChannel(d\soundchn)
+			ResumeChannel(d\soundchn)
 		EndIf
 	Next
 	
 	For dem.DevilEmitters = Each DevilEmitters
 		If dem\soundchn <> 0 Then
-			If ChannelPlaying(dem\soundchn) Then ResumeChannel(dem\soundchn)
+			ResumeChannel(dem\soundchn)
 		EndIf
 	Next
 	
 	If AmbientSFXCHN <> 0 Then
-		If ChannelPlaying(AmbientSFXCHN) Then ResumeChannel(AmbientSFXCHN)
+		ResumeChannel(AmbientSFXCHN)
 	EndIf	
 	
 	If BreathCHN <> 0 Then
-		If ChannelPlaying(BreathCHN) Then ResumeChannel(BreathCHN)
+		ResumeChannel(BreathCHN)
+	EndIf
+	
+	If CoughCHN <> 0 Then
+		ResumeChannel(CoughCHN)
+	EndIf
+	
+	If VomitCHN <> 0 Then
+		ResumeChannel(VomitCHN)
 	EndIf
 	
 	If IntercomStreamCHN <> 0
@@ -9197,54 +9207,68 @@ Function KillSounds()
 	For e.Events = Each Events
 		If e\SoundCHN <> 0 Then
 			If (Not e\SoundCHN_isStream)
-				If ChannelPlaying(e\SoundCHN) Then StopChannel(e\SoundCHN)
+				StopChannel(e\SoundCHN)
 			Else
-				StopStream_Strict(e\SoundCHN)
+				StopStream_Strict(e\SoundCHN) : e\SoundCHN_isStream = False
 			EndIf
+			e\SoundCHN = 0
 		EndIf
 		If e\SoundCHN2 <> 0 Then
 			If (Not e\SoundCHN2_isStream)
-				If ChannelPlaying(e\SoundCHN2) Then StopChannel(e\SoundCHN2)
+				StopChannel(e\SoundCHN2)
 			Else
-				StopStream_Strict(e\SoundCHN2)
+				StopStream_Strict(e\SoundCHN2) : e\SoundCHN2_isStream = False
 			EndIf
+			e\SoundCHN2 = 0
 		EndIf		
 	Next
 	For n.NPCs = Each NPCs
 		If n\SoundChn <> 0 Then
 			If (Not n\SoundChn_IsStream)
-				If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
+				StopChannel(n\SoundChn)
 			Else
-				StopStream_Strict(n\SoundChn)
+				StopStream_Strict(n\SoundChn) : n\SoundChn_isStream = False
 			EndIf
+			n\SoundChn = 0
 		EndIf
 		If n\SoundChn2 <> 0 Then
 			If (Not n\SoundChn2_IsStream)
-				If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
+				StopChannel(n\SoundChn2)
 			Else
-				StopStream_Strict(n\SoundChn2)
+				StopStream_Strict(n\SoundChn2) : n\SoundChn2_isStream = False
 			EndIf
+			n\SoundChn2 = 0
 		EndIf
 	Next	
 	For d.Doors = Each Doors
 		If d\SoundCHN <> 0 Then
-			If ChannelPlaying(d\SoundCHN) Then StopChannel(d\SoundCHN)
+			StopChannel(d\SoundCHN) : d\SoundCHN = 0
 		EndIf
 	Next
 	For dem.DevilEmitters = Each DevilEmitters
 		If dem\SoundCHN <> 0 Then
-			If ChannelPlaying(dem\SoundCHN) Then StopChannel(dem\SoundCHN)
+			StopChannel(dem\SoundCHN) : dem\SoundCHN = 0
 		EndIf
 	Next
 	If AmbientSFXCHN <> 0 Then
-		If ChannelPlaying(AmbientSFXCHN) Then StopChannel(AmbientSFXCHN)
+		StopChannel(AmbientSFXCHN) : AmbientSFXCHN = 0
 	EndIf
 	If BreathCHN <> 0 Then
-		If ChannelPlaying(BreathCHN) Then StopChannel(BreathCHN)
+		StopChannel(BreathCHN) : BreathCHN = 0
 	EndIf
+	If CoughCHN <> 0 Then
+		StopChannel(CoughCHN) : CoughCHN = 0
+	EndIf
+	If VomitCHN <> 0 Then
+		StopChannel(VomitCHN) : VomitCHN = 0
+	EndIf
+	For i = 0 To 6
+		If RadioCHN(i) <> 0 Then
+			StopChannel(RadioCHN(i)) : RadioCHN(i) = 0
+		EndIf
+	Next
 	If IntercomStreamCHN <> 0
-		StopStream_Strict(IntercomStreamCHN)
-		IntercomStreamCHN = 0
+		StopStream_Strict(IntercomStreamCHN) : IntercomStreamCHN = 0
 	EndIf
 	If EnableSFXRelease
 		For snd.Sound = Each Sound
@@ -9259,7 +9283,7 @@ Function KillSounds()
 	For snd.Sound = Each Sound
 		For i = 0 To 31
 			If snd\channels[i]<>0 Then
-				StopChannel snd\channels[i]
+				StopChannel snd\channels[i] : snd\channels[i] = 0
 			EndIf
 		Next
 	Next
@@ -9326,42 +9350,50 @@ Function GetStepSound(entity%)
 End Function
 
 Function UpdateSoundOrigin2(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
-	range# = Max(range,1.0)
-	
-	If volume>0 Then
-		
-		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 - dist# > 0 And 1 - dist# < 1 Then
+	If Chn <> 0 Then
+		If ChannelPlaying(Chn) Then
+			range# = Max(range,1.0)
 			
-			Local panvalue# = Sin(-DeltaYaw(cam,entity))
-			
-			ChannelVolume(Chn, volume# * (1 - dist#))
-			ChannelPan(Chn, panvalue)
+			If volume>0 Then
+				
+				Local dist# = EntityDistance(cam, entity) / range#
+				If 1 - dist# > 0 And 1 - dist# < 1 Then
+					
+					Local panvalue# = Sin(-DeltaYaw(cam,entity))
+					
+					ChannelVolume(Chn, volume# * (1 - dist#))
+					ChannelPan(Chn, panvalue)
+				Else
+					ChannelVolume (Chn, 0)
+				EndIf
+			Else
+				ChannelVolume (Chn, 0)
+			EndIf
 		EndIf
-	Else
-		If Chn <> 0 Then
-			ChannelVolume (Chn, 0)
-		EndIf 
 	EndIf
 End Function
 
 Function UpdateSoundOrigin(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
-	range# = Max(range,1.0)
-	
-	If volume>0 Then
-		
-		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 - dist# > 0 And 1 - dist# < 1 Then
+	If Chn <> 0 Then
+		If ChannelPlaying(Chn) Then
+			range# = Max(range,1.0)
 			
-			Local panvalue# = Sin(-DeltaYaw(cam,entity))
-			
-			ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
-			ChannelPan(Chn, panvalue)
+			If volume>0 Then
+				
+				Local dist# = EntityDistance(cam, entity) / range#
+				If 1 - dist# > 0 And 1 - dist# < 1 Then
+					
+					Local panvalue# = Sin(-DeltaYaw(cam,entity))
+					
+					ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
+					ChannelPan(Chn, panvalue)
+				Else
+					ChannelVolume (Chn, 0)
+				EndIf
+			Else
+				ChannelVolume (Chn, 0)
+			EndIf
 		EndIf
-	Else
-		If Chn <> 0 Then
-			ChannelVolume (Chn, 0)
-		EndIf 
 	EndIf
 End Function
 ;--------------------------------------- random -------------------------------------------------------
@@ -11803,8 +11835,7 @@ End Function
 Function PlayAnnouncement(file$) ;This function streams the announcement currently playing
 	
 	If IntercomStreamCHN <> 0 Then
-		StopStream_Strict(IntercomStreamCHN)
-		IntercomStreamCHN = 0
+		StopStream_Strict(IntercomStreamCHN) : IntercomStreamCHN = 0
 	EndIf
 	
 	IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,0)
@@ -11835,20 +11866,19 @@ Function UpdateStreamSounds()
 	If (Not PlayerInReachableRoom()) Then
 		If PlayerRoom\RoomTemplate\Name <> "exit1" And PlayerRoom\RoomTemplate\Name <> "gatea" Then
 			If IntercomStreamCHN <> 0 Then
-				StopStream_Strict(IntercomStreamCHN)
-				IntercomStreamCHN = 0
+				StopStream_Strict(IntercomStreamCHN) : IntercomStreamCHN = 0
 			EndIf
 			If PlayerRoom\RoomTemplate\Name$ <> "dimension1499" Then
 				For e = Each Events
-					If e\SoundCHN<>0 And e\SoundCHN_isStream Then
-						StopStream_Strict(e\SoundCHN)
-						e\SoundCHN = 0
-						e\SoundCHN_isStream = 0
+					If e\SoundCHN<>0 Then
+						If e\SoundCHN_isStream Then
+							StopStream_Strict(e\SoundCHN) : e\SoundCHN = 0 : e\SoundCHN_isStream = False
+						EndIf
 					EndIf
-					If e\SoundCHN2<>0 And e\SoundCHN2_isStream Then
-						StopStream_Strict(e\SoundCHN2)
-						e\SoundCHN2 = 0
-						e\SoundCHN2_isStream = 0
+					If e\SoundCHN2<>0 Then
+						If e\SoundCHN2_isStream Then
+							StopStream_Strict(e\SoundCHN2) : e\SoundCHN2 = 0 : e\SoundCHN2_isStream = False
+						EndIf
 					EndIf
 				Next
 			EndIf
