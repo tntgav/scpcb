@@ -4077,7 +4077,7 @@ Function UpdateNPCs()
 					
 					If (WearingNightVision=0) Then
 						HideEntity n\obj
-						If dist<1 And n\Reload <= 0 And MsgTimer <= 0 Then
+						If dist<1 And n\Reload <= 0 Then
 							Select Rand(6)
 								Case 1
 									Msg="You feel something breathing right next to you."
@@ -4181,13 +4181,7 @@ Function UpdateNPCs()
 								If (WearingNightVision>0) Then GiveAchievement(Achv966)
 								
 								If (Not Wearing714) And (WearingGasMask<3) And (WearingHazmat<3) And dist<16 Then
-									BlinkEffect = Max(BlinkEffect, 1.5)
-									BlinkEffectTimer = 1000
-									
-									StaminaEffect = 2.0
-									StaminaEffectTimer = 1000
-									
-									If MsgTimer<=0 And StaminaEffect<1.5 Then
+									If StaminaEffect<1.5 Then
 										Select Rand(4)
 											Case 1
 												Msg = "You feel exhausted."
@@ -4201,6 +4195,12 @@ Function UpdateNPCs()
 										
 										MsgTimer = 7*70
 									EndIf
+									
+									BlinkEffect = Max(BlinkEffect, 1.5)
+									BlinkEffectTimer = 1000
+									
+									StaminaEffect = 2.0
+									StaminaEffectTimer = 1000
 								EndIf							
 							EndIf
 							
@@ -4223,7 +4223,7 @@ Function UpdateNPCs()
 							EndIf
 							
 							;If n\Frame>1393.0 And prevFrame<=1393.0 Or n\Frame>1589.0 And prevFrame<=1589.0 Or n\Frame>2000.0 And prevFrame<=2000.0 Then
-							If n\Frame>271.0 And prevFrame<=271.0 Or n\Frame>354 Or n\Frame>314.0 And prevFrame<=314.0 Or n\Frame>301.0 And prevFrame<=301.0
+							If (n\Frame>271.0 And prevFrame<=271.0) Or (n\Frame>314.0 And prevFrame<=314.0) Or (n\Frame>301.0 And prevFrame<=301.0)
 								PlaySound2(LoadTempSound("SFX\SCP\966\Idle"+Rand(1,3)+".ogg"), Camera, n\Collider)
 							EndIf
 							
@@ -4231,16 +4231,12 @@ Function UpdateNPCs()
 							RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),20.0),0.0
 						Case 5,6,8 ;walking or chasing
 							;If n\Frame<2343.0 Then
-							If n\Frame<580.0 And n\Frame>214.0 ;start walking
+							If n\Frame>213.0 And n\Frame<580.0 ;start walking
 								;AnimateNPC(n, 2319, 2343, 0.5, False)
 								AnimateNPC(n, 556, 580, 0.25, False)
 							Else
 								;AnimateNPC(n, 2343, 2391, n\CurrSpeed*25.0)
-								If n\CurrSpeed >= 0.005 Then
-									AnimateNPC(n, 580, 628, n\CurrSpeed*25.0)
-								Else
-									AnimateNPC(n, 2, 214, 0.25)
-								EndIf
+								AnimateNPC(n, 580, 628, n\CurrSpeed*25.0)
 								
 								;chasing the player
 								If n\State = 8 And dist<32 Then
@@ -4336,7 +4332,7 @@ Function UpdateNPCs()
 							EndIf
 							
 							;If n\Frame>2300.0 Then
-							If n\Frame>557.0
+							If n\Frame>556.0
 								;AnimateNPC(n, 2391, 2416, 1.0, False
 								AnimateNPC(n, 628, 652, 0.25, False)
 								;If n\Frame>2415.0 Then
@@ -4380,7 +4376,7 @@ Function UpdateNPCs()
 							
 							If dist<1.0 Then
 								;If n\Frame>2173.0 And prevFrame<=2173.0 Or n\Frame>2203.0 And prevFrame<=2203.0 Or n\Frame>2227.0 And prevFrame<=2227.0 Then
-								If n\Frame>470.0 And prevFrame<=470.0 Or n\Frame>500.0 And prevFrame<=500.0 Or n\Frame>527.0 And prevFrame<=527.0
+								If (n\Frame>470.0 And prevFrame<=470.0) Or (n\Frame>500.0 And prevFrame<=500.0) Or (n\Frame>527.0 And prevFrame<=527.0)
 									PlaySound2(LoadTempSound("SFX\General\Slash"+Rand(1,2)+".ogg"), Camera, n\Collider)
 									Injuries = Injuries + Rnd(0.5,1.0)								
 								EndIf	

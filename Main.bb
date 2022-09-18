@@ -3650,8 +3650,6 @@ Function QuickLoadEvents()
 						Local ch.Chunk
 						For i = -2 To 0 Step 2
 							ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#,True)
-						Next
-						For i = -2 To 0 Step 2
 							ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#-40,True)
 						Next
 						e\EventState = 2.0
@@ -4164,33 +4162,27 @@ Function MovePlayer()
 				If CurrStepSFX=0 Then
 					temp = GetStepSound(Collider)
 					
-					If Sprint = 1.0 Then
+					If Sprint = 2.5 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
 						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 7)))
-						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					Else
 						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
 						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 7)))
-						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					End If
 				ElseIf CurrStepSFX=1
 					tempchn% = PlaySound_Strict(Step2SFX(Rand(0, 2)))
-					ChannelVolume tempchn, (1.0-(Crouch*0.4))*SFXVolume#
 				ElseIf CurrStepSFX=2
 					tempchn% = PlaySound_Strict(Step2SFX(Rand(3,5)))
-					ChannelVolume tempchn, (1.0-(Crouch*0.4))*SFXVolume#
 				ElseIf CurrStepSFX=3
-					If Sprint = 1.0 Then
+					If Sprint = 2.5 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
 						tempchn% = PlaySound_Strict(StepSFX(0, 0, Rand(0, 7)))
-						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					Else
 						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
 						tempchn% = PlaySound_Strict(StepSFX(0, 1, Rand(0, 7)))
-						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					End If
 				EndIf
-				
+				If tempchn <> 0 Then ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 			EndIf	
 		EndIf
 	Else ;noclip on
@@ -6026,21 +6018,21 @@ Function DrawGUI()
 				Case "cup"
 					;[Block]
 					If CanUseItem(False,False,True)
-						SelectedItem\name = Trim(Lower(SelectedItem\name))
-						If Left(SelectedItem\name, Min(6,Len(SelectedItem\name))) = "cup of" Then
-							SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-7)
-						ElseIf Left(SelectedItem\name, Min(8,Len(SelectedItem\name))) = "a cup of" 
-							SelectedItem\name = Right(SelectedItem\name, Len(SelectedItem\name)-9)
+						strtemp = Trim(Lower(SelectedItem\name))
+						If Left(strtemp, 6) = "cup of" Then
+							strtemp = Right(strtemp, Len(strtemp)-7)
+						ElseIf Left(strtemp, 8) = "a cup of"
+							strtemp = Right(strtemp, Len(strtemp)-9)
 						EndIf
-						
-						;the state of refined items is more than 1.0 (fine setting increases it by 1, very fine doubles it)
-						x2 = (SelectedItem\state+1.0)
 						
 						Local iniStr$ = "DATA\SCP-294.ini"
 						
-						Local loc% = GetINISectionLocation(iniStr, SelectedItem\name)
+						Local loc% = GetINISectionLocation(iniStr, strtemp)
 						
 						;Stop
+						
+						strtemp = GetINIString2(iniStr, loc, "sound")
+						If strtemp <> "" Then PlaySound_Strict LoadTempSound(strtemp)
 						
 						strtemp = GetINIString2(iniStr, loc, "message")
 						If strtemp <> "" Then Msg = strtemp : MsgTimer = 70*6
@@ -6049,24 +6041,42 @@ Function DrawGUI()
 							DeathMSG = GetINIString2(iniStr, loc, "deathmessage")
 							If GetINIInt2(iniStr, loc, "lethal") Then Kill()
 						EndIf
-						BlurTimer = GetINIInt2(iniStr, loc, "blur")*70;*temp
-						If VomitTimer = 0 Then VomitTimer = GetINIInt2(iniStr, loc, "vomit")
-						CameraShakeTimer = GetINIString2(iniStr, loc, "camerashake")
-						Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"),0);*temp
-						Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"),0);*temp
-						strtemp =  GetINIString2(iniStr, loc, "sound")
-						If strtemp<>"" Then
-							PlaySound_Strict LoadTempSound(strtemp)
+						
+						BlurTimer = Max(BlurTimer + GetINIInt2(iniStr, loc, "blur")*70, 0);*temp
+						CameraShakeTimer = Max(CameraShakeTimer + GetINIString2(iniStr, loc, "camerashake"), 0)
+						
+						temp = GetINIInt2(iniStr, loc, "vomit")*70
+						If temp > 0 Then
+							If VomitTimer = 0 Then
+								VomitTimer = temp
+							Else
+								VomitTimer = Min(VomitTimer, temp)
+							EndIf
 						EndIf
+						
+						temp = GetINIInt2(iniStr, loc, "deathtimer")*70
+						If temp > 0 Then
+							If DeathTimer = 0 Then
+								DeathTimer = temp
+							Else
+								DeathTimer = Min(DeathTimer, temp)
+							EndIf
+						EndIf
+						
+						Injuries = Max(Injuries + GetINIInt2(iniStr, loc, "damage"), 0);*temp
+						Bloodloss = Max(Bloodloss + GetINIInt2(iniStr, loc, "blood loss"), 0);*temp
+						
 						If GetINIInt2(iniStr, loc, "stomachache") Then SCP1025state[3]=1
 						
-						DeathTimer=GetINIInt2(iniStr, loc, "deathtimer")*70
-						
-						BlinkEffect = Float(GetINIString2(iniStr, loc, "blink effect", 1.0))*x2
-						BlinkEffectTimer = Float(GetINIString2(iniStr, loc, "blink effect timer", 1.0))*x2
-						
-						StaminaEffect = Float(GetINIString2(iniStr, loc, "stamina effect", 1.0))*x2
-						StaminaEffectTimer = Float(GetINIString2(iniStr, loc, "stamina effect timer", 1.0))*x2
+						;the state of refined drinks is more than 1.0 (fine setting increases it by 1, very fine doubles it)
+						strtemp = GetINIString2(iniStr, loc, "blink effect")
+						If strtemp <> "" Then BlinkEffect = Float(strtemp)^SelectedItem\state
+						strtemp = GetINIString2(iniStr, loc, "blink effect timer")
+						If strtemp <> "" Then BlinkEffectTimer = Float(strtemp)*SelectedItem\state
+						strtemp = GetINIString2(iniStr, loc, "stamina effect")
+						If strtemp <> "" Then StaminaEffect = Float(strtemp)^SelectedItem\state
+						strtemp = GetINIString2(iniStr, loc, "stamina effect timer")
+						If strtemp <> "" Then StaminaEffectTimer = Float(strtemp)*SelectedItem\state
 						
 						strtemp = GetINIString2(iniStr, loc, "refusemessage")
 						If strtemp <> "" Then
@@ -7055,15 +7065,12 @@ Function DrawGUI()
 				Default
 					;[Block]
 					;check if the item is an inventory-type object
-					If SelectedItem\invSlots>0 Then
-						DoubleClick = 0
-						MouseHit1 = 0
-						MouseDown1 = 0
-						LastMouseHit1 = 0
-						OtherOpen = SelectedItem
-						SelectedItem = Null
-					EndIf
-					
+					DoubleClick = 0
+					MouseHit1 = 0
+					MouseDown1 = 0
+					LastMouseHit1 = 0
+					If SelectedItem\invSlots>0 Then OtherOpen = SelectedItem
+					SelectedItem = Null
 					;[End Block]
 			End Select
 			
@@ -8638,13 +8645,8 @@ Function InitLoadGame()
 			If e\EventState = 2
 				;[Block]
 				DrawLoading(91)
-				e\room\Objects[0] = CreatePlane()
-				Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
-				EntityTexture e\room\Objects[0],planetex%
-				FreeTexture planetex%
-				PositionEntity e\room\Objects[0],0,EntityY(e\room\obj),0
-				EntityType e\room\Objects[0],HIT_MAP
-				;EntityParent e\room\Objects[0],e\room\obj
+				e\room\Objects[0] = LoadMesh_Strict("GFX\map\dimension1499\1499plane.b3d")
+				HideEntity(e\room\Objects[0])
 				DrawLoading(92)
 				NTF_1499Sky = sky_CreateSky("GFX\map\sky\1499sky")
 				DrawLoading(93)
@@ -8659,7 +8661,8 @@ Function InitLoadGame()
 				z# = EntityZ(e\room\obj)
 				Local ch.Chunk
 				For i = -2 To 2 Step 2
-					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#)
+					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#,True)
+					ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#-40,True)
 				Next
 				DrawLoading(98)
 				UpdateChunks(e\room,15,False)
@@ -10018,25 +10021,17 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
 							d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 						Case "1:1"
-							it2 = CreateItem("cup", "cup", x,y,z)
+							it2 = CreateItem("cup", "cup", x,y,z, 255-item\r,255-item\g,255-item\b,item\a)
 							it2\name = item\name
-							it2\r = 255-item\r
-							it2\g = 255-item\g
-							it2\b = 255-item\b
+							it2\state = item\state
 						Case "fine"
-							it2 = CreateItem("cup", "cup", x,y,z)
+							it2 = CreateItem("cup", "cup", x,y,z, Min(item\r*Rnd(0.9,1.1),255),Min(item\g*Rnd(0.9,1.1),255),Min(item\b*Rnd(0.9,1.1),255),item\a)
 							it2\name = item\name
-							it2\state = 1.0
-							it2\r = Min(item\r*Rnd(0.9,1.1),255)
-							it2\g = Min(item\g*Rnd(0.9,1.1),255)
-							it2\b = Min(item\b*Rnd(0.9,1.1),255)
+							it2\state = item\state+1.0
 						Case "very fine"
-							it2 = CreateItem("cup", "cup", x,y,z)
+							it2 = CreateItem("cup", "cup", x,y,z, Min(item\r*Rnd(0.5,1.5),255),Min(item\g*Rnd(0.5,1.5),255),Min(item\b*Rnd(0.5,1.5),255),item\a)
 							it2\name = item\name
-							it2\state = Max(it2\state*2.0,2.0)	
-							it2\r = Min(item\r*Rnd(0.5,1.5),255)
-							it2\g = Min(item\g*Rnd(0.5,1.5),255)
-							it2\b = Min(item\b*Rnd(0.5,1.5),255)
+							it2\state = item\state*2
 							If Rand(5)=1 Then
 								ExplosionTimer = 135
 							EndIf
@@ -10091,7 +10086,7 @@ Function Use294()
 	temp = True
 	If PlayerRoom\SoundCHN<>0 Then temp = False
 	
-	AAText x+907, y+185, Input294, True,True
+	AAText x+905, y+185, Right(Input294,13), True,True
 	
 	If temp Then
 		If MouseHit1 Then
@@ -10185,8 +10180,6 @@ Function Use294()
 			EndIf
 			
 			Input294 = Input294 + strtemp
-			
-			Input294 = Left(Input294, Min(Len(Input294),15))
 			
 			If temp And Input294<>"" Then ;dispense
 				Input294 = Trim(Lower(Input294))
@@ -11060,12 +11053,13 @@ Function GetINISectionLocation%(file$, section$)
 		If Left(strtemp,1) = "[" Then
 			strtemp$ = Lower(strtemp)
 			Temp = Instr(strtemp, section)
-			If Temp>0 Then
-				If Mid(strtemp, Temp-1, 1)="[" Or Mid(strtemp, Temp-1, 1)="|" Then
+			While Temp>0
+				If (Mid(strtemp, Temp-1, 1)="[" Or Mid(strtemp, Temp-1, 1)="|") And (Mid(strtemp, Temp+Len(section), 1)="]" Or Mid(strtemp, Temp+Len(section), 1)="|") Then
 					CloseFile f
 					Return n
 				EndIf
-			EndIf
+				Temp = Instr(strtemp, section, Temp+Len(section)+1)
+			Wend
 		EndIf
 	Wend
 	
