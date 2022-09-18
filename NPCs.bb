@@ -220,6 +220,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;[End Block]
 		Case NPCtype372
 			;[Block]
+			n\NVName = "SCP-372"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\372.b3d")
@@ -3003,16 +3004,18 @@ Function UpdateNPCs()
 							n\Idle = False
 							n\State = Rand(20, 60)
 							
-							If Rand(300)=1 Then PlaySound2(RustleSFX(Rand(0,2)),Camera, n\obj, 8, Rnd(0.0,0.2))
+							If Rand(300)=1 Then PlaySound2(RustleSFX(Rand(0,2)),Camera, n\Collider, 8, Rnd(0.0,0.2))
 						End If
-					Else
+					EndIf
+					
+					If (Not n\Idle) Then
 						PositionEntity(n\obj, EntityX(n\Collider) + Rnd(-0.005, 0.005), EntityY(n\Collider)+0.3+0.1*Sin(MilliSecs2()/2), EntityZ(n\Collider) + Rnd(-0.005, 0.005))
 						RotateEntity n\obj, 0, EntityYaw(n\Collider), ((MilliSecs2()/5) Mod 360)
 						
 						AnimateNPC(n, 32, 113, 0.4)
 						;Animate2(n\obj, AnimTime(n\obj), 32, 113, 0.4)
 						
-						If EntityInView(n\obj, Camera) Then
+						If EntityInView(n\obj, Camera) And (BlinkTimer < - 16 Or BlinkTimer > - 6) Then
 							GiveAchievement(Achv372)
 							
 							If Rand(30)=1 Then 
@@ -3040,7 +3043,10 @@ Function UpdateNPCs()
 							n\State = n\State-FPSfactor
 						EndIf
 						n\State=n\State-(FPSfactor/80.0)
-						If n\State <= 0 Then n\Idle = True	
+						If n\State <= 0 Then
+							n\Idle = True
+							PositionEntity(n\Collider, 0, 500, 0)
+						EndIf	
 					End If
 					
 				EndIf
