@@ -59,7 +59,7 @@ difficulties(KETER)\g = 0
 difficulties(KETER)\b = 0
 
 difficulties(CUSTOM) = New Difficulty
-difficulties(CUSTOM)\name = "Custom"
+difficulties(CUSTOM)\name = "Esoteric"
 difficulties(CUSTOM)\permaDeath = False
 difficulties(CUSTOM)\aggressiveNPCs = True
 difficulties(CUSTOM)\saveType = SAVEANYWHERE
