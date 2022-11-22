@@ -59,7 +59,7 @@ difficulties(KETER)\g = 0
 difficulties(KETER)\b = 0
 
 difficulties(CUSTOM) = New Difficulty
-difficulties(CUSTOM)\name = "Custom"
+difficulties(CUSTOM)\name = "Esoteric"
 difficulties(CUSTOM)\permaDeath = False
 difficulties(CUSTOM)\aggressiveNPCs = True
 difficulties(CUSTOM)\saveType = SAVEANYWHERE
@@ -69,7 +69,7 @@ difficulties(CUSTOM)\r = 255
 difficulties(CUSTOM)\g = 255
 difficulties(CUSTOM)\b = 255
 
-SelectedDifficulty = difficulties(SAFE)
+SelectedDifficulty = difficulties(EUCLID)
 ;~IDEal Editor Parameters:
 ;~F#0
 ;~C#Blitz3D
