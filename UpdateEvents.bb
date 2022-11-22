@@ -1536,12 +1536,8 @@ Function UpdateEvents()
 				
 				e\EventState = e\room\RoomDoors[0]\open
 				
-				If ChannelPlaying(e\SoundCHN)
-					UpdateSoundOrigin(e\SoundCHN,Camera,e\room\RoomDoors[0]\obj)
-				EndIf
-				If ChannelPlaying(e\SoundCHN2)
-					UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[1]\obj)
-				EndIf
+				UpdateSoundOrigin(e\SoundCHN,Camera,e\room\RoomDoors[0]\obj)
+				UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[1]\obj)
 				;[End Block]
 			Case "coffin", "coffin106"
 				;[Block]
@@ -4393,8 +4389,9 @@ Function UpdateEvents()
 							ScaleSprite(de\obj, de\Size,de\Size)
 							
 							Curr096\State=5
-							StopStream_Strict(Curr096\SoundChn)
-							Curr096\SoundChn=0
+							If Curr096\SoundChn <> 0 Then
+								StopStream_Strict(Curr096\SoundChn) : Curr096\SoundChn=0 : Curr096\SoundChn_isStream = False
+							EndIf
 							
 							RemoveNPC(e\room\NPC[0])
 							e\room\NPC[0]=Null
@@ -4992,9 +4989,7 @@ Function UpdateEvents()
 									e\room\NPC[2]\IgnorePlayer = True
 							End Select
 							
-							If ChannelPlaying(e\SoundCHN2)
-								UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[4]\obj,400)
-							EndIf
+							UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\RoomDoors[4]\obj,400)
 							
 							PlayerFallingPickDistance = 0.0
 							
@@ -5929,28 +5924,33 @@ Function UpdateEvents()
 								;e\Sound = LoadSound_Strict("SFX\SCP\079\Speech.ogg")
 								;LoadEventSound(e,"SFX\SCP\079\Speech.ogg")
 								;e\SoundCHN = PlaySound_Strict (e\Sound)
+								If e\SoundCHN<>0
+									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0 : e\SoundCHN_isStream = False
+								EndIf
 								e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Speech.ogg",SFXVolume,0)
 								e\SoundCHN_isStream = True
 							EndIf							
 						;ElseIf e\EventState = 3
-						ElseIf e\EventState < 2000 Then ;3500
+						ElseIf e\EventState < 6000 Then ;3500
 							;If ChannelPlaying(e\SoundCHN) Then
-							If IsStreamPlaying_Strict(e\SoundCHN)
-								If Rand(3) = 1 Then
-									EntityTexture(e\room\Objects[1], OldAiPics(0))
+							If e\SoundCHN <> 0 Then
+								If IsStreamPlaying_Strict(e\SoundCHN)
+									If Rand(3) = 1 Then
+										EntityTexture(e\room\Objects[1], OldAiPics(0))
+										ShowEntity (e\room\Objects[1])
+									ElseIf Rand(10) = 1 
+										HideEntity (e\room\Objects[1])							
+									EndIf							
+								Else
+									;If e\Sound <> 0 Then FreeSound_Strict e\Sound : e\Sound = 0
+									If e\SoundCHN<>0
+										StopStream_Strict(e\SoundCHN) : e\SoundCHN=0 : e\SoundCHN_isStream = False
+									EndIf
+									EntityTexture(e\room\Objects[1], OldAiPics(1))
 									ShowEntity (e\room\Objects[1])
-								ElseIf Rand(10) = 1 
-									HideEntity (e\room\Objects[1])							
-								EndIf							
-							Else
-								;If e\Sound <> 0 Then FreeSound_Strict e\Sound : e\Sound = 0
-								If e\SoundCHN<>0
-									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
 								EndIf
-								EntityTexture(e\room\Objects[1], OldAiPics(1))
-								ShowEntity (e\room\Objects[1])
-								e\EventState = e\EventState + FPSfactor
 							EndIf
+							e\EventState = e\EventState + FPSfactor
 						Else
 							If EntityDistance(e\room\Objects[0], Collider)<2.5 Then 
 								e\EventState = 10001
@@ -5958,9 +5958,10 @@ Function UpdateEvents()
 								;LoadEventSound(e,"SFX\SCP\079\Refuse.ogg")
 								;e\SoundCHN = PlaySound_Strict (e\Sound)
 								If e\SoundCHN<>0
-									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
+									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0 : e\SoundCHN_isStream = False
 								EndIf
 								e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Refuse.ogg",SFXVolume,0)
+								e\SoundCHN_isStream = True
 								;EntityTexture(e\room\Objects[1], OldAiPics(1))
 								;ShowEntity (e\room\Objects[1])
 							EndIf
@@ -5968,7 +5969,9 @@ Function UpdateEvents()
 					Else
 						If e\SoundCHN<>0
 							If (Not IsStreamPlaying_Strict(e\SoundCHN))
-								e\SoundCHN = 0
+								If e\SoundCHN<>0
+									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0 : e\SoundCHN_isStream = False
+								EndIf
 								EntityTexture(e\room\Objects[1], OldAiPics(1))
 								ShowEntity (e\room\Objects[1])
 							Else
@@ -5990,7 +5993,7 @@ Function UpdateEvents()
 						;LoadEventSound(e,"SFX\SCP\079\GateB.ogg")
 						;e\SoundCHN = PlaySound_Strict (e\Sound)
 						If e\SoundCHN<>0
-							StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
+							StopStream_Strict(e\SoundCHN) : e\SoundCHN=0 : e\SoundCHN_isStream = False
 						EndIf
 						e\SoundCHN = StreamSound_Strict("SFX\SCP\079\GateB.ogg",SFXVolume,0)
 						e\SoundCHN_isStream = True
@@ -7741,9 +7744,8 @@ Function UpdateEvents()
 							If (Not ChannelPlaying(e\SoundCHN))
 								e\EventState = 2.0
 								e\room\RoomDoors[0]\locked = False
-							Else
-								UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[0],100,1.0)
 							EndIf
+							UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[0],100,1.0)
 						EndIf
 					Else
 						DebugLog "Removed 'room2scps2' event"
@@ -8098,13 +8100,9 @@ Function UpdateEvents()
 					EndIf
 					
 					If brokendoor
-						If ChannelPlaying(e\SoundCHN2)
-							UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\Objects[1],5)
-						EndIf
+						UpdateSoundOrigin(e\SoundCHN2,Camera,e\room\Objects[1],5)
 					EndIf
-					If ChannelPlaying(e\SoundCHN)
-						UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[0],5)
-					EndIf
+					UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[0],5)
 				Else
 					e\EventState3 = 0.0
 				EndIf
@@ -8620,10 +8618,10 @@ Function UpdateEvents()
 				EndIf
 				If e\EventState = 2.0
 					If e\SoundCHN<>0 Then
-						StopStream_Strict(e\SoundCHN)
-						StopChannel(e\SoundCHN2)
-						e\SoundCHN = 0
-						e\SoundCHN2 = 0
+						StopStream_Strict(e\SoundCHN) : e\SoundCHN = 0 : e\SoundCHN_isStream = False
+					EndIf
+					If e\SoundCHN2<>0 Then
+						StopChannel(e\SoundCHN2) : e\SoundCHN2 = 0
 					EndIf
 					HideEntity NTF_1499Sky
 					HideChunks()
@@ -9105,10 +9103,10 @@ Function UpdateDimension1499()
 						Else
 							ShouldPlay = 19
 							If e\SoundCHN<>0 Then
-								StopStream_Strict(e\SoundCHN)
-								StopChannel(e\SoundCHN2)
-								e\SoundCHN = 0
-								e\SoundCHN2 = 0
+								StopStream_Strict(e\SoundCHN) : e\SoundCHN = 0 : e\SoundCHN_isStream = False
+							EndIf
+							If e\SoundCHN2<>0 Then
+								StopChannel(e\SoundCHN2) : e\SoundCHN2 = 0
 							EndIf
 							If e\Sound2 <> 0 Then
 								FreeSound_Strict e\Sound2
@@ -9134,10 +9132,10 @@ Function UpdateDimension1499()
 			Else
 				If e\EventState = 2.0
 					If e\SoundCHN<>0 Then
-						StopStream_Strict(e\SoundCHN)
-						StopChannel(e\SoundCHN2)
-						e\SoundCHN = 0
-						e\SoundCHN2 = 0
+						StopStream_Strict(e\SoundCHN) : e\SoundCHN = 0 : e\SoundCHN_isStream = False
+					EndIf
+					If e\SoundCHN2<>0 Then
+						StopChannel(e\SoundCHN2) : e\SoundCHN2 = 0
 					EndIf
 					HideEntity NTF_1499Sky
 					HideChunks()
@@ -9351,8 +9349,12 @@ Function UpdateEndings()
 									If SelectedEnding = "" Then
 									    ShouldPlay = 66
 										
-										StopStream_Strict(e\SoundCHN)
-										StopStream_Strict(e\SoundCHN2)
+										If e\SoundCHN <> 0 Then
+											StopStream_Strict(e\SoundCHN) : e\SoundCHN = 0 : e\SoundCHN_isStream = False
+										EndIf
+										If e\SoundCHN2 <> 0 Then
+											StopStream_Strict(e\SoundCHN2) : e\SoundCHN2 = 0 : e\SoundCHN2_isStream = False
+										EndIf
 										
 										temp = True
 										For e2.Events = Each Events

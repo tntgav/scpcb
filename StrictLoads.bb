@@ -276,25 +276,27 @@ Function SetStreamPan_Strict(streamHandle%,pan#)
 End Function
 
 Function UpdateStreamSoundOrigin(streamHandle%,cam%,entity%,range#=10,volume#=1.0)
-	;Local st.Stream = Object.Stream(streamHandle)
-	range# = Max(range,1.0)
-	
-	If volume>0 Then
-		
-		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 - dist# > 0 And 1 - dist# < 1 Then
+	If streamHandle <> 0 Then
+		If IsStreamPlaying_Strict(streamHandle) Then
+			;Local st.Stream = Object.Stream(streamHandle)
+			range# = Max(range,1.0)
 			
-			Local panvalue# = Sin(-DeltaYaw(cam,entity))
-			
-			SetStreamVolume_Strict(streamHandle,volume#*(1-dist#)*SFXVolume#)
-			SetStreamPan_Strict(streamHandle,panvalue)
-		Else
-			SetStreamVolume_Strict(streamHandle,0.0)
+			If volume>0 Then
+				
+				Local dist# = EntityDistance(cam, entity) / range#
+				If 1 - dist# > 0 And 1 - dist# < 1 Then
+					
+					Local panvalue# = Sin(-DeltaYaw(cam,entity))
+					
+					SetStreamVolume_Strict(streamHandle,volume#*(1-dist#)*SFXVolume#)
+					SetStreamPan_Strict(streamHandle,panvalue)
+				Else
+					SetStreamVolume_Strict(streamHandle,0.0)
+				EndIf
+			Else
+				SetStreamVolume_Strict(streamHandle,0.0)
+			EndIf
 		EndIf
-	Else
-		If streamHandle <> 0 Then
-			SetStreamVolume_Strict(streamHandle,0.0)
-		EndIf 
 	EndIf
 End Function
 
