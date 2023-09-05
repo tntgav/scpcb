@@ -725,6 +725,13 @@ Function UpdateNPCs()
 							EndIf
 							
 							If NoTarget Then move = True
+
+							If move=False Then
+								;being watched. play the sound "Concrete1.ogg" in SFX/SCP/173
+								;there is no function for the concrete sound so we've gotta load it and play it manually
+								WatchedSFX() = LoadSound_Strict("SFX\SCP\173\Concrete1.ogg")
+								PlaySound2(WatchedSFX(), Camera, n\obj)
+							EndIf
 							
 							;player is looking at it -> doesn't move
 							If move=False Then
