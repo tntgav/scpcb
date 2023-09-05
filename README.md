@@ -10,3 +10,5 @@ Requirements:
 •	Blitz3D v1.108
 
 Beware - the source code is perhaps more horrifying than the game itself!
+
+😈😈😈 devilish mod. i control the rules now 😈😈😈
