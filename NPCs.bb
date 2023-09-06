@@ -726,12 +726,12 @@ Function UpdateNPCs()
 							
 							If NoTarget Then move = True
 
-							If move=False Then
-								;being watched. play the sound "Concrete1.ogg" in SFX/SCP/173
-								;there is no function for the concrete sound so we've gotta load it and play it manually
-								WatchedSFX() = LoadSound_Strict("SFX\SCP\173\Concrete1.ogg")
-								PlaySound2(WatchedSFX(), Camera, n\obj)
-							EndIf
+							; If move=False Then
+							; 	;being watched. play the sound "Concrete1.ogg" in SFX/SCP/173
+							; 	;there is no function for the concrete sound so we've gotta load it and play it manually
+								
+							; 	PlaySound2(LoadSound_Strict("SFX\SCP\173\Concrete1.ogg"), Camera, n\obj)
+							; EndIf
 							
 							;player is looking at it -> doesn't move
 							If move=False Then
@@ -796,13 +796,18 @@ Function UpdateNPCs()
 									n\State = CurveValue(SoundVol, n\State, 3)
 									
 									;try to open doors
-									If Rand(20) = 1 Then
+									; define TMP_DST = 1.5
+									TMP_DST = 10.0
+									If True Then
 										For d.Doors = Each Doors
-											If (Not d\locked) And d\open = False And d\Code = "" And d\KeyCard=0 Then
+											If (Not d\locked) And d\open = False And d\Code = "" And d\KeyCard<3 Then ;someone taped a level 2 keycard to 173's hand, or something like that
+											; If (Not d\locked) And d\open = False And d\Code = "" Then
 												For i% = 0 To 1
 													If d\buttons[i] <> 0 Then
-														If Abs(EntityX(n\Collider) - EntityX(d\buttons[i])) < 0.5 Then
-															If Abs(EntityZ(n\Collider) - EntityZ(d\buttons[i])) < 0.5 Then
+														If Abs(EntityX(n\Collider) - EntityX(d\buttons[i])) < TMP_DST Then
+														; If True Then
+															If Abs(EntityZ(n\Collider) - EntityZ(d\buttons[i])) < TMP_DST Then
+															; If True Then
 																If (d\openstate >= 180 Or d\openstate <= 0) Then
 																	pvt = CreatePivot()
 																	PositionEntity pvt, EntityX(n\Collider), EntityY(n\Collider) + 0.5, EntityZ(n\Collider)
@@ -811,6 +816,7 @@ Function UpdateNPCs()
 																	
 																	If EntityPick(pvt, 0.5) = d\buttons[i] Then 
 																		PlaySound_Strict (LoadTempSound("SFX\Door\DoorOpen173.ogg"))
+																		DebugLog "cuh open dat sshi"
 																		UseDoor(d,False)
 																	EndIf
 																	
@@ -846,17 +852,33 @@ Function UpdateNPCs()
 														DeathMSG = Chr(34)+"If I'm not mistaken, one of the main purposes of these rooms was to stop SCP-173 from moving further in the event of a containment breach. "
 														DeathMSG = DeathMSG + "So, who's brilliant idea was it to put A GODDAMN MAN-SIZED VENTILATION DUCT in there?"+Chr(34)
 													Default 
-														DeathMSG = "Subject D-9341. Cause of death: Fatal cervical fracture. Assumed to be attacked by SCP-173."
+														DeathMSG = "Subject D-9341. Captured after containment breach. Studying for possible immortality or similar abilities."
 												End Select
 												
 												If (Not GodMode) Then n\Idle = True
 												PlaySound_Strict(NeckSnapSFX(Rand(0,2)))
-												If Rand(2) = 1 Then 
-													TurnEntity(Camera, 0, Rand(80,100), 0)
+												
+
+												if Rand(3) = 1 Then
+
+													Msg = "You feel dead, but you can't finish now. You have work to do."
+													MsgTimer = 70 * 7
+													GodMode = True
+													n\Idle = False ; if i didnt do this, most things would stop after fake death
+													; wait 5 seconds, giving the player a chance to escape
+													
+
 												Else
-													TurnEntity(Camera, 0, Rand(-100,-80), 0)
+
+													Kill()
+
+													If Rand(2) = 1 Then 
+														TurnEntity(Camera, 0, Rand(80,100), 0)
+													Else
+														TurnEntity(Camera, 0, Rand(-100,-80), 0)
+													EndIf
+
 												EndIf
-												Kill()
 												
 											EndIf
 										Else

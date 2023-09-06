@@ -321,11 +321,14 @@ Function UpdateMainMenu()
 				
 				;Local modeName$, modeDescription$, selectedDescription$
 				AAText (x + 20 * MenuScale, y + 150 * MenuScale, "Difficulty:")				
-				For i = SAFE To CUSTOM
-					If DrawTick(x + 20 * MenuScale, y + (180+30*i) * MenuScale, (SelectedDifficulty = difficulties(i))) Then SelectedDifficulty = difficulties(i)
-					Color(difficulties(i)\r,difficulties(i)\g,difficulties(i)\b)
-					AAText(x + 60 * MenuScale, y + (180+30*i) * MenuScale, difficulties(i)\name)
-				Next
+				
+				If DrawTick(x + 20 * MenuScale, y + (180+30*SAFE) * MenuScale, (SelectedDifficulty = difficulties(SAFE))) Then SelectedDifficulty = difficulties(SAFE)
+				Color(difficulties(SAFE)\r,difficulties(SAFE)\g,difficulties(SAFE)\b)
+				AAText(x + 60 * MenuScale, y + (180+30*SAFE) * MenuScale, difficulties(SAFE)\name)
+				
+
+				; please describe the abovee for loop's purpose
+				; the above for loop is used to draw the difficulty selection buttons
 				
 				Color(255, 255, 255)
 				DrawFrame(x + 150 * MenuScale,y + 155 * MenuScale, 410*MenuScale, 150*MenuScale)

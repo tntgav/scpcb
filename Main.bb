@@ -2296,7 +2296,12 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 						Return
 					Else
 						PlaySound_Strict KeyCardSFX1
-						Msg = "The keycard was inserted into the slot."
+						; Msg = "The keycard was inserted into the slot."
+						if Rand(5) = 1 Then
+							Msg = "The keycard was inserted into the slot, You aren't in control."
+						Else
+							Msg = "The keycard was inserted into the slot."
+						EndIf
 						MsgTimer = 70 * 7	
 					EndIf
 				EndIf
@@ -2307,7 +2312,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 					If d\locked Then
 						Msg = "The keycard was inserted into the slot but nothing happened."
 					Else
-						Msg = "A keycard with security clearance "+d\KeyCard+" or higher is required to operate this door."
+						Msg = "F̪̜͎̯ͧ͂̌̓Ǎ̷̩̤̳̪̘̞ͪ͛Ȉ͙̬͉͊̇̏̅ͮ̎͠L̯͎̜.ͮ͂̂́͐̓́"
 					EndIf
 					MsgTimer = 70 * 7					
 				EndIf
@@ -2323,7 +2328,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 		If temp <> 0 Then
 			PlaySound_Strict ScannerSFX1
 			If (Instr(Msg,"You placed your")=0) Or (MsgTimer < 70*3) Then
-				Msg = "You place the palm of the hand onto the scanner. The scanner reads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
+				Msg = "You place the palm of the hand onto the scanner. The scanner Thenreads: "+Chr(34)+"DNA verified. Access granted."+Chr(34)
 			EndIf
 			MsgTimer = 70 * 10
 		Else
@@ -3058,11 +3063,14 @@ Repeat
 					;Randomizes the frequency of blinking. Scales with difficulty.
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							BLINKFREQ = Rnd(490,700)
+							; BLINKFREQ = Rnd(490,700)
+							BLINKFREQ = 1
 						Case NORMAL
-							BLINKFREQ = Rnd(455,665)
+							; BLINKFREQ = Rnd(455,665)
+							BLINKFREQ = 1 ; nil. not used due to only difficulty being hard same with easy
 						Case HARD
-							BLINKFREQ = Rnd(420,630)
+							; BLINKFREQ = Rnd(420,630)
+							BLINKFREQ = 800
 					End Select 
 					BlinkTimer = BLINKFREQ
 				EndIf

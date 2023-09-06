@@ -30,9 +30,9 @@ difficulties(SAFE)\permaDeath = False
 difficulties(SAFE)\aggressiveNPCs = False
 difficulties(SAFE)\saveType = SAVEANYWHERE
 difficulties(SAFE)\otherFactors = HARD
-difficulties(SAFE)\r = 120
-difficulties(SAFE)\g = 150
-difficulties(SAFE)\b = 50
+difficulties(SAFE)\r = 255
+difficulties(SAFE)\g = 0
+difficulties(SAFE)\b = 0
 
 SelectedDifficulty = difficulties(SAFE)
 ;~IDEal Editor Parameters:

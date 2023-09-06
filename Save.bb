@@ -9,6 +9,8 @@ Function SaveGame(file$)
 	If KillTimer < 0 Then Return
 	
 	GameSaved = True
+
+	
 	
 	Local x%, y%, i%, temp%
 	Local n.NPCs, r.Rooms, do.Doors
